@@ -1571,11 +1571,19 @@ const Generatori = {
   saveGeneratedNPC: () => {
     const npc = Generatori._lastGeneratedNPC;
     if (!npc) return;
+    // Ricarica campagna fresca
+    App.reloadActiveCampaign();
     const camp = App.getActiveCampaign();
+    Debug.log(`saveGeneratedNPC: camp=${camp?.name}, id=${camp?.id}`);
     if (!camp) { Toast.show('Seleziona una campagna prima', 'warning'); return; }
-    const npcs = [...(camp.npcs || [])];
+    // Leggi direttamente dal localStorage
+    const campFresh = Storage.getCampaign(camp.id);
+    const npcs = [...(campFresh?.npcs || [])];
     npcs.push({ id: 'npc_' + Date.now(), ...npc });
-    App.saveActiveCampaign({ npcs });
+    const result = Storage.updateCampaign(camp.id, { npcs });
+    Debug.log(`saveGeneratedNPC: result=${result ? 'ok' : 'FALLITO'}, npcs=${npcs.length}`);
+    if (!result) { Toast.show('Errore salvataggio', 'error'); return; }
+    App.reloadActiveCampaign();
     Toast.show(`${npc.name} salvato nel Mondo!`, 'success');
     document.getElementById('gen-npc-save-btn').style.display = 'none';
     document.getElementById('gen-npc-edit-btn').style.display = 'none';
