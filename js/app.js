@@ -55,15 +55,13 @@ const App = (() => {
 
     // Hook pagina specifica
     switch (pageId) {
-      case 'home':      renderHomePage(); break;
-      case 'campagna':  renderCampaignPage(); break;
-      case 'mondo':     if (window.NPC) NPC.init(); if (window.Luoghi) Luoghi.init(); if (window.Fazioni) Fazioni.init(); break;
-      case 'sessione':  if (window.Sessione) Sessione.init(); break;
-      case 'compendio': if (window.Compendio) Compendio.init(); break;
-      case 'sessione':  if (window.Sessione) Sessione.init(); break;
-      case 'generatori': if (window.Generatori) Generatori.init(); break;
-      case 'compendio': if (window.Compendio) Compendio.init(); break;
-      case 'schermo':   if (window.Schermo) Schermo.init(); break;
+      case 'home':       renderHomePage(); break;
+      case 'campagna':   renderCampaignPage(); break;
+      case 'mondo':      if (window.NPC) NPC.init(); if (window.Luoghi) Luoghi.init(); if (window.Fazioni) Fazioni.init(); break;
+      case 'sessione':   if (window.Sessione) Sessione.init(); break;
+      case 'generatori': break; // generatori sono inline, no init separato
+      case 'compendio':  if (window.Compendio) Compendio.init(); break;
+      case 'schermo':    if (window.Schermo) Schermo.init(); break;
     }
   };
 
