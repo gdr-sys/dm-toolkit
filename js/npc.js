@@ -481,6 +481,8 @@ const NPC = (() => {
   const filter = () => render();
 
   const init = () => {
+    // Assicura che la campagna in memoria sia aggiornata
+    App.reloadActiveCampaign();
     populateFactionSelect();
     render();
     Debug.log('NPC.init()');
