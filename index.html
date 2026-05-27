@@ -327,7 +327,8 @@
 
       </div>
 
-      <div class="grid-3" style="gap:var(--space-md);">
+      <!-- Riga 2: 4 card uguali in grid-4 -->
+      <div class="grid-4" style="gap:var(--space-md);">
         <div class="card">
           <div class="card-header">
             <h3 class="card-title">🌤️ Meteo</h3>
@@ -355,29 +356,30 @@
             <div class="text-muted text-sm">Seleziona l'ambiente e genera</div>
           </div>
         </div>
-
         <div class="card">
           <div class="card-header">
             <h3 class="card-title">💬 Voci di Corridoio</h3>
             <button class="btn btn-secondary btn-sm" onclick="Generatori.rollRumors()">🎲 Genera</button>
           </div>
           <div id="gen-rumors-result">
-            <div class="text-muted text-sm">Genera 3 voci per la taverna (2 vere, 1 falsa)</div>
+            <div class="text-muted text-sm">Genera 3 voci (2 vere, 1 falsa)</div>
           </div>
         </div>
-
         <div class="card">
           <div class="card-header">
             <h3 class="card-title">🎭 Voce & Accento</h3>
             <button class="btn btn-secondary btn-sm" onclick="Generatori.rollAccent()">🎲 Genera</button>
           </div>
           <div id="gen-accent-result">
-            <div class="text-muted text-sm">Genera suggerimenti per interpretare un PNG</div>
+            <div class="text-muted text-sm">Genera suggerimenti per un PNG</div>
           </div>
         </div>
       </div>
 
-      <div style="margin-top:var(--space-md);" class="grid-3">
+      <!-- Riga 3: Tesoro + Shop + Viaggio -->
+      <div class="grid-3" style="gap:var(--space-md);margin-top:var(--space-md);">
+
+        <!-- Tesoro per CR -->
         <div class="card">
           <div class="card-header">
             <h3 class="card-title">💰 Tesoro per CR</h3>
@@ -399,21 +401,88 @@
           <div id="gen-treasure-result" style="margin-top:var(--space-sm);"></div>
         </div>
 
+        <!-- Shop Generator -->
         <div class="card">
-          <div class="module-placeholder" style="min-height:auto;padding:var(--space-lg);border:none;">
-            <div class="module-placeholder-icon" style="font-size:2rem;">🏪</div>
-            <h4 style="font-size:0.9rem;">Shop Generator</h4>
-            <p class="text-muted text-xs">In arrivo</p>
+          <div class="card-header">
+            <h3 class="card-title">🏪 Shop Generator</h3>
+            <button class="btn btn-secondary btn-sm" onclick="Generatori.rollShop()">🎲 Genera</button>
+          </div>
+          <div class="form-row" style="margin-bottom:var(--space-sm);">
+            <div class="form-group" style="margin-bottom:0;">
+              <label class="form-label">Tipo negozio</label>
+              <select id="gen-shop-tipo" class="form-select">
+                <option value="armaiolo_base">Armaiolo (base)</option>
+                <option value="armaiolo_lusso">Armaiolo (lusso)</option>
+                <option value="speziale">Speziale / Erborista</option>
+                <option value="generale">Negozio Generico</option>
+                <option value="magia">Emporio Arcano</option>
+                <option value="bazar">Bazar Strambo</option>
+                <option value="taverna_shop">Taverna (extra)</option>
+              </select>
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label class="form-label">Atteggiamento party</label>
+              <select id="gen-shop-att" class="form-select">
+                <option value="ostile">Ostile (–20%)</option>
+                <option value="diffidente">Diffidente (–10%)</option>
+                <option value="neutrale" selected>Neutrale</option>
+                <option value="cordiale">Cordiale (+10%)</option>
+                <option value="amico">Amico (+20%)</option>
+              </select>
+            </div>
+          </div>
+          <div id="gen-shop-result" style="max-height:220px;overflow-y:auto;">
+            <div class="text-muted text-sm">Seleziona il tipo e genera l'inventario</div>
           </div>
         </div>
 
+        <!-- Calcolatore Viaggio -->
         <div class="card">
-          <div class="module-placeholder" style="min-height:auto;padding:var(--space-lg);border:none;">
-            <div class="module-placeholder-icon" style="font-size:2rem;">🧭</div>
-            <h4 style="font-size:0.9rem;">Calcolatore Viaggio</h4>
-            <p class="text-muted text-xs">In arrivo</p>
+          <div class="card-header">
+            <h3 class="card-title">🧭 Calcolatore Viaggio</h3>
+            <button class="btn btn-secondary btn-sm" onclick="Generatori.calcViaggio()">Calcola</button>
           </div>
+          <div class="form-row" style="margin-bottom:var(--space-xs);">
+            <div class="form-group" style="margin-bottom:0;">
+              <label class="form-label">Terreno</label>
+              <select id="gen-viaggio-terreno" class="form-select">
+                <option value="strada">Strada</option>
+                <option value="pianura">Pianura</option>
+                <option value="foresta">Foresta</option>
+                <option value="colline">Colline</option>
+                <option value="montagna">Montagna</option>
+                <option value="palude">Palude</option>
+                <option value="deserto">Deserto</option>
+                <option value="mare">Mare / Fiume</option>
+              </select>
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label class="form-label">Ritmo</label>
+              <select id="gen-viaggio-ritmo" class="form-select">
+                <option value="lento">Lento (–Perc, no incontri)</option>
+                <option value="normale" selected>Normale</option>
+                <option value="veloce">Veloce (+incontri, –Perc)</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row" style="margin-bottom:var(--space-xs);">
+            <div class="form-group" style="margin-bottom:0;">
+              <label class="form-label">Mezzo</label>
+              <select id="gen-viaggio-mezzo" class="form-select">
+                <option value="piedi">A piedi</option>
+                <option value="cavallo">Cavallo</option>
+                <option value="barca">Barca</option>
+                <option value="nave">Nave</option>
+              </select>
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label class="form-label">Giorni di viaggio</label>
+              <input type="number" id="gen-viaggio-giorni" class="form-input" min="1" max="365" value="1" placeholder="1">
+            </div>
+          </div>
+          <div id="gen-viaggio-result" style="margin-top:var(--space-sm);"></div>
         </div>
+
       </div>
     </section>
 
@@ -1631,7 +1700,175 @@ const Generatori = {
     `;
     Debug.log(`Tesoro CR${cr}: ${rolls.map(r=>r.replace(/<[^>]+>/g,'')).join(', ')}`);
   },
-};
+
+  rollShop: () => {
+    const tipo = document.getElementById('gen-shop-tipo')?.value || 'generale';
+    const att  = document.getElementById('gen-shop-att')?.value  || 'neutrale';
+    const el   = document.getElementById('gen-shop-result');
+    if (!el) return;
+
+    // Moltiplicatore prezzo per atteggiamento
+    const attMult = { ostile: 1.2, diffidente: 1.1, neutrale: 1.0, cordiale: 0.9, amico: 0.8 };
+    const mult = attMult[att] || 1.0;
+    const sconto = mult < 1 ? `🟢 ${Math.round((1-mult)*100)}% sconto` : mult > 1 ? `🔴 +${Math.round((mult-1)*100)}% rincaro` : '';
+
+    // Cataloghi per tipo negozio
+    const cataloghi = {
+      armaiolo_base: [
+        { n: 'Spada corta',       p: 10,  u: 'mo' }, { n: 'Ascia da mano',    p: 5,  u: 'mo' },
+        { n: 'Pugnale',           p: 2,   u: 'mo' }, { n: 'Lancia',           p: 1,  u: 'mo' },
+        { n: 'Scudo',             p: 10,  u: 'mo' }, { n: 'Cotta di maglia',  p: 75, u: 'mo' },
+        { n: 'Cuoio',             p: 10,  u: 'mo' }, { n: 'Frecce (20)',       p: 1,  u: 'mo' },
+        { n: 'Giavellotto',       p: 5,   u: 'mr' }, { n: 'Mazza',            p: 5,  u: 'mo' },
+        { n: 'Arco corto',        p: 25,  u: 'mo' }, { n: 'Balestra leggera', p: 25, u: 'mo' },
+      ],
+      armaiolo_lusso: [
+        { n: 'Spadone',           p: 50,  u: 'mo' }, { n: 'Spada lunga',       p: 15, u: 'mo' },
+        { n: 'Alabarda',          p: 20,  u: 'mo' }, { n: 'Arco lungo',        p: 50, u: 'mo' },
+        { n: 'Mezza armatura',    p: 750, u: 'mo' }, { n: 'Armatura a piastre',p:1500,u: 'mo' },
+        { n: 'Cotta di maglia',   p: 75,  u: 'mo' }, { n: 'Scudo',             p: 10, u: 'mo' },
+        { n: 'Balestra pesante',  p: 50,  u: 'mo' }, { n: 'Dardi balestra (20)',p: 1, u: 'mo' },
+      ],
+      speziale: [
+        { n: 'Pozione di cura',    p: 50,  u: 'mo' }, { n: 'Antidoto',          p: 50, u: 'mo' },
+        { n: 'Olio (fiasca)',      p: 1,   u: 'mr' }, { n: 'Torcia',            p: 1,  u: 'mr' },
+        { n: 'Razioni (1 giorno)', p: 5,   u: 'mr' }, { n: 'Candela',           p: 1,  u: 'mr' },
+        { n: 'Corda canapa (15m)', p: 1,   u: 'mo' }, { n: 'Esca e acciarino',  p: 5,  u: 'mr' },
+        { n: 'Borsa da erborista', p: 5,   u: 'mo' }, { n: 'Incenso (blocco)',   p: 10, u: 'mr' },
+        { n: 'Veleno di serpe',    p: 100, u: 'mo' }, { n: 'Acido (fiala)',      p: 25, u: 'mo' },
+      ],
+      generale: [
+        { n: 'Zaino',              p: 2,  u: 'mo' }, { n: 'Coperta',          p: 5,  u: 'mr' },
+        { n: 'Corda canapa (15m)', p: 1,  u: 'mo' }, { n: 'Rampino',          p: 2,  u: 'mo' },
+        { n: 'Lanterna a campana', p: 5,  u: 'mo' }, { n: 'Olio (fiasca)',    p: 1,  u: 'mr' },
+        { n: 'Razioni (1 giorno)', p: 5,  u: 'mr' }, { n: 'Torcia',           p: 1,  u: 'mr' },
+        { n: 'Attrezzi da ladro',  p: 25, u: 'mo' }, { n: 'Kit primo soccorso',p:5,  u: 'mo' },
+        { n: 'Carta (foglio)',     p: 2,  u: 'mr' }, { n: 'Inchiostro (oncia)',p:10, u: 'mo' },
+      ],
+      magia: [
+        { n: 'Componenti incant.', p: 50,  u: 'mo' }, { n: 'Pergamena vuota',   p: 1,  u: 'mo' },
+        { n: 'Cristallo arcano',   p: 50,  u: 'mo' }, { n: 'Verga (focus)',      p: 10, u: 'mo' },
+        { n: 'Libro degli inc.',   p: 50,  u: 'mo' }, { n: 'Talismano sacro',   p: 5,  u: 'mo' },
+        { n: 'Pozione di cura',    p: 50,  u: 'mo' }, { n: 'Pietra lucida',     p: 10, u: 'mo' },
+        { n: 'Stivali elfici',     p: 2500,u: 'mo', raro: true },
+        { n: 'Borsa senza fondo',  p: 4000,u: 'mo', raro: true },
+      ],
+      bazar: [
+        { n: 'Dado da gioco truccato', p: 5,   u: 'mo' }, { n: 'Mappa (falsa)',     p: 1,  u: 'mo' },
+        { n: 'Teschio di drago (falso)',p: 50,  u: 'mo' }, { n: 'Specchio magico',  p: 500,u: 'mo' },
+        { n: 'Cappello del fool',  p: 1,   u: 'mo' }, { n: 'Bottiglia di nebbia',p: 100,u: 'mo' },
+        { n: 'Polvere di stelle',  p: 25,  u: 'mo' }, { n: 'Moneta portafortuna',p: 5,  u: 'mr' },
+      ],
+      taverna_shop: [
+        { n: 'Birra (boccale)',    p: 4,   u: 'mr' }, { n: 'Vino (caraffa)',   p: 2,  u: 'mr' },
+        { n: 'Pasto comune',       p: 3,   u: 'mr' }, { n: 'Pasto buono',      p: 5,  u: 'mr' },
+        { n: 'Stanza (notte)',     p: 5,   u: 'mr' }, { n: 'Stanza (buona)',   p: 8,  u: 'mr' },
+        { n: 'Tabacco (borsa)',    p: 5,   u: 'mr' }, { n: 'Dado da gioco',    p: 1,  u: 'mr' },
+      ],
+    };
+
+    const items = cataloghi[tipo] || cataloghi.generale;
+    // Seleziona 6-8 oggetti casualmente
+    const shuffled = [...items].sort(() => Math.random() - 0.5);
+    const count = Math.min(shuffled.length, 6 + Math.floor(Math.random() * 3));
+    const selected = shuffled.slice(0, count);
+
+    const nomiNegozio = {
+      armaiolo_base: ['Al Ferro Antico', 'La Spada Spuntata', 'Forge di Ugrosh'],
+      armaiolo_lusso: ['Lame d\'Argento', 'L\'Arsenal del Re', 'Acciaio & Gloria'],
+      speziale: ['L\'Erba Buona', 'Pozioni di Mirna', 'Il Calderone Verde'],
+      generale: ['Bottega del Viaggiatore', 'Il Sacco Pesante', 'Merce Varia di Polt'],
+      magia: ['L\'Occhio di Vecna', 'Arcana Borealis', 'Il Grimorio Aperto'],
+      bazar: ['Curiosità di Zarnax', 'Il Bazar del Caos', 'Oggetti Misteriosi'],
+      taverna_shop: ['La Fiasca Traboccante', 'Il Drago Ubriaco', 'Locanda dei Viandanti'],
+    };
+    const nomeNeg = rnd(nomiNegozio[tipo] || ['Negozio Sconosciuto']);
+
+    el.innerHTML = `
+      <div style="font-family:var(--font-display);font-size:0.8rem;color:var(--accent-secondary);margin-bottom:6px;">
+        ${nomeNeg} ${sconto ? `<span class="badge badge-muted" style="margin-left:6px;">${sconto}</span>` : ''}
+      </div>
+      <table style="width:100%;border-collapse:collapse;font-size:0.8rem;">
+        <thead><tr>
+          <th style="text-align:left;padding:3px 0;border-bottom:1px solid var(--border);font-family:var(--font-display);font-size:0.65rem;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-muted);">Oggetto</th>
+          <th style="text-align:right;padding:3px 0;border-bottom:1px solid var(--border);font-family:var(--font-display);font-size:0.65rem;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-muted);">Prezzo</th>
+        </tr></thead>
+        <tbody>
+          ${selected.map(item => {
+            const prezzoFin = Math.round(item.p * mult);
+            const mostra = item.raro ? `<span class="badge badge-gold" style="font-size:0.6rem;">raro</span>` : '';
+            return `<tr>
+              <td style="padding:4px 0;border-bottom:1px solid var(--border);">${item.n} ${mostra}</td>
+              <td style="padding:4px 0;border-bottom:1px solid var(--border);text-align:right;font-family:var(--font-mono);color:var(--accent-secondary);">${prezzoFin.toLocaleString('it-IT')} ${item.u}</td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>`;
+    Debug.log(`Shop generato: ${nomeNeg} (${selected.length} oggetti, mult ${mult})`);
+  },
+
+  calcViaggio: () => {
+    const terreno = document.getElementById('gen-viaggio-terreno')?.value || 'strada';
+    const ritmo   = document.getElementById('gen-viaggio-ritmo')?.value   || 'normale';
+    const mezzo   = document.getElementById('gen-viaggio-mezzo')?.value   || 'piedi';
+    const giorni  = parseInt(document.getElementById('gen-viaggio-giorni')?.value) || 1;
+    const el      = document.getElementById('gen-viaggio-result');
+    if (!el) return;
+
+    // Velocità base km/giorno (8h di marcia)
+    const velBase = {
+      piedi:  { lento: 24, normale: 32, veloce: 40 },
+      cavallo:{ lento: 32, normale: 48, veloce: 64 },
+      barca:  { lento: 24, normale: 40, veloce: 56 },
+      nave:   { lento: 48, normale: 80, veloce: 96 },
+    };
+
+    // Modificatori terreno (moltiplicatore sulla velocità)
+    const terrenoMult = {
+      strada:   1.0, pianura: 0.9, foresta: 0.6,
+      colline:  0.7, montagna: 0.5, palude: 0.5,
+      deserto:  0.7, mare: 1.0,
+    };
+
+    // Probabilità incontri (%)
+    const incontriBase = { lento: 10, normale: 20, veloce: 35 };
+    const incontriTerreno = { strada: 0.5, pianura: 1.0, foresta: 1.5, colline: 1.2, montagna: 1.3, palude: 1.4, deserto: 1.2, mare: 0.8 };
+
+    const vel = (velBase[mezzo]?.[ritmo] || 32) * (terrenoMult[terreno] || 1.0);
+    const kmTotali = Math.round(vel * giorni);
+    const razTotali = giorni * 1; // 1 razione/giorno a persona
+    const probIncontro = Math.min(95, Math.round(incontriBase[ritmo] * (incontriTerreno[terreno] || 1.0)));
+
+    // Turni di guardia (notte)
+    const turniGuardia = giorni * 3; // 3 turni da ~2h a notte
+
+    // Modificatori percezione
+    const percMod = ritmo === 'lento' ? '+5 Percezione passiva' : ritmo === 'veloce' ? '–5 Percezione passiva' : 'Nessun modificatore';
+
+    // Perdita di strada
+    const perditaStrada = terreno === 'strada' ? 'No' : terreno === 'pianura' ? '10%' : terreno === 'foresta' ? '50%' : terreno === 'montagna' ? '30%' : '25%';
+
+    el.innerHTML = `
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 12px;font-size:0.82rem;">
+        <div class="text-muted">Distanza totale</div>
+        <div style="font-family:var(--font-mono);font-weight:700;color:var(--accent-primary);">${kmTotali} km</div>
+        <div class="text-muted">Velocità/giorno</div>
+        <div style="font-family:var(--font-mono);">${Math.round(vel)} km</div>
+        <div class="text-muted">Razioni (per PG)</div>
+        <div style="font-family:var(--font-mono);">${razTotali} ×</div>
+        <div class="text-muted">Turni di guardia</div>
+        <div style="font-family:var(--font-mono);">${turniGuardia}</div>
+        <div class="text-muted">Prob. incontri</div>
+        <div style="font-family:var(--font-mono);color:${probIncontro > 50 ? 'var(--accent-danger)' : 'var(--accent-secondary)'};">${probIncontro}% / notte</div>
+        <div class="text-muted">Percezione</div>
+        <div style="font-size:0.75rem;">${percMod}</div>
+        <div class="text-muted">Perdersi</div>
+        <div style="font-size:0.75rem;">${perditaStrada}</div>
+      </div>`;
+    Debug.log(`Viaggio: ${kmTotali}km in ${giorni}gg (${mezzo}, ${terreno}, ${ritmo})`);
+  },
+
+
 
 /* ── TABS HELPER ── */
 const switchTab = (btn, targetId) => {
