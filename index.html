@@ -16,6 +16,7 @@
   <script src="js/fazioni.js" defer></script>
   <script src="js/sessione.js" defer></script>
   <script src="js/compendio.js" defer></script>
+  <script src="js/schermo.js" defer></script>
   <script src="js/app.js" defer></script>
 </head>
 <body>
@@ -278,7 +279,7 @@
           <div class="card">
             <div class="card-header">
               <h3 class="card-title">👥 Party</h3>
-              <button class="btn btn-primary btn-sm" onclick="Sessione.addPG()">+ Personaggio</button>
+              <button class="btn btn-primary btn-sm" onclick="Sessione.addPG()">+ PG Party</button>
             </div>
             <div id="party-list" class="grid-auto-sm" style="gap:var(--space-sm);"></div>
           </div>
@@ -437,10 +438,10 @@
         <!-- Tabs -->
         <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:var(--space-md);margin-bottom:var(--space-md);">
           <div class="tabs" style="max-width:520px;">
-            <button class="tab-btn active" id="comp-tab-monsters"    onclick="Compendio.switchTab('monsters')">🐉 Mostri</button>
-            <button class="tab-btn"        id="comp-tab-magic_items" onclick="Compendio.switchTab('magic_items')">✨ Oggetti Magici</button>
-            <button class="tab-btn"        id="comp-tab-equipment"   onclick="Compendio.switchTab('equipment')">⚔️ Equipaggiamento</button>
-            <button class="tab-btn"        id="comp-tab-rules"       onclick="Compendio.switchTab('rules')">📖 Regole</button>
+            <button class="tab-btn active" id="comp-tab-monsters"    onclick="Compendio.switchTab('monsters')">Mostri</button>
+            <button class="tab-btn"        id="comp-tab-magic_items" onclick="Compendio.switchTab('magic_items')">Oggetti Magici</button>
+            <button class="tab-btn"        id="comp-tab-equipment"   onclick="Compendio.switchTab('equipment')">Equipaggiamento</button>
+            <button class="tab-btn"        id="comp-tab-rules"       onclick="Compendio.switchTab('rules')">Regole</button>
           </div>
           <div style="display:flex;align-items:center;gap:var(--space-sm);">
             <span class="text-xs text-muted" id="comp-count-monsters"></span>
@@ -526,12 +527,22 @@
           <h1 class="page-title">🖥️ Schermo del Master</h1>
           <p class="page-subtitle">La tua area di gioco personalizzabile</p>
         </div>
+        <div style="display:flex;gap:var(--space-sm);">
+          <button class="btn btn-secondary btn-sm" onclick="Schermo.addBlock()">+ Aggiungi Blocco</button>
+          <button class="btn btn-ghost btn-sm" onclick="Schermo.resetLayout()">↺ Reset</button>
+        </div>
       </div>
-      <div class="module-placeholder">
+
+      <!-- Istruzioni -->
+      <div id="schermo-empty" class="module-placeholder" style="display:none;">
         <div class="module-placeholder-icon">🖥️</div>
-        <h3>Schermo Personalizzabile</h3>
-        <p class="text-muted text-sm" style="max-width:400px;margin:0 auto;">Griglia drag & drop dove inserire i blocchi che preferisci: percezioni passive, dadi, meteo, note rapide, combat mini e tutto ciò che ti serve a portata di click. In arrivo.</p>
+        <h3>Schermo vuoto</h3>
+        <p class="text-sm text-muted" style="max-width:360px;margin:0 auto;">Clicca "+ Aggiungi Blocco" per personalizzare il tuo schermo con i widget che ti servono durante la sessione.</p>
+        <button class="btn btn-primary" style="margin-top:var(--space-md);" onclick="Schermo.addBlock()">+ Aggiungi il primo blocco</button>
       </div>
+
+      <!-- Griglia blocchi -->
+      <div id="schermo-grid" class="schermo-grid"></div>
     </section>
 
   </div><!-- /main-content -->
@@ -1303,6 +1314,45 @@
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="Modal.close('custom-combatant-modal')">Annulla</button>
       <button class="btn btn-primary" onclick="Sessione.submitCustomCombatant()">Aggiungi al Combat</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- Modal: Aggiungi blocco schermo -->
+<div class="modal-overlay hidden" id="modal-schermo-add-modal" style="display:none;">
+  <div class="modal" style="max-width:440px;">
+    <div class="modal-header">
+      <h2 style="font-family:var(--font-display);font-size:1.1rem;">Aggiungi Blocco</h2>
+      <button class="btn btn-ghost btn-icon" onclick="Modal.close('schermo-add-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Tipo di blocco</label>
+        <select id="schermo-block-type" class="form-select" onchange="Schermo._onTypeChange && Schermo._onTypeChange(this.value)">
+          <!-- Popolato da JS -->
+        </select>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Dimensione</label>
+          <select id="schermo-block-size" class="form-select">
+            <!-- Popolato da JS -->
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Titolo (opzionale)</label>
+          <input type="text" id="schermo-block-title" class="form-input" placeholder="Lascia vuoto per default">
+        </div>
+      </div>
+      <div class="form-group" id="schermo-content-group">
+        <label class="form-label">Contenuto (per blocchi personalizzati)</label>
+        <textarea id="schermo-block-content" class="form-textarea" rows="4" placeholder="Testo libero, regole, note..."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="Modal.close('schermo-add-modal')">Annulla</button>
+      <button class="btn btn-primary" onclick="Schermo.submitAddBlock()">Aggiungi</button>
     </div>
   </div>
 </div>
