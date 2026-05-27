@@ -92,6 +92,24 @@ const Compendio = (() => {
         }
       }
 
+      // Carica DM Screen (facoltativi — non bloccano se mancano)
+      const dmScreenFiles = [
+        ['dm_screen_2024', 'dm_screen_2024.json'],
+        ['dm_screen_2014', 'dm_screen_2014.json'],
+      ];
+      for (const [key, file] of dmScreenFiles) {
+        try {
+          const r = await fetch(base + file);
+          if (r.ok) {
+            const data = await r.json();
+            _data.rules = [..._data.rules, ...data];
+            Debug.log(`Compendio: ${file} aggiunto (${data.length} regole)`);
+          }
+        } catch (e) {
+          Debug.warn(`Compendio: ${file} non trovato, skip`);
+        }
+      }
+
       // Normalizza rarità oggetti magici
       _data.magic_items.forEach(i => {
         i._rarita_norm = normalizzaRarita(i.rarita);
