@@ -252,14 +252,17 @@ const Sessione = (() => {
 
     if (!_combat || !_combat.combatants.length) {
       el.innerHTML = `
-        <div class="empty-state" style="padding:var(--space-2xl);">
-          <div class="empty-state-icon">⚔️</div>
-          <h3>Nessuno scontro attivo</h3>
-          <p class="text-sm text-muted">Inizia un nuovo scontro oppure aggiungi combatenti</p>
-          <div style="display:flex;gap:var(--space-sm);justify-content:center;margin-top:var(--space-md);">
-            <button class="btn btn-primary" onclick="Sessione.newCombat()">⚔️ Nuovo Scontro</button>
-            <button class="btn btn-secondary" onclick="Sessione.addPGtoCombat()">👥 Aggiungi Party</button>
+        <div class="combat-header" style="justify-content:space-between;">
+          <div style="font-family:var(--font-display);font-size:1rem;color:var(--text-muted);">Nessuno scontro attivo</div>
+          <div style="display:flex;gap:var(--space-sm);flex-wrap:wrap;">
+            <button class="btn btn-primary btn-sm" onclick="Sessione.newCombat()">⚔️ Nuovo Scontro</button>
+            <button class="btn btn-secondary btn-sm" onclick="Sessione.addPGtoCombat()">👥 Aggiungi Party</button>
+            <button class="btn btn-secondary btn-sm" onclick="Sessione.addMonsterQuick()">🐉 Aggiungi Mostro</button>
           </div>
+        </div>
+        <div style="padding:var(--space-lg);text-align:center;color:var(--text-muted);">
+          <div style="font-size:2.5rem;margin-bottom:var(--space-sm);">⚔️</div>
+          <div class="text-sm">Inizia un nuovo scontro o riprendi uno salvato qui sotto</div>
         </div>`;
       return;
     }
