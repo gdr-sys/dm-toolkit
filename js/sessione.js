@@ -75,40 +75,74 @@ const Sessione = (() => {
       return;
     }
 
-    el.innerHTML = party.map(pg => `
+    el.innerHTML = party.map(pg => {
+      const hpPct = pg.hpMax > 0 ? Math.max(0, Math.round((pg.hpAttuali || pg.hpMax) / pg.hpMax * 100)) : 100;
+      const hpCol = hpPct > 66 ? 'var(--accent-success)' : hpPct > 33 ? 'var(--accent-warning)' : 'var(--accent-danger)';
+      return `
       <div class="party-card">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
-          <div>
-            <div style="font-family:var(--font-display);font-size:0.9rem;">${pg.nome}</div>
-            <div class="text-xs text-muted">${pg.giocatore || ''} · Liv. ${pg.livello || '?'}</div>
+        <!-- Header: nome + azioni -->
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:6px;gap:4px;">
+          <div style="min-width:0;flex:1;">
+            <div class="party-name">${pg.nome}</div>
+            <div class="party-meta">${[pg.giocatore, pg.classe, pg.livello ? 'Liv. ' + pg.livello : ''].filter(Boolean).join(' · ')}</div>
           </div>
-          <div style="display:flex;gap:4px;">
-            <button class="btn btn-ghost btn-icon-sm" onclick="Sessione.editPG('${pg.id}')">✏️</button>
-            <button class="btn btn-ghost btn-icon-sm" onclick="Sessione.deletePG('${pg.id}')">🗑️</button>
+          <div style="display:flex;gap:2px;flex-shrink:0;">
+            <button class="btn btn-ghost btn-icon-sm" onclick="Sessione.editPG('${pg.id}')" title="Modifica">✏️</button>
+            <button class="btn btn-ghost btn-icon-sm" onclick="Sessione.deletePG('${pg.id}')" title="Rimuovi">🗑️</button>
           </div>
         </div>
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px;text-align:center;">
+
+        <!-- Percezioni passive -->
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:3px;margin-bottom:6px;">
           <div class="party-stat-box" title="Percezione Passiva">
-            <div class="party-stat-label">Perc.</div>
-            <div class="party-stat-value">${pg.percezionePassiva || 10}</div>
+            <span class="party-stat-label">Perc.</span>
+            <span class="party-stat-value">${pg.percezionePassiva || 10}</span>
           </div>
           <div class="party-stat-box" title="Investigazione Passiva">
-            <div class="party-stat-label">Invest.</div>
-            <div class="party-stat-value">${pg.investigazionePassiva || 10}</div>
+            <span class="party-stat-label">Invest.</span>
+            <span class="party-stat-value">${pg.investigazionePassiva || 10}</span>
           </div>
           <div class="party-stat-box" title="Intuizione Passiva">
-            <div class="party-stat-label">Intui.</div>
-            <div class="party-stat-value">${pg.intuizionePassiva || 10}</div>
+            <span class="party-stat-label">Intui.</span>
+            <span class="party-stat-value">${pg.intuizionePassiva || 10}</span>
           </div>
         </div>
-        <div style="display:flex;gap:4px;margin-top:6px;justify-content:center;">
-          <span class="comp-stat-pill">PF ${pg.hpAttuali || pg.hpMax || '?'}/${pg.hpMax || '?'}</span>
-          <span class="comp-stat-pill">CA ${pg.ca || '?'}</span>
-          ${pg.inspirazione ? '<span class="badge badge-gold">✨ Ispirazione</span>' : ''}
+
+        <!-- HP barra + CA + Ispirazione -->
+        <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap;">
+          <div style="flex:1;min-width:80px;">
+            <div style="display:flex;justify-content:space-between;margin-bottom:2px;">
+              <span class="party-pill">PF ${pg.hpAttuali ?? pg.hpMax ?? '?'}/${pg.hpMax || '?'}</span>
+              <span class="party-pill">CA ${pg.ca || '?'}</span>
+            </div>
+            <div style="height:4px;background:var(--bg-tertiary);border-radius:var(--radius-full);overflow:hidden;">
+              <div style="height:100%;width:${hpPct}%;background:${hpCol};border-radius:var(--radius-full);transition:width 0.3s;"></div>
+            </div>
+          </div>
+          <button class="party-inspiration-btn ${pg.inspirazione ? 'active' : ''}"
+            onclick="Sessione.toggleInspirazione('${pg.id}')"
+            title="Clicca per toggle ispirazione">
+            ✨ Ispirazione
+          </button>
         </div>
-      </div>
-    `).join('');
+      </div>`;
+    }).join('');
   };
+
+  // Toggle ispirazione senza aprire modal
+  const toggleInspirazione = (id) => {
+    const camp = App.getActiveCampaign();
+    if (!camp) return;
+    const party = [...(camp.party || [])];
+    const idx = party.findIndex(p => p.id === id);
+    if (idx === -1) return;
+    party[idx].inspirazione = !party[idx].inspirazione;
+    saveParty(party);
+    renderParty();
+    Toast.show(party[idx].inspirazione ? `✨ ${party[idx].nome} ha ispirazione!` : `${party[idx].nome}: ispirazione rimossa`, 'info');
+    Debug.log(`Ispirazione ${party[idx].nome}: ${party[idx].inspirazione}`);
+  };
+
 
   const addPG = () => openPGModal(null);
   const editPG = (id) => {
@@ -586,20 +620,44 @@ const Sessione = (() => {
   };
 
   const addCustomCombatant = () => {
-    const nome = prompt('Nome del combatente:', '');
-    if (!nome) return;
-    const hp = parseInt(prompt('Punti Ferita:', '10')) || 10;
-    const ca = parseInt(prompt('Classe Armatura:', '10')) || 10;
-    if (!_combat) newCombat();
-    _combat.combatants.push({
-      id: 'comb_' + Date.now(),
-      nome, tipo: 'custom', hp, maxHp: hp, ca,
-      iniziativa: rollD(20),
-      condizioni: [], note: '', concentrazione: false,
-    });
-    saveCombat(_combat);
-    renderCombat();
+    // Apre il modal per combatente custom/homebrew
+    ['custom-nome','custom-tipo','custom-hp','custom-ca','custom-gs','custom-init-bonus','custom-qty']
+      .forEach(id => { const el = document.getElementById(id); if (el) el.value = el.id === 'custom-qty' ? '1' : el.id === 'custom-tipo' ? 'mostro' : ''; });
+    Modal.open('custom-combatant-modal');
+    setTimeout(() => document.getElementById('custom-nome')?.focus(), 100);
   };
+
+  const submitCustomCombatant = () => {
+    const nome = document.getElementById('custom-nome')?.value?.trim();
+    if (!nome) { Toast.show('Inserisci un nome', 'warning'); return; }
+    const hp  = parseInt(document.getElementById('custom-hp')?.value)  || 10;
+    const ca  = parseInt(document.getElementById('custom-ca')?.value)  || 10;
+    const gs  = document.getElementById('custom-gs')?.value?.trim()    || '';
+    const bon = parseInt(document.getElementById('custom-init-bonus')?.value) || 0;
+    const qty = Math.max(1, Math.min(20, parseInt(document.getElementById('custom-qty')?.value) || 1));
+    const tipo = document.getElementById('custom-tipo')?.value || 'mostro';
+
+    if (!_combat) newCombat();
+
+    for (let i = 0; i < qty; i++) {
+      const suffix = qty > 1 ? ` #${i + 1}` : '';
+      _combat.combatants.push({
+        id: 'comb_' + Date.now() + '_' + i,
+        nome: nome + suffix,
+        tipo,
+        hp, maxHp: hp, ca, gs,
+        iniziativa: rollInit(bon),
+        iniziativaBonus: bon,
+        condizioni: [], note: '', concentrazione: false,
+      });
+    }
+    saveCombat(_combat);
+    Modal.close('custom-combatant-modal');
+    renderCombat();
+    Toast.show(`${qty > 1 ? qty + '× ' : ''}${nome} aggiunto`, 'success');
+    Debug.log(`Combatente custom: ${nome} x${qty}`);
+  };
+
 
   const removeCombatant = (id) => {
     if (!_combat) return;
@@ -674,14 +732,14 @@ const Sessione = (() => {
   return {
     init,
     // Party
-    addPG, editPG, deletePG, submitPG, openPGModal, addPGtoCombat,
+    addPG, editPG, deletePG, submitPG, openPGModal, addPGtoCombat, toggleInspirazione,
     // Combat
     newCombat, nextTurn, rollAllInitiative, updateInit,
     changeHP, setHP, quickDamage,
     openCondizioneModal, submitCondizioni, removeCondizione,
     toggleConcentrazione, openNote,
     addMonsterQuick, searchMonster, addMonsterFromCompendio,
-    addCustomCombatant, removeCombatant,
+    addCustomCombatant, submitCustomCombatant, removeCombatant,
     saveCombatSession, endCombat, loadCombatSession,
   };
 })();
