@@ -23,10 +23,22 @@ const App = (() => {
     const page = pages[pageId];
     if (!page) { Debug.warn(`Pagina sconosciuta: ${pageId}`); return; }
 
+    // Se la pagina richiede una campagna e non c'è in memoria, prova a ripristinarla
     if (page.requiresCampaign && !activeCampaign) {
-      Toast.show('Seleziona prima una campagna', 'warning');
-      navigateTo('home');
-      return;
+      const savedId = Storage.getActiveCampaignId();
+      if (savedId) {
+        const camp = Storage.getCampaign(savedId);
+        if (camp) {
+          setActiveCampaign(camp);
+          Debug.log(`Campagna ripristinata automaticamente: ${camp.name}`);
+        }
+      }
+      // Se ancora non c'è, manda alla home
+      if (!activeCampaign) {
+        Toast.show('Seleziona prima una campagna', 'warning');
+        navigateTo('home');
+        return;
+      }
     }
 
     // Nascondi tutte le pagine
@@ -59,7 +71,7 @@ const App = (() => {
       case 'campagna':   renderCampaignPage(); break;
       case 'mondo':      if (window.NPC) NPC.init(); if (window.Luoghi) Luoghi.init(); if (window.Fazioni) Fazioni.init(); break;
       case 'sessione':   if (window.Sessione) Sessione.init(); break;
-      case 'generatori': break; // generatori sono inline, no init separato
+      case 'generatori': break;
       case 'compendio':  if (window.Compendio) Compendio.init(); break;
       case 'schermo':    if (window.Schermo) Schermo.init(); break;
     }
