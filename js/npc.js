@@ -198,12 +198,17 @@ const NPC = (() => {
     const name = document.getElementById('nm-name')?.value?.trim();
     if (!name) { Toast.show('Inserisci un nome', 'warning'); return; }
 
-    // Ricarica campagna fresca dal storage per evitare oggetto stale
+    // Ricarica campagna fresca dal storage
     App.reloadActiveCampaign();
     const camp = App.getActiveCampaign();
-    if (!camp) { Toast.show('Nessuna campagna attiva', 'warning'); return; }
+    Debug.log(`NPC save: campagna = ${camp ? camp.name : 'NULL'}, id = ${camp?.id}`);
+    if (!camp) { Toast.show('Nessuna campagna attiva — apri una campagna prima', 'warning'); return; }
 
-    const npcs = [...(camp.npcs || [])];
+    // Leggi direttamente dal localStorage per sicurezza
+    const campFresh = Storage.getCampaign(camp.id);
+    Debug.log(`NPC save: campagna fresh npcs = ${JSON.stringify((campFresh?.npcs || []).length)}`);
+
+    const npcs = [...(campFresh?.npcs || [])];
     const relation = parseInt(document.getElementById('nm-relation')?.value) || 50;
 
     const data = {
@@ -244,11 +249,25 @@ const NPC = (() => {
     if (_editingId) {
       const idx = npcs.findIndex(n => n.id === _editingId);
       if (idx !== -1) npcs[idx] = { ...npcs[idx], ...data };
+      else npcs.push({ id: 'npc_' + Date.now(), ...data }); // fallback
     } else {
       npcs.push({ id: 'npc_' + Date.now(), ...data });
     }
 
-    App.saveActiveCampaign({ npcs });
+    Debug.log(`NPC save: salvo ${npcs.length} npcs per campagna ${camp.id}`);
+
+    // Salva DIRETTAMENTE nel storage bypassando App per sicurezza
+    const result = Storage.updateCampaign(camp.id, { npcs });
+    Debug.log(`NPC save: Storage.updateCampaign result = ${result ? 'ok' : 'FALLITO'}`);
+
+    if (!result) {
+      Toast.show('Errore salvataggio — controlla il debug', 'error');
+      return;
+    }
+
+    // Aggiorna anche la campagna in memoria
+    App.reloadActiveCampaign();
+
     Modal.close('npc');
     render();
     Toast.show(_editingId ? 'PNG aggiornato' : 'PNG aggiunto', 'success');
