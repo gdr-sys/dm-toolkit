@@ -845,3 +845,109 @@
 }
 .sb-action:last-child { border-bottom: none; }
 .sb-action strong { color: var(--text-primary); }
+
+/* ══════════════════════════════════════
+   COMBAT TRACKER
+══════════════════════════════════════ */
+.combat-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-md) var(--space-lg);
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+.combat-round-badge {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--accent-primary);
+  background: rgba(139,38,53,0.1);
+  border: 1px solid var(--accent-primary);
+  border-radius: var(--radius-md);
+  padding: 4px 14px;
+}
+.combat-list { padding: var(--space-xs) 0; }
+.combat-footer {
+  display: flex;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  border-top: 1px solid var(--border);
+  background: var(--bg-secondary);
+}
+.combat-row {
+  display: grid;
+  grid-template-columns: 60px 1fr 160px 50px 140px;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: 8px var(--space-md);
+  border-bottom: 1px solid var(--border);
+  transition: background var(--transition-fast);
+}
+.combat-row:last-child { border-bottom: none; }
+.combat-row:hover { background: var(--bg-card-hover); }
+.combat-row-active {
+  background: rgba(139,38,53,0.06) !important;
+  border-left: 3px solid var(--accent-primary);
+}
+.combat-row-dead { opacity: 0.45; }
+.combat-init-col { text-align: center; }
+.combat-init-input {
+  width: 52px;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  font-weight: 700;
+  padding: 4px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  outline: none;
+}
+.combat-init-input:focus { border-color: var(--accent-primary); }
+.combat-hp-col { display: flex; flex-direction: column; gap: 4px; }
+.combat-hp-input {
+  width: 52px;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  font-weight: 700;
+  padding: 2px 4px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  outline: none;
+}
+.combat-hp-input:focus { border-color: var(--accent-primary); background: var(--bg-card); }
+.combat-hp-bar {
+  height: 4px;
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+.combat-hp-fill {
+  height: 100%;
+  border-radius: var(--radius-full);
+  transition: width 0.3s ease, background 0.3s ease;
+}
+.combat-ca-col { text-align: center; }
+.combat-actions-col { display: flex; gap: 2px; justify-content: flex-end; }
+
+/* Party cards */
+.party-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--space-sm) var(--space-md);
+}
+.party-stat-box {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 3px;
+}
+.party-stat-label { font-size: 0.6rem; font-family: var(--font-display); letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-muted); }
+.party-stat-value { font-family: var(--font-mono); font-size: 1rem; font-weight: 700; color: var(--text-primary); }
