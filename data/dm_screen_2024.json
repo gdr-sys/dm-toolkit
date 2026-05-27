@@ -1,0 +1,209 @@
+[
+  {
+    "id": "condizioni_2024",
+    "nome": "Condizioni",
+    "capitolo": "DM Screen Rapido 2024",
+    "categoria": "Combattimento",
+    "pagine_sorgente": "PHB 2024",
+    "descrizione": "Le condizioni modificano le capacità di una creatura in vari modi e possono essere applicate da incantesimi, trappole, oggetti magici e molte altre fonti.",
+    "sezioni": [
+      {
+        "titolo": "Elenco Condizioni",
+        "righe": [
+          {"Condizione": "Accecato", "Effetti": "Non vede. Fallisce automaticamente prove che richiedono la vista. Attacchi contro di lui: Vantaggio. Suoi attacchi: Svantaggio."},
+          {"Condizione": "Affascinato", "Effetti": "Non può attaccare o bersagliare la fonte. La fonte ha Vantaggio alle prove di interazione sociale contro di lui."},
+          {"Condizione": "Afferrato ★", "Effetti": "Velocità 0. Svantaggio a tutti gli attacchi contro bersagli diversi dall'afferratore. Cessa se l'afferratore è Incapacitato o se la distanza supera la portata. Per liberarsi: azione + prova di Atletica (FOR) o Acrobazia (DES) contro DC = 8 + mod FOR + bonus competenza dell'afferratore."},
+          {"Condizione": "Assordato", "Effetti": "Non può sentire. Fallisce automaticamente prove che richiedono l'udito."},
+          {"Condizione": "Avvelenato", "Effetti": "Svantaggio a tutte le prove di caratteristica e i tiri per colpire."},
+          {"Condizione": "Incapacitato ★", "Effetti": "Non può effettuare azioni né reazioni. Non può parlare. Svantaggio ai tiri di Iniziativa."},
+          {"Condizione": "Invisibile", "Effetti": "Non può essere visto senza magia. Attacchi contro di lui: Svantaggio. Suoi attacchi: Vantaggio."},
+          {"Condizione": "Paralizzato", "Effetti": "Incapacitato, non può muoversi né parlare. Fallisce automaticamente TS FOR e DES. Attacchi contro di lui: Vantaggio. Colpi da mischia entro 1,5 m: critico automatico."},
+          {"Condizione": "Pietrificato", "Effetti": "Trasformato in pietra. Incapacitato, peso ×10, immune a veleni e malattie. Resistenza a tutti i danni. Attacchi: Vantaggio. Critico da mischia automatico."},
+          {"Condizione": "Prono", "Effetti": "Può muoversi solo strisciando (costo doppio). Svantaggio ai propri attacchi. Attacchi da mischia contro di lui: Vantaggio. Attacchi a distanza: Svantaggio. Alzarsi costa metà del movimento totale."},
+          {"Condizione": "Spaventato", "Effetti": "Svantaggio a prove e tiri d'attacco finché la fonte è visibile. Non può avvicinarsi volontariamente alla fonte della paura."},
+          {"Condizione": "Stordito", "Effetti": "Incapacitato, non può muoversi, parla in modo incerto. Fallisce automaticamente TS FOR e DES. Attacchi contro di lui: Vantaggio."},
+          {"Condizione": "Trattenuto", "Effetti": "Velocità 0. Svantaggio ai propri attacchi. Vantaggio agli attacchi contro di lui. Svantaggio ai TS su DES."}
+        ]
+      }
+    ]
+  },
+  {
+    "id": "esaurimento_2024",
+    "nome": "Esaurimento",
+    "capitolo": "DM Screen Rapido 2024",
+    "categoria": "Combattimento",
+    "pagine_sorgente": "PHB 2024",
+    "descrizione": "Ogni livello di Esaurimento infligge –2 a tutti i tiri d20 (attacchi, prove di caratteristica, tiri salvezza) e riduce la velocità di 1,5 m. Al livello 6 la creatura muore. Si recupera 1 livello al termine di ogni Riposo Lungo. Formula rapida: penalità = livello × 2 | riduzione velocità = livello × 1,5 m",
+    "sezioni": [
+      {
+        "titolo": "Livelli di Esaurimento (2024)",
+        "righe": [
+          {"Livello": "1", "Penalità ai tiri d20": "–2", "Riduzione velocità": "–1,5 m"},
+          {"Livello": "2", "Penalità ai tiri d20": "–4", "Riduzione velocità": "–3 m"},
+          {"Livello": "3", "Penalità ai tiri d20": "–6", "Riduzione velocità": "–4,5 m"},
+          {"Livello": "4", "Penalità ai tiri d20": "–8", "Riduzione velocità": "–6 m"},
+          {"Livello": "5", "Penalità ai tiri d20": "–10", "Riduzione velocità": "–7,5 m"},
+          {"Livello": "6", "Penalità ai tiri d20": "–12", "Riduzione velocità": "MORTE"}
+        ]
+      }
+    ]
+  },
+  {
+    "id": "copertura_2024",
+    "nome": "Copertura",
+    "capitolo": "DM Screen Rapido 2024",
+    "categoria": "Combattimento",
+    "pagine_sorgente": "PHB 2024",
+    "descrizione": "La copertura riduce la vulnerabilità di una creatura agli attacchi e agli effetti. Per beneficiarne, è necessario che un ostacolo si frapponga tra te e la fonte dell'attacco.",
+    "sezioni": [
+      {
+        "titolo": "Tipi di Copertura",
+        "righe": [
+          {"Tipo": "Metà copertura", "Bonus a CA e TS DES": "+2", "Esempio": "Muro basso, mobilio, un'altra creatura"},
+          {"Tipo": "Tre quarti", "Bonus a CA e TS DES": "+5", "Esempio": "Feritoie, tronco spesso, porta socchiusa"},
+          {"Tipo": "Copertura totale", "Bonus a CA e TS DES": "Non può essere bersagliato", "Esempio": "Completamente dietro un ostacolo solido"}
+        ]
+      }
+    ]
+  },
+  {
+    "id": "dc_prove_2024",
+    "nome": "Prove di Caratteristica & DC",
+    "capitolo": "DM Screen Rapido 2024",
+    "categoria": "Prove",
+    "pagine_sorgente": "PHB 2024",
+    "descrizione": "Il DM stabilisce la Classe di Difficoltà (DC) in base alla complessità del compito. Il giocatore tira 1d20, aggiunge il modificatore di caratteristica (e il bonus competenza se applicabile) e deve eguagliare o superare la DC. Prove in opposizione: entrambe le parti tirano, chi ottiene il risultato più alto vince. In caso di parità, vince chi agisce attivamente.",
+    "sezioni": [
+      {
+        "titolo": "Classi di Difficoltà",
+        "righe": [
+          {"Difficoltà": "Banale", "DC": "5", "Esempio": "Sfondare una porta marcia, scalare una parete con molti appigli"},
+          {"Difficoltà": "Facile", "DC": "10", "Esempio": "Notare un nemico che si avvicina, persuadere un mercante disponibile"},
+          {"Difficoltà": "Media", "DC": "15", "Esempio": "Forzare una serratura comune, scalare una parete bagnata"},
+          {"Difficoltà": "Difficile", "DC": "20", "Esempio": "Percepire un ladro esperto, persuadere una guardia sospettosa"},
+          {"Difficoltà": "Molto difficile", "DC": "25", "Esempio": "Seguire tracce su roccia, convincere un nemico dichiarato"},
+          {"Difficoltà": "Quasi impossibile", "DC": "30", "Esempio": "Scalare una superficie liscia verticale, notare un'illusione perfetta"}
+        ]
+      }
+    ]
+  },
+  {
+    "id": "movimento_2024",
+    "nome": "Movimento & Terreno Difficile",
+    "capitolo": "DM Screen Rapido 2024",
+    "categoria": "Combattimento",
+    "pagine_sorgente": "PHB 2024",
+    "descrizione": "Le creature possono muoversi fino alla loro velocità in ciascun turno. Il terreno difficile e alcune condizioni possono ridurre drasticamente la mobilità.",
+    "sezioni": [
+      {
+        "titolo": "Regole di Movimento",
+        "righe": [
+          {"Situazione": "Terreno difficile", "Regola": "Costa 2 piedi di movimento per ogni piede percorso. Esempi: fango, neve alta, acqua bassa, scale, vegetazione fitta."},
+          {"Situazione": "Strisciare", "Regola": "Costa 2 piedi per ogni piede mentre si è Proni. Si combina con il terreno difficile (4 piedi per piede)."},
+          {"Situazione": "Scalare / Nuotare", "Regola": "Costa il doppio del movimento, salvo velocità naturale di scalata o nuoto."},
+          {"Situazione": "Saltare in lungo", "Regola": "Con rincorsa (almeno 3 m): pari al punteggio di FOR in piedi. Senza rincorsa: metà. Ogni piede saltato consuma 1 piede di movimento."},
+          {"Situazione": "Saltare in alto", "Regola": "Con rincorsa: 3 + modificatore FOR in piedi. Senza rincorsa: metà. Estendendo le braccia aggiungi metà della tua altezza alla portata verticale."},
+          {"Situazione": "Caduta", "Regola": "1d6 danni contundenti per ogni 3 m caduti, massimo 20d6. La creatura atterra Prona, salvo non eviti i danni da caduta."},
+          {"Situazione": "Soffocamento", "Regola": "Può trattenere il respiro per 1 + modificatore CON minuti (minimo 30 secondi). Poi TS CON DC 10 (+1 per ogni turno successivo) o scende a 0 PF."},
+          {"Situazione": "Oscurità", "Regola": "Senza Scurovisione: cecità totale nell'oscurità. Luce fioca: Svantaggio alle prove di Percezione basate sulla vista."}
+        ]
+      }
+    ]
+  },
+  {
+    "id": "grapple_spingere_2024",
+    "nome": "Afferrare & Spingere",
+    "capitolo": "DM Screen Rapido 2024",
+    "categoria": "Combattimento",
+    "pagine_sorgente": "PHB 2024",
+    "descrizione": "Afferrare e Spingere sono opzioni dell'Unarmed Strike. Non richiedono un tiro per colpire: il bersaglio fa direttamente il Tiro Salvezza. DC = 8 + modificatore FOR + bonus competenza dell'attaccante. Il bersaglio sceglie liberamente se usare FOR o DES per il TS. ★ Cambio 2024: nel PHB 2014 erano prove in opposizione e richiedevano un'azione separata. Ora sono opzioni dell'Unarmed Strike con TS diretto.",
+    "sezioni": [
+      {
+        "titolo": "Regole Dettagliate",
+        "righe": [
+          {"Azione": "Afferrare", "Regola": "Usa l'Unarmed Strike e scegli Grapple. Il bersaglio fa un TS FOR o DES contro DC 8 + mod FOR + bonus competenza. Se fallisce: condizione Afferrato. Richiede una mano libera e bersaglio max 1 taglia più grande."},
+          {"Azione": "Liberarsi", "Regola": "Il bersaglio usa un'azione: prova di Atletica (FOR) o Acrobazia (DES) contro la DC fissa dell'afferratore."},
+          {"Azione": "Spingere", "Regola": "Usa l'Unarmed Strike e scegli Shove. Il bersaglio fa TS FOR o DES contro la DC. Se fallisce: spingi di 1,5 m oppure lo fai cadere Prono — a tua scelta."},
+          {"Azione": "Trascinare", "Regola": "Puoi muovere una creatura afferrata con te, ma ogni piede di movimento costa 1 piede extra (salvo bersaglio Minuscolo o 2 taglie inferiori)."},
+          {"Azione": "Limite taglia", "Regola": "Non puoi afferrare né spingere creature di due o più taglie superiori alla tua."},
+          {"Azione": "Rilasciare", "Regola": "Puoi rilasciare una creatura afferrata in qualsiasi momento, senza azione richiesta."}
+        ]
+      }
+    ]
+  },
+  {
+    "id": "morte_2024",
+    "nome": "Tiri Salvezza contro la Morte",
+    "capitolo": "DM Screen Rapido 2024",
+    "categoria": "Combattimento",
+    "pagine_sorgente": "PHB 2024",
+    "descrizione": "Quando i PF di una creatura scendono a 0, ottiene la condizione Privo di Sensi (Unconscious) — che include Incapacitato, Prono e incoscienza totale. 3 successi → stabile. 3 fallimenti → morte. Ricevere danni mentre a 0 PF: 1 fallimento (colpo critico = 2 fallimenti). Stabilizzare: azione + prova Medicina (SAG) DC 10.",
+    "sezioni": [
+      {
+        "titolo": "Risultati del Tiro",
+        "righe": [
+          {"Risultato": "20 nat", "Effetto": "La creatura si rialza immediatamente con 1 PF."},
+          {"Risultato": "10–19", "Effetto": "Successo. Accumula 1 successo sul contatore."},
+          {"Risultato": "2–9", "Effetto": "Fallimento. Accumula 1 fallimento sul contatore."},
+          {"Risultato": "1 nat", "Effetto": "Doppio fallimento. Conta come 2 fallimenti."}
+        ]
+      }
+    ]
+  },
+  {
+    "id": "concentrazione_2024",
+    "nome": "Concentrazione",
+    "capitolo": "DM Screen Rapido 2024",
+    "categoria": "Incantesimi",
+    "pagine_sorgente": "PHB 2024",
+    "descrizione": "Alcuni incantesimi richiedono Concentrazione per mantenere i loro effetti. Non è possibile concentrarsi su più incantesimi contemporaneamente: lanciarne un secondo con Concentrazione interrompe il primo immediatamente.",
+    "sezioni": [
+      {
+        "titolo": "Cosa interrompe la Concentrazione",
+        "righe": [
+          {"Causa": "Subire danni", "Effetto": "TS Costituzione. DC = max(10, metà del danno subito). Fallimento: la concentrazione cade."},
+          {"Causa": "Essere Incapacitato", "Effetto": "La concentrazione cade automaticamente."},
+          {"Causa": "Morte", "Effetto": "La concentrazione cade automaticamente."},
+          {"Causa": "Scelta volontaria", "Effetto": "Puoi interrompere la concentrazione in qualsiasi momento, senza azione richiesta."},
+          {"Causa": "Ambiente ostile", "Effetto": "Il DM può richiedere un TS CON (solitamente DC 10) in condizioni particolarmente difficili."}
+        ]
+      }
+    ]
+  },
+  {
+    "id": "iniziativa_sorpresa_2024",
+    "nome": "Iniziativa & Sorpresa",
+    "capitolo": "DM Screen Rapido 2024",
+    "categoria": "Combattimento",
+    "pagine_sorgente": "PHB 2024",
+    "descrizione": "All'inizio di ogni combattimento, tutte le creature tirano Iniziativa: 1d20 + modificatore DES. ★ Cambio 2024: non esiste più un round di sorpresa. Le creature sorprese hanno Svantaggio al tiro di Iniziativa e non possono usare reazioni prima del loro primo turno.",
+    "sezioni": [
+      {
+        "titolo": "Regole di Iniziativa",
+        "righe": [
+          {"Situazione": "Parità", "Regola": "Il DM decide, oppure le creature coinvolte ritirano tra loro."},
+          {"Situazione": "Sorpresa ★", "Regola": "Non esiste più un round di sorpresa. Le creature sorprese hanno Svantaggio al tiro di Iniziativa e non possono usare reazioni prima del loro primo turno."},
+          {"Situazione": "Feat Alert ★", "Regola": "Immunità alla sorpresa + Vantaggio al tiro di Iniziativa."}
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ado_reazioni_2024",
+    "nome": "Attacchi di Opportunità & Reazioni",
+    "capitolo": "DM Screen Rapido 2024",
+    "categoria": "Combattimento",
+    "pagine_sorgente": "PHB 2024",
+    "descrizione": "Una reazione è un'azione speciale usata fuori dal proprio turno, in risposta a un trigger specifico. Hai una sola reazione per round, che si recupera all'inizio del tuo turno. ★ Cambio 2024: nel PHB 2014 scattava solo con il movimento volontario. Ora scatta con qualsiasi tipo di movimento — incluse azioni bonus e reazioni che causano spostamento.",
+    "sezioni": [
+      {
+        "titolo": "Attacchi di Opportunità",
+        "righe": [
+          {"Situazione": "Quando scatta", "Regola": "Quando una creatura che puoi vedere lascia la tua portata usando la sua azione, azione bonus, reazione, o una qualsiasi delle sue velocità."},
+          {"Situazione": "Costo", "Regola": "Costa la tua reazione. Consiste in un attacco da mischia con arma o Unarmed Strike."},
+          {"Situazione": "NON scatta con", "Regola": "Teletrasporto, essere spostato involontariamente (spinto da incantesimo), usare l'azione Disimpegnarsi."}
+        ]
+      }
+    ]
+  }
+]
