@@ -198,8 +198,10 @@ const NPC = (() => {
     const name = document.getElementById('nm-name')?.value?.trim();
     if (!name) { Toast.show('Inserisci un nome', 'warning'); return; }
 
+    // Ricarica campagna fresca dal storage per evitare oggetto stale
+    App.reloadActiveCampaign();
     const camp = App.getActiveCampaign();
-    if (!camp) return;
+    if (!camp) { Toast.show('Nessuna campagna attiva', 'warning'); return; }
 
     const npcs = [...(camp.npcs || [])];
     const relation = parseInt(document.getElementById('nm-relation')?.value) || 50;
