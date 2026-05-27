@@ -12,6 +12,7 @@
   <script src="js/dadi.js" defer></script>
   <script src="js/modals.js" defer></script>
   <script src="js/npc.js" defer></script>
+  <script src="js/sessione.js" defer></script>
   <script src="js/compendio.js" defer></script>
   <script src="js/app.js" defer></script>
 </head>
@@ -235,13 +236,47 @@
       <div class="page-header">
         <div>
           <h1 class="page-title">⚔️ Sessione</h1>
-          <p class="page-subtitle">Combat tracker, initiative, party e strumenti di gioco</p>
+          <p class="page-subtitle">Combat Tracker · Party · Scontri salvati</p>
+        </div>
+        <div style="display:flex;gap:var(--space-sm);">
+          <button class="btn btn-primary" onclick="Sessione.newCombat()">⚔️ Nuovo Scontro</button>
+          <button class="btn btn-secondary" onclick="Sessione.addPGtoCombat()">👥 Party in Combat</button>
         </div>
       </div>
-      <div class="module-placeholder">
-        <div class="module-placeholder-icon">⚔️</div>
-        <h3>Modulo Sessione</h3>
-        <p class="text-muted text-sm" style="max-width:400px;margin:0 auto;">Combat Tracker con iniziativa salvabile per campagna, tracker percezioni passive del party, gestore tempo e calendario, Wild Magic tracker. In arrivo.</p>
+
+      <div id="sessione-content">
+        <div class="grid-2" style="gap:var(--space-lg);align-items:flex-start;">
+
+          <!-- Colonna sinistra: Combat Tracker -->
+          <div style="grid-column:1/3;">
+            <div class="card" style="padding:0;overflow:hidden;">
+              <div id="combat-tracker"></div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Riga sotto: Party + Sessioni salvate -->
+        <div class="grid-2" style="gap:var(--space-lg);margin-top:var(--space-lg);">
+
+          <!-- Party -->
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">👥 Party</h3>
+              <button class="btn btn-primary btn-sm" onclick="Sessione.addPG()">+ Personaggio</button>
+            </div>
+            <div id="party-list" class="grid-auto-sm" style="gap:var(--space-sm);"></div>
+          </div>
+
+          <!-- Sessioni salvate -->
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">💾 Scontri Salvati</h3>
+            </div>
+            <div id="saved-sessions-list" class="comp-list"></div>
+          </div>
+
+        </div>
       </div>
     </section>
 
@@ -256,16 +291,19 @@
         </div>
       </div>
 
-      <!-- Generatore PNG Istantaneo (preview funzionante) -->
+      <!-- Generatore PNG Completo -->
       <div class="grid-2" style="gap:var(--space-md);margin-bottom:var(--space-lg);">
-        <div class="card card-gold">
+        <div class="card card-gold" style="grid-column:1/3;">
           <div class="card-header">
-            <h3 class="card-title">👤 PNG Istantaneo</h3>
-            <button class="btn btn-gold btn-sm" onclick="Generatori.rollNPC()">🎲 Genera</button>
+            <h3 class="card-title">👤 Generatore PNG Completo</h3>
+            <div style="display:flex;gap:var(--space-sm);">
+              <button class="btn btn-gold btn-sm" onclick="Generatori.rollNPC()">🎲 Genera</button>
+              <button class="btn btn-secondary btn-sm" id="gen-npc-save-btn" style="display:none;" onclick="Generatori.saveGeneratedNPC()">💾 Salva nel Mondo</button>
+            </div>
           </div>
-          <div id="gen-npc-result" style="min-height:120px;">
+          <div id="gen-npc-result" style="min-height:80px;">
             <div class="empty-state" style="padding:var(--space-md);">
-              <div class="text-muted text-sm">Clicca "Genera" per creare un PNG al volo</div>
+              <div class="text-muted text-sm">Clicca "Genera" per creare un PNG completo al volo — nome, razza, professione, tratti, segreto, obiettivo, difetto, apparenza e stat block di base</div>
             </div>
           </div>
         </div>
@@ -959,6 +997,80 @@
 </div>
 
 
+
+<!-- Modal: Personaggio Party -->
+<div class="modal-overlay hidden" id="modal-pg-modal" style="display:none;">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 style="font-family:var(--font-display);font-size:1.1rem;" id="pg-modal-title">Aggiungi Personaggio</h2>
+      <button class="btn btn-ghost btn-icon" onclick="Modal.close('pg-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="pg-modal-id">
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Nome *</label><input type="text" id="pg-nome" class="form-input" placeholder="Nome personaggio"></div>
+        <div class="form-group"><label class="form-label">Giocatore</label><input type="text" id="pg-giocatore" class="form-input" placeholder="Nome giocatore"></div>
+      </div>
+      <div class="form-row-3">
+        <div class="form-group"><label class="form-label">Livello</label><input type="number" id="pg-livello" class="form-input" min="1" max="20" placeholder="1"></div>
+        <div class="form-group"><label class="form-label">Classe</label><input type="text" id="pg-classe" class="form-input" placeholder="es. Guerriero"></div>
+        <div class="form-group"><label class="form-label">Bonus Iniziativa</label><input type="number" id="pg-iniziativa-bonus" class="form-input" placeholder="0"></div>
+      </div>
+      <div class="form-row-3">
+        <div class="form-group"><label class="form-label">HP Max</label><input type="number" id="pg-hp-max" class="form-input" min="1" placeholder="es. 45"></div>
+        <div class="form-group"><label class="form-label">HP Attuali</label><input type="number" id="pg-hp-attuali" class="form-input" min="0" placeholder="es. 45"></div>
+        <div class="form-group"><label class="form-label">CA</label><input type="number" id="pg-ca" class="form-input" min="1" placeholder="es. 16"></div>
+      </div>
+      <div class="form-row-3">
+        <div class="form-group"><label class="form-label">Perc. Passiva</label><input type="number" id="pg-perc" class="form-input" min="1" placeholder="10"></div>
+        <div class="form-group"><label class="form-label">Invest. Passiva</label><input type="number" id="pg-invest" class="form-input" min="1" placeholder="10"></div>
+        <div class="form-group"><label class="form-label">Intui. Passiva</label><input type="number" id="pg-intui" class="form-input" min="1" placeholder="10"></div>
+      </div>
+      <div class="form-group">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:0.85rem;">
+          <input type="checkbox" id="pg-inspirazione"> ✨ Ha ispirazione
+        </label>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="Modal.close('pg-modal')">Annulla</button>
+      <button class="btn btn-primary" onclick="Sessione.submitPG()">Salva</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Condizioni -->
+<div class="modal-overlay hidden" id="modal-cond-modal" style="display:none;">
+  <div class="modal" style="max-width:400px;">
+    <div class="modal-header">
+      <h2 style="font-family:var(--font-display);font-size:1.1rem;" id="cond-modal-title">Condizioni</h2>
+      <button class="btn btn-ghost btn-icon" onclick="Modal.close('cond-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="cond-combatant-id">
+      <div id="cond-list" style="columns:2;gap:var(--space-md);"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="Modal.close('cond-modal')">Annulla</button>
+      <button class="btn btn-primary" onclick="Sessione.submitCondizioni()">Applica</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Cerca Mostro per Combat -->
+<div class="modal-overlay hidden" id="modal-monster-search-modal" style="display:none;">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 style="font-family:var(--font-display);font-size:1.1rem;">Aggiungi Mostro</h2>
+      <button class="btn btn-ghost btn-icon" onclick="Modal.close('monster-search-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="text" id="monster-search-input" class="form-input" placeholder="🔍 Cerca mostro nel Compendio..." oninput="Sessione.searchMonster()" style="margin-bottom:var(--space-md);">
+      <div id="monster-search-results" class="comp-list" style="max-height:360px;overflow-y:auto;"></div>
+    </div>
+  </div>
+</div>
+
 <!-- Modal: Compendio dettaglio -->
 <div class="modal-overlay hidden" id="modal-comp-detail" style="display:none;">
   <div class="modal modal-lg">
@@ -1001,31 +1113,111 @@ const Generatori = {
     const t = await loadTabelle();
     if (!t) return;
 
-    const razze = t.razze;
-    const razza = rnd(razze);
-    const razzaKey = razza.toLowerCase().replace(/'/g, '').replace(/\s/g, '_');
-
-    // Nome: prova chiave esatta o fallback umano
-    const nomiPool = t.nomi[razzaKey] || t.nomi['mezz_orco'] || t.nomi['umano'];
+    const razza = rnd(t.razze);
+    const razzaKey = razza.toLowerCase().replace(/['\s]/g, k => k === "'" ? '' : '_').replace(/mezz_orco.*/, 'mezz_orco');
+    const nomiPool = t.nomi[razzaKey] || t.nomi['umano'];
     const nome = rnd(nomiPool);
     const prof = rnd(t.professioni);
     const tratto = rnd(t.tratti);
     const segreto = rnd(t.segreti);
     const desiderio = rnd(t.desideri);
+    const obiettivo = rnd(t.obiettivi || []);
+    const difetto = rnd(t.difetti || []);
+    const legame = rnd(t.legami || []);
+    const apparenza = rnd(t.apparenza || []);
+    const voce = rnd(t.accenti_voci.voce);
+    const tic = rnd(t.accenti_voci.tic);
+    const background = rnd(t.background_npc || []);
+
+    // Genera stat block base (medio per default)
+    const statTpl = t.stat_array_templates?.['medio'] || [10,10,10,12,12,14];
+    const statsShuffled = [...statTpl].sort(() => Math.random() - 0.5);
+    const statNames = ['FOR','DES','COS','INT','SAG','CAR'];
+    const statKeys = ['forza','destrezza','costituzione','intelligenza','saggezza','carisma'];
+    const stats = {};
+    statKeys.forEach((k, i) => { stats[k] = statsShuffled[i]; });
+    const modStr = v => { const m = Math.floor((v - 10) / 2); return (m >= 0 ? '+' : '') + m; };
+    const gsInfo = t.gs_npc?.['civile'] || { ca: 10, pf: '2d8', attacco: '+2', danno: '1d4' };
+    const icon = ['👨', '👩', '🧙', '⚔️', '🗡️', '🛡️', '🎭', '🧝', '🐉'][Math.floor(Math.random()*9)];
+
+    // Salva l'NPC generato per uso futuro
+    Generatori._lastGeneratedNPC = {
+      nome, razza, job: prof, icon,
+      trait: tratto, secret: segreto, wants: desiderio,
+      voice: voce, tic,
+      obiettivo, difetto, legame, apparenza, background,
+      str: stats.forza, dex: stats.destrezza, con: stats.costituzione,
+      int_: stats.intelligenza, wis: stats.saggezza, cha: stats.carisma,
+      ac: gsInfo.ca, hp: gsInfo.pf, cr: '0', relation: 50,
+    };
 
     const el = document.getElementById('gen-npc-result');
+    const saveBtn = document.getElementById('gen-npc-save-btn');
     if (!el) return;
+    if (saveBtn) saveBtn.style.display = '';
+
     el.innerHTML = `
-      <div style="border-left:3px solid var(--accent-secondary);padding-left:var(--space-md);">
-        <div style="font-family:var(--font-display);font-size:1.1rem;color:var(--text-primary);margin-bottom:4px;">
-          ${nome} <span class="badge badge-muted">${razza}</span> <span class="badge badge-gold">${prof}</span>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-md);">
+        <!-- Colonna sinistra: Ruolo -->
+        <div>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:var(--space-sm);">
+            <span style="font-size:1.8rem;">${icon}</span>
+            <div>
+              <div style="font-family:var(--font-display);font-size:1.1rem;">${nome}</div>
+              <div><span class="badge badge-muted">${razza}</span> <span class="badge badge-gold">${prof}</span></div>
+            </div>
+          </div>
+          <div class="text-sm" style="margin-bottom:4px;"><strong>Apparenza:</strong> ${apparenza}</div>
+          <div class="text-sm" style="margin-bottom:4px;"><strong>Tratto:</strong> ${tratto}</div>
+          <div class="text-sm" style="margin-bottom:4px;"><strong>Voce:</strong> ${voce} · <em>${tic}</em></div>
+          <div class="text-sm" style="margin-bottom:4px;"><strong>Background:</strong> ${background}</div>
+          <div class="text-sm" style="margin-bottom:4px;"><strong>Legame:</strong> ${legame}</div>
+          <div class="text-sm" style="margin-bottom:4px;"><strong>Obiettivo:</strong> ${obiettivo}</div>
+          <div class="text-sm" style="margin-bottom:4px;"><strong>Difetto:</strong> ${difetto}</div>
+          <div class="text-sm" style="margin-bottom:4px;"><strong style="color:var(--accent-secondary);">Vuole dai PG:</strong> ${desiderio}</div>
+          <div class="text-sm"><strong style="color:var(--accent-primary);">🔒 Segreto:</strong> ${segreto}</div>
         </div>
-        <div class="text-sm" style="margin-bottom:4px;"><strong>Tratto:</strong> ${tratto}</div>
-        <div class="text-sm" style="margin-bottom:4px;"><strong style="color:var(--accent-primary);">Segreto:</strong> ${segreto}</div>
-        <div class="text-sm"><strong>Vuole:</strong> ${desiderio}</div>
+        <!-- Colonna destra: Stat block -->
+        <div>
+          <div class="stat-block">
+            <div class="stat-block-title" style="font-size:0.85rem;">${nome}</div>
+            <div class="stat-block-subtitle">Umanoide (${razza}), varia</div>
+            <div class="stat-block-divider"></div>
+            <div class="stat-row" style="font-size:0.78rem;"><strong>CA</strong> <span>${gsInfo.ca}</span></div>
+            <div class="stat-row" style="font-size:0.78rem;"><strong>PF</strong> <span>${gsInfo.pf}</span></div>
+            <div class="stat-block-divider"></div>
+            <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:3px;margin:4px 0;">
+              ${statNames.map((abbr, i) => {
+                const v = statsShuffled[i];
+                return `<div class="stat-ability-box">
+                  <div class="stat-ability-name">${abbr}</div>
+                  <div class="stat-ability-score" style="font-size:0.85rem;">${v}</div>
+                  <div class="stat-ability-mod">${modStr(v)}</div>
+                </div>`;
+              }).join('')}
+            </div>
+            <div class="stat-block-divider"></div>
+            <div class="stat-row" style="font-size:0.78rem;"><strong>GS</strong> <span>0 (PE 10)</span></div>
+          </div>
+        </div>
       </div>
     `;
-    Debug.log(`PNG generato: ${nome} (${razza}, ${prof})`);
+    Debug.log(`PNG completo generato: ${nome} (${razza}, ${prof})`);
+  },
+
+  _lastGeneratedNPC: null,
+
+  saveGeneratedNPC: () => {
+    const npc = Generatori._lastGeneratedNPC;
+    if (!npc) return;
+    const camp = App.getActiveCampaign();
+    if (!camp) { Toast.show('Seleziona una campagna prima', 'warning'); return; }
+    const npcs = [...(camp.npcs || [])];
+    npcs.push({ id: 'npc_' + Date.now(), ...npc });
+    App.saveActiveCampaign({ npcs });
+    Toast.show(`${npc.nome} salvato nel Mondo!`, 'success');
+    document.getElementById('gen-npc-save-btn').style.display = 'none';
+    Debug.log(`PNG salvato: ${npc.nome}`);
   },
 
   rollWeather: async () => {
