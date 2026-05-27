@@ -2017,7 +2017,7 @@ const Generatori = {
     Debug.log(`Loot generato: tipo=${tipo}, CR=${cr}, extras=${extras.length}`);
   },
 
-
+  calcViaggio: () => {
     const terreno = document.getElementById('gen-viaggio-terreno')?.value || 'strada';
     const ritmo   = document.getElementById('gen-viaggio-ritmo')?.value   || 'normale';
     const mezzo   = document.getElementById('gen-viaggio-mezzo')?.value   || 'piedi';
