@@ -2087,9 +2087,11 @@ const switchTab = (btn, targetId) => {
   parent.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
 
-  // Trova il container dei tab content (fratello successivo o padre)
-  const section = btn.closest('section') || document.body;
-  section.querySelectorAll('.tab-content').forEach(c => {
+  // Trova solo i tab-content che sono fratelli diretti del container .tabs
+  // Cerca il contenitore comune più vicino
+  const container = parent.parentElement;
+  if (!container) return;
+  container.querySelectorAll(':scope > .tab-content').forEach(c => {
     c.classList.toggle('active', c.id === targetId);
   });
 };
