@@ -1249,6 +1249,64 @@
   </div>
 </div>
 
+
+<!-- Modal: Combatente Custom / Homebrew -->
+<div class="modal-overlay hidden" id="modal-custom-combatant-modal" style="display:none;">
+  <div class="modal" style="max-width:480px;">
+    <div class="modal-header">
+      <h2 style="font-family:var(--font-display);font-size:1.1rem;">Combatente Custom / Homebrew</h2>
+      <button class="btn btn-ghost btn-icon" onclick="Modal.close('custom-combatant-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Nome *</label>
+          <input type="text" id="custom-nome" class="form-input" placeholder="es. Drago Ancestrale, Goblin Boss..."
+                 onkeydown="if(event.key==='Enter')Sessione.submitCustomCombatant()">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Tipo</label>
+          <select id="custom-tipo" class="form-select">
+            <option value="mostro">🐉 Mostro</option>
+            <option value="pg">👤 PG</option>
+            <option value="custom">⚔️ Altro</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row-3">
+        <div class="form-group">
+          <label class="form-label">Punti Ferita</label>
+          <input type="number" id="custom-hp" class="form-input" min="1" placeholder="es. 52">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Classe Armatura</label>
+          <input type="number" id="custom-ca" class="form-input" min="1" placeholder="es. 14">
+        </div>
+        <div class="form-group">
+          <label class="form-label">GS / CR</label>
+          <input type="text" id="custom-gs" class="form-input" placeholder="es. 5, 1/2">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Bonus Iniziativa (mod DES)</label>
+          <input type="number" id="custom-init-bonus" class="form-input" placeholder="es. +2 o -1" value="0">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Quantità</label>
+          <input type="number" id="custom-qty" class="form-input" min="1" max="20" value="1"
+                 placeholder="Quanti aggiungere?">
+        </div>
+      </div>
+      <div class="form-hint">💡 Se inserisci più di 1, verranno aggiunti come #1, #2, #3... con iniziativa tirata individualmente.</div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="Modal.close('custom-combatant-modal')">Annulla</button>
+      <button class="btn btn-primary" onclick="Sessione.submitCustomCombatant()">Aggiungi al Combat</button>
+    </div>
+  </div>
+</div>
+
 <!-- Modal: Compendio dettaglio -->
 <div class="modal-overlay hidden" id="modal-comp-detail" style="display:none;">
   <div class="modal modal-lg">
@@ -1320,7 +1378,7 @@ const Generatori = {
 
     // Salva l'NPC generato per uso futuro
     Generatori._lastGeneratedNPC = {
-      nome, razza, job: prof, icon,
+      name: nome, race: razza, job: prof, icon,
       trait: tratto, secret: segreto, wants: desiderio,
       voice: voce, tic,
       obiettivo, difetto, legame, apparenza, background,
@@ -1399,11 +1457,11 @@ const Generatori = {
     const npcs = [...(camp.npcs || [])];
     npcs.push({ id: 'npc_' + Date.now(), ...npc });
     App.saveActiveCampaign({ npcs });
-    Toast.show(`${npc.nome} salvato nel Mondo!`, 'success');
+    Toast.show(`${npc.name} salvato nel Mondo!`, 'success');
     document.getElementById('gen-npc-save-btn').style.display = 'none';
     document.getElementById('gen-npc-edit-btn').style.display = 'none';
     if (window.NPC) NPC.render();
-    Debug.log(`PNG salvato: ${npc.nome}`);
+    Debug.log(`PNG salvato: ${npc.name}`);
   },
 
   rollWeather: async () => {
