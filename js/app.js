@@ -57,7 +57,7 @@ const App = (() => {
     switch (pageId) {
       case 'home':      renderHomePage(); break;
       case 'campagna':  renderCampaignPage(); break;
-      case 'mondo':     if (window.NPC) NPC.init(); break;
+      case 'mondo':     if (window.NPC) NPC.init(); if (window.Luoghi) Luoghi.init(); if (window.Fazioni) Fazioni.init(); break;
       case 'sessione':  if (window.Sessione) Sessione.init(); break;
       case 'compendio': if (window.Compendio) Compendio.init(); break;
       case 'sessione':  if (window.Sessione) Sessione.init(); break;
