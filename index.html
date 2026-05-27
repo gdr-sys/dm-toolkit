@@ -12,6 +12,8 @@
   <script src="js/dadi.js" defer></script>
   <script src="js/modals.js" defer></script>
   <script src="js/npc.js" defer></script>
+  <script src="js/luoghi.js" defer></script>
+  <script src="js/fazioni.js" defer></script>
   <script src="js/sessione.js" defer></script>
   <script src="js/compendio.js" defer></script>
   <script src="js/app.js" defer></script>
@@ -213,19 +215,32 @@
       </div>
 
       <div id="mondo-tab-luoghi" class="tab-content">
-        <div class="module-placeholder">
-          <div class="module-placeholder-icon">🏰</div>
-          <h3>Modulo Luoghi</h3>
-          <p class="text-muted text-sm" style="max-width:320px;margin:0 auto;">Luoghi gerarchici, punti di interesse, tabelle incontri casuali e loot. In arrivo nel prossimo modulo.</p>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-md);flex-wrap:wrap;gap:var(--space-sm);">
+          <div style="display:flex;gap:var(--space-sm);flex-wrap:wrap;">
+            <input type="text" id="luoghi-search" class="form-input" placeholder="🔍 Cerca luogo..." style="width:220px;" oninput="Luoghi.filter()">
+            <select id="luoghi-filter-tipo" class="form-select" style="width:auto;" onchange="Luoghi.filter()">
+              <option value="">Tutti i tipi</option>
+              <option value="regno">Regno</option>
+              <option value="citta">Città</option>
+              <option value="villaggio">Villaggio</option>
+              <option value="dungeon">Dungeon</option>
+              <option value="locanda">Locanda</option>
+              <option value="edificio">Edificio</option>
+              <option value="natura">Natura</option>
+              <option value="altro">Altro</option>
+            </select>
+          </div>
+          <button class="btn btn-primary" onclick="Luoghi.openModal(null)">+ Nuovo Luogo</button>
         </div>
+        <div id="luoghi-list" class="grid-auto"></div>
       </div>
 
       <div id="mondo-tab-fazioni" class="tab-content">
-        <div class="module-placeholder">
-          <div class="module-placeholder-icon">🏛️</div>
-          <h3>Fazioni nel Mondo</h3>
-          <p class="text-muted text-sm" style="max-width:320px;margin:0 auto;">Le fazioni della campagna sono gestibili nella sezione Campagna. Qui arriverà la mappa relazionale delle fazioni.</p>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-md);flex-wrap:wrap;gap:var(--space-sm);">
+          <input type="text" id="fazioni-search" class="form-input" placeholder="🔍 Cerca fazione..." style="width:220px;" oninput="Fazioni.filter()">
+          <button class="btn btn-primary" onclick="Fazioni.openModal(null)">+ Nuova Fazione</button>
         </div>
+        <div id="fazioni-list" class="grid-auto"></div>
       </div>
     </section>
 
@@ -298,7 +313,8 @@
             <h3 class="card-title">👤 Generatore PNG Completo</h3>
             <div style="display:flex;gap:var(--space-sm);">
               <button class="btn btn-gold btn-sm" onclick="Generatori.rollNPC()">🎲 Genera</button>
-              <button class="btn btn-secondary btn-sm" id="gen-npc-save-btn" style="display:none;" onclick="Generatori.saveGeneratedNPC()">💾 Salva nel Mondo</button>
+              <button class="btn btn-secondary btn-sm" id="gen-npc-edit-btn" style="display:none;" onclick="Generatori.openGeneratedNPC()">✏️ Modifica Scheda</button>
+              <button class="btn btn-primary btn-sm" id="gen-npc-save-btn" style="display:none;" onclick="Generatori.saveGeneratedNPC()">💾 Salva nel Mondo</button>
             </div>
           </div>
           <div id="gen-npc-result" style="min-height:80px;">
@@ -308,20 +324,18 @@
           </div>
         </div>
 
+      </div>
+
+      <div class="grid-3" style="gap:var(--space-md);">
         <div class="card">
           <div class="card-header">
             <h3 class="card-title">🌤️ Meteo</h3>
             <button class="btn btn-secondary btn-sm" onclick="Generatori.rollWeather()">🎲 Genera</button>
           </div>
-          <div id="gen-weather-result" style="min-height:80px;">
-            <div class="empty-state" style="padding:var(--space-md);">
-              <div class="text-muted text-sm">Clicca per generare il meteo del giorno</div>
-            </div>
+          <div id="gen-weather-result" style="min-height:60px;">
+            <div class="text-muted text-sm">Clicca per generare il meteo</div>
           </div>
         </div>
-      </div>
-
-      <div class="grid-3" style="gap:var(--space-md);">
         <div class="card">
           <div class="card-header">
             <h3 class="card-title">👁️ Rumori & Odori</h3>
@@ -831,6 +845,19 @@
           <div class="form-group"><label class="form-label">Icona / Emoji</label><input type="text" id="nm-icon" class="form-input" placeholder="👤" maxlength="4"></div>
           <div class="form-group"><label class="form-label">Fazione</label><select id="nm-faction" class="form-select"><option value="">Nessuna</option></select></div>
         </div>
+        <div class="form-group">
+          <label class="form-label">Immagine PNG</label>
+          <div class="img-upload-area" id="npc-img-area" onclick="document.getElementById('npc-img-file').click()" style="max-height:100px;">
+            <img id="npc-img-preview" src="" style="display:none;max-height:80px;border-radius:var(--radius-md);object-fit:cover;width:100%;">
+            <div id="npc-img-placeholder" style="text-align:center;color:var(--text-muted);padding:var(--space-sm);">
+              <div style="font-size:1.5rem;">👤</div>
+              <div class="text-xs">Clicca per caricare un'immagine</div>
+            </div>
+          </div>
+          <input type="file" id="npc-img-file" accept="image/*" style="display:none;" onchange="handleImgUpload('npc')">
+          <input type="text" id="npc-img-url" class="form-input" placeholder="oppure incolla URL immagine..." style="margin-top:6px;" oninput="handleImgUrl('npc')">
+          <button class="btn btn-ghost btn-sm" id="npc-img-clear" style="display:none;margin-top:4px;" onclick="clearImg('npc')">✕ Rimuovi immagine</button>
+        </div>
         <div class="form-row">
           <div class="form-group"><label class="form-label">Voce</label><input type="text" id="nm-voice" class="form-input" placeholder="es. Bassa e roca"></div>
           <div class="form-group"><label class="form-label">Tic / Gesto</label><input type="text" id="nm-tic" class="form-input" placeholder="es. Si tocca sempre l'orecchio"></div>
@@ -1071,6 +1098,157 @@
   </div>
 </div>
 
+
+<!-- ══════════════════════════════════════════════
+     MODAL: Luogo (crea/modifica)
+══════════════════════════════════════════════ -->
+<div class="modal-overlay hidden" id="modal-luogo" style="display:none;">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <h2 style="font-family:var(--font-display);font-size:1.1rem;" id="luogo-modal-title">Nuovo Luogo</h2>
+      <button class="btn btn-ghost btn-icon" onclick="Modal.close('luogo')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="luogo-id">
+
+      <!-- Immagine -->
+      <div class="form-group">
+        <label class="form-label">Immagine</label>
+        <div class="img-upload-area" id="luogo-img-area" onclick="document.getElementById('luogo-img-file').click()">
+          <img id="luogo-img-preview" src="" style="display:none;max-height:140px;border-radius:var(--radius-md);object-fit:cover;width:100%;">
+          <div id="luogo-img-placeholder" style="text-align:center;color:var(--text-muted);padding:var(--space-md);">
+            <div style="font-size:2rem;">🏰</div>
+            <div class="text-sm">Clicca per caricare un'immagine</div>
+          </div>
+        </div>
+        <input type="file" id="luogo-img-file" accept="image/*" style="display:none;" onchange="handleImgUpload('luogo')">
+        <input type="text" id="luogo-img-url" class="form-input" placeholder="oppure incolla un URL immagine..." style="margin-top:6px;" oninput="handleImgUrl('luogo')">
+        <button class="btn btn-ghost btn-sm" id="luogo-img-clear" style="display:none;margin-top:4px;" onclick="clearImg('luogo')">✕ Rimuovi immagine</button>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Nome *</label>
+          <input type="text" id="luogo-nome" class="form-input" placeholder="es. Locanda del Drago Ubriaco">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Tipo</label>
+          <select id="luogo-tipo" class="form-select">
+            <option value="regno">🌍 Regno</option>
+            <option value="citta">🏙️ Città</option>
+            <option value="villaggio">🏘️ Villaggio</option>
+            <option value="dungeon">⚔️ Dungeon</option>
+            <option value="locanda" selected>🍺 Locanda</option>
+            <option value="edificio">🏛️ Edificio</option>
+            <option value="natura">🌲 Natura</option>
+            <option value="altro">📍 Altro</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Contenuto in</label>
+          <select id="luogo-parent" class="form-select">
+            <option value="">— Nessuno (luogo radice) —</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Icona / Emoji</label>
+          <input type="text" id="luogo-icon" class="form-input" placeholder="🏰" maxlength="4">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Descrizione</label>
+        <textarea id="luogo-desc" class="form-textarea" rows="3" placeholder="Atmosfera, dettagli sensoriali, cosa si vede appena si entra..."></textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Punti di Interesse / PNG residenti</label>
+          <textarea id="luogo-poi" class="form-textarea" rows="2" placeholder="es. Il proprietario Garak, il mercante sospetto al tavolo d'angolo..."></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Loot / Tesoro (nascosto)</label>
+          <textarea id="luogo-loot" class="form-textarea" rows="2" placeholder="es. 50 mo in una cassetta sotto il pavimento..."></textarea>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Note DM</label>
+        <textarea id="luogo-note" class="form-textarea" rows="2" placeholder="Informazioni riservate al master..."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="Modal.close('luogo')">Annulla</button>
+      <button class="btn btn-primary" onclick="Luoghi.submitModal()">Salva Luogo</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     MODAL: Fazione (crea/modifica) nel Mondo
+══════════════════════════════════════════════ -->
+<div class="modal-overlay hidden" id="modal-fazione-mondo" style="display:none;">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 style="font-family:var(--font-display);font-size:1.1rem;" id="fazione-mondo-title">Nuova Fazione</h2>
+      <button class="btn btn-ghost btn-icon" onclick="Modal.close('fazione-mondo')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="fazione-mondo-id">
+
+      <!-- Immagine -->
+      <div class="form-group">
+        <label class="form-label">Immagine / Stemma</label>
+        <div class="img-upload-area" id="fazione-img-area" onclick="document.getElementById('fazione-img-file').click()" style="max-height:100px;">
+          <img id="fazione-img-preview" src="" style="display:none;max-height:80px;border-radius:var(--radius-md);object-fit:cover;width:100%;">
+          <div id="fazione-img-placeholder" style="text-align:center;color:var(--text-muted);padding:var(--space-sm);">
+            <div style="font-size:1.5rem;">🏛️</div>
+            <div class="text-xs">Clicca per caricare</div>
+          </div>
+        </div>
+        <input type="file" id="fazione-img-file" accept="image/*" style="display:none;" onchange="handleImgUpload('fazione')">
+        <input type="text" id="fazione-img-url" class="form-input" placeholder="oppure URL immagine..." style="margin-top:6px;" oninput="handleImgUrl('fazione')">
+        <button class="btn btn-ghost btn-sm" id="fazione-img-clear" style="display:none;margin-top:4px;" onclick="clearImg('fazione')">✕ Rimuovi</button>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Nome *</label>
+          <input type="text" id="fazione-mondo-nome" class="form-input" placeholder="es. Gli Arpisti">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Icona</label>
+          <input type="text" id="fazione-mondo-icon" class="form-input" placeholder="🏛️" maxlength="4">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Potere attuale (0–100): <span id="fazione-mondo-power-val">50</span></label>
+        <input type="range" id="fazione-mondo-power" min="0" max="100" value="50" style="width:100%;"
+               oninput="document.getElementById('fazione-mondo-power-val').textContent=this.value">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Zona di influenza</label>
+        <input type="text" id="fazione-mondo-influenza" class="form-input" placeholder="es. Controllo del commercio di Waterdeep">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Obiettivi e metodi</label>
+        <textarea id="fazione-mondo-obiettivi" class="form-textarea" rows="2" placeholder="Cosa vuole questa fazione e come lo persegue..."></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Relazioni con altre fazioni</label>
+        <input type="text" id="fazione-mondo-relazioni" class="form-input" placeholder="es. Alleata: Ordine del Guanto | Rivale: Zhentarim">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Note DM</label>
+        <textarea id="fazione-mondo-note" class="form-textarea" rows="2" placeholder="Piani segreti, leader, agenti..."></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="Modal.close('fazione-mondo')">Annulla</button>
+      <button class="btn btn-primary" onclick="Fazioni.submitModal()">Salva Fazione</button>
+    </div>
+  </div>
+</div>
+
 <!-- Modal: Compendio dettaglio -->
 <div class="modal-overlay hidden" id="modal-comp-detail" style="display:none;">
   <div class="modal modal-lg">
@@ -1207,6 +1385,12 @@ const Generatori = {
 
   _lastGeneratedNPC: null,
 
+  openGeneratedNPC: () => {
+    const npc = Generatori._lastGeneratedNPC;
+    if (!npc || !window.NPC) return;
+    NPC.openModal(npc);
+  },
+
   saveGeneratedNPC: () => {
     const npc = Generatori._lastGeneratedNPC;
     if (!npc) return;
@@ -1217,6 +1401,8 @@ const Generatori = {
     App.saveActiveCampaign({ npcs });
     Toast.show(`${npc.nome} salvato nel Mondo!`, 'success');
     document.getElementById('gen-npc-save-btn').style.display = 'none';
+    document.getElementById('gen-npc-edit-btn').style.display = 'none';
+    if (window.NPC) NPC.render();
     Debug.log(`PNG salvato: ${npc.nome}`);
   },
 
@@ -1361,6 +1547,70 @@ const switchQuestTab = (btn, status) => {
     const el = document.getElementById(`quest-list-${s}`);
     if (el) el.classList.toggle('active', s === status);
   });
+};
+
+
+/* ══════════════════════════════════════
+   GESTIONE IMMAGINI (PNG, Luoghi, Fazioni)
+══════════════════════════════════════ */
+
+const _imgData = {}; // chiave -> base64 o url
+
+const setImgPreview = (key, src) => {
+  const preview = document.getElementById(`${key}-img-preview`);
+  const placeholder = document.getElementById(`${key}-img-placeholder`);
+  const clearBtn = document.getElementById(`${key}-img-clear`);
+  if (!preview) return;
+  if (src) {
+    preview.src = src;
+    preview.style.display = 'block';
+    if (placeholder) placeholder.style.display = 'none';
+    if (clearBtn) clearBtn.style.display = '';
+    _imgData[key] = src;
+  } else {
+    preview.src = '';
+    preview.style.display = 'none';
+    if (placeholder) placeholder.style.display = '';
+    if (clearBtn) clearBtn.style.display = 'none';
+    _imgData[key] = '';
+  }
+};
+
+const handleImgUpload = (key) => {
+  const input = document.getElementById(`${key}-img-file`);
+  if (!input?.files?.[0]) return;
+  const file = input.files[0];
+  if (file.size > 2 * 1024 * 1024) {
+    Toast.show('Immagine troppo grande (max 2MB)', 'warning');
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const src = e.target.result;
+    setImgPreview(key, src);
+    // Aggiorna anche il campo URL
+    const urlEl = document.getElementById(`${key}-img-url`);
+    if (urlEl) urlEl.value = src;
+  };
+  reader.readAsDataURL(file);
+};
+
+const handleImgUrl = (key) => {
+  const urlEl = document.getElementById(`${key}-img-url`);
+  const src = urlEl?.value?.trim() || '';
+  if (src && (src.startsWith('http') || src.startsWith('data:'))) {
+    setImgPreview(key, src);
+  } else if (!src) {
+    setImgPreview(key, '');
+  }
+};
+
+const clearImg = (key) => {
+  setImgPreview(key, '');
+  const urlEl = document.getElementById(`${key}-img-url`);
+  const fileEl = document.getElementById(`${key}-img-file`);
+  if (urlEl) urlEl.value = '';
+  if (fileEl) fileEl.value = '';
 };
 
 
