@@ -12,6 +12,7 @@
   <script src="js/dadi.js" defer></script>
   <script src="js/modals.js" defer></script>
   <script src="js/npc.js" defer></script>
+  <script src="js/compendio.js" defer></script>
   <script src="js/app.js" defer></script>
 </head>
 <body>
@@ -370,13 +371,97 @@
       <div class="page-header">
         <div>
           <h1 class="page-title">📚 Compendio</h1>
-          <p class="page-subtitle">Regole, mostri, oggetti magici ed equipaggiamento</p>
+          <p class="page-subtitle">D&D 5e 2024 — Mostri, Oggetti Magici, Equipaggiamento, Regole</p>
         </div>
       </div>
-      <div class="module-placeholder">
-        <div class="module-placeholder-icon">📚</div>
-        <h3>Compendio 5e</h3>
-        <p class="text-muted text-sm" style="max-width:400px;margin:0 auto;">Qui potrai consultare mostri, oggetti magici, incantesimi e regole. Si attiva quando carichi i file JSON della 5e. Manda i tuoi file e li integriamo!</p>
+
+      <!-- Loading -->
+      <div id="comp-loading" style="display:none;align-items:center;justify-content:center;min-height:200px;flex-direction:column;gap:var(--space-md);">
+        <div style="font-size:2rem;animation:pulse 1.5s infinite;">📚</div>
+        <div class="text-muted text-sm">Caricamento dati in corso...</div>
+      </div>
+
+      <div id="comp-content">
+        <!-- Tabs -->
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:var(--space-md);margin-bottom:var(--space-md);">
+          <div class="tabs" style="max-width:520px;">
+            <button class="tab-btn active" id="comp-tab-monsters"    onclick="Compendio.switchTab('monsters')">🐉 Mostri</button>
+            <button class="tab-btn"        id="comp-tab-magic_items" onclick="Compendio.switchTab('magic_items')">✨ Oggetti Magici</button>
+            <button class="tab-btn"        id="comp-tab-equipment"   onclick="Compendio.switchTab('equipment')">⚔️ Equipaggiamento</button>
+            <button class="tab-btn"        id="comp-tab-rules"       onclick="Compendio.switchTab('rules')">📖 Regole</button>
+          </div>
+          <div style="display:flex;align-items:center;gap:var(--space-sm);">
+            <span class="text-xs text-muted" id="comp-count-monsters"></span>
+            <span class="text-xs text-muted" id="comp-count-magic" style="display:none;"></span>
+            <span class="text-xs text-muted" id="comp-count-equip" style="display:none;"></span>
+            <span class="text-xs text-muted" id="comp-count-rules" style="display:none;"></span>
+          </div>
+        </div>
+
+        <!-- Filtri Mostri -->
+        <div id="comp-filters-monsters" class="comp-filters">
+          <input type="text" id="comp-search-monsters" class="form-input" placeholder="🔍 Cerca mostro..." style="flex:1;min-width:180px;" oninput="Compendio.onSearch('monsters')">
+          <select class="form-select" id="comp-filter-tipo-monsters" style="width:auto;" onchange="Compendio.onFilter('monsters','tipo',this.value)">
+            <option value="">Tutti i tipi</option>
+          </select>
+          <select class="form-select" id="comp-filter-gs-min" style="width:auto;" onchange="Compendio.onFilter('monsters','gs_min',this.value)">
+            <option value="">GS min</option>
+          </select>
+          <select class="form-select" id="comp-filter-gs-max" style="width:auto;" onchange="Compendio.onFilter('monsters','gs_max',this.value)">
+            <option value="">GS max</option>
+          </select>
+        </div>
+
+        <!-- Filtri Oggetti Magici -->
+        <div id="comp-filters-magic_items" class="comp-filters hidden">
+          <input type="text" id="comp-search-magic_items" class="form-input" placeholder="🔍 Cerca oggetto..." style="flex:1;min-width:180px;" oninput="Compendio.onSearch('magic_items')">
+          <select class="form-select" id="comp-filter-tipo-magic" style="width:auto;" onchange="Compendio.onFilter('magic_items','tipo_base',this.value)">
+            <option value="">Tutti i tipi</option>
+          </select>
+          <select class="form-select" id="comp-filter-rarita" style="width:auto;" onchange="Compendio.onFilter('magic_items','rarita',this.value)">
+            <option value="">Tutte le rarità</option>
+            <option value="comune">Comune</option>
+            <option value="non comune">Non comune</option>
+            <option value="rara">Rara</option>
+            <option value="molto rara">Molto rara</option>
+            <option value="leggendaria">Leggendaria</option>
+            <option value="manufatto">Manufatto</option>
+            <option value="variabile">Variabile</option>
+          </select>
+        </div>
+
+        <!-- Filtri Equipaggiamento -->
+        <div id="comp-filters-equipment" class="comp-filters hidden">
+          <input type="text" id="comp-search-equipment" class="form-input" placeholder="🔍 Cerca equipaggiamento..." style="flex:1;min-width:180px;" oninput="Compendio.onSearch('equipment')">
+          <select class="form-select" id="comp-filter-tipo-equip" style="width:auto;" onchange="Compendio.onFilter('equipment','tipo',this.value)">
+            <option value="">Tutti i tipi</option>
+          </select>
+          <select class="form-select" id="comp-filter-cat-equip" style="width:auto;" onchange="Compendio.onFilter('equipment','categoria',this.value)">
+            <option value="">Tutte le categorie</option>
+          </select>
+        </div>
+
+        <!-- Filtri Regole -->
+        <div id="comp-filters-rules" class="comp-filters hidden">
+          <input type="text" id="comp-search-rules" class="form-input" placeholder="🔍 Cerca regola..." style="flex:1;min-width:180px;" oninput="Compendio.onSearch('rules')">
+          <select class="form-select" id="comp-filter-cat-rules" style="width:auto;" onchange="Compendio.onFilter('rules','categoria',this.value)">
+            <option value="">Tutte le categorie</option>
+          </select>
+        </div>
+
+        <!-- Liste -->
+        <div class="tab-content active" id="comp-panel-monsters">
+          <div id="comp-list-monsters" class="comp-list"></div>
+        </div>
+        <div class="tab-content" id="comp-panel-magic_items">
+          <div id="comp-list-magic" class="comp-list"></div>
+        </div>
+        <div class="tab-content" id="comp-panel-equipment">
+          <div id="comp-list-equip" class="comp-list"></div>
+        </div>
+        <div class="tab-content" id="comp-panel-rules">
+          <div id="comp-list-rules" class="comp-list"></div>
+        </div>
       </div>
     </section>
 
@@ -873,6 +958,20 @@
   </div>
 </div>
 
+
+<!-- Modal: Compendio dettaglio -->
+<div class="modal-overlay hidden" id="modal-comp-detail" style="display:none;">
+  <div class="modal modal-lg">
+    <div class="modal-header">
+      <h2 style="font-family:var(--font-display);font-size:1.1rem;" id="comp-detail-title">—</h2>
+      <div style="display:flex;gap:var(--space-sm);align-items:center;">
+        <button class="btn btn-primary btn-sm" id="comp-detail-combat-btn" style="display:none;" onclick="Compendio.sendCurrentToCombat()">⚔️ Aggiungi al Combat</button>
+        <button class="btn btn-ghost btn-icon" onclick="Modal.close('comp-detail')">✕</button>
+      </div>
+    </div>
+    <div class="modal-body" id="comp-detail-body"></div>
+  </div>
+</div>
 
 <!-- ════════════════════════════════════════════════════════
      SCRIPTS
