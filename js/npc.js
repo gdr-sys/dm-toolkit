@@ -183,6 +183,11 @@ const NPC = (() => {
     updateRelationPreview(rel);
     renderActionsInModal(npc?.actions || []);
 
+    // Immagine
+    if (window.setImgPreview) setImgPreview('npc', npc?.immagine || '');
+    const imgUrlEl = document.getElementById('npc-img-url');
+    if (imgUrlEl) imgUrlEl.value = npc?.immagine || '';
+
     Modal.open('npc');
     setTimeout(() => document.getElementById('nm-name')?.focus(), 100);
     Debug.log(`NPC modal: ${npc ? npc.name : 'nuovo'}`);
@@ -231,6 +236,7 @@ const NPC = (() => {
       special:     document.getElementById('nm-special')?.value?.trim()      || '',
       combatNotes: document.getElementById('nm-combat-notes')?.value?.trim() || '',
       actions: getActions(),
+      immagine: document.getElementById('npc-img-url')?.value?.trim() || '',
     };
 
     if (_editingId) {
@@ -418,6 +424,7 @@ const NPC = (() => {
       const facName = camp?.factions?.find(f => f.id === npc.factionId)?.name || '';
       return `
         <div class="npc-card" onclick="NPC.openView('${npc.id}')">
+          ${npc.immagine ? `<div style="height:90px;background:url('${npc.immagine}') center/cover no-repeat;border-radius:var(--radius-lg) var(--radius-lg) 0 0;flex-shrink:0;"></div>` : ''}
           <div class="npc-card-header">
             <div class="npc-avatar">${npc.icon || '👤'}</div>
             <div style="flex:1;min-width:0;">
