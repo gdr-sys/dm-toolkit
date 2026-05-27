@@ -91,7 +91,11 @@ const Storage = (() => {
 
   const getCampaign = (id) => {
     const list = getCampaigns();
-    return list.find(c => c.id === id) || null;
+    const found = list.find(c => c.id === id);
+    if (!found) return null;
+    // Merge con struttura default per campagne vecchie create prima di nuovi campi
+    const defaults = emptyCampaign(found.id, found.name, found.type);
+    return { ...defaults, ...found };
   };
 
   const createCampaign = (name, type = 'campagna') => {
