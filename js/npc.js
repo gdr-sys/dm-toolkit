@@ -414,8 +414,11 @@ const NPC = (() => {
 
   // ── Render lista ──
   const render = () => {
+    // Ricarica sempre dal storage prima di renderizzare
+    App.reloadActiveCampaign();
     const camp = App.getActiveCampaign();
     const el = document.getElementById('npc-list');
+    Debug.log(`NPC.render: camp=${camp?.name || 'NULL'}, npcs=${camp?.npcs?.length ?? 'undefined'}, el=${el ? 'ok' : 'NOT FOUND'}`);
     if (!el) return;
 
     const search  = document.getElementById('npc-search')?.value?.toLowerCase() || '';
