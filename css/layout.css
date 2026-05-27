@@ -951,3 +951,19 @@
 }
 .party-stat-label { font-size: 0.6rem; font-family: var(--font-display); letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-muted); }
 .party-stat-value { font-family: var(--font-mono); font-size: 1rem; font-weight: 700; color: var(--text-primary); }
+
+/* ══════════════════════════════════════
+   UPLOAD IMMAGINI
+══════════════════════════════════════ */
+.img-upload-area {
+  border: 2px dashed var(--border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: border-color var(--transition-fast);
+  overflow: hidden;
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.img-upload-area:hover { border-color: var(--accent-primary); }
