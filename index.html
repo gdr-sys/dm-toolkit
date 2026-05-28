@@ -2331,14 +2331,14 @@ const App = (() => {
       case 'campagna':   renderCampaignPage(); break;
       case 'mondo':
         App.reloadActiveCampaign();
-        if (window.NPC) NPC.init();
-        if (window.Luoghi) Luoghi.init();
-        if (window.Fazioni) Fazioni.init();
+        try { NPC.init(); } catch(e) { Debug.warn('NPC non pronto: ' + e); }
+        try { Luoghi.init(); } catch(e) {}
+        try { Fazioni.init(); } catch(e) {}
         break;
-      case 'sessione':   if (window.Sessione) Sessione.init(); break;
+      case 'sessione':   try { Sessione.init(); } catch(e) {} break;
       case 'generatori': break;
-      case 'compendio':  if (window.Compendio) Compendio.init(); break;
-      case 'schermo':    if (window.Schermo) Schermo.init(); break;
+      case 'compendio':  try { Compendio.init(); } catch(e) {} break;
+      case 'schermo':    try { Schermo.init(); } catch(e) {} break;
     }
   };
 
@@ -5604,7 +5604,7 @@ const Generatori = {
     Toast.show(`${npc.name} salvato nel Mondo!`, 'success');
     document.getElementById('gen-npc-save-btn').style.display = 'none';
     document.getElementById('gen-npc-edit-btn').style.display = 'none';
-    if (window.NPC) NPC.render();
+    try { NPC.render(); } catch(e) {}
     Debug.log(`PNG salvato: ${npc.name}`);
   },
 
