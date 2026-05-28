@@ -668,33 +668,187 @@
 .debug-line.warn  { color: #ffaa00; }
 .debug-line.info  { color: #44aaff; }
 
-/* ── RESPONSIVE ── */
+/* ══════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════ */
+
+/* ── Tablet orizzontale (1024px) ── */
 @media (max-width: 1024px) {
   .grid-4 { grid-template-columns: repeat(2, 1fr); }
   .grid-3 { grid-template-columns: repeat(2, 1fr); }
+  .schermo-grid { grid-template-columns: repeat(2, 1fr); }
 }
 
+/* ── Tablet verticale / telefono grande (768px) ── */
 @media (max-width: 768px) {
   :root {
-    --nav-width: 100%;
-    --nav-collapsed: 0px;
+    --nav-width: 220px;
+    --nav-collapsed: 60px;
+    --mobile-nav-height: 56px;
   }
 
+  /* Sidebar diventa overlay su mobile */
   #sidebar {
-    width: 100%;
-    height: auto;
-    position: relative;
-    flex-direction: row;
-    flex-wrap: wrap;
+    position: fixed;
+    left: -220px;
+    top: 0;
+    bottom: var(--mobile-nav-height);
+    width: 220px;
+    transition: left var(--transition-normal);
+    z-index: 300;
   }
 
-  #main-content { margin-left: 0; }
-  #main-content.expanded { margin-left: 0; }
+  #sidebar.mobile-open {
+    left: 0;
+    box-shadow: var(--shadow-xl);
+  }
 
+  /* Overlay quando sidebar è aperta */
+  #sidebar-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 299;
+  }
+  #sidebar-overlay.active { display: block; }
+
+  /* Main content occupa tutto */
+  #main-content {
+    margin-left: 0 !important;
+    padding-bottom: var(--mobile-nav-height);
+  }
+
+  /* Topbar mobile */
+  #topbar {
+    padding: 0 var(--space-sm);
+  }
+
+  /* Navbar in basso su mobile */
+  #mobile-nav {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: var(--mobile-nav-height);
+    background: var(--nav-bg);
+    border-top: 1px solid rgba(255,255,255,0.08);
+    z-index: 400;
+    align-items: stretch;
+  }
+
+  .mobile-nav-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    color: var(--nav-text);
+    cursor: pointer;
+    border: none;
+    background: none;
+    padding: 4px 2px;
+    transition: color var(--transition-fast);
+    min-width: 0;
+  }
+
+  .mobile-nav-item.active { color: var(--nav-active); }
+  .mobile-nav-item:hover { color: var(--nav-active); }
+
+  .mobile-nav-icon { font-size: 1.1rem; line-height: 1; }
+  .mobile-nav-label {
+    font-family: var(--font-display);
+    font-size: 0.52rem;
+    letter-spacing: 0.03em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+  }
+
+  .mobile-nav-item.active .mobile-nav-icon,
+  .mobile-nav-item.active .mobile-nav-label {
+    color: var(--accent-primary);
+  }
+
+  /* Hamburger nel topbar */
+  #mobile-menu-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    background: none;
+    border: none;
+    color: var(--text-primary);
+    cursor: pointer;
+    font-size: 1.2rem;
+    margin-right: var(--space-sm);
+    flex-shrink: 0;
+  }
+
+  /* Layout griglia mobile */
   .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
   .form-row, .form-row-3 { grid-template-columns: 1fr; }
+  .schermo-grid { grid-template-columns: 1fr; }
 
-  #dice-widget { bottom: var(--space-md); right: var(--space-md); }
+  /* Dadi widget sopra la navbar */
+  #dice-widget {
+    bottom: calc(var(--mobile-nav-height) + var(--space-sm));
+    right: var(--space-sm);
+  }
+
+  /* Debug panel */
+  #debug-panel {
+    left: var(--space-sm);
+    bottom: calc(var(--mobile-nav-height) + var(--space-sm));
+  }
+
+  /* Page padding ridotto */
+  .page { padding: var(--space-sm); }
+
+  /* Combat tracker mobile */
+  .combat-row {
+    grid-template-columns: 48px 1fr 130px 0 100px;
+  }
+  .combat-ca-col { display: none; }
+
+  /* Tabs scrollabili */
+  .tabs {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+  }
+  .tab-btn { flex-shrink: 0; }
+
+  /* Modal fullscreen su mobile */
+  .modal {
+    max-width: 100%;
+    max-height: 95vh;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    margin: auto auto 0;
+  }
+  .modal-overlay {
+    align-items: flex-end;
+  }
+
+  /* Card NPC più compatte */
+  .npc-card { min-width: 0; }
+
+  /* Page header impilato */
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+/* ── Telefono piccolo (480px) ── */
+@media (max-width: 480px) {
+  #topbar { height: 48px; }
+  .page { padding: var(--space-xs) var(--space-sm); }
+  .modal-body { padding: var(--space-sm); }
+  .modal-header, .modal-footer { padding: var(--space-sm) var(--space-md); }
 }
 
 /* ── Sezione placeholder per moduli futuri ── */
