@@ -1,0 +1,486 @@
+[
+  {
+    "id": "aboleth",
+    "nome": "Aboleth",
+    "tipo": "Aberrazione",
+    "dimensione": "Grande",
+    "allineamento": "legale malvagio",
+    "classe_armatura": 17,
+    "iniziativa": { "valore": 9, "bonus": -1 },
+    "punti_ferita": { "media": 135, "formula": "18d10 + 36" },
+    "velocita": { "camminata": "3 m", "nuoto": "12 m" },
+    "caratteristiche": {
+      "forza":        { "punteggio": 21, "modificatore": 5, "tiro_salvezza": 5 },
+      "destrezza":    { "punteggio": 9,  "modificatore": -1, "tiro_salvezza": -1 },
+      "costituzione": { "punteggio": 15, "modificatore": 2, "tiro_salvezza": 6 },
+      "intelligenza": { "punteggio": 18, "modificatore": 4, "tiro_salvezza": 8 },
+      "saggezza":     { "punteggio": 15, "modificatore": 2, "tiro_salvezza": 6 },
+      "carisma":      { "punteggio": 18, "modificatore": 4, "tiro_salvezza": 4 }
+    },
+    "abilita": { "percezione": 10, "storia": 12 },
+    "sensi": { "percezione_passiva": 20, "scurovisione": "36 m" },
+    "lingue": ["Gergo delle Profondità", "telepatia 36 m"],
+    "grado_sfida": { "valore": 10, "punti_esperienza": 5900 },
+    "bonus_competenza": 4,
+    "tratti": [
+      { "nome": "Anfibio", "descrizione": "L'aboleth può respirare in aria e in acqua." },
+      { "nome": "Nube di muco", "descrizione": "Finché si trova sott'acqua, l'aboleth è circondato da muco mutageno. Una creatura che lo tocca o lo colpisce in mischia entro 1,5 m deve superare un TS Cos CD 14 o si ammala per 1d4 ore: può respirare solo sott'acqua." },
+      { "nome": "Sonda telepatica", "descrizione": "Se una creatura comunica telepaticamente con l'aboleth, quest'ultimo apprende i suoi più grandi desideri." }
+    ],
+    "azioni": [
+      { "nome": "Multiattacco", "descrizione": "L'aboleth effettua tre attacchi con i tentacoli." },
+      { "nome": "Coda", "descrizione": "Attacco con arma da mischia: +9 al tiro per colpire, portata 3 m. Colpito: 15 (3d6+5) danni contundenti." },
+      { "nome": "Tentacolo", "descrizione": "Attacco con arma da mischia: +9 al tiro per colpire, portata 3 m. Colpito: 12 (2d6+5) danni contundenti. Se il bersaglio è una creatura deve superare un TS Cos CD 14 o si ammala: pelle traslucida, non recupera PF fuori acqua, subisce 6d12 danni da acido ogni 10 min fuori acqua." },
+      { "nome": "Schiavizzare (3/giorno)", "descrizione": "Bersaglio entro 9 m visibile. TS Sag CD 14 o affascinato finché l'aboleth muore o si trova su un piano diverso. Controllato, no reazioni. Il bersaglio può ripetere il TS quando subisce danni o ogni 24 ore se è ad almeno 1,5 km." }
+    ],
+    "azioni_leggendarie": {
+      "utilizzi": "3",
+      "descrizione_utilizzi": "Subito dopo il turno di un'altra creatura. L'aboleth recupera tutti gli utilizzi all'inizio del suo turno.",
+      "azioni": [
+        { "nome": "Individuazione", "descrizione": "L'aboleth effettua una prova di Saggezza (Percezione)." },
+        { "nome": "Spazzata di coda", "descrizione": "L'aboleth effettua un attacco con la coda." },
+        { "nome": "Risucchio psichico (2 azioni)", "descrizione": "Una creatura affascinata subisce 10 (3d6) danni psichici; l'aboleth recupera PF pari ai danni inflitti." }
+      ]
+    }
+  },
+  {
+    "id": "deva",
+    "nome": "Deva",
+    "tipo": "Celestiale",
+    "dimensione": "Medio",
+    "allineamento": "legale buono",
+    "classe_armatura": 17,
+    "iniziativa": { "valore": 14, "bonus": 4 },
+    "punti_ferita": { "media": 136, "formula": "16d8 + 64" },
+    "velocita": { "camminata": "9 m", "volo": "27 m" },
+    "caratteristiche": {
+      "forza":        { "punteggio": 18, "modificatore": 4, "tiro_salvezza": 4 },
+      "destrezza":    { "punteggio": 18, "modificatore": 4, "tiro_salvezza": 4 },
+      "costituzione": { "punteggio": 18, "modificatore": 4, "tiro_salvezza": 4 },
+      "intelligenza": { "punteggio": 17, "modificatore": 3, "tiro_salvezza": 3 },
+      "saggezza":     { "punteggio": 20, "modificatore": 5, "tiro_salvezza": 9 },
+      "carisma":      { "punteggio": 20, "modificatore": 5, "tiro_salvezza": 9 }
+    },
+    "abilita": { "intuizione": 9, "percezione": 9 },
+    "resistenze": ["radiosi", "contundenti da attacchi non magici", "perforanti da attacchi non magici", "taglienti da attacchi non magici"],
+    "immunita_condizione": ["affascinato", "indebolimento", "spaventato"],
+    "sensi": { "percezione_passiva": 19, "scurovisione": "36 m" },
+    "lingue": ["tutti", "telepatia 36 m"],
+    "grado_sfida": { "valore": 10, "punti_esperienza": 5900 },
+    "bonus_competenza": 4,
+    "tratti": [
+      { "nome": "Armi angeliche", "descrizione": "Gli attacchi con arma del deva sono magici. Quando colpisce con qualsiasi arma, infligge 4d8 danni radiosi extra (già inclusi nell'attacco)." },
+      { "nome": "Incantesimi innati", "descrizione": "Caratteristica: Carisma (CD TS 17). A volontà: individuazione del bene e del male. 1/giorno: comunione, rianimare morti." },
+      { "nome": "Resistenza alla magia", "descrizione": "Il deva dispone di vantaggio ai tiri salvezza contro incantesimi e altri effetti magici." }
+    ],
+    "azioni": [
+      { "nome": "Multiattacco", "descrizione": "Il deva effettua due attacchi in mischia." },
+      { "nome": "Mazza", "descrizione": "Attacco con arma da mischia: +8 al tiro per colpire, portata 1,5 m. Colpito: 7 (1d6+4) danni contundenti più 18 (4d8) danni radiosi." },
+      { "nome": "Tocco Guaritore (3/giorno)", "descrizione": "Il deva tocca un'altra creatura. Il bersaglio recupera 20 (4d8+2) PF ed è liberato da maledizioni, malattie, veleno, cecità e sordità." },
+      { "nome": "Cambiare forma", "descrizione": "Il deva si trasforma magicamente in una bestia o umanoide con GdS ≤ proprio, o ritorna alla sua vera forma." }
+    ]
+  },
+  {
+    "id": "solar",
+    "nome": "Solar",
+    "tipo": "Celestiale",
+    "dimensione": "Grande",
+    "allineamento": "legale buono",
+    "classe_armatura": 21,
+    "iniziativa": { "valore": 16, "bonus": 6 },
+    "punti_ferita": { "media": 243, "formula": "18d10 + 144" },
+    "velocita": { "camminata": "15 m", "volo": "45 m" },
+    "caratteristiche": {
+      "forza":        { "punteggio": 26, "modificatore": 8, "tiro_salvezza": 8 },
+      "destrezza":    { "punteggio": 22, "modificatore": 6, "tiro_salvezza": 6 },
+      "costituzione": { "punteggio": 26, "modificatore": 8, "tiro_salvezza": 8 },
+      "intelligenza": { "punteggio": 25, "modificatore": 7, "tiro_salvezza": 17 },
+      "saggezza":     { "punteggio": 25, "modificatore": 7, "tiro_salvezza": 14 },
+      "carisma":      { "punteggio": 30, "modificatore": 10, "tiro_salvezza": 14 }
+    },
+    "abilita": { "percezione": 14 },
+    "resistenze": ["radiosi", "contundenti da attacchi non magici", "perforanti da attacchi non magici", "taglienti da attacchi non magici"],
+    "immunita_danni": ["necrotici", "veleno"],
+    "immunita_condizione": ["affascinato", "avvelenato", "indebolimento", "spaventato"],
+    "sensi": { "percezione_passiva": 24, "vista_pura": "36 m" },
+    "lingue": ["tutti", "telepatia 36 m"],
+    "grado_sfida": { "valore": 21, "punti_esperienza": 33000 },
+    "bonus_competenza": 7,
+    "tratti": [
+      { "nome": "Armi angeliche", "descrizione": "Gli attacchi con arma del solar sono magici; infligge 6d8 danni radiosi extra." },
+      { "nome": "Consapevolezza divina", "descrizione": "Il solar sa riconoscere le menzogne." },
+      { "nome": "Incantesimi innati", "descrizione": "Caratteristica: Carisma (CD TS 25). A volontà: individuazione del bene e del male, invisibilità (solo sé). 3/giorno: barriera di lame, dissolvi il bene e il male, resurrezione. 1/giorno: comunione, controllare tempo atmosferico." },
+      { "nome": "Resistenza alla magia", "descrizione": "Il solar dispone di vantaggio ai tiri salvezza contro incantesimi e altri effetti magici." }
+    ],
+    "azioni": [
+      { "nome": "Multiattacco", "descrizione": "Il solar effettua due attacchi con lo spadone." },
+      { "nome": "Spadone", "descrizione": "Attacco con arma da mischia: +15 al tiro per colpire, portata 1,5 m. Colpito: 22 (4d6+8) danni taglienti più 27 (6d8) danni radiosi." },
+      { "nome": "Arco lungo assassino", "descrizione": "Attacco con arma a distanza: +13 al tiro per colpire, gittata 45/180 m. Colpito: 15 (2d8+6) danni perforanti più 27 (6d8) danni radiosi. Se il bersaglio ha ≤100 PF, TS Cos CD 15 o muore." },
+      { "nome": "Spada volante", "descrizione": "Il solar lascia andare lo spadone, che fluttua entro 1,5 m da lui. Come azione bonus gli ordina di volare fino a 15 m e attaccare un bersaglio." },
+      { "nome": "Tocco Guaritore (4/giorno)", "descrizione": "Il bersaglio recupera 40 (8d8+4) PF ed è liberato da maledizioni, malattie, veleno, cecità e sordità." }
+    ],
+    "azioni_leggendarie": {
+      "utilizzi": "3",
+      "descrizione_utilizzi": "Subito dopo il turno di un'altra creatura. Recupera tutti gli utilizzi all'inizio del suo turno.",
+      "azioni": [
+        { "nome": "Teletrasporto", "descrizione": "Il solar si teletrasporta fino a uno spazio libero visibile entro 36 m." },
+        { "nome": "Esplosione incandescente (2 azioni)", "descrizione": "Ogni creatura scelta entro 3 m: TS Des CD 23 o 14 (4d6) danni da fuoco + 14 (4d6) danni radiosi (metà successo)." },
+        { "nome": "Sguardo accecante (3 azioni)", "descrizione": "Un bersaglio entro 9 m visibile: TS Cos CD 15 o accecato finché una magia come ristorare inferiore non lo cura." }
+      ]
+    }
+  },
+  {
+    "id": "ankheg",
+    "nome": "Ankheg",
+    "tipo": "Mostruosità",
+    "dimensione": "Grande",
+    "allineamento": "senza allineamento",
+    "classe_armatura": 14,
+    "iniziativa": { "valore": 10, "bonus": 0 },
+    "punti_ferita": { "media": 39, "formula": "6d10 + 6" },
+    "velocita": { "camminata": "9 m", "scavo": "3 m" },
+    "caratteristiche": {
+      "forza":        { "punteggio": 17, "modificatore": 3, "tiro_salvezza": 3 },
+      "destrezza":    { "punteggio": 11, "modificatore": 0, "tiro_salvezza": 0 },
+      "costituzione": { "punteggio": 13, "modificatore": 1, "tiro_salvezza": 1 },
+      "intelligenza": { "punteggio": 1,  "modificatore": -5, "tiro_salvezza": -5 },
+      "saggezza":     { "punteggio": 13, "modificatore": 1, "tiro_salvezza": 1 },
+      "carisma":      { "punteggio": 6,  "modificatore": -2, "tiro_salvezza": -2 }
+    },
+    "sensi": { "percezione_passiva": 11, "percezione_tellurica": "18 m", "scurovisione": "18 m" },
+    "lingue": [],
+    "grado_sfida": { "valore": 2, "punti_esperienza": 450 },
+    "bonus_competenza": 2,
+    "azioni": [
+      { "nome": "Morso", "descrizione": "Attacco con arma da mischia: +5 al tiro per colpire, portata 1,5 m. Colpito: 10 (2d6+3) danni taglienti più 3 (1d6) danni da acido. Se il bersaglio è Grande o inferiore, è afferrato (CD 13 per sfuggire). Finché la presa perdura, l'ankheg morde solo la creatura afferrata e ha vantaggio ai tiri per colpire." },
+      { "nome": "Spruzzo acido (ricarica 6)", "descrizione": "Linea 9 m × 1,5 m (solo se non afferra). TS Des CD 13 o 10 (3d6) danni da acido (metà successo)." }
+    ]
+  },
+  {
+    "id": "azer",
+    "nome": "Azer",
+    "tipo": "Elementale",
+    "dimensione": "Medio",
+    "allineamento": "legale neutrale",
+    "classe_armatura": 17,
+    "iniziativa": { "valore": 11, "bonus": 1 },
+    "punti_ferita": { "media": 39, "formula": "6d8 + 12" },
+    "velocita": { "camminata": "9 m" },
+    "caratteristiche": {
+      "forza":        { "punteggio": 17, "modificatore": 3, "tiro_salvezza": 3 },
+      "destrezza":    { "punteggio": 12, "modificatore": 1, "tiro_salvezza": 1 },
+      "costituzione": { "punteggio": 15, "modificatore": 2, "tiro_salvezza": 4 },
+      "intelligenza": { "punteggio": 12, "modificatore": 1, "tiro_salvezza": 1 },
+      "saggezza":     { "punteggio": 13, "modificatore": 1, "tiro_salvezza": 1 },
+      "carisma":      { "punteggio": 10, "modificatore": 0, "tiro_salvezza": 0 }
+    },
+    "immunita_danni": ["fuoco", "veleno"],
+    "immunita_condizione": ["avvelenato"],
+    "sensi": { "percezione_passiva": 11 },
+    "lingue": ["Ignan"],
+    "grado_sfida": { "valore": 2, "punti_esperienza": 450 },
+    "bonus_competenza": 2,
+    "tratti": [
+      { "nome": "Armi surriscaldate", "descrizione": "Quando l'azer colpisce con un'arma da mischia in metallo, infligge 3 (1d6) danni da fuoco extra." },
+      { "nome": "Corpo surriscaldato", "descrizione": "Una creatura che tocchi l'azer o lo colpisca in mischia entro 1,5 m subisce 5 (1d10) danni da fuoco." },
+      { "nome": "Illuminazione", "descrizione": "L'azer emana luce intensa in un raggio di 3 m e luce fioca per ulteriori 3 m." }
+    ],
+    "azioni": [
+      { "nome": "Martello da guerra", "descrizione": "Attacco con arma da mischia: +5 al tiro per colpire, portata 1,5 m. Colpito: 7 (1d8+3) danni contundenti [o 8 (1d10+3) a due mani] più 3 (1d6) danni da fuoco." }
+    ]
+  },
+  {
+    "id": "basilisco",
+    "nome": "Basilisco",
+    "tipo": "Mostruosità",
+    "dimensione": "Medio",
+    "allineamento": "senza allineamento",
+    "classe_armatura": 15,
+    "iniziativa": { "valore": 9, "bonus": -1 },
+    "punti_ferita": { "media": 52, "formula": "8d8 + 16" },
+    "velocita": { "camminata": "6 m" },
+    "caratteristiche": {
+      "forza":        { "punteggio": 16, "modificatore": 3, "tiro_salvezza": 3 },
+      "destrezza":    { "punteggio": 8,  "modificatore": -1, "tiro_salvezza": -1 },
+      "costituzione": { "punteggio": 15, "modificatore": 2, "tiro_salvezza": 2 },
+      "intelligenza": { "punteggio": 2,  "modificatore": -4, "tiro_salvezza": -4 },
+      "saggezza":     { "punteggio": 8,  "modificatore": -1, "tiro_salvezza": -1 },
+      "carisma":      { "punteggio": 7,  "modificatore": -2, "tiro_salvezza": -2 }
+    },
+    "sensi": { "percezione_passiva": 9, "scurovisione": "18 m" },
+    "lingue": [],
+    "grado_sfida": { "valore": 3, "punti_esperienza": 700 },
+    "bonus_competenza": 2,
+    "tratti": [
+      { "nome": "Sguardo pietrificante", "descrizione": "Creatura che inizia il turno entro 9 m dal basilisco e che possono vedersi a vicenda: TS Cos CD 12 o trattenuta (si trasforma in pietra). Fine turno successivo: nuovo TS, fallimento = pietrificata finché ristorare superiore non la libera. La creatura può distogliere lo sguardo all'inizio del suo turno (non vede il basilisco fino al turno successivo, rischiando di guardarlo casualmente)." }
+    ],
+    "azioni": [
+      { "nome": "Morso", "descrizione": "Attacco con arma da mischia: +5 al tiro per colpire, portata 1,5 m. Colpito: 10 (2d6+3) danni perforanti più 7 (2d6) danni da veleno." }
+    ]
+  },
+  {
+    "id": "behir",
+    "nome": "Behir",
+    "tipo": "Mostruosità",
+    "dimensione": "Enorme",
+    "allineamento": "neutrale malvagio",
+    "classe_armatura": 17,
+    "iniziativa": { "valore": 13, "bonus": 3 },
+    "punti_ferita": { "media": 168, "formula": "16d12 + 64" },
+    "velocita": { "camminata": "15 m", "scalata": "12 m" },
+    "caratteristiche": {
+      "forza":        { "punteggio": 23, "modificatore": 6, "tiro_salvezza": 6 },
+      "destrezza":    { "punteggio": 16, "modificatore": 3, "tiro_salvezza": 3 },
+      "costituzione": { "punteggio": 18, "modificatore": 4, "tiro_salvezza": 4 },
+      "intelligenza": { "punteggio": 7,  "modificatore": -2, "tiro_salvezza": -2 },
+      "saggezza":     { "punteggio": 14, "modificatore": 2, "tiro_salvezza": 2 },
+      "carisma":      { "punteggio": 12, "modificatore": 1, "tiro_salvezza": 1 }
+    },
+    "abilita": { "furtivita": 7, "percezione": 6 },
+    "immunita_danni": ["fulmine"],
+    "sensi": { "percezione_passiva": 16, "scurovisione": "27 m" },
+    "lingue": ["Draconico"],
+    "grado_sfida": { "valore": 11, "punti_esperienza": 7200 },
+    "bonus_competenza": 4,
+    "azioni": [
+      { "nome": "Multiattacco", "descrizione": "Il behir effettua due attacchi: uno con il morso e uno per stritolare." },
+      { "nome": "Morso", "descrizione": "Attacco con arma da mischia: +10 al tiro per colpire, portata 3 m. Colpito: 22 (3d10+6) danni perforanti." },
+      { "nome": "Stritolare", "descrizione": "Attacco con arma da mischia: +10 al tiro per colpire, portata 1,5 m. Creatura Grande o inferiore: 17 (2d10+6) contundenti + 17 (2d10+6) taglienti; afferrata/trattenuta (CD 16). Il behir non può stritolarne un'altra finché la presa perdura." },
+      { "nome": "Inghiottire", "descrizione": "Attacco morso contro creatura Media o inferiore afferrata. Se colpisce: inghiottita (accecata, trattenuta, copertura totale, 6d6 acido/turno). Se il behir subisce ≥30 danni in un turno da una creatura inghiottita: TS Cos CD 14 o rigurgita (cade prona entro 3 m)." },
+      { "nome": "Soffio di fulmini (ricarica 5-6)", "descrizione": "Linea 6 m × 1,5 m. TS Des CD 16 o 66 (12d10) danni da fulmine (metà successo)." }
+    ]
+  },
+  {
+    "id": "bugbear",
+    "nome": "Bugbear",
+    "gruppo": "Goblinoidi",
+    "tipo": "Umanoide",
+    "dimensione": "Medio",
+    "allineamento": "caotico malvagio",
+    "classe_armatura": 16,
+    "iniziativa": { "valore": 12, "bonus": 2 },
+    "punti_ferita": { "media": 27, "formula": "5d8 + 5" },
+    "velocita": { "camminata": "9 m" },
+    "caratteristiche": {
+      "forza":        { "punteggio": 15, "modificatore": 2, "tiro_salvezza": 2 },
+      "destrezza":    { "punteggio": 14, "modificatore": 2, "tiro_salvezza": 2 },
+      "costituzione": { "punteggio": 13, "modificatore": 1, "tiro_salvezza": 1 },
+      "intelligenza": { "punteggio": 8,  "modificatore": -1, "tiro_salvezza": -1 },
+      "saggezza":     { "punteggio": 11, "modificatore": 0, "tiro_salvezza": 0 },
+      "carisma":      { "punteggio": 9,  "modificatore": -1, "tiro_salvezza": -1 }
+    },
+    "abilita": { "furtivita": 6, "sopravvivenza": 2 },
+    "sensi": { "percezione_passiva": 10, "scurovisione": "18 m" },
+    "lingue": ["Comune", "Goblin"],
+    "grado_sfida": { "valore": 1, "punti_esperienza": 200 },
+    "bonus_competenza": 2,
+    "tratti": [
+      { "nome": "Attacco a sorpresa", "descrizione": "Se il bugbear sorprende una creatura e la colpisce con un attacco durante il primo round di combattimento, il bersaglio subisce 7 (2d6) danni extra dall'attacco." },
+      { "nome": "Bruto", "descrizione": "Quando il bugbear colpisce con un'arma da mischia, l'attacco infligge un dado extra del tipo di danno dell'arma (già incluso nell'attacco)." }
+    ],
+    "azioni": [
+      { "nome": "Mazza chiodata", "descrizione": "Attacco con arma da mischia: +4 al tiro per colpire, portata 1,5 m. Colpito: 11 (2d8+2) danni perforanti." },
+      { "nome": "Giavellotto", "descrizione": "Attacco con arma da mischia o a distanza: +4 al tiro per colpire, portata 1,5 m o gittata 9/36 m. Colpito: 10 (2d6+2) danni perforanti [mischia] o 5 (1d6+2) danni perforanti [distanza]." }
+    ]
+  },
+  {
+    "id": "bulette",
+    "nome": "Bulette",
+    "tipo": "Mostruosità",
+    "dimensione": "Grande",
+    "allineamento": "senza allineamento",
+    "classe_armatura": 17,
+    "iniziativa": { "valore": 10, "bonus": 0 },
+    "punti_ferita": { "media": 94, "formula": "9d10 + 45" },
+    "velocita": { "camminata": "12 m", "scavo": "12 m" },
+    "caratteristiche": {
+      "forza":        { "punteggio": 19, "modificatore": 4, "tiro_salvezza": 4 },
+      "destrezza":    { "punteggio": 11, "modificatore": 0, "tiro_salvezza": 0 },
+      "costituzione": { "punteggio": 21, "modificatore": 5, "tiro_salvezza": 5 },
+      "intelligenza": { "punteggio": 2,  "modificatore": -4, "tiro_salvezza": -4 },
+      "saggezza":     { "punteggio": 10, "modificatore": 0, "tiro_salvezza": 0 },
+      "carisma":      { "punteggio": 5,  "modificatore": -3, "tiro_salvezza": -3 }
+    },
+    "abilita": { "percezione": 6 },
+    "sensi": { "percezione_passiva": 16, "percezione_tellurica": "18 m", "scurovisione": "18 m" },
+    "lingue": [],
+    "grado_sfida": { "valore": 5, "punti_esperienza": 1800 },
+    "bonus_competenza": 3,
+    "tratti": [
+      { "nome": "Balzo da fermo", "descrizione": "Il bulette può compiere un salto in lunghezza di max 9 m e un salto in alto di max 4,5 m, con o senza rincorsa." }
+    ],
+    "azioni": [
+      { "nome": "Morso", "descrizione": "Attacco con arma da mischia: +7 al tiro per colpire, portata 1,5 m. Colpito: 30 (4d12+4) danni perforanti." },
+      { "nome": "Balzo letale", "descrizione": "Se il bulette salta di almeno 4,5 m e poi atterra in uno spazio con creature: ognuna deve scegliere For o Des e superare TS CD 16 o cadere prona subendo 14 (3d6+4) contundenti + 14 (3d6+4) taglienti (metà successo, non prona; se non c'è spazio libero: prona nel suo spazio)." }
+    ]
+  },
+  {
+    "id": "chimera",
+    "nome": "Chimera",
+    "tipo": "Mostruosità",
+    "dimensione": "Grande",
+    "allineamento": "caotico malvagio",
+    "classe_armatura": 14,
+    "iniziativa": { "valore": 10, "bonus": 0 },
+    "punti_ferita": { "media": 114, "formula": "12d10 + 48" },
+    "velocita": { "camminata": "9 m", "volo": "18 m" },
+    "caratteristiche": {
+      "forza":        { "punteggio": 19, "modificatore": 4, "tiro_salvezza": 4 },
+      "destrezza":    { "punteggio": 11, "modificatore": 0, "tiro_salvezza": 0 },
+      "costituzione": { "punteggio": 19, "modificatore": 4, "tiro_salvezza": 4 },
+      "intelligenza": { "punteggio": 3,  "modificatore": -4, "tiro_salvezza": -4 },
+      "saggezza":     { "punteggio": 14, "modificatore": 2, "tiro_salvezza": 2 },
+      "carisma":      { "punteggio": 10, "modificatore": 0, "tiro_salvezza": 0 }
+    },
+    "abilita": { "percezione": 8 },
+    "sensi": { "percezione_passiva": 18, "scurovisione": "18 m" },
+    "lingue": ["capisce il Draconico ma non lo parla"],
+    "grado_sfida": { "valore": 6, "punti_esperienza": 2300 },
+    "bonus_competenza": 3,
+    "azioni": [
+      { "nome": "Multiattacco", "descrizione": "La chimera effettua tre attacchi: uno con il morso, uno con le corna e uno con gli artigli. Quando il soffio di fuoco è disponibile, può usarlo al posto del morso o delle corna." },
+      { "nome": "Artigli", "descrizione": "Attacco con arma da mischia: +7 al tiro per colpire, portata 1,5 m. Colpito: 11 (2d6+4) danni taglienti." },
+      { "nome": "Corna", "descrizione": "Attacco con arma da mischia: +7 al tiro per colpire, portata 1,5 m. Colpito: 10 (1d12+4) danni contundenti." },
+      { "nome": "Morso", "descrizione": "Attacco con arma da mischia: +7 al tiro per colpire, portata 1,5 m. Colpito: 11 (2d6+4) danni perforanti." },
+      { "nome": "Soffio di fuoco (ricarica 5-6)", "descrizione": "Cono di 4,5 m. TS Des CD 15 o 31 (7d8) danni da fuoco (metà successo)." }
+    ]
+  },
+  {
+    "id": "centauro",
+    "nome": "Centauro",
+    "tipo": "Mostruosità",
+    "dimensione": "Grande",
+    "allineamento": "neutrale buono",
+    "classe_armatura": 12,
+    "iniziativa": { "valore": 12, "bonus": 2 },
+    "punti_ferita": { "media": 45, "formula": "6d10 + 12" },
+    "velocita": { "camminata": "15 m" },
+    "caratteristiche": {
+      "forza":        { "punteggio": 18, "modificatore": 4, "tiro_salvezza": 4 },
+      "destrezza":    { "punteggio": 14, "modificatore": 2, "tiro_salvezza": 2 },
+      "costituzione": { "punteggio": 14, "modificatore": 2, "tiro_salvezza": 2 },
+      "intelligenza": { "punteggio": 9,  "modificatore": -1, "tiro_salvezza": -1 },
+      "saggezza":     { "punteggio": 13, "modificatore": 1, "tiro_salvezza": 1 },
+      "carisma":      { "punteggio": 11, "modificatore": 0, "tiro_salvezza": 0 }
+    },
+    "abilita": { "atletica": 6, "percezione": 3, "sopravvivenza": 3 },
+    "sensi": { "percezione_passiva": 13 },
+    "lingue": ["Elfico", "Silvano"],
+    "grado_sfida": { "valore": 2, "punti_esperienza": 450 },
+    "bonus_competenza": 2,
+    "tratti": [
+      { "nome": "Carica", "descrizione": "Se il centauro si muove di almeno 9 m in linea retta verso un bersaglio e poi lo colpisce con un attacco con la picca nello stesso turno, il bersaglio subisce 10 (3d6) danni perforanti extra." }
+    ],
+    "azioni": [
+      { "nome": "Multiattacco", "descrizione": "Il centauro effettua due attacchi: uno con la picca e uno con gli zoccoli, oppure due con l'arco lungo." },
+      { "nome": "Picca", "descrizione": "Attacco con arma da mischia: +6 al tiro per colpire, portata 3 m. Colpito: 9 (1d10+4) danni perforanti." },
+      { "nome": "Zoccoli", "descrizione": "Attacco con arma da mischia: +6 al tiro per colpire, portata 1,5 m. Colpito: 11 (2d6+4) danni contundenti." },
+      { "nome": "Arco lungo", "descrizione": "Attacco con arma a distanza: +4 al tiro per colpire, gittata 45/180 m. Colpito: 6 (1d8+2) danni perforanti." }
+    ]
+  },
+  {
+    "id": "coboldo",
+    "nome": "Coboldo",
+    "gruppo": "Goblinoidi",
+    "tipo": "Umanoide",
+    "dimensione": "Piccolo",
+    "allineamento": "legale malvagio",
+    "classe_armatura": 12,
+    "iniziativa": { "valore": 12, "bonus": 2 },
+    "punti_ferita": { "media": 5, "formula": "2d6 - 2" },
+    "velocita": { "camminata": "9 m" },
+    "caratteristiche": {
+      "forza":        { "punteggio": 7,  "modificatore": -2, "tiro_salvezza": -2 },
+      "destrezza":    { "punteggio": 15, "modificatore": 2, "tiro_salvezza": 2 },
+      "costituzione": { "punteggio": 9,  "modificatore": -1, "tiro_salvezza": -1 },
+      "intelligenza": { "punteggio": 8,  "modificatore": -1, "tiro_salvezza": -1 },
+      "saggezza":     { "punteggio": 7,  "modificatore": -2, "tiro_salvezza": -2 },
+      "carisma":      { "punteggio": 8,  "modificatore": -1, "tiro_salvezza": -1 }
+    },
+    "sensi": { "percezione_passiva": 8, "scurovisione": "18 m" },
+    "lingue": ["Comune", "Draconico"],
+    "grado_sfida": { "valore": "1/8", "punti_esperienza": 25 },
+    "bonus_competenza": 2,
+    "tratti": [
+      { "nome": "Sensibilità al sole", "descrizione": "Mentre è alla luce del sole, il coboldo ha svantaggio ai tiri per colpire e alle prove di Saggezza (Percezione) basate sulla vista." },
+      { "nome": "Tattiche del branco", "descrizione": "Il coboldo dispone di vantaggio al tiro per colpire contro una creatura se almeno uno degli alleati si trova entro 1,5 m dalla creatura e non è incapacitato." }
+    ],
+    "azioni": [
+      { "nome": "Pugnale", "descrizione": "Attacco con arma da mischia: +4 al tiro per colpire, portata 1,5 m. Colpito: 4 (1d4+2) danni perforanti." },
+      { "nome": "Fionda", "descrizione": "Attacco con arma a distanza: +4 al tiro per colpire, gittata 9/36 m. Colpito: 4 (1d4+2) danni contundenti." }
+    ]
+  },
+  {
+    "id": "balor",
+    "nome": "Balor",
+    "tipo": "Immondo (demone)",
+    "dimensione": "Enorme",
+    "allineamento": "caotico malvagio",
+    "classe_armatura": 19,
+    "iniziativa": { "valore": 12, "bonus": 2 },
+    "punti_ferita": { "media": 262, "formula": "21d12 + 126" },
+    "velocita": { "camminata": "12 m", "volo": "24 m" },
+    "caratteristiche": {
+      "forza":        { "punteggio": 26, "modificatore": 8, "tiro_salvezza": 14 },
+      "destrezza":    { "punteggio": 15, "modificatore": 2, "tiro_salvezza": 2 },
+      "costituzione": { "punteggio": 22, "modificatore": 6, "tiro_salvezza": 12 },
+      "intelligenza": { "punteggio": 20, "modificatore": 5, "tiro_salvezza": 5 },
+      "saggezza":     { "punteggio": 16, "modificatore": 3, "tiro_salvezza": 9 },
+      "carisma":      { "punteggio": 22, "modificatore": 6, "tiro_salvezza": 12 }
+    },
+    "resistenze": ["freddo", "fulmine", "contundenti da attacchi non magici", "perforanti da attacchi non magici", "taglienti da attacchi non magici"],
+    "immunita_danni": ["fuoco", "veleno"],
+    "immunita_condizione": ["avvelenato"],
+    "sensi": { "percezione_passiva": 13, "vista_pura": "36 m" },
+    "lingue": ["Abissale", "telepatia 36 m"],
+    "grado_sfida": { "valore": 19, "punti_esperienza": 22000 },
+    "bonus_competenza": 6,
+    "tratti": [
+      { "nome": "Armi magiche", "descrizione": "Gli attacchi con arma del balor sono magici." },
+      { "nome": "Aura di fuoco", "descrizione": "All'inizio di ogni turno del balor, ogni creatura entro 1,5 m subisce 10 (3d6) danni da fuoco. Gli oggetti infiammabili si incendiano. Una creatura che lo tocca o lo colpisce in mischia subisce i medesimi danni." },
+      { "nome": "Resistenza alla magia", "descrizione": "Il balor dispone di vantaggio ai tiri salvezza contro incantesimi e altri effetti magici." },
+      { "nome": "Spasmi di morte", "descrizione": "Quando il balor muore, esplode. Ogni creatura entro 9 m: TS Des CD 20 o 70 (20d6) danni da fuoco (metà successo). L'esplosione incendia gli oggetti infiammabili e distrugge le armi del balor." }
+    ],
+    "azioni": [
+      { "nome": "Multiattacco", "descrizione": "Il balor effettua due attacchi: uno con la spada lunga e uno con la frusta." },
+      { "nome": "Frusta", "descrizione": "Attacco con arma da mischia: +14 al tiro per colpire, portata 9 m. Colpito: 15 (2d6+8) danni taglienti più 10 (3d6) danni da fuoco. TS For CD 20 o tirato fino a 7,5 m verso il balor." },
+      { "nome": "Spada lunga", "descrizione": "Attacco con arma da mischia: +14 al tiro per colpire, portata 3 m. Colpito: 21 (3d8+8) danni taglienti più 13 (3d8) danni da fulmine. Colpo critico: tira i dadi tre volte invece che due." },
+      { "nome": "Teletrasporto", "descrizione": "Il balor si teletrasporta magicamente, con tutto ciò che indossa o trasporta, fino a uno spazio libero visibile entro 36 m." }
+    ]
+  },
+  {
+    "id": "couatl",
+    "nome": "Couatl",
+    "tipo": "Celestiale",
+    "dimensione": "Medio",
+    "allineamento": "legale buono",
+    "classe_armatura": 19,
+    "iniziativa": { "valore": 15, "bonus": 5 },
+    "punti_ferita": { "media": 97, "formula": "13d8 + 39" },
+    "velocita": { "camminata": "9 m", "volo": "27 m" },
+    "caratteristiche": {
+      "forza":        { "punteggio": 16, "modificatore": 3, "tiro_salvezza": 3 },
+      "destrezza":    { "punteggio": 20, "modificatore": 5, "tiro_salvezza": 5 },
+      "costituzione": { "punteggio": 17, "modificatore": 3, "tiro_salvezza": 5 },
+      "intelligenza": { "punteggio": 18, "modificatore": 4, "tiro_salvezza": 4 },
+      "saggezza":     { "punteggio": 20, "modificatore": 5, "tiro_salvezza": 7 },
+      "carisma":      { "punteggio": 18, "modificatore": 4, "tiro_salvezza": 6 }
+    },
+    "resistenze": ["radiosi"],
+    "immunita_danni": ["psichici", "contundenti da attacchi non magici", "perforanti da attacchi non magici", "taglienti da attacchi non magici"],
+    "sensi": { "percezione_passiva": 15, "vista_pura": "36 m" },
+    "lingue": ["tutti", "telepatia 36 m"],
+    "grado_sfida": { "valore": 4, "punti_esperienza": 1100 },
+    "bonus_competenza": 2,
+    "tratti": [
+      { "nome": "Armi magiche", "descrizione": "Gli attacchi con arma del couatl sono magici." },
+      { "nome": "Incantesimi innati", "descrizione": "Caratteristica: Carisma (CD TS 14). A volontà: individuazione dei pensieri, individuazione del bene e del male, individuazione del magico. 3/giorno: benedizione, creare cibo e acqua, cura ferite, protezione dai veleni, ristorare inferiore, santuario, scudo. 1/giorno: ristorare superiore, scrutare, sogno." },
+      { "nome": "Mente schermata", "descrizione": "Il couatl è immune agli scrutamenti e a qualsiasi effetto che possa percepire le sue emozioni, leggere i suoi pensieri o individuare la sua posizione." }
+    ],
+    "azioni": [
+      { "nome": "Morso", "descrizione": "Attacco con arma da mischia: +8 al tiro per colpire, portata 1,5 m. Colpito: 8 (1d6+5) danni perforanti. TS Cos CD 13 o avvelenato 24 ore (privo di sensi; si risveglia se subisce danni o viene scosso)." },
+      { "nome": "Stritolare", "descrizione": "Attacco con arma da mischia: +6 al tiro per colpire, portata 3 m. Creatura Media o inferiore: 10 (2d6+3) contundenti; afferrata/trattenuta (CD 15). Il couatl non stritola un'altra creatura finché la presa perdura." },
+      { "nome": "Cambiare forma", "descrizione": "Il couatl si trasforma magicamente in una bestia o umanoide con GdS ≤ proprio, o ritorna alla sua vera forma." }
+    ]
+  }
+]
