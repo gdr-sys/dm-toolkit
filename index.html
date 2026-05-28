@@ -91,9 +91,11 @@ const App = (() => {
       case 'campagna':   renderCampaignPage(); break;
       case 'mondo':
         App.reloadActiveCampaign();
-        if (window.NPC) NPC.init();
-        if (window.Luoghi) Luoghi.init();
-        if (window.Fazioni) Fazioni.init();
+        setTimeout(() => {
+          if (window.NPC) NPC.init();
+          if (window.Luoghi) Luoghi.init();
+          if (window.Fazioni) Fazioni.init();
+        }, 50);
         break;
       case 'sessione':   if (window.Sessione) Sessione.init(); break;
       case 'generatori': break;
@@ -3169,7 +3171,8 @@ const clearImg = (key) => {
 
 
 /* ── INIT ── */
-document.addEventListener('DOMContentLoaded', () => {
+// Aspetta che tutti gli script defer siano caricati
+window.addEventListener('load', () => {
   // Init debug (prima di tutto)
   Debug.init(
     document.getElementById('debug-body'),
