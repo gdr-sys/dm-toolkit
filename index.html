@@ -84,6 +84,7 @@
 
     <!-- Topbar -->
     <header id="topbar">
+      <button id="mobile-menu-btn" onclick="toggleMobileMenu()" style="display:none;">☰</button>
       <h1 class="topbar-title" id="topbar-title">Campagne</h1>
       <div class="topbar-actions">
         <span class="text-xs text-muted" id="topbar-campaign-badge"></span>
@@ -6162,6 +6163,81 @@ document.addEventListener('DOMContentLoaded', () => {
   );
   App.init();
 });
+</script>
+
+
+<!-- Overlay sidebar mobile -->
+<div id="sidebar-overlay" onclick="closeMobileMenu()"></div>
+
+<!-- Navbar mobile (bottom) -->
+<nav id="mobile-nav" style="display:none;">
+  <button class="mobile-nav-item active" data-page="home" onclick="App.navigateTo('home');setMobileActive(this)">
+    <span class="mobile-nav-icon">🏠</span>
+    <span class="mobile-nav-label">Campagne</span>
+  </button>
+  <button class="mobile-nav-item" data-page="campagna" onclick="App.navigateTo('campagna');setMobileActive(this)">
+    <span class="mobile-nav-icon">📖</span>
+    <span class="mobile-nav-label">Campagna</span>
+  </button>
+  <button class="mobile-nav-item" data-page="mondo" onclick="App.navigateTo('mondo');setMobileActive(this)">
+    <span class="mobile-nav-icon">🗺️</span>
+    <span class="mobile-nav-label">Mondo</span>
+  </button>
+  <button class="mobile-nav-item" data-page="sessione" onclick="App.navigateTo('sessione');setMobileActive(this)">
+    <span class="mobile-nav-icon">⚔️</span>
+    <span class="mobile-nav-label">Sessione</span>
+  </button>
+  <button class="mobile-nav-item" data-page="generatori" onclick="App.navigateTo('generatori');setMobileActive(this)">
+    <span class="mobile-nav-icon">✨</span>
+    <span class="mobile-nav-label">Generatori</span>
+  </button>
+  <button class="mobile-nav-item" onclick="toggleMobileMenu()">
+    <span class="mobile-nav-icon">⋯</span>
+    <span class="mobile-nav-label">Altro</span>
+  </button>
+</nav>
+
+<script>
+// ══ MOBILE NAVIGATION ══
+const isMobile = () => window.innerWidth <= 768;
+
+const initMobileNav = () => {
+  const mobileNav = document.getElementById('mobile-nav');
+  const menuBtn = document.getElementById('mobile-menu-btn');
+  if (isMobile()) {
+    if (mobileNav) mobileNav.style.display = 'flex';
+    if (menuBtn) menuBtn.style.display = 'flex';
+  } else {
+    if (mobileNav) mobileNav.style.display = 'none';
+    if (menuBtn) menuBtn.style.display = 'none';
+  }
+};
+
+const toggleMobileMenu = () => {
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('sidebar-overlay');
+  const isOpen = sidebar?.classList.contains('mobile-open');
+  sidebar?.classList.toggle('mobile-open', !isOpen);
+  overlay?.classList.toggle('active', !isOpen);
+};
+
+const closeMobileMenu = () => {
+  document.getElementById('sidebar')?.classList.remove('mobile-open');
+  document.getElementById('sidebar-overlay')?.classList.remove('active');
+};
+
+const setMobileActive = (btn) => {
+  document.querySelectorAll('.mobile-nav-item').forEach(b => b.classList.remove('active'));
+  btn?.classList.add('active');
+  closeMobileMenu();
+};
+
+// Sync mobile nav con navigazione sidebar
+const origNavigateTo = App.navigateTo.bind(App);
+// Inizializza al resize
+window.addEventListener('resize', initMobileNav);
+window.addEventListener('load', initMobileNav);
+document.addEventListener('DOMContentLoaded', initMobileNav);
 </script>
 
 </body>
