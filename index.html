@@ -538,6 +538,12 @@
             <button class="tab-btn"        id="comp-tab-rules"       onclick="Compendio.switchTab('rules')">Regole</button>
           </div>
           <div style="display:flex;align-items:center;gap:var(--space-sm);">
+            <span class="badge badge-muted" id="comp-sistema-badge">5e 2024</span>
+            <select id="comp-sistema-select" class="form-select" style="width:auto;font-size:0.75rem;"
+              onchange="Compendio.changeSistema(this.value)">
+              <option value="5e2024">D&D 5e 2024</option>
+              <option value="5e2014">D&D 5e 2014</option>
+            </select>
             <span class="text-xs text-muted" id="comp-count-monsters"></span>
             <span class="text-xs text-muted" id="comp-count-magic" style="display:none;"></span>
             <span class="text-xs text-muted" id="comp-count-equip" style="display:none;"></span>
@@ -4383,6 +4389,47 @@ const Compendio = (() => {
   let _loading = false;
   let _activeTab = 'monsters';
   let _searchTimer = null;
+  let _sistema = '5e2024'; // sistema attivo
+
+  // ── File per sistema ──
+  const SISTEMA_FILES = {
+    '5e2024': {
+      monsters:    'srd_5_2_1_monsters.json',
+      magic_items: 'srd_5_2_1_magic_items.json',
+      equipment:   'srd_5_2_1_equipment.json',
+      rules:       'srd_5_2_1_rules.json',
+      dm_screen:   'dm_screen_2024.json',
+    },
+    '5e2014': {
+      monsters:    'srd_5_1_monsters.json',
+      magic_items: 'srd_5_1_magic_items.json',
+      equipment:   null, // non disponibile ancora
+      rules:       'srd_5_1_rules.json',
+      dm_screen:   'dm_screen_2014.json',
+    },
+  };
+
+  // ── Rileva sistema dalla campagna attiva ──
+  const getSistema = () => {
+    const override = document.getElementById('comp-sistema-select')?.value;
+    if (override) return override;
+    const camp = App.getActiveCampaign();
+    if (camp?.system === '5e2014') return '5e2014';
+    return '5e2024';
+  };
+
+  // ── Cambia sistema ──
+  const changeSistema = (sistema) => {
+    if (_sistema === sistema) return;
+    _sistema = sistema;
+    _loaded = false;
+    _data.monsters = [];
+    _data.magic_items = [];
+    _data.equipment = [];
+    _data.rules = [];
+    load();
+    Debug.log(`Compendio: sistema cambiato → ${sistema}`);
+  };
 
   // ── Filtri per tab ──
   const _filters = {
@@ -4442,16 +4489,22 @@ const Compendio = (() => {
     if (_loaded || _loading) return;
     _loading = true;
     showLoading(true);
-    Debug.log('Compendio: caricamento dati...');
+    _sistema = getSistema();
+    const sistemaFiles = SISTEMA_FILES[_sistema] || SISTEMA_FILES['5e2024'];
+    Debug.log(`Compendio: caricamento ${_sistema}...`);
+
+    // Aggiorna il badge sistema nell'UI
+    const badge = document.getElementById('comp-sistema-badge');
+    if (badge) badge.textContent = _sistema === '5e2014' ? '5e 2014' : '5e 2024';
 
     try {
       const base = 'data/';
       const files = [
-        ['monsters',    'srd_5_2_1_monsters.json'],
-        ['magic_items', 'srd_5_2_1_magic_items.json'],
-        ['equipment',   'srd_5_2_1_equipment.json'],
-        ['rules',       'srd_5_2_1_rules.json'],
-      ];
+        ['monsters',    sistemaFiles.monsters],
+        ['magic_items', sistemaFiles.magic_items],
+        ['equipment',   sistemaFiles.equipment],
+        ['rules',       sistemaFiles.rules],
+      ].filter(([, f]) => f); // salta i null
 
       for (const [key, file] of files) {
         try {
@@ -4461,26 +4514,20 @@ const Compendio = (() => {
           Debug.log(`Compendio: ${key} caricato (${_data[key].length} voci)`);
         } catch (e) {
           Debug.error(`Compendio: errore caricamento ${file}:`, e.message);
-          Toast.show(`Errore caricamento ${file}`, 'error');
+          _data[key] = [];
         }
       }
 
-      // Carica DM Screen (facoltativi — non bloccano se mancano)
-      const dmScreenFiles = [
-        ['dm_screen_2024', 'dm_screen_2024.json'],
-        ['dm_screen_2014', 'dm_screen_2014.json'],
-      ];
-      for (const [key, file] of dmScreenFiles) {
+      // DM Screen per il sistema attivo
+      if (sistemaFiles.dm_screen) {
         try {
-          const r = await fetch(base + file);
+          const r = await fetch(base + sistemaFiles.dm_screen);
           if (r.ok) {
             const data = await r.json();
             _data.rules = [..._data.rules, ...data];
-            Debug.log(`Compendio: ${file} aggiunto (${data.length} regole)`);
+            Debug.log(`Compendio: dm_screen aggiunto (${data.length} regole)`);
           }
-        } catch (e) {
-          Debug.warn(`Compendio: ${file} non trovato, skip`);
-        }
+        } catch (e) { /* skip */ }
       }
 
       // Normalizza rarità oggetti magici
@@ -5011,15 +5058,21 @@ const Compendio = (() => {
 
   // ── Init ──
   const init = () => {
+    // Rileva sistema dalla campagna — ricarica se è cambiato
+    const nuovoSistema = getSistema();
+    if (nuovoSistema !== _sistema && _loaded) {
+      _sistema = nuovoSistema;
+      _loaded = false;
+    }
     if (!_loaded && !_loading) load();
     else if (_loaded) render();
-    Debug.log('Compendio.init()');
+    Debug.log(`Compendio.init() sistema=${_sistema}`);
   };
 
   return {
     init, switchTab, onSearch, onFilter,
     openMonster, openMagicItem, openEquipment, openRule,
-    sendCurrentToCombat,
+    sendCurrentToCombat, changeSistema,
     getData: () => _data,
   };
 })();
