@@ -6066,10 +6066,7 @@ const Generatori = {
           ${selected.map(item => {
             const prezzoFin = Math.round(item.p * mult);
             const mostra = item.raro ? `<span class="badge badge-gold" style="font-size:0.58rem;">raro</span> ` : '';
-            const foundItem = CompendioCache.findItem(item.n);
-            const nomeCell = foundItem
-              ? `<span style="cursor:pointer;color:var(--accent-secondary);text-decoration:underline dotted;" onclick="CompendioCache.openItem('${item.n.replace(/'/g,"\\'")}')" title="Apri scheda nel Compendio">${mostra}${item.n} 🔗</span>`
-              : `${mostra}${item.n}`;
+            const nomeCell = `<span style="cursor:pointer;color:var(--accent-secondary);text-decoration:underline dotted;" onclick="CompendioCache.openItem('${item.n.replace(/'/g,"\\'")}')" title="Cerca nel Compendio">${mostra}${item.n} 🔗</span>`;
             return `<tr>
               <td style="padding:3px 0;border-bottom:1px solid var(--border);">${nomeCell}</td>
               <td style="padding:3px 4px;border-bottom:1px solid var(--border);text-align:center;font-family:var(--font-mono);color:var(--text-muted);">×${item.qty}</td>
@@ -6164,12 +6161,8 @@ const Generatori = {
     const linkItem = (testo) => {
       if (!testo.startsWith('✨')) return `<span>${testo}</span>`;
       const nomePulito = testo.replace('✨ ', '').replace(/ \(.*\)$/, '').trim();
-      const found = CompendioCache.findItem(nomePulito);
-      if (found) {
-        return `<span style="cursor:pointer;color:var(--accent-secondary);text-decoration:underline dotted;"
-          onclick="CompendioCache.openItem('${nomePulito.replace(/'/g,"\\'")}')" title="Apri scheda nel Compendio">✨ ${nomePulito} 🔗</span>`;
-      }
-      return `<span>${testo}</span>`;
+      return `<span style="cursor:pointer;color:var(--accent-secondary);text-decoration:underline dotted;"
+        onclick="CompendioCache.openItem('${nomePulito.replace(/'/g,"\\'")}')" title="Cerca nel Compendio">✨ ${nomePulito} 🔗</span>`;
     };
 
     const rows = extras.map(e => `
@@ -6339,47 +6332,42 @@ const clearImg = (key) => {
 
 
 /* ── INIT ── */
-// ══ CACHE GLOBALE COMPENDIO (per generatori) ══
+// ══ RICERCA COMPENDIO DAI GENERATORI ══
 const CompendioCache = (() => {
-  let _items = [];    // magic_items
-  let _equip = [];    // equipment
-  let _loaded = false;
+  // Cerca un oggetto nel compendio per nome e apre la scheda
+  const openItem = (nome) => {
+    // Prima assicuriamoci che il compendio abbia i dati
+    const data = Compendio.getData();
+    const n = nome.toLowerCase().trim();
 
-  const load = async () => {
-    if (_loaded) return;
-    try {
-      const base = 'data/';
-      const sistema = App.getActiveCampaign()?.system === '5e2014' ? '5e2014' : '5e2024';
-      const miFile = sistema === '5e2014' ? 'srd_5_1_magic_items.json' : 'srd_5_2_1_magic_items.json';
-      const eqFile = sistema === '5e2014' ? 'srd_5_1_equipment.json'   : 'srd_5_2_1_equipment.json';
+    // Cerca in magic_items
+    let found = data.magic_items.find(x => x.nome?.toLowerCase().includes(n) || n.includes(x.nome?.toLowerCase()));
+    if (found) { Compendio.openMagicItem(found.id); return; }
 
-      const [mi, eq] = await Promise.all([
-        fetch(base + miFile).then(r => r.ok ? r.json() : []),
-        fetch(base + eqFile).then(r => r.ok ? r.json() : []),
-      ]);
-      _items = mi || [];
-      _equip = eq || [];
-      _loaded = true;
-      Debug.log(`CompendioCache: ${_items.length} oggetti magici, ${_equip.length} equipaggiamento`);
-    } catch(e) {
-      Debug.warn('CompendioCache: errore caricamento', e.message);
+    // Cerca in equipment
+    found = data.equipment.find(x => x.nome?.toLowerCase().includes(n) || n.includes(x.nome?.toLowerCase()));
+    if (found) { Compendio.openEquipment(found.id); return; }
+
+    // Non trovato — carica il compendio e riprova
+    if (data.magic_items.length === 0) {
+      Toast.show('Caricamento compendio...', 'info', 2000);
+      Compendio.init();
+      setTimeout(() => openItem(nome), 2000);
+      return;
     }
+
+    Toast.show(`"${nome}" non trovato nel Compendio`, 'info');
+    Debug.log(`CompendioCache: "${nome}" non trovato (${data.magic_items.length} mi, ${data.equipment.length} eq)`);
   };
 
   const findItem = (nome) => {
+    const data = Compendio.getData();
     const n = nome?.toLowerCase().trim();
-    return _items.find(x => x.nome?.toLowerCase() === n) ||
-           _equip.find(x => x.nome?.toLowerCase() === n) || null;
+    return data.magic_items.find(x => x.nome?.toLowerCase().includes(n)) ||
+           data.equipment.find(x => x.nome?.toLowerCase().includes(n)) || null;
   };
 
-  const openItem = (nome) => {
-    const found = findItem(nome);
-    if (!found) { Toast.show(`"${nome}" non trovato nel Compendio`, 'info'); return; }
-    if (found.tipo_base !== undefined) Compendio.openMagicItem(found.id);
-    else Compendio.openEquipment(found.id);
-  };
-
-  return { load, findItem, openItem };
+  return { openItem, findItem, load: () => Compendio.init() };
 })();
 
 // Aspetta che tutti gli script defer siano caricati
@@ -6389,8 +6377,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('debug-panel')
   );
   App.init();
-  // Carica cache compendio in background dopo 1s
-  setTimeout(() => CompendioCache.load(), 1000);
+
 });
 </script>
 
