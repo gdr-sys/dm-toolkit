@@ -6066,11 +6066,9 @@ const Generatori = {
           ${selected.map(item => {
             const prezzoFin = Math.round(item.p * mult);
             const mostra = item.raro ? `<span class="badge badge-gold" style="font-size:0.58rem;">raro</span> ` : '';
-            // Cerca l'oggetto nel compendio
-            const allItems = [...(Compendio?.getData()?.magic_items||[]), ...(Compendio?.getData()?.equipment||[])];
-            const found = allItems.find(x => x.nome?.toLowerCase() === item.n?.toLowerCase());
-            const nomeCell = found
-              ? `<span style="cursor:pointer;color:var(--accent-secondary);text-decoration:underline dotted;" onclick="Compendio.${found.tipo_base?'openMagicItem':'openEquipment'}('${found.id}')" title="Apri scheda">${mostra}${item.n}</span>`
+            const foundItem = CompendioCache.findItem(item.n);
+            const nomeCell = foundItem
+              ? `<span style="cursor:pointer;color:var(--accent-secondary);text-decoration:underline dotted;" onclick="CompendioCache.openItem('${item.n.replace(/'/g,"\\'")}')" title="Apri scheda nel Compendio">${mostra}${item.n} 🔗</span>`
               : `${mostra}${item.n}`;
             return `<tr>
               <td style="padding:3px 0;border-bottom:1px solid var(--border);">${nomeCell}</td>
@@ -6166,11 +6164,10 @@ const Generatori = {
     const linkItem = (testo) => {
       if (!testo.startsWith('✨')) return `<span>${testo}</span>`;
       const nomePulito = testo.replace('✨ ', '').replace(/ \(.*\)$/, '').trim();
-      const items = Compendio?.getData()?.magic_items || [];
-      const found = items.find(i => i.nome.toLowerCase() === nomePulito.toLowerCase());
+      const found = CompendioCache.findItem(nomePulito);
       if (found) {
         return `<span style="cursor:pointer;color:var(--accent-secondary);text-decoration:underline dotted;"
-          onclick="Compendio.openMagicItem('${found.id}')" title="Apri scheda nel Compendio">✨ ${nomePulito}</span>`;
+          onclick="CompendioCache.openItem('${nomePulito.replace(/'/g,"\\'")}')" title="Apri scheda nel Compendio">✨ ${nomePulito} 🔗</span>`;
       }
       return `<span>${testo}</span>`;
     };
@@ -6342,6 +6339,49 @@ const clearImg = (key) => {
 
 
 /* ── INIT ── */
+// ══ CACHE GLOBALE COMPENDIO (per generatori) ══
+const CompendioCache = (() => {
+  let _items = [];    // magic_items
+  let _equip = [];    // equipment
+  let _loaded = false;
+
+  const load = async () => {
+    if (_loaded) return;
+    try {
+      const base = 'data/';
+      const sistema = App.getActiveCampaign()?.system === '5e2014' ? '5e2014' : '5e2024';
+      const miFile = sistema === '5e2014' ? 'srd_5_1_magic_items.json' : 'srd_5_2_1_magic_items.json';
+      const eqFile = sistema === '5e2014' ? 'srd_5_1_equipment.json'   : 'srd_5_2_1_equipment.json';
+
+      const [mi, eq] = await Promise.all([
+        fetch(base + miFile).then(r => r.ok ? r.json() : []),
+        fetch(base + eqFile).then(r => r.ok ? r.json() : []),
+      ]);
+      _items = mi || [];
+      _equip = eq || [];
+      _loaded = true;
+      Debug.log(`CompendioCache: ${_items.length} oggetti magici, ${_equip.length} equipaggiamento`);
+    } catch(e) {
+      Debug.warn('CompendioCache: errore caricamento', e.message);
+    }
+  };
+
+  const findItem = (nome) => {
+    const n = nome?.toLowerCase().trim();
+    return _items.find(x => x.nome?.toLowerCase() === n) ||
+           _equip.find(x => x.nome?.toLowerCase() === n) || null;
+  };
+
+  const openItem = (nome) => {
+    const found = findItem(nome);
+    if (!found) { Toast.show(`"${nome}" non trovato nel Compendio`, 'info'); return; }
+    if (found.tipo_base !== undefined) Compendio.openMagicItem(found.id);
+    else Compendio.openEquipment(found.id);
+  };
+
+  return { load, findItem, openItem };
+})();
+
 // Aspetta che tutti gli script defer siano caricati
 document.addEventListener('DOMContentLoaded', () => {
   Debug.init(
@@ -6349,6 +6389,8 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('debug-panel')
   );
   App.init();
+  // Carica cache compendio in background dopo 1s
+  setTimeout(() => CompendioCache.load(), 1000);
 });
 </script>
 
