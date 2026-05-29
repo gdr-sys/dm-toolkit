@@ -6335,29 +6335,39 @@ const clearImg = (key) => {
 // ══ RICERCA COMPENDIO DAI GENERATORI ══
 const CompendioCache = (() => {
   // Cerca un oggetto nel compendio per nome e apre la scheda
-  const openItem = (nome) => {
-    // Prima assicuriamoci che il compendio abbia i dati
-    const data = Compendio.getData();
+  const openItem = async (nome) => {
     const n = nome.toLowerCase().trim();
 
-    // Cerca in magic_items
-    let found = data.magic_items.find(x => x.nome?.toLowerCase().includes(n) || n.includes(x.nome?.toLowerCase()));
-    if (found) { Compendio.openMagicItem(found.id); return; }
-
-    // Cerca in equipment
-    found = data.equipment.find(x => x.nome?.toLowerCase().includes(n) || n.includes(x.nome?.toLowerCase()));
-    if (found) { Compendio.openEquipment(found.id); return; }
-
-    // Non trovato — carica il compendio e riprova
-    if (data.magic_items.length === 0) {
-      Toast.show('Caricamento compendio...', 'info', 2000);
-      Compendio.init();
-      setTimeout(() => openItem(nome), 2000);
-      return;
+    // Sincronizza il sistema con la campagna attiva
+    const campSistema = App.getActiveCampaign()?.system || '5e2024';
+    const selEl = document.getElementById('comp-sistema-select');
+    if (selEl && selEl.value !== campSistema) {
+      selEl.value = campSistema;
+      Compendio.changeSistema(campSistema);
+      // Aspetta il caricamento
+      await new Promise(r => setTimeout(r, 1500));
     }
 
+    const data = Compendio.getData();
+
+    // Se dati non ancora caricati, init e riprova
+    if (data.magic_items.length === 0 && data.equipment.length === 0) {
+      Toast.show('Caricamento compendio...', 'info', 2000);
+      Compendio.init();
+      await new Promise(r => setTimeout(r, 2000));
+    }
+
+    const data2 = Compendio.getData();
+    const n2 = n;
+
+    let found = data2.magic_items.find(x => x.nome?.toLowerCase().includes(n2) || n2.includes(x.nome?.toLowerCase().trim()));
+    if (found) { Compendio.openMagicItem(found.id); return; }
+
+    found = data2.equipment.find(x => x.nome?.toLowerCase().includes(n2) || n2.includes(x.nome?.toLowerCase().trim()));
+    if (found) { Compendio.openEquipment(found.id); return; }
+
     Toast.show(`"${nome}" non trovato nel Compendio`, 'info');
-    Debug.log(`CompendioCache: "${nome}" non trovato (${data.magic_items.length} mi, ${data.equipment.length} eq)`);
+    Debug.log(`CompendioCache miss: "${nome}" (sistema: ${campSistema}, mi:${data2.magic_items.length}, eq:${data2.equipment.length})`);
   };
 
   const findItem = (nome) => {
