@@ -1,0 +1,586 @@
+[
+  {
+    "id": "anello_accumula_incantesimi",
+    "nome": "Anello accumula incantesimi",
+    "tipo": "Anello, raro (richiede sintonia)",
+    "tipo_base": "Anello",
+    "rarita": "raro",
+    "richiede_sintonia": true,
+    "descrizione": "Questo anello accumula gli incantesimi lanciati su di esso, finché un possessore in sintonia con esso non decide di usarli. L'anello può contenere fino a 5 livelli di incantesimo per volta. Quando viene trovato, contiene 1d6 – 1 livelli di incantesimi accumulati scelti dal GM. Qualsiasi creatura può lanciare nell'anello un incantesimo di livello compreso tra il 1° e il 5° toccandolo al momento del lancio dell'incantesimo. L'incantesimo non ha alcun effetto, a parte quello di essere immagazzinato nell'anello. Se l'anello non può contenere altri incantesimi, quello lanciato viene sprecato senza provocare alcun effetto. Il livello dello slot usato per lanciare l'incantesimo determina lo spazio che occupa. Finché il personaggio indossa l'anello, può lanciare qualsiasi incantesimo conservato al suo interno. L'incantesimo usa il livello di slot, la CD del tiro salvezza sull'incantesimo, il bonus all'attacco con incantesimo e la caratteristica da incantatore di chi l'ha lanciato in origine, ma sotto ogni altro aspetto si considera che sia stato il personaggio a lanciarlo. L'incantesimo lanciato dall'anello non è più conservato al suo interno, liberando il relativo spazio. Anello, leggendario Anello del calore Anello, non comune (richiede sintonia) Finché il personaggio indossa questo anello, ottiene resistenza ai danni da freddo. Inoltre, il personaggio e tutto ciò che indossa e trasporta non subiscono effetti nocivi dalle basse temperature fino a – 45° C.",
+    "pagine_sorgente": "235-291"
+  },
+  {
+    "id": "anello_del_camminare_sull_acqua",
+    "nome": "Anello del camminare sull'acqua",
+    "tipo": "Anello, non comune",
+    "tipo_base": "Anello",
+    "rarita": "non comune",
+    "richiede_sintonia": false,
+    "descrizione": "Finché il personaggio indossa questo anello, può stare in piedi e camminare su qualsiasi superficie liquida come se fosse terreno solido.",
+    "pagine_sorgente": "235-291"
+  },
+  {
+    "id": "anello_del_comando_degli_elementali",
+    "nome": "Anello del comando degli elementali",
+    "tipo": "Anello, leggendario (richiede sintonia)",
+    "tipo_base": "Anello",
+    "rarita": "leggendario",
+    "richiede_sintonia": true,
+    "descrizione": "Questo anello è collegato a un Piano Elementale scelto dal GM o determinato in maniera casuale. Finché il personaggio indossa questo anello, dispone di vantaggio ai tiri per colpire contro gli elementali provenienti dal piano a esso collegato; questi ultimi, inoltre, subiscono svantaggio ai tiri per colpire contro di lui. Il personaggio ha anche accesso alle proprietà basate sul piano collegato. L'anello possiede 5 cariche e recupera 1d4 + 1 cariche consumate all'alba di ogni giorno. Gli incantesimi lanciati dall'anello hanno una CD del tiro salvezza pari a 17. Anello del comando degli elementali del fuoco. Il personaggio può consumare 2 cariche dell'anello per lanciare dominare mostri su un elementale del fuoco. Inoltre, dispone di resistenza ai danni da fuoco. Può anche parlare e capire l'Ignan. Se il personaggio contribuisce a uccidere un elementale del fuoco mentre è in sintonia con l'anello, ottiene le seguenti proprietà aggiuntive: • Ottiene immunità ai danni da fuoco. • Può lanciare dall'anello gli incantesimi seguenti, consumando il numero necessario di cariche: mani brucianti (1 carica), muro di fuoco (3 cariche) o palla di fuoco (2 cariche). Anello del comando degli elementali della terra. Il personaggio può consumare 2 cariche dell'anello per lanciare dominare mostri su un elementale della È permesso fotocopiare o stampare questo documento per il solo uso personale.",
+    "pagine_sorgente": "235-291"
+  },
+  {
+    "id": "anello_del_nuotare",
+    "nome": "Anello del nuotare",
+    "tipo": "Anello, non comune",
+    "tipo_base": "Anello",
+    "rarita": "non comune",
+    "richiede_sintonia": false,
+    "descrizione": "Finché il personaggio indossa questo anello, la sua velocità di nuotare è pari a 12 metri. Anello del saltare Anello, non comune (richiede sintonia) Mentre il personaggio indossa questo anello, può lanciare con esso l'incantesimo saltare a volontà come azione bonus, ma può bersagliare solo se stesso.",
+    "pagine_sorgente": "235-291"
+  },
+  {
+    "id": "anello_della_caduta_morbida",
+    "nome": "Anello della caduta morbida",
+    "tipo": "Anello, raro (richiede sintonia)",
+    "tipo_base": "Anello",
+    "rarita": "raro",
+    "richiede_sintonia": true,
+    "descrizione": "Quando il personaggio cade indossando questo anello, scende di 18 metri per round e non subisce danni dalla caduta.",
+    "pagine_sorgente": "235-291"
+  },
+  {
+    "id": "anello_della_liberta_di_azione",
+    "nome": "Anello della libertà di azione",
+    "tipo": "Anello, raro (richiede sintonia)",
+    "tipo_base": "Anello",
+    "rarita": "raro",
+    "richiede_sintonia": true,
+    "descrizione": "Mentre il personaggio indossa questo anello, il terreno difficile non gli costa movimento extra. Inoltre, la magia non può né ridurre la sua velocità né renderlo paralizzato o trattenuto. Anello della vista a raggi X Anello, raro (richiede sintonia) Finché il personaggio indossa questo anello, può usare un'azione per pronunciarne la parola d'ordine. Quando lo fa, può vedere all'interno della materia solida e attraverso di essa per 1 minuto. Questo tipo di vista ha un raggio di 9 metri. Gli oggetti solidi che si trovano entro il raggio d'azione appaiono al personaggio come trasparenti e non impediscono alla luce di attraversarli. La vista può penetrare 30 cm di pietra, 2,5 centimetri di metallo comune o fino a 90 cm di legno o terriccio. Le sostanze più dense, come per esempio un sottile strato di piombo, bloccano questa forma di vista. Ogni volta che usa di nuovo l'anello prima di completare un riposo lungo, il personaggio deve superare un tiro salvezza su Costituzione con CD 15, altrimenti subisce un livello di indebolimento. Anello dell'ariete Anello, raro (richiede sintonia) Questo anello possiede 3 cariche e recupera 1d3 cariche consumate all'alba di ogni giorno. Mentre il personaggio lo indossa, può usare un'azione per consumare da 1 a 3 cariche e attaccare una creatura È permesso fotocopiare o stampare questo documento per il solo uso personale.",
+    "pagine_sorgente": "235-291"
+  },
+  {
+    "id": "anello_di_influenza_sugli_animali",
+    "nome": "Anello di influenza sugli animali",
+    "tipo": "Anello, raro",
+    "tipo_base": "Anello",
+    "rarita": "raro",
+    "richiede_sintonia": false,
+    "descrizione": "Questo anello possiede 3 cariche e recupera 1d3 cariche consumate all'alba di ogni giorno. Mentre il personaggio lo indossa, può usare un'azione per consumare 1 carica e lanciare uno dei seguenti incantesimi: • Amicizia con gli animali (CD del tiro salvezza 13) È permesso fotocopiare o stampare questo documento per il solo uso personale.",
+    "pagine_sorgente": "235-291"
+  },
+  {
+    "id": "armatura_di_cuoio_borchiato_incantata",
+    "nome": "Armatura di cuoio borchiato incantata",
+    "tipo": "Armatura (cuoio borchiato), rara",
+    "tipo_base": "Arma",
+    "rarita": "raro",
+    "richiede_sintonia": false,
+    "descrizione": "Mentre il personaggio indossa quest'armatura, ottiene un bonus di +1 alla CA. Può anche usare un'azione bonus per pronunciare la parola d'ordine dell'armatura e farle assumere l'aspetto di un normale capo di vestiario o di un altro tipo di armatura. Il personaggio può deciderne l'aspetto, inclusi il colore, lo stile e gli accessori, ma l'armatura mantiene il suo ingombro e il suo peso normali. L'aspetto illusorio permane finché la proprietà dell'armatura non viene utilizzata di nuovo o finché il personaggio non rimuove l'armatura. Armatura in Mithral Armatura (media o pesante, ma non di pelle), non comune Il mithral è un metallo flessibile e leggero. Un giaco di maglia o una corazza di piastre in mithral possono essere indossate sotto gli abiti normali. Se un'armatura normalmente impone svantaggio alle prove di Destrezza (Furtività) o prevede un requisito di Forza, la sua versione di mithral non fa né l'una né l'altra cosa. Ascia del berserker Arma (qualsiasi ascia), rara (richiede sintonia) Il personaggio ottiene un bonus di +1 ai tiri per colpire e ai tiri per i danni effettuati con quest'arma magica. Inoltre, una volta entrato in sintonia con l'arma, il suoi punti ferita massimi aumentano di 1 per ogni livello acquisito. Maledizione. Quest'ascia è maledetta e la sua maledizione si trasmette al personaggio quando entra in sintonia con essa. Finché è maledetto, il personaggio non vuole separarsene e non la perde mai di vista. Subisce inoltre svantaggio ai tiri per colpire effettuati con tutte le altre armi, a meno che nel raggio di 18 metri non ci sia alcun nemico che è in grado di vedere o udire. Ogni volta che una creatura ostile infligge danni al personaggio mentre questi è in possesso dell'ascia, il personaggio deve superare un tiro salvezza su Saggezza con CD 15, altrimenti entra in uno stato di berserk. Finché è in stato di berserk, il personaggio deve usare la sua azione ogni round per attaccare con l'ascia la creatura a lui più vicina. Se il personaggio può",
+    "pagine_sorgente": "235-291"
+  },
+  {
+    "id": "bacchetta_di_individuazione_dei_nemici",
+    "nome": "Bacchetta di individuazione dei nemici",
+    "tipo": "Bacchetta, rara (richiede sintonia)",
+    "tipo_base": "Bacchetta",
+    "rarita": "raro",
+    "richiede_sintonia": true,
+    "descrizione": "Questa bacchetta possiede 7 cariche. Mentre il personaggio la impugna, può usare un'azione e spendere 1 carica per pronunciarne la parola d'ordine. Durante il minuto successivo, il personaggio conosce la direzione della creatura ostile a lui più vicina e situata entro 18 metri da lui, ma non la sua distanza precisa. La bacchetta può percepire la presenza di creature ostili eteree, invisibili, camuffate o nascoste, oltre a quelle in piena vista. L'effetto termina se il personaggio smette di impugnare la bacchetta. All'alba di ogni giorno, la bacchetta recupera 1d6 + 1 cariche consumate. Se il personaggio consuma l'ultima carica, deve tirare un d20: se ottiene 1, la bacchetta diventa cenere e viene distrutta.",
+    "pagine_sorgente": "235-291"
+  },
+  {
+    "id": "bacchetta_di_individuazione_del_magico",
+    "nome": "Bacchetta di individuazione del magico",
+    "tipo": "Bacchetta, non comune",
+    "tipo_base": "Bacchetta",
+    "rarita": "non comune",
+    "richiede_sintonia": false,
+    "descrizione": "Questa bacchetta possiede 3 cariche. Mentre il personaggio la impugna, può usare un'azione per consumare 1 carica e lanciare con essa l'incantesimo individuazione del magico. La bacchetta recupera 1d3 cariche consumate all'alba di ogni giorno.",
+    "pagine_sorgente": "235-291"
+  },
+  {
+    "id": "bacchetta_di_missili_magici",
+    "nome": "Bacchetta di missili magici",
+    "tipo": "Bacchetta, non comune",
+    "tipo_base": "Bacchetta",
+    "rarita": "non comune",
+    "richiede_sintonia": false,
+    "descrizione": "Questa bacchetta possiede 7 cariche. Mentre il personaggio la impugna, può usare un'azione per consumare 1 o più delle sue cariche e lanciare con essa l'incantesimo dardo incantato. Consumando 1 carica, il personaggio lancia la versione di 1° livello dell'incantesimo. Può aumentare il livello dello slot incantesimo di 1 per ogni carica aggiuntiva consumata. All'alba di ogni giorno, la bacchetta recupera 1d6 + 1 cariche consumate. Se il personaggio consuma l'ultima carica, deve tirare un d20: se ottiene 1, la bacchetta diventa cenere e viene distrutta. Barca pieghevole Oggetto meraviglioso, raro Quest'oggetto si presenta come una scatola di legno lunga 30 cm, larga e profonda 15 cm. Pesa 2 kg e galleggia. Può essere aperta per custodire degli oggetti all'interno. Possiede tre parole d'ordine, per pronunciare ognuna delle quali è richiesta un'azione. Una delle parole d'ordine fa sì che la scatola si apra e si trasformi in una barca di 3 metri di lunghezza per 1,2 metri di larghezza e 60 cm di profondità, provvista di un paio di remi, un'ancora, un albero e una vela. La barca può trasportare comodamente fino a quattro creature di taglia Media. La seconda parola d'ordine fa trasformare la scatola in una nave lunga 7,2 metri, larga 2,4 metri e profonda 1,8 metri, con un ponte, postazioni per i rematori, cinque paia di remi, un timone, un'ancora, una cabina sul ponte e un albero con una vela quadrata. La nave può trasportare comodamente quindici creature di taglia Media. È permesso fotocopiare o stampare questo documento per il solo uso personale.",
+    "pagine_sorgente": "235-291"
+  },
+  {
+    "id": "borsa_dei_fagioli_magici",
+    "nome": "Borsa dei fagioli magici",
+    "tipo": "Oggetto meraviglioso, raro",
+    "tipo_base": "Oggetto meraviglioso",
+    "rarita": "raro",
+    "richiede_sintonia": false,
+    "descrizione": "Questa borsa di stoffa robusta contiene 3d4 fagioli secchi. La borsa pesa 250 grammi, più 125 grammi per ogni fagiolo presente al suo interno. Se i fagioli vengono gettati a terra, generano un'esplosione in un raggio di 3 metri centrata sui fagioli stessi. Ogni creatura presente nell'area, incluso il possessore della borsa, deve effettuare un tiro salvezza su Destrezza con CD 15; in caso di fallimento, subisce 5d4 danni da fuoco, o la metà dei danni in caso di successo. Il fuoco incendia ogni oggetto infiammabile non indossato o trasportato presente nell'area. Se un fagiolo viene prelevato dalla borsa, piantato nel terriccio o nella sabbia e innaffiato, dopo 1 minuto genera un effetto nel luogo in cui è stato piantato. Il GM può scegliere l'effetto dalla tabella seguente, determinarlo casualmente o crearne uno personalmente. d100 01 02–10 11–20 21–30 31–40 41–50 Effetto Spuntano 5d4 funghi velenosi. Se una creatura mangia un fungo, si tira un dado. Se il risultato del tiro è dispari, tale creatura deve superare un tiro salvezza su Costituzione con CD 15, altrimenti subisce 5d6 danni da veleno e diventa avvelenata per 1 ora. Se il risultato è pari, la creatura che ha mangiato il fungo ottiene 5d6 punti ferita temporanei per 1 ora. Scaturisce un geyser che spruzza una colonna alta 9 metri di acqua, birra, succo di mirtillo, tè, aceto, vino od olio (a scelta del GM) per 1d12 round. Spunta un treant. C'è una probabilità del 50 percento che sia caotico malvagio e attacchi. Dal terreno emerge una statua di pietra animata ma immobile, con le sembianze del possessore della borsa, che pronuncia minacce verbali contro di lui. Se il possessore della borsa si allontana dalla statua, quando sopraggiungono altre creature, quest'ultima descrive loro il possessore come il più scellerato dei nemici e fornisce loro le informazioni per trovarlo e attaccarlo. Se il possessore si trova sullo stesso piano di esistenza della statua, questa conosce la sua posizione. La statua diventa inani",
+    "pagine_sorgente": "235-291"
+  },
+  {
+    "id": "collana_delle_palle_di_fuoco",
+    "nome": "Collana delle palle di fuoco",
+    "tipo": "Oggetto meraviglioso, raro",
+    "tipo_base": "Oggetto meraviglioso",
+    "rarita": "raro",
+    "richiede_sintonia": false,
+    "descrizione": "Da questa collana pendono 1d6 + 3 perle. Il personaggio può usare un'azione per staccare una delle perle e lanciarla fino a 18 metri di distanza. Alla fine della sua traiettoria, la perla esplode in una palla di fuoco di 3° livello (CD del tiro salvezza 15). Con un'unica azione, è possibile lanciare un numero maggiore di perle o perfino l'intera collana. In questi casi, il livello della palla di fuoco aumenta di 1 per ogni perla lanciata oltre alla prima. Collana di grani di preghiera Oggetto meraviglioso, raro (richiede sintonia con un chierico, druido o paladino) Questa collana ha 1d4 + 2 perle magiche fatte di acquamarina, perla nera o topazio, oltre a molte perle non magiche fatte di ambra, diaspro, citrino, corallo, giada, perla o quarzo. Se una perla magica viene rimossa dalla collana, perde la sua magia. Esistono sei tipi di perline magiche. Il GM decide il tipo di ogni perla sulla collana o lo determina casualmente. La collana può includere più perle dello stesso tipo. Per usarne una, il personaggio deve usare la collana. Ogni perla contiene un incantesimo che il personaggio può lanciare come azione bonus (usando la sua CD del tiro salvezza sull'incantesimo, quando è richiesto un tiro salvezza). Una volta lanciato l'incantesimo di una perla magica, quella perla non può più essere usata fino all'alba successiva. d20 01 02–05 06 07–12 13–18 Perla... del camminare nel vento del favore dell'evocazione della benedizione della guarigione 19–20 della punizione Incantesimo Camminare nel vento Ristorare superiore Alleato planare Benedizione Cura ferite (2° livello) o ristorare inferiore Punizione marchiante Corazza di scaglie di drago Armatura (corazza a scaglie), molto rara (richiede sintonia) La corazza di scaglie di drago è ricavata dalle scaglie di un tipo di drago. A volte i draghi raccolgono le loro scaglie cadute e ne fanno dono a un umanoide. Altre volte i cacciatori scuoiano accuratamente i draghi uccisi e ne conservano le pelli. In entrambi i casi, la coraz",
+    "pagine_sorgente": "235-291"
+  },
+  {
+    "id": "corno_della_distruzione",
+    "nome": "Corno della distruzione",
+    "tipo": "Oggetto meraviglioso, raro",
+    "tipo_base": "Oggetto meraviglioso",
+    "rarita": "raro",
+    "richiede_sintonia": false,
+    "descrizione": "Il personaggio può usare un'azione per pronunciare la parola d'ordine del corno e suonarlo, emettendo un boato roboante in un cono di 9 metri udibile fino a una distanza di 180 metri. Ogni creatura all'interno del cono deve effettuare un tiro salvezza su Costituzione con CD 15: se lo fallisce, subisce 5d6 danni da tuono ed è assordata per 1 minuto, mentre se lo supera, subisce la metà di quei danni e non viene assordata. Le creature e gli oggetti fatti di vetro o di cristallo hanno svantaggio al tiro salvezza e subiscono 10d6 danni da tuono invece che 5d6. Ogni volta che viene usata la magia del corno esiste una probabilità del 20 percento che esploda. L'esplosione infligge 10d6 danni da fuoco a chi ha suonato il corno e distrugge l'oggetto. Cubo dei portali Oggetto meraviglioso, leggendario Questo cubo ha uno spigolo di 7,5 cm e irradia un'energia magica quasi palpabile. Ognuna delle sei facce è collegata a un piano di esistenza diverso, uno dei quali è il Piano Materiale. I piani a cui sono collegate le altre facce sono determinati dal GM. Il personaggio può usare un'azione per premere una delle facce del cubo e lanciare l'incantesimo portale, che si apre sul piano di esistenza collegato È permesso fotocopiare o stampare questo documento per il solo uso personale.",
+    "pagine_sorgente": "235-291"
+  },
+  {
+    "id": "elmo_della_comprensione_dei_linguaggi",
+    "nome": "Elmo della comprensione dei linguaggi",
+    "tipo": "Oggetto meraviglioso, non comune",
+    "tipo_base": "Oggetto meraviglioso",
+    "rarita": "non comune",
+    "richiede_sintonia": false,
+    "descrizione": "Finché il personaggio indossa questo elmo, può usare un'azione per lanciare con esso l'incantesimo comprensione dei linguaggi a volontà. È permesso fotocopiare o stampare questo documento per il solo uso personale.",
+    "pagine_sorgente": "235-291"
+  },
+  {
+    "id": "fasce_metalliche_del_legame",
+    "nome": "Fasce metalliche del legame",
+    "tipo": "Oggetto meraviglioso, raro",
+    "tipo_base": "Oggetto meraviglioso",
+    "rarita": "raro",
+    "richiede_sintonia": false,
+    "descrizione": "Questa sfera di metallo arrugginito ha un diametro di 7,5 cm e pesa 0,5 kg. Il personaggio può usare un'azione per pronunciare la parola d'ordine della sfera e lanciarla contro una creatura di taglia Enorme o inferiore che è in grado di vedere situata entro 18 metri da lui. Mentre sfreccia in aria, la sfera si apre rivelando un groviglio di fasce metalliche. Il personaggio effettua un tiro per colpire a distanza con un bonus di attacco pari al suo modificatore di Destrezza più il suo bonus di competenza. Se il colpo va a segno, il bersaglio è trattenuto finché il personaggio non usa un'azione bonus per pronunciare di nuovo la parola d'ordine e liberarlo. Se lo fa, o se l'attacco manca il bersaglio, le fasce si ritraggono e tornano a formare la sfera originale. È permesso fotocopiare o stampare questo documento per il solo uso personale.",
+    "pagine_sorgente": "235-291"
+  },
+  {
+    "id": "mantello_della_resistenza_agli_incantesimi",
+    "nome": "Mantello della resistenza agli incantesimi",
+    "tipo": "Oggetto meraviglioso, raro (richiede sintonia)",
+    "tipo_base": "Oggetto meraviglioso",
+    "rarita": "raro",
+    "richiede_sintonia": true,
+    "descrizione": "Finché il personaggio indossa questo mantello, dispone di vantaggio ai tiri salvezza contro gli incantesimi. Mantello dell'aracnide Oggetto meraviglioso, molto raro (richiede sintonia) Questo raffinato indumento di seta nera è intessuto con sottilissimi fili argentati. Il personaggio che lo indossa riceve i benefici seguenti: • Resistenza ai danni da veleno. • Velocità di scalare pari alla propria velocità base sul terreno. • Può muoversi in alto, in basso e lateralmente sulle superfici verticali e a testa in giù sui soffitti mantenendo le mani libere. • Non può essere bloccato da alcun tipo di ragnatela e può muoversi attraverso di esse come se fossero terreno difficile. • Può usare un'azione per lanciare l'incantesimo ragnatela (CD del tiro salvezza 13). La ragnatela creata dall'incantesimo riempie un'area doppia rispetto al normale. Una volta usata, la proprietà del mantello non può essere riutilizzata fino all'alba successiva. È permesso fotocopiare o stampare questo documento per il solo uso personale.",
+    "pagine_sorgente": "235-291"
+  },
+  {
+    "id": "manuale_della_velocita_di_azione",
+    "nome": "Manuale della velocità di azione",
+    "tipo": "Oggetto meraviglioso, molto raro",
+    "tipo_base": "Oggetto meraviglioso",
+    "rarita": "molto raro",
+    "richiede_sintonia": false,
+    "descrizione": "Questo libro contiene la descrizione di una serie di esercizi per la coordinazione e l'equilibrio, e le sue parole sono cariche di magia. Se il personaggio trascorre 48 ore in un periodo massimo di 6 giorni a studiare il contenuto del libro e ad applicarne i precetti, il suo punteggio di Destrezza aumenta di 2, come anche il massimo ottenibile in quel punteggio. Una volta letto, il libro perde il suo potere: lo riacquisterà dopo un secolo. Manuale dell'esercizio fisico Oggetto meraviglioso, molto raro Questo libro contiene la descrizione di una serie di esercizi ginnici e le sue parole sono cariche di magia. Se il personaggio trascorre 48 ore in un periodo massimo di 6 giorni a studiare il contenuto del libro e ad applicarne i precetti, il suo punteggio di Forza aumenta di 2, come anche il massimo ottenibile in quel punteggio. Una volta letto, il libro perde il suo potere: lo riacquisterà dopo un secolo. Martello dei fulmini Arma (maglio), leggendaria Il personaggio ottiene un bonus di +1 ai tiri per colpire e ai tiri per i danni effettuati con quest'arma magica. Anatema dei giganti (richiede sintonia). Per entrare in sintonia con quest'arma, il personaggio deve indossare una cintura della forza dei giganti (di qualunque tipo) e dei guanti del potere orchesco. La sintonia termina se il personaggio rimuove uno qualsiasi di questi oggetti. Finché il personaggio è in sintonia con l'arma e la impugna, il suo punteggio di Forza aumenta di È permesso fotocopiare o stampare questo documento per il solo uso personale.",
+    "pagine_sorgente": "235-291"
+  },
+  {
+    "id": "mazza_della_punizione",
+    "nome": "Mazza della punizione",
+    "tipo": "Arma (mazza), rara",
+    "tipo_base": "Arma",
+    "rarita": "raro",
+    "richiede_sintonia": false,
+    "descrizione": "Il personaggio ottiene un bonus di +1 ai tiri per colpire e ai tiri per i danni effettuati con quest'arma magica. Quando la usa per attaccare un costrutto, questo bonus sale a +3. Quando il personaggio ottiene un 20 a un tiro per colpire con quest'arma, il bersaglio subisce 2d6 danni contundenti extra o 4d6 danni contundenti se si tratta di un costrutto. Se dopo aver subito tali danni un costrutto scende a 25 punti ferita o meno, viene distrutto. Mazzo delle illusioni Oggetto meraviglioso, non comune Questa scatola contiene un mazzo di carte pergamenate. Un mazzo completo è composto da 34 carte. In un mazzo trovato come tesoro solitamente mancano 1d20 – 1 carte. La magia del mazzo funziona solo se le carte vengono pescate casualmente (è possibile usare un normale mazzo di carte opportunamente modificato per simulare quest'oggetto magico). Il personaggio può usare un'azione per pescare una carta casuale dal mazzo e gettarla a terra in un punto entro 9 metri da sé. Dalla carta gettata a terra si genera un'illusione raffigurante una o più creature che permangono finché non vengono dissolte. Le creature illusorie appaiono reali, hanno la taglia giusta e si comportano esattamente come le creature che simulano, ma non possono nuocere in alcun modo. Finché il personaggio resta entro 36 metri dalla creatura illusoria ed è in grado di vederla, può usare un'azione per spostarla magicamente fino a un È permesso fotocopiare o stampare questo documento per il solo uso personale.",
+    "pagine_sorgente": "235-291"
+  },
+  {
+    "id": "olio_della_forma_eterea",
+    "nome": "Olio della forma eterea",
+    "tipo": "Pozione, rara",
+    "tipo_base": "Pozione",
+    "rarita": "raro",
+    "richiede_sintonia": false,
+    "descrizione": "All'esterno del contenitore di questo torbido olio grigiastro si formano in continuazione delle bolle che evaporano velocemente. L'olio può coprire una creatura di taglia Media o inferiore, nonché ogni oggetto che indossa e trasporta (per ogni categoria di taglia superiore, è necessario usare una fiala aggiuntiva). L'applicazione dell'olio richiede 10 minuti. La creatura cosparsa d'olio ottiene gli effetti dell'incantesimo forma eterea per 1 ora. È permesso fotocopiare o stampare questo documento per il solo uso personale.",
+    "pagine_sorgente": "235-291"
+  },
+  {
+    "id": "polvere_dello_starnuto_e_del_soffocamento",
+    "nome": "Polvere dello starnuto e del soffocamento",
+    "tipo": "Oggetto meraviglioso, non comune",
+    "tipo_base": "Oggetto meraviglioso",
+    "rarita": "non comune",
+    "richiede_sintonia": false,
+    "descrizione": "Questa polvere sembra sabbia molto sottile ed è contenuta in un piccolo contenitore. Ha lo stesso aspetto della polvere della sparizione e un incantesimo identificare la indica come tale. Nel contenitore si trova polvere a sufficienza per un singolo uso. Quando il personaggio usa un'azione per gettare in aria una manciata di polvere, lui e ogni creatura che necessita di respirare situata entro 9 metri da lui devono superare un tiro salvezza su Costituzione con CD 15, altrimenti entrambi non riescono più a respirare e iniziano a starnutire in modo incontrollato. Le creature influenzate in questo modo diventano incapacitate e soffocano. Finché una creatura resta cosciente, può ripetere il tiro salvezza alla fine di ogni suo turno, ponendo fine all'effetto su di lei in caso di successo. Tale effetto può terminare anche grazie all'incantesimo ristorare inferiore. Polvere prosciugante Oggetto meraviglioso, non comune Questo pacchetto contiene 1d6 + 4 pizzichi di polvere. Con un'azione, il personaggio può spargere un pizzico di polvere sull'acqua. La polvere trasforma un cubo d'acqua con spigolo di 4,5 metri in una sfera delle dimensioni di una biglia, che fluttua o resta vicino al luogo in cui è caduta la polvere. Il peso della biglia è trascurabile. Chiunque può usare un'azione per schiantare la biglia contro una superficie rigida, rompendola e liberando l'acqua che era stata assorbita. Quando questo accade, la magia della biglia termina. Un elementale composto per la maggior parte d'acqua che si trovi esposto a un pizzico di questa polvere deve effettuare un tiro salvezza su Costituzione con CD 13; in caso di fallimento, subisce 10d6 danni necrotici, o la metà dei danni in caso di successo. È permesso fotocopiare o stampare questo documento per il solo uso personale.",
+    "pagine_sorgente": "235-291"
+  },
+  {
+    "id": "pozione_della_forma_gassosa",
+    "nome": "Pozione della forma gassosa",
+    "tipo": "Pozione, rara",
+    "tipo_base": "Pozione",
+    "rarita": "raro",
+    "richiede_sintonia": false,
+    "descrizione": "Quando il personaggio beve questa pozione, ottiene l'effetto dell'incantesimo forma gassosa per 1 ora (non è richiesta la concentrazione) o finché non vi pone fine con un'azione bonus. Il contenitore di questa pozione sembra pieno di nebbia che ondeggia e si riversa all'esterno come se fosse acqua.",
+    "pagine_sorgente": "235-291"
+  },
+  {
+    "id": "pozione_della_forza_dei_giganti",
+    "nome": "Pozione della forza dei giganti",
+    "tipo": "Pozione, rarità variabile",
+    "tipo_base": "Pozione",
+    "rarita": "variabile",
+    "richiede_sintonia": false,
+    "descrizione": "Quando il personaggio beve questa pozione, il suo punteggio di Forza cambia per 1 ora, come determinato dal tipo di gigante (vedi la tabella sottostante). Se il punteggio di Forza del personaggio è pari o superiore a quello conferito dalla pozione, non ha alcun effetto. Nel liquido trasparente di questa pozione galleggia un frammento d'unghia di un gigante del tipo appropriato. La pozione della forza dei giganti del gelo e la pozione della forza dei giganti delle pietre hanno lo stesso effetto. Tipo di gigante Giganti delle colline Giganti del gelo/delle pietre Giganti del fuoco Giganti delle nuvole Giganti delle tempeste Forza 21 23 25 27 29 Rarità Non comune Rara Rara Molto rara Leggendaria",
+    "pagine_sorgente": "235-291"
+  },
+  {
+    "id": "pozione_dell_invisibilita",
+    "nome": "Pozione dell'invisibilità",
+    "tipo": "Pozione, molto rara",
+    "tipo_base": "Pozione",
+    "rarita": "molto raro",
+    "richiede_sintonia": false,
+    "descrizione": "Il contenitore di questa pozione sembra vuoto, ma pesa come se al suo interno ci fosse un liquido. Quando il personaggio beve la pozione, diventa invisibile per 1 ora. Tutto ciò che indossa o trasporta diventa invisibile assieme a lui. L'effetto termina anticipatamente se il personaggio effettua un attacco o lancia un incantesimo. Pozione, non comune",
+    "pagine_sorgente": "235-291"
+  },
+  {
+    "id": "pozione_di_chiaroveggenza",
+    "nome": "Pozione di chiaroveggenza",
+    "tipo": "Pozione, rara",
+    "tipo_base": "Pozione",
+    "rarita": "raro",
+    "richiede_sintonia": false,
+    "descrizione": "Quando il personaggio beve questa pozione, ottiene l'effetto dell'incantesimo chiaroveggenza. Nel liquido giallastro galleggia un globo oculare, che scompare quando la pozione viene aperta.",
+    "pagine_sorgente": "235-291"
+  },
+  {
+    "id": "pozione_di_crescita",
+    "nome": "Pozione di crescita",
+    "tipo": "Pozione, non comune",
+    "tipo_base": "Pozione",
+    "rarita": "non comune",
+    "richiede_sintonia": false,
+    "descrizione": "Quando il personaggio beve questa pozione, ottiene l'effetto \"ingrandire\" dell'incantesimo ingrandire/ridurre, per 1d4 ore (non è richiesta la concentrazione). All'interno della pozione è visibile un piccolo nucleo rosso che si espande progressivamente fino a tingere tutto il liquido trasparente intorno a esso per poi contrarsi fino a diventare un granello minuscolo. Agitare la bottiglia non interrompe il processo.",
+    "pagine_sorgente": "235-291"
+  },
+  {
+    "id": "pozione_di_diminuzione",
+    "nome": "Pozione di diminuzione",
+    "tipo": "Pozione, rara",
+    "tipo_base": "Pozione",
+    "rarita": "raro",
+    "richiede_sintonia": false,
+    "descrizione": "Quando il personaggio beve questa pozione, ottiene l'effetto \"ridurre\" dell'incantesimo ingrandire/ridurre, per 1d4 ore (non è richiesta la concentrazione). All'interno della pozione è visibile un nucleo rosso che si contrae progressivamente fino a diventare un granello minuscolo per poi esplodere e tingere tutto il liquido trasparente intorno a esso. Agitare la bottiglia non interrompe il processo.",
+    "pagine_sorgente": "235-291"
+  },
+  {
+    "id": "pozione_di_eroismo",
+    "nome": "Pozione di eroismo",
+    "tipo": "Pozione, rara",
+    "tipo_base": "Pozione",
+    "rarita": "raro",
+    "richiede_sintonia": false,
+    "descrizione": "Quando il personaggio beve questa pozione, ottiene 10 punti ferita temporanei che durano 1 ora. Per la stessa durata, il personaggio è sotto l'effetto dell'incantesimo benedizione (non è richiesta la concentrazione). Il liquido blu di questa pozione gorgoglia e fuma come se stesse bollendo. È permesso fotocopiare o stampare questo documento per il solo uso personale.",
+    "pagine_sorgente": "235-291"
+  },
+  {
+    "id": "pozione_di_lettura_della_mente",
+    "nome": "Pozione di lettura della mente",
+    "tipo": "Pozione, rara",
+    "tipo_base": "Pozione",
+    "rarita": "raro",
+    "richiede_sintonia": false,
+    "descrizione": "Quando il personaggio beve questa pozione, ottiene l'effetto dell'incantesimo individuazione dei pensieri (CD del tiro salvezza 13). Nel denso liquido violaceo della pozione fluttua una nuvola ovoidale di colore rosa.",
+    "pagine_sorgente": "235-291"
+  },
+  {
+    "id": "pozione_di_resistenza",
+    "nome": "Pozione di resistenza",
+    "tipo": "Pozione, non comune",
+    "tipo_base": "Pozione",
+    "rarita": "non comune",
+    "richiede_sintonia": false,
+    "descrizione": "Quando beve questa pozione, il personaggio ottiene resistenza per 1 ora a un tipo di danno che il GM sceglie o determina casualmente tra le opzioni sottostanti. d10 1 2 3 4 5 Tipo di danno Acido Forza Freddo Fulmine Fuoco d10 6 7 8 9 10 Tipo di danno Necrotico Psichico Radioso Tuono Veleno",
+    "pagine_sorgente": "235-291"
+  },
+  {
+    "id": "pozione_di_scalare",
+    "nome": "Pozione di scalare",
+    "tipo": "Pozione, comune",
+    "tipo_base": "Pozione",
+    "rarita": "comune",
+    "richiede_sintonia": false,
+    "descrizione": "Quando il personaggio beve questa pozione, ottiene una velocità di scalare pari alla sua velocità base sul terreno per 1 ora. Per la stessa durata, dispone anche di vantaggio alle prove di Forza (Atletica) effettuate per scalare. La pozione è composta da strati separati di colore marrone, argento e grigio, simili a strati geologici sovrapposti. Agitando la pozione, gli strati non si mescolano.",
+    "pagine_sorgente": "235-291"
+  },
+  {
+    "id": "pozione_di_volare",
+    "nome": "Pozione di volare",
+    "tipo": "Pozione, molto rara",
+    "tipo_base": "Pozione",
+    "rarita": "molto raro",
+    "richiede_sintonia": false,
+    "descrizione": "Quando il personaggio beve questa pozione, ottiene una velocità di volare pari alla sua velocità base sul terreno per 1 ora e può fluttuare. Se il personaggio si trova in aria quando l'effetto della pozione termina, cade a meno che non possieda altri mezzi per mantenersi in aria. Il liquido trasparente di questa pozione rimane sospeso nella parte superiore del contenitore e al suo interno sono visibili alcune impurità biancastre simili a nuvole. Pozione velenosa Pozione, non comune Questa mistura ha l'aspetto, l'odore e il sapore di una pozione di guarigione o di altre pozioni benefiche. In realtà, si tratta di un veleno mascherato da un'illusione magica. L'incantesimo identificare rivela la sua vera natura. Se il personaggio la beve, subisce 3d6 danni da veleno e deve superare un tiro salvezza su Costituzione con CD 13, altrimenti diventa avvelenato. All'inizio di ogni suo turno, finché è avvelenato in questo modo, subisce 3d6 danni da veleno. Alla fine di ogni suo turno, può ripetere il tiro salvezza: se lo supera, i danni da veleno che subisce nei turni successivi si riducono di 1d6. L'effetto della pozione termina quando questi danni scendono a 0. Pozzo dei mondi Oggetto meraviglioso, leggendario Quando è piegato, questo panno di elegante tessuto nero morbido come la seta ha le dimensioni di un fazzoletto. Una volta spiegato, copre una superficie circolare di 1,8 metri di diametro. Il personaggio può usare un'azione per stendere e posizionare il pozzo dei mondi su una superficie solida, creando un portale a doppio senso verso un altro mondo o piano di esistenza. Ogni volta che l'oggetto apre un portale, il GM decide dove porterà. Il personaggio può usare un'azione per chiudere un portale aperto afferrandone i lembi e ripiegandoli. Una volta che ha aperto un portale, il pozzo dei mondi non può essere riutilizzato per 1d8 ore. È permesso fotocopiare o stampare questo documento per il solo uso personale.",
+    "pagine_sorgente": "235-291"
+  },
+  {
+    "id": "statuina_del_potere_meraviglioso",
+    "nome": "Statuina del potere meraviglioso",
+    "tipo": "Oggetto meraviglioso, rarità variabile",
+    "tipo_base": "Oggetto meraviglioso",
+    "rarita": "variabile",
+    "richiede_sintonia": false,
+    "descrizione": "Una statuina del potere meraviglioso è una scultura raffigurante un animale abbastanza piccola da stare in tasca. Se il personaggio usa un'azione per pronunciare la parola d'ordine e gettare la statuina al suolo in un punto entro 18 metri da lui, essa si trasforma in una creatura vivente. Se lo spazio dove dovrebbe apparire la creatura è già occupato da altre creature o oggetti, o se non c'è spazio a sufficienza, la statuina non si trasforma. La creatura è amichevole nei confronti del personaggio e dei suoi compagni. Comprende i suoi linguaggi e obbedisce ai suoi comandi verbali. Se il personaggio non impartisce comandi, la creatura si difende, ma non effettua altre azioni. La creatura permane per una durata specifica per ogni statuina. Esaurita la durata, la creatura riassume la forma di statuina. La creatura si ritrasforma anticipatamente anche se scende a 0 punti ferita o se il personaggio usa di nuovo un'azione per pronunciare la parola d'ordine mentre la tocca. Quando torna a essere una statuina, la sua proprietà non può essere riutilizzata prima che sia trascorso un certo periodo di tempo, come specificato nella descrizione della specifica statuina. Cane di onice (rara). Questa statuina di onice raffigura un cane e può trasformarsi in un mastino per una durata massima di 6 ore. Il mastino ha un punteggio di Intelligenza pari a 8 e può parlare il Comune. Possiede inoltre scurovisione entro un raggio di 18 metri ed entro questo raggio è in grado di vedere creature e oggetti invisibili. Una volta usata, non può essere riutilizzata finché non sono trascorsi 7 giorni. Capre d'avorio (rara). Queste statuine di avorio raffiguranti delle capre vengono sempre create in gruppi di tre pezzi. Ognuna delle capre ha un aspetto diverso dalle altre e funziona diversamente. Le loro caratteristiche speciali sono le seguenti: • La capra del viaggio può trasformarsi in una capra Grande con le stesse statistiche di un cavallo da galoppo. Possiede 24 cariche e ogni ora o frazione d",
+    "pagine_sorgente": "235-291"
+  },
+  {
+    "id": "talismano_di_prova_contro_il_veleno",
+    "nome": "Talismano di prova contro il veleno",
+    "tipo": "Oggetto meraviglioso, raro",
+    "tipo_base": "Oggetto meraviglioso",
+    "rarita": "raro",
+    "richiede_sintonia": false,
+    "descrizione": "Questa delicata catenella d'argento ha come pendente una gemma nera con taglio a brillante. Finché il personaggio la indossa, i veleni non hanno alcun effetto su di lui. Il personaggio è inoltre immune alla condizione avvelenato e ottiene immunità ai danni da veleno. Tappeto volante Oggetto meraviglioso, molto raro Con un'azione, il personaggio può pronunciare la parola d'ordine del tappeto per fare in modo che fluttui in volo. Il tappeto si muove in base ai comandi verbali impartiti dal personaggio, che deve trovarsi entro 9 metri da esso. Esistono tappeti volanti di quattro misure diverse. Il GM può scegliere le dimensioni di un determinato tappeto o determinarle casualmente. d100 01–20 21–55 56–80 81–100 Dimensioni 90 cm × 150 cm 120 cm × 80 cm 150 cm × 210 cm 180 cm × 270 cm Capacità di trasporto 100 kg 200 kg 300 kg 400 kg Velocità di volare 24 metri 18 metri 12 metri 9 metri Un tappeto può trasportare fino al doppio del peso indicato in tabella, ma se trasporta più di quanto indicato vola a velocità dimezzata.",
+    "pagine_sorgente": "235-291"
+  },
+  {
+    "id": "tomo_del_comando_e_dell_influenza",
+    "nome": "Tomo del comando e dell'influenza",
+    "tipo": "Oggetto meraviglioso, molto raro",
+    "tipo_base": "Oggetto meraviglioso",
+    "rarita": "molto raro",
+    "richiede_sintonia": false,
+    "descrizione": "Questo libro contiene una serie di suggerimenti su come persuadere e ispirare gli altri, e le sue parole sono cariche di magia. Se il personaggio trascorre 48 ore in un periodo massimo di 6 giorni a studiare il contenuto del libro e ad applicarne i precetti, il suo punteggio di Carisma aumenta di 2, come anche il massimo ottenibile in quel punteggio. Una volta letto, il libro perde il suo potere: lo riacquisterà dopo un secolo. Tomo del nitido pensiero Oggetto meraviglioso, molto raro Questo libro contiene la descrizione di una serie di esercizi di logica e memoria, e le sue parole sono cariche di magia. Se il personaggio trascorre 48 ore in un periodo massimo di 6 giorni a studiare il contenuto del libro e ad applicarne i precetti, il suo punteggio di Intelligenza aumenta di 2, come anche il massimo ottenibile in quel punteggio. Una volta letto, il libro perde il suo potere: lo riacquisterà dopo un secolo. Tomo della comprensione Oggetto meraviglioso, molto raro Questo libro contiene la descrizione di una serie di esercizi di intuizione e percezione, e le sue parole sono cariche di magia. Se il personaggio trascorre 48 ore in un periodo massimo di 6 giorni a studiare il contenuto del libro e ad applicarne i precetti, il suo punteggio di Saggezza aumenta di 2, come anche il massimo ottenibile in quel punteggio. Una volta letto, il libro perde il suo potere: lo riacquisterà dopo un secolo. Tridente del comando dei pesci Arma (tridente), non comune (richiede sintonia) Questo tridente è un'arma magica. Possiede 3 cariche. Finché il personaggio lo trasporta, può usare un'azione e spendere 1 carica per lanciare con esso l'incantesimo dominare bestie (CD del tiro salvezza 15) su una bestia dotata di una velocità di nuotare innata. Il tridente recupera 1d3 cariche consumate all'alba di ogni giorno. Tunica degli occhi Oggetto meraviglioso, raro (richiede sintonia) Questa tunica è decorata con un motivo raffigurante vari occhi. Mentre il personaggio la indossa ottiene i bene",
+    "pagine_sorgente": "235-291"
+  },
+  {
+    "id": "verga_inamovibile",
+    "nome": "Verga inamovibile",
+    "tipo": "Verga, non comune",
+    "tipo_base": "Verga",
+    "rarita": "non comune",
+    "richiede_sintonia": false,
+    "descrizione": "Questa verga piatta di ferro è dotata di un tasto su un'estremità. Il personaggio può usare un'azione per premere il tasto e fare in modo che la verga si fissi magicamente nel luogo in cui si trova. Finché una creatura non usa un'azione per premere nuovamente il tasto, la verga non si sposta, sfidando anche la forza di gravità. La verga può sostenere un peso massimo di 4 tonnellate; un peso superiore fa sì che la verga si disattivi e cada. Una creatura può usare un'azione per effettuare una prova di forza con CD 30, spostando la verga per un massimo di 3 metri in caso di successo. Oggetto meraviglioso, raro Oggetti magici senzienti Alcuni oggetti magici sono dotati di mente e personalità proprie. Gli oggetti di questo tipo potrebbero essere posseduti, infestati dagli spiriti di un precedente proprietario oppure potrebbero essere senzienti grazie alla magia usata nella loro creazione. In ogni caso, un oggetto di questo tipo si comporta come un personaggio, con tanto di peculiarità, ideali, legami e a volte difetti. Un oggetto È permesso fotocopiare o stampare questo documento per il solo uso personale.",
+    "pagine_sorgente": "235-291"
+  },
+  {
+    "id": "apparatus_del_granchio",
+    "nome": "Apparatus del Granchio",
+    "tipo": "Oggetto meraviglioso, leggendario",
+    "tipo_base": "Oggetto meraviglioso",
+    "rarita": "leggendario",
+    "richiede_sintonia": false,
+    "descrizione": "Apparatus del Granchio Oggetto meraviglioso, leggendario A prima vista quest'oggetto ha l'aspetto di un barile di ferro di taglia Grande sigillato e del peso di 250 kg. Il barile possiede una maniglia nascosta, che può essere trovata effettuando con successo una prova di Intelligenza (Indagare) con CD 20. La maniglia apre uno sportello posto a un'estremità del barile, che permette a due creature di taglia Media o inferiore di entrare. All'interno, sul lato opposto rispetto all'entrata, si trova una fila di dieci leve, tutte in posizione neutrale, che possono essere È permesso fotocopiare o stampare questo documento per il solo uso personale. .1 241 spostate in alto o in basso. Muovendo determinate leve, l'Apparatus si trasforma in un oggetto simile a un'aragosta gigante. Apparatus del Granchio è un oggetto di taglia Grande dotato delle statistiche seguenti: Classe armatura: 20 Punti ferita: 200 Velocità: 9 m, nuotare 9 m (o 0 m per entrambi i movimenti quando le zampe e la coda sono ritratte all'interno) Immunità ai danni: psichici, veleno Per essere utilizzato come veicolo, l'Apparatus necessita di un pilota. Quando lo sportello dell'Apparatus è chiuso, l'abitacolo è sigillato e a tenuta stagna sia per l'aria che per l'acqua. L'abitacolo contiene una quantità d'aria sufficiente per 10 ore, da dividere per il numero di creature che respirano al suo interno. L'Apparatus galleggia sull'acqua. Può anche immergersi fino a una profondità di 270 metri. Per ogni minuto trascorso al di sotto di tale profondità, il veicolo subisce 2d6 danni contundenti a causa della pressione. Una creatura all'interno dell'abitacolo può usare un'azione per muovere su o giù fino a due leve. Dopo ogni uso, le leve tornano in posizione neutrale. Il funzionamento delle leve, da sinistra a destra, è descritto nella tabella \"Leve dell'Apparatus del Granchio\". Leve dell'Apparatus del Granchio Leva 1 Su Le zampe e la coda si estendono: l'Apparatus può camminare e nuotare. 2 La saracinesca dell'oblò anteriore si apre. Le saracinesche degli oblò laterali si aprono (due per lato). Dalla zona anteriore dell'Apparatus si estendono due chele. Ognuna delle chele estese effettua il seguente attacco con arma da mischia: +8 al tiro per colpire, portata 1,5 m, un bersaglio. Colpito: 7 (2d6) danni contundenti. L'Apparatus cammina o nuota in avanti. L'Apparatus si gira di 90 gradi verso sinistra. Strutture simili a occhi proiettano luce intensa in un raggio di 9 metri e luce fioca per altri 9 metri. L'Apparatus si immerge di 6 metri nel liquido in cui si trova. Lo sportello posteriore si sblocca e si apre. 3 4 5 6 7 8 9 10 Giù Le zampe e la coda dell'Apparatus si ritirano, riducendo la sua velocità a 0 e impedendogli di beneficiare di bonus alla velocità. La saracinesca dell'oblò anteriore si chiude. Le saracinesche degli oblò laterali si chiudono (due per lato). Le chele si ritraggono. Ognuna delle chele estese effettua il seguent",
+    "pagine_sorgente": "236-237"
+  },
+  {
+    "id": "borsa_conservante",
+    "nome": "Borsa conservante",
+    "tipo": "Oggetto meraviglioso, non comune",
+    "tipo_base": "Oggetto meraviglioso",
+    "rarita": "non comune",
+    "richiede_sintonia": false,
+    "descrizione": "Borsa conservante Oggetto meraviglioso, non comune Lo spazio interno di questa borsa è molto più grande delle sue dimensioni esterne, pari a circa 60 cm di diametro all'apertura e 120 cm di profondità. La borsa può contenere fino a 250 kg di materiale, per un volume massimo di 64 cubi con spigolo di 30 cm. La borsa pesa 7,5 kg a prescindere dal suo contenuto. Recuperare un oggetto dall'interno della borsa richiede un'azione. Se la borsa viene caricata con un peso eccessivo, bucata o strappata, si rompe ed è distrutta, e il suo contenuto viene sparpagliato sul Piano Astrale. Se la borsa viene rivoltata, il suo contenuto si riversa all'esterno, integro. Tuttavia, per essere riutilizzata, la borsa deve essere rivoltata di nuovo. Le creature che necessitano di respirare situate all'interno della borsa possono sopravvivere per un numero di minuti pari a 10 diviso il numero di creature (fino a un minimo di 1 minuto); trascorso questo periodo di tempo, le creature cominciano a soffocare. Collocare una borsa conservante all'interno di uno spazio extradimensionale, come quello creato da uno zainetto pratico, da un buco portatile o da altri oggetti simili, distrugge istantaneamente entrambi gli oggetti e apre un portale sul Piano Astrale. Il portale ha origine nel punto in cui uno dei due oggetti è stato inserito nell'altro. Tutte le creature entro 3 metri dal portale vengono attirate al suo interno e trasportate in un luogo casuale del Piano Astrale, dopodiché il portale si chiude. Il portale è a senso unico e non può essere riaperto. Borsa dei fagioli magici Oggetto meraviglioso, raro Questa borsa di stoffa robusta contiene 3d4 fagioli secchi. La borsa pesa 250 grammi, più 125 grammi per ogni fagiolo presente al suo interno. Se i fagioli vengono gettati a terra, generano un'esplosione in un raggio di 3 metri centrata sui fagioli stessi. Ogni creatura presente nell'area, incluso il possessore della borsa, deve effettuare un tiro salvezza su Destrezza con CD 15; in caso",
+    "pagine_sorgente": "244"
+  },
+  {
+    "id": "mazzo_delle_meraviglie",
+    "nome": "Mazzo delle meraviglie",
+    "tipo": "Oggetto meraviglioso, leggendario",
+    "tipo_base": "Oggetto meraviglioso",
+    "rarita": "leggendario",
+    "richiede_sintonia": false,
+    "descrizione": "Mazzo delle meraviglie Oggetto meraviglioso, leggendario Questo mazzo in genere si trova in una scatola o in un sacchetto ed è composto da una serie di carte di avorio o di vellum. La maggior parte di questi mazzi (il 75 percento) è composta soltanto da 13 carte, mentre il resto ne ha 22. Prima di pescare una carta, il personaggio deve dichiarare quante carte ha intenzione di pescare complessivamente e poi pescarle in maniera casuale (è possibile usare un normale mazzo di carte opportunamente modificato per simulare quest'oggetto). Le eventuali carte pescate in eccesso oltre il numero dichiarato non hanno alcun effetto. Altrimenti, non appena il personaggio pesca una carta dal mazzo, la sua magia ha effetto. Il personaggio deve pescare ogni carta entro 1 ora dall'ultima carta pescata. Se non riesce a pescare il numero di carte dichiarato, le carte restanti volano via dal mazzo da sole e hanno effetto simultaneamente. Una volta pescate dal mazzo, le carte svaniscono. A eccezione della Matta e del Giullare, le altre carte ricompaiono nel mazzo, quindi è possibile pescare la stessa carta due volte. Carta da gioco Carta Asso di quadri Visir* Re di quadri Sole Regina di quadri Luna Jack di quadri Stella Due di quadri Cometa* Asso di cuori Destino* Re di cuori Trono Regina di cuori Chiave Jack di cuori Cavaliere Due di cuori Gemma* Asso di fiori Artigli* Re di fiori Il vuoto Regina di fiori Fiamme Jack di fiori Teschio Due di fiori Idiota* Asso di spade Prigione* Re di picche Rovina Regina di picche Eurialo Jack di picche Ladro Due di picche Bilancia* Jolly (con marca) Matta* Jolly (senza marca) Giullare * Presente solo in mazzi con 22 carte Artigli. Tutti gli oggetti magici indossati o trasportati dal personaggio si disintegrano. I manufatti posseduti dal personaggio non si disintegrano ma svaniscono. Bilancia. La mente del personaggio è sottoposta a una sofferta alterazione che modifica il suo allineamento. Un legale diventa caotico, un buono diventa malvagio e viceversa. Se il personaggio è neutrale o senza allineamento, questa carta non ha alcun effetto su di lui. È permesso fotocopiare o stampare questo documento per il solo uso personale. .1 268 Cavaliere. Il personaggio ottiene i servigi di un guerriero di 4° livello che appare in un spazio a sua scelta entro 9 metri da lui. Il guerriero è della stessa razza del personaggio e lo serve fedelmente fino alla morte, convinto che sia stato il destino a condurlo da lui. Il personaggio ha il controllo del guerriero. Chiave. Nella mano del personaggio appare un'arma magica rara, molto rara o leggendaria in cui è competente. L'arma viene scelta dal GM. Cometa. Se il personaggio sconfigge da solo il successivo mostro o gruppo di mostri ostili che incontra, ottiene abbastanza punti esperienza da aumentare di livello. Altrimenti, la carta non ha alcun effetto. Destino. La trama della realtà si disfa e si ricompone, permettendo al personaggio di evitare o annullare un evento come se non fosse mai avvenuto. Il personaggio può usare la magia della carta non appena la pesca o in qualsiasi altro momento prima della sua morte. Eurialo. Il volto di medusa raffigurato sulla carta maledice il personaggio. Finché è maledetto in questo modo, il personaggio subisce una penalità di –2 ai tiri salvezza. Solo un dio o la magia della carta Destino può porre fine a questa maledizione. Fiamme. Il personaggio si inimica un potente diavolo, che desidera condurlo alla rovina e avvelenerà la sua vita in ogni modo, assaporando ogni istante della sua sofferenza prima di tentare di distruggerlo. Questa ostilità dura finché uno dei due non muore. Gemma. Ai piedi del personaggio appaiono venticinque gemme del valore di 2.000 mo ognuna o cinquanta gemme del valore di 1.000 mo ognuna. Giullare. Il personaggio ottiene 10.000 PE oppure può pescare due carte aggiuntive oltre al numero dichiarato di carte da pescare. Idiota. Il punteggio di Intelligenza del personaggio si riduce permanentemente di 1d4 + 1 (fino a un punteggio minimo di 1). Il personaggio può pescare un'altra carta oltre al numero dichiarato. Ladro. Un personaggio non giocante a scelta del GM diventa ostile nei confronti del personaggio. L'identità del nuovo nemico è ignota al personaggio finché lo stesso PNG o qualcun altro non la rivela. Solo un incantesimo desiderio o un intervento divino possono annullare l'ostilità del PNG. Luna. Il personaggio ottiene la capacità di lanciare l'incantesimo desiderio per 1d3 volte. Matta. Il personaggio perde 10.000 PE, scarta questa carta e ne pesca un'altra; la pesca di entrambe queste carte conta solo come una ai fini del numero dichiarato di carte da pescare. Se la perdita di questi PE provocasse la perdita di un livello, il personaggio perde invece solo l'ammontare di PE che gli consente di rimanere al livello attuale. Prigione. Il personaggio scompare e resta intrappolato in stato di animazione sospesa all'interno di una sfera extradime",
+    "pagine_sorgente": "260-263"
+  },
+  {
+    "id": "pergamena_magica",
+    "nome": "Pergamena magica",
+    "tipo": "Pergamena, rarità variabile",
+    "tipo_base": "Pergamena",
+    "rarita": "variabile",
+    "richiede_sintonia": false,
+    "descrizione": "",
+    "pagine_sorgente": "271-272",
+    "sezioni": [
+      {
+        "titolo": "Rarità per livello di incantesimo",
+        "righe": [
+          {
+            "Livello": "Trucchetto",
+            "Rarità": "comune",
+            "CD TS": "13",
+            "Bonus attacco": "+5"
+          },
+          {
+            "Livello": "1°",
+            "Rarità": "comune",
+            "CD TS": "13",
+            "Bonus attacco": "+5"
+          },
+          {
+            "Livello": "2°",
+            "Rarità": "non comune",
+            "CD TS": "13",
+            "Bonus attacco": "+5"
+          },
+          {
+            "Livello": "3°",
+            "Rarità": "non comune",
+            "CD TS": "15",
+            "Bonus attacco": "+7"
+          },
+          {
+            "Livello": "4°",
+            "Rarità": "raro",
+            "CD TS": "15",
+            "Bonus attacco": "+7"
+          },
+          {
+            "Livello": "5°",
+            "Rarità": "raro",
+            "CD TS": "17",
+            "Bonus attacco": "+9"
+          },
+          {
+            "Livello": "6°",
+            "Rarità": "molto raro",
+            "CD TS": "17",
+            "Bonus attacco": "+9"
+          },
+          {
+            "Livello": "7°",
+            "Rarità": "molto raro",
+            "CD TS": "18",
+            "Bonus attacco": "+10"
+          },
+          {
+            "Livello": "8°",
+            "Rarità": "molto raro",
+            "CD TS": "18",
+            "Bonus attacco": "+10"
+          },
+          {
+            "Livello": "9°",
+            "Rarità": "leggendario",
+            "CD TS": "19",
+            "Bonus attacco": "+11"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "sfera_annientatrice",
+    "nome": "Sfera annientatrice",
+    "tipo": "Oggetto meraviglioso, leggendario",
+    "tipo_base": "Oggetto meraviglioso",
+    "rarita": "leggendario",
+    "richiede_sintonia": false,
+    "descrizione": "Sfera annientatrice Oggetto meraviglioso, leggendario Questa sfera nera del diametro di 60 cm è un buco nel multiverso che fluttua a mezz'aria e che è stabilizzato da un campo magico che la circonda. La sfera annienta tutta la materia che attraversa e che passa attraverso di essa, a eccezione dei manufatti. A meno che un manufatto non sia suscettibile ai danni di una sfera annientatrice, esso vi passa attraverso e ne esce illeso. Ogni altra cosa che tocca la sfera, ma che non ne viene interamente inghiottita e annientata, subisce 4d10 danni da forza. La sfera rimane stazionaria finché qualcuno non ne prende il controllo. Se il personaggio si trova entro 18 metri da una sfera non controllata, può usare un'azione per effettuare una prova di Intelligenza (Arcano) con CD 25. In caso di successo, la sfera levita in una direzione scelta dal personaggio, fino a un numero di metri pari a 1,5 × il suo modificatore di Intelligenza (per un minimo di 1,5 metri). In caso di fallimento, la sfera si muove di 3 metri verso il personaggio. Se la sfera entra nello spazio occupato da una creatura, quest'ultima deve superare un tiro salvezza su Destrezza con CD 13 per non farsi toccare, altrimenti subisce 4d10 danni da forza. Se il personaggio tenta di controllare una sfera che si trova sotto il controllo di un'altra creatura, deve effettuare una prova di Intelligenza (Arcano) contrapposta a quella dell'altra creatura. Chi vince ottiene il controllo della sfera e può farla levitare normalmente. Se la sfera entra in contatto con un portale planare, come quello creato dall'incantesimo portale, o con uno spazio extradimensionale, come quello di un buco portatile, il GM determina casualmente ciò che succede, usando la tabella seguente. d100 01–50 51–85 86–00 Risultato La sfera è distrutta. La sfera si muove attraverso il portale o nello spazio extradimensionale. Uno squarcio nello spazio trascina ogni creatura e oggetto entro 54 metri dalla sfera (inclusa la sfera stessa) su un piano di esistenza casuale. Sfera di cristallo Oggetto meraviglioso, molto raro o leggendario (richiede sintonia) Una tipica sfera di cristallo, un oggetto molto raro, ha un diametro di circa 15 cm. Mentre il personaggio tocca la sfera, può lanciare l'incantesimo scrutare (CD del tiro salvezza 17). Le seguenti varianti della sfera di cristallo sono oggetti leggendari e hanno proprietà aggiuntive. Sfera di cristallo della lettura del pensiero. Mentre il personaggio scruta con la sfera di cristallo, può usare un'azione per lanciare l'incantesimo individuazione dei pensieri (CD del tiro salvezza 17) su creature che è in grado di vedere situate entro 9 metri dal sensore dell'incantesimo. Non è obbligato a concentrarsi su individuazione dei pensieri per mantenerlo per la sua durata, ma se scrutare viene interrotto, anche l'incantesimo si interrompe. È permesso fotocopiare o stampare questo documento per il solo uso personale. .1 278 Sfera di cr",
+    "pagine_sorgente": "278-279"
+  },
+  {
+    "id": "anello_del_saltare",
+    "nome": "Anello del saltare",
+    "tipo": "Anello, non comune (richiede sintonia)",
+    "tipo_base": "Anello",
+    "rarita": "non comune",
+    "richiede_sintonia": true,
+    "descrizione": "Mentre il personaggio indossa questo anello, può lanciare con esso l'incantesimo saltare a volontà come azione bonus, ma può bersagliare solo se stesso.",
+    "pagine_sorgente": "238"
+  },
+  {
+    "id": "pozione_velenosa",
+    "nome": "Pozione velenosa",
+    "tipo": "Pozione, non comune",
+    "tipo_base": "Pozione",
+    "rarita": "non comune",
+    "richiede_sintonia": false,
+    "descrizione": "Pozione velenosa Pozione, non comune Questa mistura ha l'aspetto, l'odore e il sapore di una pozione di guarigione o di altre pozioni benefiche. In realtà, si tratta di un veleno mascherato da un'illusione magica. L'incantesimo identificare rivela la sua vera natura. Se il personaggio la beve, subisce 3d6 danni da veleno e deve superare un tiro salvezza su Costituzione con CD 13, altrimenti diventa avvelenato. All'inizio di ogni suo turno, finché è avvelenato in questo modo, subisce 3d6 danni da veleno. Alla fine di ogni suo turno, può ripetere il tiro salvezza: se lo supera, i danni da veleno che subisce nei turni successivi si riducono di 1d6. L'effetto della pozione termina quando questi danni scendono a 0. Pozzo dei mondi Oggetto meraviglioso, leggendario Quando è piegato, questo panno di elegante tessuto nero morbido come la seta ha le dimensioni di un fazzoletto. Una volta spiegato, copre una superficie circolare di 1,8 metri di diametro. Il personaggio può usare un'azione per stendere e posizionare il pozzo dei mondi su una superficie solida, creando un portale a doppio senso verso un altro mondo o piano di esistenza. Ogni volta che l'oggetto apre un portale, il GM decide dove porterà. Il personaggio può usare un'azione per chiudere un portale aperto afferrandone i lembi e ripiegandoli. Una volta che ha aperto un portale, il pozzo dei mondi non può essere riutilizzato per 1d8 ore. È permesso fotocopiare o stampare questo documento per il solo us",
+    "pagine_sorgente": "276"
+  },
+  {
+    "id": "filtro_d_amore",
+    "nome": "Filtro d'amore",
+    "tipo": "Pozione, non comune",
+    "tipo_base": "Pozione",
+    "rarita": "non comune",
+    "richiede_sintonia": false,
+    "descrizione": "Filtro d'amore Pozione, non comune La prossima volta che un personaggio vede una creatura entro 10 minuti dal momento in cui ha bevuto il filtro, diventa affascinato da essa per 1 ora. Se la creatura appartiene a una specie e a un sesso dai quali il personaggio è normalmente attratto, egli considera la creatura il suo vero amore per tutta la durata dell'effetto. Il liquido rosato ed effervescente di questa pozione contiene una bolla a forma di cuore alquanto difficile da individuare. Flauto dei topi Oggetto meraviglioso, non comune (richiede sintonia) Per usare questo flauto, il personaggio deve essere competente negli strumenti a fiato. Finché il personaggio è in sintonia con esso, i topi comuni e i topi giganti lo ignorano e non lo attaccano, a meno che il personaggio non li minacci o non li ferisca. Il flauto possiede 3 cariche. Se il personaggio usa un'azione per suonarlo, può usare un'azione bonus per consumare da 1 a 3 cariche e richiamare uno sciame di topi per ogni carica consumata, purché entro un raggio di 750 metri ci siano topi sufficienti (sarà il GM a determinarlo). Se non ci sono abbastanza topi per formare uno sciame, la carica viene sprecata. Gli sciami così chiamati si muovono verso la musica seguendo il percorso più breve disponibile, ma sotto ogni altro aspetto non sono sotto il controllo del personaggio. Il flauto recupera 1d3 cariche consumate all'all'alba di ogni giorno. Ogni volta che uno sciame di topi che non è sotto il controllo di altre creatu",
+    "pagine_sorgente": "251"
+  },
+  {
+    "id": "olio_della_scivolosita",
+    "nome": "Olio della scivolosità",
+    "tipo": "Pozione, non comune",
+    "tipo_base": "Pozione",
+    "rarita": "non comune",
+    "richiede_sintonia": false,
+    "descrizione": "Olio della scivolosità Pozione, non comune All'interno del suo contenitore questo unguento nero viscoso sembra denso e pesante, ma scorre fluidamente quando viene versato. L'olio può coprire una creatura di taglia Media o inferiore, nonché ogni oggetto che indossa e trasporta (per ogni categoria di taglia superiore, è necessario usare una fiala aggiuntiva). L'applicazione dell'olio richiede 10 minuti. La creatura cosparsa d'olio ottiene gli effetti dell'incantesimo libertà di movimento per 8 ore. In alternativa, è possibile usare un'azione per versare l'olio a terra, dove copre una superficie quadrata con lato di 3 metri, in cui riproduce gli effetti dell'incantesimo unto per 8 ore. svaniscono e la pergamena si polverizza. Se il lancio viene interrotto, la pergamena non viene perduta. Se l'incantesimo si trova sulla lista degli incantesimi della classe del personaggio, ma è di un livello più alto rispetto a quelli che può lanciare normalmente, il personaggio deve effettuare una prova di caratteristica usando la sua caratteristica da incantatore per determinare se riesce a lanciarlo. La CD è pari a 10 + il livello dell'incantesimo. In caso di fallimento, l'incantesimo scompare dalla pergamena senza alcun altro effetto. Il livello dell'incantesimo sulla pergamena determina la CD del tiro salvezza dell'incantesimo e il bonus di attacco, così come la rarità della pergamena, come illustrato nella tabella Pergamena magica. Olio dell'affilatura Pergamena magica Quest'olio trasp",
+    "pagine_sorgente": "266"
+  },
+  {
+    "id": "bacchetta_delle_meraviglie",
+    "nome": "Bacchetta delle meraviglie",
+    "tipo": "Bacchetta, rara (richiede sintonia con un incantatore)",
+    "tipo_base": "Bacchetta",
+    "rarita": "raro",
+    "richiede_sintonia": true,
+    "descrizione": "Bacchetta delle meraviglie 50–53 Bacchetta, rara (richiede sintonia con un incantatore) Questa bacchetta possiede 7 cariche. Mentre il personaggio la impugna, può usare un'azione per consumare 1 carica e scegliere un bersaglio entro 36 metri da lui. Il bersaglio può essere una creatura, un oggetto o un punto nello spazio. Tira un d100 e consulta la seguente tabella per scoprire cosa succede. Se l'effetto fa lanciare al personaggio un incantesimo tramite la bacchetta, la CD del tiro salvezza è pari a 15. Se di norma l'incantesimo ha una gittata espressa in metri, essa diventa di 36 metri, se non lo è già. Se l'effetto copre una determinata area, l'incantesimo sarà centrato sul bersaglio e lo includerà. Se un effetto può colpire più bersagli, il GM determina in modo casuale quali vengono colpiti. All'alba di ogni giorno, la bacchetta recupera 1d6 + 1 cariche consumate. Se il personaggio consuma l'ultima carica, deve tirare un d20: se ottiene 1, la bacchetta si sbriciola ed è distrutta. d100 01–05 06–10 11–15 16–20 21–25 26–30 31–33 Effetto Il personaggio lancia lentezza. Il personaggio lancia luminescenza. Il personaggio è stordito fino all'inizio del suo turno successivo, convinto che sia successo qualcosa di meraviglioso. Il personaggio lancia folata di vento. Il personaggio lancia individuazione dei pensieri sul bersaglio scelto. Se non aveva scelto una creatura, il personaggio subisce 1d6 danni psichici. Il personaggio lancia nube maleodorante. Una fitta pioggia cade in un'area del raggio di 18 metri centrata sul bersaglio. L'area diventa leggermente oscurata. La pioggia continua a cadere fino all'inizio del turno successivo del personaggio. 54–58 59–62 63–65 66–69 70–79 80–84 85–87 88–90 91–95 Effetto Un animale compare nello spazio libero più vicino al bersaglio. L'animale non è sotto il controllo del personaggio e agisce come farebbe normalmente. Tira un d100 per determinare quale animare compare. Con un risultato di 01–25, compare un rinoceronte; con 26–50 compare un elefante; con 51–100 compare un topo. Il personaggio lancia fulmine. Una nube di 600 farfalle più grandi del normale riempie un'area del raggio di 9 metri centrata sul bersaglio. L'area diventa pesantemente oscurata. Le farfalle permangono per 10 minuti. Il personaggio ingrandisce il bersaglio come se avesse lanciato ingrandire/ridurre. Se il bersaglio non può essere influenzato da quell'incantesimo o se il personaggio non ha indicato come bersaglio una creatura, diventa lui stesso il bersaglio dell'incantesimo. Il personaggio lancia oscurità. Dal terreno spunta dell'erba in un'area del raggio di 18 metri centrata sul bersaglio. Se l'area era già erbosa, l'erba cresce fino a 10 volte la sua taglia normale e permane in questo stato per 1 minuto. Un oggetto a scelta del GM scompare e va nel Piano Etereo. L'oggetto non deve essere indossato né trasportato, deve trovarsi entro 36 metri dal bersaglio e non deve superare i 3 metri in nessuna delle sue dimensioni. Il person",
+    "pagine_sorgente": "240"
+  },
+  {
+    "id": "bastone_dei_boschi",
+    "nome": "Bastone dei boschi",
+    "tipo": "Bastone, raro (richiede sintonia con un druido)",
+    "tipo_base": "Bastone",
+    "rarita": "raro",
+    "richiede_sintonia": true,
+    "descrizione": "Bastone dei boschi Bastone, raro (richiede sintonia con un druido) Questo bastone può essere impugnato come un bastone ferrato magico che garantisce un bonus di +2 ai tiri per colpire e ai tiri per i danni effettuati con esso. Mentre il personaggio lo impugna, ottiene un bonus di +2 ai tiri per colpire con incantesimo. Il bastone possiede 10 cariche per le proprietà descritte di seguito. All'alba di ogni giorno, recupera 1d6 + 4 cariche consumate. Se il personaggio consuma l'ultima carica, deve tirare un d20; se ottiene 1, il bastone diventa un bastone ferrato non magico. Incantesimi. Il personaggio può usare un'azione e consumare 1 o più cariche per lanciare con esso uno degli incantesimi seguenti, usando la sua CD del tiro salvezza sull'incantesimo: amicizia con gli animali (1 carica), localizza animali o vegetali (2 cariche), muro di spine (6 cariche), parlare con gli animali (1 carica), parlare con i vegetali (3 cariche), pelle coriacea (2 cariche) o risveglio (5 cariche). Il personaggio può anche usare un'azione per lanciare con il bastone l'incantesimo passare senza tracce senza consumare alcuna carica. Forma arborea. Il personaggio può usare un'azione per piantare un'estremità del bastone in un tratto di terra fertile e consumare 1 carica per trasformare il bastone in un albero rigoglioso. L'albero è alto 18 metri, ha un tronco del diametro di 1,5 metri e i rami sulla cima si estendono in un raggio di 6 metri. Sembra un normale albero, ma se su di lui viene lanciato un incantesimo individuazione del magico, emana una debole aura di magia di trasmutazione. Toccando l'albero e usando un'altra azione per pronunciare la parola d'ordine, il personaggio può riportare il bastone alla sua forma normale, facendo cadere ogni creatura che si trova su di esso. Bastone dei magi Bastone, leggendario (richiede sintonia con un mago, uno stregone o un warlock) Questo bastone può essere impugnato come un bastone ferrato magico che garantisce un bonus di +2 ai tiri per colpire e ai tiri per i danni effettuati con esso. Mentre il personaggio lo impugna, ottiene un bonus di +2 ai tiri per colpire con incantesimo. Il bastone possiede 50 cariche per le proprietà descritte di seguito e recupera 4d6 + 2 cariche consumate all'alba di ogni giorno. Se il personaggio consuma l'ultima carica, deve tirare un d20; se ottiene 20, il bastone recupera 1d12 + 1 cariche. Assorbimento degli incantesimi. Mentre il personaggio impugna il bastone, dispone di vantaggio ai tiri salvezza contro gli incantesimi. Può inoltre usare la sua reazione quando un'altra creatura lancia un incantesimo che ha solo lui come bersaglio. Se lo fa, il bastone assorbe la magia dell'incantesimo, annullandone gli effetti e ottenendo un numero di cariche pari al livello dell'incantesimo assorbito. Tuttavia, se così facendo il numero totale delle cariche del bastone supera 50, il bastone esplode come se il personaggio avesse attivato il suo colpo del castigo (vedi di seguito). Incantesimi. Mentre il",
+    "pagine_sorgente": "243"
+  },
+  {
+    "id": "bastone_dei_magi",
+    "nome": "Bastone dei magi",
+    "tipo": "Bastone, leggendario (richiede sintonia con un mago, uno stregone o un warlock)",
+    "tipo_base": "Bastone",
+    "rarita": "leggendario",
+    "richiede_sintonia": true,
+    "descrizione": "Bastone dei magi Bastone, leggendario (richiede sintonia con un mago, uno stregone o un warlock) Questo bastone può essere impugnato come un bastone ferrato magico che garantisce un bonus di +2 ai tiri per colpire e ai tiri per i danni effettuati con esso. Mentre il personaggio lo impugna, ottiene un bonus di +2 ai tiri per colpire con incantesimo. Il bastone possiede 50 cariche per le proprietà descritte di seguito e recupera 4d6 + 2 cariche consumate all'alba di ogni giorno. Se il personaggio consuma l'ultima carica, deve tirare un d20; se ottiene 20, il bastone recupera 1d12 + 1 cariche. Assorbimento degli incantesimi. Mentre il personaggio impugna il bastone, dispone di vantaggio ai tiri salvezza contro gli incantesimi. Può inoltre usare la sua reazione quando un'altra creatura lancia un incantesimo che ha solo lui come bersaglio. Se lo fa, il bastone assorbe la magia dell'incantesimo, annullandone gli effetti e ottenendo un numero di cariche pari al livello dell'incantesimo assorbito. Tuttavia, se così facendo il numero totale delle cariche del bastone supera 50, il bastone esplode come se il personaggio avesse attivato il suo colpo del castigo (vedi di seguito). Incantesimi. Mentre il personaggio impugna il bastone, può usare un'azione per consumare alcune cariche e lanciare uno dei seguenti incantesimi usando la CD del tiro salvezza sull'incantesimo e la sua caratteristica da incantatore: dissolvi magie (3 cariche), evoca elementale (7 cariche), fulmine (versione di 7° livello, 7 cariche), invisibilità (2 cariche), muro di fuoco (4 cariche), palla di fuoco (versione di 7° livello, 7 cariche), passapareti (5 cariche), ragnatela (2 cariche), scassinare (2 cariche), sfera infuocata (2 cariche), spostamento planare (7 cariche), telecinesi (5 cariche) o tempesta di ghiaccio (4 cariche). Il personaggio può anche usare un'azione per lanciare con il bastone uno degli incantesimi seguenti senza spendere alcuna carica: individuazione del magico, ingrandire/ridurre, luce, mano magica, protezione dal bene e dal male o serratura arcana. È permesso fotocopiare o stampare questo documento per il solo uso personale. .1 248 Colpo del castigo. Il personaggio può usare un'azione per spezzare il bastone sul ginocchio o contro una superficie solida ed effettuare un colpo del castigo. Il bastone è distrutto e sprigiona la magia che gli restava in un'esplosione che si espande fino a riempire una sfera del raggio di 9 metri centrata su di esso. Il personaggio ha una probabilità del 50% di spostarsi istantaneamente su un piano di esistenza casuale per evitare l'esplosione. Se non riesce a evitare l'effetto, subisce danni da forza pari a 16 × il numero di cariche rimanenti nel bastone. Ogni altra creatura nell'area deve effettuare un tiro salvezza su Destrezza con CD 17: se lo fallisce, subisce un ammontare di danni basato sulla sua distanza dal punto di origine dell'esplosione, come indicato nella tabella sottostante. Ogni creatura che supera il tiro salvezza subisce soltanto la metà di quei danni. Distanza dall'origine 3 m o meno Più di 3 m, fino a 6 m Più di 6 m, fino a 9 m Danni 8 × il numero di cariche nel bastone 6 × il numero di cariche nel bastone 4 × il numero di cariche nel bastone Bastone dei tuoni e fulmini Bastone, molto raro (richiede sintonia) Questo bastone può essere impugnato come un bastone ferrato magico che garantisce un bonus di +2 ai tiri per colpire e ai tiri per i danni effettuati con esso. Possiede anche le seguenti proprietà aggiuntive. Quando una di queste proprietà viene usata, non può essere riutilizzata fino all'alba successiva. Fulmini. Quando il personaggio colpisce con un attacco in mischia usando questo bastone, il bersaglio subisce 2d6 danni da fulmine extra. Tuono. Quando il personaggio colpisce con un attacco in mischia usando questo bastone, quest'ultimo scatena un tuono che può essere udito fino a 90 metri. Il bersaglio colpito deve superare un tiro s",
+    "pagine_sorgente": "243-244"
+  },
+  {
+    "id": "pozioni_di_guarigione",
+    "nome": "Pozioni di guarigione",
+    "tipo": "Pozione, rarità variabile",
+    "tipo_base": "Pozione",
+    "rarita": "variabile",
+    "richiede_sintonia": false,
+    "descrizione": "Quando il personaggio beve questa pozione, recupera punti ferita. Guarigione (comune): 2d4+2 PF. Guarigione maggiore (non comune): 4d4+4 PF. Guarigione superiore (rara): 8d4+8 PF. Guarigione suprema (molto rara): 10d4+20 PF.",
+    "pagine_sorgente": "276",
+    "sezioni": [
+      {
+        "titolo": "Varianti",
+        "righe": [
+          {
+            "Variante": "Guarigione",
+            "Rarità": "comune",
+            "PF recuperati": "2d4+2"
+          },
+          {
+            "Variante": "Guarigione maggiore",
+            "Rarità": "non comune",
+            "PF recuperati": "4d4+4"
+          },
+          {
+            "Variante": "Guarigione superiore",
+            "Rarità": "raro",
+            "PF recuperati": "8d4+8"
+          },
+          {
+            "Variante": "Guarigione suprema",
+            "Rarità": "molto raro",
+            "PF recuperati": "10d4+20"
+          }
+        ]
+      }
+    ]
+  }
+]

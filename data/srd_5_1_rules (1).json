@@ -1,0 +1,943 @@
+[
+  {
+    "id": "trappole_regole_generali",
+    "nome": "Trappole — Regole generali",
+    "capitolo": "Strumenti di gioco",
+    "categoria": "Trappole",
+    "pagine_sorgente": "223-224",
+    "descrizione": "Le trappole possono essere meccaniche o magiche. La descrizione di una trappola specifica innesco, CD per individuarla (Saggezza/Percezione passiva, o Intelligenza/Arcano per le magiche) e disinnescarla (spesso Destrezza con arnesi da scasso). Dissolvi magie può disattivare trappole magiche (CD specificata).",
+    "sezioni": [
+      {
+        "titolo": "CD tiri salvezza e bonus di attacco",
+        "righe": [
+          {
+            "Pericolo della trappola": "Imprevisto",
+            "CD del tiro salvezza": "10–11",
+            "Bonus di attacco": "da +3 a +5"
+          },
+          {
+            "Pericolo della trappola": "Pericolosa",
+            "CD del tiro salvezza": "12–15",
+            "Bonus di attacco": "da +6 a +8"
+          },
+          {
+            "Pericolo della trappola": "Letale",
+            "CD del tiro salvezza": "16–20",
+            "Bonus di attacco": "da +9 a +12"
+          }
+        ]
+      },
+      {
+        "titolo": "Gravità dei danni per livello",
+        "righe": [
+          {
+            "Livello del personaggio": "1°–4°",
+            "Imprevisto": "1d10",
+            "Pericoloso": "2d10",
+            "Letale": "4d10"
+          },
+          {
+            "Livello del personaggio": "5°–10°",
+            "Imprevisto": "2d10",
+            "Pericoloso": "4d10",
+            "Letale": "10d10"
+          },
+          {
+            "Livello del personaggio": "11°–16°",
+            "Imprevisto": "4d10",
+            "Pericoloso": "10d10",
+            "Letale": "18d10"
+          },
+          {
+            "Livello del personaggio": "17°–20°",
+            "Imprevisto": "10d10",
+            "Pericoloso": "18d10",
+            "Letale": "24d10"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ago_avvelenato",
+    "nome": "Ago avvelenato",
+    "capitolo": "Strumenti di gioco",
+    "categoria": "Trappole",
+    "pagine_sorgente": "224",
+    "descrizione": "Trappola meccanica. Innesco: aprire il forziere senza la chiave giusta. Individuare: Int (Indagare) CD 20. Disattivare: Des (arnesi da scasso) CD 15 (fallimento → innesco). Effetto: 1 danno perforante + 11 (2d10) veleno; TS Cos CD 15 o avvelenato 1 ora.",
+    "sezioni": [
+      {
+        "titolo": "Dettagli",
+        "righe": [
+          {
+            "Tipo": "Meccanica",
+            "Innesco": "Aprire senza chiave giusta",
+            "CD individuare (Int, Indagare)": "20",
+            "CD disattivare (Des, arnesi da scasso)": "15",
+            "Effetto": "1 perforante + 11 (2d10) veleno; TS Cos CD 15 o avvelenato 1 ora"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "dardi_avvelenati",
+    "nome": "Dardi avvelenati",
+    "capitolo": "Strumenti di gioco",
+    "categoria": "Trappole",
+    "pagine_sorgente": "224",
+    "descrizione": "Trappola meccanica. Innesco: piastra a pressione (>10 kg). Individuare i fori: CD 15. Individuare la piastra: Int (Indagare) CD 15. Disattivare: spuntone sotto la piastra oppure otturare i fori. Effetto: 4 dardi (+8 colpire, 3 m), 2 (1d4) perforanti + TS Cos CD 15 o 11 (2d10) veleno (metà successo).",
+    "sezioni": [
+      {
+        "titolo": "Dettagli",
+        "righe": [
+          {
+            "Tipo": "Meccanica",
+            "Innesco": "Piastra a pressione (>10 kg)",
+            "CD individuare fori": "15",
+            "CD individuare piastra (Int, Indagare)": "15",
+            "Disattivare": "Spuntone sotto la piastra o otturare i fori",
+            "Effetto": "4 dardi, +8 colpire; 2 (1d4) perforanti + TS Cos CD 15 o 11 (2d10) veleno (metà successo)"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "crollo_del_tetto",
+    "nome": "Crollo del tetto",
+    "capitolo": "Strumenti di gioco",
+    "categoria": "Trappole",
+    "pagine_sorgente": "224-225",
+    "descrizione": "Trappola meccanica. Innesco: cavo teso a 8 cm da terra. Individuare (cavo): Sag (Percezione) passiva o attiva, CD 10. Disattivare: Des (arnesi da scasso) CD 15 (svantaggio senza arnesi, fallimento → innesco). Effetto: 22 (4d10) contundenti (TS Des CD 15 per metà); pavimento diventa terreno difficile.",
+    "sezioni": [
+      {
+        "titolo": "Dettagli",
+        "righe": [
+          {
+            "Tipo": "Meccanica",
+            "Innesco": "Cavo teso a 8 cm da terra",
+            "CD individuare": "10",
+            "CD disattivare (Des, arnesi)": "15",
+            "Effetto": "22 (4d10) contundenti; TS Des CD 15 per metà; terreno difficile nell'area"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "fosse",
+    "nome": "Fosse (semplice, nascosta, richiudibile, con spuntoni)",
+    "capitolo": "Strumenti di gioco",
+    "categoria": "Trappole",
+    "pagine_sorgente": "225",
+    "descrizione": "Trappole meccaniche. Innesco: calpestare la copertura/telo. Effetto: caduta (danni in base alla profondità). La fossa con spuntoni aggiunge 11 (2d10) perforanti; versione avvelenata: TS Cos CD 13 o 22 (4d10) veleno (metà successo).",
+    "sezioni": [
+      {
+        "titolo": "Tipi di fossa",
+        "righe": [
+          {
+            "Tipo": "Fossa semplice",
+            "CD individuare": "10 (passiva)",
+            "Disattivare": "—",
+            "Effetto": "Caduta (solitamente 3 m)"
+          },
+          {
+            "Tipo": "Fossa nascosta",
+            "CD individuare": "15 (Sag/Percezione) + 15 (Int/Indagare)",
+            "Disattivare": "Spuntone tra copertura e pavimento",
+            "Effetto": "Caduta 3–6 m"
+          },
+          {
+            "Tipo": "Fossa richiudibile",
+            "CD individuare": "15 (Sag/Percezione) + 15 (Int/Indagare)",
+            "Disattivare": "For CD 20 (fuori) o Des+arnesi CD 15 (dentro)",
+            "Effetto": "Caduta + intrappolamento"
+          },
+          {
+            "Tipo": "Fossa con spuntoni",
+            "CD individuare": "Come tipo base",
+            "Disattivare": "Come tipo base",
+            "Effetto": "Caduta + 11 (2d10) perforanti; avvelenata: TS Cos CD 13 o 22 (4d10) veleno (metà successo)"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "rete_in_caduta",
+    "nome": "Rete in caduta",
+    "capitolo": "Strumenti di gioco",
+    "categoria": "Trappole",
+    "pagine_sorgente": "225-226",
+    "descrizione": "Trappola meccanica. Innesco: cavo teso a 8 cm da terra. CD individuare: 10. Disattivare: Des (arnesi da scasso) CD 15 (svantaggio senza arnesi). Effetto: rete 3×3 m, creature trattenute; TS For CD 10 o anche prono. Liberarsi: prova For CD 10 (azione). Rete: CA 10, 20 PF; 5 danni taglienti distruggono sezione 1,5×1,5 m.",
+    "sezioni": [
+      {
+        "titolo": "Dettagli",
+        "righe": [
+          {
+            "Tipo": "Meccanica",
+            "Innesco": "Cavo teso a 8 cm da terra",
+            "CD individuare": "10",
+            "CD disattivare (Des, arnesi)": "15",
+            "Effetto": "Rete 3×3 m; trattenuto + TS For CD 10 o prono",
+            "Liberarsi": "For CD 10 (azione)",
+            "Rete": "CA 10, 20 PF; 5 danni taglienti distruggono sezione 1,5×1,5 m"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "sfera_annientatrice_trappola",
+    "nome": "Sfera annientatrice (trappola)",
+    "capitolo": "Strumenti di gioco",
+    "categoria": "Trappole",
+    "pagine_sorgente": "226",
+    "descrizione": "Trappola magica. Bocca di pietra scolpita (Ø 60 cm): qualsiasi materia che vi entra viene annientata (manufatti immuni). Individuare: Int (Arcano) CD 20. Alcune versioni includono ammaliamento (come simpatia); dissolvi magie CD 18 lo rimuove.",
+    "sezioni": [
+      {
+        "titolo": "Dettagli",
+        "righe": [
+          {
+            "Tipo": "Magica",
+            "CD individuare (Int, Arcano)": "20",
+            "CD disattivare ammaliamento (dissolvi magie)": "18",
+            "Effetto": "Annientamento istantaneo (manufatti immuni)"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "sfera_rotolante",
+    "nome": "Sfera rotolante",
+    "capitolo": "Strumenti di gioco",
+    "categoria": "Trappole",
+    "pagine_sorgente": "226-227",
+    "descrizione": "Trappola meccanica. Innesco: piastra a pressione (>10 kg). Individuare (botola+piastra): Sag (Percezione) CD 15 o Int (Indagare) CD 15. Disattivare: spuntone sotto la piastra. Effetto: sfera Ø 3 m, iniziativa +8, velocità 18 m/round, TS Des CD 15 o 55 (10d10) contundenti + prono. Rallentare: For CD 20 (azione, riduce velocità di 4,5 m).",
+    "sezioni": [
+      {
+        "titolo": "Dettagli",
+        "righe": [
+          {
+            "Tipo": "Meccanica",
+            "Innesco": "Piastra a pressione (>10 kg)",
+            "CD individuare": "15",
+            "Disattivare": "Spuntone sotto la piastra",
+            "Sfera": "Ø 3 m; iniziativa +8; velocità 18 m/round",
+            "Effetto": "TS Des CD 15 o 55 (10d10) contundenti + prono",
+            "Rallentare": "For CD 20 (azione): -4,5 m di velocità; a 0 si ferma"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "statua_del_soffio_di_fuoco",
+    "nome": "Statua del soffio di fuoco",
+    "capitolo": "Strumenti di gioco",
+    "categoria": "Trappole",
+    "pagine_sorgente": "227",
+    "descrizione": "Trappola magica. Innesco: piastra a pressione (>10 kg). Individuare (piastra o bruciature): CD 15. Individuazione magica: individuazione del magico rivela aura di invocazione. Disattivare: spuntone sotto la piastra; dissolvi magie CD 13 contro la statua. Effetto: cono di fuoco 9 m, TS Des CD 13 o 22 (4d10) fuoco (metà successo).",
+    "sezioni": [
+      {
+        "titolo": "Dettagli",
+        "righe": [
+          {
+            "Tipo": "Magica",
+            "Innesco": "Piastra a pressione (>10 kg)",
+            "CD individuare": "15",
+            "Disattivare (meccanico)": "Spuntone sotto la piastra",
+            "Disattivare (magico, dissolvi magie)": "CD 13",
+            "Effetto": "Cono 9 m; TS Des CD 13 o 22 (4d10) fuoco (metà successo)"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "epidemia_fognaria",
+    "nome": "Epidemia fognaria",
+    "capitolo": "Strumenti di gioco",
+    "categoria": "Malattie",
+    "pagine_sorgente": "228-229",
+    "descrizione": "Malattia. Contagio: morso di portatore o contatto con liquami contaminati; TS Cos CD 11. Incubazione: 1d4 giorni. Sintomi: 1 livello indebolimento; metà PF dai Dadi Vita; no recupero PF con riposo lungo. Cura: TS Cos CD 11 per ogni riposo lungo; successo = -1 livello indebolimento; a 0 = guarisce.",
+    "sezioni": [
+      {
+        "titolo": "Dettagli",
+        "righe": [
+          {
+            "Contagio": "Morso portatore o liquami; TS Cos CD 11",
+            "Incubazione": "1d4 giorni",
+            "Sintomi": "1 livello indebolimento; metà PF dai DV; no recupero PF riposo lungo",
+            "Cura": "TS Cos CD 11 per riposo lungo; successo = -1 livello; a 0 = guarisce"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "febbre_giuliva",
+    "nome": "Febbre giuliva",
+    "capitolo": "Strumenti di gioco",
+    "categoria": "Malattie",
+    "pagine_sorgente": "228-229",
+    "descrizione": "Malattia. Bersaglia umanoidi (gnomi immuni). Contagio: prossimità (3 m) a infetto in crisi di risate; TS Cos CD 10. Incubazione: 1d4 ore. Sintomi: 1 livello indebolimento inamovibile; sotto tensione TS Cos CD 13 o 5 (1d10) psichici + incapacitato da risate 1 min (ripete TS fine turno). Contagio delle risate: entro 3 m, CD 10. Cura: TS Cos CD 13 per riposo lungo; successo = CD scende di 1d6; CD 0 = guarisce. 3 fallimenti = follia illimitata casuale.",
+    "sezioni": [
+      {
+        "titolo": "Dettagli",
+        "righe": [
+          {
+            "Bersaglio": "Umanoidi (gnomi immuni)",
+            "Contagio": "Prossimità 3 m in crisi di risate; TS Cos CD 10",
+            "Incubazione": "1d4 ore",
+            "Sintomi": "1 livello indebolimento inamovibile; tensione → TS Cos CD 13 o 5 (1d10) psichici + incapacitato 1 min",
+            "Cura": "TS Cos CD 13 per riposo lungo; successo = -1d6 alla CD; CD 0 = guarisce; 3 fallimenti = follia illimitata"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "vista_putrefatta",
+    "nome": "Vista putrefatta",
+    "capitolo": "Strumenti di gioco",
+    "categoria": "Malattie",
+    "pagine_sorgente": "229",
+    "descrizione": "Malattia. Contagio: bere acqua contaminata; TS Cos CD 15. Incubazione: 1 giorno. Sintomi: penalità -1 ai tiri per colpire e alle prove basate sulla vista; peggiora di -1 per ogni riposo lungo; a -5: accecato. Cura magica: ristorare inferiore o guarigione. Cura erbacea: 3 dosi unguento Occhiovispo (borsa da erborista, 1 ora/dose), applicate prima di un riposo lungo.",
+    "sezioni": [
+      {
+        "titolo": "Dettagli",
+        "righe": [
+          {
+            "Contagio": "Acqua contaminata; TS Cos CD 15",
+            "Incubazione": "1 giorno",
+            "Sintomi": "-1 tiri per colpire/prove visive; -1 per ogni riposo lungo; a -5 accecato",
+            "Cura magica": "Ristorare inferiore o guarigione",
+            "Cura erbacea": "3 dosi unguento Occhiovispo (borsa da erborista)"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "follia_temporanea",
+    "nome": "Follia temporanea",
+    "capitolo": "Strumenti di gioco",
+    "categoria": "Follia",
+    "pagine_sorgente": "230",
+    "descrizione": "Follia temporanea; durata 1d10 minuti. Cura: calmare emozioni (sopprime); ristorare inferiore (rimuove). Tira d100 per l'effetto.",
+    "sezioni": [
+      {
+        "titolo": "Tabella follia temporanea (d100)",
+        "righe": [
+          {
+            "d100": "01–20",
+            "Effetto (dura 1d10 minuti)": "Il personaggio si ritira nella propria mente e diventa paralizzato. Questo effetto termina se il personaggio subisce danni."
+          },
+          {
+            "d100": "21–30",
+            "Effetto (dura 1d10 minuti)": "Il personaggio diventa incapacitato e trascorre la durata dell'effetto urlando, ridendo o piangendo."
+          },
+          {
+            "d100": "31–40",
+            "Effetto (dura 1d10 minuti)": "Il personaggio diventa spaventato e a ogni round deve usare la sua azione e il suo movimento per fuggire dalla fonte della sua paura."
+          },
+          {
+            "d100": "41–50",
+            "Effetto (dura 1d10 minuti)": "Il personaggio inizia a balbettare e non è in grado di parlare normalmente o lanciare incantesimi."
+          },
+          {
+            "d100": "51–60",
+            "Effetto (dura 1d10 minuti)": "Il personaggio deve usare la sua azione a ogni round per attaccare la creatura più vicina."
+          },
+          {
+            "d100": "61–70",
+            "Effetto (dura 1d10 minuti)": "Il personaggio soffre di vivide allucinazioni e subisce svantaggio alle prove di caratteristica."
+          },
+          {
+            "d100": "71–75",
+            "Effetto (dura 1d10 minuti)": "Il personaggio fa qualsiasi cosa gli venga detto di fare purché non sia palesemente autodistruttiva."
+          },
+          {
+            "d100": "76–80",
+            "Effetto (dura 1d10 minuti)": "Il personaggio soffre dell'impulso irrefrenabile di mangiare qualcosa di strano come terriccio, fanghiglia o escrementi."
+          },
+          {
+            "d100": "81–90",
+            "Effetto (dura 1d10 minuti)": "Il personaggio è stordito."
+          },
+          {
+            "d100": "91–100",
+            "Effetto (dura 1d10 minuti)": "Il personaggio cade privo di sensi."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "follia_duratura",
+    "nome": "Follia duratura",
+    "capitolo": "Strumenti di gioco",
+    "categoria": "Follia",
+    "pagine_sorgente": "230",
+    "descrizione": "Follia duratura; durata 1d10 × 10 ore. Cura: calmare emozioni (sopprime); ristorare inferiore (rimuove). Tira d100 per l'effetto.",
+    "sezioni": [
+      {
+        "titolo": "Tabella follia duratura (d100)",
+        "righe": [
+          {
+            "d100": "01–10",
+            "Effetto (dura 1d10 × 10 ore)": "Il personaggio si sente obbligato a ripetere un'attività specifica all'infinito, come lavarsi le mani, toccare qualcosa, pregare o contare le monete."
+          },
+          {
+            "d100": "11–20",
+            "Effetto (dura 1d10 × 10 ore)": "Il personaggio soffre di vivide allucinazioni e subisce svantaggio alle prove di caratteristica."
+          },
+          {
+            "d100": "21–30",
+            "Effetto (dura 1d10 × 10 ore)": "Il personaggio soffre di una grave forma di paranoia e subisce svantaggio alle prove di Saggezza e di Carisma."
+          },
+          {
+            "d100": "31–40",
+            "Effetto (dura 1d10 × 10 ore)": "Il personaggio prova una forte repulsione nei confronti di qualcosa (solitamente la fonte della sua follia), come se fosse sotto l'effetto antipatia dell'incantesimo antipatia/simpatia."
+          },
+          {
+            "d100": "41–45",
+            "Effetto (dura 1d10 × 10 ore)": "Il personaggio è affetto da un forte delirio. Il GM sceglie una pozione, dei cui effetti il personaggio immagina di risentire."
+          },
+          {
+            "d100": "46–55",
+            "Effetto (dura 1d10 × 10 ore)": "Il personaggio si affeziona a un \"portafortuna\" (persona o oggetto) e subisce svantaggio ai tiri per colpire, alle prove e ai tiri salvezza quando si allontana per più di 9 m da esso."
+          },
+          {
+            "d100": "56–65",
+            "Effetto (dura 1d10 × 10 ore)": "Il personaggio è accecato (25%) o assordato (75%)."
+          },
+          {
+            "d100": "66–75",
+            "Effetto (dura 1d10 × 10 ore)": "Il personaggio soffre di tremori e tic incontrollabili che gli impongono svantaggio ai tiri per colpire, alle prove e ai tiri salvezza basati su Forza e Destrezza."
+          },
+          {
+            "d100": "76–85",
+            "Effetto (dura 1d10 × 10 ore)": "Il personaggio soffre di amnesia parziale. Sa chi è e conserva i suoi tratti razziali e privilegi di classe, ma non riconosce le altre persone e non ricorda nulla di ciò che è avvenuto prima che cadesse preda della follia."
+          },
+          {
+            "d100": "86–90",
+            "Effetto (dura 1d10 × 10 ore)": "Ogni volta che il personaggio subisce danni, deve superare un tiro salvezza su Saggezza con CD 15, altrimenti subisce le conseguenze di un tiro salvezza fallito contro l'incantesimo confusione per 1 minuto."
+          },
+          {
+            "d100": "91–95",
+            "Effetto (dura 1d10 × 10 ore)": "Il personaggio perde la capacità di parlare."
+          },
+          {
+            "d100": "96–100",
+            "Effetto (dura 1d10 × 10 ore)": "Il personaggio cade privo di sensi e non si risveglia né se viene scosso né se subisce danni."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "follia_imprecisata",
+    "nome": "Follia imprecisata",
+    "capitolo": "Strumenti di gioco",
+    "categoria": "Follia",
+    "pagine_sorgente": "231",
+    "descrizione": "Follia imprecisata; permanente finché non viene curata. Cura: ristorare superiore o magia più potente. Tira d100 per il difetto del personaggio.",
+    "sezioni": [
+      {
+        "titolo": "Tabella follia imprecisata (d100)",
+        "righe": [
+          {
+            "d100": "01–15",
+            "Difetto (permanente)": "\"Solo ubriacandomi evito di impazzire.\""
+          },
+          {
+            "d100": "16–25",
+            "Difetto (permanente)": "\"Tengo tutto ciò che trovo.\""
+          },
+          {
+            "d100": "26–30",
+            "Difetto (permanente)": "\"Cerco di diventare più simile a qualcuno che conosco, adottando il suo stile di vestire, i suoi modi di fare e il suo nome.\""
+          },
+          {
+            "d100": "31–35",
+            "Difetto (permanente)": "\"Devo distorcere la verità, esagerare o mentire spudoratamente per risultare interessante agli occhi degli altri.\""
+          },
+          {
+            "d100": "36–45",
+            "Difetto (permanente)": "\"Raggiungere il mio obiettivo è l'unica cosa che mi interessa e per farlo ignorerò tutto il resto.\""
+          },
+          {
+            "d100": "46–50",
+            "Difetto (permanente)": "\"Mi riesce difficile provare interesse per qualsiasi cosa accada intorno a me.\""
+          },
+          {
+            "d100": "51–55",
+            "Difetto (permanente)": "\"Non mi piace il modo in cui la gente continua a giudicarmi.\""
+          },
+          {
+            "d100": "56–70",
+            "Difetto (permanente)": "\"Sono la persona più intelligente, più saggia, più forte, più veloce e più bella che io conosca.\""
+          },
+          {
+            "d100": "71–80",
+            "Difetto (permanente)": "\"Ho la certezza che potenti nemici mi diano la caccia e che i loro agenti siano presenti ovunque io vada e mi osservino in ogni momento.\""
+          },
+          {
+            "d100": "81–85",
+            "Difetto (permanente)": "\"C'è solo una persona di cui posso fidarmi e solo io sono in grado di vedere questo amico speciale.\""
+          },
+          {
+            "d100": "86–95",
+            "Difetto (permanente)": "\"Non riesco a prendere nulla sul serio. Più la situazione è seria, più la trovo divertente.\""
+          },
+          {
+            "d100": "96–100",
+            "Difetto (permanente)": "\"Ho scoperto che mi piace moltissimo uccidere la gente.\""
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "statistiche_oggetti",
+    "nome": "Statistiche degli oggetti",
+    "capitolo": "Strumenti di gioco",
+    "categoria": "Oggetti",
+    "pagine_sorgente": "232",
+    "descrizione": "Gli oggetti inanimati hanno CA e PF. Sono immuni a veleno e danni psichici. La soglia di danno si applica agli oggetti molto resistenti: i danni inferiori alla soglia non riducono i PF.",
+    "sezioni": [
+      {
+        "titolo": "Classe Armatura degli oggetti",
+        "righe": [
+          {
+            "Materiale": "Stoffa, carta, corda",
+            "CA": "11"
+          },
+          {
+            "Materiale": "Cristallo, vetro, ghiaccio",
+            "CA": "13"
+          },
+          {
+            "Materiale": "Legno, osso",
+            "CA": "15"
+          },
+          {
+            "Materiale": "Pietra",
+            "CA": "17"
+          },
+          {
+            "Materiale": "Ferro, acciaio",
+            "CA": "19"
+          },
+          {
+            "Materiale": "Mithral",
+            "CA": "21"
+          },
+          {
+            "Materiale": "Adamantio",
+            "CA": "23"
+          }
+        ]
+      },
+      {
+        "titolo": "Punti ferita degli oggetti",
+        "righe": [
+          {
+            "Taglia": "Minuscola (bottiglia, serratura)",
+            "Fragile": "2 (1d4)",
+            "Resiliente": "5 (2d4)"
+          },
+          {
+            "Taglia": "Piccola (forziere, liuto)",
+            "Fragile": "3 (1d6)",
+            "Resiliente": "10 (3d6)"
+          },
+          {
+            "Taglia": "Media (barile, lampadario)",
+            "Fragile": "4 (1d8)",
+            "Resiliente": "18 (4d8)"
+          },
+          {
+            "Taglia": "Grande (carretto, finestra 3×3 m)",
+            "Fragile": "5 (1d10)",
+            "Resiliente": "27 (5d10)"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "veleni_regole_generali",
+    "nome": "Veleni — Regole generali",
+    "capitolo": "Strumenti di gioco",
+    "categoria": "Veleni",
+    "pagine_sorgente": "233",
+    "descrizione": "I veleni sono illegali nella maggior parte delle società. Tipi: contatto (tocco con pelle scoperta), ferimento (arma/munizioni che infliggono taglienti/perforanti), inalazione (cubo 1,5 m, si dissipa subito, trattenere il respiro non aiuta), ingestione (dose intera in cibo/liquido).",
+    "sezioni": [
+      {
+        "titolo": "Tipi di veleno",
+        "righe": [
+          {
+            "Tipo": "Contatto",
+            "Descrizione": "Cosparso su oggetto; attivo finché non viene toccato o lavato via. Effetto al contatto con pelle scoperta."
+          },
+          {
+            "Tipo": "Ferimento",
+            "Descrizione": "Applicato ad armi/munizioni/trappole. Effetto su ferite taglienti o perforanti."
+          },
+          {
+            "Tipo": "Inalazione",
+            "Descrizione": "Polvere o gas in cubo 1,5 m; si dissipa subito. Trattenere il respiro non aiuta."
+          },
+          {
+            "Tipo": "Ingestione",
+            "Descrizione": "Dose intera in cibo/liquido. Dose parziale: effetto ridotto a discrezione del GM."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "veleni_esempi",
+    "nome": "Esempi di veleni",
+    "capitolo": "Strumenti di gioco",
+    "categoria": "Veleni",
+    "pagine_sorgente": "233-234",
+    "descrizione": "Tabella dei veleni dell'SRD 5.1 con tipo, prezzo e effetti.",
+    "sezioni": [
+      {
+        "titolo": "Veleni disponibili",
+        "righe": [
+          {
+            "Veleno": "Essenza di etere",
+            "Tipo": "Inalazione",
+            "Prezzo/dose": "300 mo",
+            "CD TS (Cos)": "15",
+            "Effetto": "TS Cos CD 15 o avvelenato 8 ore + privo di sensi; si risveglia con danni o se scosso."
+          },
+          {
+            "Veleno": "Fumi di othur bruciato",
+            "Tipo": "Inalazione",
+            "Prezzo/dose": "500 mo",
+            "CD TS (Cos)": "13",
+            "Effetto": "TS Cos CD 13 o 10 (3d6) veleno; ripete TS inizio turno: fallimento = 3 (1d6) veleno; 3 successi = termine."
+          },
+          {
+            "Veleno": "Lacrime di mezzanotte",
+            "Tipo": "Ingestione",
+            "Prezzo/dose": "1.500 mo",
+            "CD TS (Cos)": "17",
+            "Effetto": "Nessun effetto immediato; a mezzanotte: TS Cos CD 17 o 31 (9d6) veleno (metà successo)."
+          },
+          {
+            "Veleno": "Malizia",
+            "Tipo": "Inalazione",
+            "Prezzo/dose": "250 mo",
+            "CD TS (Cos)": "15",
+            "Effetto": "TS Cos CD 15 o avvelenato 1 ora + accecato."
+          },
+          {
+            "Veleno": "Muco di vermeiena",
+            "Tipo": "Contatto",
+            "Prezzo/dose": "200 mo",
+            "CD TS (Cos)": "13",
+            "Effetto": "TS Cos CD 13 o avvelenato 1 min + paralizzato; TS fine turno per liberarsi."
+          },
+          {
+            "Veleno": "Olio di taggit",
+            "Tipo": "Contatto",
+            "Prezzo/dose": "400 mo",
+            "CD TS (Cos)": "13",
+            "Effetto": "TS Cos CD 13 o avvelenato 24 ore + privo di sensi; si risveglia con danni."
+          },
+          {
+            "Veleno": "Sangue dell'assassino",
+            "Tipo": "Ingestione",
+            "Prezzo/dose": "150 mo",
+            "CD TS (Cos)": "10",
+            "Effetto": "TS Cos CD 10: fallimento = 6 (1d12) veleno + avvelenato 24 ore; successo = metà, non avvelenato."
+          },
+          {
+            "Veleno": "Siero della verità",
+            "Tipo": "Ingestione",
+            "Prezzo/dose": "150 mo",
+            "CD TS (Cos)": "11",
+            "Effetto": "TS Cos CD 11 o avvelenato 1 ora + non può mentire consapevolmente (come zona di verità)."
+          },
+          {
+            "Veleno": "Tintura pallida",
+            "Tipo": "Ingestione",
+            "Prezzo/dose": "250 mo",
+            "CD TS (Cos)": "16",
+            "Effetto": "TS Cos CD 16 o 3 (1d6) veleno + avvelenato; ogni 24 ore ripete TS: fallimento = 3 (1d6) veleno; danni incurabili; 7 successi = fine."
+          },
+          {
+            "Veleno": "Torpore",
+            "Tipo": "Ingestione",
+            "Prezzo/dose": "600 mo",
+            "CD TS (Cos)": "15",
+            "Effetto": "TS Cos CD 15 o avvelenato 4d6 ore + incapacitato."
+          },
+          {
+            "Veleno": "Veleno di drow",
+            "Tipo": "Ferimento",
+            "Prezzo/dose": "200 mo",
+            "CD TS (Cos)": "13",
+            "Effetto": "TS Cos CD 13 o avvelenato 1 ora; fallimento di 5+ = anche privo di sensi."
+          },
+          {
+            "Veleno": "Veleno di serpente",
+            "Tipo": "Ferimento",
+            "Prezzo/dose": "200 mo",
+            "CD TS (Cos)": "11",
+            "Effetto": "TS Cos CD 11: 10 (3d6) veleno (metà successo)."
+          },
+          {
+            "Veleno": "Veleno di verme purpureo",
+            "Tipo": "Ferimento",
+            "Prezzo/dose": "2.000 mo",
+            "CD TS (Cos)": "19",
+            "Effetto": "TS Cos CD 19: 42 (12d6) veleno (metà successo)."
+          },
+          {
+            "Veleno": "Veleno di viverna",
+            "Tipo": "Ferimento",
+            "Prezzo/dose": "1.200 mo",
+            "CD TS (Cos)": "15",
+            "Effetto": "TS Cos CD 15: 24 (7d6) veleno (metà successo)."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "oggetti_magici_identificare",
+    "nome": "Oggetti magici — Identificazione e sintonia",
+    "capitolo": "Oggetti magici",
+    "categoria": "Oggetti magici",
+    "pagine_sorgente": "235-236",
+    "descrizione": "Per identificare un oggetto magico occorre esaminarlo durante un riposo breve (Intelligenza/Arcano opzionale) o lanciare identificare. Alcuni oggetti si identificano solo indossandoli. La sintonia richiede un riposo breve dedicato: massimo 3 oggetti contemporaneamente. Se si perde un prerequisito, la sintonia termina; termina anche oltre 30 m per 24 ore o alla morte.",
+    "sezioni": [
+      {
+        "titolo": "Rarità e livello consigliato",
+        "righe": [
+          {
+            "Rarità": "Comune",
+            "Livello consigliato": "1°",
+            "Valore indicativo": "50–100 mo"
+          },
+          {
+            "Rarità": "Non comune",
+            "Livello consigliato": "1°",
+            "Valore indicativo": "101–500 mo"
+          },
+          {
+            "Rarità": "Raro",
+            "Livello consigliato": "5°",
+            "Valore indicativo": "501–5.000 mo"
+          },
+          {
+            "Rarità": "Molto raro",
+            "Livello consigliato": "11°",
+            "Valore indicativo": "5.001–50.000 mo"
+          },
+          {
+            "Rarità": "Leggendario",
+            "Livello consigliato": "17°",
+            "Valore indicativo": "50.001+ mo"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "grado_sfida_pe",
+    "nome": "Grado di sfida e punti esperienza",
+    "capitolo": "Mostri",
+    "categoria": "Mostri",
+    "pagine_sorgente": "295-296",
+    "descrizione": "Il grado di sfida (GdS) indica la difficoltà di un mostro per un gruppo di quattro avventurieri di quel livello. Ogni GdS corrisponde a un numero di PE assegnati alla sconfitta.",
+    "sezioni": [
+      {
+        "titolo": "PE per grado di sfida",
+        "righe": [
+          {
+            "GdS": "0",
+            "PE": "0 o 10"
+          },
+          {
+            "GdS": "1/8",
+            "PE": "25"
+          },
+          {
+            "GdS": "1/4",
+            "PE": "50"
+          },
+          {
+            "GdS": "1/2",
+            "PE": "100"
+          },
+          {
+            "GdS": "1",
+            "PE": "200"
+          },
+          {
+            "GdS": "2",
+            "PE": "450"
+          },
+          {
+            "GdS": "3",
+            "PE": "700"
+          },
+          {
+            "GdS": "4",
+            "PE": "1.100"
+          },
+          {
+            "GdS": "5",
+            "PE": "1.800"
+          },
+          {
+            "GdS": "6",
+            "PE": "2.300"
+          },
+          {
+            "GdS": "7",
+            "PE": "2.900"
+          },
+          {
+            "GdS": "8",
+            "PE": "3.900"
+          },
+          {
+            "GdS": "9",
+            "PE": "5.000"
+          },
+          {
+            "GdS": "10",
+            "PE": "5.900"
+          },
+          {
+            "GdS": "11",
+            "PE": "7.200"
+          },
+          {
+            "GdS": "12",
+            "PE": "8.400"
+          },
+          {
+            "GdS": "13",
+            "PE": "10.000"
+          },
+          {
+            "GdS": "14",
+            "PE": "11.500"
+          },
+          {
+            "GdS": "15",
+            "PE": "13.000"
+          },
+          {
+            "GdS": "16",
+            "PE": "15.000"
+          },
+          {
+            "GdS": "17",
+            "PE": "18.000"
+          },
+          {
+            "GdS": "18",
+            "PE": "20.000"
+          },
+          {
+            "GdS": "19",
+            "PE": "22.000"
+          },
+          {
+            "GdS": "20",
+            "PE": "25.000"
+          },
+          {
+            "GdS": "21",
+            "PE": "33.000"
+          },
+          {
+            "GdS": "22",
+            "PE": "41.000"
+          },
+          {
+            "GdS": "23",
+            "PE": "50.000"
+          },
+          {
+            "GdS": "24",
+            "PE": "62.000"
+          },
+          {
+            "GdS": "25",
+            "PE": "75.000"
+          },
+          {
+            "GdS": "26",
+            "PE": "90.000"
+          },
+          {
+            "GdS": "27",
+            "PE": "105.000"
+          },
+          {
+            "GdS": "28",
+            "PE": "120.000"
+          },
+          {
+            "GdS": "29",
+            "PE": "135.000"
+          },
+          {
+            "GdS": "30",
+            "PE": "155.000"
+          }
+        ]
+      },
+      {
+        "titolo": "Dado vita per taglia",
+        "righe": [
+          {
+            "Taglia": "Minuscola",
+            "Dado vita": "d4",
+            "Media PF per dado": "2,5"
+          },
+          {
+            "Taglia": "Piccola",
+            "Dado vita": "d6",
+            "Media PF per dado": "3,5"
+          },
+          {
+            "Taglia": "Media",
+            "Dado vita": "d8",
+            "Media PF per dado": "4,5"
+          },
+          {
+            "Taglia": "Grande",
+            "Dado vita": "d10",
+            "Media PF per dado": "5,5"
+          },
+          {
+            "Taglia": "Enorme",
+            "Dado vita": "d12",
+            "Media PF per dado": "6,5"
+          },
+          {
+            "Taglia": "Mastodontica",
+            "Dado vita": "d20",
+            "Media PF per dado": "10,5"
+          }
+        ]
+      }
+    ]
+  }
+]
