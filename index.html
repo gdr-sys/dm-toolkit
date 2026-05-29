@@ -4025,6 +4025,7 @@ const Sessione = (() => {
 
         <!-- Azioni rapide -->
         <div class="combat-actions-col">
+          ${c.monsterId || c.tipo === 'mostro' ? `<button class="btn btn-ghost btn-icon-sm" title="Scheda mostro" onclick="Sessione.openCombatantSheet('${c.id}')">📋</button>` : ''}
           <button class="btn btn-ghost btn-icon-sm" title="Aggiungi condizione" onclick="Sessione.openCondizioneModal('${c.id}')">🔴</button>
           <button class="btn btn-ghost btn-icon-sm" title="Concentrazione" onclick="Sessione.toggleConcentrazione('${c.id}')" style="${c.concentrazione ? 'color:var(--accent-tertiary);' : ''}">🔮</button>
           <button class="btn btn-ghost btn-icon-sm" title="Danno rapido" onclick="Sessione.quickDamage('${c.id}')">💥</button>
@@ -4169,6 +4170,121 @@ const Sessione = (() => {
   };
 
   // ── Aggiungi combatenti ──
+  const openCombatantSheet = (id) => {
+    const c = _combat?.combatants.find(x => x.id === id);
+    if (!c) return;
+
+    // Cerca il mostro nel compendio
+    const monsters = Compendio?.getData()?.monsters || [];
+    const m = c.monsterId ? monsters.find(x => x.id === c.monsterId) : monsters.find(x => x.nome === c.nome);
+
+    const modStr = (v) => { const m = Math.floor((parseInt(v||10)-10)/2); return (m>=0?'+':'')+m; };
+
+    // Parsa formula dadi da stringa descrizione azione
+    const parseRoll = (desc) => {
+      // Cerca pattern tipo "2d6+3", "1d8", "3d10+5"
+      const match = desc?.match(/(\d+d\d+(?:[+\-]\d+)?)/i);
+      return match ? match[1] : null;
+    };
+
+    const rollFormula = (formula, nomeDanno) => {
+      const result = Dadi.roll(formula);
+      if (result.error) return;
+      // Mostra toast con risultato
+      Toast.show(`${nomeDanno}: ${result.total} (${formula})`, 'info', 4000);
+      Debug.log(`Combat roll: ${nomeDanno} → ${result.total} [${formula}]`);
+    };
+
+    const car = m?.caratteristiche || {};
+    const statAbbr = { forza:'FOR', destrezza:'DES', costituzione:'COS', intelligenza:'INT', saggezza:'SAG', carisma:'CAR' };
+
+    // Costruisci stat block con azioni cliccabili
+    const azioniHTML = (m?.azioni || []).map(a => {
+      const formula = parseRoll(a.descrizione || a.desc || '');
+      const nomeAz = a.nome || a.name || '?';
+      const descAz = a.descrizione || a.desc || '';
+      return `
+        <div class="sb-action" style="cursor:${formula ? 'pointer' : 'default'};"
+          ${formula ? `onclick="Sessione._rollAction('${formula}','${nomeAz.replace(/'/g,"\\'")}',this)"` : ''}>
+          <strong>${nomeAz}.</strong>
+          <span class="text-secondary"> ${descAz}</span>
+          ${formula ? `<span class="badge badge-muted" style="margin-left:4px;font-size:0.6rem;">🎲 ${formula}</span>` : ''}
+        </div>`;
+    }).join('') || '<div class="text-muted text-sm" style="padding:4px 0;">Nessuna azione disponibile</div>';
+
+    const content = m ? `
+      <div style="max-height:70vh;overflow-y:auto;">
+        <div class="stat-block">
+          <div class="stat-block-title">${m.nome}</div>
+          <div class="stat-block-subtitle">${m.dimensione||''} ${m.tipo||''}${m.allineamento?', '+m.allineamento:''}</div>
+          <div class="stat-block-divider"></div>
+          <div class="stat-row"><strong>Classe Armatura</strong> <span>${m.classe_armatura||'—'}</span></div>
+          <div class="stat-row"><strong>Punti Ferita</strong> <span>${m.punti_ferita?.media||'—'} ${m.punti_ferita?.formula?'('+m.punti_ferita.formula+')':''}</span></div>
+          <div class="stat-row"><strong>Velocità</strong> <span>${Object.entries(m.velocita||{}).filter(([,v])=>v).map(([k,v])=>k==='camminata'?v:k+' '+v).join(', ')||'—'}</span></div>
+          <div class="stat-block-divider"></div>
+          <div class="stat-abilities">
+            ${Object.entries(statAbbr).map(([key,abbr])=>{
+              const s = car[key]||{};
+              return `<div class="stat-ability-box">
+                <div class="stat-ability-name">${abbr}</div>
+                <div class="stat-ability-score">${s.punteggio||10}</div>
+                <div class="stat-ability-mod">${modStr(s.punteggio||10)}</div>
+              </div>`;
+            }).join('')}
+          </div>
+          <div class="stat-block-divider"></div>
+          ${m.grado_sfida ? `<div class="stat-row"><strong>GS</strong> <span>${m.grado_sfida.raw||m.grado_sfida.valore}</span></div>` : ''}
+          <div class="stat-block-divider"></div>
+          <div style="font-size:0.7rem;color:var(--text-muted);margin-bottom:6px;">💡 Clicca su un'azione con 🎲 per tirare i dadi automaticamente</div>
+          <div class="sb-section-title">Azioni</div>
+          ${azioniHTML}
+          ${m.azioni_bonus?.length ? `<div class="sb-section-title" style="margin-top:8px;">Azioni Bonus</div>${m.azioni_bonus.map(a=>{
+            const formula = parseRoll(a.descrizione||'');
+            return `<div class="sb-action" style="cursor:${formula?'pointer':'default'};" ${formula?`onclick="Sessione._rollAction('${formula}','${(a.nome||'').replace(/'/g,"\\'")}',this)"`:''}>
+              <strong>${a.nome||''}.</strong> <span class="text-secondary">${a.descrizione||''}</span>
+              ${formula?`<span class="badge badge-muted" style="margin-left:4px;font-size:0.6rem;">🎲 ${formula}</span>`:''}
+            </div>`;
+          }).join('')}` : ''}
+          ${m.reazioni?.length ? `<div class="sb-section-title" style="margin-top:8px;">Reazioni</div>${m.reazioni.map(a=>`<div class="sb-action"><strong>${a.nome||''}.</strong> <span class="text-secondary">${a.descrizione||''}</span></div>`).join('')}` : ''}
+        </div>
+      </div>` :
+      `<div class="empty-state"><div class="empty-state-icon">📋</div>
+        <h3>${c.nome}</h3>
+        <p class="text-sm text-muted">Mostro custom — nessuna scheda nel Compendio</p>
+        ${c.gs ? `<p class="text-sm">GS ${c.gs} · CA ${c.ca} · PF ${c.hp}/${c.maxHp}</p>` : ''}
+      </div>`;
+
+    const titleEl = document.getElementById('comp-detail-title');
+    const bodyEl  = document.getElementById('comp-detail-body');
+    const btn     = document.getElementById('comp-detail-combat-btn');
+    if (titleEl) titleEl.textContent = `📋 ${c.nome}`;
+    if (bodyEl)  bodyEl.innerHTML = content;
+    if (btn)     btn.style.display = 'none';
+    Modal.open('comp-detail');
+    Debug.log(`Combat sheet: ${c.nome} (${m ? 'da compendio' : 'custom'})`);
+  };
+
+  // Tira dadi da azione e mostra risultato inline
+  const _rollAction = (formula, nome, el) => {
+    const result = Dadi.roll(formula);
+    if (result.error) { Toast.show('Formula non valida: ' + formula, 'warning'); return; }
+
+    // Mostra risultato inline vicino al pulsante
+    const existing = el.querySelector('.action-roll-result');
+    if (existing) existing.remove();
+    const div = document.createElement('div');
+    div.className = 'action-roll-result';
+    div.style.cssText = 'margin-top:4px;padding:4px 8px;background:var(--bg-tertiary);border-radius:var(--radius-sm);font-family:var(--font-mono);font-size:0.85rem;display:flex;align-items:center;gap:8px;';
+    div.innerHTML = `<span style="color:var(--accent-secondary);font-weight:700;font-size:1.1rem;">${result.total}</span><span style="color:var(--text-muted);font-size:0.72rem;">${result.detail}</span><span style="color:var(--text-muted);font-size:0.7rem;">${nome}</span>`;
+    el.appendChild(div);
+
+    // Animazione
+    div.style.animation = 'diceResult 0.3s ease';
+    Storage.addDiceRoll(formula, result.rolls, result.total);
+    Debug.log(`${nome}: ${result.total} [${formula}] → ${result.detail}`);
+  };
+
+
   const addCombatantToCurrent = (combatant) => {
     if (!_combat) newCombat();
     _combat.combatants.push({
@@ -4362,9 +4478,7 @@ const Sessione = (() => {
 
   return {
     init,
-    // Party
     addPG, editPG, deletePG, submitPG, openPGModal, addPGtoCombat, toggleInspirazione,
-    // Combat
     newCombat, nextTurn, rollAllInitiative, updateInit,
     changeHP, setHP, quickDamage,
     openCondizioneModal, submitCondizioni, removeCondizione,
@@ -4372,6 +4486,7 @@ const Sessione = (() => {
     addMonsterQuick, searchMonster, addMonsterFromCompendio,
     addCustomCombatant, submitCustomCombatant, removeCombatant,
     saveCombatSession, endCombat, loadCombatSession,
+    openCombatantSheet, _rollAction,
   };
 })();
 
@@ -5951,8 +6066,14 @@ const Generatori = {
           ${selected.map(item => {
             const prezzoFin = Math.round(item.p * mult);
             const mostra = item.raro ? `<span class="badge badge-gold" style="font-size:0.58rem;">raro</span> ` : '';
+            // Cerca l'oggetto nel compendio
+            const allItems = [...(Compendio?.getData()?.magic_items||[]), ...(Compendio?.getData()?.equipment||[])];
+            const found = allItems.find(x => x.nome?.toLowerCase() === item.n?.toLowerCase());
+            const nomeCell = found
+              ? `<span style="cursor:pointer;color:var(--accent-secondary);text-decoration:underline dotted;" onclick="Compendio.${found.tipo_base?'openMagicItem':'openEquipment'}('${found.id}')" title="Apri scheda">${mostra}${item.n}</span>`
+              : `${mostra}${item.n}`;
             return `<tr>
-              <td style="padding:3px 0;border-bottom:1px solid var(--border);">${mostra}${item.n}</td>
+              <td style="padding:3px 0;border-bottom:1px solid var(--border);">${nomeCell}</td>
               <td style="padding:3px 4px;border-bottom:1px solid var(--border);text-align:center;font-family:var(--font-mono);color:var(--text-muted);">×${item.qty}</td>
               <td style="padding:3px 0;border-bottom:1px solid var(--border);text-align:right;font-family:var(--font-mono);color:var(--accent-secondary);">${prezzoFin.toLocaleString('it-IT')} ${item.u}</td>
             </tr>`;
@@ -6041,9 +6162,22 @@ const Generatori = {
       monete = '';
     }
 
+    // Helper: rende un item cliccabile se è un oggetto magico nel compendio
+    const linkItem = (testo) => {
+      if (!testo.startsWith('✨')) return `<span>${testo}</span>`;
+      const nomePulito = testo.replace('✨ ', '').replace(/ \(.*\)$/, '').trim();
+      const items = Compendio?.getData()?.magic_items || [];
+      const found = items.find(i => i.nome.toLowerCase() === nomePulito.toLowerCase());
+      if (found) {
+        return `<span style="cursor:pointer;color:var(--accent-secondary);text-decoration:underline dotted;"
+          onclick="Compendio.openMagicItem('${found.id}')" title="Apri scheda nel Compendio">✨ ${nomePulito}</span>`;
+      }
+      return `<span>${testo}</span>`;
+    };
+
     const rows = extras.map(e => `
       <div style="display:flex;align-items:baseline;gap:6px;padding:3px 0;border-bottom:1px solid var(--border);font-size:0.82rem;">
-        <span>${e}</span>
+        ${linkItem(e)}
       </div>`).join('') || '<div class="text-muted text-sm">Nessun oggetto speciale (sfortuna!)</div>';
 
     el.innerHTML = `
