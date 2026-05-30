@@ -536,6 +536,7 @@
             <button class="tab-btn"        id="comp-tab-magic_items" onclick="Compendio.switchTab('magic_items')">Oggetti Magici</button>
             <button class="tab-btn"        id="comp-tab-equipment"   onclick="Compendio.switchTab('equipment')">Equipaggiamento</button>
             <button class="tab-btn"        id="comp-tab-rules"       onclick="Compendio.switchTab('rules')">Regole</button>
+            <button class="tab-btn"        id="comp-tab-spells"      onclick="Compendio.switchTab('spells')">Incantesimi</button>
           </div>
           <div style="display:flex;align-items:center;gap:var(--space-sm);">
             <span class="badge badge-muted" id="comp-sistema-badge">5e 2024</span>
@@ -548,6 +549,7 @@
             <span class="text-xs text-muted" id="comp-count-magic" style="display:none;"></span>
             <span class="text-xs text-muted" id="comp-count-equip" style="display:none;"></span>
             <span class="text-xs text-muted" id="comp-count-rules" style="display:none;"></span>
+            <span class="text-xs text-muted" id="comp-count-spells" style="display:none;"></span>
           </div>
         </div>
 
@@ -594,6 +596,27 @@
           </select>
         </div>
 
+        <!-- Filtri Incantesimi -->
+        <div id="comp-filters-spells" class="comp-filters hidden">
+          <input type="text" id="comp-search-spells" class="form-input" placeholder="Cerca incantesimo..." style="flex:1;min-width:180px;" oninput="Compendio.onSearch('spells')">
+          <select class="form-select" id="comp-filter-livello-spells" style="width:auto;" onchange="Compendio.onFilter('spells','livello',this.value)">
+            <option value="">Tutti i livelli</option>
+            <option value="0">Trucchetti (0)</option>
+            <option value="1">1°</option><option value="2">2°</option><option value="3">3°</option>
+            <option value="4">4°</option><option value="5">5°</option><option value="6">6°</option>
+            <option value="7">7°</option><option value="8">8°</option><option value="9">9°</option>
+          </select>
+          <select class="form-select" id="comp-filter-scuola-spells" style="width:auto;" onchange="Compendio.onFilter('spells','scuola',this.value)">
+            <option value="">Tutte le scuole</option>
+            <option>Abiurazione</option><option>Ammaliamento</option><option>Divinazione</option>
+            <option>Evocazione</option><option>Illusione</option><option>Invocazione</option>
+            <option>Necromanzia</option><option>Trasmutazione</option>
+          </select>
+          <label style="display:flex;align-items:center;gap:4px;font-size:0.78rem;cursor:pointer;">
+            <input type="checkbox" id="comp-filter-ritual-spells" onchange="Compendio.onFilter('spells','rituale',this.checked?'true':'')"> Solo rituali
+          </label>
+        </div>
+
         <!-- Filtri Regole -->
         <div id="comp-filters-rules" class="comp-filters hidden">
           <input type="text" id="comp-search-rules" class="form-input" placeholder="🔍 Cerca regola..." style="flex:1;min-width:180px;" oninput="Compendio.onSearch('rules')">
@@ -611,6 +634,9 @@
         </div>
         <div class="tab-content" id="comp-panel-equipment">
           <div id="comp-list-equip" class="comp-list"></div>
+        </div>
+        <div class="tab-content" id="comp-panel-spells">
+          <div id="comp-list-spells" class="comp-list"></div>
         </div>
         <div class="tab-content" id="comp-panel-rules">
           <div id="comp-list-rules" class="comp-list"></div>
@@ -4499,7 +4525,7 @@ const Sessione = (() => {
 const Compendio = (() => {
 
   // ── Stato ──
-  const _data = { monsters: [], magic_items: [], equipment: [], rules: [] };
+  const _data = { monsters: [], magic_items: [], equipment: [], rules: [], spells: [] };
   let _loaded = false;
   let _loading = false;
   let _activeTab = 'monsters';
@@ -4513,6 +4539,7 @@ const Compendio = (() => {
       magic_items: 'srd_5_2_1_magic_items.json',
       equipment:   'srd_5_2_1_equipment.json',
       rules:       'srd_5_2_1_rules.json',
+      spells:      'srd_5_2_1_spells.json',
       dm_screen:   'dm_screen_2024.json',
     },
     '5e2014': {
@@ -4520,6 +4547,7 @@ const Compendio = (() => {
       magic_items: 'srd_5_1_magic_items.json',
       equipment:   'srd_5_1_equipment.json',
       rules:       'srd_5_1_rules.json',
+      spells:      'srd_5_1_spells.json',
       dm_screen:   'dm_screen_2014.json',
     },
   };
@@ -4542,6 +4570,7 @@ const Compendio = (() => {
     _data.magic_items = [];
     _data.equipment = [];
     _data.rules = [];
+    _data.spells = [];
     load();
     Debug.log(`Compendio: sistema cambiato → ${sistema}`);
   };
@@ -4552,6 +4581,7 @@ const Compendio = (() => {
     magic_items: { q: '', tipo_base: '', rarita: '' },
     equipment:   { q: '', tipo: '', categoria: '' },
     rules:       { q: '', categoria: '' },
+    spells:      { q: '', livello: '', scuola: '', rituale: '' },
   };
 
   // ── Helpers ──
@@ -4619,6 +4649,7 @@ const Compendio = (() => {
         ['magic_items', sistemaFiles.magic_items],
         ['equipment',   sistemaFiles.equipment],
         ['rules',       sistemaFiles.rules],
+        ['spells',      sistemaFiles.spells],
       ].filter(([, f]) => f); // salta i null
 
       for (const [key, file] of files) {
@@ -4720,8 +4751,8 @@ const Compendio = (() => {
   // ── Cambio tab ──
   const switchTab = (tab) => {
     _activeTab = tab;
-    const tabKeys = ['monsters', 'magic_items', 'equipment', 'rules'];
-    const countIds = { monsters: 'comp-count-monsters', magic_items: 'comp-count-magic', equipment: 'comp-count-equip', rules: 'comp-count-rules' };
+    const tabKeys = ['monsters', 'magic_items', 'equipment', 'rules', 'spells'];
+    const countIds = { monsters: 'comp-count-monsters', magic_items: 'comp-count-magic', equipment: 'comp-count-equip', rules: 'comp-count-rules', spells: 'comp-count-spells' };
     tabKeys.forEach(t => {
       document.getElementById(`comp-tab-${t}`)?.classList.toggle('active', t === tab);
       document.getElementById(`comp-panel-${t}`)?.classList.toggle('active', t === tab);
@@ -4755,6 +4786,7 @@ const Compendio = (() => {
       case 'magic_items': renderMagicItems(); break;
       case 'equipment':   renderEquipment(); break;
       case 'rules':       renderRules(); break;
+      case 'spells':      renderSpells(); break;
     }
   };
 
@@ -5171,6 +5203,102 @@ const Compendio = (() => {
     if (_currentMonsterForCombat) _currentMonsterForCombat();
   };
 
+  // ─────────────────────────────────────────────────
+  // INCANTESIMI
+  // ─────────────────────────────────────────────────
+  const renderSpells = () => {
+    const el = document.getElementById('comp-list-spells');
+    if (!el) return;
+    const f = _filters.spells;
+    const q = f.q.toLowerCase();
+
+    const scuolaBadge = {
+      Abiurazione: 'badge-blue', Ammaliamento: 'badge-primary',
+      Divinazione: 'badge-gold', Evocazione: 'badge-success',
+      Illusione: 'badge-muted', Invocazione: 'badge-warning',
+      Necromanzia: 'badge-primary', Trasmutazione: 'badge-muted',
+    };
+
+    let list = _data.spells.filter(s => {
+      if (q && !s.nome.toLowerCase().includes(q) && !(s.scuola||'').toLowerCase().includes(q)) return false;
+      if (f.livello !== '' && String(s.livello) !== f.livello) return false;
+      if (f.scuola && s.scuola !== f.scuola) return false;
+      if (f.rituale === 'true' && !(s.rituale === true || s.rituale === 'true')) return false;
+      return true;
+    });
+
+    list.sort((a, b) => {
+      if (a.livello !== b.livello) return a.livello - b.livello;
+      return a.nome.localeCompare(b.nome, 'it');
+    });
+
+    const count = document.getElementById('comp-count-spells');
+    if (count) count.textContent = list.length + ' incantesimi';
+
+    if (list.length === 0) {
+      el.innerHTML = '<div class="empty-state"><div class="empty-state-icon">✨</div><h3>Nessun incantesimo trovato</h3></div>';
+      return;
+    }
+
+    let currentLv = -1;
+    el.innerHTML = list.map(s => {
+      let lvHeader = '';
+      if (s.livello !== currentLv) {
+        currentLv = s.livello;
+        lvHeader = '<div class="comp-cat-header">' + (s.livello === 0 ? 'Trucchetti (0)' : s.livello + '\xB0 livello') + '</div>';
+      }
+      const badge = scuolaBadge[s.scuola] || 'badge-muted';
+      const isRitual = s.rituale === true || s.rituale === 'true';
+      const isConc = (s.durata||'').toLowerCase().includes('concentrazione');
+      const ritLabel = isRitual ? '<span class="badge badge-gold" style="font-size:0.6rem;">R</span>' : '';
+      const conc = isConc ? '<span class="badge badge-blue" style="font-size:0.6rem;">C</span>' : '';
+      return lvHeader +
+        '<div class="comp-row" onclick="Compendio.openSpell(\'' + s.id + '\')">' +
+          '<div class="comp-row-main">' +
+            '<span class="comp-row-name">' + highlight(s.nome, f.q) + '</span>' +
+            '<span class="comp-row-meta">' + (s.scuola||'') + ' \xB7 ' + (s.tempo_lancio||'') + ' \xB7 ' + (s.gittata||'') + '</span>' +
+          '</div>' +
+          '<div class="comp-row-stats">' +
+            '<span class="badge ' + badge + '" style="font-size:0.62rem;">' + (s.scuola||'') + '</span>' +
+            ritLabel + conc +
+          '</div>' +
+        '</div>';
+    }).join('');
+  };
+
+  const openSpell = (id) => {
+    const s = _data.spells.find(x => x.id === id);
+    if (!s) return;
+    Debug.log('Compendio: apro incantesimo ' + s.nome);
+
+    const isConc = (s.durata||'').toLowerCase().includes('concentrazione');
+    const isRitual = s.rituale === true || s.rituale === 'true';
+    const lvLabel = s.livello === 0 ? 'Trucchetto' : s.livello + '\xB0 livello';
+
+    const rows = [
+      ['Tempo di lancio', s.tempo_lancio],
+      ['Gittata', s.gittata],
+      ['Componenti', s.componenti],
+      ['Durata', s.durata],
+    ].filter(function(r){ return r[1]; }).map(function(r){
+      return '<tr><td style="color:var(--text-muted);padding:3px 0;width:130px;font-family:var(--font-display);font-size:0.72rem;letter-spacing:0.04em;text-transform:uppercase;">' + r[0] + '</td><td style="padding:3px 0;">' + r[1] + '</td></tr>';
+    }).join('');
+
+    const content =
+      '<div style="max-height:65vh;overflow-y:auto;">' +
+        '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:var(--space-md);">' +
+          '<span class="badge badge-muted">' + lvLabel + '</span>' +
+          '<span class="badge badge-muted">' + (s.scuola||'') + '</span>' +
+          (isRitual ? '<span class="badge badge-gold">Rituale</span>' : '') +
+          (isConc ? '<span class="badge badge-blue">Concentrazione</span>' : '') +
+        '</div>' +
+        '<table style="width:100%;font-size:0.85rem;margin-bottom:var(--space-md);">' + rows + '</table>' +
+        '<div class="text-sm" style="line-height:1.75;white-space:pre-wrap;">' + (s.descrizione||'\u2014') + '</div>' +
+      '</div>';
+
+    openDetailModal(s.nome, content);
+  };
+
   // ── Init ──
   const init = () => {
     // Rileva sistema dalla campagna — ricarica se è cambiato
@@ -5186,7 +5314,7 @@ const Compendio = (() => {
 
   return {
     init, switchTab, onSearch, onFilter,
-    openMonster, openMagicItem, openEquipment, openRule,
+    openMonster, openMagicItem, openEquipment, openRule, openSpell,
     sendCurrentToCombat, changeSistema,
     getData: () => _data,
   };
