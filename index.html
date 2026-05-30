@@ -5341,9 +5341,9 @@ const Schermo = (() => {
   // ── Blocchi disponibili ──
   const BLOCK_TYPES = {
     percezioni: {
-      label: 'Percezioni Passive Party',
-      icon: '👁️',
-      desc: 'Perc./Invest./Intuiz. di tutti i PG',
+      label: 'Schede PG Party',
+      icon: '👥',
+      desc: 'HP, CA, percezioni e ispirazione di tutti i PG',
       defaultSize: 'md',
     },
     dadi: {
@@ -5365,16 +5365,23 @@ const Schermo = (() => {
       defaultSize: 'md',
     },
     combat_mini: {
-      label: 'Combat Mini',
+      label: 'Combat Tracker',
       icon: '⚔️',
-      desc: 'Iniziativa e HP del round attuale',
+      desc: 'Combat tracker completo sincronizzato',
       defaultSize: 'lg',
     },
     condizioni: {
-      label: 'Riferimento Condizioni',
+      label: 'Condizioni (tabella compatta)',
       icon: '🔴',
       desc: 'Lista rapida delle condizioni 5e',
       defaultSize: 'md',
+    },
+    compendio_ref: {
+      label: 'Riferimento Compendio',
+      icon: '📖',
+      desc: 'Scegli una sezione del compendio (ripetibile)',
+      defaultSize: 'md',
+      repeatable: true,
     },
     dc: {
       label: 'Tabella DC',
@@ -5388,11 +5395,18 @@ const Schermo = (() => {
       desc: 'Gestione del tempo di gioco',
       defaultSize: 'sm',
     },
+    proprieta_armi: {
+      label: 'Proprietà delle Armi',
+      icon: '⚔️',
+      desc: 'Tabella completa delle proprietà (2014/2024)',
+      defaultSize: 'md',
+    },
     custom: {
       label: 'Blocco Personalizzato',
       icon: '✏️',
       desc: 'Testo libero con titolo personalizzato',
       defaultSize: 'md',
+      repeatable: true,
     },
   };
 
@@ -5475,16 +5489,18 @@ const Schermo = (() => {
     if (!el) return;
 
     switch (block.type) {
-      case 'percezioni':  el.innerHTML = renderPercezioni(); break;
-      case 'dadi':        el.innerHTML = renderDadiMini(block.id); break;
-      case 'meteo':       el.innerHTML = renderMeteoMini(block.id); break;
-      case 'note':        el.innerHTML = renderNote(block); break;
-      case 'combat_mini': el.innerHTML = renderCombatMini(); break;
-      case 'condizioni':  el.innerHTML = renderCondizioni(); break;
-      case 'dc':          el.innerHTML = renderDC(); break;
-      case 'tempo':       el.innerHTML = renderTempo(); break;
-      case 'custom':      el.innerHTML = renderCustom(block); break;
-      default:            el.innerHTML = `<div class="text-muted text-sm">Blocco sconosciuto</div>`;
+      case 'percezioni':     el.innerHTML = renderPercezioni(); break;
+      case 'dadi':           el.innerHTML = renderDadiMini(block.id); break;
+      case 'meteo':          el.innerHTML = renderMeteoMini(block.id); break;
+      case 'note':           el.innerHTML = renderNote(block); break;
+      case 'combat_mini':    el.innerHTML = renderCombatMini(); break;
+      case 'condizioni':     el.innerHTML = renderCondizioni(); break;
+      case 'compendio_ref':  el.innerHTML = renderCompendioRef(block); break;
+      case 'proprieta_armi': el.innerHTML = renderProprietaArmi(); break;
+      case 'dc':             el.innerHTML = renderDC(); break;
+      case 'tempo':          el.innerHTML = renderTempo(); break;
+      case 'custom':         el.innerHTML = renderCustom(block); break;
+      default:               el.innerHTML = '<div class="text-muted text-sm">Blocco sconosciuto</div>';
     }
   };
 
@@ -5636,29 +5652,177 @@ const Schermo = (() => {
   };
 
   const renderCondizioni = () => {
-    const condizioni = [
-      ['Accecato', 'Svantaggio attacchi. Vantaggio vs lui.'],
-      ['Affascinato', 'Non può attaccare la fonte.'],
-      ['Afferrato', 'Velocità 0.'],
-      ['Assordato', 'Non sente.'],
-      ['Avvelenato', 'Svantaggio a tutto.'],
-      ['Incapacitato', 'Niente azioni/reazioni.'],
-      ['Invisibile', 'Vantaggio attacchi. Svantaggio vs lui.'],
-      ['Paralizzato', 'Incap. + critici da mischia.'],
-      ['Pietrificato', 'Pietra. Resist. tutti danni.'],
-      ['Prono', 'Svant. attacchi. Vantaggi vs lui in mischia.'],
-      ['Spaventato', 'Svant. se fonte visibile.'],
-      ['Stordito', 'Incap. + TS FOR/DES auto-fallisce.'],
-      ['Trattenuto', 'Vel. 0. Svant. attacchi. Vantaggi vs lui.'],
+    const condizioni2024 = [
+      ['Accecato',     'Non vede. Fallisce prove che richiedono la vista. Attacchi contro: Vantaggio. Suoi attacchi: Svantaggio.'],
+      ['Affascinato',  'Non può attaccare la fonte. La fonte ha Vantaggio alle prove sociali contro di lui.'],
+      ['Afferrato ★',  'Velocità 0. Svantaggio agli attacchi vs bersagli diversi dall\'afferratore. Liberarsi: azione + Atletica/Acrobazia vs DC 8+FOR+comp.'],
+      ['Assordato',    'Non sente. Fallisce prove che richiedono l\'udito.'],
+      ['Avvelenato',   'Svantaggio a tutte le prove e i tiri per colpire.'],
+      ['Incapacitato ★','Niente azioni né reazioni. Non può parlare. Svantaggio all\'iniziativa.'],
+      ['Invisibile',   'Non visto senza magia. Attacchi contro: Svantaggio. Suoi attacchi: Vantaggio.'],
+      ['Paralizzato',  'Incapacitato, immobile. Fallisce TS FOR/DES. Attacchi contro: Vantaggio. Critici da mischia entro 1,5m.'],
+      ['Pietrificato', 'Pietra. Incapacitato, peso ×10. Immune a veleni/malattie. Resistenza a tutti i danni. Critici da mischia.'],
+      ['Prono',        'Muove solo strisciando (costo doppio). Svantaggio ai propri attacchi. Mischia vs lui: Vantaggio. Distanza vs lui: Svantaggio.'],
+      ['Spaventato',   'Svantaggio a prove e attacchi mentre la fonte è visibile. Non può avvicinarsi volontariamente.'],
+      ['Stordito',     'Incapacitato, immobile. Parla in modo incerto. Fallisce TS FOR/DES. Attacchi contro: Vantaggio.'],
+      ['Trattenuto',   'Velocità 0. Svantaggio ai propri attacchi. Vantaggio agli attacchi contro. Svantaggio ai TS DES.'],
     ];
-    return `<div style="display:flex;flex-direction:column;gap:3px;">` +
-      condizioni.map(([nome, desc]) => `
-        <div style="display:flex;gap:6px;align-items:baseline;padding:2px 0;border-bottom:1px solid var(--border);">
-          <span style="font-family:var(--font-display);font-size:0.72rem;font-weight:600;white-space:nowrap;min-width:90px;">${nome}</span>
-          <span style="font-size:0.72rem;color:var(--text-muted);">${desc}</span>
-        </div>`).join('') +
-      `</div>`;
+    const condizioni2014 = [
+      ['Accecato',     'Non vede. Fallisce prove che richiedono la vista. Attacchi contro: Vantaggio. Suoi attacchi: Svantaggio.'],
+      ['Affascinato',  'Non può attaccare o bersagliare la fonte con effetti nocivi. La fonte ha Vantaggio alle prove sociali.'],
+      ['Afferrato',    'Velocità 0. Termina se afferratore è Incapacitato o bersaglio viene spostato fuori portata.'],
+      ['Assordato',    'Non sente. Fallisce prove che richiedono l\'udito.'],
+      ['Avvelenato',   'Svantaggio a tutte le prove di caratteristica e ai tiri per colpire.'],
+      ['Incapacitato', 'Niente azioni né reazioni.'],
+      ['Invisibile',   'Pesantemente oscurato. TxC contro: Svantaggio. Suoi attacchi: Vantaggio.'],
+      ['Paralizzato',  'Incapacitato, immobile. Fallisce TS FOR/DES. Attacchi contro: Vantaggio. Critici da mischia entro 1,5m.'],
+      ['Pietrificato', 'Incapacitato, immobile, peso ×10. Fallisce TS FOR/DES. Attacchi contro: Vantaggio. Immune a veleni/malattie. Resist. tutti danni.'],
+      ['Prono',        'Muove solo strisciando (costo doppio). Svantaggio ai propri attacchi. Mischia vs lui (entro 1,5m): Vantaggio. Distanza vs lui: Svantaggio.'],
+      ['Spaventato',   'Svantaggio a prove e TxC mentre fonte è visibile. Non può muoversi volontariamente verso la fonte.'],
+      ['Stordito',     'Incapacitato, immobile. Parla solo balbettando. Fallisce TS FOR/DES. Attacchi contro: Vantaggio.'],
+      ['Trattenuto',   'Velocità 0. Svantaggio ai TxC e ai TS DES. Attacchi contro: Vantaggio.'],
+    ];
+
+    const camp = App.getActiveCampaign();
+    const sistema = camp?.system === '5e2014' ? '5e2014' : '5e2024';
+    const list = sistema === '5e2014' ? condizioni2014 : condizioni2024;
+    const label = sistema === '5e2014' ? '2014' : '2024 ★';
+
+    return '<div style="font-size:0.62rem;color:var(--text-muted);margin-bottom:6px;font-family:var(--font-display);">Edizione ' + label + '</div>' +
+      '<table style="width:100%;border-collapse:collapse;font-size:0.75rem;">' +
+      list.map(([nome, desc]) =>
+        '<tr>' +
+          '<td style="font-family:var(--font-display);font-weight:600;font-size:0.72rem;padding:4px 6px 4px 0;vertical-align:top;white-space:nowrap;border-bottom:1px solid var(--border);min-width:90px;">' + nome + '</td>' +
+          '<td style="padding:4px 0;vertical-align:top;border-bottom:1px solid var(--border);color:var(--text-secondary);line-height:1.4;">' + desc + '</td>' +
+        '</tr>'
+      ).join('') +
+      '</table>';
   };
+
+  // ── Blocco Compendio Ref (ripetibile, scelta sezione) ──
+  const _compendioSections = () => {
+    const rules = Compendio?.getData()?.rules || [];
+    // Raggruppa per capitolo
+    const capitoli = {};
+    rules.forEach(r => {
+      const cap = r.capitolo || 'Regole';
+      if (!capitoli[cap]) capitoli[cap] = [];
+      capitoli[cap].push(r);
+    });
+    return capitoli;
+  };
+
+  const renderCompendioRef = (block) => {
+    const sezione = block.content || ''; // id della regola scelta
+    const capitoli = _compendioSections();
+    const allRules = Compendio?.getData()?.rules || [];
+
+    // Selector sezione
+    const opts = Object.entries(capitoli).map(([cap, rules]) =>
+      '<optgroup label="' + cap + '">' +
+      rules.map(r => '<option value="' + r.id + '"' + (r.id === sezione ? ' selected' : '') + '>' + r.nome + '</option>').join('') +
+      '</optgroup>'
+    ).join('');
+
+    const selector = '<select class="form-select" style="width:100%;margin-bottom:8px;font-size:0.75rem;" ' +
+      'onchange="Schermo.setCompendioRef(\'' + block.id + '\',this.value)">' +
+      '<option value="">— Scegli una sezione —</option>' +
+      opts +
+      '</select>';
+
+    if (!sezione) {
+      return (allRules.length === 0
+        ? '<div class="text-muted text-sm">Apri il Compendio almeno una volta per caricare le regole.</div>'
+        : selector);
+    }
+
+    const regola = allRules.find(r => r.id === sezione);
+    if (!regola) return selector + '<div class="text-muted text-sm">Sezione non trovata.</div>';
+
+    const content = (regola.sezioni || []).map(sez => {
+      if (!sez.righe?.length) return '';
+      const cols = Object.keys(sez.righe[0]);
+      return '<div style="font-family:var(--font-display);font-size:0.65rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;margin:8px 0 4px;">' + sez.titolo + '</div>' +
+        '<table style="width:100%;border-collapse:collapse;font-size:0.75rem;">' +
+        '<thead><tr>' + cols.map(c => '<th style="text-align:left;padding:3px 4px 3px 0;border-bottom:1px solid var(--border);font-family:var(--font-display);font-size:0.62rem;letter-spacing:0.04em;text-transform:uppercase;color:var(--text-muted);">' + c + '</th>').join('') + '</tr></thead>' +
+        '<tbody>' + sez.righe.map(r =>
+          '<tr>' + cols.map(c => '<td style="padding:3px 4px 3px 0;border-bottom:1px solid var(--border);vertical-align:top;line-height:1.4;">' + (r[c]||'—') + '</td>').join('') + '</tr>'
+        ).join('') + '</tbody></table>';
+    }).join('');
+
+    const descHtml = regola.descrizione
+      ? '<div class="text-sm" style="line-height:1.6;margin-bottom:8px;color:var(--text-secondary);">' + regola.descrizione + '</div>'
+      : '';
+
+    return selector + descHtml + (content || '<div class="text-muted text-sm">Nessuna tabella disponibile.</div>');
+  };
+
+  const renderProprietaArmi = () => {
+    const camp = App.getActiveCampaign();
+    const is2024 = camp?.system !== '5e2014';
+
+    // Proprietà 2024 (PHB 2024)
+    const props2024 = [
+      ['Ammunizione', 'Richiede munizioni per attaccare a distanza. Estrarre/recuperare munizione fa parte dell\'attacco. Fine scontro: recuperi metà delle munizioni usate.'],
+      ['Affilata', 'Puoi usare FOR o DES per TxC e danno con questa arma.'],
+      ['Appesantita', 'Creature Piccole o Minuscole hanno Svantaggio ai TxC con quest\'arma.'],
+      ['Colpo di grazia', 'Critico automatico se bersaglio è Incapacitato e sei entro 1,5m.'],
+      ['Destrezza', 'Puoi scegliere FOR o DES per TxC e danno.'],
+      ['Devastante', 'Quando tiri il massimo su un dado danno, ritira e somma (una volta sola).'],
+      ['Lancio', 'Puoi lanciare l\'arma come attacco a distanza. Gittata indicata tra parentesi.'],
+      ['Leggera', 'Adatta al combattimento con due armi. Puoi effettuare un attacco bonus con l\'altra mano.'],
+      ['Lunga', 'Quando fai un attacco con quest\'arma, puoi attaccare bersagli entro 3m invece di 1,5m.'],
+      ['Mischia', 'Attacca bersagli entro 1,5m (o di più con proprietà Lunga).'],
+      ['Munizioni', 'Vedi Ammunizione.'],
+      ['Spinta', 'Se colpisci, puoi spingere il bersaglio di 3m lontano da te (azione bonus).'],
+      ['Speciale', 'Regole speciali descritte nella voce dell\'arma.'],
+      ['Versatile', 'Puoi usare questa arma a una o due mani. Danno a due mani indicato tra parentesi.'],
+    ];
+
+    // Proprietà 2014 (PHB 2014)
+    const props2014 = [
+      ['Ammunizione', 'Richiede munizioni per attaccare a distanza. Fine scontro: recuperi metà delle munizioni usate (se non magiche).'],
+      ['Destrezza', 'Puoi usare FOR o DES per TxC e danno.'],
+      ['Lanciabile', 'Puoi lanciare quest\'arma come attacco a distanza. Gittata tra parentesi.'],
+      ['Leggera', 'Adatta al combattimento con due armi (bonus action attack).'],
+      ['Lunga', 'Portata di 3m invece di 1,5m.'],
+      ['Mischia', 'Attacco da mischia a 1,5m.'],
+      ['Pesante', 'Creature Piccole e Minuscole: Svantaggio ai TxC.'],
+      ['Ricarica', 'Puoi fare solo 1 attacco con questa arma per azione/azione bonus, indipendentemente dagli attacchi extra.'],
+      ['Speciale', 'Regole speciali nella voce dell\'arma.'],
+      ['Versatile', 'Puoi usarla a una o due mani. Danno a due mani tra parentesi.'],
+      ['A due mani', 'Richiede entrambe le mani per attaccare.'],
+      ['Distanza', 'Gittata normale/massima tra parentesi. Oltre la gittata normale: Svantaggio. Oltre la massima: impossibile.'],
+    ];
+
+    const list = is2024 ? props2024 : props2014;
+    const label = is2024 ? '2024' : '2014';
+
+    return '<div style="font-size:0.62rem;color:var(--text-muted);margin-bottom:6px;font-family:var(--font-display);">Edizione ' + label + '</div>' +
+      '<table style="width:100%;border-collapse:collapse;font-size:0.75rem;">' +
+      list.map(([nome, desc]) =>
+        '<tr>' +
+          '<td style="font-family:var(--font-display);font-weight:600;font-size:0.72rem;padding:4px 6px 4px 0;vertical-align:top;white-space:nowrap;border-bottom:1px solid var(--border);min-width:85px;">' + nome + '</td>' +
+          '<td style="padding:4px 0;vertical-align:top;border-bottom:1px solid var(--border);color:var(--text-secondary);line-height:1.4;">' + desc + '</td>' +
+        '</tr>'
+      ).join('') +
+      '</table>';
+  };
+
+
+  const setCompendioRef = (blockId, sezioneId) => {
+    const block = _blocks.find(b => b.id === blockId);
+    const regola = rules.find(r => r.id === sezioneId);
+    if (regola) block.title = '📖 ' + regola.nome;
+    save();
+    updateBlockContent(block);
+    // Aggiorna anche header titolo
+    const titleEl = document.querySelector('#sblock-' + blockId + ' .schermo-block-title');
+    if (titleEl && regola) titleEl.textContent = regola.nome;
+    Debug.log('CompendioRef: ' + sezioneId);
+  };
+
+
 
   const renderDC = () => {
     const dcs = [
@@ -5715,7 +5879,7 @@ const Schermo = (() => {
     const sel = document.getElementById('schermo-block-type');
     if (sel) {
       sel.innerHTML = Object.entries(BLOCK_TYPES).map(([key, def]) =>
-        `<option value="${key}">${def.icon} ${def.label}</option>`
+        `<option value="${key}">${def.icon} ${def.label}${def.repeatable ? ' (ripetibile)' : ''}</option>`
       ).join('');
     }
     const sizeSel = document.getElementById('schermo-block-size');
@@ -5811,6 +5975,7 @@ const Schermo = (() => {
     init, render, addBlock, submitAddBlock,
     removeBlock, resizeBlock, moveBlock, editBlock, resetLayout,
     rollDie, generateMeteo, saveNote, advanceTime, refreshCombat,
+    setCompendioRef, _refreshCombat,
   };
 })();
 
