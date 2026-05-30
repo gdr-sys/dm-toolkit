@@ -367,29 +367,7 @@
       </div>
 
       <!-- Riga 3: Tesoro + Shop + Viaggio -->
-      <div class="grid-3" style="gap:var(--space-md);margin-top:var(--space-md);">
-
-        <!-- Tesoro per CR -->
-        <div class="card">
-          <div class="card-header">
-            <h3 class="card-title">💰 Tesoro per CR</h3>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label">CR Mostro</label>
-              <input type="number" id="gen-cr-input" class="form-input" min="0" max="30" placeholder="es. 5" value="5">
-            </div>
-            <div class="form-group">
-              <label class="form-label">Tipo</label>
-              <select id="gen-cr-type" class="form-select">
-                <option value="individuale">Individuale</option>
-                <option value="bottino">Bottino</option>
-              </select>
-            </div>
-          </div>
-          <button class="btn btn-secondary w-full" style="margin-top:8px;" onclick="Generatori.rollTreasure()">🎲 Calcola Tesoro</button>
-          <div id="gen-treasure-result" style="margin-top:var(--space-sm);"></div>
-        </div>
+      <div class="grid-2" style="gap:var(--space-md);margin-top:var(--space-md);">
 
         <!-- Shop Generator -->
         <div class="card">
@@ -472,6 +450,7 @@
           </div>
           <div id="gen-viaggio-result" style="margin-top:var(--space-sm);"></div>
         </div>
+
 
       </div>
 
@@ -3699,10 +3678,11 @@ const Sessione = (() => {
 
     // Controlla se ci sono combatant in arrivo dal Compendio
     if (camp.pendingCombatants && camp.pendingCombatants.length > 0) {
-      if (_combat) {
-        camp.pendingCombatants.forEach(c => addCombatantToCurrent(c));
-      }
+      if (!_combat) newCombat();
+      camp.pendingCombatants.forEach(c => addCombatantToCurrent(c));
+      saveCombat(_combat);
       App.saveActiveCampaign({ pendingCombatants: [] });
+      Toast.show(camp.pendingCombatants.length + ' mostro aggiunto al combat', 'success');
     }
 
     _combat = loadCombat();
@@ -4200,9 +4180,10 @@ const Sessione = (() => {
     const c = _combat?.combatants.find(x => x.id === id);
     if (!c) return;
 
-    // Cerca il mostro nel compendio
-    const monsters = Compendio?.getData()?.monsters || [];
-    const m = c.monsterId ? monsters.find(x => x.id === c.monsterId) : monsters.find(x => x.nome === c.nome);
+    // Cerca il mostro nella cache
+    const m = c.monsterId
+      ? (MonsterCache.get(c.monsterId) || MonsterCache.getAll().find(x => x.nome === c.nome))
+      : MonsterCache.getAll().find(x => x.nome === c.nome);
 
     const modStr = (v) => { const m = Math.floor((parseInt(v||10)-10)/2); return (m>=0?'+':'')+m; };
 
@@ -4336,8 +4317,13 @@ const Sessione = (() => {
     if (!el) return;
     if (!q) { el.innerHTML = '<div class="text-muted text-sm">Digita per cercare...</div>'; return; }
 
-    const monsters = Compendio?.getData()?.monsters || [];
-    const results = monsters.filter(m => m.nome.toLowerCase().includes(q)).slice(0, 12);
+    // Carica se non ancora caricati
+    if (!MonsterCache.isLoaded()) {
+      el.innerHTML = '<div class="text-muted text-sm">Caricamento mostri...</div>';
+      MonsterCache.load().then(() => searchMonster());
+      return;
+    }
+    const results = MonsterCache.search(q);
 
     if (!results.length) { el.innerHTML = '<div class="text-muted text-sm">Nessun mostro trovato</div>'; return; }
 
@@ -4358,8 +4344,7 @@ const Sessione = (() => {
   };
 
   const addMonsterFromCompendio = (id) => {
-    const monsters = Compendio?.getData()?.monsters || [];
-    const m = monsters.find(x => x.id === id);
+    const m = MonsterCache.get(id) || Compendio?.getData()?.monsters?.find(x => x.id === id);
     if (!m) return;
     if (!_combat) newCombat();
 
@@ -4658,8 +4643,10 @@ const Compendio = (() => {
           if (!r.ok) throw new Error(`HTTP ${r.status}`);
           _data[key] = await r.json();
           Debug.log(`Compendio: ${key} caricato (${_data[key].length} voci)`);
+          if (key === 'spells') Toast.show(`Incantesimi: ${_data[key].length} caricati`, 'success', 3000);
         } catch (e) {
           Debug.error(`Compendio: errore caricamento ${file}:`, e.message);
+          if (key === 'spells') Toast.show(`Errore spells: ${file} — ${e.message}`, 'error', 6000);
           _data[key] = [];
         }
       }
@@ -5234,6 +5221,10 @@ const Compendio = (() => {
 
     const count = document.getElementById('comp-count-spells');
     if (count) count.textContent = list.length + ' incantesimi';
+    // Toast diagnostico temporaneo
+    if (_data.spells.length === 0) {
+      Toast.show('Incantesimi non caricati — verifica il nome file su GitHub', 'warning', 5000);
+    }
 
     if (list.length === 0) {
       el.innerHTML = '<div class="empty-state"><div class="empty-state-icon">✨</div><h3>Nessun incantesimo trovato</h3></div>';
@@ -5482,19 +5473,34 @@ const Schermo = (() => {
   const renderPercezioni = () => {
     const camp = App.getActiveCampaign();
     const party = camp?.party || [];
-    if (!party.length) return `<div class="text-muted text-sm">Nessun PG nel party. Aggiungili nella Sessione.</div>`;
+    if (!party.length) return '<div class="text-muted text-sm">Nessun PG. Aggiungili in Sessione → Party.</div>';
 
-    return `<div style="display:flex;flex-direction:column;gap:6px;">` +
-      party.map(pg => `
-        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
-          <span style="font-family:var(--font-display);font-size:0.82rem;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${pg.nome}</span>
-          <div style="display:flex;gap:4px;">
-            <span class="schermo-stat" title="Percezione Passiva">👁️ ${pg.percezionePassiva || 10}</span>
-            <span class="schermo-stat" title="Investigazione Passiva">🔍 ${pg.investigazionePassiva || 10}</span>
-            <span class="schermo-stat" title="Intuizione Passiva">💡 ${pg.intuizionePassiva || 10}</span>
-          </div>
-        </div>`).join('') +
-      `</div>`;
+    return party.map(pg => {
+      const hpPct = pg.hpMax > 0 ? Math.max(0, Math.round((pg.hpAttuali ?? pg.hpMax) / pg.hpMax * 100)) : 100;
+      const hpCol = hpPct > 66 ? 'var(--accent-success)' : hpPct > 33 ? 'var(--accent-warning)' : 'var(--accent-danger)';
+      return '<div style="background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-md);padding:8px;margin-bottom:6px;">' +
+        '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">' +
+          '<div>' +
+            '<div style="font-family:var(--font-display);font-size:0.85rem;">' + pg.nome + '</div>' +
+            '<div style="font-size:0.7rem;color:var(--text-muted);">' + [pg.giocatore, pg.classe, pg.livello ? 'Liv.'+pg.livello : ''].filter(Boolean).join(' · ') + '</div>' +
+          '</div>' +
+          (pg.inspirazione ? '<span class="badge badge-gold" style="font-size:0.6rem;">✨ Ispirazione</span>' : '') +
+        '</div>' +
+        '<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:3px;margin-bottom:6px;">' +
+          ['percezionePassiva:👁️Perc.', 'investigazionePassiva:🔍Inv.', 'intuizionePassiva:💡Int.', 'ca:🛡️CA', 'hpAttuali:❤️HP'].map(s => {
+            const [key, lbl] = s.split(':');
+            const val = key === 'hpAttuali' ? (pg.hpAttuali ?? pg.hpMax ?? '?') + '/' + (pg.hpMax||'?') : (pg[key] || 10);
+            return '<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:3px;text-align:center;">' +
+              '<div style="font-size:0.55rem;color:var(--text-muted);">' + lbl + '</div>' +
+              '<div style="font-family:var(--font-mono);font-size:0.8rem;font-weight:700;">' + val + '</div>' +
+            '</div>';
+          }).join('') +
+        '</div>' +
+        '<div style="height:4px;background:var(--bg-tertiary);border-radius:var(--radius-full);overflow:hidden;">' +
+          '<div style="height:100%;width:' + hpPct + '%;background:' + hpCol + ';border-radius:var(--radius-full);transition:width 0.3s;"></div>' +
+        '</div>' +
+      '</div>';
+    }).join('');
   };
 
   const renderDadiMini = (blockId) => `
@@ -5550,31 +5556,64 @@ const Schermo = (() => {
   };
 
   const renderCombatMini = () => {
+    App.reloadActiveCampaign();
     const camp = App.getActiveCampaign();
     const combat = camp?.activeCombat;
     if (!combat || !combat.combatants?.length) {
-      return `<div class="text-muted text-sm">Nessuno scontro attivo. Avvia uno scontro nella Sessione.</div>
-              <button class="btn btn-secondary btn-sm" style="margin-top:8px;" onclick="App.navigateTo('sessione')">→ Vai alla Sessione</button>`;
+      return '<div class="text-muted text-sm" style="margin-bottom:8px;">Nessuno scontro attivo.</div>' +
+             '<div style="display:flex;gap:4px;flex-wrap:wrap;">' +
+               '<button class="btn btn-primary btn-sm" onclick="App.navigateTo(\'sessione\');Sessione.newCombat()">⚔️ Nuovo Scontro</button>' +
+               '<button class="btn btn-secondary btn-sm" onclick="App.navigateTo(\'sessione\')">→ Sessione</button>' +
+             '</div>';
     }
 
     const sorted = [...combat.combatants].sort((a,b) => b.iniziativa - a.iniziativa);
     const activeIdx = combat.turno || 0;
 
-    return `
-      <div style="font-family:var(--font-mono);font-size:0.7rem;color:var(--text-muted);margin-bottom:6px;">Round ${combat.round || 1}</div>
-      <div style="display:flex;flex-direction:column;gap:3px;">
-        ${sorted.map((c, i) => {
-          const isActive = i === activeIdx;
-          const hpPct = c.maxHp > 0 ? Math.max(0, (c.hp / c.maxHp) * 100) : 100;
-          const hpCol = hpPct > 66 ? 'var(--accent-success)' : hpPct > 33 ? 'var(--accent-warning)' : 'var(--accent-danger)';
-          return `<div style="display:flex;align-items:center;gap:6px;padding:3px 6px;border-radius:var(--radius-sm);background:${isActive ? 'rgba(139,38,53,0.15)' : 'transparent'};border-left:2px solid ${isActive ? 'var(--accent-primary)' : 'transparent'};">
-            <span style="font-family:var(--font-mono);font-size:0.75rem;width:24px;text-align:right;color:var(--accent-secondary);">${c.iniziativa}</span>
-            <span style="flex:1;font-size:0.82rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;${c.hp <= 0 ? 'opacity:0.4;text-decoration:line-through;' : ''}">${c.nome}</span>
-            <div style="width:40px;height:4px;background:var(--bg-tertiary);border-radius:2px;"><div style="height:100%;width:${hpPct}%;background:${hpCol};border-radius:2px;"></div></div>
-            <span style="font-family:var(--font-mono);font-size:0.7rem;color:${hpCol};">${c.hp}</span>
-          </div>`;
-        }).join('')}
-      </div>`;
+    return '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">' +
+        '<div style="font-family:var(--font-display);font-size:0.85rem;">Round ' + (combat.round||1) + ' · ' +
+          '<span style="color:var(--accent-secondary);">' + (sorted[activeIdx]?.nome||'') + '</span></div>' +
+        '<div style="display:flex;gap:4px;">' +
+          '<button class="btn btn-primary btn-sm" onclick="Sessione.nextTurn();Schermo._refreshCombat()">▶ Avanti</button>' +
+          '<button class="btn btn-secondary btn-sm" onclick="Sessione.rollAllInitiative();Schermo._refreshCombat()">🎲</button>' +
+        '</div>' +
+      '</div>' +
+      '<div style="display:flex;flex-direction:column;gap:2px;">' +
+      sorted.map((c, i) => {
+        const isActive = i === activeIdx;
+        const hpPct = c.maxHp > 0 ? Math.max(0, Math.round((c.hp/c.maxHp)*100)) : 100;
+        const hpCol = hpPct > 66 ? 'var(--accent-success)' : hpPct > 33 ? 'var(--accent-warning)' : 'var(--accent-danger)';
+        const cond = (c.condizioni||[]).map(x => '<span style="font-size:0.55rem;background:var(--accent-primary);color:#fff;border-radius:2px;padding:0 3px;">' + x.slice(0,4) + '</span>').join('');
+        return '<div style="display:flex;align-items:center;gap:4px;padding:4px 6px;border-radius:var(--radius-sm);' +
+            'background:' + (isActive ? 'rgba(139,38,53,0.15)' : 'transparent') + ';' +
+            'border-left:2px solid ' + (isActive ? 'var(--accent-primary)' : 'transparent') + ';' +
+            (c.hp <= 0 ? 'opacity:0.4;' : '') + '">' +
+          '<span style="font-family:var(--font-mono);font-size:0.72rem;width:22px;text-align:right;color:var(--accent-secondary);">' + c.iniziativa + '</span>' +
+          '<span style="flex:1;font-size:0.8rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' +
+            (c.tipo==='pg'?'👤':c.tipo==='mostro'?'🐉':'⚔️') + ' ' + c.nome +
+            (c.concentrazione ? ' 🔮' : '') +
+          '</span>' +
+          (cond ? '<span style="display:flex;gap:2px;">' + cond + '</span>' : '') +
+          '<div style="display:flex;align-items:center;gap:3px;">' +
+            '<div style="width:32px;height:4px;background:var(--bg-tertiary);border-radius:2px;">' +
+              '<div style="height:100%;width:' + hpPct + '%;background:' + hpCol + ';border-radius:2px;"></div>' +
+            '</div>' +
+            '<span style="font-family:var(--font-mono);font-size:0.68rem;color:' + hpCol + ';min-width:24px;">' + c.hp + '</span>' +
+          '</div>' +
+          '<div style="display:flex;gap:1px;">' +
+            '<button class="btn btn-ghost btn-icon-sm" style="width:22px;height:22px;font-size:0.65rem;" onclick="Sessione.quickDamage(\'' + c.id + '\');Schermo._refreshCombat()" title="Danno">💥</button>' +
+            '<button class="btn btn-ghost btn-icon-sm" style="width:22px;height:22px;font-size:0.65rem;" onclick="Sessione.openCondizioneModal(\'' + c.id + '\')" title="Condizioni">🔴</button>' +
+          '</div>' +
+        '</div>';
+      }).join('') +
+      '</div>' +
+      '<button class="btn btn-ghost btn-sm w-full" style="margin-top:6px;font-size:0.72rem;" onclick="App.navigateTo(\'sessione\')">→ Apri Sessione completa</button>';
+  };
+
+  // Refresh blocchi combat nello schermo
+  const _refreshCombat = () => {
+    _blocks.filter(b => b.type === 'combat_mini').forEach(b => updateBlockContent(b));
+    _blocks.filter(b => b.type === 'percezioni').forEach(b => updateBlockContent(b));
   };
 
   const renderCondizioni = () => {
@@ -6460,6 +6499,45 @@ const clearImg = (key) => {
 
 
 /* ── INIT ── */
+
+// ══ MONSTER CACHE (per Combat Tracker) ══
+const MonsterCache = (() => {
+  let _monsters = [];
+  let _loaded = false;
+  let _loading = false;
+
+  const load = async () => {
+    if (_loaded || _loading) return;
+    _loading = true;
+    try {
+      const camp = App.getActiveCampaign();
+      const sistema = camp?.system === '5e2014' ? '5e2014' : '5e2024';
+      const file = sistema === '5e2014' ? 'srd_5_1_monsters.json' : 'srd_5_2_1_monsters.json';
+      const r = await fetch('data/' + file);
+      if (r.ok) {
+        _monsters = await r.json();
+        _loaded = true;
+        Debug.log('MonsterCache: ' + _monsters.length + ' mostri caricati (' + sistema + ')');
+      }
+    } catch(e) {
+      Debug.warn('MonsterCache errore: ' + e.message);
+    }
+    _loading = false;
+  };
+
+  const search = (q) => {
+    if (!q) return [];
+    const n = q.toLowerCase();
+    return _monsters.filter(m => m.nome.toLowerCase().includes(n)).slice(0, 15);
+  };
+
+  const get = (id) => _monsters.find(m => m.id === id) || null;
+  const getAll = () => _monsters;
+  const isLoaded = () => _loaded;
+
+  return { load, search, get, getAll, isLoaded };
+})();
+
 // ══ RICERCA COMPENDIO DAI GENERATORI ══
 const CompendioCache = (() => {
   // Cerca un oggetto nel compendio per nome e apre la scheda
