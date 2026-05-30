@@ -6256,175 +6256,128 @@ const Generatori = {
     Debug.log(`Tesoro CR${cr}: ${rolls.map(r=>r.replace(/<[^>]+>/g,'')).join(', ')}`);
   },
 
-  rollShop: () => {
+
+  rollShop: async () => {
     const tipo    = document.getElementById('gen-shop-tipo')?.value    || 'generale';
     const att     = document.getElementById('gen-shop-att')?.value     || 'neutrale';
     const livello = document.getElementById('gen-shop-livello')?.value || 'medio';
     const el      = document.getElementById('gen-shop-result');
     if (!el) return;
 
+    el.innerHTML = '<div class="text-muted text-sm">Generazione in corso...</div>';
+
     const attMult = { ostile: 1.2, diffidente: 1.1, neutrale: 1.0, cordiale: 0.9, amico: 0.8 };
-    const mult = attMult[att] || 1.0;
+    const mult  = attMult[att] || 1.0;
     const sconto = mult < 1 ? `🟢 ${Math.round((1-mult)*100)}% sconto` : mult > 1 ? `🔴 +${Math.round((mult-1)*100)}% rincaro` : '';
 
-    // Tag livello: B=basso, M=medio, A=alto — ogni item può avere uno o più tag
-    // Se nessun tag, appare sempre
-    const cataloghi = {
-      armaiolo_base: [
-        { n: 'Pugnale',            p: 2,    u: 'mo', qMin:2, qMax:8  },
-        { n: 'Randello',           p: 1,    u: 'mr', qMin:2, qMax:5  },
-        { n: 'Falce',              p: 1,    u: 'mo', qMin:1, qMax:3  },
-        { n: 'Giavellotto',        p: 5,    u: 'mr', qMin:3, qMax:10 },
-        { n: 'Lancia',             p: 1,    u: 'mo', qMin:2, qMax:6  },
-        { n: 'Mazza',              p: 5,    u: 'mo', qMin:1, qMax:3  },
-        { n: 'Ascia da mano',      p: 5,    u: 'mo', qMin:1, qMax:4  },
-        { n: 'Fionda',             p: 1,    u: 'mr', qMin:1, qMax:3  },
-        { n: 'Arco corto',         p: 25,   u: 'mo', qMin:1, qMax:2  },
-        { n: 'Frecce (20)',        p: 1,    u: 'mo', qMin:2, qMax:6  },
-        { n: 'Scudo',              p: 10,   u: 'mo', qMin:2, qMax:5  },
-        { n: 'Armatura di cuoio',  p: 10,   u: 'mo', qMin:1, qMax:3  },
-        { n: 'Spada corta',        p: 10,   u: 'mo', qMin:1, qMax:3,  lv:'M' },
-        { n: 'Balestra leggera',   p: 25,   u: 'mo', qMin:1, qMax:2,  lv:'M' },
-        { n: 'Cotta di maglia',    p: 75,   u: 'mo', qMin:1, qMax:2,  lv:'M' },
-        { n: 'Dardi balestra (20)',p: 1,    u: 'mo', qMin:2, qMax:4,  lv:'M' },
-        { n: 'Spada lunga',        p: 15,   u: 'mo', qMin:1, qMax:2,  lv:'A' },
-        { n: 'Ascia da battaglia', p: 10,   u: 'mo', qMin:1, qMax:2,  lv:'A' },
-        { n: 'Balestra pesante',   p: 50,   u: 'mo', qMin:1, qMax:1,  lv:'A' },
-      ],
-      armaiolo_lusso: [
-        { n: 'Spada corta',        p: 10,   u: 'mo', qMin:1, qMax:3  },
-        { n: 'Spada lunga',        p: 15,   u: 'mo', qMin:1, qMax:3  },
-        { n: 'Scudo',              p: 10,   u: 'mo', qMin:2, qMax:5  },
-        { n: 'Cotta di maglia',    p: 75,   u: 'mo', qMin:1, qMax:2  },
-        { n: 'Frecce (20)',        p: 1,    u: 'mo', qMin:3, qMax:8  },
-        { n: 'Arco lungo',         p: 50,   u: 'mo', qMin:1, qMax:2,  lv:'M' },
-        { n: 'Alabarda',           p: 20,   u: 'mo', qMin:1, qMax:2,  lv:'M' },
-        { n: 'Balestra pesante',   p: 50,   u: 'mo', qMin:1, qMax:2,  lv:'M' },
-        { n: 'Mezza armatura',     p: 750,  u: 'mo', qMin:1, qMax:1,  lv:'M' },
-        { n: 'Spadone',            p: 50,   u: 'mo', qMin:1, qMax:2,  lv:'M' },
-        { n: 'Martello da guerra', p: 15,   u: 'mo', qMin:1, qMax:2,  lv:'M' },
-        { n: 'Corazza a bande',    p: 400,  u: 'mo', qMin:1, qMax:1,  lv:'A' },
-        { n: 'Armatura a piastre', p: 1500, u: 'mo', qMin:1, qMax:1,  lv:'A' },
-        { n: 'Lancia da guerra',   p: 5,    u: 'mo', qMin:2, qMax:4,  lv:'A' },
-      ],
-      speziale: [
-        { n: 'Torcia',             p: 1,    u: 'mr', qMin:5, qMax:20 },
-        { n: 'Candela',            p: 1,    u: 'mr', qMin:5, qMax:20 },
-        { n: 'Razioni (1 giorno)', p: 5,    u: 'mr', qMin:5, qMax:15 },
-        { n: 'Olio (fiasca)',      p: 1,    u: 'mr', qMin:3, qMax:10 },
-        { n: 'Esca e acciarino',   p: 5,    u: 'mr', qMin:2, qMax:6  },
-        { n: 'Corda canapa (15m)', p: 1,    u: 'mo', qMin:2, qMax:5  },
-        { n: 'Incenso (blocco)',   p: 10,   u: 'mr', qMin:3, qMax:8  },
-        { n: 'Borsa da erborista', p: 5,    u: 'mo', qMin:1, qMax:3  },
-        { n: 'Antidoto',           p: 50,   u: 'mo', qMin:1, qMax:3,  lv:'M' },
-        { n: 'Pozione di cura',    p: 50,   u: 'mo', qMin:2, qMax:5,  lv:'M' },
-        { n: 'Acido (fiala)',      p: 25,   u: 'mo', qMin:1, qMax:3,  lv:'M' },
-        { n: 'Veleno di serpe',    p: 100,  u: 'mo', qMin:1, qMax:2,  lv:'M' },
-        { n: 'Fuoco greco',        p: 50,   u: 'mo', qMin:1, qMax:2,  lv:'M' },
-        { n: 'Antitossina (fiala)',p: 50,   u: 'mo', qMin:1, qMax:3,  lv:'M' },
-        { n: 'Unguento curativo',  p: 50,   u: 'mo', qMin:1, qMax:3,  lv:'A' },
-        { n: 'Corda di seta (15m)',p: 10,   u: 'mo', qMin:1, qMax:2,  lv:'A' },
-      ],
-      generale: [
-        { n: 'Torcia',             p: 1,    u: 'mr', qMin:5, qMax:20 },
-        { n: 'Coperta',            p: 5,    u: 'mr', qMin:2, qMax:6  },
-        { n: 'Sacco',              p: 1,    u: 'mr', qMin:3, qMax:8  },
-        { n: 'Borraccia',          p: 2,    u: 'mr', qMin:2, qMax:5  },
-        { n: 'Razioni (1 giorno)', p: 5,    u: 'mr', qMin:5, qMax:15 },
-        { n: 'Zaino',              p: 2,    u: 'mo', qMin:1, qMax:4  },
-        { n: 'Olio (fiasca)',      p: 1,    u: 'mr', qMin:3, qMax:8  },
-        { n: 'Corda canapa (15m)', p: 1,    u: 'mo', qMin:2, qMax:5  },
-        { n: 'Esca e acciarino',   p: 5,    u: 'mr', qMin:2, qMax:6  },
-        { n: 'Lanterna a campana', p: 5,    u: 'mo', qMin:1, qMax:3,  lv:'M' },
-        { n: 'Rampino',            p: 2,    u: 'mo', qMin:1, qMax:2,  lv:'M' },
-        { n: 'Kit primo soccorso', p: 5,    u: 'mo', qMin:1, qMax:3,  lv:'M' },
-        { n: 'Carta (foglio)',     p: 2,    u: 'mr', qMin:5, qMax:15, lv:'M' },
-        { n: 'Inchiostro (oncia)', p: 10,   u: 'mo', qMin:1, qMax:3,  lv:'M' },
-        { n: 'Specchio d\'acciaio',p: 5,    u: 'mo', qMin:1, qMax:2,  lv:'M' },
-        { n: 'Attrezzi da ladro',  p: 25,   u: 'mo', qMin:1, qMax:2,  lv:'A' },
-        { n: 'Piccone da minatore',p: 2,    u: 'mo', qMin:1, qMax:3,  lv:'A' },
-        { n: 'Scala di corda (3m)',p: 1,    u: 'mo', qMin:1, qMax:2,  lv:'A' },
-      ],
-      magia: [
-        { n: 'Pergamena vuota',    p: 1,    u: 'mo', qMin:3, qMax:8  },
-        { n: 'Componenti arcane',  p: 25,   u: 'mo', qMin:2, qMax:6  },
-        { n: 'Incenso mistico',    p: 5,    u: 'mo', qMin:2, qMax:6  },
-        { n: 'Talismano sacro',    p: 5,    u: 'mo', qMin:1, qMax:3  },
-        { n: 'Verga (focus)',      p: 10,   u: 'mo', qMin:1, qMax:3,  lv:'M' },
-        { n: 'Cristallo arcano',   p: 50,   u: 'mo', qMin:1, qMax:3,  lv:'M' },
-        { n: 'Pozione di cura',    p: 50,   u: 'mo', qMin:2, qMax:5,  lv:'M' },
-        { n: 'Libro degli inc.',   p: 50,   u: 'mo', qMin:1, qMax:2,  lv:'M' },
-        { n: 'Inchiostro arcano',  p: 25,   u: 'mo', qMin:1, qMax:3,  lv:'M' },
-        { n: 'Pietra luminosa',    p: 10,   u: 'mo', qMin:2, qMax:5,  lv:'M' },
-        { n: 'Pozione di cura sup.',p:150,  u: 'mo', qMin:1, qMax:3,  lv:'A', raro:true },
-        { n: 'Sfera di cristallo', p: 50,   u: 'mo', qMin:1, qMax:2,  lv:'A' },
-        { n: 'Stivali elfici',     p: 2500, u: 'mo', qMin:1, qMax:1,  lv:'A', raro:true },
-        { n: 'Borsa senza fondo',  p: 4000, u: 'mo', qMin:1, qMax:1,  lv:'A', raro:true },
-        { n: 'Mantello del mago',  p: 500,  u: 'mo', qMin:1, qMax:1,  lv:'A', raro:true },
-      ],
-      bazar: [
-        { n: 'Dado truccato',      p: 5,    u: 'mo', qMin:1, qMax:4  },
-        { n: 'Mappa (dubbia)',     p: 1,    u: 'mo', qMin:1, qMax:3  },
-        { n: 'Moneta portafortuna',p: 5,    u: 'mr', qMin:1, qMax:5  },
-        { n: 'Amuleto del drago',  p: 30,   u: 'mo', qMin:1, qMax:3  },
-        { n: 'Occhio di vetro',    p: 10,   u: 'mo', qMin:1, qMax:4  },
-        { n: 'Polvere di stelle',  p: 25,   u: 'mo', qMin:1, qMax:4,  lv:'M' },
-        { n: 'Cappello del fool',  p: 1,    u: 'mo', qMin:1, qMax:3,  lv:'M' },
-        { n: 'Bottiglia di nebbia',p: 100,  u: 'mo', qMin:1, qMax:2,  lv:'M' },
-        { n: 'Frammento di portale',p:75,   u: 'mo', qMin:1, qMax:2,  lv:'M' },
-        { n: 'Teschio di drago',   p: 50,   u: 'mo', qMin:1, qMax:1,  lv:'A' },
-        { n: 'Specchio magico',    p: 500,  u: 'mo', qMin:1, qMax:1,  lv:'A', raro:true },
-        { n: 'Sfera parlante',     p: 200,  u: 'mo', qMin:1, qMax:1,  lv:'A', raro:true },
-      ],
-      taverna_shop: [
-        { n: 'Birra (boccale)',    p: 4,    u: 'mr', qMin:10, qMax:30 },
-        { n: 'Birra scura',        p: 6,    u: 'mr', qMin:5,  qMax:15 },
-        { n: 'Vino comune (bott)', p: 2,    u: 'mr', qMin:5,  qMax:15 },
-        { n: 'Idromele (boccale)', p: 5,    u: 'mr', qMin:5,  qMax:15 },
-        { n: 'Pasto comune',       p: 3,    u: 'mr', qMin:5,  qMax:15 },
-        { n: 'Pasto buono',        p: 5,    u: 'mr', qMin:3,  qMax:8  },
-        { n: 'Stalla (per notte)', p: 5,    u: 'mr', qMin:1,  qMax:6  },
-        { n: 'Tabacco (borsa)',    p: 5,    u: 'mr', qMin:2,  qMax:6  },
-        { n: 'Dado da gioco',      p: 1,    u: 'mr', qMin:2,  qMax:8  },
-        { n: 'Torcia',             p: 1,    u: 'mr', qMin:5,  qMax:15 },
-        { n: 'Vino fine (bott)',   p: 10,   u: 'mo', qMin:2,  qMax:6,  lv:'M' },
-        { n: 'Stanza semplice',    p: 5,    u: 'mr', qMin:1,  qMax:4,  lv:'M' },
-        { n: 'Stanza buona',       p: 8,    u: 'mr', qMin:1,  qMax:2,  lv:'M' },
-      ],
+    // Edizione dalla campagna attiva
+    const camp   = App.getActiveCampaign();
+    const sistema = camp?.system === '5e2014' ? '5e2014' : '5e2024';
+    const eqFile = sistema === '5e2014' ? 'srd_5_1_equipment.json'   : 'srd_5_2_1_equipment.json';
+    const miFile = sistema === '5e2014' ? 'srd_5_1_magic_items.json' : 'srd_5_2_1_magic_items.json';
+
+    let eqData = [], miData = [];
+    try {
+      const [r1, r2] = await Promise.all([
+        fetch('data/' + eqFile),
+        fetch('data/' + miFile),
+      ]);
+      if (r1.ok) eqData = await r1.json();
+      if (r2.ok) miData = await r2.json();
+    } catch(e) { Debug.warn('Shop fetch:', e.message); }
+
+    // Parsa costo "5 mo" → {p, u}
+    const parseCosto = (s) => {
+      const m = String(s||'').match(/^([\d.,]+)\s*(\w+)$/);
+      return m ? { p: parseFloat(m[1].replace(',','.')), u: m[2] } : null;
     };
 
-    // Filtra per livello: B mostra solo senza tag, M mostra B+M, A mostra tutto
-    const lvMap = { basso: [''], medio: ['', 'M'], alto: ['', 'M', 'A'] };
-    const lvAccepted = lvMap[livello] || ['', 'M'];
-
-    const items = (cataloghi[tipo] || cataloghi.generale)
-      .filter(i => lvAccepted.includes(i.lv || ''));
-
-    const nomiNegozio = {
-      armaiolo_base: ['Al Ferro Antico', 'La Spada Spuntata', 'Forge di Ugrosh'],
-      armaiolo_lusso: ['Lame d\'Argento', 'L\'Arsenal del Re', 'Acciaio & Gloria'],
-      speziale: ['L\'Erba Buona', 'Pozioni di Mirna', 'Il Calderone Verde'],
-      generale: ['Bottega del Viaggiatore', 'Il Sacco Pesante', 'Merce Varia di Polt'],
-      magia: ['L\'Occhio di Vecna', 'Arcana Borealis', 'Il Grimorio Aperto'],
-      bazar: ['Curiosità di Zarnax', 'Il Bazar del Caos', 'Oggetti Misteriosi'],
-      taverna_shop: ['La Fiasca Traboccante', 'Il Drago Ubriaco', 'Locanda dei Viandanti'],
+    // Mappa categorie → tipo shop (compatibile 2014 e 2024)
+    const catMap = {
+      armaiolo_base:  ['Mischia semplice', 'Distanza semplice', 'Leggera', 'Scudo'],
+      armaiolo_lusso: ['Mischia da guerra', 'Distanza da guerra', 'Media', 'Pesante', 'Scudo'],
+      speziale:       ["Equipaggiamento d'avventura", 'Dotazioni'],
+      generale:       ["Equipaggiamento d'avventura", 'Dotazioni', 'Strumenti da artigiano', 'Strumenti'],
+      magia:          ["Equipaggiamento d'avventura", 'Dotazioni', 'Strumenti speciali', 'Strumenti'],
+      bazar:          ["Equipaggiamento d'avventura", 'Dotazioni', 'Giochi', 'Merci'],
+      taverna_shop:   ['Vitto e alloggio', 'Stile di vita', 'Servizi', 'Servizi magici'],
     };
-    const nomeNeg = rnd(nomiNegozio[tipo] || ['Negozio Sconosciuto']);
+
+    // Soglia prezzo per livello (in mo)
+    const prezzoMax = { basso: 75, medio: 750, alto: 999999 };
+    const maxP = prezzoMax[livello] || 750;
+
+    // Rarità oggetti magici per livello
+    const raritaOk = {
+      basso:  ['comune', 'common'],
+      medio:  ['comune', 'common', 'non comune', 'uncommon'],
+      alto:   ['comune', 'common', 'non comune', 'uncommon', 'raro', 'rare'],
+    };
+    const rarOk = raritaOk[livello] || raritaOk.medio;
+
+    const cats = catMap[tipo] || catMap.generale;
+
+    // Converti in mo per confronto
+    const toMo = (p, u) => {
+      if (u === 'mr') return p / 10;
+      if (u === 'ma') return p / 5;
+      if (u === 'mp') return p * 10;
+      return p;
+    };
+
+    // Pool dall'equipaggiamento
+    let pool = eqData
+      .filter(x => cats.includes(x.categoria))
+      .map(x => { const c = parseCosto(x.costo); return c ? { ...c, n: x.nome, qMin:1, qMax:4, id:x.id } : null; })
+      .filter(x => x && toMo(x.p, x.u) <= maxP);
+
+    // Oggetti magici per emporio e bazar
+    if (tipo === 'magia' || tipo === 'bazar') {
+      const miPool = miData
+        .filter(x => rarOk.includes((x.rarita||'').toLowerCase()))
+        .map(x => { const c = parseCosto(x.costo); return c ? { ...c, n: x.nome, qMin:1, qMax:1, raro: true, id:x.id } : null; })
+        .filter(Boolean);
+      pool = [...pool, ...miPool];
+    }
+
+    // Fallback se pool vuoto
+    if (pool.length === 0) {
+      pool = [
+        { n:'Pugnale', p:2, u:'mo', qMin:2, qMax:6 },
+        { n:'Torcia', p:1, u:'mr', qMin:5, qMax:20 },
+        { n:'Razioni (1 giorno)', p:5, u:'mr', qMin:5, qMax:15 },
+        { n:'Corda canapa (15m)', p:1, u:'mo', qMin:2, qMax:5 },
+        { n:'Scudo', p:10, u:'mo', qMin:1, qMax:3 },
+      ];
+    }
 
     // Seleziona 8-12 oggetti
-    const shuffled = [...items].sort(() => Math.random() - 0.5);
+    const shuffled = [...pool].sort(() => Math.random() - 0.5);
     const count = Math.min(shuffled.length, 8 + Math.floor(Math.random() * 5));
-    const selected = shuffled.slice(0, count).map(item => ({
-      ...item,
-      qty: item.qMin + Math.floor(Math.random() * (item.qMax - item.qMin + 1))
+    const selected = shuffled.slice(0, count).map(i => ({
+      ...i, qty: (i.qMin||1) + Math.floor(Math.random() * ((i.qMax||1) - (i.qMin||1) + 1))
     }));
 
-    const lvLabel = { basso: 'Liv. 1–4', medio: 'Liv. 5–10', alto: 'Liv. 11+' }[livello] || '';
+    const nomiNeg = {
+      armaiolo_base:  ['Al Ferro Antico','La Spada Spuntata','Forge di Ugrosh'],
+      armaiolo_lusso: ['Lame d\'Argento','L\'Arsenal del Re','Acciaio & Gloria'],
+      speziale:       ['L\'Erba Buona','Pozioni di Mirna','Il Calderone Verde'],
+      generale:       ['Bottega del Viaggiatore','Il Sacco Pesante','Merce Varia di Polt'],
+      magia:          ['L\'Occhio di Vecna','Arcana Borealis','Il Grimorio Aperto'],
+      bazar:          ['Curiosità di Zarnax','Il Bazar del Caos','Oggetti Misteriosi'],
+      taverna_shop:   ['La Fiasca Traboccante','Il Drago Ubriaco','Locanda dei Viandanti'],
+    };
+    const nomeNeg = rnd(nomiNeg[tipo] || ['Negozio']);
+    const lvLabel = { basso:'Liv. 1–4', medio:'Liv. 5–10', alto:'Liv. 11+' }[livello] || '';
+    const edLabel = sistema === '5e2014' ? '2014' : '2024';
 
     el.innerHTML = `
-      <div style="font-family:var(--font-display);font-size:0.8rem;color:var(--accent-secondary);margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;">
-        <span>${nomeNeg} ${sconto ? `<span class="badge badge-muted" style="margin-left:6px;">${sconto}</span>` : ''}</span>
-        <span class="badge badge-muted" style="font-size:0.6rem;">${lvLabel}</span>
+      <div style="font-family:var(--font-display);font-size:0.8rem;color:var(--accent-secondary);margin-bottom:6px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px;">
+        <span>${nomeNeg}${sconto ? ` <span class="badge badge-muted">${sconto}</span>` : ''}</span>
+        <span style="display:flex;gap:4px;">
+          <span class="badge badge-muted" style="font-size:0.6rem;">${lvLabel}</span>
+          <span class="badge badge-muted" style="font-size:0.6rem;">${edLabel}</span>
+        </span>
       </div>
       <table style="width:100%;border-collapse:collapse;font-size:0.78rem;">
         <thead><tr>
@@ -6432,27 +6385,19 @@ const Generatori = {
           <th style="text-align:center;padding:3px 4px;border-bottom:1px solid var(--border);font-family:var(--font-display);font-size:0.62rem;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-muted);">Qt.</th>
           <th style="text-align:right;padding:3px 0;border-bottom:1px solid var(--border);font-family:var(--font-display);font-size:0.62rem;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-muted);">Prezzo cad.</th>
         </tr></thead>
-        <tbody>
-          ${selected.map(item => {
-            const prezzoFin = Math.round(item.p * mult);
-            const mostra = item.raro ? `<span class="badge badge-gold" style="font-size:0.58rem;">raro</span> ` : '';
-            const foundItem = CompendioCache.findItem(item.n);
-            const nomeCell = foundItem
-              ? `<span style="cursor:pointer;color:var(--accent-secondary);text-decoration:underline dotted;" onclick="CompendioCache.openItem('${item.n.replace(/'/g,"\\'")}'')" title="Cerca nel Compendio">${mostra}${item.n} 🔗</span>`
-              : `${mostra}${item.n}`;
-            return `<tr>
-              <td style="padding:3px 0;border-bottom:1px solid var(--border);">${nomeCell}</td>
-              <td style="padding:3px 4px;border-bottom:1px solid var(--border);text-align:center;font-family:var(--font-mono);color:var(--text-muted);">×${item.qty}</td>
-              <td style="padding:3px 0;border-bottom:1px solid var(--border);text-align:right;font-family:var(--font-mono);color:var(--accent-secondary);">${prezzoFin.toLocaleString('it-IT')} ${item.u}</td>
-            </tr>`;
-          }).join('')}
-        </tbody>
+        <tbody>${selected.map(item => {
+          const prezzoFin = Math.round(item.p * mult * 10) / 10;
+          const mostra = item.raro ? '<span class="badge badge-gold" style="font-size:0.58rem;">magico</span> ' : '';
+          const nomeCell = `<span style="cursor:pointer;color:var(--accent-secondary);text-decoration:underline dotted;" onclick="CompendioCache.openItem('${item.n.replace(/'/g,"\\'")}'')" title="Apri nel Compendio">${mostra}${item.n} 🔗</span>`;
+          return `<tr>
+            <td style="padding:3px 0;border-bottom:1px solid var(--border);">${nomeCell}</td>
+            <td style="padding:3px 4px;border-bottom:1px solid var(--border);text-align:center;font-family:var(--font-mono);color:var(--text-muted);">×${item.qty}</td>
+            <td style="padding:3px 0;border-bottom:1px solid var(--border);text-align:right;font-family:var(--font-mono);color:var(--accent-secondary);">${prezzoFin.toLocaleString('it-IT')} ${item.u}</td>
+          </tr>`;
+        }).join('')}</tbody>
       </table>`;
-    Debug.log(`Shop generato: ${nomeNeg} (${selected.length} oggetti, lv:${livello}, mult:${mult})`);
+    Debug.log(`Shop: ${nomeNeg} | ${sistema} | ${livello} | ${selected.length} items`);
   },
-
-
-
 
   rollLoot: () => {
     const tipo   = document.getElementById('gen-loot-tipo')?.value   || 'mostro';
