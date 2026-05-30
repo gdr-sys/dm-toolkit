@@ -4031,7 +4031,7 @@ const Sessione = (() => {
 
         <!-- Azioni rapide -->
         <div class="combat-actions-col">
-          ${c.monsterId || c.tipo === 'mostro' ? `<button class="btn btn-ghost btn-icon-sm" title="Scheda mostro" onclick="Sessione.openCombatantSheet('${c.id}')">📋</button>` : ''}
+          ${c.tipo !== 'pg' ? `<button class="btn btn-ghost btn-icon-sm" title="Scheda mostro" onclick="Sessione.openCombatantSheet('${c.id}')">📋</button>` : ''}
           <button class="btn btn-ghost btn-icon-sm" title="Aggiungi condizione" onclick="Sessione.openCondizioneModal('${c.id}')">🔴</button>
           <button class="btn btn-ghost btn-icon-sm" title="Concentrazione" onclick="Sessione.toggleConcentrazione('${c.id}')" style="${c.concentrazione ? 'color:var(--accent-tertiary);' : ''}">🔮</button>
           <button class="btn btn-ghost btn-icon-sm" title="Danno rapido" onclick="Sessione.quickDamage('${c.id}')">💥</button>
@@ -4079,11 +4079,22 @@ const Sessione = (() => {
   };
 
   // ── HP ──
+  // ── Sincronizza HP PG nel party ──
+  const _syncPartyHP = (combatant) => {
+    if (combatant.tipo !== 'pg') return;
+    const camp = App.getActiveCampaign();
+    if (!camp) return;
+    const party = [...(camp.party || [])];
+    const pgIdx = party.findIndex(p => p.nome === combatant.nome);
+    if (pgIdx === -1) return;
+    party[pgIdx] = { ...party[pgIdx], hpAttuali: combatant.hp };
+    App.saveActiveCampaign({ party });
+    Debug.log(`Party sync: ${combatant.nome} HP → ${combatant.hp}`);
+  };
+
   const changeHP = (id, delta) => {
     const c = _combat?.combatants.find(x => x.id === id);
     if (!c) return;
-    const step = delta > 0 ? 1 : -1;
-    // Apre prompt veloce
     const val = prompt(`${delta > 0 ? 'Cura' : 'Danno'} per ${c.nome} (HP attuali: ${c.hp}/${c.maxHp}):`, '');
     if (val === null) return;
     const amount = parseInt(val);
@@ -4091,6 +4102,7 @@ const Sessione = (() => {
     c.hp = Math.max(0, Math.min(c.maxHp || 9999, c.hp + (delta > 0 ? amount : -amount)));
     if (c.hp === 0) Toast.show(`${c.nome} è a 0 PF!`, 'warning');
     saveCombat(_combat);
+    _syncPartyHP(c);
     renderCombat();
     Debug.log(`${c.nome}: HP ${c.hp}/${c.maxHp}`);
   };
@@ -4100,7 +4112,7 @@ const Sessione = (() => {
     if (!c) return;
     c.hp = Math.max(0, Math.min(c.maxHp || 9999, parseInt(val) || 0));
     saveCombat(_combat);
-    // Aggiorna solo la barra senza re-render completo
+    _syncPartyHP(c);
     const bar = document.querySelector(`#combatant-${id} .combat-hp-fill`);
     const pct = c.maxHp > 0 ? Math.round((c.hp / c.maxHp) * 100) : 100;
     const col = pct > 66 ? 'var(--accent-success)' : pct > 33 ? 'var(--accent-warning)' : 'var(--accent-danger)';
@@ -4117,6 +4129,7 @@ const Sessione = (() => {
     c.hp = Math.max(0, c.hp - amount);
     if (c.hp === 0) Toast.show(`💀 ${c.nome} è a 0 PF!`, 'warning');
     saveCombat(_combat);
+    _syncPartyHP(c);
     renderCombat();
   };
 
@@ -4176,9 +4189,15 @@ const Sessione = (() => {
   };
 
   // ── Aggiungi combatenti ──
-  const openCombatantSheet = (id) => {
+  const openCombatantSheet = async (id) => {
     const c = _combat?.combatants.find(x => x.id === id);
     if (!c) return;
+
+    // Assicura che MonsterCache sia caricata
+    if (!MonsterCache.isLoaded()) {
+      Toast.show('Caricamento mostri...', 'info', 2000);
+      await MonsterCache.load();
+    }
 
     // Cerca il mostro nella cache
     const m = c.monsterId
