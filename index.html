@@ -6463,7 +6463,7 @@ const Generatori = {
         <tbody>${selected.map(item => {
           const prezzoFin = Math.round(item.p * mult * 10) / 10;
           const mostra = item.raro ? '<span class="badge badge-gold" style="font-size:0.58rem;">magico</span> ' : '';
-          const nomeCell = `<span style="cursor:pointer;color:var(--accent-secondary);text-decoration:underline dotted;" onclick="CompendioCache.openItem('${item.n.replace(/'/g,"\\'")}'')" title="Apri nel Compendio">${mostra}${item.n} 🔗</span>`;
+          const nomeCell = `<span style="cursor:pointer;color:var(--accent-secondary);text-decoration:underline dotted;" onclick="CompendioCache.openItem(this.dataset.nome)" data-nome="${item.n.replace(/"/g,'&quot;')}" title="Apri nel Compendio">${mostra}${item.n} 🔗</span>`;
           return `<tr>
             <td style="padding:3px 0;border-bottom:1px solid var(--border);">${nomeCell}</td>
             <td style="padding:3px 4px;border-bottom:1px solid var(--border);text-align:center;font-family:var(--font-mono);color:var(--text-muted);">×${item.qty}</td>
