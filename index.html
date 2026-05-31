@@ -6276,20 +6276,56 @@ const Generatori = {
     const eqFile = sistema === '5e2014' ? 'srd_5_1_equipment.json'   : 'srd_5_2_1_equipment.json';
     const miFile = sistema === '5e2014' ? 'srd_5_1_magic_items.json' : 'srd_5_2_1_magic_items.json';
 
-    let eqData = [], miData = [];
+    let eqData = [], miData = [], sanePrices = {};
     try {
-      const [r1, r2] = await Promise.all([
+      const [r1, r2, r3] = await Promise.all([
         fetch('data/' + eqFile),
         fetch('data/' + miFile),
+        fetch('data/sane_prices.json'),
       ]);
       if (r1.ok) eqData = await r1.json();
       if (r2.ok) miData = await r2.json();
+      if (r3.ok) sanePrices = await r3.json();
     } catch(e) { Debug.warn('Shop fetch:', e.message); }
 
     // Parsa costo "5 mo" → {p, u}
     const parseCosto = (s) => {
       const m = String(s||'').match(/^([\d.,]+)\s*(\w+)$/);
       return m ? { p: parseFloat(m[1].replace(',','.')), u: m[2] } : null;
+    };
+
+    // Cerca prezzo Sane per nome (italiano e inglese)
+    const getSanePrice = (nome) => {
+      if (!nome) return null;
+      // Cerca match esatto
+      if (sanePrices[nome]) return { p: sanePrices[nome], u: 'mo' };
+      // Cerca case-insensitive
+      const nLow = nome.toLowerCase();
+      for (const [k, v] of Object.entries(sanePrices)) {
+        if (k.toLowerCase() === nLow) return { p: v, u: 'mo' };
+      }
+      return null;
+    };
+
+    // Prezzi standard oggetti magici per rarità (Xanathar's Guide + DMG)
+    const prezziRarita = {
+      'comune':      { min: 50,    max: 100   },
+      'common':      { min: 50,    max: 100   },
+      'non comune':  { min: 101,   max: 500   },
+      'uncommon':    { min: 101,   max: 500   },
+      'raro':        { min: 501,   max: 5000  },
+      'rare':        { min: 501,   max: 5000  },
+      'molto raro':  { min: 5001,  max: 50000 },
+      'very rare':   { min: 5001,  max: 50000 },
+      'rara':        { min: 501,   max: 5000  },
+      'molto rara':  { min: 5001,  max: 50000 },
+    };
+
+    const prezzoRarita = (r) => {
+      const key = (r||'').toLowerCase();
+      const range = prezziRarita[key];
+      if (!range) return null;
+      return range.min + Math.floor(Math.random() * (range.max - range.min));
     };
 
     // Mappa categorie → tipo shop (compatibile 2014 e 2024)
@@ -6303,17 +6339,46 @@ const Generatori = {
       taverna_shop:   ['Vitto e alloggio', 'Stile di vita', 'Servizi', 'Servizi magici'],
     };
 
-    // Soglia prezzo per livello (in mo)
+    // Soglia prezzo base per livello (in mo) — equipaggiamento
     const prezzoMax = { basso: 75, medio: 750, alto: 999999 };
     const maxP = prezzoMax[livello] || 750;
 
-    // Rarità oggetti magici per livello
+    // Rarità oggetti magici consentite per livello
     const raritaOk = {
       basso:  ['comune', 'common'],
       medio:  ['comune', 'common', 'non comune', 'uncommon'],
-      alto:   ['comune', 'common', 'non comune', 'uncommon', 'raro', 'rare'],
+      alto:   ['comune', 'common', 'non comune', 'uncommon', 'raro', 'rara', 'rare'],
     };
     const rarOk = raritaOk[livello] || raritaOk.medio;
+
+    // Oggetti magici fissi per livello (con bonus +1/+2/+3)
+    const magicoFisso = {
+      basso: [
+        { n: 'Pozione di cura',         p: 50,   u: 'mo', qMin:2, qMax:4 },
+        { n: 'Pergamena (trucchetto)',   p: 25,   u: 'mo', qMin:1, qMax:3 },
+        { n: 'Pergamena (1° livello)',   p: 75,   u: 'mo', qMin:1, qMax:2 },
+        { n: 'Olio lucente',             p: 50,   u: 'mo', qMin:1, qMax:2 },
+      ],
+      medio: [
+        { n: 'Pozione di cura',          p: 50,   u: 'mo', qMin:2, qMax:4 },
+        { n: 'Pozione di cura superiore',p: 150,  u: 'mo', qMin:1, qMax:2 },
+        { n: 'Pergamena (2° livello)',   p: 150,  u: 'mo', qMin:1, qMax:2 },
+        { n: 'Pergamena (3° livello)',   p: 300,  u: 'mo', qMin:1, qMax:1 },
+        { n: 'Arma +1',                  p: 1000, u: 'mo', qMin:1, qMax:1, raro:true },
+        { n: 'Scudo +1',                 p: 1000, u: 'mo', qMin:1, qMax:1, raro:true },
+        { n: 'Armatura +1',              p: 1500, u: 'mo', qMin:1, qMax:1, raro:true },
+      ],
+      alto: [
+        { n: 'Pozione di cura grande',   p: 450,  u: 'mo', qMin:1, qMax:3 },
+        { n: 'Pozione di cura suprema',  p: 1350, u: 'mo', qMin:1, qMax:2 },
+        { n: 'Pergamena (4°-5° livello)',p: 1500, u: 'mo', qMin:1, qMax:1 },
+        { n: 'Arma +1',                  p: 1000, u: 'mo', qMin:1, qMax:2, raro:true },
+        { n: 'Arma +2',                  p: 4000, u: 'mo', qMin:1, qMax:1, raro:true },
+        { n: 'Scudo +1',                 p: 1000, u: 'mo', qMin:1, qMax:1, raro:true },
+        { n: 'Armatura +1',              p: 1500, u: 'mo', qMin:1, qMax:1, raro:true },
+        { n: 'Armatura +2',              p: 6000, u: 'mo', qMin:1, qMax:1, raro:true },
+      ],
+    };
 
     const cats = catMap[tipo] || catMap.generale;
 
@@ -6325,19 +6390,29 @@ const Generatori = {
       return p;
     };
 
-    // Pool dall'equipaggiamento
+    // Pool equipaggiamento dal JSON
     let pool = eqData
       .filter(x => cats.includes(x.categoria))
       .map(x => { const c = parseCosto(x.costo); return c ? { ...c, n: x.nome, qMin:1, qMax:4, id:x.id } : null; })
       .filter(x => x && toMo(x.p, x.u) <= maxP);
 
-    // Oggetti magici per emporio e bazar
-    if (tipo === 'magia' || tipo === 'bazar') {
+    // Pool oggetti magici
+    if (tipo === 'magia' || tipo === 'bazar' || tipo === 'armaiolo_lusso') {
+      // Dal JSON — usa prezzi Sane se disponibili, altrimenti stima per rarità
       const miPool = miData
         .filter(x => rarOk.includes((x.rarita||'').toLowerCase()))
-        .map(x => { const c = parseCosto(x.costo); return c ? { ...c, n: x.nome, qMin:1, qMax:1, raro: true, id:x.id } : null; })
+        .map(x => {
+          const sane = getSanePrice(x.nome);
+          const p = sane ? sane.p : prezzoRarita(x.rarita);
+          return p ? { n: x.nome, p, u: 'mo', qMin:1, qMax:1, raro:true, id:x.id } : null;
+        })
         .filter(Boolean);
-      pool = [...pool, ...miPool];
+
+      // Aggiunge oggetti fissi per livello (pozioni, pergamene, +1/+2/+3)
+      const fissi = magicoFisso[livello] || [];
+      pool = [...pool, ...miPool, ...fissi];
+    } else if (tipo === 'speziale') {
+      pool = [...pool, ...(magicoFisso[livello]||[]).filter(x => x.n.includes('ozione') || x.n.includes('ergamena'))];
     }
 
     // Fallback se pool vuoto
