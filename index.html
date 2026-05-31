@@ -5508,6 +5508,15 @@ const Schermo = (() => {
     try {
       const saved = Storage.getMasterScreen();
       _blocks = saved?.blocks || [];
+      // Aggiorna titoli vecchi
+      const titoliFix = {
+        'Percezioni Passive Party': 'Party',
+        'Combat Mini': 'Combat Tracker',
+        'Riferimento Condizioni': 'Condizioni (tabella completa)',
+      };
+      _blocks.forEach(b => {
+        if (titoliFix[b.title]) b.title = titoliFix[b.title];
+      });
     } catch (e) {
       _blocks = [];
     }
@@ -5520,7 +5529,10 @@ const Schermo = (() => {
   // ── Init ──
   const init = () => {
     load();
+    App.reloadActiveCampaign();
     render();
+    // Secondo render dopo 100ms per assicurare che tutti i dati siano pronti
+    setTimeout(render, 100);
     Debug.log(`Schermo.init(): ${_blocks.length} blocchi`);
   };
 
