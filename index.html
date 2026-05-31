@@ -4809,6 +4809,71 @@ const Compendio = (() => {
   // ─────────────────────────────────────────────────
   // MOSTRI
   // ─────────────────────────────────────────────────
+  // ─────────────────────────────────────────────────
+  // PREFERITI
+  // ─────────────────────────────────────────────────
+  const _getFavoriti = () => {
+    const camp = App.getActiveCampaign();
+    return camp?.compendioFavoriti || [];
+  };
+
+  const _isFavorito = (id) => _getFavoriti().some(f => f.id === id);
+
+  const toggleFavorito = (id, nome, tipo, event) => {
+    if (event) event.stopPropagation();
+    const camp = App.getActiveCampaign();
+    if (!camp) return;
+    let favoriti = [..._getFavoriti()];
+    const idx = favoriti.findIndex(f => f.id === id);
+    if (idx !== -1) {
+      favoriti.splice(idx, 1);
+      Toast.show(`${nome} rimosso dai preferiti`, 'info', 2000);
+    } else {
+      favoriti.push({ id, nome, tipo });
+      Toast.show(`⭐ ${nome} aggiunto ai preferiti`, 'success', 2000);
+    }
+    App.saveActiveCampaign({ compendioFavoriti: favoriti });
+    // Aggiorna stella nella riga senza re-render completo
+    const btn = document.querySelector(`.comp-fav-btn[data-id="${id}"]`);
+    if (btn) btn.textContent = idx !== -1 ? '☆' : '⭐';
+    // Se siamo nel tab favoriti, re-render
+    if (_activeTab === 'favoriti') render();
+    // Aggiorna blocco schermo se presente
+    if (window.Schermo) Schermo._refreshFavoriti?.();
+    Debug.log(`Favoriti: ${idx !== -1 ? 'rimosso' : 'aggiunto'} ${nome}`);
+  };
+
+  // Riga con stella favorito
+  const favBtn = (id, nome, tipo) => {
+    const star = _isFavorito(id) ? '⭐' : '☆';
+    return `<button class="comp-fav-btn btn btn-ghost btn-icon-sm" data-id="${id}"
+      onclick="Compendio.toggleFavorito('${id}','${nome.replace(/'/g,"\\'")}','${tipo}',event)"
+      title="${_isFavorito(id) ? 'Rimuovi dai preferiti' : 'Aggiungi ai preferiti'}"
+      style="font-size:0.9rem;padding:0 4px;">${star}</button>`;
+  };
+
+  // Sezione preferiti fissata in cima
+  const renderFavoritiSection = (tipo) => {
+    const favs = _getFavoriti().filter(f => f.tipo === tipo);
+    if (!favs.length) return '';
+    const openFn = {
+      monsters: 'openMonster', magic_items: 'openMagicItem',
+      equipment: 'openEquipment', rules: 'openRule', spells: 'openSpell',
+    }[tipo] || 'openMonster';
+
+    return `<div class="comp-cat-header" style="color:var(--accent-secondary);">⭐ Preferiti</div>` +
+      favs.map(f => `
+        <div class="comp-row comp-row-fav" onclick="Compendio.${openFn}('${f.id}')">
+          <div class="comp-row-main">
+            <span class="comp-row-name">${f.nome}</span>
+          </div>
+          <div class="comp-row-stats">
+            ${favBtn(f.id, f.nome, tipo)}
+          </div>
+        </div>`).join('') +
+      `<div style="height:1px;background:var(--border);margin:6px 0 8px;"></div>`;
+  };
+
   const renderMonsters = () => {
     const el = document.getElementById('comp-list-monsters');
     if (!el) return;
@@ -4846,7 +4911,7 @@ const Compendio = (() => {
       return;
     }
 
-    el.innerHTML = list.map(m => {
+    el.innerHTML = renderFavoritiSection('monsters') + list.map(m => {
       const gs = gsDisplay(m);
       const tipo = tipoPrincipale(m.tipo);
       const pf = m.punti_ferita?.media || '?';
@@ -4861,6 +4926,7 @@ const Compendio = (() => {
             <span class="comp-stat-pill" title="Grado Sfida">GS ${gs}</span>
             <span class="comp-stat-pill" title="Punti Ferita">PF ${pf}</span>
             <span class="comp-stat-pill" title="Classe Armatura">CA ${ca}</span>
+            ${favBtn(m.id, m.nome, 'monsters')}
           </div>
         </div>`;
     }).join('');
@@ -4897,7 +4963,7 @@ const Compendio = (() => {
       return;
     }
 
-    el.innerHTML = list.map(i => `
+    el.innerHTML = renderFavoritiSection('magic_items') + list.map(i => `
       <div class="comp-row" onclick="Compendio.openMagicItem('${i.id}')">
         <div class="comp-row-main">
           <span class="comp-row-name">${highlight(i.nome, f.q)}</span>
@@ -4905,6 +4971,7 @@ const Compendio = (() => {
         </div>
         <div class="comp-row-stats">
           <span class="badge ${raritaBadge[i._rarita_norm] || 'badge-muted'}">${i._rarita_norm}</span>
+          ${favBtn(i.id, i.nome, 'magic_items')}
         </div>
       </div>`).join('');
   };
@@ -4935,7 +5002,7 @@ const Compendio = (() => {
       return;
     }
 
-    el.innerHTML = list.map(e => `
+    el.innerHTML = renderFavoritiSection('equipment') + list.map(e => `
       <div class="comp-row" onclick="Compendio.openEquipment('${e.id}')">
         <div class="comp-row-main">
           <span class="comp-row-name">${highlight(e.nome, f.q)}</span>
@@ -4945,6 +5012,7 @@ const Compendio = (() => {
           ${e.danni ? `<span class="comp-stat-pill">${e.danni}</span>` : ''}
           ${e.costo ? `<span class="comp-stat-pill">${e.costo}</span>` : ''}
           ${e.peso  ? `<span class="comp-stat-pill">${e.peso}</span>`  : ''}
+          ${favBtn(e.id, e.nome, 'equipment')}
         </div>
       </div>`).join('');
   };
@@ -4975,7 +5043,7 @@ const Compendio = (() => {
     }
 
     let currentCat = '';
-    el.innerHTML = list.map(r => {
+    el.innerHTML = renderFavoritiSection('rules') + list.map(r => {
       let catHeader = '';
       if (r.categoria !== currentCat) {
         currentCat = r.categoria;
@@ -5261,7 +5329,7 @@ const Compendio = (() => {
     }
 
     let currentLv = -1;
-    el.innerHTML = list.map(s => {
+    el.innerHTML = renderFavoritiSection('spells') + list.map(s => {
       let lvHeader = '';
       if (s.livello !== currentLv) {
         currentLv = s.livello;
@@ -5280,7 +5348,7 @@ const Compendio = (() => {
           '</div>' +
           '<div class="comp-row-stats">' +
             '<span class="badge ' + badge + '" style="font-size:0.62rem;">' + (s.scuola||'') + '</span>' +
-            ritLabel + conc +
+            ritLabel + conc + favBtn(s.id, s.nome, 'spells') +
           '</div>' +
         '</div>';
     }).join('');
@@ -5335,7 +5403,7 @@ const Compendio = (() => {
   return {
     init, switchTab, onSearch, onFilter,
     openMonster, openMagicItem, openEquipment, openRule, openSpell,
-    sendCurrentToCombat, changeSistema,
+    sendCurrentToCombat, changeSistema, toggleFavorito,
     getData: () => _data,
   };
 })();
@@ -5351,9 +5419,9 @@ const Schermo = (() => {
   // ── Blocchi disponibili ──
   const BLOCK_TYPES = {
     percezioni: {
-      label: 'Schede PG Party',
+      label: 'Party',
       icon: '👥',
-      desc: 'HP, CA, percezioni e ispirazione di tutti i PG',
+      desc: 'HP, CA, percezioni passive e ispirazione dei PG',
       defaultSize: 'md',
     },
     dadi: {
@@ -5404,6 +5472,12 @@ const Schermo = (() => {
       icon: '⏰',
       desc: 'Gestione del tempo di gioco',
       defaultSize: 'sm',
+    },
+    preferiti: {
+      label: 'Preferiti Compendio',
+      icon: '⭐',
+      desc: 'I tuoi preferiti dal Compendio — accesso rapido',
+      defaultSize: 'md',
     },
     proprieta_armi: {
       label: 'Proprietà delle Armi',
@@ -5500,6 +5574,7 @@ const Schermo = (() => {
 
     switch (block.type) {
       case 'percezioni':     el.innerHTML = renderPercezioni(); break;
+      case 'preferiti':      el.innerHTML = renderPreferiti(); break;
       case 'dadi':           el.innerHTML = renderDadiMini(block.id); break;
       case 'meteo':          el.innerHTML = renderMeteoMini(block.id); break;
       case 'note':           el.innerHTML = renderNote(block); break;
@@ -5515,9 +5590,52 @@ const Schermo = (() => {
   };
 
   // ── Contenuti blocchi ──
+  const renderPreferiti = () => {
+    const camp = App.getActiveCampaign();
+    const favs = camp?.compendioFavoriti || [];
+    if (!favs.length) return '<div class="text-muted text-sm">Nessun preferito. Aggiungi ⭐ dal Compendio.</div>';
+
+    const openFn = {
+      monsters: 'openMonster', magic_items: 'openMagicItem',
+      equipment: 'openEquipment', rules: 'openRule', spells: 'openSpell',
+    };
+    const tipoLabel = {
+      monsters: '🐉', magic_items: '✨', equipment: '⚔️', rules: '📖', spells: '💫',
+    };
+
+    // Raggruppa per tipo
+    const gruppi = {};
+    favs.forEach(f => {
+      if (!gruppi[f.tipo]) gruppi[f.tipo] = [];
+      gruppi[f.tipo].push(f);
+    });
+
+    return Object.entries(gruppi).map(([tipo, items]) =>
+      '<div style="margin-bottom:8px;">' +
+        '<div style="font-family:var(--font-display);font-size:0.62rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px;">' +
+          tipoLabel[tipo] + ' ' + tipo.replace('_',' ') +
+        '</div>' +
+        items.map(f =>
+          '<div style="display:flex;align-items:center;justify-content:space-between;padding:3px 0;border-bottom:1px solid var(--border);font-size:0.82rem;">' +
+            '<span style="cursor:pointer;color:var(--accent-secondary);text-decoration:underline dotted;" ' +
+              'onclick="App.navigateTo(\'compendio\');setTimeout(()=>Compendio.' + (openFn[tipo]||'openMonster') + '(\'' + f.id + '\'),500)">' +
+              f.nome +
+            '</span>' +
+            '<button class="btn btn-ghost btn-icon-sm" style="font-size:0.8rem;" ' +
+              'onclick="Compendio.toggleFavorito(\'' + f.id + '\',\'' + f.nome.replace(/'/g,"\\'") + '\',\'' + tipo + '\',event);Schermo._refreshFavoriti()" ' +
+              'title="Rimuovi">⭐</button>' +
+          '</div>'
+        ).join('') +
+      '</div>'
+    ).join('');
+  };
+
+  const _refreshFavoriti = () => {
+    _blocks.filter(b => b.type === 'preferiti').forEach(b => updateBlockContent(b));
+  };
+
   const renderPercezioni = () => {
     const camp = App.getActiveCampaign();
-    const party = camp?.party || [];
     if (!party.length) return '<div class="text-muted text-sm">Nessun PG. Aggiungili in Sessione → Party.</div>';
 
     return party.map(pg => {
@@ -5985,7 +6103,7 @@ const Schermo = (() => {
     init, render, addBlock, submitAddBlock,
     removeBlock, resizeBlock, moveBlock, editBlock, resetLayout,
     rollDie, generateMeteo, saveNote, advanceTime, refreshCombat,
-    setCompendioRef, _refreshCombat,
+    setCompendioRef, _refreshCombat, _refreshFavoriti,
   };
 })();
 
