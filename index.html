@@ -774,6 +774,13 @@
           </select>
         </div>
       </div>
+      <div class="form-group">
+        <label class="form-label" style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+          <input type="checkbox" id="nc-elettro">
+          Usa monete di <strong>elettro</strong> (me) nel loot e tesoro
+        </label>
+        <div class="form-hint">L'elettro vale 5 mo. Disabilitato di default perché poco comune in molte ambientazioni.</div>
+      </div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="Modal.close('new-campaign')">Annulla</button>
@@ -2111,14 +2118,15 @@ const openNewCampaignModal = () => {
 };
 
 const submitNewCampaign = () => {
-  const name = document.getElementById('nc-name')?.value?.trim();
-  const type = document.getElementById('nc-type')?.value || 'campagna';
+  const name   = document.getElementById('nc-name')?.value?.trim();
+  const type   = document.getElementById('nc-type')?.value   || 'campagna';
   const system = document.getElementById('nc-system')?.value || '5e2024';
+  const useElettro = document.getElementById('nc-elettro')?.checked || false;
 
   if (!name) { Toast.show('Inserisci un nome', 'warning'); return; }
 
   const camp = Storage.createCampaign(name, type);
-  Storage.updateCampaign(camp.id, { system });
+  Storage.updateCampaign(camp.id, { system, useElettro });
 
   Modal.close('new-campaign');
   App.openCampaign(camp.id);
@@ -4568,8 +4576,6 @@ const Compendio = (() => {
 
   // ── Rileva sistema dalla campagna attiva ──
   const getSistema = () => {
-    const override = document.getElementById('comp-sistema-select')?.value;
-    if (override) return override;
     const camp = App.getActiveCampaign();
     if (camp?.system === '5e2014') return '5e2014';
     return '5e2024';
@@ -5531,8 +5537,9 @@ const Schermo = (() => {
     load();
     App.reloadActiveCampaign();
     render();
-    // Secondo render dopo 100ms per assicurare che tutti i dati siano pronti
-    setTimeout(render, 100);
+    // Ri-render progressivi per dati asincroni
+    setTimeout(render, 150);
+    setTimeout(render, 600);
     Debug.log(`Schermo.init(): ${_blocks.length} blocchi`);
   };
 
@@ -5549,10 +5556,21 @@ const Schermo = (() => {
     }
     if (empty) empty.style.display = 'none';
 
-    grid.innerHTML = _blocks.map((block, idx) => renderBlock(block, idx)).join('');
-
-    // Aggiorna contenuti dinamici
+    // Aggiorna solo i body senza ricreare l'intera griglia se già renderizzata
+    const alreadyRendered = grid.children.length === _blocks.length;
+    if (!alreadyRendered) {
+      grid.innerHTML = _blocks.map((block, idx) => renderBlock(block, idx)).join('');
+    }
     _blocks.forEach(b => updateBlockContent(b));
+    // Abilita drag & drop sui blocchi
+    requestAnimationFrame(() => {
+      DragDrop.init('#schermo-grid', '.schermo-block', (fromIdx, toIdx) => {
+        const item = _blocks.splice(fromIdx, 1)[0];
+        _blocks.splice(toIdx, 0, item);
+        save();
+        render();
+      });
+    });
   };
 
   const renderBlock = (block, idx) => {
@@ -6635,28 +6653,32 @@ const Generatori = {
     let monete = '', extras = [];
 
     // ── Loot da mostro (per CR) ──
+    const useElettro = App.getActiveCampaign()?.useElettro || false;
+
     if (tipo === 'mostro' || tipo === 'scrigno') {
       if (cr <= 4) {
-        monete = `🟤 ${d(5,6)*100} mr · ⚪ ${d(2,6)*10} ma · 🟡 ${d(1,6)} mo`;
-        if (pct(30)) extras.push('💎 ' + r(gemme_basse));
-        if (pct(10)) extras.push('🖼️ ' + r(arte_bassa));
-        if (pct(18)) extras.push('✨ ' + r(magia_A));
+        const mr = d(5,6)*100; const ma = d(2,6)*10; const mo = d(1,6);
+        monete = `🟤 ${mr} mr · ⚪ ${ma} ma · 🟡 ${mo} mo`;
       } else if (cr <= 10) {
-        monete = `⚪ ${d(4,6)*100} ma · 🔵 ${d(1,6)*10} me · 🟡 ${d(2,6)*10} mo`;
+        const mr = d(2,6)*50; const ma = d(4,6)*100; const mo = d(2,6)*10;
+        const me = useElettro ? d(1,6)*10 : 0;
+        monete = `🟤 ${mr} mr · ⚪ ${ma} ma${me ? ' · 🔵 ' + me + ' me' : ''} · 🟡 ${mo} mo`;
         if (pct(40)) extras.push('💎 ' + r(gemme_basse));
         if (pct(20)) extras.push('💎 ' + r(gemme_medie));
         if (pct(20)) extras.push('🖼️ ' + r(arte_media));
         if (pct(25)) extras.push('✨ ' + r(magia_B));
         if (pct(10)) extras.push('✨ ' + r(magia_C));
       } else if (cr <= 16) {
-        monete = `🟡 ${d(4,6)*100} mo · 🔷 ${d(1,6)*10} mp`;
+        const mo = d(4,6)*100; const mp = d(1,6)*10;
+        monete = `🟡 ${mo} mo · 🔷 ${mp} mp`;
         if (pct(50)) extras.push('💎 ' + r(gemme_medie));
         if (pct(30)) extras.push('💎 ' + r(gemme_alte));
         if (pct(30)) extras.push('🖼️ ' + r(arte_alta));
         if (pct(35)) extras.push('✨ ' + r(magia_C));
         if (pct(20)) extras.push('✨ ' + r(magia_D));
       } else {
-        monete = `🟡 ${d(6,6)*1000} mo · 🔷 ${d(3,6)*100} mp`;
+        const mo = d(6,6)*1000; const mp = d(3,6)*100;
+        monete = `🟡 ${mo.toLocaleString('it-IT')} mo · 🔷 ${mp} mp`;
         if (pct(70)) extras.push('💎 ' + r(gemme_alte));
         if (pct(50)) extras.push('🖼️ ' + r(arte_alta));
         if (pct(40)) extras.push('✨ ' + r(magia_D));
@@ -6943,6 +6965,89 @@ const CompendioCache = (() => {
   };
 
   return { openItem, findItem, load: () => Compendio.init() };
+})();
+
+
+// ══ DRAG & DROP GENERICO ══
+const DragDrop = (() => {
+  let _dragEl = null, _dragIdx = null, _container = null, _onReorder = null;
+
+  const init = (containerSelector, itemSelector, onReorder) => {
+    const container = document.querySelector(containerSelector);
+    if (!container) return;
+    _container = container;
+    _onReorder = onReorder;
+
+    container.querySelectorAll(itemSelector).forEach((item, idx) => {
+      item.setAttribute('draggable', 'true');
+      item.dataset.dragIdx = idx;
+
+      // Desktop drag
+      item.addEventListener('dragstart', e => {
+        _dragEl = item;
+        _dragIdx = idx;
+        item.style.opacity = '0.4';
+        e.dataTransfer.effectAllowed = 'move';
+      });
+      item.addEventListener('dragend', () => {
+        item.style.opacity = '';
+        _dragEl = null;
+      });
+      item.addEventListener('dragover', e => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        if (_dragEl && _dragEl !== item) {
+          item.style.outline = '2px solid var(--accent-primary)';
+        }
+      });
+      item.addEventListener('dragleave', () => {
+        item.style.outline = '';
+      });
+      item.addEventListener('drop', e => {
+        e.preventDefault();
+        item.style.outline = '';
+        if (_dragEl && _dragEl !== item) {
+          const toIdx = parseInt(item.dataset.dragIdx);
+          _onReorder(_dragIdx, toIdx);
+        }
+      });
+
+      // Touch drag
+      let touchStartY = 0, touchEl = null;
+      item.addEventListener('touchstart', e => {
+        touchStartY = e.touches[0].clientY;
+        touchEl = item;
+        _dragIdx = idx;
+      }, { passive: true });
+      item.addEventListener('touchmove', e => {
+        if (!touchEl) return;
+        const y = e.touches[0].clientY;
+        const els = [...container.querySelectorAll(itemSelector)];
+        const target = els.find(el => {
+          const rect = el.getBoundingClientRect();
+          return y >= rect.top && y <= rect.bottom && el !== touchEl;
+        });
+        els.forEach(el => el.style.outline = '');
+        if (target) target.style.outline = '2px solid var(--accent-primary)';
+      }, { passive: true });
+      item.addEventListener('touchend', e => {
+        const y = e.changedTouches[0].clientY;
+        const els = [...container.querySelectorAll(itemSelector)];
+        els.forEach(el => el.style.outline = '');
+        const target = els.find(el => {
+          const rect = el.getBoundingClientRect();
+          return y >= rect.top && y <= rect.bottom && el !== touchEl;
+        });
+        if (target) {
+          const toIdx = parseInt(target.dataset.dragIdx);
+          _onReorder(_dragIdx, toIdx);
+        }
+        touchEl = null;
+      });
+    });
+  };
+
+  return { init };
 })();
 
 // Aspetta che tutti gli script defer siano caricati
