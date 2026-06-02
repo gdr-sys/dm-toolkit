@@ -526,6 +526,7 @@
             <button class="tab-btn"        id="comp-tab-equipment"   onclick="Compendio.switchTab('equipment')">Equipaggiamento</button>
             <button class="tab-btn"        id="comp-tab-rules"       onclick="Compendio.switchTab('rules')">Regole</button>
             <button class="tab-btn"        id="comp-tab-spells"      onclick="Compendio.switchTab('spells')">Incantesimi</button>
+            <button class="tab-btn"        id="comp-tab-homebrew"    onclick="Compendio.switchTab('homebrew')">🔧 Homebrew</button>
           </div>
           <div style="display:flex;align-items:center;gap:var(--space-sm);">
             <span class="badge badge-muted" id="comp-sistema-badge">5e 2024</span>
@@ -539,6 +540,7 @@
             <span class="text-xs text-muted" id="comp-count-equip" style="display:none;"></span>
             <span class="text-xs text-muted" id="comp-count-rules" style="display:none;"></span>
             <span class="text-xs text-muted" id="comp-count-spells" style="display:none;"></span>
+            <span class="text-xs text-muted" id="comp-count-homebrew" style="display:none;"></span>
           </div>
         </div>
 
@@ -606,6 +608,21 @@
           </label>
         </div>
 
+        <!-- Filtri Homebrew -->
+        <div id="comp-filters-homebrew" class="comp-filters hidden">
+          <input type="text" id="comp-search-homebrew" class="form-input" placeholder="Cerca homebrew..." style="flex:1;min-width:150px;" oninput="Compendio.onSearch('homebrew')">
+          <select class="form-select" id="comp-filter-cat-homebrew" style="width:auto;" onchange="Compendio.onFilter('homebrew','categoria',this.value)">
+            <option value="">Tutte le categorie</option>
+            <option value="monsters">Mostri</option>
+            <option value="magic_items">Oggetti Magici</option>
+            <option value="equipment">Equipaggiamento</option>
+            <option value="spells">Incantesimi</option>
+            <option value="rules">Regole</option>
+            <option value="altro">Altro</option>
+          </select>
+          <button class="btn btn-primary btn-sm" onclick="Compendio.openHomebrewModal()">+ Aggiungi</button>
+        </div>
+
         <!-- Filtri Regole -->
         <div id="comp-filters-rules" class="comp-filters hidden">
           <input type="text" id="comp-search-rules" class="form-input" placeholder="🔍 Cerca regola..." style="flex:1;min-width:180px;" oninput="Compendio.onSearch('rules')">
@@ -623,6 +640,9 @@
         </div>
         <div class="tab-content" id="comp-panel-equipment">
           <div id="comp-list-equip" class="comp-list"></div>
+        </div>
+        <div class="tab-content" id="comp-panel-homebrew">
+          <div id="comp-list-homebrew" class="comp-list"></div>
         </div>
         <div class="tab-content" id="comp-panel-spells">
           <div id="comp-list-spells" class="comp-list"></div>
@@ -4548,6 +4568,7 @@ const Compendio = (() => {
 
   // ── Stato ──
   const _data = { monsters: [], magic_items: [], equipment: [], rules: [], spells: [] };
+
   let _loaded = false;
   let _loading = false;
   let _activeTab = 'monsters';
@@ -4602,6 +4623,7 @@ const Compendio = (() => {
     equipment:   { q: '', tipo: '', categoria: '' },
     rules:       { q: '', categoria: '' },
     spells:      { q: '', livello: '', scuola: '', rituale: '' },
+    homebrew:    { q: '', categoria: '' },
   };
 
   // ── Helpers ──
@@ -4773,8 +4795,8 @@ const Compendio = (() => {
   // ── Cambio tab ──
   const switchTab = (tab) => {
     _activeTab = tab;
-    const tabKeys = ['monsters', 'magic_items', 'equipment', 'rules', 'spells'];
-    const countIds = { monsters: 'comp-count-monsters', magic_items: 'comp-count-magic', equipment: 'comp-count-equip', rules: 'comp-count-rules', spells: 'comp-count-spells' };
+    const tabKeys = ['monsters', 'magic_items', 'equipment', 'rules', 'spells', 'homebrew'];
+    const countIds = { monsters: 'comp-count-monsters', magic_items: 'comp-count-magic', equipment: 'comp-count-equip', rules: 'comp-count-rules', spells: 'comp-count-spells', homebrew: 'comp-count-homebrew' };
     tabKeys.forEach(t => {
       document.getElementById(`comp-tab-${t}`)?.classList.toggle('active', t === tab);
       document.getElementById(`comp-panel-${t}`)?.classList.toggle('active', t === tab);
@@ -4782,7 +4804,7 @@ const Compendio = (() => {
       const countEl = document.getElementById(countIds[t]);
       if (countEl) countEl.style.display = t === tab ? '' : 'none';
     });
-    if (!_loaded) { load(); return; }
+    if (!_loaded && tab !== 'homebrew') { load(); return; }
     render();
     Debug.log(`Compendio tab: ${tab}`);
   };
@@ -4809,6 +4831,7 @@ const Compendio = (() => {
       case 'equipment':   renderEquipment(); break;
       case 'rules':       renderRules(); break;
       case 'spells':      renderSpells(); break;
+      case 'homebrew':    renderHomebrew(); break;
     }
   };
 
@@ -4861,14 +4884,15 @@ const Compendio = (() => {
   // Sezione preferiti fissata in cima
   const renderFavoritiSection = (tipo) => {
     const favs = _getFavoriti().filter(f => f.tipo === tipo);
-    if (!favs.length) return '';
+    // Aggiungi anche homebrew della categoria corrispondente
+    const hbItems = _getHomebrew().filter(h => h.categoria === tipo);
+    if (!favs.length && !hbItems.length) return '';
     const openFn = {
       monsters: 'openMonster', magic_items: 'openMagicItem',
       equipment: 'openEquipment', rules: 'openRule', spells: 'openSpell',
     }[tipo] || 'openMonster';
 
-    return `<div class="comp-cat-header" style="color:var(--accent-secondary);">⭐ Preferiti</div>` +
-      favs.map(f => `
+    const favRows = favs.map(f => `
         <div class="comp-row comp-row-fav" onclick="Compendio.${openFn}('${f.id}')">
           <div class="comp-row-main">
             <span class="comp-row-name">${f.nome}</span>
@@ -4876,7 +4900,23 @@ const Compendio = (() => {
           <div class="comp-row-stats">
             ${favBtn(f.id, f.nome, tipo)}
           </div>
-        </div>`).join('') +
+        </div>`).join('');
+
+    const hbRows = hbItems.map(h => `
+        <div class="comp-row comp-row-fav" onclick="Compendio.openHomebrew('${h.id}')">
+          <div class="comp-row-main">
+            <span class="comp-row-name">🔧 ${h.nome}</span>
+            <span class="comp-row-meta">${h.sottotitolo||'Homebrew'}</span>
+          </div>
+          <div class="comp-row-stats">
+            <span class="badge badge-muted" style="font-size:0.58rem;">HB</span>
+          </div>
+        </div>`).join('');
+
+    const hasContent = favRows || hbRows;
+    if (!hasContent) return '';
+    return `<div class="comp-cat-header" style="color:var(--accent-secondary);">${favs.length ? '⭐ Preferiti' : ''}${favs.length && hbItems.length ? ' · ' : ''}${hbItems.length ? '🔧 Homebrew' : ''}</div>` +
+      favRows + hbRows +
       `<div style="height:1px;background:var(--border);margin:6px 0 8px;"></div>`;
   };
 
@@ -5393,6 +5433,127 @@ const Compendio = (() => {
     openDetailModal(s.nome, content);
   };
 
+  // ─────────────────────────────────────────────────
+  // HOMEBREW
+  // ─────────────────────────────────────────────────
+  const _getHomebrew = () => App.getActiveCampaign()?.homebrew || [];
+  const _saveHomebrew = (list) => App.saveActiveCampaign({ homebrew: list });
+
+  const renderHomebrew = () => {
+    const el = document.getElementById('comp-list-homebrew');
+    if (!el) return;
+    const f = _filters.homebrew;
+    const q = f.q.toLowerCase();
+    let list = _getHomebrew().filter(h => {
+      if (q && !h.nome.toLowerCase().includes(q) && !(h.note||'').toLowerCase().includes(q)) return false;
+      if (f.categoria && h.categoria !== f.categoria) return false;
+      return true;
+    });
+    list.sort((a,b) => a.nome.localeCompare(b.nome,'it'));
+    const count = document.getElementById('comp-count-homebrew');
+    if (count) count.textContent = list.length + ' voci';
+    if (list.length === 0) {
+      el.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🔧</div><h3>Nessuna voce homebrew</h3><p class="text-muted">Clicca "+ Aggiungi" per creare la tua prima voce</p></div>';
+      return;
+    }
+    const catLabel = { monsters:'🐉 Mostri', magic_items:'✨ Oggetti Magici', equipment:'⚔️ Equipaggiamento', spells:'💫 Incantesimi', rules:'📖 Regole', altro:'📌 Altro' };
+    const catBadge = { monsters:'badge-primary', magic_items:'badge-gold', equipment:'badge-muted', spells:'badge-blue', rules:'badge-muted', altro:'badge-muted' };
+    el.innerHTML = list.map(h =>
+      '<div class="comp-row">' +
+        '<div class="comp-row-main" onclick="Compendio.openHomebrew(\'' + h.id + '\')" style="cursor:pointer;flex:1;">' +
+          '<span class="comp-row-name">' + highlight(h.nome, f.q) + '</span>' +
+          '<span class="comp-row-meta">' + (h.sottotitolo||'') + '</span>' +
+        '</div>' +
+        '<div class="comp-row-stats">' +
+          '<span class="badge ' + (catBadge[h.categoria]||'badge-muted') + '" style="font-size:0.62rem;">' + (catLabel[h.categoria]||h.categoria) + '</span>' +
+          favBtn(h.id, h.nome, 'homebrew') +
+          '<button class="btn btn-ghost btn-icon-sm" style="font-size:0.7rem;" onclick="Compendio.editHomebrew(\'' + h.id + '\')" title="Modifica">✏️</button>' +
+          '<button class="btn btn-ghost btn-icon-sm" style="font-size:0.7rem;color:var(--accent-danger);" onclick="Compendio.deleteHomebrew(\'' + h.id + '\')" title="Elimina">🗑️</button>' +
+        '</div>' +
+      '</div>'
+    ).join('');
+  };
+
+  const openHomebrew = (id) => {
+    const h = _getHomebrew().find(x => x.id === id);
+    if (!h) return;
+    const content = '<div style="max-height:65vh;overflow-y:auto;">' +
+      (h.sottotitolo ? '<div class="text-muted text-sm" style="margin-bottom:8px;">' + h.sottotitolo + '</div>' : '') +
+      '<div class="text-sm" style="line-height:1.75;white-space:pre-wrap;">' + (h.note||'Nessuna descrizione.') + '</div>' +
+      '</div>';
+    openDetailModal(h.nome, content);
+  };
+
+  const openHomebrewModal = (id) => {
+    const h = id ? _getHomebrew().find(x => x.id === id) : null;
+    const modal = document.createElement('div');
+    modal.className = 'modal-overlay';
+    modal.style.cssText = 'display:flex;';
+    modal.innerHTML = '<div class="modal" style="max-width:520px;">' +
+      '<div class="modal-header">' +
+        '<h2 style="font-family:var(--font-display);font-size:1.1rem;">' + (h ? 'Modifica' : 'Nuovo') + ' Homebrew</h2>' +
+        '<button class="btn btn-ghost btn-icon" onclick="this.closest(\'.modal-overlay\').remove()">✕</button>' +
+      '</div>' +
+      '<div class="modal-body">' +
+        '<div class="form-group"><label class="form-label">Nome *</label>' +
+          '<input type="text" id="hb-nome" class="form-input" value="' + (h?.nome||'') + '" placeholder="es. Spada del Destino"></div>' +
+        '<div class="form-row">' +
+          '<div class="form-group"><label class="form-label">Categoria</label>' +
+            '<select id="hb-cat" class="form-select">' +
+              '<option value="monsters"' + (h?.categoria==='monsters'?' selected':'') + '>🐉 Mostri</option>' +
+              '<option value="magic_items"' + (h?.categoria==='magic_items'?' selected':'') + '>✨ Oggetti Magici</option>' +
+              '<option value="equipment"' + (h?.categoria==='equipment'?' selected':'') + '>⚔️ Equipaggiamento</option>' +
+              '<option value="spells"' + (h?.categoria==='spells'?' selected':'') + '>💫 Incantesimi</option>' +
+              '<option value="rules"' + (h?.categoria==='rules'?' selected':'') + '>📖 Regole</option>' +
+              '<option value="altro"' + (!h?.categoria||h?.categoria==='altro'?' selected':'') + '>📌 Altro (solo Homebrew)</option>' +
+            '</select></div>' +
+          '<div class="form-group"><label class="form-label">Sottotitolo / Tipo</label>' +
+            '<input type="text" id="hb-sub" class="form-input" value="' + (h?.sottotitolo||'') + '" placeholder="es. Arma, Raro"></div>' +
+        '</div>' +
+        '<div class="form-group"><label class="form-label">Descrizione / Note</label>' +
+          '<textarea id="hb-note" class="form-input" rows="6" style="resize:vertical;" placeholder="Descrizione, statistiche, effetti...">' + (h?.note||'') + '</textarea></div>' +
+      '</div>' +
+      '<div class="modal-footer">' +
+        '<button class="btn btn-ghost" onclick="this.closest(\'.modal-overlay\').remove()">Annulla</button>' +
+        '<button class="btn btn-primary" onclick="Compendio.saveHomebrew(\'' + (h?.id||'') + '\',this)">💾 Salva</button>' +
+      '</div>' +
+    '</div>';
+    modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
+    document.body.appendChild(modal);
+    setTimeout(() => document.getElementById('hb-nome')?.focus(), 100);
+  };
+
+  const editHomebrew = (id) => openHomebrewModal(id);
+
+  const saveHomebrew = (id, btn) => {
+    const nome = document.getElementById('hb-nome')?.value?.trim();
+    if (!nome) { Toast.show('Inserisci un nome', 'warning'); return; }
+    const cat  = document.getElementById('hb-cat')?.value  || 'altro';
+    const sub  = document.getElementById('hb-sub')?.value?.trim() || '';
+    const note = document.getElementById('hb-note')?.value?.trim() || '';
+    let list = _getHomebrew();
+    if (id) {
+      const idx = list.findIndex(x => x.id === id);
+      if (idx !== -1) list[idx] = { ...list[idx], nome, categoria: cat, sottotitolo: sub, note };
+    } else {
+      list.push({ id: 'hb_' + Date.now(), nome, categoria: cat, sottotitolo: sub, note });
+    }
+    _saveHomebrew(list);
+    btn.closest('.modal-overlay').remove();
+    Toast.show('✅ Homebrew salvato', 'success');
+    if (_activeTab === 'homebrew') render();
+  };
+
+  const deleteHomebrew = (id) => {
+    const h = _getHomebrew().find(x => x.id === id);
+    if (!h) return;
+    Modal.confirm('Elimina "' + h.nome + '"?', () => {
+      _saveHomebrew(_getHomebrew().filter(x => x.id !== id));
+      if (_activeTab === 'homebrew') render();
+      Toast.show('Eliminato', 'info');
+    });
+  };
+
   // ── Init ──
   const init = () => {
     // Rileva sistema dalla campagna — ricarica se è cambiato
@@ -5409,6 +5570,7 @@ const Compendio = (() => {
   return {
     init, switchTab, onSearch, onFilter,
     openMonster, openMagicItem, openEquipment, openRule, openSpell,
+    openHomebrew, openHomebrewModal, editHomebrew, saveHomebrew, deleteHomebrew,
     sendCurrentToCombat, changeSistema, toggleFavorito,
     getData: () => _data,
   };
@@ -5449,10 +5611,16 @@ const Schermo = (() => {
       defaultSize: 'md',
     },
     combat_mini: {
-      label: 'Combat Tracker',
+      label: 'Combat Tracker (ridotto)',
       icon: '⚔️',
-      desc: 'Combat tracker completo sincronizzato',
+      desc: 'Iniziativa, HP, turno attivo con pulsanti essenziali',
       defaultSize: 'lg',
+    },
+    combat_full: {
+      label: 'Combat Tracker (completo)',
+      icon: '🗡️',
+      desc: 'Combat tracker identico alla sezione Sessione',
+      defaultSize: 'xl',
     },
     condizioni: {
       label: 'Condizioni (tabella compatta)',
@@ -5562,15 +5730,7 @@ const Schermo = (() => {
       grid.innerHTML = _blocks.map((block, idx) => renderBlock(block, idx)).join('');
     }
     _blocks.forEach(b => updateBlockContent(b));
-    // Abilita drag & drop sui blocchi
-    requestAnimationFrame(() => {
-      DragDrop.init('#schermo-grid', '.schermo-block', (fromIdx, toIdx) => {
-        const item = _blocks.splice(fromIdx, 1)[0];
-        _blocks.splice(toIdx, 0, item);
-        save();
-        render();
-      });
-    });
+    requestAnimationFrame(() => SchermoDD.enable());
   };
 
   const renderBlock = (block, idx) => {
@@ -5609,6 +5769,7 @@ const Schermo = (() => {
       case 'meteo':          el.innerHTML = renderMeteoMini(block.id); break;
       case 'note':           el.innerHTML = renderNote(block); break;
       case 'combat_mini':    el.innerHTML = renderCombatMini(); break;
+      case 'combat_full':    el.innerHTML = renderCombatFull(); break;
       case 'condizioni':     el.innerHTML = renderCondizioni(); break;
       case 'compendio_ref':  el.innerHTML = renderCompendioRef(block); break;
       case 'proprieta_armi': el.innerHTML = renderProprietaArmi(); break;
@@ -5648,7 +5809,7 @@ const Schermo = (() => {
         items.map(f =>
           '<div style="display:flex;align-items:center;justify-content:space-between;padding:3px 0;border-bottom:1px solid var(--border);font-size:0.82rem;">' +
             '<span style="cursor:pointer;color:var(--accent-secondary);text-decoration:underline dotted;" ' +
-              'onclick="App.navigateTo(\'compendio\');setTimeout(()=>Compendio.' + (openFn[tipo]||'openMonster') + '(\'' + f.id + '\'),500)">' +
+              'onclick="apriFavoritoSchermo(\'' + tipo + '\',\'' + f.id + '\')">'  +
               f.nome +
             '</span>' +
             '<button class="btn btn-ghost btn-icon-sm" style="font-size:0.8rem;" ' +
@@ -5748,6 +5909,82 @@ const Schermo = (() => {
     if (block) { block.content = content; save(); }
   };
 
+  // ── Combat Tracker completo (identico a Sessione) ──
+  const renderCombatFull = () => {
+    App.reloadActiveCampaign();
+    const camp = App.getActiveCampaign();
+    const combat = camp?.activeCombat;
+
+    if (!combat || !combat.combatants?.length) {
+      return '<div class="text-muted text-sm" style="margin-bottom:8px;">Nessuno scontro attivo.</div>' +
+        '<div style="display:flex;gap:4px;flex-wrap:wrap;">' +
+          '<button class="btn btn-primary btn-sm" onclick="App.navigateTo(\'sessione\');setTimeout(()=>Sessione.newCombat(),300)">⚔️ Nuovo Scontro</button>' +
+          '<button class="btn btn-secondary btn-sm" onclick="App.navigateTo(\'sessione\')">→ Sessione</button>' +
+        '</div>';
+    }
+
+    const sorted = [...combat.combatants].sort((a, b) => b.iniziativa - a.iniziativa);
+    const activeIdx = combat.turno || 0;
+
+    // Stessa struttura renderCombat di Sessione, con onclick che chiamano Sessione.*
+    const rows = sorted.map((c, i) => {
+      const isActive = i === activeIdx;
+      const hpPct = c.maxHp > 0 ? Math.max(0, Math.round((c.hp / c.maxHp) * 100)) : 100;
+      const hpCol = hpPct > 66 ? 'var(--accent-success)' : hpPct > 33 ? 'var(--accent-warning)' : 'var(--accent-danger)';
+      const condBadges = (c.condizioni || []).map(cond =>
+        `<span class="badge badge-primary" style="font-size:0.55rem;padding:1px 3px;">${cond.slice(0,4)}</span>`
+      ).join('');
+
+      return `<div class="combat-row${isActive ? ' combat-active' : ''}${c.hp <= 0 ? ' combat-dead' : ''}"
+          id="schermo-comb-${c.id}" style="padding:4px 6px;">
+        <div class="combat-init-col" style="width:32px;">
+          <span class="combat-init-value" style="font-size:0.78rem;">${c.iniziativa}</span>
+        </div>
+        <div class="combat-name-col" style="flex:1;min-width:0;">
+          <span style="font-size:0.8rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;">
+            ${c.tipo === 'pg' ? '👤' : c.tipo === 'mostro' ? '🐉' : '⚔️'} ${c.nome}
+            ${c.concentrazione ? ' 🔮' : ''}
+          </span>
+          ${condBadges ? `<div style="display:flex;flex-wrap:wrap;gap:2px;margin-top:2px;">${condBadges}</div>` : ''}
+        </div>
+        <div class="combat-hp-col" style="min-width:90px;">
+          <div style="display:flex;align-items:center;gap:4px;">
+            <div style="flex:1;height:5px;background:var(--bg-tertiary);border-radius:3px;overflow:hidden;">
+              <div class="combat-hp-fill" style="height:100%;width:${hpPct}%;background:${hpCol};border-radius:3px;transition:width 0.3s;"></div>
+            </div>
+            <span style="font-family:var(--font-mono);font-size:0.72rem;color:${hpCol};min-width:30px;text-align:right;">${c.hp}/${c.maxHp}</span>
+          </div>
+        </div>
+        <div class="combat-actions-col" style="display:flex;gap:2px;">
+          <button class="btn btn-ghost btn-icon-sm" style="width:24px;height:24px;font-size:0.65rem;"
+            onclick="Sessione.changeHP('${c.id}',-1);setTimeout(()=>Schermo._refreshCombat(),100)" title="Danno">💥</button>
+          <button class="btn btn-ghost btn-icon-sm" style="width:24px;height:24px;font-size:0.65rem;"
+            onclick="Sessione.changeHP('${c.id}',1);setTimeout(()=>Schermo._refreshCombat(),100)" title="Cura">💚</button>
+          ${c.tipo !== 'pg' ? `<button class="btn btn-ghost btn-icon-sm" style="width:24px;height:24px;font-size:0.65rem;"
+            onclick="Sessione.openCombatantSheet('${c.id}')" title="Scheda">📋</button>` : ''}
+          <button class="btn btn-ghost btn-icon-sm" style="width:24px;height:24px;font-size:0.65rem;"
+            onclick="Sessione.openCondizioneModal('${c.id}')" title="Condizioni">🔴</button>
+        </div>
+      </div>`;
+    }).join('');
+
+    return `<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:4px;">
+        <div style="font-family:var(--font-display);font-size:0.85rem;">
+          Round ${combat.round || 1} · <span style="color:var(--accent-secondary);">${sorted[activeIdx]?.nome || ''}</span>
+        </div>
+        <div style="display:flex;gap:4px;">
+          <button class="btn btn-secondary btn-sm" onclick="Sessione.rollAllInitiative();setTimeout(()=>Schermo._refreshCombat(),200)">🎲 Init</button>
+          <button class="btn btn-ghost btn-sm" onclick="Sessione.prevTurn();setTimeout(()=>Schermo._refreshCombat(),200)">◀</button>
+          <button class="btn btn-primary btn-sm" onclick="Sessione.nextTurn();setTimeout(()=>Schermo._refreshCombat(),200)">▶ Avanti</button>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:1px;">${rows}</div>
+      <div style="display:flex;gap:4px;margin-top:8px;flex-wrap:wrap;">
+        <button class="btn btn-ghost btn-sm" style="font-size:0.72rem;" onclick="Sessione.newCombat();setTimeout(()=>Schermo._refreshCombat(),300)">🆕 Nuovo</button>
+        <button class="btn btn-ghost btn-sm" style="font-size:0.72rem;" onclick="App.navigateTo('sessione')">→ Sessione</button>
+      </div>`;
+  };
+
   const renderCombatMini = () => {
     App.reloadActiveCampaign();
     const camp = App.getActiveCampaign();
@@ -5805,7 +6042,7 @@ const Schermo = (() => {
 
   // Refresh blocchi combat nello schermo
   const _refreshCombat = () => {
-    _blocks.filter(b => b.type === 'combat_mini').forEach(b => updateBlockContent(b));
+    _blocks.filter(b => b.type === 'combat_mini' || b.type === 'combat_full').forEach(b => updateBlockContent(b));
     _blocks.filter(b => b.type === 'percezioni').forEach(b => updateBlockContent(b));
   };
 
@@ -6129,11 +6366,19 @@ const Schermo = (() => {
     _blocks.filter(b => b.type === 'combat_mini').forEach(b => updateBlockContent(b));
   };
 
+  const _swapBlocks = (fromIdx, toIdx) => {
+    if (fromIdx === toIdx) return;
+    const item = _blocks.splice(fromIdx, 1)[0];
+    _blocks.splice(toIdx, 0, item);
+    save();
+    render();
+  };
+
   return {
     init, render, addBlock, submitAddBlock,
     removeBlock, resizeBlock, moveBlock, editBlock, resetLayout,
     rollDie, generateMeteo, saveNote, advanceTime, refreshCombat,
-    setCompendioRef, _refreshCombat, _refreshFavoriti,
+    setCompendioRef, _refreshCombat, _refreshFavoriti, _swapBlocks,
   };
 })();
 
@@ -6968,86 +7213,108 @@ const CompendioCache = (() => {
 })();
 
 
-// ══ DRAG & DROP GENERICO ══
-const DragDrop = (() => {
-  let _dragEl = null, _dragIdx = null, _container = null, _onReorder = null;
 
-  const init = (containerSelector, itemSelector, onReorder) => {
-    const container = document.querySelector(containerSelector);
-    if (!container) return;
-    _container = container;
-    _onReorder = onReorder;
+// Apri scheda preferito dallo Schermo senza navigare
+const apriFavoritoSchermo = async (tipo, id) => {
+  // Assicura che il compendio abbia i dati
+  if (!Compendio.getData()[tipo]?.length) {
+    Toast.show('Caricamento...', 'info', 1500);
+    await new Promise(r => setTimeout(r, 1600));
+    Compendio.init();
+    await new Promise(r => setTimeout(r, 1500));
+  }
+  const fn = {
+    monsters: 'openMonster', magic_items: 'openMagicItem',
+    equipment: 'openEquipment', rules: 'openRule', spells: 'openSpell',
+  }[tipo];
+  if (fn && Compendio[fn]) Compendio[fn](id);
+};
 
-    container.querySelectorAll(itemSelector).forEach((item, idx) => {
-      item.setAttribute('draggable', 'true');
-      item.dataset.dragIdx = idx;
+// ══ DRAG & DROP SCHERMO DM ══
+const SchermoDD = (() => {
+  let _dragId = null;
 
-      // Desktop drag
-      item.addEventListener('dragstart', e => {
-        _dragEl = item;
-        _dragIdx = idx;
-        item.style.opacity = '0.4';
+  const enable = () => {
+    const blocks = document.querySelectorAll('#schermo-grid .schermo-block');
+    if (!blocks.length) return;
+
+    blocks.forEach(block => {
+      const header = block.querySelector('.schermo-block-header');
+      if (!header) return;
+
+      // Drag handle sul header
+      header.style.cursor = 'grab';
+
+      // Desktop
+      block.setAttribute('draggable', 'true');
+      block.addEventListener('dragstart', e => {
+        _dragId = block.id;
+        block.style.opacity = '0.5';
         e.dataTransfer.effectAllowed = 'move';
       });
-      item.addEventListener('dragend', () => {
-        item.style.opacity = '';
-        _dragEl = null;
+      block.addEventListener('dragend', () => {
+        block.style.opacity = '';
+        document.querySelectorAll('.schermo-block').forEach(b => b.style.outline = '');
+        _dragId = null;
       });
-      item.addEventListener('dragover', e => {
+      block.addEventListener('dragover', e => {
         e.preventDefault();
-        e.dataTransfer.dropEffect = 'move';
-        if (_dragEl && _dragEl !== item) {
-          item.style.outline = '2px solid var(--accent-primary)';
+        if (_dragId && _dragId !== block.id) {
+          block.style.outline = '2px solid var(--accent-primary)';
         }
       });
-      item.addEventListener('dragleave', () => {
-        item.style.outline = '';
-      });
-      item.addEventListener('drop', e => {
+      block.addEventListener('dragleave', () => { block.style.outline = ''; });
+      block.addEventListener('drop', e => {
         e.preventDefault();
-        item.style.outline = '';
-        if (_dragEl && _dragEl !== item) {
-          const toIdx = parseInt(item.dataset.dragIdx);
-          _onReorder(_dragIdx, toIdx);
+        block.style.outline = '';
+        if (!_dragId || _dragId === block.id) return;
+        // Trova indici e scambia
+        const allBlocks = [...document.querySelectorAll('#schermo-grid .schermo-block')];
+        const fromIdx = allBlocks.findIndex(b => b.id === _dragId);
+        const toIdx   = allBlocks.findIndex(b => b.id === block.id);
+        if (fromIdx !== -1 && toIdx !== -1) {
+          Schermo._swapBlocks(fromIdx, toIdx);
         }
       });
 
-      // Touch drag
-      let touchStartY = 0, touchEl = null;
-      item.addEventListener('touchstart', e => {
-        touchStartY = e.touches[0].clientY;
-        touchEl = item;
-        _dragIdx = idx;
+      // Touch
+      let touchFromIdx = -1;
+      block.addEventListener('touchstart', e => {
+        const allBlocks = [...document.querySelectorAll('#schermo-grid .schermo-block')];
+        touchFromIdx = allBlocks.indexOf(block);
+        block.style.opacity = '0.5';
       }, { passive: true });
-      item.addEventListener('touchmove', e => {
-        if (!touchEl) return;
-        const y = e.touches[0].clientY;
-        const els = [...container.querySelectorAll(itemSelector)];
-        const target = els.find(el => {
-          const rect = el.getBoundingClientRect();
-          return y >= rect.top && y <= rect.bottom && el !== touchEl;
+      block.addEventListener('touchmove', e => {
+        const t = e.touches[0];
+        const allBlocks = [...document.querySelectorAll('#schermo-grid .schermo-block')];
+        allBlocks.forEach(b => b.style.outline = '');
+        const target = allBlocks.find(b => {
+          const r = b.getBoundingClientRect();
+          return t.clientX >= r.left && t.clientX <= r.right &&
+                 t.clientY >= r.top  && t.clientY <= r.bottom && b !== block;
         });
-        els.forEach(el => el.style.outline = '');
         if (target) target.style.outline = '2px solid var(--accent-primary)';
       }, { passive: true });
-      item.addEventListener('touchend', e => {
-        const y = e.changedTouches[0].clientY;
-        const els = [...container.querySelectorAll(itemSelector)];
-        els.forEach(el => el.style.outline = '');
-        const target = els.find(el => {
-          const rect = el.getBoundingClientRect();
-          return y >= rect.top && y <= rect.bottom && el !== touchEl;
+      block.addEventListener('touchend', e => {
+        block.style.opacity = '';
+        const t = e.changedTouches[0];
+        const allBlocks = [...document.querySelectorAll('#schermo-grid .schermo-block')];
+        allBlocks.forEach(b => b.style.outline = '');
+        const target = allBlocks.find(b => {
+          const r = b.getBoundingClientRect();
+          return t.clientX >= r.left && t.clientX <= r.right &&
+                 t.clientY >= r.top  && t.clientY <= r.bottom && b !== block;
         });
-        if (target) {
-          const toIdx = parseInt(target.dataset.dragIdx);
-          _onReorder(_dragIdx, toIdx);
+        if (target && touchFromIdx !== -1) {
+          const toIdx = allBlocks.indexOf(target);
+          Schermo._swapBlocks(touchFromIdx, toIdx);
         }
-        touchEl = null;
+        touchFromIdx = -1;
       });
     });
   };
 
-  return { init };
+  return { enable };
 })();
 
 // Aspetta che tutti gli script defer siano caricati
