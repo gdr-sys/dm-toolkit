@@ -296,6 +296,23 @@
           <h1 class="page-title">✨ Generatori</h1>
           <p class="page-subtitle">Strumenti one-click per l'improvvisazione</p>
         </div>
+        <button class="btn btn-secondary btn-sm" onclick="Generatori.toggleSettings()" id="gen-settings-btn">
+          ⚙️ Personalizza
+        </button>
+      </div>
+
+      <!-- Pannello toggle generatori -->
+      <div id="gen-settings-panel" style="display:none;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:var(--space-md);margin-bottom:var(--space-md);">
+        <div style="font-family:var(--font-display);font-size:0.85rem;margin-bottom:var(--space-sm);color:var(--text-secondary);">
+          Scegli quali generatori visualizzare per questa campagna
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px;" id="gen-toggles-list">
+          <!-- Popolato da JS -->
+        </div>
+        <div style="margin-top:var(--space-sm);display:flex;gap:8px;">
+          <button class="btn btn-ghost btn-sm" onclick="Generatori.toggleAll(true)">✅ Tutti</button>
+          <button class="btn btn-ghost btn-sm" onclick="Generatori.toggleAll(false)">❌ Nessuno</button>
+        </div>
       </div>
 
       <!-- Griglia generatori riordinabile — tutte le card inclusa PNG -->
@@ -2436,7 +2453,9 @@ const App = (() => {
         try { Fazioni.init(); } catch(e) {}
         break;
       case 'sessione':   try { Sessione.init(); } catch(e) {} break;
-      case 'generatori': break;
+      case 'generatori':
+        setTimeout(() => { GeneratoriDD.enable(); Generatori.applyVisibility(); }, 100);
+        break;
       case 'compendio':  try { Compendio.init(); } catch(e) {} break;
       case 'schermo':    try { Schermo.init(); } catch(e) {} break;
     }
@@ -6793,6 +6812,82 @@ const loadTabelle = async () => {
 const rnd = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
 const Generatori = {
+
+  // ── Definizione generatori (label, emoji) ──
+  _GEN_DEFS: {
+    npc:       { label: 'PNG Completo',         emoji: '👤' },
+    meteo:     { label: 'Meteo',                emoji: '🌤️' },
+    sensori:   { label: 'Rumori & Odori',       emoji: '👁️' },
+    rumors:    { label: 'Voci di Corridoio',    emoji: '💬' },
+    accento:   { label: 'Voce & Accento',       emoji: '🎭' },
+    shop:      { label: 'Shop Generator',       emoji: '🏪' },
+    viaggio:   { label: 'Calcolatore Viaggio',  emoji: '🧭' },
+    loot:      { label: 'Loot Generator',       emoji: '💰' },
+    stilivita: { label: 'Stili di Vita',        emoji: '🏨' },
+    biblioteca:{ label: 'Biblioteca',           emoji: '📚' },
+  },
+
+  _getEnabledGen: () => {
+    const camp = App.getActiveCampaign();
+    const saved = camp?.generatoriAbilitati;
+    if (!saved) return Object.keys(Generatori._GEN_DEFS); // tutti di default
+    return saved;
+  },
+
+  _saveEnabledGen: (list) => {
+    App.saveActiveCampaign({ generatoriAbilitati: list });
+  },
+
+  applyVisibility: () => {
+    const enabled = Generatori._getEnabledGen();
+    document.querySelectorAll('.gen-card[data-gen-id]').forEach(card => {
+      const id = card.dataset.genId;
+      card.style.display = enabled.includes(id) ? '' : 'none';
+    });
+  },
+
+  toggleSettings: () => {
+    const panel = document.getElementById('gen-settings-panel');
+    if (!panel) return;
+    const isOpen = panel.style.display !== 'none';
+    if (!isOpen) {
+      Generatori._renderToggles();
+      panel.style.display = '';
+      document.getElementById('gen-settings-btn').textContent = '✕ Chiudi';
+    } else {
+      panel.style.display = 'none';
+      document.getElementById('gen-settings-btn').textContent = '⚙️ Personalizza';
+    }
+  },
+
+  _renderToggles: () => {
+    const list = document.getElementById('gen-toggles-list');
+    if (!list) return;
+    const enabled = Generatori._getEnabledGen();
+    list.innerHTML = Object.entries(Generatori._GEN_DEFS).map(([id, def]) => {
+      const on = enabled.includes(id);
+      return `<label style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:6px 8px;border-radius:var(--radius-sm);background:var(--bg-secondary);font-size:0.82rem;">
+        <input type="checkbox" data-gen-toggle="${id}" ${on?'checked':''} onchange="Generatori._onToggle('${id}',this.checked)">
+        <span>${def.emoji} ${def.label}</span>
+      </label>`;
+    }).join('');
+  },
+
+  _onToggle: (id, checked) => {
+    let enabled = [...Generatori._getEnabledGen()];
+    if (checked && !enabled.includes(id)) enabled.push(id);
+    if (!checked) enabled = enabled.filter(x => x !== id);
+    Generatori._saveEnabledGen(enabled);
+    Generatori.applyVisibility();
+  },
+
+  toggleAll: (value) => {
+    const all = Object.keys(Generatori._GEN_DEFS);
+    Generatori._saveEnabledGen(value ? all : []);
+    Generatori._renderToggles();
+    Generatori.applyVisibility();
+  },
+
   rollNPC: async () => {
     const t = await loadTabelle();
     if (!t) return;
