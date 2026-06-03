@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/components.css">
   <link rel="stylesheet" href="css/layout.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.2/Sortable.min.js"></script>
 </head>
 <body>
 
@@ -317,9 +318,9 @@
 
       </div>
 
-      <!-- Riga 2: 4 card uguali in grid-4 -->
-      <div class="grid-4" style="gap:var(--space-md);">
-        <div class="card">
+      <!-- Griglia generatori riordinabile -->
+      <div class="generatori-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:var(--space-md);">
+        <div class="card gen-card" data-gen-id="meteo">
           <div class="card-header">
             <h3 class="card-title">🌤️ Meteo</h3>
             <button class="btn btn-secondary btn-sm" onclick="Generatori.rollWeather()">🎲 Genera</button>
@@ -328,7 +329,7 @@
             <div class="text-muted text-sm">Clicca per generare il meteo</div>
           </div>
         </div>
-        <div class="card">
+        <div class="card gen-card" data-gen-id="sensori">
           <div class="card-header">
             <h3 class="card-title">👁️ Rumori & Odori</h3>
             <div style="display:flex;gap:4px;">
@@ -346,7 +347,7 @@
             <div class="text-muted text-sm">Seleziona l'ambiente e genera</div>
           </div>
         </div>
-        <div class="card">
+        <div class="card gen-card" data-gen-id="rumors">
           <div class="card-header">
             <h3 class="card-title">💬 Voci di Corridoio</h3>
             <button class="btn btn-secondary btn-sm" onclick="Generatori.rollRumors()">🎲 Genera</button>
@@ -355,7 +356,7 @@
             <div class="text-muted text-sm">Genera 3 voci (2 vere, 1 falsa)</div>
           </div>
         </div>
-        <div class="card">
+        <div class="card gen-card" data-gen-id="accento">
           <div class="card-header">
             <h3 class="card-title">🎭 Voce & Accento</h3>
             <button class="btn btn-secondary btn-sm" onclick="Generatori.rollAccent()">🎲 Genera</button>
@@ -364,13 +365,8 @@
             <div class="text-muted text-sm">Genera suggerimenti per un PNG</div>
           </div>
         </div>
-      </div>
-
-      <!-- Riga 3: Tesoro + Shop + Viaggio -->
-      <div class="grid-2" style="gap:var(--space-md);margin-top:var(--space-md);">
-
         <!-- Shop Generator -->
-        <div class="card">
+        <div class="card gen-card" data-gen-id="shop">
           <div class="card-header">
             <h3 class="card-title">🏪 Shop Generator</h3>
             <button class="btn btn-secondary btn-sm" onclick="Generatori.rollShop()">🎲 Genera</button>
@@ -462,11 +458,7 @@
         </div>
 
 
-      </div>
-
-      <!-- Riga 4: Loot Generator -->
-      <div style="margin-top:var(--space-md);">
-        <div class="card">
+        <div class="card gen-card" data-gen-id="loot">
           <div class="card-header">
             <h3 class="card-title">🎁 Generatore Loot</h3>
             <button class="btn btn-secondary btn-sm" onclick="Generatori.rollLoot()">🎲 Genera Loot</button>
@@ -496,7 +488,7 @@
             <div class="text-muted text-sm">Seleziona il tipo e genera il loot</div>
           </div>
         </div>
-      </div>
+      </div><!-- fine generatori-grid -->
 
     </section>
 
@@ -5727,6 +5719,7 @@ const Schermo = (() => {
     // Aggiorna solo i body senza ricreare l'intera griglia se già renderizzata
     const alreadyRendered = grid.children.length === _blocks.length;
     if (!alreadyRendered) {
+      SchermoDD.reset();
       grid.innerHTML = _blocks.map((block, idx) => renderBlock(block, idx)).join('');
     }
     _blocks.forEach(b => updateBlockContent(b));
@@ -7230,91 +7223,81 @@ const apriFavoritoSchermo = async (tipo, id) => {
   if (fn && Compendio[fn]) Compendio[fn](id);
 };
 
-// ══ DRAG & DROP SCHERMO DM ══
+// ══ DRAG & DROP SCHERMO DM (SortableJS) ══
 const SchermoDD = (() => {
-  let _dragId = null;
+  let _sortable = null;
 
   const enable = () => {
-    const blocks = document.querySelectorAll('#schermo-grid .schermo-block');
-    if (!blocks.length) return;
+    const grid = document.getElementById('schermo-grid');
+    if (!grid || typeof Sortable === 'undefined') return;
 
-    blocks.forEach(block => {
-      const header = block.querySelector('.schermo-block-header');
-      if (!header) return;
+    // Distruggi istanza precedente se esiste
+    if (_sortable) { _sortable.destroy(); _sortable = null; }
 
-      // Drag handle sul header
-      header.style.cursor = 'grab';
+    _sortable = Sortable.create(grid, {
+      animation: 150,
+      handle: '.schermo-block-header',
+      ghostClass: 'sortable-ghost',
+      chosenClass: 'sortable-chosen',
+      dragClass: 'sortable-drag',
+      forceFallback: false,
+      onEnd: (evt) => {
+        if (evt.oldIndex === evt.newIndex) return;
+        Schermo._swapBlocks(evt.oldIndex, evt.newIndex);
+      },
+    });
 
-      // Desktop
-      block.setAttribute('draggable', 'true');
-      block.addEventListener('dragstart', e => {
-        _dragId = block.id;
-        block.style.opacity = '0.5';
-        e.dataTransfer.effectAllowed = 'move';
-      });
-      block.addEventListener('dragend', () => {
-        block.style.opacity = '';
-        document.querySelectorAll('.schermo-block').forEach(b => b.style.outline = '');
-        _dragId = null;
-      });
-      block.addEventListener('dragover', e => {
-        e.preventDefault();
-        if (_dragId && _dragId !== block.id) {
-          block.style.outline = '2px solid var(--accent-primary)';
-        }
-      });
-      block.addEventListener('dragleave', () => { block.style.outline = ''; });
-      block.addEventListener('drop', e => {
-        e.preventDefault();
-        block.style.outline = '';
-        if (!_dragId || _dragId === block.id) return;
-        // Trova indici e scambia
-        const allBlocks = [...document.querySelectorAll('#schermo-grid .schermo-block')];
-        const fromIdx = allBlocks.findIndex(b => b.id === _dragId);
-        const toIdx   = allBlocks.findIndex(b => b.id === block.id);
-        if (fromIdx !== -1 && toIdx !== -1) {
-          Schermo._swapBlocks(fromIdx, toIdx);
-        }
-      });
-
-      // Touch
-      let touchFromIdx = -1;
-      block.addEventListener('touchstart', e => {
-        const allBlocks = [...document.querySelectorAll('#schermo-grid .schermo-block')];
-        touchFromIdx = allBlocks.indexOf(block);
-        block.style.opacity = '0.5';
-      }, { passive: true });
-      block.addEventListener('touchmove', e => {
-        const t = e.touches[0];
-        const allBlocks = [...document.querySelectorAll('#schermo-grid .schermo-block')];
-        allBlocks.forEach(b => b.style.outline = '');
-        const target = allBlocks.find(b => {
-          const r = b.getBoundingClientRect();
-          return t.clientX >= r.left && t.clientX <= r.right &&
-                 t.clientY >= r.top  && t.clientY <= r.bottom && b !== block;
-        });
-        if (target) target.style.outline = '2px solid var(--accent-primary)';
-      }, { passive: true });
-      block.addEventListener('touchend', e => {
-        block.style.opacity = '';
-        const t = e.changedTouches[0];
-        const allBlocks = [...document.querySelectorAll('#schermo-grid .schermo-block')];
-        allBlocks.forEach(b => b.style.outline = '');
-        const target = allBlocks.find(b => {
-          const r = b.getBoundingClientRect();
-          return t.clientX >= r.left && t.clientX <= r.right &&
-                 t.clientY >= r.top  && t.clientY <= r.bottom && b !== block;
-        });
-        if (target && touchFromIdx !== -1) {
-          const toIdx = allBlocks.indexOf(target);
-          Schermo._swapBlocks(touchFromIdx, toIdx);
-        }
-        touchFromIdx = -1;
-      });
+    // Cursore grab sull'header
+    grid.querySelectorAll('.schermo-block-header').forEach(h => {
+      h.style.cursor = 'grab';
     });
   };
 
-  return { enable };
+  const reset = () => {
+    if (_sortable) { _sortable.destroy(); _sortable = null; }
+  };
+
+  return { enable, reset };
+})();
+
+// ══ DRAG & DROP GENERATORI (SortableJS) ══
+const GeneratoriDD = (() => {
+  const STORAGE_KEY = 'dm_generatori_order';
+  let _sortable = null;
+
+  const saveOrder = () => {
+    const grid = document.querySelector('#page-generatori .generatori-grid');
+    if (!grid) return;
+    const order = [...grid.querySelectorAll('.gen-card[data-gen-id]')].map(c => c.dataset.genId);
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(order)); } catch {}
+  };
+
+  const applyOrder = () => {
+    const grid = document.querySelector('#page-generatori .generatori-grid');
+    if (!grid) return;
+    let order = [];
+    try { order = JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; } catch {}
+    if (!order.length) return;
+    order.forEach(id => {
+      const card = grid.querySelector(`.gen-card[data-gen-id="${id}"]`);
+      if (card) grid.appendChild(card);
+    });
+  };
+
+  const enable = () => {
+    const grid = document.querySelector('#page-generatori .generatori-grid');
+    if (!grid || typeof Sortable === 'undefined') return;
+    if (_sortable) { _sortable.destroy(); _sortable = null; }
+    applyOrder();
+    _sortable = Sortable.create(grid, {
+      animation: 150,
+      ghostClass: 'sortable-ghost',
+      chosenClass: 'sortable-chosen',
+      onEnd: saveOrder,
+    });
+  };
+
+  return { enable, applyOrder };
 })();
 
 // Aspetta che tutti gli script defer siano caricati
