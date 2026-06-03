@@ -1357,8 +1357,8 @@
   }
   .comp-row { gap: 4px; padding: 5px 4px; overflow: hidden; }
   .comp-row-main { min-width: 0; flex: 1; overflow: hidden; }
-  .comp-row-name { font-size: 0.83rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .comp-row-meta { font-size: 0.7rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .comp-row-name { font-size: 0.83rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text-primary) !important; display: block; }
+  .comp-row-meta { font-size: 0.7rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text-muted) !important; display: block; }
   .comp-row-stats { flex-shrink: 0; display: flex; align-items: center; gap: 3px; }
   /* Su mobile mostra solo stella e primo badge */
   .comp-row-stats .comp-stat-pill:nth-child(n+2) { display: none; }
@@ -1367,6 +1367,11 @@
   /* Filtri compendio su mobile */
   .comp-filters > * { max-width: 100%; }
   .comp-filters label { font-size: 0.75rem; }
+
+  /* ── Incontri casuali — fix layout su mobile ── */
+  #gen-incontri-result { overflow: hidden; }
+  .gen-card .card-header { flex-wrap: wrap; gap: 4px; }
+  .gen-card .card-header select { flex: 1 1 auto; min-width: 0; font-size: 0.72rem; }
 
   /* ── Sessione — combat ── */
   .combat-header { flex-wrap: wrap; gap: 6px; }
