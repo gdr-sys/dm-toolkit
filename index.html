@@ -6090,9 +6090,9 @@ const Schermo = (() => {
     load();
     App.reloadActiveCampaign();
     render();
-    // Ri-render progressivi per dati asincroni
-    setTimeout(render, 150);
-    setTimeout(render, 600);
+    // Ri-render progressivi — ricarica campagna ogni volta per dati aggiornati
+    setTimeout(() => { App.reloadActiveCampaign(); render(); }, 200);
+    setTimeout(() => { App.reloadActiveCampaign(); render(); }, 800);
     Debug.log(`Schermo.init(): ${_blocks.length} blocchi`);
   };
 
@@ -6168,6 +6168,7 @@ const Schermo = (() => {
 
   // ── Contenuti blocchi ──
   const renderPreferiti = () => {
+    App.reloadActiveCampaign();
     const camp = App.getActiveCampaign();
     const favs = camp?.compendioFavoriti || [];
     if (!favs.length) return '<div class="text-muted text-sm">Nessun preferito. Aggiungi ⭐ dal Compendio.</div>';
@@ -6212,6 +6213,7 @@ const Schermo = (() => {
   };
 
   const renderPercezioni = () => {
+    App.reloadActiveCampaign();
     const camp = App.getActiveCampaign();
     if (!party.length) return '<div class="text-muted text-sm">Nessun PG. Aggiungili in Sessione → Party.</div>';
 
@@ -6494,6 +6496,7 @@ const Schermo = (() => {
   };
 
   const renderCompendioRef = (block) => {
+    App.reloadActiveCampaign();
     const sezione = block.content || ''; // id della regola scelta
     const capitoli = _compendioSections();
     const allRules = Compendio?.getData()?.rules || [];
