@@ -4368,13 +4368,23 @@ const Sessione = (() => {
         ${c.gs ? `<p class="text-sm">GS ${c.gs} · CA ${c.ca} · PF ${c.hp}/${c.maxHp}</p>` : ''}
       </div>`;
 
-    const titleEl = document.getElementById('comp-detail-title');
-    const bodyEl  = document.getElementById('comp-detail-body');
-    const btn     = document.getElementById('comp-detail-combat-btn');
-    if (titleEl) titleEl.textContent = `📋 ${c.nome}`;
-    if (bodyEl)  bodyEl.innerHTML = content;
-    if (btn)     btn.style.display = 'none';
-    Modal.open('comp-detail');
+    // Apri modal — funziona da qualsiasi pagina (Sessione o Schermo DM)
+    const existingModal = document.getElementById('combat-sheet-modal');
+    if (existingModal) existingModal.remove();
+
+    const modal = document.createElement('div');
+    modal.className = 'modal-overlay';
+    modal.id = 'combat-sheet-modal';
+    modal.style.cssText = 'display:flex;';
+    modal.innerHTML = `<div class="modal" style="max-width:540px;">
+      <div class="modal-header">
+        <h2 style="font-family:var(--font-display);font-size:1rem;">📋 ${c.nome}</h2>
+        <button class="btn btn-ghost btn-icon" onclick="document.getElementById('combat-sheet-modal')?.remove()">✕</button>
+      </div>
+      <div class="modal-body" style="padding:0;">${content}</div>
+    </div>`;
+    modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
+    document.body.appendChild(modal);
     Debug.log(`Combat sheet: ${c.nome} (${m ? 'da compendio' : 'custom'})`);
   };
 
