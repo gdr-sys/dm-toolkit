@@ -298,9 +298,11 @@
         </div>
       </div>
 
-      <!-- Generatore PNG Completo -->
-      <div class="grid-2" style="gap:var(--space-md);margin-bottom:var(--space-lg);">
-        <div class="card card-gold" style="grid-column:1/3;">
+      <!-- Griglia generatori riordinabile — tutte le card inclusa PNG -->
+      <div class="generatori-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:var(--space-md);">
+
+        <!-- PNG Completo — full width -->
+        <div class="card card-gold gen-card" data-gen-id="npc" style="grid-column:1/-1;">
           <div class="card-header">
             <h3 class="card-title">👤 Generatore PNG Completo</h3>
             <div style="display:flex;gap:var(--space-sm);">
@@ -311,15 +313,10 @@
           </div>
           <div id="gen-npc-result" style="min-height:80px;">
             <div class="empty-state" style="padding:var(--space-md);">
-              <div class="text-muted text-sm">Clicca "Genera" per creare un PNG completo al volo — nome, razza, professione, tratti, segreto, obiettivo, difetto, apparenza e stat block di base</div>
+              <div class="text-muted text-sm">Clicca "Genera" per creare un PNG completo al volo</div>
             </div>
           </div>
         </div>
-
-      </div>
-
-      <!-- Griglia generatori riordinabile -->
-      <div class="generatori-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:var(--space-md);">
         <div class="card gen-card" data-gen-id="meteo">
           <div class="card-header">
             <h3 class="card-title">🌤️ Meteo</h3>
@@ -382,6 +379,7 @@
                 <option value="magia">Emporio Arcano</option>
                 <option value="bazar">Bazar Strambo</option>
                 <option value="taverna_shop">Taverna (extra)</option>
+                <option value="biblioteca">📚 Biblioteca</option>
               </select>
             </div>
             <div class="form-group" style="margin-bottom:0;">
@@ -411,7 +409,7 @@
         </div>
 
         <!-- Calcolatore Viaggio -->
-        <div class="card">
+        <div class="card gen-card" data-gen-id="viaggio">
           <div class="card-header">
             <h3 class="card-title">🧭 Calcolatore Viaggio</h3>
             <button class="btn btn-secondary btn-sm" onclick="Generatori.calcViaggio()">Calcola</button>
@@ -488,6 +486,66 @@
             <div class="text-muted text-sm">Seleziona il tipo e genera il loot</div>
           </div>
         </div>
+        <!-- Stili di Vita & Servizi -->
+        <div class="card gen-card" data-gen-id="stilivita">
+          <div class="card-header">
+            <h3 class="card-title">🏨 Stili di Vita & Servizi</h3>
+          </div>
+          <div id="gen-stilivita-result">
+            <table style="width:100%;border-collapse:collapse;font-size:0.78rem;">
+              <thead><tr>
+                <th style="text-align:left;padding:3px 4px 3px 0;border-bottom:1px solid var(--border);font-family:var(--font-display);font-size:0.62rem;letter-spacing:0.05em;text-transform:uppercase;color:var(--text-muted);">Stile di vita</th>
+                <th style="text-align:right;padding:3px 0;border-bottom:1px solid var(--border);font-family:var(--font-display);font-size:0.62rem;letter-spacing:0.05em;text-transform:uppercase;color:var(--text-muted);">Costo/giorno</th>
+              </tr></thead>
+              <tbody>
+                <tr><td style="padding:3px 0;border-bottom:1px solid var(--border);">Miserabile</td><td style="padding:3px 0;text-align:right;font-family:var(--font-mono);color:var(--accent-secondary);border-bottom:1px solid var(--border);">— (da straccione)</td></tr>
+                <tr><td style="padding:3px 0;border-bottom:1px solid var(--border);">Squallido</td><td style="padding:3px 0;text-align:right;font-family:var(--font-mono);color:var(--accent-secondary);border-bottom:1px solid var(--border);">1 mr</td></tr>
+                <tr><td style="padding:3px 0;border-bottom:1px solid var(--border);">Povero</td><td style="padding:3px 0;text-align:right;font-family:var(--font-mono);color:var(--accent-secondary);border-bottom:1px solid var(--border);">2 mr</td></tr>
+                <tr><td style="padding:3px 0;border-bottom:1px solid var(--border);">Modesto</td><td style="padding:3px 0;text-align:right;font-family:var(--font-mono);color:var(--accent-secondary);border-bottom:1px solid var(--border);">1 mo</td></tr>
+                <tr><td style="padding:3px 0;border-bottom:1px solid var(--border);">Comodo</td><td style="padding:3px 0;text-align:right;font-family:var(--font-mono);color:var(--accent-secondary);border-bottom:1px solid var(--border);">2 mo</td></tr>
+                <tr><td style="padding:3px 0;border-bottom:1px solid var(--border);">Ricco</td><td style="padding:3px 0;text-align:right;font-family:var(--font-mono);color:var(--accent-secondary);border-bottom:1px solid var(--border);">4 mo</td></tr>
+                <tr><td style="padding:3px 0;">Aristocratico</td><td style="padding:3px 0;text-align:right;font-family:var(--font-mono);color:var(--accent-secondary);">10+ mo</td></tr>
+              </tbody>
+            </table>
+            <div style="margin-top:var(--space-sm);font-family:var(--font-display);font-size:0.62rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;padding-top:6px;border-top:1px solid var(--border);">Servizi comuni</div>
+            <table style="width:100%;border-collapse:collapse;font-size:0.78rem;margin-top:4px;">
+              <tbody>
+                <tr><td style="padding:2px 0;border-bottom:1px solid var(--border);">Notte in locanda (squallida)</td><td style="padding:2px 0;text-align:right;font-family:var(--font-mono);color:var(--accent-secondary);border-bottom:1px solid var(--border);">7 mr</td></tr>
+                <tr><td style="padding:2px 0;border-bottom:1px solid var(--border);">Notte in locanda (povera)</td><td style="padding:2px 0;text-align:right;font-family:var(--font-mono);color:var(--accent-secondary);border-bottom:1px solid var(--border);">1 ma</td></tr>
+                <tr><td style="padding:2px 0;border-bottom:1px solid var(--border);">Notte in locanda (modesta)</td><td style="padding:2px 0;text-align:right;font-family:var(--font-mono);color:var(--accent-secondary);border-bottom:1px solid var(--border);">5 ma</td></tr>
+                <tr><td style="padding:2px 0;border-bottom:1px solid var(--border);">Notte in locanda (comoda)</td><td style="padding:2px 0;text-align:right;font-family:var(--font-mono);color:var(--accent-secondary);border-bottom:1px solid var(--border);">8 ma</td></tr>
+                <tr><td style="padding:2px 0;border-bottom:1px solid var(--border);">Notte in locanda (ricca)</td><td style="padding:2px 0;text-align:right;font-family:var(--font-mono);color:var(--accent-secondary);border-bottom:1px solid var(--border);">2 mo</td></tr>
+                <tr><td style="padding:2px 0;border-bottom:1px solid var(--border);">Notte in locanda (aristocratica)</td><td style="padding:2px 0;text-align:right;font-family:var(--font-mono);color:var(--accent-secondary);border-bottom:1px solid var(--border);">4 mo</td></tr>
+                <tr><td style="padding:2px 0;border-bottom:1px solid var(--border);">Pasto semplice</td><td style="padding:2px 0;text-align:right;font-family:var(--font-mono);color:var(--accent-secondary);border-bottom:1px solid var(--border);">3 mr</td></tr>
+                <tr><td style="padding:2px 0;border-bottom:1px solid var(--border);">Pasto buono</td><td style="padding:2px 0;text-align:right;font-family:var(--font-mono);color:var(--accent-secondary);border-bottom:1px solid var(--border);">5 mr</td></tr>
+                <tr><td style="padding:2px 0;border-bottom:1px solid var(--border);">Boccale di birra</td><td style="padding:2px 0;text-align:right;font-family:var(--font-mono);color:var(--accent-secondary);border-bottom:1px solid var(--border);">4 mr</td></tr>
+                <tr><td style="padding:2px 0;border-bottom:1px solid var(--border);">Bottiglia di vino (comune)</td><td style="padding:2px 0;text-align:right;font-family:var(--font-mono);color:var(--accent-secondary);border-bottom:1px solid var(--border);">2 mr</td></tr>
+                <tr><td style="padding:2px 0;border-bottom:1px solid var(--border);">Stalla (per animale/notte)</td><td style="padding:2px 0;text-align:right;font-family:var(--font-mono);color:var(--accent-secondary);border-bottom:1px solid var(--border);">5 mr</td></tr>
+                <tr><td style="padding:2px 0;border-bottom:1px solid var(--border);">Guardia del corpo (giorno)</td><td style="padding:2px 0;text-align:right;font-family:var(--font-mono);color:var(--accent-secondary);border-bottom:1px solid var(--border);">2 mo</td></tr>
+                <tr><td style="padding:2px 0;border-bottom:1px solid var(--border);">Messaggero (per km)</td><td style="padding:2px 0;text-align:right;font-family:var(--font-mono);color:var(--accent-secondary);border-bottom:1px solid var(--border);">2 mr</td></tr>
+                <tr><td style="padding:2px 0;border-bottom:1px solid var(--border);">Traghetto / pedaggio</td><td style="padding:2px 0;text-align:right;font-family:var(--font-mono);color:var(--accent-secondary);border-bottom:1px solid var(--border);">1 mr</td></tr>
+                <tr><td style="padding:2px 0;">Carrozza (per km)</td><td style="padding:2px 0;text-align:right;font-family:var(--font-mono);color:var(--accent-secondary);">3 mr</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Biblioteca / Pergamene -->
+        <div class="card gen-card" data-gen-id="biblioteca">
+          <div class="card-header">
+            <h3 class="card-title">📚 Biblioteca & Pergamene</h3>
+            <select id="gen-bib-size" class="form-select" style="width:auto;font-size:0.75rem;" onchange="Generatori.rollBiblioteca()">
+              <option value="piccola">Piccola</option>
+              <option value="grande">Grande</option>
+              <option value="enorme">Enorme</option>
+            </select>
+            <button class="btn btn-secondary btn-sm" onclick="Generatori.rollBiblioteca()">🎲</button>
+          </div>
+          <div id="gen-bib-result">
+            <div class="text-muted text-sm">Seleziona la dimensione e genera l'inventario</div>
+          </div>
+        </div>
+
       </div><!-- fine generatori-grid -->
 
     </section>
@@ -4392,6 +4450,31 @@ const Sessione = (() => {
     }).join('');
   };
 
+  const addHomebrewMonster = (id) => {
+    const h = Compendio._getHB ? Compendio._getHB().find(x => x.id === id) : null;
+    // Usa i dati strutturati del mostro homebrew
+    const nome = h?.nome || 'Mostro Homebrew';
+    const pf = parseInt(h?.pf) || (h?.punti_ferita?.media) || 20;
+    const ca = parseInt(h?.ca) || (h?.classe_armatura) || 12;
+    const gs = parseFloat(h?.gs) || (h?.grado_sfida?.valore) || 1;
+    const bonusInit = Math.floor(((parseInt(h?.stat1?.split('/')[1]) || 10) - 10) / 2);
+
+    if (!_combat) newCombat();
+    const init = rollInit(bonusInit);
+    const combatant = {
+      id: 'c_hb_' + Date.now(),
+      nome, tipo: 'mostro',
+      hp: pf, maxHp: pf, ca,
+      iniziativa: init, iniziativaBonus: bonusInit,
+      condizioni: [], concentrazione: false, note: '',
+      homebrewId: id,
+    };
+    _combat.combatants.push(combatant);
+    saveCombat(_combat);
+    renderCombat();
+    Toast.show(`${nome} aggiunto al combat (Init: ${init})`, 'success');
+  };
+
   const addMonsterFromCompendio = (id) => {
     const m = MonsterCache.get(id) || Compendio?.getData()?.monsters?.find(x => x.id === id);
     if (!m) return;
@@ -4543,7 +4626,7 @@ const Sessione = (() => {
     changeHP, setHP, quickDamage,
     openCondizioneModal, submitCondizioni, removeCondizione,
     toggleConcentrazione, openNote,
-    addMonsterQuick, searchMonster, addMonsterFromCompendio,
+    addMonsterQuick, searchMonster, addMonsterFromCompendio, addHomebrewMonster,
     addCustomCombatant, submitCustomCombatant, removeCombatant,
     saveCombatSession, endCombat, loadCombatSession,
     openCombatantSheet, _rollAction,
@@ -5469,50 +5552,297 @@ const Compendio = (() => {
   const openHomebrew = (id) => {
     const h = _getHomebrew().find(x => x.id === id);
     if (!h) return;
-    const content = '<div style="max-height:65vh;overflow-y:auto;">' +
-      (h.sottotitolo ? '<div class="text-muted text-sm" style="margin-bottom:8px;">' + h.sottotitolo + '</div>' : '') +
-      '<div class="text-sm" style="line-height:1.75;white-space:pre-wrap;">' + (h.note||'Nessuna descrizione.') + '</div>' +
-      '</div>';
+
+    let content = '';
+    const row = (label, val) => val ? `<tr><td style="color:var(--text-muted);padding:3px 0;width:130px;font-family:var(--font-display);font-size:0.72rem;letter-spacing:0.04em;text-transform:uppercase;">${label}</td><td style="padding:3px 0;">${val}</td></tr>` : '';
+
+    switch (h.categoria) {
+      case 'monsters':
+        content = '<div style="max-height:65vh;overflow-y:auto;">' +
+          '<div style="font-size:0.82rem;color:var(--text-muted);margin-bottom:8px;font-style:italic;">' +
+            [h.dimensione, h.tipo, h.allineamento].filter(Boolean).join(', ') +
+          '</div>' +
+          '<table style="width:100%;border-collapse:collapse;font-size:0.85rem;margin-bottom:12px;">' +
+            row('Classe Armatura', h.ca) +
+            row('Punti Ferita', h.pf) +
+            row('Velocità', h.velocita) +
+            row('Grado Sfida', h.gs) +
+          '</table>' +
+          (h.stat1 || h.stat2 ? '<div style="display:grid;grid-template-columns:repeat(6,1fr);gap:4px;margin-bottom:12px;text-align:center;">' +
+            (h.stat1+'/'+h.stat2).split('/').map((s,i)=>{
+              const labels=['FOR','DES','COS','INT','SAG','CAR'];
+              const val=parseInt(s.trim())||10;
+              const mod=Math.floor((val-10)/2);
+              return `<div style="background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-sm);padding:4px 2px;"><div style="font-size:0.6rem;color:var(--text-muted);">${labels[i]||''}</div><div style="font-family:var(--font-mono);font-size:0.85rem;font-weight:700;">${val}</div><div style="font-size:0.65rem;color:var(--text-muted);">${mod>=0?'+':''}${mod}</div></div>`;
+            }).join('') +
+          '</div>' : '') +
+          '<table style="width:100%;border-collapse:collapse;font-size:0.85rem;margin-bottom:12px;">' +
+            row('Tiri Salvezza', h.ts) +
+            row('Sensi', h.sensi) +
+            row('Lingue', h.lingue) +
+            row('Immunità danni', h.immunitaDanni) +
+            row('Immunità cond.', h.immunitaCond) +
+          '</table>' +
+          (h.tratti ? '<div style="font-family:var(--font-display);font-size:0.7rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--accent-primary);margin:8px 0 4px;">Tratti</div><div style="font-size:0.85rem;white-space:pre-wrap;line-height:1.6;">' + h.tratti + '</div>' : '') +
+          (h.azioni ? '<div style="font-family:var(--font-display);font-size:0.7rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--accent-primary);margin:8px 0 4px;">Azioni</div><div style="font-size:0.85rem;white-space:pre-wrap;line-height:1.6;">' + h.azioni + '</div>' : '') +
+          (h.legact ? '<div style="font-family:var(--font-display);font-size:0.7rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--accent-primary);margin:8px 0 4px;">Azioni Leggendarie</div><div style="font-size:0.85rem;white-space:pre-wrap;line-height:1.6;">' + h.legact + '</div>' : '') +
+          '<div style="margin-top:12px;padding-top:8px;border-top:1px solid var(--border);">' +
+            '<button class="btn btn-primary btn-sm" onclick="Sessione.addHomebrewMonster(\''+id+'\');this.closest(\'.modal-overlay\').remove()">⚔️ Aggiungi al Combat Tracker</button>' +
+          '</div>' +
+        '</div>';
+        break;
+
+      case 'magic_items':
+        content = '<div style="max-height:65vh;overflow-y:auto;">' +
+          '<div style="display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap;">' +
+            (h.rarita ? `<span class="badge badge-muted">${h.rarita}</span>` : '') +
+            (h.tipo_base ? `<span class="badge badge-muted">${h.tipo_base}</span>` : '') +
+            (h.sintonia ? `<span class="badge badge-muted"><em>richiede sintonia${h.sintonia_con?' ('+h.sintonia_con+')':''}</em></span>` : '') +
+          '</div>' +
+          '<div class="text-sm" style="line-height:1.75;white-space:pre-wrap;">' + (h.descrizione||'—') + '</div>' +
+        '</div>';
+        break;
+
+      case 'equipment':
+        content = '<div style="max-height:65vh;overflow-y:auto;">' +
+          '<table style="width:100%;border-collapse:collapse;font-size:0.85rem;margin-bottom:12px;">' +
+            row('Categoria', h.categoria_eq) +
+            row('Costo', h.costo) +
+            row('Danni', h.danni) +
+            row('Peso', h.peso) +
+            row('Proprietà', h.proprieta) +
+          '</table>' +
+          (h.descrizione ? '<div class="text-sm" style="line-height:1.75;white-space:pre-wrap;">' + h.descrizione + '</div>' : '') +
+        '</div>';
+        break;
+
+      case 'spells':
+        const isConc = (h.durata||'').toLowerCase().includes('concentrazione');
+        content = '<div style="max-height:65vh;overflow-y:auto;">' +
+          '<div style="display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap;">' +
+            `<span class="badge badge-muted">${h.livello===0?'Trucchetto':h.livello+'° livello'}</span>` +
+            (h.scuola ? `<span class="badge badge-muted">${h.scuola}</span>` : '') +
+            (h.rituale ? '<span class="badge badge-gold">Rituale</span>' : '') +
+            (isConc ? '<span class="badge badge-blue">Concentrazione</span>' : '') +
+          '</div>' +
+          '<table style="width:100%;border-collapse:collapse;font-size:0.85rem;margin-bottom:12px;">' +
+            row('Tempo di lancio', h.tempo_lancio) +
+            row('Gittata', h.gittata) +
+            row('Componenti', h.componenti) +
+            row('Durata', h.durata) +
+            row('Classi', h.classi) +
+          '</table>' +
+          '<div class="text-sm" style="line-height:1.75;white-space:pre-wrap;">' + (h.descrizione||'—') + '</div>' +
+        '</div>';
+        break;
+
+      default:
+        content = '<div style="max-height:65vh;overflow-y:auto;">' +
+          (h.capitolo ? '<div class="text-muted text-sm" style="margin-bottom:8px;">' + h.capitolo + '</div>' : '') +
+          (h.sotto ? '<div class="text-muted text-sm" style="margin-bottom:8px;">' + h.sotto + '</div>' : '') +
+          '<div class="text-sm" style="line-height:1.75;white-space:pre-wrap;">' + (h.descrizione||'—') + '</div>' +
+        '</div>';
+    }
+
     openDetailModal(h.nome, content);
+  };
+
+  // ── Form homebrew strutturati per categoria ──
+  const _hbFormFields = (cat, h) => {
+    const v = (key, def='') => h?.[key] ?? def;
+    const sel = (key, opts) => opts.map(([val, lbl]) =>
+      `<option value="${val}"${v(key)===val?' selected':''}>${lbl}</option>`).join('');
+
+    switch (cat) {
+      case 'monsters': return `
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Dimensione</label>
+            <select id="hb-dimensione" class="form-select">
+              ${sel('dimensione',[['Minuscola','Minuscola'],['Piccola','Piccola'],['Media','Media'],['Grande','Grande'],['Enorme','Enorme'],['Mastodontica','Mastodontica']])}
+            </select></div>
+          <div class="form-group"><label class="form-label">Tipo</label>
+            <input id="hb-tipo" class="form-input" value="${v('tipo')}" placeholder="es. Non Morto, Bestia"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Allineamento</label>
+            <input id="hb-allineamento" class="form-input" value="${v('allineamento')}" placeholder="es. Caotico Malvagio"></div>
+          <div class="form-group"><label class="form-label">Grado Sfida</label>
+            <input id="hb-gs" class="form-input" value="${v('gs')}" placeholder="es. 5 (1.800 PE)"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Punti Ferita</label>
+            <input id="hb-pf" class="form-input" value="${v('pf')}" placeholder="es. 52 (7d10+14)"></div>
+          <div class="form-group"><label class="form-label">Classe Armatura</label>
+            <input id="hb-ca" class="form-input" value="${v('ca')}" placeholder="es. 15 (armatura naturale)"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Velocità</label>
+            <input id="hb-velocita" class="form-input" value="${v('velocita')}" placeholder="es. 9m, volare 18m"></div>
+          <div class="form-group"><label class="form-label">Tiro Salvezza Bonus</label>
+            <input id="hb-ts" class="form-input" value="${v('ts')}" placeholder="es. FOR +5, COS +4"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">FOR / DES / COS</label>
+            <input id="hb-stat1" class="form-input" value="${v('stat1')}" placeholder="es. 16 / 12 / 15"></div>
+          <div class="form-group"><label class="form-label">INT / SAG / CAR</label>
+            <input id="hb-stat2" class="form-input" value="${v('stat2')}" placeholder="es. 8 / 10 / 6"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Immunità danni</label>
+            <input id="hb-immunitaDanni" class="form-input" value="${v('immunitaDanni')}" placeholder="es. Fuoco, Veleno"></div>
+          <div class="form-group"><label class="form-label">Immunità condizioni</label>
+            <input id="hb-immunitaCond" class="form-input" value="${v('immunitaCond')}" placeholder="es. Avvelenato, Paralizzato"></div>
+        </div>
+        <div class="form-group"><label class="form-label">Sensi</label>
+          <input id="hb-sensi" class="form-input" value="${v('sensi')}" placeholder="es. Scurovisione 18m, Perc. Passiva 12"></div>
+        <div class="form-group"><label class="form-label">Lingue</label>
+          <input id="hb-lingue" class="form-input" value="${v('lingue')}" placeholder="es. Comune, Abissale"></div>
+        <div class="form-group"><label class="form-label">Tratti speciali</label>
+          <textarea id="hb-tratti" class="form-input" rows="3" placeholder="Tratti passivi (es. Resistenza Magica: vantaggio ai TS contro magie...)">${v('tratti')}</textarea></div>
+        <div class="form-group"><label class="form-label">Azioni</label>
+          <textarea id="hb-azioni" class="form-input" rows="4" placeholder="Attacchi e azioni (es. Spada: +5 a colpire, 1d8+3 taglienti...)">${v('azioni')}</textarea></div>
+        <div class="form-group"><label class="form-label">Azioni leggendarie / bonus / reazioni</label>
+          <textarea id="hb-legact" class="form-input" rows="3" placeholder="Azioni leggendarie, bonus action, reazioni...">${v('legact')}</textarea></div>`;
+
+      case 'magic_items': return `
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Tipo</label>
+            <select id="hb-tipo_base" class="form-select">
+              ${sel('tipo_base',[['Arma','Arma'],['Armatura','Armatura'],['Scudo','Scudo'],['Anello','Anello'],['Bacchetta','Bacchetta'],['Bastone','Bastone'],['Verga','Verga'],['Oggetto meraviglioso','Oggetto meraviglioso'],['Pozione','Pozione'],['Pergamena','Pergamena']])}
+            </select></div>
+          <div class="form-group"><label class="form-label">Rarità</label>
+            <select id="hb-rarita" class="form-select">
+              ${sel('rarita',[['comune','Comune'],['non comune','Non comune'],['raro','Raro'],['molto raro','Molto raro'],['leggendario','Leggendario'],['variabile','Variabile']])}
+            </select></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label" style="display:flex;align-items:center;gap:6px;">
+            <input type="checkbox" id="hb-sintonia" ${v('sintonia')?'checked':''}> Richiede sintonia</label></div>
+          <div class="form-group"><label class="form-label">Con chi (sintonia)</label>
+            <input id="hb-sintonia_con" class="form-input" value="${v('sintonia_con')}" placeholder="es. solo da un druido"></div>
+        </div>
+        <div class="form-group"><label class="form-label">Descrizione / Effetti</label>
+          <textarea id="hb-descrizione" class="form-input" rows="6" placeholder="Descrivi proprietà, cariche, effetti...">${v('descrizione')}</textarea></div>`;
+
+      case 'equipment': return `
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Categoria</label>
+            <select id="hb-categoria_eq" class="form-select">
+              ${sel('categoria_eq',[['Mischia semplice','Mischia semplice'],['Mischia da guerra','Mischia da guerra'],['Distanza semplice','Distanza semplice'],['Distanza da guerra','Distanza da guerra'],['Leggera','Armatura Leggera'],['Media','Armatura Media'],['Pesante','Armatura Pesante'],['Scudo','Scudo'],["Equipaggiamento d'avventura","Equipaggiamento d'avventura"],['Strumenti','Strumenti'],['Altro','Altro']])}
+            </select></div>
+          <div class="form-group"><label class="form-label">Costo</label>
+            <input id="hb-costo" class="form-input" value="${v('costo')}" placeholder="es. 15 mo"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Danni</label>
+            <input id="hb-danni" class="form-input" value="${v('danni')}" placeholder="es. 1d8 taglienti"></div>
+          <div class="form-group"><label class="form-label">Peso</label>
+            <input id="hb-peso" class="form-input" value="${v('peso')}" placeholder="es. 2 kg"></div>
+        </div>
+        <div class="form-group"><label class="form-label">Proprietà</label>
+          <input id="hb-proprieta" class="form-input" value="${v('proprieta')}" placeholder="es. leggera, lancio 6/18m, versatile (1d10)"></div>
+        <div class="form-group"><label class="form-label">Descrizione / Note</label>
+          <textarea id="hb-descrizione" class="form-input" rows="4" placeholder="Descrizione o regole speciali...">${v('descrizione')}</textarea></div>`;
+
+      case 'spells': return `
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Livello</label>
+            <select id="hb-livello" class="form-select">
+              ${[0,1,2,3,4,5,6,7,8,9].map(l=>`<option value="${l}"${v('livello',0)==l?' selected':''}>${l===0?'Trucchetto':l+'° livello'}</option>`).join('')}
+            </select></div>
+          <div class="form-group"><label class="form-label">Scuola</label>
+            <select id="hb-scuola" class="form-select">
+              ${sel('scuola',[['Abiurazione','Abiurazione'],['Ammaliamento','Ammaliamento'],['Divinazione','Divinazione'],['Evocazione','Evocazione'],['Illusione','Illusione'],['Invocazione','Invocazione'],['Necromanzia','Necromanzia'],['Trasmutazione','Trasmutazione']])}
+            </select></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Tempo di lancio</label>
+            <input id="hb-tempo_lancio" class="form-input" value="${v('tempo_lancio')}" placeholder="es. 1 azione"></div>
+          <div class="form-group"><label class="form-label">Gittata</label>
+            <input id="hb-gittata" class="form-input" value="${v('gittata')}" placeholder="es. 30m, Sé stessi"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Componenti</label>
+            <input id="hb-componenti" class="form-input" value="${v('componenti')}" placeholder="es. V, S, M (un ramoscello)"></div>
+          <div class="form-group"><label class="form-label">Durata</label>
+            <input id="hb-durata" class="form-input" value="${v('durata')}" placeholder="es. Concentrazione, fino a 1 minuto"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label" style="display:flex;align-items:center;gap:6px;">
+            <input type="checkbox" id="hb-rituale" ${v('rituale')?'checked':''}> Rituale</label></div>
+          <div class="form-group"><label class="form-label">Classi</label>
+            <input id="hb-classi" class="form-input" value="${v('classi')}" placeholder="es. Mago, Stregone"></div>
+        </div>
+        <div class="form-group"><label class="form-label">Descrizione</label>
+          <textarea id="hb-descrizione" class="form-input" rows="6" placeholder="Effetti dell'incantesimo...">${v('descrizione')}</textarea></div>`;
+
+      case 'rules': return `
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Capitolo / Categoria</label>
+            <input id="hb-capitolo" class="form-input" value="${v('capitolo')}" placeholder="es. Combattimento, Magia, Esplorazione"></div>
+        </div>
+        <div class="form-group"><label class="form-label">Regola / Descrizione</label>
+          <textarea id="hb-descrizione" class="form-input" rows="8" placeholder="Testo della regola, tabelle, esempi...">${v('descrizione')}</textarea></div>`;
+
+      default: return `
+        <div class="form-group"><label class="form-label">Sottotitolo / Tipo</label>
+          <input id="hb-sub" class="form-input" value="${v('sotto')}" placeholder="es. Oggetto, Luogo, Evento"></div>
+        <div class="form-group"><label class="form-label">Descrizione / Note</label>
+          <textarea id="hb-descrizione" class="form-input" rows="7" placeholder="Descrizione libera...">${v('descrizione')}</textarea></div>`;
+    }
   };
 
   const openHomebrewModal = (id) => {
     const h = id ? _getHomebrew().find(x => x.id === id) : null;
+    const cat = h?.categoria || 'monsters';
+
     const modal = document.createElement('div');
     modal.className = 'modal-overlay';
     modal.style.cssText = 'display:flex;';
-    modal.innerHTML = '<div class="modal" style="max-width:520px;">' +
-      '<div class="modal-header">' +
-        '<h2 style="font-family:var(--font-display);font-size:1.1rem;">' + (h ? 'Modifica' : 'Nuovo') + ' Homebrew</h2>' +
-        '<button class="btn btn-ghost btn-icon" onclick="this.closest(\'.modal-overlay\').remove()">✕</button>' +
-      '</div>' +
-      '<div class="modal-body">' +
-        '<div class="form-group"><label class="form-label">Nome *</label>' +
-          '<input type="text" id="hb-nome" class="form-input" value="' + (h?.nome||'') + '" placeholder="es. Spada del Destino"></div>' +
-        '<div class="form-row">' +
-          '<div class="form-group"><label class="form-label">Categoria</label>' +
-            '<select id="hb-cat" class="form-select">' +
-              '<option value="monsters"' + (h?.categoria==='monsters'?' selected':'') + '>🐉 Mostri</option>' +
-              '<option value="magic_items"' + (h?.categoria==='magic_items'?' selected':'') + '>✨ Oggetti Magici</option>' +
-              '<option value="equipment"' + (h?.categoria==='equipment'?' selected':'') + '>⚔️ Equipaggiamento</option>' +
-              '<option value="spells"' + (h?.categoria==='spells'?' selected':'') + '>💫 Incantesimi</option>' +
-              '<option value="rules"' + (h?.categoria==='rules'?' selected':'') + '>📖 Regole</option>' +
-              '<option value="altro"' + (!h?.categoria||h?.categoria==='altro'?' selected':'') + '>📌 Altro (solo Homebrew)</option>' +
-            '</select></div>' +
-          '<div class="form-group"><label class="form-label">Sottotitolo / Tipo</label>' +
-            '<input type="text" id="hb-sub" class="form-input" value="' + (h?.sottotitolo||'') + '" placeholder="es. Arma, Raro"></div>' +
+    modal.id = 'hb-modal';
+
+    const catOptions = [
+      ['monsters','🐉 Mostri'],['magic_items','✨ Oggetti Magici'],
+      ['equipment','⚔️ Equipaggiamento'],['spells','💫 Incantesimi'],
+      ['rules','📖 Regole'],['altro','📌 Altro'],
+    ].map(([v,l]) => `<option value="${v}"${cat===v?' selected':''}>${l}</option>`).join('');
+
+    modal.innerHTML =
+      '<div class="modal" style="max-width:580px;">' +
+        '<div class="modal-header">' +
+          '<h2 style="font-family:var(--font-display);font-size:1.1rem;">' + (h?'Modifica':'Nuovo') + ' Homebrew</h2>' +
+          '<button class="btn btn-ghost btn-icon" onclick="this.closest(\'.modal-overlay\').remove()">✕</button>' +
         '</div>' +
-        '<div class="form-group"><label class="form-label">Descrizione / Note</label>' +
-          '<textarea id="hb-note" class="form-input" rows="6" style="resize:vertical;" placeholder="Descrizione, statistiche, effetti...">' + (h?.note||'') + '</textarea></div>' +
-      '</div>' +
-      '<div class="modal-footer">' +
-        '<button class="btn btn-ghost" onclick="this.closest(\'.modal-overlay\').remove()">Annulla</button>' +
-        '<button class="btn btn-primary" onclick="Compendio.saveHomebrew(\'' + (h?.id||'') + '\',this)">💾 Salva</button>' +
-      '</div>' +
-    '</div>';
+        '<div class="modal-body" style="max-height:70vh;overflow-y:auto;">' +
+          '<div class="form-row" style="margin-bottom:var(--space-md);">' +
+            '<div class="form-group" style="flex:2;">' +
+              '<label class="form-label">Nome *</label>' +
+              '<input type="text" id="hb-nome" class="form-input" value="' + (h?.nome||'') + '" placeholder="Nome">' +
+            '</div>' +
+            '<div class="form-group">' +
+              '<label class="form-label">Categoria</label>' +
+              '<select id="hb-cat" class="form-select" onchange="Compendio._refreshHBForm(this.value,\'' + (h?.id||'') + '\')">' +
+                catOptions +
+              '</select>' +
+            '</div>' +
+          '</div>' +
+          '<div id="hb-fields">' + _hbFormFields(cat, h) + '</div>' +
+        '</div>' +
+        '<div class="modal-footer">' +
+          '<button class="btn btn-ghost" onclick="this.closest(\'.modal-overlay\').remove()">Annulla</button>' +
+          '<button class="btn btn-primary" onclick="Compendio.saveHomebrew(\'' + (h?.id||'') + '\',this)">💾 Salva</button>' +
+        '</div>' +
+      '</div>';
+
     modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
     document.body.appendChild(modal);
     setTimeout(() => document.getElementById('hb-nome')?.focus(), 100);
+  };
+
+  const _refreshHBForm = (cat, id) => {
+    const h = id ? _getHomebrew().find(x => x.id === id) : null;
+    const fields = document.getElementById('hb-fields');
+    if (fields) fields.innerHTML = _hbFormFields(cat, h);
   };
 
   const editHomebrew = (id) => openHomebrewModal(id);
@@ -5520,20 +5850,72 @@ const Compendio = (() => {
   const saveHomebrew = (id, btn) => {
     const nome = document.getElementById('hb-nome')?.value?.trim();
     if (!nome) { Toast.show('Inserisci un nome', 'warning'); return; }
-    const cat  = document.getElementById('hb-cat')?.value  || 'altro';
-    const sub  = document.getElementById('hb-sub')?.value?.trim() || '';
-    const note = document.getElementById('hb-note')?.value?.trim() || '';
+    const cat = document.getElementById('hb-cat')?.value || 'altro';
+
+    // Raccogli tutti i campi per categoria
+    const g = (sid) => document.getElementById(sid)?.value?.trim() || '';
+    const gc = (sid) => document.getElementById(sid)?.checked || false;
+
+    let dati = { nome, categoria: cat };
+
+    switch (cat) {
+      case 'monsters':
+        dati = { ...dati,
+          dimensione: g('hb-dimensione'), tipo: g('hb-tipo'),
+          allineamento: g('hb-allineamento'), gs: g('hb-gs'),
+          pf: g('hb-pf'), ca: g('hb-ca'), velocita: g('hb-velocita'),
+          ts: g('hb-ts'), stat1: g('hb-stat1'), stat2: g('hb-stat2'),
+          immunitaDanni: g('hb-immunitaDanni'), immunitaCond: g('hb-immunitaCond'),
+          sensi: g('hb-sensi'), lingue: g('hb-lingue'),
+          tratti: g('hb-tratti'), azioni: g('hb-azioni'), legact: g('hb-legact'),
+          // Per il combat tracker
+          classe_armatura: parseInt(g('hb-ca')) || 10,
+          punti_ferita: { media: parseInt(g('hb-pf')) || 10 },
+          grado_sfida: { valore: parseFloat(g('hb-gs')) || 1 },
+        };
+        break;
+      case 'magic_items':
+        dati = { ...dati,
+          tipo_base: g('hb-tipo_base'), rarita: g('hb-rarita'),
+          sintonia: gc('hb-sintonia'), sintonia_con: g('hb-sintonia_con'),
+          descrizione: g('hb-descrizione'),
+        };
+        break;
+      case 'equipment':
+        dati = { ...dati,
+          categoria_eq: g('hb-categoria_eq'), costo: g('hb-costo'),
+          danni: g('hb-danni'), peso: g('hb-peso'),
+          proprieta: g('hb-proprieta'), descrizione: g('hb-descrizione'),
+        };
+        break;
+      case 'spells':
+        dati = { ...dati,
+          livello: parseInt(document.getElementById('hb-livello')?.value) || 0,
+          scuola: g('hb-scuola'), tempo_lancio: g('hb-tempo_lancio'),
+          gittata: g('hb-gittata'), componenti: g('hb-componenti'),
+          durata: g('hb-durata'), rituale: gc('hb-rituale'),
+          classi: g('hb-classi'), descrizione: g('hb-descrizione'),
+        };
+        break;
+      case 'rules':
+        dati = { ...dati, capitolo: g('hb-capitolo'), descrizione: g('hb-descrizione') };
+        break;
+      default:
+        dati = { ...dati, sotto: g('hb-sub'), descrizione: g('hb-descrizione') };
+    }
+
     let list = _getHomebrew();
     if (id) {
       const idx = list.findIndex(x => x.id === id);
-      if (idx !== -1) list[idx] = { ...list[idx], nome, categoria: cat, sottotitolo: sub, note };
+      if (idx !== -1) list[idx] = { ...list[idx], ...dati };
     } else {
-      list.push({ id: 'hb_' + Date.now(), nome, categoria: cat, sottotitolo: sub, note });
+      list.push({ id: 'hb_' + Date.now(), ...dati });
     }
     _saveHomebrew(list);
     btn.closest('.modal-overlay').remove();
     Toast.show('✅ Homebrew salvato', 'success');
     if (_activeTab === 'homebrew') render();
+    Debug.log('Homebrew salvato: ' + nome + ' [' + cat + ']');
   };
 
   const deleteHomebrew = (id) => {
@@ -5563,6 +5945,7 @@ const Compendio = (() => {
     init, switchTab, onSearch, onFilter,
     openMonster, openMagicItem, openEquipment, openRule, openSpell,
     openHomebrew, openHomebrewModal, editHomebrew, saveHomebrew, deleteHomebrew,
+    _refreshHBForm, _getHB: _getHomebrew,
     sendCurrentToCombat, changeSistema, toggleFavorito,
     getData: () => _data,
   };
@@ -6524,6 +6907,53 @@ const Generatori = {
     Debug.log(`PNG salvato: ${npc.name}`);
   },
 
+  rollBiblioteca: async () => {
+    const size = document.getElementById('gen-bib-size')?.value || 'piccola';
+    const el = document.getElementById('gen-bib-result');
+    if (!el) return;
+
+    // Carica incantesimi dalla giusta edizione
+    const camp = App.getActiveCampaign();
+    const sistema = camp?.system === '5e2014' ? '5e2014' : '5e2024';
+    const spFile = sistema === '5e2014' ? 'srd_5_1_spells.json' : 'srd_5_2_1_spells.json';
+    let spells = [];
+    try {
+      const r = await fetch('data/' + spFile);
+      if (r.ok) spells = await r.json();
+    } catch(e) {}
+
+    // Disponibilità per dimensione
+    const config = {
+      piccola: { maxLv:3, n:6,  prezzi:{0:10,1:60,2:120,3:200}, desc:'Una stanza con scaffali polverosi. Incantesimi comuni, qualche testo di storia.' },
+      grande:  { maxLv:6, n:10, prezzi:{0:10,1:60,2:120,3:200,4:320,5:640,6:1280}, desc:'Biblioteca civica o universitaria. Ottima selezione, anche testi rari.' },
+      enorme:  { maxLv:9, n:16, prezzi:{0:10,1:60,2:120,3:200,4:320,5:640,6:1280,7:2560,8:5120,9:10240}, desc:'Archivio monumentale. Pergamene di ogni livello, testi proibiti, grimori antichi.' },
+    };
+    const cfg = config[size];
+
+    // Seleziona incantesimi casuali disponibili
+    const available = spells.filter(s => s.livello <= cfg.maxLv);
+    const shuffled = [...available].sort(() => Math.random() - 0.5).slice(0, cfg.n);
+
+    const nomiNomi = { piccola:['Archivio di Fratel Aldric','Scriptorium del Borgo','La Biblioteca Impolverata'], grande:['Accademia delle Arti Arcane','Biblioteca Civica di Valmoore','Il Gran Scriptorium'], enorme:['Archivio dei Mille Nomi','La Biblioteca dell\'Oracolo','Il Vault dei Segreti'] };
+    const nome = rnd(nomiNomi[size]);
+
+    el.innerHTML = '<div style="font-family:var(--font-display);font-size:0.8rem;color:var(--accent-secondary);margin-bottom:4px;">' + nome + '</div>' +
+      '<div class="text-muted text-sm" style="margin-bottom:8px;">' + cfg.desc + '</div>' +
+      '<table style="width:100%;border-collapse:collapse;font-size:0.78rem;">' +
+        '<thead><tr>' +
+          '<th style="text-align:left;padding:3px 0;border-bottom:1px solid var(--border);font-family:var(--font-display);font-size:0.62rem;letter-spacing:0.05em;text-transform:uppercase;color:var(--text-muted);">Pergamena</th>' +
+          '<th style="text-align:center;padding:3px 4px;border-bottom:1px solid var(--border);font-family:var(--font-display);font-size:0.62rem;letter-spacing:0.05em;text-transform:uppercase;color:var(--text-muted);">Lv</th>' +
+          '<th style="text-align:right;padding:3px 0;border-bottom:1px solid var(--border);font-family:var(--font-display);font-size:0.62rem;letter-spacing:0.05em;text-transform:uppercase;color:var(--text-muted);">Prezzo</th>' +
+        '</tr></thead><tbody>' +
+        shuffled.map(s =>
+          '<tr><td style="padding:3px 0;border-bottom:1px solid var(--border);">📜 ' + s.nome + '</td>' +
+          '<td style="padding:3px 4px;border-bottom:1px solid var(--border);text-align:center;font-family:var(--font-mono);color:var(--text-muted);">' + s.livello + '</td>' +
+          '<td style="padding:3px 0;border-bottom:1px solid var(--border);text-align:right;font-family:var(--font-mono);color:var(--accent-secondary);">' + (cfg.prezzi[s.livello]||'—') + ' mo</td></tr>'
+        ).join('') +
+        '</tbody></table>';
+    Debug.log('Biblioteca: ' + nome + ' (' + shuffled.length + ' pergamene)');
+  },
+
   rollWeather: async () => {
     const t = await loadTabelle();
     if (!t) return;
@@ -6723,7 +7153,31 @@ const Generatori = {
       magia:          ["Equipaggiamento d'avventura", 'Dotazioni', 'Strumenti speciali', 'Strumenti'],
       bazar:          ["Equipaggiamento d'avventura", 'Dotazioni', 'Giochi', 'Merci'],
       taverna_shop:   ['Vitto e alloggio', 'Stile di vita', 'Servizi', 'Servizi magici'],
+      biblioteca:    ["Equipaggiamento d'avventura", 'Strumenti'],  // fallback, gestito separatamente
     };
+
+    // ── Gestione speciale: Biblioteca ──
+    if (tipo === 'biblioteca') {
+      el.innerHTML = '<div class="text-muted text-sm">Usa il generatore <strong>📚 Biblioteca</strong> nella griglia per le pergamene. Lo Shop mostra equipaggiamento fisico.</div>';
+      // Genera comunque pergamene base
+      const prezziScroll = { basso:{0:10,1:60}, medio:{0:10,1:60,2:120,3:200,4:320}, alto:{0:10,1:60,2:120,3:200,4:320,5:640,6:1280} };
+      const scrollLv = prezziScroll[livello] || prezziScroll.medio;
+      const nomeNeg = rnd(['Archivio di Fratel Aldric','Scriptorium del Borgo','La Libreria Arcana']);
+      el.innerHTML = `<div style="font-family:var(--font-display);font-size:0.8rem;color:var(--accent-secondary);margin-bottom:6px;">${nomeNeg} <span class="badge badge-muted" style="font-size:0.6rem;">${lvLabel}</span></div>` +
+        '<table style="width:100%;border-collapse:collapse;font-size:0.78rem;"><thead><tr>' +
+        '<th style="text-align:left;padding:3px 0;border-bottom:1px solid var(--border);font-family:var(--font-display);font-size:0.62rem;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-muted);">Pergamena</th>' +
+        '<th style="text-align:right;padding:3px 0;border-bottom:1px solid var(--border);font-family:var(--font-display);font-size:0.62rem;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-muted);">Prezzo</th>' +
+        '</tr></thead><tbody>' +
+        Object.entries(scrollLv).map(([lv, p]) => {
+          const prezFin = Math.round(p * mult);
+          return `<tr><td style="padding:3px 0;border-bottom:1px solid var(--border);">📜 Pergamena magica (${lv}° livello)</td>` +
+            `<td style="padding:3px 0;border-bottom:1px solid var(--border);text-align:right;font-family:var(--font-mono);color:var(--accent-secondary);">${prezFin} mo</td></tr>`;
+        }).join('') +
+        '</tbody></table>' +
+        '<div class="text-muted text-sm" style="margin-top:6px;">Livelli disponibili variano per dimensione biblioteca. Usa il generatore 📚 per la lista completa.</div>';
+      Debug.log(`Shop biblioteca: ${nomeNeg}`);
+      return;
+    }
 
     // Soglia prezzo base per livello (in mo) — equipaggiamento
     const prezzoMax = { basso: 75, medio: 750, alto: 999999 };
@@ -6740,29 +7194,30 @@ const Generatori = {
     // Oggetti magici fissi per livello (con bonus +1/+2/+3)
     const magicoFisso = {
       basso: [
-        { n: 'Pozione di cura',         p: 50,   u: 'mo', qMin:2, qMax:4 },
-        { n: 'Pergamena (trucchetto)',   p: 25,   u: 'mo', qMin:1, qMax:3 },
-        { n: 'Pergamena (1° livello)',   p: 75,   u: 'mo', qMin:1, qMax:2 },
-        { n: 'Olio lucente',             p: 50,   u: 'mo', qMin:1, qMax:2 },
+        { n: 'Pozione di guarigione',         p: 50,  u: 'mo', qMin:2, qMax:5 },
+        { n: 'Pergamena magica (0° livello)',  p: 10,  u: 'mo', qMin:2, qMax:4 },
+        { n: 'Pergamena magica (1° livello)',  p: 60,  u: 'mo', qMin:1, qMax:3 },
       ],
       medio: [
-        { n: 'Pozione di cura',          p: 50,   u: 'mo', qMin:2, qMax:4 },
-        { n: 'Pozione di cura superiore',p: 150,  u: 'mo', qMin:1, qMax:2 },
-        { n: 'Pergamena (2° livello)',   p: 150,  u: 'mo', qMin:1, qMax:2 },
-        { n: 'Pergamena (3° livello)',   p: 300,  u: 'mo', qMin:1, qMax:1 },
-        { n: 'Arma +1',                  p: 1000, u: 'mo', qMin:1, qMax:1, raro:true },
-        { n: 'Scudo +1',                 p: 1000, u: 'mo', qMin:1, qMax:1, raro:true },
-        { n: 'Armatura +1',              p: 1500, u: 'mo', qMin:1, qMax:1, raro:true },
+        { n: 'Pozione di guarigione',              p: 50,   u: 'mo', qMin:2, qMax:4 },
+        { n: 'Pozione di guarigione superiore',    p: 150,  u: 'mo', qMin:1, qMax:2 },
+        { n: 'Pergamena magica (2° livello)',      p: 120,  u: 'mo', qMin:1, qMax:2 },
+        { n: 'Pergamena magica (3° livello)',      p: 200,  u: 'mo', qMin:1, qMax:1 },
+        { n: 'Arma +1',                            p: 1000, u: 'mo', qMin:1, qMax:1, raro:true },
+        { n: 'Scudo +1',                           p: 1500, u: 'mo', qMin:1, qMax:1, raro:true },
+        { n: 'Armatura +1',                        p: 1500, u: 'mo', qMin:1, qMax:1, raro:true },
       ],
       alto: [
-        { n: 'Pozione di cura grande',   p: 450,  u: 'mo', qMin:1, qMax:3 },
-        { n: 'Pozione di cura suprema',  p: 1350, u: 'mo', qMin:1, qMax:2 },
-        { n: 'Pergamena (4°-5° livello)',p: 1500, u: 'mo', qMin:1, qMax:1 },
-        { n: 'Arma +1',                  p: 1000, u: 'mo', qMin:1, qMax:2, raro:true },
-        { n: 'Arma +2',                  p: 4000, u: 'mo', qMin:1, qMax:1, raro:true },
-        { n: 'Scudo +1',                 p: 1000, u: 'mo', qMin:1, qMax:1, raro:true },
-        { n: 'Armatura +1',              p: 1500, u: 'mo', qMin:1, qMax:1, raro:true },
-        { n: 'Armatura +2',              p: 6000, u: 'mo', qMin:1, qMax:1, raro:true },
+        { n: 'Pozione di guarigione eccezionale',  p: 450,  u: 'mo', qMin:1, qMax:3 },
+        { n: 'Pozione di guarigione suprema',      p: 1350, u: 'mo', qMin:1, qMax:2 },
+        { n: 'Pergamena magica (4° livello)',      p: 320,  u: 'mo', qMin:1, qMax:2 },
+        { n: 'Pergamena magica (5° livello)',      p: 640,  u: 'mo', qMin:1, qMax:1 },
+        { n: 'Arma +1',                            p: 1000, u: 'mo', qMin:1, qMax:2, raro:true },
+        { n: 'Arma +2',                            p: 4000, u: 'mo', qMin:1, qMax:1, raro:true },
+        { n: 'Scudo +1',                           p: 1500, u: 'mo', qMin:1, qMax:1, raro:true },
+        { n: 'Scudo +2',                           p: 6000, u: 'mo', qMin:1, qMax:1, raro:true },
+        { n: 'Armatura +1',                        p: 1500, u: 'mo', qMin:1, qMax:1, raro:true },
+        { n: 'Armatura +2',                        p: 6000, u: 'mo', qMin:1, qMax:1, raro:true },
       ],
     };
 
@@ -6827,6 +7282,7 @@ const Generatori = {
       magia:          ['L\'Occhio di Vecna','Arcana Borealis','Il Grimorio Aperto'],
       bazar:          ['Curiosità di Zarnax','Il Bazar del Caos','Oggetti Misteriosi'],
       taverna_shop:   ['La Fiasca Traboccante','Il Drago Ubriaco','Locanda dei Viandanti'],
+      biblioteca:    ['Archivio di Fratel Aldric','Scriptorium del Borgo','La Libreria Arcana'],
     };
     const nomeNeg = rnd(nomiNeg[tipo] || ['Negozio']);
     const lvLabel = { basso:'Liv. 1–4', medio:'Liv. 5–10', alto:'Liv. 11+' }[livello] || '';
@@ -7378,9 +7834,26 @@ const setMobileActive = (btn) => {
   closeMobileMenu();
 };
 
-// Sync mobile nav con navigazione sidebar
-const origNavigateTo = App.navigateTo.bind(App);
-// Inizializza al resize
+// Sincronizza active con qualsiasi navigazione (anche dalla sidebar)
+const syncMobileActive = (page) => {
+  document.querySelectorAll('.mobile-nav-item[data-page]').forEach(b => {
+    b.classList.toggle('active', b.dataset.page === page);
+  });
+  // Pagine non in navbar: deseleziona tutto
+  const navPages = ['home','campagna','mondo','sessione','generatori'];
+  if (!navPages.includes(page)) {
+    document.querySelectorAll('.mobile-nav-item').forEach(b => b.classList.remove('active'));
+  }
+};
+
+// Override App.navigateTo per sincronizzare la navbar mobile
+const _origNavigateTo = App.navigateTo.bind(App);
+App.navigateTo = (page) => {
+  _origNavigateTo(page);
+  syncMobileActive(page);
+  closeMobileMenu();
+};
+
 window.addEventListener('resize', initMobileNav);
 window.addEventListener('load', initMobileNav);
 document.addEventListener('DOMContentLoaded', initMobileNav);
