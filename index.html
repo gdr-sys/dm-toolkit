@@ -263,7 +263,7 @@
 
         </div>
 
-        <!-- Riga sotto: Party + Sessioni salvate -->
+        <!-- Riga sotto: Party + Sessioni salvate + Note Sessione -->
         <div class="grid-2" style="gap:var(--space-lg);margin-top:var(--space-lg);">
 
           <!-- Party -->
@@ -283,6 +283,18 @@
             <div id="saved-sessions-list" class="comp-list"></div>
           </div>
 
+        </div>
+
+        <!-- Note Sessione -->
+        <div class="card" style="margin-top:var(--space-lg);">
+          <div class="card-header">
+            <h3 class="card-title">📝 Note Sessione</h3>
+            <div style="display:flex;gap:6px;">
+              <button class="btn btn-secondary btn-sm" onclick="NoteSessione.addVoce()">+ Nota</button>
+              <button class="btn btn-ghost btn-sm" onclick="NoteSessione.clear()" title="Cancella tutte le note">🗑️</button>
+            </div>
+          </div>
+          <div id="note-sessione-list" style="min-height:60px;"></div>
         </div>
       </div>
     </section>
@@ -337,10 +349,18 @@
         <div class="card gen-card" data-gen-id="meteo">
           <div class="card-header">
             <h3 class="card-title">🌤️ Meteo</h3>
+            <select id="gen-meteo-stagione" class="form-select" style="width:auto;font-size:0.75rem;">
+              <option value="primavera">🌸 Primavera</option>
+              <option value="estate">☀️ Estate</option>
+              <option value="autunno">🍂 Autunno</option>
+              <option value="inverno">❄️ Inverno</option>
+              <option value="tropicale">🌴 Tropicale</option>
+              <option value="artico">🧊 Artico</option>
+            </select>
             <button class="btn btn-secondary btn-sm" onclick="Generatori.rollWeather()">🎲 Genera</button>
           </div>
           <div id="gen-weather-result" style="min-height:60px;">
-            <div class="text-muted text-sm">Clicca per generare il meteo</div>
+            <div class="text-muted text-sm">Seleziona la stagione e genera</div>
           </div>
         </div>
         <div class="card gen-card" data-gen-id="sensori">
@@ -563,6 +583,64 @@
           </div>
         </div>
 
+        <!-- Generatore Nomi per Razza -->
+        <div class="card gen-card" data-gen-id="nomi">
+          <div class="card-header">
+            <h3 class="card-title">📛 Generatore Nomi</h3>
+            <select id="gen-nomi-razza" class="form-select" style="width:auto;font-size:0.75rem;">
+              <option value="umano">Umano</option>
+              <option value="elfo">Elfo</option>
+              <option value="nano">Nano</option>
+              <option value="halfling">Halfling</option>
+              <option value="tiefling">Tiefling</option>
+              <option value="dragonide">Dragonide</option>
+              <option value="gnomo">Gnomo</option>
+              <option value="mezzorco">Mezz'Orco</option>
+            </select>
+            <button class="btn btn-secondary btn-sm" onclick="Generatori.rollNomi()">🎲</button>
+          </div>
+          <div id="gen-nomi-result" style="min-height:60px;">
+            <div class="text-muted text-sm">Seleziona la razza e genera</div>
+          </div>
+        </div>
+
+        <!-- Incontri Casuali -->
+        <div class="card gen-card" data-gen-id="incontri">
+          <div class="card-header">
+            <h3 class="card-title">⚠️ Incontri Casuali</h3>
+            <select id="gen-incontri-ambiente" class="form-select" style="width:auto;font-size:0.75rem;">
+              <option value="foresta">🌲 Foresta</option>
+              <option value="dungeon">🏚️ Dungeon</option>
+              <option value="citta">🏙️ Città</option>
+              <option value="pianura">🌾 Pianura</option>
+              <option value="montagna">⛰️ Montagna</option>
+              <option value="mare">🌊 Mare / Costa</option>
+              <option value="palude">🌿 Palude</option>
+              <option value="deserto">🏜️ Deserto</option>
+            </select>
+            <button class="btn btn-secondary btn-sm" onclick="Generatori.rollIncontro()">🎲</button>
+          </div>
+          <div id="gen-incontri-result" style="min-height:60px;">
+            <div class="text-muted text-sm">Seleziona l'ambiente e genera</div>
+          </div>
+        </div>
+
+        <!-- Tabelle Follia -->
+        <div class="card gen-card" data-gen-id="follia">
+          <div class="card-header">
+            <h3 class="card-title">🌀 Follia</h3>
+            <select id="gen-follia-tipo" class="form-select" style="width:auto;font-size:0.75rem;">
+              <option value="breve">Breve (1d10 minuti)</option>
+              <option value="prolungata">Prolungata (1d10×10 ore)</option>
+              <option value="permanente">Permanente</option>
+            </select>
+            <button class="btn btn-secondary btn-sm" onclick="Generatori.rollFollia()">🎲</button>
+          </div>
+          <div id="gen-follia-result" style="min-height:60px;">
+            <div class="text-muted text-sm">Seleziona il tipo e genera</div>
+          </div>
+        </div>
+
       </div><!-- fine generatori-grid -->
 
     </section>
@@ -594,6 +672,7 @@
             <button class="tab-btn"        id="comp-tab-rules"       onclick="Compendio.switchTab('rules')">Regole</button>
             <button class="tab-btn"        id="comp-tab-spells"      onclick="Compendio.switchTab('spells')">Incantesimi</button>
             <button class="tab-btn"        id="comp-tab-homebrew"    onclick="Compendio.switchTab('homebrew')">🔧 Homebrew</button>
+            <button class="tab-btn"        id="comp-tab-cerca"       onclick="Compendio.switchTab('cerca')">🔍 Cerca tutto</button>
           </div>
           <div style="display:flex;align-items:center;gap:var(--space-sm);">
             <span class="badge badge-muted" id="comp-sistema-badge">5e 2024</span>
@@ -690,6 +769,13 @@
           <button class="btn btn-primary btn-sm" onclick="Compendio.openHomebrewModal()">+ Aggiungi</button>
         </div>
 
+        <!-- Filtri Cerca tutto -->
+        <div id="comp-filters-cerca" class="comp-filters hidden">
+          <input type="text" id="comp-search-cerca" class="form-input" placeholder="🔍 Cerca in tutto il Compendio..." style="flex:1;min-width:200px;"
+            oninput="Compendio.onSearch('cerca')" autofocus>
+          <span class="text-muted text-sm" id="comp-count-cerca" style="white-space:nowrap;"></span>
+        </div>
+
         <!-- Filtri Regole -->
         <div id="comp-filters-rules" class="comp-filters hidden">
           <input type="text" id="comp-search-rules" class="form-input" placeholder="🔍 Cerca regola..." style="flex:1;min-width:180px;" oninput="Compendio.onSearch('rules')">
@@ -707,6 +793,9 @@
         </div>
         <div class="tab-content" id="comp-panel-equipment">
           <div id="comp-list-equip" class="comp-list"></div>
+        </div>
+        <div class="tab-content" id="comp-panel-cerca">
+          <div id="comp-list-cerca" class="comp-list"></div>
         </div>
         <div class="tab-content" id="comp-panel-homebrew">
           <div id="comp-list-homebrew" class="comp-list"></div>
@@ -905,6 +994,12 @@
             <option value="custom">Personalizzato</option>
           </select>
         </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label" style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+          <input type="checkbox" id="ec-elettro">
+          Usa monete di <strong>elettro</strong> (me) nel loot e tesoro
+        </label>
       </div>
     </div>
     <div class="modal-footer">
@@ -2051,10 +2146,15 @@ const Dadi = (() => {
     el.textContent = result.total;
     detail.textContent = result.detail;
 
-    // Anima icona
+    // Anima icona e mostra ultimo risultato
     if (icon) {
       icon.classList.add('dice-rolling');
-      setTimeout(() => icon.classList.remove('dice-rolling'), 400);
+      setTimeout(() => {
+        icon.classList.remove('dice-rolling');
+        // Mostra numero sul bottone
+        icon.innerHTML = `<span style="font-size:1.1rem;font-weight:900;font-family:var(--font-mono);">${result.total}</span>`;
+        setTimeout(() => { icon.textContent = '🎲'; }, 3000);
+      }, 400);
     }
 
     updateHistory();
@@ -2063,13 +2163,15 @@ const Dadi = (() => {
   const updateHistory = () => {
     const el = document.getElementById('dice-history-list');
     if (!el) return;
-    const history = Storage.getDiceHistory().slice(0, 8);
-    el.innerHTML = history.map(h => `
-      <div class="dice-history-item">
-        <span>${h.formula.toUpperCase()}</span>
-        <span class="text-accent font-bold">${h.total}</span>
-      </div>
-    `).join('');
+    const history = Storage.getDiceHistory().slice(0, 10);
+    el.innerHTML = history.length === 0
+      ? '<div class="text-muted text-sm" style="text-align:center;padding:4px;">Nessun tiro</div>'
+      : history.map((h, i) => `
+        <div class="dice-history-item" style="${i===0?'opacity:1;':'opacity:0.7;'}">
+          <span style="color:var(--text-muted);font-size:0.72rem;">${h.formula.toUpperCase()}</span>
+          <span style="font-size:0.72rem;color:var(--text-muted);">${h.rolls?.join(', ')||''}</span>
+          <span class="text-accent font-bold" style="font-size:${i===0?'1.1rem':'0.9rem'};font-family:var(--font-mono);">${h.total}</span>
+        </div>`).join('');
   };
 
   const rollFormula = (formula) => {
@@ -2225,6 +2327,7 @@ const openEditCampaignModal = (camp) => {
   document.getElementById('ec-name').value = camp.name;
   document.getElementById('ec-type').value = camp.type || 'campagna';
   document.getElementById('ec-system').value = camp.system || '5e2024';
+  document.getElementById('ec-elettro').checked = camp.useElettro || false;
   Modal.open('edit-campaign');
   setTimeout(() => document.getElementById('ec-name')?.focus(), 100);
 };
@@ -2238,6 +2341,7 @@ const submitEditCampaign = () => {
     name,
     type: document.getElementById('ec-type')?.value,
     system: document.getElementById('ec-system')?.value,
+    useElettro: document.getElementById('ec-elettro')?.checked || false,
   });
 
   Modal.close('edit-campaign');
@@ -2452,7 +2556,7 @@ const App = (() => {
         try { Luoghi.init(); } catch(e) {}
         try { Fazioni.init(); } catch(e) {}
         break;
-      case 'sessione':   try { Sessione.init(); } catch(e) {} break;
+      case 'sessione':   try { Sessione.init(); setTimeout(() => NoteSessione.render(), 100); } catch(e) {} break;
       case 'generatori':
         setTimeout(() => { GeneratoriDD.enable(); Generatori.applyVisibility(); }, 100);
         break;
@@ -4338,7 +4442,7 @@ const Sessione = (() => {
       const descAz = a.descrizione || a.desc || '';
       return `
         <div class="sb-action" style="cursor:${formula ? 'pointer' : 'default'};"
-          ${formula ? `onclick="Sessione._rollAction('${formula}','${nomeAz.replace(/'/g,"\\'")}',this)"` : ''}>
+          ${formula ? `onclick="Sessione._rollAction('${formula}','${nomeAz.replace(/'/g,"\'")}',this)"` : ''}>
           <strong>${nomeAz}.</strong>
           <span class="text-secondary"> ${descAz}</span>
           ${formula ? `<span class="badge badge-muted" style="margin-left:4px;font-size:0.6rem;">🎲 ${formula}</span>` : ''}
@@ -4368,12 +4472,12 @@ const Sessione = (() => {
           <div class="stat-block-divider"></div>
           ${m.grado_sfida ? `<div class="stat-row"><strong>GS</strong> <span>${m.grado_sfida.raw||m.grado_sfida.valore}</span></div>` : ''}
           <div class="stat-block-divider"></div>
-          <div style="font-size:0.7rem;color:var(--text-muted);margin-bottom:6px;">💡 Clicca su un'azione con 🎲 per tirare i dadi automaticamente</div>
+          <div style="font-size:0.7rem;color:var(--text-muted);margin-bottom:6px;">💡 Clicca su un\'azione con 🎲 per tirare i dadi automaticamente</div>
           <div class="sb-section-title">Azioni</div>
           ${azioniHTML}
           ${m.azioni_bonus?.length ? `<div class="sb-section-title" style="margin-top:8px;">Azioni Bonus</div>${m.azioni_bonus.map(a=>{
             const formula = parseRoll(a.descrizione||'');
-            return `<div class="sb-action" style="cursor:${formula?'pointer':'default'};" ${formula?`onclick="Sessione._rollAction('${formula}','${(a.nome||'').replace(/'/g,"\\'")}',this)"`:''}>
+            return `<div class="sb-action" style="cursor:${formula?'pointer':'default'};" ${formula?`onclick="Sessione._rollAction('${formula}','${(a.nome||'').replace(/'/g,"\'")}',this)"`:''}>
               <strong>${a.nome||''}.</strong> <span class="text-secondary">${a.descrizione||''}</span>
               ${formula?`<span class="badge badge-muted" style="margin-left:4px;font-size:0.6rem;">🎲 ${formula}</span>`:''}
             </div>`;
@@ -4728,6 +4832,7 @@ const Compendio = (() => {
     rules:       { q: '', categoria: '' },
     spells:      { q: '', livello: '', scuola: '', rituale: '' },
     homebrew:    { q: '', categoria: '' },
+    cerca:       { q: '' },
   };
 
   // ── Helpers ──
@@ -4899,8 +5004,8 @@ const Compendio = (() => {
   // ── Cambio tab ──
   const switchTab = (tab) => {
     _activeTab = tab;
-    const tabKeys = ['monsters', 'magic_items', 'equipment', 'rules', 'spells', 'homebrew'];
-    const countIds = { monsters: 'comp-count-monsters', magic_items: 'comp-count-magic', equipment: 'comp-count-equip', rules: 'comp-count-rules', spells: 'comp-count-spells', homebrew: 'comp-count-homebrew' };
+    const tabKeys = ['monsters', 'magic_items', 'equipment', 'rules', 'spells', 'homebrew', 'cerca'];
+    const countIds = { monsters: 'comp-count-monsters', magic_items: 'comp-count-magic', equipment: 'comp-count-equip', rules: 'comp-count-rules', spells: 'comp-count-spells', homebrew: 'comp-count-homebrew', cerca: 'comp-count-cerca' };
     tabKeys.forEach(t => {
       document.getElementById(`comp-tab-${t}`)?.classList.toggle('active', t === tab);
       document.getElementById(`comp-panel-${t}`)?.classList.toggle('active', t === tab);
@@ -4908,7 +5013,10 @@ const Compendio = (() => {
       const countEl = document.getElementById(countIds[t]);
       if (countEl) countEl.style.display = t === tab ? '' : 'none';
     });
-    if (!_loaded && tab !== 'homebrew') { load(); return; }
+    if (!_loaded && tab !== 'homebrew' && tab !== 'cerca') { load(); return; }
+    if (tab === 'cerca') {
+      setTimeout(() => document.getElementById('comp-search-cerca')?.focus(), 100);
+    }
     render();
     Debug.log(`Compendio tab: ${tab}`);
   };
@@ -4936,6 +5044,7 @@ const Compendio = (() => {
       case 'rules':       renderRules(); break;
       case 'spells':      renderSpells(); break;
       case 'homebrew':    renderHomebrew(); break;
+      case 'cerca':       renderCercaTutto(); break;
     }
   };
 
@@ -4980,7 +5089,7 @@ const Compendio = (() => {
   const favBtn = (id, nome, tipo) => {
     const star = _isFavorito(id) ? '⭐' : '☆';
     return `<button class="comp-fav-btn btn btn-ghost btn-icon-sm" data-id="${id}"
-      onclick="Compendio.toggleFavorito('${id}','${nome.replace(/'/g,"\\'")}','${tipo}',event)"
+      onclick="Compendio.toggleFavorito('${id}','${nome.replace(/'/g,"\'")}','${tipo}',event)"
       title="${_isFavorito(id) ? 'Rimuovi dai preferiti' : 'Aggiungi ai preferiti'}"
       style="font-size:0.9rem;padding:0 4px;">${star}</button>`;
   };
@@ -5957,6 +6066,54 @@ const Compendio = (() => {
     });
   };
 
+  // ─────────────────────────────────────────────────
+  // CERCA TUTTO
+  // ─────────────────────────────────────────────────
+  const renderCercaTutto = () => {
+    const el = document.getElementById('comp-list-cerca');
+    if (!el) return;
+    const q = (_filters.cerca.q || '').toLowerCase().trim();
+    const count = document.getElementById('comp-count-cerca');
+    if (!q) {
+      el.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🔍</div><h3>Cerca in tutto il Compendio</h3><p class="text-muted">Mostri, oggetti, equipaggiamento, regole, incantesimi, homebrew</p></div>';
+      if (count) count.textContent = '';
+      return;
+    }
+    if (q.length < 2) {
+      el.innerHTML = '<div class="text-muted text-sm" style="padding:8px;">Digita almeno 2 caratteri...</div>';
+      return;
+    }
+    const results = [];
+    _data.monsters.filter(m => m.nome.toLowerCase().includes(q)).slice(0,5).forEach(m =>
+      results.push({ tipo:'🐉 Mostro', nome:m.nome, meta:(m.tipo||'')+(m.grado_sfida?.valore!=null?' · GS '+m.grado_sfida.valore:''), fn:"Compendio.openMonster('"+m.id+"')" }));
+    _data.magic_items.filter(m => m.nome.toLowerCase().includes(q)).slice(0,5).forEach(m =>
+      results.push({ tipo:'✨ Oggetto', nome:m.nome, meta:(m.rarita||''), fn:"Compendio.openMagicItem('"+m.id+"')" }));
+    _data.equipment.filter(m => m.nome.toLowerCase().includes(q)).slice(0,5).forEach(m =>
+      results.push({ tipo:'⚔️ Equip.', nome:m.nome, meta:(m.categoria||''), fn:"Compendio.openEquipment('"+m.id+"')" }));
+    _data.spells.filter(m => m.nome.toLowerCase().includes(q)).slice(0,5).forEach(m =>
+      results.push({ tipo:'💫 Incant.', nome:m.nome, meta:(m.livello===0?'Trucchetto':m.livello+'° lv')+(m.scuola?' · '+m.scuola:''), fn:"Compendio.openSpell('"+m.id+"')" }));
+    _data.rules.filter(m => m.nome.toLowerCase().includes(q)).slice(0,3).forEach(m =>
+      results.push({ tipo:'📖 Regola', nome:m.nome, meta:m.capitolo||'', fn:"Compendio.openRule('"+m.id+"')" }));
+    _getHomebrew().filter(m => m.nome.toLowerCase().includes(q)).slice(0,5).forEach(m => {
+      const cl = {monsters:'🐉',magic_items:'✨',equipment:'⚔️',spells:'💫',rules:'📖',altro:'📌'}[m.categoria]||'🔧';
+      results.push({ tipo:cl+' HB', nome:m.nome, meta:m.sottotitolo||'', fn:"Compendio.openHomebrew('"+m.id+"')" });
+    });
+    if (count) count.textContent = results.length + ' risultati';
+    if (!results.length) {
+      el.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🔍</div><h3>Nessun risultato per "'+q+'"</h3></div>';
+      return;
+    }
+    el.innerHTML = results.map(r =>
+      '<div class="comp-row" onclick="'+r.fn+'">' +
+        '<div class="comp-row-main">' +
+          '<span class="comp-row-name">'+highlight(r.nome, q)+'</span>' +
+          '<span class="comp-row-meta">'+r.meta+'</span>' +
+        '</div>' +
+        '<div class="comp-row-stats"><span class="badge badge-muted" style="font-size:0.6rem;white-space:nowrap;">'+r.tipo+'</span></div>' +
+      '</div>'
+    ).join('');
+  };
+
   // ── Init ──
   const init = () => {
     // Rileva sistema dalla campagna — ricarica se è cambiato
@@ -5977,6 +6134,7 @@ const Compendio = (() => {
     _refreshHBForm, _getHB: _getHomebrew,
     sendCurrentToCombat, changeSistema, toggleFavorito,
     getData: () => _data,
+    renderCercaTutto,
   };
 })();
 
@@ -6007,6 +6165,12 @@ const Schermo = (() => {
       icon: '🌤️',
       desc: 'Genera e mostra il meteo del giorno',
       defaultSize: 'sm',
+    },
+    note_sessione: {
+      label: 'Note Sessione',
+      icon: '📝',
+      desc: 'Note rapide della sessione attiva — sincronizzate con la Sessione',
+      defaultSize: 'md',
     },
     note: {
       label: 'Note Rapide',
@@ -6170,6 +6334,7 @@ const Schermo = (() => {
     switch (block.type) {
       case 'percezioni':     el.innerHTML = renderPercezioni(); break;
       case 'preferiti':      el.innerHTML = renderPreferiti(); break;
+      case 'note_sessione':  el.innerHTML = renderNoteSessione(); break;
       case 'dadi':           el.innerHTML = renderDadiMini(block.id); break;
       case 'meteo':          el.innerHTML = renderMeteoMini(block.id); break;
       case 'note':           el.innerHTML = renderNote(block); break;
@@ -6219,7 +6384,7 @@ const Schermo = (() => {
               f.nome +
             '</span>' +
             '<button class="btn btn-ghost btn-icon-sm" style="font-size:0.8rem;" ' +
-              'onclick="Compendio.toggleFavorito(\'' + f.id + '\',\'' + f.nome.replace(/'/g,"\\'") + '\',\'' + tipo + '\',event);Schermo._refreshFavoriti()" ' +
+              'onclick="Compendio.toggleFavorito(\'' + f.id + '\',\'' + f.nome.replace(/'/g,"\'") + '\',\'' + tipo + '\',event);Schermo._refreshFavoriti()" ' +
               'title="Rimuovi">⭐</button>' +
           '</div>'
         ).join('') +
@@ -6229,6 +6394,37 @@ const Schermo = (() => {
 
   const _refreshFavoriti = () => {
     _blocks.filter(b => b.type === 'preferiti').forEach(b => updateBlockContent(b));
+  };
+
+  const renderNoteSessione = () => {
+    App.reloadActiveCampaign();
+    const notes = NoteSessione.getData();
+
+    if (!notes.length) {
+      return '<div class="text-muted text-sm" style="margin-bottom:8px;">Nessuna nota.</div>' +
+        '<button class="btn btn-secondary btn-sm" onclick="NoteSessione.addVoce();Schermo._refreshNoteSessione()">+ Nota</button>';
+    }
+
+    return '<div style="display:flex;flex-direction:column;gap:3px;margin-bottom:8px;">' +
+      notes.map((n, i) =>
+        '<div style="display:flex;gap:6px;align-items:flex-start;padding:4px 0;border-bottom:1px solid var(--border);">' +
+          '<span style="flex-shrink:0;font-size:0.85rem;">' + (n.tipo||'📌') + '</span>' +
+          '<span style="flex:1;font-size:0.8rem;line-height:1.4;word-break:break-word;">' + (n.testo||'') + '</span>' +
+          '<button class="btn btn-ghost btn-icon-sm" style="flex-shrink:0;font-size:0.65rem;opacity:0.5;" ' +
+            'onclick="NoteSessione.remove('+i+');Schermo._refreshNoteSessione()" title="Rimuovi">✕</button>' +
+        '</div>'
+      ).join('') +
+    '</div>' +
+    '<div style="display:flex;gap:4px;">' +
+      '<button class="btn btn-secondary btn-sm" style="flex:1;font-size:0.72rem;" onclick="NoteSessione.addVoce();setTimeout(()=>Schermo._refreshNoteSessione(),100)">+ Nota</button>' +
+      '<button class="btn btn-ghost btn-sm" style="font-size:0.72rem;" onclick="App.navigateTo(\'sessione\')">→ Sessione</button>' +
+    '</div>';
+  };
+
+  const _refreshNoteSessione = () => {
+    _blocks.filter(b => b.type === 'note_sessione').forEach(b => updateBlockContent(b));
+    // Aggiorna anche la lista in Sessione se visibile
+    NoteSessione.render();
   };
 
   const renderPercezioni = () => {
@@ -6516,9 +6712,17 @@ const Schermo = (() => {
 
   const renderCompendioRef = (block) => {
     App.reloadActiveCampaign();
-    const sezione = block.content || ''; // id della regola scelta
-    const capitoli = _compendioSections();
+    const sezione = block.content || '';
+
+    // Se Compendio non ha le regole, le carica e ri-renderizza dopo
     const allRules = Compendio?.getData()?.rules || [];
+    if (allRules.length === 0) {
+      Compendio?.init?.();
+      setTimeout(() => updateBlockContent(block), 1500);
+      return '<div class="text-muted text-sm">Caricamento regole...<br><small>Apri il Compendio almeno una volta se non appare nulla.</small></div>';
+    }
+
+    const capitoli = _compendioSections();
 
     // Selector sezione
     const opts = Object.entries(capitoli).map(([cap, rules]) =>
@@ -6787,6 +6991,7 @@ const Schermo = (() => {
     removeBlock, resizeBlock, moveBlock, editBlock, resetLayout,
     rollDie, generateMeteo, saveNote, advanceTime, refreshCombat,
     setCompendioRef, _refreshCombat, _refreshFavoriti, _swapBlocks,
+    _refreshNoteSessione,
   };
 })();
 
@@ -6825,6 +7030,9 @@ const Generatori = {
     loot:      { label: 'Loot Generator',       emoji: '💰' },
     stilivita: { label: 'Stili di Vita',        emoji: '🏨' },
     biblioteca:{ label: 'Biblioteca',           emoji: '📚' },
+    nomi:      { label: 'Generatore Nomi',      emoji: '📛' },
+    incontri:  { label: 'Incontri Casuali',     emoji: '⚠️' },
+    follia:    { label: 'Follia',               emoji: '🌀' },
   },
 
   _getEnabledGen: () => {
@@ -7015,6 +7223,261 @@ const Generatori = {
     Debug.log(`PNG salvato: ${npc.name}`);
   },
 
+  rollNomi: () => {
+    const razza = document.getElementById('gen-nomi-razza')?.value || 'umano';
+    const el = document.getElementById('gen-nomi-result');
+    if (!el) return;
+
+    const nomi = {
+      umano: {
+        m: ['Aldric','Beren','Caelan','Dorian','Edric','Faolan','Garrett','Hadric','Idris','Jareth','Kael','Loran','Mattis','Nestor','Oryn','Perin','Quirin','Rolan','Soren','Tavish','Ulric','Varis','Wynn','Xander','Yoren','Zephyr'],
+        f: ['Aelindra','Brynn','Calla','Dara','Elara','Freya','Gwen','Hana','Isara','Jessa','Kira','Lyra','Mira','Nessa','Orla','Petra','Quinn','Risa','Sera','Tara','Una','Vera','Willa','Xyla','Yara','Zara'],
+        c: ['Ashford','Blackwood','Coldwell','Dunmore','Eastgate','Fairfield','Greenwood','Harwick','Ironwood','Jarvis','Kestrel','Lannis','Merrow','Nighthollow','Overton','Pendleton','Quarry','Redmoor','Stonemark','Thorne','Underhill','Vanthorpe','Westfall','Xenos','York','Zane'],
+      },
+      elfo: {
+        m: ['Aerdyn','Celeborn','Daeron','Erevan','Faelas','Galeth','Halamar','Ilphas','Jariel','Kerym','Laucian','Miritar','Neldor','Orym','Paelias','Quelmar','Riardon','Soveliss','Thalion','Uruvion','Varis','Wyll','Xelris','Yaerevan','Zannifer'],
+        f: ['Adrie','Birel','Caelynn','Dara','Enna','Faral','Galinndan','Hadarai','Immeral','Jelenneth','Keyleth','Leshanna','Mialee','Naivara','Orisis','Quelenna','Raina','Shava','Thia','Uriangkatai','Valna','Wrennis','Xanaphia','Yaara','Zinnia'],
+        c: ["Amastacia (Quella che Canta le Stelle)","Galanodel (Sussurro di Luna)","Holimion (Fiocco di Diamante)","Liadon (Lama d'Argento)","Meliamne (Quercia Danzante)","Naïlo (Brezza Notturna)","Siannodel (Ruscello di Luna)","Xiloscient (Petalo d'Oro)"],
+      },
+      nano: {
+        m: ['Adrik','Baern','Darrak','Eberk','Fargrim','Gardain','Harbek','Kildrak','Morgran','Orsik','Oskar','Rangrim','Rurik','Taklinn','Thoradin','Thorin','Tordek','Traubon','Travok','Ulfgar','Veit','Vondal'],
+        f: ['Amber','Artin','Audhild','Bardryn','Dagnal','Diesa','Eldeth','Falkrunn','Finellen','Gunnloda','Gurdis','Helja','Hlin','Kathra','Kristryd','Mardred','Riswynn','Sannl','Torbera','Torgga','Vistra'],
+        c: ['Balderk','Dankil','Gorunn','Holderhek','Loderr','Lutgehr','Rumnaheim','Strakeln','Torunn','Ungart'],
+      },
+      halfling: {
+        m: ['Alton','Ander','Cade','Corrin','Eldon','Errich','Finnan','Garret','Lindal','Lyle','Merric','Milo','Osborn','Perrin','Reed','Roscoe','Wellby'],
+        f: ['Andry','Bree','Callie','Cora','Euphemia','Jillian','Kithri','Lavinia','Lidda','Merla','Nedda','Paela','Portia','Seraphina','Shaena','Trym','Vani','Verna'],
+        c: ['Brushgather','Goodbarrel','Greenbottle','High-hill','Hilltopple','Leagallow','Tealeaf','Thorngage','Tosscobble','Underbough'],
+      },
+      tiefling: {
+        m: ['Akmenos','Amnon','Barakas','Damakos','Ekemon','Iados','Kairon','Leucis','Melech','Mordai','Morthos','Pelaios','Skamos','Therai'],
+        f: ['Akta','Anakis','Bryseis','Criella','Damaia','Ea','Kallista','Lerissa','Makaria','Nemeia','Orianna','Phelaia','Rieta'],
+        v: ['Ambizione','Arte','Caos','Corruzione','Crudeltà','Disfatta','Dolore','Eccesso','Fuoco','Gloria','Inganno','Menzogna','Morte','Notte','Odio','Rabbia','Sangue','Terrore','Tormento','Tradimento','Vendetta','Vergogna'],
+      },
+      dragonide: {
+        m: ['Arjhan','Balasar','Bharash','Donaar','Ghesh','Heskan','Kriv','Medrash','Mehen','Nadarr','Pandjed','Patrin','Rhogar','Shamash','Shedinn','Tarhun','Torinn'],
+        f: ['Akra','Biri','Daret','Farideh','Harann','Havilar','Jheri','Kava','Korinn','Mishann','Nala','Perra','Raiann','Sora','Surina','Thava','Uadjit'],
+        c: ['Clethtinthiallor','Daardendrian','Delmirev','Drachedandion','Fenkenkabradon','Kepeshkmolik','Kerrhylon','Kimbatuul','Linxakasendalor','Myastan','Nemmonis','Norixius','Ophinshtalajiir','Prexijandilin','Shestendeliath','Turnuroth','Verthisathurgiesh','Yarjerit'],
+      },
+      gnomo: {
+        m: ['Alston','Alvyn','Boddynock','Brocc','Burgell','Dimble','Eldon','Erky','Fonkin','Frug','Gerbo','Gimble','Glim','Jebeddo','Kellen','Namfoodle','Orryn','Roondar','Seebo','Sindri','Warryn','Wrenn','Zook'],
+        f: ['Bimpnottin','Breena','Caramip','Carlin','Donella','Duvamil','Ella','Ellyjobell','Ellywick','Lilli','Loopmottin','Lorilla','Mardnab','Nissa','Nyx','Oda','Orla','Roywyn','Shamil','Tana','Waywocket','Zanna'],
+        c: ['Beren','Dunderdell','Garrick','Nackle','Ningel','Raulnor','Scheppen','Timbers','Turen'],
+      },
+      mezzorco: {
+        m: ['Dench','Feng','Gell','Henk','Holg','Imsh','Keth','Krusk','Mhurren','Ront','Shump','Thokk'],
+        f: ['Baggi','Emen','Engong','Kansif','Myev','Neega','Ovak','Ownka','Shautha','Sutha','Vola','Volen','Yevelda'],
+        c: ['nessun cognome (usa nome del clan)'],
+      },
+    };
+
+    const n = nomi[razza] || nomi.umano;
+    const r = (arr) => arr[Math.floor(Math.random()*arr.length)];
+    const genM = r(n.m||[]);
+    const genF = r(n.f||[]);
+    const genC = r(n.c||n.v||['—']);
+
+    el.innerHTML = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">' +
+      ['Maschile','Femminile'].map((g,i) => {
+        const nome = i===0 ? genM : genF;
+        const full = nome + (n.c||n.v ? ' ' + genC : '');
+        return '<div style="background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px;">' +
+          '<div style="font-size:0.65rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:2px;">' + g + '</div>' +
+          '<div style="font-family:var(--font-display);font-size:0.9rem;">' + nome + '</div>' +
+          '<div style="font-size:0.72rem;color:var(--text-muted);">' + genC + '</div>' +
+        '</div>';
+      }).join('') +
+    '</div>' +
+    '<button class="btn btn-ghost btn-sm w-full" style="margin-top:6px;font-size:0.72rem;" onclick="Generatori.rollNomi()">🎲 Altri nomi</button>';
+    Debug.log('Nomi generati per ' + razza);
+  },
+
+  rollIncontro: () => {
+    const ambiente = document.getElementById('gen-incontri-ambiente')?.value || 'foresta';
+    const el = document.getElementById('gen-incontri-result');
+    if (!el) return;
+    const rnd = (a) => a[Math.floor(Math.random()*a.length)];
+
+    const incontri = {
+      foresta: [
+        '1d4 lupi che cacciano un cervo ferito',
+        'Un eremita elfo sospettoso di chiunque attraversi il suo territorio',
+        '2d4 goblin che tendono un agguato al prossimo viandante',
+        'Una radura con segni di combattimento recente — ossa e sangue',
+        '1d6 bandit umani che si fingono mercanti in difficoltà',
+        'Un orso con i cuccioli — aggressivo se avvicinato',
+        'Un druido che cura un animale ferito, chiede di non disturbare',
+        'Tracce di un drago che attraversa la zona (pochi giorni prima)',
+        '1d4 pixie che rubano oggetti dagli zaini',
+        'Un mercante perso con un carro spezzato e merce preziosa',
+        'Una trappola nascosta di cacciatori — già scattata, gabbia vuota',
+        '2d6 coboldi che scortano un loro sciamano verso un sito sacro',
+      ],
+      dungeon: [
+        '1d6 scheletri che pattugliano un corridoio',
+        'Una porta sigillata con un sigillo magico che ronza piano',
+        'Voci in lontananza — difficile capire da dove vengono',
+        '1d4 zombie che banchettano su resti di un avventuriero',
+        'Una trappola a fossa coperta da un sottile strato di polvere',
+        'Un gelatinoso cubo che occupa tutto il corridoio',
+        'Un topolino magico che sembra guidare verso qualcosa',
+        '2d4 orchi che dormono — molto ubriachi',
+        'Una sala con un simbolo divino sul pavimento — rimozione di maledizioni?',
+        'Un prigioniero incatenato, disidratato, che chiede aiuto',
+        'Ombre che si muovono contro il senso della luce',
+        'Un indovinello inciso sulla porta — risposta sbagliata → dardo',
+      ],
+      citta: [
+        'Un borseggiatore nimble che colpisce uno del gruppo',
+        'Una rissa fuori da una taverna — folla che guarda',
+        'Un banditore che annuncia una taglia su qualcuno con la descrizione di un PG',
+        'Un mercante che offre un oggetto "molto raro" a prezzo stracciato',
+        'Una guardia che chiede di vedere i documenti di viaggio',
+        'Un bambino che chiede aiuto — madre scomparsa',
+        'Un culto che distribuisce pane ai poveri in piazza',
+        'Un nobile in carrozza che quasi investe un mendicante',
+        'Un individuo mascherato che passa un messaggio senza parole',
+        'Urla da un vicolo — qualcuno viene derubato',
+        'Un mago ambulante che vende pozioni di dubbia qualità',
+        'Una processione funebre che blocca la strada principale',
+      ],
+      pianura: [
+        '1d4 banditi a cavallo che chiedono pedaggio',
+        'Un caravan di mercanti attaccato in precedenza — superstiti',
+        'Una mandria di bisonti che attraversa la strada',
+        'Un cavaliere solitario che porta un messaggio urgente',
+        '2d4 goblin su lupi da guerra che cacciano',
+        'Un cerchio di pietre antiche con iscrizioni semi-cancellate',
+        'Nuvola di polvere in lontananza — esercito in marcia',
+        'Un contadino con un carrello rotto, bestiame rubato',
+        'Un gregge incustodito — dove sono i pastori?',
+        'Un fuoco di accampamento abbandonato di recente',
+      ],
+      montagna: [
+        '1d4 orchi che controllano il passo di montagna',
+        'Una valanga in distanza — potenzialmente pericolosa',
+        'Un gigante delle colline curioso dei piccoli viandanti',
+        'Un sentiero nascosto che sale verso una grotta',
+        'Un drago vecchio che sorvola l\'area lentamente',
+        '2d6 coboldi che estraggono minerali in una sporgenza',
+        'Un eremita nano che conosce i tunnel meglio di chiunque',
+        'Tracce di un wyvern fresco — attenzione al cielo',
+        'Un valico ghiacciato con visibilità quasi nulla',
+        'Resti di un avamposto militare abbandonato',
+      ],
+      mare: [
+        'Una nave pirata che batte bandiera neutrale ma cambia rotta',
+        'Una tempesta improvvisa — tiro DES DC 13 o caduta in mare',
+        'Una sirena che canta nelle vicinanze',
+        'Un relitto galleggiante con qualcosa che si muove dentro',
+        'Delfini che escortano la nave — buon segno?',
+        'Un kraken addormentato che la nave sta sorvolando',
+        'Un mercante di mare che offre commercio fuori bordo',
+        'Una scialuppa alla deriva con un unico sopravvissuto delirante',
+        'Banchi di nebbia fitta — qualcosa si muove dentro',
+        'Una corrente magica che spinge verso una rotta diversa',
+      ],
+      palude: [
+        '1d6 lizardfolk che emergono dall\'acqua torbida',
+        'Gas fetido — CD COS 12 o svantaggio per 1 ora',
+        'Fuochi fatui che cercano di condurre fuori strada',
+        'Un arcanoloth travestito da vecchia che chiede aiuto',
+        'Sabbie mobili — 1d4 PG rischiano di finirci',
+        'Una capanna su palafitte — luce fioca dentro',
+        '2d4 zombie acquatici che emergono dal fango',
+        'Tracce di un drago nero — recenti',
+        'Un serpente gigante che dorme su un tronco',
+        'Un druidessa che protegge la zona dai cacciatori',
+      ],
+      deserto: [
+        'Un miraggio — WIS DC 14 per non seguirlo',
+        'Una carovana di mercanti nomadi disposta a commerciare',
+        '1d6 gnoll che seguono da distanza',
+        'Una tempesta di sabbia in arrivo — 30 minuti',
+        'Rovine di una città antica semi-seppellita dalla sabbia',
+        'Un djinn liberato che offre un desiderio — parziale',
+        'Un pozzo asciutto con ossa attorno',
+        '2d4 scorpioni giganti che escono da sotto la sabbia',
+        'Un mercante di spezie con prezzi eccellenti e linguaggio strano',
+        'Tracce di un verme della sabbia — fresche',
+      ],
+    };
+
+    const lista = incontri[ambiente] || incontri.foresta;
+    const incontro = rnd(lista);
+    const ora = rnd(['Alba (nebbia leggera)','Mattina','Mezzogiorno (caldo)','Pomeriggio','Tramonto','Sera','Notte (buio)','Mezzanotte']);
+    const distanza = rnd(['Visibile immediatamente','A 30m','A 60m','In lontananza (300m+)','Sentito ma non visto']);
+
+    el.innerHTML =
+      '<div style="background:var(--bg-secondary);border-left:3px solid var(--accent-primary);border-radius:0 var(--radius-sm) var(--radius-sm) 0;padding:8px;margin-bottom:6px;font-size:0.85rem;line-height:1.5;">' + incontro + '</div>' +
+      '<div style="display:flex;gap:6px;flex-wrap:wrap;">' +
+        '<span class="badge badge-muted">🕐 ' + ora + '</span>' +
+        '<span class="badge badge-muted">📍 ' + distanza + '</span>' +
+      '</div>' +
+      '<button class="btn btn-ghost btn-sm w-full" style="margin-top:6px;font-size:0.72rem;" onclick="Generatori.rollIncontro()">🎲 Nuovo incontro</button>';
+    Debug.log('Incontro: ' + ambiente);
+  },
+
+  rollFollia: () => {
+    const tipo = document.getElementById('gen-follia-tipo')?.value || 'breve';
+    const el = document.getElementById('gen-follia-result');
+    if (!el) return;
+    const rnd = (a) => a[Math.floor(Math.random()*a.length)];
+
+    const follie = {
+      breve: [
+        'Il personaggio si rannicchia in un angolo e trema (incapacitato).',
+        'Il personaggio urla, ride o piange istericamente (incapacitato).',
+        'Il personaggio si paralizza, fissa nel vuoto, fermo come una statua.',
+        'Il personaggio vaneggia incomprensibilmente.',
+        'Il personaggio scappa nel modo più veloce possibile dalla fonte del terrore.',
+        'Il personaggio attacca il bersaglio più vicino — amico o nemico.',
+        'Il personaggio fa azioni casuali determinate da un d8.',
+        'Il personaggio sviene (incapacitato, non combatte).',
+        'Il personaggio è convinto di non vedere ciò che vede realmente.',
+        'Il personaggio si siede, ride piano, parla con qualcuno che non c\'è.',
+      ],
+      prolungata: [
+        'Il personaggio perde la propria identità — non risponde al nome.',
+        'Il personaggio è convinto di essere qualcun altro (personaggio famoso, NPC, creatura).',
+        'Il personaggio è paranoico: nessuno si fida di nessuno nel gruppo.',
+        'Il personaggio subisce allucinazioni — sente voci che lo insultano.',
+        'Il personaggio è ossessionato da un oggetto inanimato (lo tratta come vitale).',
+        'Il personaggio deve prepararsi ad ogni azione con rituali particolari.',
+        'Il personaggio non parla a parole, solo attraverso gesti e suoni.',
+        'Il personaggio è soggetto a attacchi di panico improvvisi (WIS DC 10 ogni mattina).',
+        'Il personaggio ricorda solo gli ultimi 5 minuti di vita (amnesia).',
+        'Il personaggio è convinto che tutti i presenti vogliano ucciderlo.',
+      ],
+      permanente: [
+        'Agorafobia: svantaggio ai tiri quando è all\'aperto.',
+        'Claustrofobia: svantaggio ai tiri in spazi chiusi o ristretti.',
+        'Deliri di grandezza: il personaggio si crede un dio incarnato.',
+        'Dipendenza: il personaggio deve possedere un tipo di oggetto o perde il controllo.',
+        'Disorganizzazione mentale: non può compiere più di un\'azione pianificata per round.',
+        'Dissociazione: in combattimento deve superare WIS DC 12 o si immobilizza.',
+        'Flashback: ogni volta che subisce danni, WIS DC 11 o è spaventato per 1 round.',
+        'Misantropia: non può cooperare con più di una persona alla volta.',
+        'Ossessione: spende ogni risorsa possibile per un obiettivo irrazionale.',
+        'Paranoia: non può dormire se qualcuno del gruppo è sveglio (esaurimento).',
+      ],
+    };
+
+    const lista = follie[tipo] || follie.breve;
+    const effetto = rnd(lista);
+    const durata = {
+      breve: `Durata: 1d10 minuti (${Math.floor(Math.random()*10)+1} min)`,
+      prolungata: `Durata: 1d10×10 ore (${(Math.floor(Math.random()*10)+1)*10} ore)`,
+      permanente: 'Permanente — rimuovibile con <em>maggior restauro</em> o magia simile',
+    }[tipo];
+
+    el.innerHTML =
+      '<div style="background:var(--bg-secondary);border-left:3px solid var(--accent-danger);border-radius:0 var(--radius-sm) var(--radius-sm) 0;padding:8px;margin-bottom:6px;font-size:0.85rem;line-height:1.5;">' + effetto + '</div>' +
+      '<div class="badge badge-muted" style="font-size:0.72rem;">' + durata + '</div>' +
+      '<button class="btn btn-ghost btn-sm w-full" style="margin-top:6px;font-size:0.72rem;" onclick="Generatori.rollFollia()">🎲 Nuovo effetto</button>';
+    Debug.log('Follia: ' + tipo);
+  },
+
   rollBiblioteca: async () => {
     const size = document.getElementById('gen-bib-size')?.value || 'piccola';
     const el = document.getElementById('gen-bib-result');
@@ -7063,24 +7526,72 @@ const Generatori = {
   },
 
   rollWeather: async () => {
-    const t = await loadTabelle();
-    if (!t) return;
-    const tipi = Object.keys(t.meteo);
-    const tipo = rnd(tipi);
-    const desc = rnd(t.meteo[tipo]);
-    const icons = { soleggiato: '☀️', nuvoloso: '☁️', pioggia: '🌧️', temporale: '⛈️', neve: '❄️', nebbia: '🌫️' };
+    const stagione = document.getElementById('gen-meteo-stagione')?.value || 'primavera';
     const el = document.getElementById('gen-weather-result');
     if (!el) return;
-    el.innerHTML = `
-      <div style="display:flex;gap:var(--space-sm);align-items:flex-start;">
-        <span style="font-size:1.8rem;">${icons[tipo] || '🌤️'}</span>
-        <div>
-          <div style="font-family:var(--font-display);font-size:0.8rem;color:var(--accent-secondary);text-transform:uppercase;letter-spacing:0.05em;">${tipo}</div>
-          <div class="text-sm">${desc}</div>
-        </div>
-      </div>
-    `;
-    Debug.log(`Meteo: ${tipo} — ${desc}`);
+
+    // Meteo per stagione — probabilità diverse
+    const meteoStagionale = {
+      primavera: {
+        '☀️ Soleggiato':   ['Sole caldo, vento leggero. Ideale per viaggiare.', 'Cielo limpido, profumo di fiori. Temperatura gradevole.', 'Sole con qualche nuvola. Brezza fresca dal nord.'],
+        '🌦️ Variabile':    ['Alternanza di sole e nuvole. Possibili rovesci brevi.', 'Cielo incerto, arcobaleno al mattino.'],
+        '🌧️ Pioggia':      ['Pioggia leggera e persistente. Strade fangose.', 'Rovescio intermittente. Terreno scivoloso (-2 velocità).'],
+        '⛈️ Temporale':    ['Temporale improvviso. Fulmini vicini. Rischio per i metalli.'],
+        '🌫️ Nebbia':       ['Nebbia mattutina densa. Visibilità ridotta a 9m. Si dirada a mezzogiorno.'],
+      },
+      estate: {
+        '☀️ Soleggiato':   ['Caldo intenso. Rischio esaurimento senza acqua ogni 4 ore.', 'Sole cocente, nessuna nuvola. Ombra preziosa.', 'Afa opprimente. Velocità ridotta di 3m in armatura pesante.'],
+        '🌬️ Ventoso':      ['Vento caldo e secco. Polvere negli occhi (-1 Percezione).', 'Raffiche di vento da sud. Difficoltà a mantenere torce accese.'],
+        '🌧️ Rovescio':     ['Temporale estivo breve ma violento. Poi sole.', 'Pioggia calda improvvisa. Finisce in 1 ora.'],
+        '☁️ Nuvoloso':     ['Coperto, nessuna pioggia. Temperatura piacevole.'],
+      },
+      autunno: {
+        '☁️ Coperto':      ['Cielo grigio, luce fioca. Temperatura fresca.', 'Nuvole basse, atmosfera cupa. Ottimo per tensione narrativa.'],
+        '🌧️ Pioggia':      ['Pioggia costante. Terreno fangoso. -3m velocità.', 'Pioggia battente con vento. Torce impossibili da tenere accese.'],
+        '🌫️ Nebbia':       ['Nebbia fitta dall\'alba al tramonto. Visibilità 6m.', 'Nebbia banchi irregolari. Si apre e si chiude.'],
+        '☀️ Soleggiato':   ['Giornata autunnale limpida. Foglie colorate. Temperatura fresca.'],
+        '🌬️ Vento':        ['Vento freddo da nord. Foglie che volano. Difficoltà Stealth all\'aperto.'],
+      },
+      inverno: {
+        '❄️ Neve':         ['Neve abbondante. Velocità dimezzata. Tracce visibili per ore.', 'Nevicata leggera. Silenzio totale. Vantaggio su Furtività.', 'Bufera di neve. Visibilità 3m. Rischio esaurimento senza riparo.'],
+        '🧊 Ghiaccio':     ['Ghiaccio sul terreno. DC DES 13 o caduta ogni 9m di corsa.', 'Tutto ghiacciato. DC DES 10 per azioni fisiche veloci.'],
+        '☁️ Grigio':       ['Cielo grigio piombo. Freddo pungente. Nessuna precipitazione.'],
+        '☀️ Sole invernale':['Sole freddo e limpido. Terreno gelato ma praticabile. Magnifico.'],
+        '🌬️ Bufera':       ['Tempesta di vento e gelo. Movimento possibile solo a metà velocità. Danno freddo 1 ogni ora senza riparo.'],
+      },
+      tropicale: {
+        '🌧️ Pioggia torrenziale':['Pioggia tropicale violenta. Fiumi in piena. Visibilità 9m.', 'Rovescio equatoriale. Finisce in 20 minuti. Poi caldo umido.'],
+        '☀️ Sole cocente': ['Umidità al 90%. Caldo insopportabile. Esaurimento dopo 6 ore senza acqua.'],
+        '🌩️ Temporale':    ['Temporale tropicale. Fulmini frequenti. Alberi che cadono.'],
+        '🌫️ Umidità':      ['Nebbia calda e umida. Visibilità ridotta. Tutto si inzuppa.'],
+        '🌊 Uragano':      ['Uragano in avvicinamento. 1d4 ore prima dell\'impatto.'],
+      },
+      artico: {
+        '❄️ Tormenta':     ['Tormenta artica. Visibilità 0. Muoversi è pericoloso (danno freddo 1d4/ora).', 'Neve fitta e vento tagliente. DC CON 12 o un livello esaurimento.'],
+        '🧊 Freddo estremo':['Temperatura sotto lo zero. Danno freddo 1 ogni 2 ore senza protezione.'],
+        '☀️ Luce artica':  ['Sole basso, luce abbagliante sul ghiaccio. Svantaggio Percezione visiva.'],
+        '🌌 Aurora boreale':['Cielo sgombro con aurora. Effetti magici potenziati (+1 livello incantesimo slot).'],
+        '🌬️ Bufera':       ['Bufera polare. Impossibile avanzare. Rifugiarsi o 1d6 danno freddo/ora.'],
+      },
+    };
+
+    const s = meteoStagionale[stagione] || meteoStagionale.primavera;
+    const tipi = Object.keys(s);
+    // Pesi casuali (evita sempre lo stesso tipo)
+    const tipo = tipi[Math.floor(Math.random()*tipi.length)];
+    const desc = s[tipo][Math.floor(Math.random()*s[tipo].length)];
+    const temp = { primavera:'10–18°C', estate:'25–38°C', autunno:'5–15°C', inverno:'-15–2°C', tropicale:'28–36°C', artico:'-40–-10°C' }[stagione]||'';
+
+    el.innerHTML =
+      '<div style="display:flex;gap:var(--space-sm);align-items:flex-start;">' +
+        '<span style="font-size:1.8rem;">' + tipo.split(' ')[0] + '</span>' +
+        '<div>' +
+          '<div style="font-family:var(--font-display);font-size:0.8rem;color:var(--accent-secondary);">' + tipo.slice(tipo.indexOf(' ')+1) + ' — ' + stagione.charAt(0).toUpperCase()+stagione.slice(1) + '</div>' +
+          '<div class="text-sm" style="margin-top:2px;">' + desc + '</div>' +
+          (temp ? '<div style="font-size:0.7rem;color:var(--text-muted);margin-top:4px;">🌡️ ' + temp + '</div>' : '') +
+        '</div>' +
+      '</div>';
+    Debug.log('Meteo: ' + tipo + ' (' + stagione + ')');
   },
 
   rollSensori: async () => {
@@ -7512,7 +8023,7 @@ const Generatori = {
       if (!testo.startsWith('✨')) return `<span>${testo}</span>`;
       const nomePulito = testo.replace('✨ ', '').replace(/ \(.*\)$/, '').trim();
       return `<span style="cursor:pointer;color:var(--accent-secondary);text-decoration:underline dotted;"
-        onclick="CompendioCache.openItem('${nomePulito.replace(/'/g,"\\'")}')" title="Cerca nel Compendio">✨ ${nomePulito} 🔗</span>`;
+        onclick="CompendioCache.openItem('${nomePulito.replace(/'/g,"\'")}')" title="Cerca nel Compendio">✨ ${nomePulito} 🔗</span>`;
     };
 
     const rows = extras.map(e => `
@@ -7787,7 +8298,88 @@ const apriFavoritoSchermo = async (tipo, id) => {
   if (fn && Compendio[fn]) Compendio[fn](id);
 };
 
-// ══ DRAG & DROP SCHERMO DM (SortableJS) ══
+// ══ NOTE SESSIONE ══
+const NoteSessione = (() => {
+  const _get = () => {
+    const camp = App.getActiveCampaign();
+    return camp?.noteSessione || [];
+  };
+  const _save = (list) => App.saveActiveCampaign({ noteSessione: list });
+
+  const render = () => {
+    const el = document.getElementById('note-sessione-list');
+    if (!el) return;
+    const notes = _get();
+    if (!notes.length) {
+      el.innerHTML = '<div class="text-muted text-sm" style="padding:8px 0;">Nessuna nota. Clicca "+ Nota" per aggiungerne una.</div>';
+      return;
+    }
+    el.innerHTML = notes.map((n, i) => `
+      <div style="display:flex;align-items:flex-start;gap:6px;padding:6px 0;border-bottom:1px solid var(--border);">
+        <select style="border:none;background:transparent;font-size:0.75rem;color:var(--text-muted);cursor:pointer;padding:0;flex-shrink:0;"
+          onchange="NoteSessione.updateTipo(${i},this.value)">
+          ${[['📌','Generico'],['👤','PNG'],['📍','Luogo'],['⚔️','Combattimento'],['🎯','Obiettivo'],['❓','Da fare'],['💡','Idea']].map(
+            ([emoji,label]) => `<option value="${emoji}" ${n.tipo===emoji?'selected':''}>${emoji} ${label}</option>`
+          ).join('')}
+        </select>
+        <textarea style="flex:1;border:none;background:transparent;font-size:0.82rem;color:var(--text-primary);resize:none;outline:none;font-family:var(--font-body);padding:0;min-height:20px;"
+          rows="1"
+          oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px';NoteSessione.updateTesto(${i},this.value)"
+          onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();NoteSessione.addVoce();}"
+          placeholder="Scrivi nota...">${n.testo}</textarea>
+        <button class="btn btn-ghost btn-icon-sm" style="flex-shrink:0;opacity:0.4;font-size:0.7rem;"
+          onclick="NoteSessione.remove(${i})" title="Rimuovi">✕</button>
+      </div>`).join('');
+    // Auto-resize textarea
+    el.querySelectorAll('textarea').forEach(t => {
+      t.style.height = 'auto';
+      t.style.height = t.scrollHeight + 'px';
+    });
+    // Aggiorna blocco schermo se presente
+    window.Schermo?._refreshNoteSessione?.();
+  };
+
+  const addVoce = (tipo='📌', testo='') => {
+    const list = [..._get(), { tipo, testo }];
+    _save(list);
+    render();
+    // Focus sull'ultima textarea
+    setTimeout(() => {
+      const textareas = document.querySelectorAll('#note-sessione-list textarea');
+      textareas[textareas.length - 1]?.focus();
+    }, 50);
+  };
+
+  const updateTipo = (i, tipo) => {
+    const list = _get();
+    if (list[i]) { list[i].tipo = tipo; _save(list); }
+    window.Schermo?._refreshNoteSessione?.();
+  };
+
+  const updateTesto = (i, testo) => {
+    const list = _get();
+    if (list[i]) { list[i].testo = testo; _save(list); }
+    window.Schermo?._refreshNoteSessione?.();
+  };
+
+  const remove = (i) => {
+    const list = _get();
+    list.splice(i, 1);
+    _save(list);
+    render();
+  };
+
+  const clear = () => {
+    Modal.confirm('Cancella tutte le note sessione?', '', () => {
+      _save([]);
+      render();
+    });
+  };
+
+  return { render, addVoce, updateTipo, updateTesto, remove, clear, getData: _get };
+})();
+
+
 const SchermoDD = (() => {
   let _sortable = null;
 
@@ -7833,7 +8425,10 @@ const GeneratoriDD = (() => {
     const grid = document.querySelector('#page-generatori .generatori-grid');
     if (!grid) return;
     const order = [...grid.querySelectorAll('.gen-card[data-gen-id]')].map(c => c.dataset.genId);
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(order)); } catch {}
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(order));
+      Debug.log('GeneratoriDD: ordine salvato', order.join(','));
+    } catch(e) { Debug.warn('GeneratoriDD: errore salvataggio', e.message); }
   };
 
   const applyOrder = () => {
@@ -7865,12 +8460,74 @@ const GeneratoriDD = (() => {
 })();
 
 // Aspetta che tutti gli script defer siano caricati
+
+// ══ BACKUP AUTOMATICO ══
+const BackupSystem = (() => {
+  const BACKUP_KEY = 'dm_last_backup';
+
+  const exportAll = () => {
+    try {
+      const data = {};
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        data[key] = localStorage.getItem(key);
+      }
+      const json = JSON.stringify({ version: 1, date: new Date().toISOString(), data }, null, 2);
+      const blob = new Blob([json], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `dm-toolkit-backup-${new Date().toISOString().slice(0,10)}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      localStorage.setItem(BACKUP_KEY, Date.now().toString());
+      Toast.show('✅ Backup scaricato', 'success', 3000);
+    } catch(e) { Toast.show('Errore backup: ' + e.message, 'error'); }
+  };
+
+  const importAll = (file) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const { data } = JSON.parse(e.target.result);
+        Object.entries(data).forEach(([k, v]) => localStorage.setItem(k, v));
+        Toast.show('✅ Backup ripristinato — ricarica la pagina', 'success', 5000);
+        setTimeout(() => location.reload(), 2000);
+      } catch(err) { Toast.show('File backup non valido', 'error'); }
+    };
+    reader.readAsText(file);
+  };
+
+  const openImport = () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json';
+    input.onchange = e => { if (e.target.files[0]) importAll(e.target.files[0]); };
+    input.click();
+  };
+
+  // Auto-backup ogni 10 minuti in background
+  const autoBackup = () => {
+    const last = parseInt(localStorage.getItem(BACKUP_KEY) || '0');
+    const now = Date.now();
+    // Ricorda ultimo backup ma non scarica automaticamente — avvisa solo
+    if (now - last > 7 * 24 * 60 * 60 * 1000) { // 7 giorni
+      setTimeout(() => Toast.show('💾 Nessun backup da 7+ giorni — considera di farne uno', 'info', 6000), 5000);
+    }
+  };
+
+  return { exportAll, openImport, autoBackup };
+})();
+
 document.addEventListener('DOMContentLoaded', () => {
   Debug.init(
     document.getElementById('debug-body'),
     document.getElementById('debug-panel')
   );
   App.init();
+  BackupSystem.autoBackup();
+  // Carica cache mostri e compendio in background
+  setTimeout(() => MonsterCache.load(), 500);
 
 });
 </script>
