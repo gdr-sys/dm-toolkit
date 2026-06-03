@@ -1526,11 +1526,11 @@
 </div>
 
 
-<!-- Modal: Combatente Custom / Homebrew -->
+<!-- Modal: Combattente Custom / Homebrew -->
 <div class="modal-overlay hidden" id="modal-custom-combatant-modal" style="display:none;">
   <div class="modal" style="max-width:480px;">
     <div class="modal-header">
-      <h2 style="font-family:var(--font-display);font-size:1.1rem;">Combatente Custom / Homebrew</h2>
+      <h2 style="font-family:var(--font-display);font-size:1.1rem;">Combattente Custom / Homebrew</h2>
       <button class="btn btn-ghost btn-icon" onclick="Modal.close('custom-combatant-modal')">✕</button>
     </div>
     <div class="modal-body">
@@ -4143,7 +4143,8 @@ const Sessione = (() => {
       <div class="combat-footer">
         <button class="btn btn-ghost btn-sm" onclick="Sessione.addPGtoCombat()">👥 + Party</button>
         <button class="btn btn-ghost btn-sm" onclick="Sessione.addMonsterQuick()">🐉 + Mostro</button>
-        <button class="btn btn-ghost btn-sm" onclick="Sessione.addCustomCombatant()">➕ + Personaggio</button>
+        <button class="btn btn-ghost btn-sm" onclick="Sessione.addNPCFromWorld()">👤 + NPC</button>
+        <button class="btn btn-ghost btn-sm" onclick="Sessione.addCustomCombatant()">🧑 + Combattente/Homebrew</button>
       </div>
     `;
   };
@@ -4544,6 +4545,76 @@ const Sessione = (() => {
     }).join('');
   };
 
+  const addNPCFromWorld = () => {
+    App.reloadActiveCampaign();
+    const camp = App.getActiveCampaign();
+    const npcs = camp?.npcs || [];
+
+    if (!npcs.length) {
+      Toast.show('Nessun NPC nel Mondo. Aggiungili dalla sezione Mondo → PNG.', 'info', 3000);
+      return;
+    }
+
+    const modal = document.createElement('div');
+    modal.className = 'modal-overlay';
+    modal.style.cssText = 'display:flex;';
+    modal.innerHTML = `<div class="modal" style="max-width:420px;">
+      <div class="modal-header">
+        <h2 style="font-family:var(--font-display);font-size:1rem;">👤 Aggiungi NPC al Combat</h2>
+        <button class="btn btn-ghost btn-icon" onclick="this.closest('.modal-overlay').remove()">✕</button>
+      </div>
+      <div class="modal-body" style="padding:0;max-height:50vh;overflow-y:auto;">
+        <div class="comp-filters" style="padding:8px;border-bottom:1px solid var(--border);">
+          <input type="text" class="form-input" placeholder="🔍 Cerca NPC..." style="flex:1;"
+            oninput="this.closest('.modal').querySelectorAll('.comp-row').forEach(r=>r.style.display=r.textContent.toLowerCase().includes(this.value.toLowerCase())?'':'none')">
+        </div>
+        ${npcs.map(npc => `
+          <div class="comp-row" onclick="Sessione._addNPCById('${npc.id}');this.closest('.modal-overlay').remove()">
+            <div class="comp-row-main">
+              <span class="comp-row-name">${npc.name || 'NPC senza nome'}</span>
+              <span class="comp-row-meta">${[npc.race, npc.role].filter(Boolean).join(' · ')}</span>
+            </div>
+            <div class="comp-row-stats">
+              ${npc.ca ? `<span class="comp-stat-pill">CA ${npc.ca}</span>` : ''}
+              ${npc.hpMax ? `<span class="comp-stat-pill">PF ${npc.hpMax}</span>` : ''}
+            </div>
+          </div>`).join('')}
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="this.closest('.modal-overlay').remove()">Chiudi</button>
+      </div>
+    </div>`;
+    modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
+    document.body.appendChild(modal);
+  };
+
+  const _addNPCById = (id) => {
+    App.reloadActiveCampaign();
+    const camp = App.getActiveCampaign();
+    const npc = (camp?.npcs || []).find(n => n.id === id);
+    if (!npc) return;
+
+    if (!_combat) newCombat();
+
+    const nome = npc.name || 'NPC';
+    const pf = parseInt(npc.hpMax || npc.hp) || 20;
+    const ca = parseInt(npc.ca) || 12;
+    const bonusInit = Math.floor(((parseInt(npc.dex) || 10) - 10) / 2);
+    const init = rollInit(bonusInit);
+
+    _combat.combatants.push({
+      id: 'c_npc_' + Date.now(),
+      nome, tipo: 'mostro',
+      hp: pf, maxHp: pf, ca,
+      iniziativa: init, iniziativaBonus: bonusInit,
+      condizioni: [], concentrazione: false, note: npc.role || '',
+      npcId: id,
+    });
+    saveCombat(_combat);
+    renderCombat();
+    Toast.show(`${nome} aggiunto al combat (Init: ${init})`, 'success');
+  };
+
   const addHomebrewMonster = (id) => {
     const h = Compendio._getHB ? Compendio._getHB().find(x => x.id === id) : null;
     // Usa i dati strutturati del mostro homebrew
@@ -4721,6 +4792,7 @@ const Sessione = (() => {
     openCondizioneModal, submitCondizioni, removeCondizione,
     toggleConcentrazione, openNote,
     addMonsterQuick, searchMonster, addMonsterFromCompendio, addHomebrewMonster,
+    addNPCFromWorld, _addNPCById,
     addCustomCombatant, submitCustomCombatant, removeCombatant,
     saveCombatSession, endCombat, loadCombatSession,
     openCombatantSheet, _rollAction,
@@ -6252,6 +6324,8 @@ const Schermo = (() => {
     const empty = document.getElementById('schermo-empty');
     if (!grid) return;
 
+    App.reloadActiveCampaign();
+
     if (_blocks.length === 0) {
       grid.innerHTML = '';
       if (empty) empty.style.display = '';
@@ -6259,12 +6333,9 @@ const Schermo = (() => {
     }
     if (empty) empty.style.display = 'none';
 
-    // Aggiorna solo i body senza ricreare l'intera griglia se già renderizzata
-    const alreadyRendered = grid.children.length === _blocks.length;
-    if (!alreadyRendered) {
-      SchermoDD.reset();
-      grid.innerHTML = _blocks.map((block, idx) => renderBlock(block, idx)).join('');
-    }
+    // Ricostruisce sempre la griglia per garantire drag & drop corretto
+    SchermoDD.reset();
+    grid.innerHTML = _blocks.map((block, idx) => renderBlock(block, idx)).join('');
     _blocks.forEach(b => updateBlockContent(b));
     requestAnimationFrame(() => SchermoDD.enable());
   };
