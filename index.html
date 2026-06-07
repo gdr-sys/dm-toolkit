@@ -179,7 +179,7 @@
           <h3 class="card-title">📓 Note Campagna</h3>
           <button class="btn btn-primary btn-sm" onclick="NoteCampagna.addCategoria()">+ Categoria</button>
         </div>
-        <div style="display:flex;min-height:320px;border-top:1px solid var(--border);">
+        <div id="nc-container" style="display:flex;min-height:320px;border-top:1px solid var(--border);">
           <!-- Pannello categorie -->
           <div id="nc-sidebar" style="width:160px;flex-shrink:0;border-right:1px solid var(--border);overflow-y:auto;background:var(--bg-secondary);">
           </div>
@@ -187,8 +187,8 @@
           <div id="nc-pages" style="width:150px;flex-shrink:0;border-right:1px solid var(--border);overflow-y:auto;background:var(--bg-card);">
           </div>
           <!-- Editor -->
-          <div style="flex:1;display:flex;flex-direction:column;min-width:0;">
-            <div style="padding:6px 10px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:6px;">
+          <div id="nc-editor-wrap" style="flex:1;display:flex;flex-direction:column;min-width:0;">
+            <div id="nc-editor-header" style="padding:6px 10px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:6px;">
               <input id="nc-page-title" class="form-input" style="flex:1;font-family:var(--font-display);font-size:0.88rem;" placeholder="Titolo pagina..." oninput="NoteCampagna.savePage()">
               <button class="btn btn-ghost btn-icon-sm" onclick="NoteCampagna.deletePage()" title="Elimina pagina">🗑️</button>
             </div>
@@ -8546,30 +8546,82 @@ const apriFavoritoSchermo = async (tipo, id) => {
   if (fn && Compendio[fn]) Compendio[fn](id);
 };
 
-// ══ NOTE CAMPAGNA (stile OneNote) ══
+// ══ NOTE CAMPAGNA (stile OneNote, responsive) ══
 const NoteCampagna = (() => {
   let _catIdx = 0;
   let _pageIdx = 0;
+  let _mobileView = 'cats'; // 'cats' | 'pages' | 'editor'
 
   const _get = () => {
     const camp = App.getActiveCampaign();
     return camp?.noteCampagna || [];
   };
   const _save = (data) => App.saveActiveCampaign({ noteCampagna: data });
+  const _isMobile = () => window.innerWidth <= 768;
 
-  const render = () => { renderSidebar(); renderPages(); renderEditor(); };
+  const render = () => {
+    if (_isMobile()) renderMobile();
+    else renderDesktop();
+  };
+
+  // ── DESKTOP: 3 pannelli affiancati ──
+  const renderDesktop = () => {
+    const container = document.getElementById('nc-container');
+    if (!container) return;
+    container.style.flexDirection = 'row';
+
+    const sidebar = document.getElementById('nc-sidebar');
+    const pages = document.getElementById('nc-pages');
+    const editorWrap = document.getElementById('nc-editor-wrap');
+    if (sidebar) { sidebar.style.display = ''; sidebar.style.width = '160px'; sidebar.style.borderRight = '1px solid var(--border)'; sidebar.style.borderBottom = 'none'; }
+    if (pages) { pages.style.display = ''; pages.style.width = '150px'; pages.style.borderRight = '1px solid var(--border)'; pages.style.borderBottom = 'none'; }
+    if (editorWrap) editorWrap.style.display = '';
+
+    renderSidebar(); renderPages(); renderEditor();
+  };
+
+  // ── MOBILE: accordion a step ──
+  const renderMobile = () => {
+    const container = document.getElementById('nc-container');
+    if (!container) return;
+    container.style.flexDirection = 'column';
+
+    const sidebar = document.getElementById('nc-sidebar');
+    const pages = document.getElementById('nc-pages');
+    const editorWrap = document.getElementById('nc-editor-wrap');
+
+    if (_mobileView === 'cats') {
+      if (sidebar) { sidebar.style.display = ''; sidebar.style.width = '100%'; sidebar.style.borderRight = 'none'; sidebar.style.borderBottom = '1px solid var(--border)'; }
+      if (pages) pages.style.display = 'none';
+      if (editorWrap) editorWrap.style.display = 'none';
+    } else if (_mobileView === 'pages') {
+      if (sidebar) sidebar.style.display = 'none';
+      if (pages) { pages.style.display = ''; pages.style.width = '100%'; pages.style.borderRight = 'none'; pages.style.borderBottom = '1px solid var(--border)'; }
+      if (editorWrap) editorWrap.style.display = 'none';
+    } else {
+      if (sidebar) sidebar.style.display = 'none';
+      if (pages) pages.style.display = 'none';
+      if (editorWrap) editorWrap.style.display = '';
+    }
+
+    renderSidebar(); renderPages(); renderEditor();
+  };
 
   const renderSidebar = () => {
     const el = document.getElementById('nc-sidebar');
     if (!el) return;
     const cats = _get();
+    const isMob = _isMobile();
+
+    const backBtn = isMob && _mobileView !== 'cats' ? '' : '';
     el.innerHTML = cats.length === 0
       ? '<div class="text-muted text-sm" style="padding:10px;font-size:0.75rem;">Nessuna categoria.<br>Clicca "+ Categoria"</div>'
       : cats.map((cat, i) =>
-        '<div onclick="NoteCampagna.selectCat(' + i + ')" style="padding:8px 10px;cursor:pointer;font-size:0.8rem;font-family:var(--font-display);border-left:3px solid ' + (i===_catIdx?'var(--accent-primary)':'transparent') + ';background:' + (i===_catIdx?'var(--bg-card)':'transparent') + ';display:flex;align-items:center;gap:4px;border-bottom:1px solid var(--border);">' +
+        '<div onclick="NoteCampagna.selectCat(' + i + ')" style="padding:9px 10px;cursor:pointer;font-size:0.82rem;font-family:var(--font-display);border-left:3px solid ' + (i===_catIdx?'var(--accent-primary)':'transparent') + ';background:' + (i===_catIdx?'var(--bg-card)':'transparent') + ';display:flex;align-items:center;gap:4px;border-bottom:1px solid var(--border);">' +
           '<span style="flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + (cat.nome||'Categoria') + '</span>' +
-          '<button class="btn btn-ghost btn-icon-sm" style="font-size:0.6rem;opacity:0.5;" onclick="event.stopPropagation();NoteCampagna.renameCategoria(' + i + ')" title="Rinomina">✏️</button>' +
-          '<button class="btn btn-ghost btn-icon-sm" style="font-size:0.6rem;opacity:0.5;color:var(--accent-danger);" onclick="event.stopPropagation();NoteCampagna.deleteCategoria(' + i + ')" title="Elimina">✕</button>' +
+          (isMob ? '<span style="color:var(--text-muted);font-size:0.8rem;">›</span>' : '') +
+          '<button class="btn btn-ghost btn-icon-sm" style="font-size:0.6rem;opacity:0.5;flex-shrink:0;" onclick="event.stopPropagation();NoteCampagna.renameCategoria(' + i + ')">✏️</button>' +
+          '<button class="btn btn-ghost btn-icon-sm" style="font-size:0.6rem;opacity:0.5;flex-shrink:0;color:var(--accent-danger);" onclick="event.stopPropagation();NoteCampagna.deleteCategoria(' + i + ')">✕</button>' +
         '</div>'
       ).join('');
   };
@@ -8579,18 +8631,23 @@ const NoteCampagna = (() => {
     if (!el) return;
     const cats = _get();
     const cat = cats[_catIdx];
+    const isMob = _isMobile();
+
     if (!cat) { el.innerHTML = '<div class="text-muted text-sm" style="padding:10px;font-size:0.75rem;">Seleziona una categoria</div>'; return; }
     const pages = cat.pagine || [];
+
     el.innerHTML =
-      '<div style="padding:5px 8px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">' +
-        '<span style="font-size:0.65rem;font-family:var(--font-display);color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100px;">' + cat.nome + '</span>' +
-        '<button class="btn btn-ghost btn-icon-sm" style="font-size:0.7rem;flex-shrink:0;" onclick="NoteCampagna.addPage()" title="Nuova pagina">+</button>' +
+      '<div style="padding:5px 8px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:6px;">' +
+        (isMob ? '<button class="btn btn-ghost btn-sm" style="font-size:0.7rem;padding:2px 6px;" onclick="NoteCampagna._mobileBack()">‹ Categorie</button>' : '') +
+        '<span style="font-size:0.65rem;font-family:var(--font-display);color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + cat.nome + '</span>' +
+        '<button class="btn btn-ghost btn-icon-sm" style="font-size:0.7rem;flex-shrink:0;" onclick="NoteCampagna.addPage()">+</button>' +
       '</div>' +
       (pages.length === 0
         ? '<div class="text-muted text-sm" style="padding:10px;font-size:0.75rem;">Clicca + per aggiungere una pagina</div>'
         : pages.map((p, i) =>
-          '<div onclick="NoteCampagna.selectPage(' + i + ')" style="padding:7px 10px;cursor:pointer;font-size:0.78rem;background:' + (i===_pageIdx?'var(--bg-tertiary)':'transparent') + ';border-bottom:1px solid var(--border);border-left:2px solid ' + (i===_pageIdx?'var(--accent-secondary)':'transparent') + ';white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="' + (p.titolo||'') + '">' +
-            (p.titolo || '<em style="color:var(--text-muted)">Senza titolo</em>') +
+          '<div onclick="NoteCampagna.selectPage(' + i + ')" style="padding:9px 10px;cursor:pointer;font-size:0.82rem;background:' + (i===_pageIdx?'var(--bg-tertiary)':'transparent') + ';border-bottom:1px solid var(--border);border-left:2px solid ' + (i===_pageIdx?'var(--accent-secondary)':'transparent') + ';display:flex;align-items:center;gap:4px;">' +
+            '<span style="flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + (p.titolo || '<em style="color:var(--text-muted)">Senza titolo</em>') + '</span>' +
+            (isMob ? '<span style="color:var(--text-muted);font-size:0.8rem;">›</span>' : '') +
           '</div>'
         ).join(''));
   };
@@ -8600,7 +8657,24 @@ const NoteCampagna = (() => {
     const page = cats[_catIdx]?.pagine?.[_pageIdx];
     const titleEl = document.getElementById('nc-page-title');
     const contentEl = document.getElementById('nc-page-content');
+    const headerEl = document.getElementById('nc-editor-header');
     if (!titleEl || !contentEl) return;
+
+    // Pulsante indietro su mobile
+    if (headerEl && _isMobile()) {
+      const backExists = headerEl.querySelector('.nc-back-btn');
+      if (!backExists) {
+        const backBtn = document.createElement('button');
+        backBtn.className = 'btn btn-ghost btn-sm nc-back-btn';
+        backBtn.style.cssText = 'font-size:0.7rem;padding:2px 6px;flex-shrink:0;';
+        backBtn.textContent = '‹ Pagine';
+        backBtn.onclick = () => NoteCampagna._mobileBack();
+        headerEl.insertBefore(backBtn, headerEl.firstChild);
+      }
+    } else if (headerEl) {
+      headerEl.querySelector('.nc-back-btn')?.remove();
+    }
+
     if (!page) {
       titleEl.value = ''; contentEl.value = '';
       titleEl.disabled = true; contentEl.disabled = true;
@@ -8611,15 +8685,32 @@ const NoteCampagna = (() => {
     contentEl.value = page.contenuto || '';
   };
 
-  const selectCat = (i) => { _catIdx = i; _pageIdx = 0; render(); };
-  const selectPage = (i) => { _pageIdx = i; renderPages(); renderEditor(); setTimeout(() => document.getElementById('nc-page-content')?.focus(), 50); };
+  const _mobileBack = () => {
+    if (_mobileView === 'editor') _mobileView = 'pages';
+    else _mobileView = 'cats';
+    render();
+  };
+
+  const selectCat = (i) => {
+    _catIdx = i; _pageIdx = 0;
+    if (_isMobile()) { _mobileView = 'pages'; render(); }
+    else { renderSidebar(); renderPages(); renderEditor(); }
+  };
+
+  const selectPage = (i) => {
+    _pageIdx = i;
+    if (_isMobile()) { _mobileView = 'editor'; render(); }
+    else { renderPages(); renderEditor(); setTimeout(() => document.getElementById('nc-page-content')?.focus(), 50); }
+  };
 
   const addCategoria = () => {
     const nome = prompt('Nome categoria:', 'Nuova Categoria');
     if (!nome?.trim()) return;
     const data = _get();
     data.push({ id: 'cat_'+Date.now(), nome: nome.trim(), pagine: [] });
-    _save(data); _catIdx = data.length-1; _pageIdx = 0; render();
+    _save(data); _catIdx = data.length-1; _pageIdx = 0;
+    if (_isMobile()) _mobileView = 'pages';
+    render();
   };
 
   const renameCategoria = (i) => {
@@ -8631,10 +8722,10 @@ const NoteCampagna = (() => {
 
   const deleteCategoria = (i) => {
     const data = _get();
-    if (!confirm('Eliminare la categoria "' + (data[i]?.nome||'') + '" e tutte le sue pagine?')) return;
+    if (!confirm('Eliminare "' + (data[i]?.nome||'') + '" e tutte le sue pagine?')) return;
     data.splice(i, 1); _save(data);
     if (_catIdx >= data.length) _catIdx = Math.max(0, data.length-1);
-    _pageIdx = 0; render();
+    _pageIdx = 0; _mobileView = 'cats'; render();
   };
 
   const addPage = () => {
@@ -8643,8 +8734,10 @@ const NoteCampagna = (() => {
     if (!data[_catIdx].pagine) data[_catIdx].pagine = [];
     data[_catIdx].pagine.push({ id: 'p_'+Date.now(), titolo: '', contenuto: '' });
     _pageIdx = data[_catIdx].pagine.length-1;
-    _save(data); renderPages(); renderEditor();
-    setTimeout(() => { const t = document.getElementById('nc-page-title'); if(t){t.focus();} }, 50);
+    _save(data);
+    if (_isMobile()) _mobileView = 'editor';
+    render();
+    setTimeout(() => document.getElementById('nc-page-title')?.focus(), 80);
   };
 
   const deletePage = () => {
@@ -8654,7 +8747,8 @@ const NoteCampagna = (() => {
     if (!confirm('Eliminare "' + (pages[_pageIdx]?.titolo||'questa pagina') + '"?')) return;
     pages.splice(_pageIdx, 1); _save(data);
     if (_pageIdx >= pages.length) _pageIdx = Math.max(0, pages.length-1);
-    renderPages(); renderEditor();
+    if (_isMobile()) _mobileView = 'pages';
+    render();
   };
 
   const savePage = () => {
@@ -8664,14 +8758,18 @@ const NoteCampagna = (() => {
     page.titolo = document.getElementById('nc-page-title')?.value || '';
     page.contenuto = document.getElementById('nc-page-content')?.value || '';
     _save(data);
-    // Aggiorna solo il titolo nell lista senza re-render completo
+    // Aggiorna solo il titolo nella lista
     const pageEls = document.querySelectorAll('#nc-pages > div');
-    const dataEl = pageEls[_pageIdx+1]; // +1 per l'header
-    if (dataEl) dataEl.textContent = page.titolo || '';
+    const dataEl = pageEls[_pageIdx+1];
+    if (dataEl) {
+      const span = dataEl.querySelector('span');
+      if (span) span.textContent = page.titolo || 'Senza titolo';
+    }
   };
 
-  return { render, renderSidebar, renderPages, renderEditor, selectCat, selectPage, addCategoria, renameCategoria, deleteCategoria, addPage, deletePage, savePage };
+  return { render, selectCat, selectPage, addCategoria, renameCategoria, deleteCategoria, addPage, deletePage, savePage, _mobileBack };
 })();
+
 
 // ══ NOTE SESSIONE ══
 const NoteSessione = (() => {
