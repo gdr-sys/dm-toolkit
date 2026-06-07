@@ -99,7 +99,6 @@
       <div class="home-hero">
         <h1 class="home-hero-title">⚔️ DM Toolkit</h1>
         <p class="home-hero-subtitle">Il tuo quartier generale per gestire campagne, PNG, sessioni e molto altro</p>
-        <button class="btn btn-primary btn-lg" onclick="openNewCampaignModal()">+ Nuova Campagna</button>
       </div>
       <div class="campaign-grid" id="campaign-grid">
         <!-- Popolato da JS -->
@@ -173,6 +172,33 @@
 
         </div>
       </div>
+
+      <!-- NOTE CAMPAGNA stile OneNote -->
+      <div class="card" style="margin-top:var(--space-lg);">
+        <div class="card-header">
+          <h3 class="card-title">📓 Note Campagna</h3>
+          <button class="btn btn-primary btn-sm" onclick="NoteCampagna.addCategoria()">+ Categoria</button>
+        </div>
+        <div style="display:flex;min-height:320px;border-top:1px solid var(--border);">
+          <!-- Pannello categorie -->
+          <div id="nc-sidebar" style="width:160px;flex-shrink:0;border-right:1px solid var(--border);overflow-y:auto;background:var(--bg-secondary);">
+          </div>
+          <!-- Pannello pagine -->
+          <div id="nc-pages" style="width:150px;flex-shrink:0;border-right:1px solid var(--border);overflow-y:auto;background:var(--bg-card);">
+          </div>
+          <!-- Editor -->
+          <div style="flex:1;display:flex;flex-direction:column;min-width:0;">
+            <div style="padding:6px 10px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:6px;">
+              <input id="nc-page-title" class="form-input" style="flex:1;font-family:var(--font-display);font-size:0.88rem;" placeholder="Titolo pagina..." oninput="NoteCampagna.savePage()">
+              <button class="btn btn-ghost btn-icon-sm" onclick="NoteCampagna.deletePage()" title="Elimina pagina">🗑️</button>
+            </div>
+            <textarea id="nc-page-content" style="flex:1;border:none;resize:none;font-size:0.83rem;line-height:1.75;padding:10px 14px;background:transparent;color:var(--text-primary);font-family:var(--font-body);outline:none;"
+              placeholder="Scrivi le tue note qui...&#10;&#10;Perfetto per lore, segreti, dialoghi, piani narrativi..."
+              oninput="NoteCampagna.savePage()"></textarea>
+          </div>
+        </div>
+      </div>
+
     </section>
 
     <!-- ════════════════════════
@@ -2510,7 +2536,7 @@ const App = (() => {
     // Hook pagina specifica
     switch (pageId) {
       case 'home':       renderHomePage(); break;
-      case 'campagna':   renderCampaignPage(); break;
+      case 'campagna':   renderCampaignPage(); setTimeout(() => NoteCampagna.render(), 100); break;
       case 'mondo':
         App.reloadActiveCampaign();
         try { NPC.init(); } catch(e) { Debug.warn('NPC non pronto: ' + e); }
@@ -2596,29 +2622,7 @@ const App = (() => {
 
     grid.innerHTML = '';
 
-    // Card nuova campagna
-    const newCard = document.createElement('div');
-    newCard.className = 'campaign-card campaign-card-new';
-    newCard.innerHTML = `
-      <div class="campaign-card-icon">➕</div>
-      <div style="font-family:var(--font-display);font-size:0.85rem;font-weight:600;">Nuova Campagna</div>
-      <div class="text-xs text-muted" style="margin-top:4px;">o One Shot</div>
-    `;
-    newCard.onclick = () => openNewCampaignModal();
-    grid.appendChild(newCard);
-
-    // Importa
-    const importCard = document.createElement('div');
-    importCard.className = 'campaign-card campaign-card-new';
-    importCard.innerHTML = `
-      <div class="campaign-card-icon">📥</div>
-      <div style="font-family:var(--font-display);font-size:0.85rem;font-weight:600;">Importa</div>
-      <div class="text-xs text-muted" style="margin-top:4px;">Da file JSON</div>
-    `;
-    importCard.onclick = () => importCampaignFromFile();
-    grid.appendChild(importCard);
-
-    // Campagne esistenti
+    // Campagne esistenti PRIMA
     campaigns.sort((a, b) => b.updatedAt - a.updatedAt).forEach(camp => {
       const card = document.createElement('div');
       card.className = 'campaign-card';
@@ -2650,6 +2654,16 @@ const App = (() => {
       card.onclick = () => App.openCampaign(camp.id);
       grid.appendChild(card);
     });
+
+    // Pulsanti azione in fondo — piccoli e discreti
+    const actionsRow = document.createElement('div');
+    actionsRow.style.cssText = 'grid-column:1/-1;display:flex;gap:8px;flex-wrap:wrap;padding:var(--space-sm) 0;';
+    actionsRow.innerHTML = `
+      <button class="btn btn-secondary btn-sm" onclick="openNewCampaignModal()">➕ Nuova Campagna / One Shot</button>
+      <button class="btn btn-ghost btn-sm" onclick="importCampaignFromFile()">📥 Importa da file</button>
+      <button class="btn btn-ghost btn-sm" onclick="BackupSystem.exportAll()">💾 Backup</button>
+    `;
+    grid.appendChild(actionsRow);
   };
 
   const openCampaign = (id) => {
@@ -8532,6 +8546,133 @@ const apriFavoritoSchermo = async (tipo, id) => {
   if (fn && Compendio[fn]) Compendio[fn](id);
 };
 
+// ══ NOTE CAMPAGNA (stile OneNote) ══
+const NoteCampagna = (() => {
+  let _catIdx = 0;
+  let _pageIdx = 0;
+
+  const _get = () => {
+    const camp = App.getActiveCampaign();
+    return camp?.noteCampagna || [];
+  };
+  const _save = (data) => App.saveActiveCampaign({ noteCampagna: data });
+
+  const render = () => { renderSidebar(); renderPages(); renderEditor(); };
+
+  const renderSidebar = () => {
+    const el = document.getElementById('nc-sidebar');
+    if (!el) return;
+    const cats = _get();
+    el.innerHTML = cats.length === 0
+      ? '<div class="text-muted text-sm" style="padding:10px;font-size:0.75rem;">Nessuna categoria.<br>Clicca "+ Categoria"</div>'
+      : cats.map((cat, i) =>
+        '<div onclick="NoteCampagna.selectCat(' + i + ')" style="padding:8px 10px;cursor:pointer;font-size:0.8rem;font-family:var(--font-display);border-left:3px solid ' + (i===_catIdx?'var(--accent-primary)':'transparent') + ';background:' + (i===_catIdx?'var(--bg-card)':'transparent') + ';display:flex;align-items:center;gap:4px;border-bottom:1px solid var(--border);">' +
+          '<span style="flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + (cat.nome||'Categoria') + '</span>' +
+          '<button class="btn btn-ghost btn-icon-sm" style="font-size:0.6rem;opacity:0.5;" onclick="event.stopPropagation();NoteCampagna.renameCategoria(' + i + ')" title="Rinomina">✏️</button>' +
+          '<button class="btn btn-ghost btn-icon-sm" style="font-size:0.6rem;opacity:0.5;color:var(--accent-danger);" onclick="event.stopPropagation();NoteCampagna.deleteCategoria(' + i + ')" title="Elimina">✕</button>' +
+        '</div>'
+      ).join('');
+  };
+
+  const renderPages = () => {
+    const el = document.getElementById('nc-pages');
+    if (!el) return;
+    const cats = _get();
+    const cat = cats[_catIdx];
+    if (!cat) { el.innerHTML = '<div class="text-muted text-sm" style="padding:10px;font-size:0.75rem;">Seleziona una categoria</div>'; return; }
+    const pages = cat.pagine || [];
+    el.innerHTML =
+      '<div style="padding:5px 8px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">' +
+        '<span style="font-size:0.65rem;font-family:var(--font-display);color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100px;">' + cat.nome + '</span>' +
+        '<button class="btn btn-ghost btn-icon-sm" style="font-size:0.7rem;flex-shrink:0;" onclick="NoteCampagna.addPage()" title="Nuova pagina">+</button>' +
+      '</div>' +
+      (pages.length === 0
+        ? '<div class="text-muted text-sm" style="padding:10px;font-size:0.75rem;">Clicca + per aggiungere una pagina</div>'
+        : pages.map((p, i) =>
+          '<div onclick="NoteCampagna.selectPage(' + i + ')" style="padding:7px 10px;cursor:pointer;font-size:0.78rem;background:' + (i===_pageIdx?'var(--bg-tertiary)':'transparent') + ';border-bottom:1px solid var(--border);border-left:2px solid ' + (i===_pageIdx?'var(--accent-secondary)':'transparent') + ';white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="' + (p.titolo||'') + '">' +
+            (p.titolo || '<em style="color:var(--text-muted)">Senza titolo</em>') +
+          '</div>'
+        ).join(''));
+  };
+
+  const renderEditor = () => {
+    const cats = _get();
+    const page = cats[_catIdx]?.pagine?.[_pageIdx];
+    const titleEl = document.getElementById('nc-page-title');
+    const contentEl = document.getElementById('nc-page-content');
+    if (!titleEl || !contentEl) return;
+    if (!page) {
+      titleEl.value = ''; contentEl.value = '';
+      titleEl.disabled = true; contentEl.disabled = true;
+      return;
+    }
+    titleEl.disabled = false; contentEl.disabled = false;
+    titleEl.value = page.titolo || '';
+    contentEl.value = page.contenuto || '';
+  };
+
+  const selectCat = (i) => { _catIdx = i; _pageIdx = 0; render(); };
+  const selectPage = (i) => { _pageIdx = i; renderPages(); renderEditor(); setTimeout(() => document.getElementById('nc-page-content')?.focus(), 50); };
+
+  const addCategoria = () => {
+    const nome = prompt('Nome categoria:', 'Nuova Categoria');
+    if (!nome?.trim()) return;
+    const data = _get();
+    data.push({ id: 'cat_'+Date.now(), nome: nome.trim(), pagine: [] });
+    _save(data); _catIdx = data.length-1; _pageIdx = 0; render();
+  };
+
+  const renameCategoria = (i) => {
+    const data = _get();
+    const nome = prompt('Nuovo nome:', data[i]?.nome || '');
+    if (!nome?.trim()) return;
+    data[i].nome = nome.trim(); _save(data); renderSidebar(); renderPages();
+  };
+
+  const deleteCategoria = (i) => {
+    const data = _get();
+    if (!confirm('Eliminare la categoria "' + (data[i]?.nome||'') + '" e tutte le sue pagine?')) return;
+    data.splice(i, 1); _save(data);
+    if (_catIdx >= data.length) _catIdx = Math.max(0, data.length-1);
+    _pageIdx = 0; render();
+  };
+
+  const addPage = () => {
+    const data = _get();
+    if (!data[_catIdx]) return;
+    if (!data[_catIdx].pagine) data[_catIdx].pagine = [];
+    data[_catIdx].pagine.push({ id: 'p_'+Date.now(), titolo: '', contenuto: '' });
+    _pageIdx = data[_catIdx].pagine.length-1;
+    _save(data); renderPages(); renderEditor();
+    setTimeout(() => { const t = document.getElementById('nc-page-title'); if(t){t.focus();} }, 50);
+  };
+
+  const deletePage = () => {
+    const data = _get();
+    const pages = data[_catIdx]?.pagine;
+    if (!pages?.length) return;
+    if (!confirm('Eliminare "' + (pages[_pageIdx]?.titolo||'questa pagina') + '"?')) return;
+    pages.splice(_pageIdx, 1); _save(data);
+    if (_pageIdx >= pages.length) _pageIdx = Math.max(0, pages.length-1);
+    renderPages(); renderEditor();
+  };
+
+  const savePage = () => {
+    const data = _get();
+    const page = data[_catIdx]?.pagine?.[_pageIdx];
+    if (!page) return;
+    page.titolo = document.getElementById('nc-page-title')?.value || '';
+    page.contenuto = document.getElementById('nc-page-content')?.value || '';
+    _save(data);
+    // Aggiorna solo il titolo nell lista senza re-render completo
+    const pageEls = document.querySelectorAll('#nc-pages > div');
+    const dataEl = pageEls[_pageIdx+1]; // +1 per l'header
+    if (dataEl) dataEl.textContent = page.titolo || '';
+  };
+
+  return { render, renderSidebar, renderPages, renderEditor, selectCat, selectPage, addCategoria, renameCategoria, deleteCategoria, addPage, deletePage, savePage };
+})();
+
 // ══ NOTE SESSIONE ══
 const NoteSessione = (() => {
   const _get = () => {
@@ -8650,19 +8791,15 @@ const SchermoDD = (() => {
   return { enable, reset };
 })();
 
-// ══ DRAG & DROP GENERATORI (SortableJS) ══
+// ══ ORDINE GENERATORI (frecce) ══
 const GeneratoriDD = (() => {
   const STORAGE_KEY = 'dm_generatori_order';
-  let _sortable = null;
 
   const saveOrder = () => {
     const grid = document.querySelector('#page-generatori .generatori-grid');
     if (!grid) return;
     const order = [...grid.querySelectorAll('.gen-card[data-gen-id]')].map(c => c.dataset.genId);
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(order));
-      Debug.log('GeneratoriDD: ordine salvato', order.join(','));
-    } catch(e) { Debug.warn('GeneratoriDD: errore salvataggio', e.message); }
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(order)); } catch {}
   };
 
   const applyOrder = () => {
@@ -8677,20 +8814,41 @@ const GeneratoriDD = (() => {
     });
   };
 
+  const move = (genId, dir) => {
+    const grid = document.querySelector('#page-generatori .generatori-grid');
+    if (!grid) return;
+    const cards = [...grid.querySelectorAll('.gen-card[data-gen-id]')];
+    const idx = cards.findIndex(c => c.dataset.genId === genId);
+    if (idx === -1) return;
+    const target = cards[idx + dir];
+    if (!target) return;
+    if (dir < 0) grid.insertBefore(cards[idx], target);
+    else grid.insertBefore(target, cards[idx]);
+    saveOrder();
+    enable(); // aggiorna frecce
+  };
+
   const enable = () => {
     const grid = document.querySelector('#page-generatori .generatori-grid');
-    if (!grid || typeof Sortable === 'undefined') return;
-    if (_sortable) { _sortable.destroy(); _sortable = null; }
+    if (!grid) return;
     applyOrder();
-    _sortable = Sortable.create(grid, {
-      animation: 150,
-      ghostClass: 'sortable-ghost',
-      chosenClass: 'sortable-chosen',
-      onEnd: saveOrder,
+    const cards = [...grid.querySelectorAll('.gen-card[data-gen-id]')];
+    cards.forEach((card, i) => {
+      // Rimuovi frecce vecchie
+      card.querySelector('.gen-move-btns')?.remove();
+      const header = card.querySelector('.card-header');
+      if (!header) return;
+      const btns = document.createElement('div');
+      btns.className = 'gen-move-btns';
+      btns.style.cssText = 'display:flex;gap:2px;margin-left:auto;';
+      btns.innerHTML =
+        `<button class="btn btn-ghost btn-icon-sm" style="opacity:${i===0?'0.2':'0.7'};" ${i===0?'disabled':''} onclick="GeneratoriDD.move('${card.dataset.genId}',-1)" title="Su">↑</button>` +
+        `<button class="btn btn-ghost btn-icon-sm" style="opacity:${i===cards.length-1?'0.2':'0.7'};" ${i===cards.length-1?'disabled':''} onclick="GeneratoriDD.move('${card.dataset.genId}',1)" title="Giù">↓</button>`;
+      header.appendChild(btns);
     });
   };
 
-  return { enable, applyOrder };
+  return { enable, applyOrder, move };
 })();
 
 // Aspetta che tutti gli script defer siano caricati
