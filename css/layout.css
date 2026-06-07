@@ -1469,3 +1469,35 @@
     padding: 5px 8px;
   }
 }
+
+/* ── Note Campagna — responsive mobile ── */
+@media (max-width: 768px) {
+  /* Il container principale diventa verticale */
+  #nc-sidebar,
+  #nc-pages {
+    width: 100% !important;
+    border-right: none !important;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* Nasconde i pannelli laterali e mostra accordion */
+  .nc-mobile-hidden { display: none !important; }
+
+  /* Wrapper diventa colonna */
+  #nc-sidebar ~ div,
+  [id^="nc-"] {
+    width: 100% !important;
+  }
+}
+
+/* Note Campagna — occupa tutto lo spazio disponibile */
+#page-campagna.active {
+  display: flex;
+  flex-direction: column;
+}
+#page-campagna .card:last-child {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
