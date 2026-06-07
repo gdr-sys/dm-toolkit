@@ -108,7 +108,7 @@
     <!-- ════════════════════════
          PAGINA: CAMPAGNA
     ════════════════════════ -->
-    <section class="page" id="page-campagna" style="display:flex;flex-direction:column;height:100%;">
+    <section class="page" id="page-campagna">
       <div class="page-header">
         <div>
           <h1 class="page-title" id="camp-page-title">Campagna</h1>
@@ -174,12 +174,12 @@
       </div>
 
       <!-- NOTE CAMPAGNA stile OneNote -->
-      <div class="card" style="margin-top:var(--space-lg);flex:1;display:flex;flex-direction:column;min-height:0;">
+      <div class="card" style="margin-top:var(--space-lg);">
         <div class="card-header">
           <h3 class="card-title">📓 Note Campagna</h3>
           <button class="btn btn-primary btn-sm" onclick="NoteCampagna.addCategoria()">+ Categoria</button>
         </div>
-        <div id="nc-container" style="display:flex;flex:1;min-height:0;border-top:1px solid var(--border);">
+        <div id="nc-container" style="display:flex;height:70vh;border-top:1px solid var(--border);">
           <!-- Pannello categorie -->
           <div id="nc-sidebar" style="width:160px;flex-shrink:0;border-right:1px solid var(--border);overflow-y:auto;background:var(--bg-secondary);height:100%;">
           </div>
