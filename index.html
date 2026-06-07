@@ -108,7 +108,7 @@
     <!-- ════════════════════════
          PAGINA: CAMPAGNA
     ════════════════════════ -->
-    <section class="page" id="page-campagna">
+    <section class="page" id="page-campagna" style="display:flex;flex-direction:column;height:100%;">
       <div class="page-header">
         <div>
           <h1 class="page-title" id="camp-page-title">Campagna</h1>
@@ -174,12 +174,12 @@
       </div>
 
       <!-- NOTE CAMPAGNA stile OneNote -->
-      <div class="card" style="margin-top:var(--space-lg);">
+      <div class="card" style="margin-top:var(--space-lg);flex:1;display:flex;flex-direction:column;min-height:0;">
         <div class="card-header">
           <h3 class="card-title">📓 Note Campagna</h3>
           <button class="btn btn-primary btn-sm" onclick="NoteCampagna.addCategoria()">+ Categoria</button>
         </div>
-        <div id="nc-container" style="display:flex;min-height:calc(100vh - 420px);height:calc(100vh - 420px);border-top:1px solid var(--border);">
+        <div id="nc-container" style="display:flex;flex:1;min-height:0;border-top:1px solid var(--border);">
           <!-- Pannello categorie -->
           <div id="nc-sidebar" style="width:160px;flex-shrink:0;border-right:1px solid var(--border);overflow-y:auto;background:var(--bg-secondary);height:100%;">
           </div>
@@ -187,7 +187,7 @@
           <div id="nc-pages" style="width:150px;flex-shrink:0;border-right:1px solid var(--border);overflow-y:auto;background:var(--bg-card);height:100%;">
           </div>
           <!-- Editor -->
-          <div id="nc-editor-wrap" style="flex:1;display:flex;flex-direction:column;min-width:0;height:100%;">
+          <div id="nc-editor-wrap" style="flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden;">
             <div id="nc-editor-header" style="padding:6px 10px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:6px;">
               <input id="nc-page-title" class="form-input" style="flex:1;font-family:var(--font-display);font-size:0.88rem;" placeholder="Titolo pagina..." oninput="NoteCampagna.savePage()">
               <button class="btn btn-ghost btn-icon-sm" onclick="NoteCampagna.deletePage()" title="Elimina pagina">🗑️</button>
