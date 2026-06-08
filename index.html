@@ -6535,6 +6535,7 @@ const Schermo = (() => {
   const renderPercezioni = () => {
     App.reloadActiveCampaign();
     const camp = App.getActiveCampaign();
+    const party = camp?.party || [];
     if (!party.length) return '<div class="text-muted text-sm">Nessun PG. Aggiungili in Sessione → Party.</div>';
 
     return party.map(pg => {
