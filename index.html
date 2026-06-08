@@ -6435,7 +6435,7 @@ const Schermo = (() => {
     if (!el) return;
 
     switch (block.type) {
-      case 'percezioni':     el.innerHTML = renderPercezioni(); break;
+      case 'percezioni':     el.innerHTML = renderPercezioni(); if(!el.innerHTML.includes('text-muted')||el.innerHTML.includes('Nessun PG')) setTimeout(()=>{App.reloadActiveCampaign();el.innerHTML=renderPercezioni();},600); break;
       case 'preferiti':      el.innerHTML = renderPreferiti(); break;
       case 'note_sessione':  el.innerHTML = renderNoteSessione(); break;
       case 'dadi':           el.innerHTML = renderDadiMini(block.id); break;
@@ -6449,7 +6449,7 @@ const Schermo = (() => {
       case 'stili_vita':     el.innerHTML = renderStiliVita(); break;
       case 'dc':             el.innerHTML = renderDC(); break;
       case 'tempo':          el.innerHTML = renderTempo(); break;
-      case 'timer':          TimerBlock.init(block.id, el); break;
+      case 'timer':          TimerBlock.init(block.id, el); break; // el è già il body
       case 'custom':         el.innerHTML = renderCustom(block); break;
       default:               el.innerHTML = '<div class="text-muted text-sm">Blocco sconosciuto</div>';
     }
@@ -8613,7 +8613,8 @@ const TimerBlock = (() => {
   const init = (blockId, el) => {
     if (_timers[blockId]?.interval) clearInterval(_timers[blockId].interval);
     if (!_timers[blockId]) _timers[blockId] = { remaining: 0, running: false, started: false };
-    _render(blockId, el);
+    // Usa el direttamente — il re-render successivo usa _el()
+    _render(blockId, el || _el(blockId));
   };
 
   const _el = (blockId) => document.querySelector(`#sblock-${blockId} .schermo-block-body`);
