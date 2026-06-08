@@ -174,12 +174,12 @@
       </div>
 
       <!-- NOTE CAMPAGNA stile OneNote -->
-      <div class="card" style="margin-top:var(--space-lg);">
+      <div class="card" style="margin-top:var(--space-lg);display:flex;flex-direction:column;">
         <div class="card-header">
           <h3 class="card-title">📓 Note Campagna</h3>
           <button class="btn btn-primary btn-sm" onclick="NoteCampagna.addCategoria()">+ Categoria</button>
         </div>
-        <div id="nc-container" style="display:flex;height:70vh;border-top:1px solid var(--border);">
+        <div id="nc-container" style="display:flex;flex:1;overflow:hidden;border-top:1px solid var(--border);">
           <!-- Pannello categorie -->
           <div id="nc-sidebar" style="width:160px;flex-shrink:0;border-right:1px solid var(--border);overflow-y:auto;background:var(--bg-secondary);height:100%;">
           </div>
@@ -944,6 +944,22 @@
         </label>
         <div class="form-hint">L'elettro vale 5 mo. Disabilitato di default perché poco comune in molte ambientazioni.</div>
       </div>
+      <div class="form-group">
+        <label class="form-label" style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+          <input type="checkbox" id="nc-calendario" onchange="document.getElementById('nc-calendario-preset').style.display=this.checked?'':'none'">
+          Attiva <strong>Calendario in-game</strong>
+        </label>
+        <div id="nc-calendario-preset" style="display:none;margin-top:6px;">
+          <label class="form-label">Preset calendario</label>
+          <select id="nc-calendario-tipo" class="form-select">
+            <option value="forgotten_realms">Forgotten Realms (Calendario delle Tempeste)</option>
+            <option value="greyhawk">Greyhawk (Calendario di Oerth)</option>
+            <option value="eberron">Eberron (Calendario di Khorvaire)</option>
+            <option value="fantasy">Fantasy Generico (12 mesi × 30 giorni)</option>
+            <option value="custom">Personalizzato (imposta dopo la creazione)</option>
+          </select>
+        </div>
+      </div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="Modal.close('new-campaign')">Annulla</button>
@@ -988,10 +1004,22 @@
           Usa monete di <strong>elettro</strong> (me) nel loot e tesoro
         </label>
       </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="Modal.close('edit-campaign')">Annulla</button>
-      <button class="btn btn-primary" onclick="submitEditCampaign()">Salva</button>
+      <div class="form-group">
+        <label class="form-label" style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+          <input type="checkbox" id="ec-calendario" onchange="document.getElementById('ec-calendario-preset').style.display=this.checked?'':'none'">
+          Attiva <strong>Calendario in-game</strong>
+        </label>
+        <div id="ec-calendario-preset" style="display:none;margin-top:6px;">
+          <label class="form-label">Preset calendario</label>
+          <select id="ec-calendario-tipo" class="form-select">
+            <option value="forgotten_realms">Forgotten Realms (Calendario delle Tempeste)</option>
+            <option value="greyhawk">Greyhawk (Calendario di Oerth)</option>
+            <option value="eberron">Eberron (Calendario di Khorvaire)</option>
+            <option value="fantasy">Fantasy Generico (12 mesi × 30 giorni)</option>
+            <option value="custom">Personalizzato</option>
+          </select>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -2298,11 +2326,17 @@ const submitNewCampaign = () => {
   const type   = document.getElementById('nc-type')?.value   || 'campagna';
   const system = document.getElementById('nc-system')?.value || '5e2024';
   const useElettro = document.getElementById('nc-elettro')?.checked || false;
+  const useCalendario = document.getElementById('nc-calendario')?.checked || false;
+  const calendarioTipo = document.getElementById('nc-calendario-tipo')?.value || 'fantasy';
 
   if (!name) { Toast.show('Inserisci un nome', 'warning'); return; }
 
   const camp = Storage.createCampaign(name, type);
-  Storage.updateCampaign(camp.id, { system, useElettro });
+  const updates = { system, useElettro };
+  if (useCalendario) {
+    updates.calendario = Calendario.initPreset(calendarioTipo);
+  }
+  Storage.updateCampaign(camp.id, updates);
 
   Modal.close('new-campaign');
   App.openCampaign(camp.id);
@@ -2315,6 +2349,10 @@ const openEditCampaignModal = (camp) => {
   document.getElementById('ec-type').value = camp.type || 'campagna';
   document.getElementById('ec-system').value = camp.system || '5e2024';
   document.getElementById('ec-elettro').checked = camp.useElettro || false;
+  const hasCalendario = !!camp.calendario;
+  document.getElementById('ec-calendario').checked = hasCalendario;
+  document.getElementById('ec-calendario-preset').style.display = hasCalendario ? '' : 'none';
+  if (camp.calendario?.tipo) document.getElementById('ec-calendario-tipo').value = camp.calendario.tipo;
   Modal.open('edit-campaign');
   setTimeout(() => document.getElementById('ec-name')?.focus(), 100);
 };
@@ -2324,13 +2362,20 @@ const submitEditCampaign = () => {
   const name = document.getElementById('ec-name')?.value?.trim();
   if (!id || !name) { Toast.show('Inserisci un nome', 'warning'); return; }
 
-  Storage.updateCampaign(id, {
+  const useCalendario = document.getElementById('ec-calendario')?.checked || false;
+  const calendarioTipo = document.getElementById('ec-calendario-tipo')?.value || 'fantasy';
+  const camp = Storage.getCampaign(id);
+  const updates = {
     name,
     type: document.getElementById('ec-type')?.value,
     system: document.getElementById('ec-system')?.value,
     useElettro: document.getElementById('ec-elettro')?.checked || false,
-  });
+    calendario: useCalendario
+      ? (camp?.calendario?.tipo === calendarioTipo ? camp.calendario : Calendario.initPreset(calendarioTipo))
+      : null,
+  };
 
+  Storage.updateCampaign(id, updates);
   Modal.close('edit-campaign');
   App.renderHomePage();
   Toast.show('Campagna aggiornata', 'success');
@@ -6259,7 +6304,13 @@ const Schermo = (() => {
     tempo: {
       label: 'Tempo & Calendario',
       icon: '⏰',
-      desc: 'Gestione del tempo di gioco',
+      desc: 'Gestione del tempo di gioco e calendario in-game',
+      defaultSize: 'sm',
+    },
+    timer: {
+      label: 'Timer / Conto alla rovescia',
+      icon: '⏱️',
+      desc: 'Timer funzionante con allarme visivo',
       defaultSize: 'sm',
     },
     preferiti: {
@@ -6398,6 +6449,7 @@ const Schermo = (() => {
       case 'stili_vita':     el.innerHTML = renderStiliVita(); break;
       case 'dc':             el.innerHTML = renderDC(); break;
       case 'tempo':          el.innerHTML = renderTempo(); break;
+      case 'timer':          TimerBlock.init(block.id, el); break;
       case 'custom':         el.innerHTML = renderCustom(block); break;
       default:               el.innerHTML = '<div class="text-muted text-sm">Blocco sconosciuto</div>';
     }
@@ -6935,38 +6987,46 @@ const Schermo = (() => {
   };
 
   const renderTempo = () => {
-    const camp = App.getActiveCampaign();
-    const cal = camp?.calendar || { day: 1, month: 1, year: 1490, timeHours: 8, timeMinutes: 0 };
-    const h = String(cal.timeHours || 0).padStart(2, '0');
-    const m = String(cal.timeMinutes || 0).padStart(2, '0');
+    App.reloadActiveCampaign();
+    const cal = Calendario.get();
+
+    if (!cal) {
+      return '<div class="text-muted text-sm" style="text-align:center;padding:8px;">Nessun calendario attivo.<br><small>Attivalo nelle impostazioni campagna.</small></div>';
+    }
+
+    const dateStr = Calendario.getDateStr(cal);
+    const timeStr = Calendario.getTimeStr(cal);
+    const mese = cal.mesi[cal.mese];
+    const festivita = (cal.festivita||[]).find(f => f.mese===cal.mese && f.giorno===cal.giorno);
+
     return `
-      <div style="text-align:center;margin-bottom:8px;">
-        <div style="font-family:var(--font-mono);font-size:2rem;font-weight:700;color:var(--accent-primary);">${h}:${m}</div>
-        <div style="font-size:0.8rem;color:var(--text-muted);">Giorno ${cal.day} · Anno ${cal.year}</div>
+      <div style="text-align:center;margin-bottom:10px;">
+        <div style="font-family:var(--font-mono);font-size:2rem;font-weight:700;color:var(--accent-primary);">${timeStr}</div>
+        <div style="font-size:0.82rem;color:var(--text-secondary);margin-top:2px;font-family:var(--font-display);">${dateStr}</div>
+        ${festivita ? `<div style="font-size:0.72rem;color:var(--accent-secondary);margin-top:3px;">🎉 ${festivita.nome}</div>` : ''}
       </div>
-      <div style="display:flex;gap:4px;flex-wrap:wrap;justify-content:center;">
-        <button class="btn btn-secondary btn-sm" style="font-size:0.7rem;" onclick="Schermo.advanceTime(10)">+10 min</button>
-        <button class="btn btn-secondary btn-sm" style="font-size:0.7rem;" onclick="Schermo.advanceTime(60)">+1 ora</button>
-        <button class="btn btn-secondary btn-sm" style="font-size:0.7rem;" onclick="Schermo.advanceTime(480)">+8 ore</button>
-        <button class="btn btn-secondary btn-sm" style="font-size:0.7rem;" onclick="Schermo.advanceTime(1440)">+1 giorno</button>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:6px;">
+        <button class="btn btn-secondary btn-sm" style="font-size:0.72rem;" onclick="Schermo._avanzaTempo('minuti',10)">+10 min</button>
+        <button class="btn btn-secondary btn-sm" style="font-size:0.72rem;" onclick="Schermo._avanzaTempo('ore',1)">+1 ora</button>
+        <button class="btn btn-secondary btn-sm" style="font-size:0.72rem;" onclick="Schermo._avanzaTempo('ore',8)">+8 ore</button>
+        <button class="btn btn-secondary btn-sm" style="font-size:0.72rem;" onclick="Schermo._avanzaTempo('giorni',1)">+1 giorno</button>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;">
+        <button class="btn btn-ghost btn-sm" style="font-size:0.65rem;" onclick="Schermo._avanzaTempo('minuti',-10)">−10 min</button>
+        <button class="btn btn-ghost btn-sm" style="font-size:0.65rem;" onclick="Schermo._avanzaTempo('giorni',-1)">−1 giorno</button>
       </div>`;
   };
 
-  const advanceTime = (minutes) => {
-    const camp = App.getActiveCampaign();
-    if (!camp) return;
-    const cal = { ...(camp.calendar || { day: 1, month: 1, year: 1490, timeHours: 8, timeMinutes: 0 }) };
-    let totalMins = (cal.timeHours || 0) * 60 + (cal.timeMinutes || 0) + minutes;
-    const extraDays = Math.floor(totalMins / (24 * 60));
-    totalMins = totalMins % (24 * 60);
-    cal.timeHours = Math.floor(totalMins / 60);
-    cal.timeMinutes = totalMins % 60;
-    cal.day = (cal.day || 1) + extraDays;
-    App.saveActiveCampaign({ calendar: cal });
-    // Aggiorna tutti i blocchi tempo
+  const _avanzaTempo = (unit, amount) => {
+    let cal = Calendario.get();
+    if (!cal) { Toast.show('Nessun calendario attivo', 'warning'); return; }
+    cal = Calendario.advance(cal, unit, amount);
+    Calendario.save(cal);
     _blocks.filter(b => b.type === 'tempo').forEach(b => updateBlockContent(b));
-    Toast.show(`Tempo avanzato: ${cal.timeHours.toString().padStart(2,'0')}:${cal.timeMinutes.toString().padStart(2,'0')} Giorno ${cal.day}`, 'info');
+    Toast.show(Calendario.getDateStr(cal) + ' ' + Calendario.getTimeStr(cal), 'info', 2000);
   };
+
+  const advanceTime = (minutes) => _avanzaTempo('minuti', minutes); // compatibilità
 
   const renderCustom = (block) => `
     <div style="font-size:0.85rem;color:var(--text-secondary);white-space:pre-wrap;line-height:1.6;">${block.content || '<span class="text-muted">Clicca ✏️ per modificare</span>'}</div>`;
@@ -7082,7 +7142,7 @@ const Schermo = (() => {
     removeBlock, resizeBlock, moveBlock, editBlock, resetLayout,
     rollDie, generateMeteo, saveNote, advanceTime, refreshCombat,
     setCompendioRef, _refreshCombat, _refreshFavoriti, _swapBlocks,
-    _refreshNoteSessione,
+    _refreshNoteSessione, _avanzaTempo,
   };
 })();
 
@@ -8546,7 +8606,272 @@ const apriFavoritoSchermo = async (tipo, id) => {
   if (fn && Compendio[fn]) Compendio[fn](id);
 };
 
-// ══ NOTE CAMPAGNA (stile OneNote, responsive) ══
+// ══ TIMER BLOCK (conto alla rovescia funzionante) ══
+const TimerBlock = (() => {
+  const _timers = {};
+
+  const init = (blockId, el) => {
+    if (_timers[blockId]?.interval) clearInterval(_timers[blockId].interval);
+    if (!_timers[blockId]) _timers[blockId] = { remaining: 0, running: false, started: false };
+    _render(blockId, el);
+  };
+
+  const _el = (blockId) => document.querySelector(`#sblock-${blockId} .schermo-block-body`);
+
+  const _render = (blockId, el) => {
+    const container = el || _el(blockId);
+    if (!container) return;
+    const t = _timers[blockId] || { remaining: 0, running: false, started: false };
+    const rem = Math.max(0, t.remaining);
+    const m = Math.floor(rem / 60);
+    const s = rem % 60;
+    const display = String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+    const isAlarm = rem === 0 && t.started;
+    const color = isAlarm ? 'var(--accent-danger)' : t.running ? 'var(--accent-primary)' : 'var(--text-primary)';
+
+    container.innerHTML =
+      '<div style="text-align:center;">' +
+        '<div id="td-' + blockId + '" style="font-family:var(--font-mono);font-size:2.4rem;font-weight:900;color:' + color + ';letter-spacing:2px;margin-bottom:6px;">' + display + '</div>' +
+        (isAlarm ? '<div style="font-size:0.78rem;color:var(--accent-danger);font-weight:700;margin-bottom:6px;">⏰ TEMPO SCADUTO!</div>' : '') +
+        '<div style="display:flex;gap:4px;justify-content:center;margin-bottom:6px;">' +
+          (t.running
+            ? '<button class="btn btn-secondary btn-sm" onclick="TimerBlock.pause(\'' + blockId + '\')">⏸ Pausa</button>'
+            : '<button class="btn btn-primary btn-sm" onclick="TimerBlock.start(\'' + blockId + '\')"' + (rem===0&&!t.started?' disabled':'') + '>▶ Avvia</button>'
+          ) +
+          '<button class="btn btn-ghost btn-sm" onclick="TimerBlock.reset(\'' + blockId + '\')">↺</button>' +
+        '</div>' +
+        '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:3px;margin-bottom:6px;">' +
+          [['1m',60],['3m',180],['5m',300],['10m',600]].map(function(x){ return '<button class="btn btn-ghost btn-sm" style="font-size:0.7rem;padding:3px;" onclick="TimerBlock.set(\'' + blockId + '\',' + x[1] + ')">' + x[0] + '</button>'; }).join('') +
+        '</div>' +
+        '<div style="display:flex;gap:3px;align-items:center;justify-content:center;">' +
+          '<input type="number" id="tm-' + blockId + '" placeholder="min" min="0" max="99" class="form-input" style="width:46px;text-align:center;font-size:0.8rem;padding:4px;">' +
+          '<span style="color:var(--text-muted);">:</span>' +
+          '<input type="number" id="ts-' + blockId + '" placeholder="ss" min="0" max="59" class="form-input" style="width:46px;text-align:center;font-size:0.8rem;padding:4px;">' +
+          '<button class="btn btn-secondary btn-sm" style="font-size:0.72rem;" onclick="TimerBlock.setCustom(\'' + blockId + '\')">Set</button>' +
+        '</div>' +
+      '</div>';
+  };
+
+  const start = (blockId) => {
+    const t = _timers[blockId];
+    if (!t || t.remaining <= 0) return;
+    t.running = true; t.started = true;
+    t.interval = setInterval(() => {
+      t.remaining--;
+      const disp = document.getElementById('td-' + blockId);
+      if (disp) {
+        const m = Math.floor(t.remaining / 60), s = t.remaining % 60;
+        disp.textContent = String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+        if (t.remaining <= 10) disp.style.color = 'var(--accent-danger)';
+        if (t.remaining <= 0) { clearInterval(t.interval); t.running = false; _render(blockId, null); if(navigator.vibrate) navigator.vibrate([500,200,500,200,500]); }
+      }
+    }, 1000);
+    _render(blockId, null);
+  };
+
+  const pause = (blockId) => {
+    const t = _timers[blockId]; if (!t) return;
+    clearInterval(t.interval); t.running = false; _render(blockId, null);
+  };
+
+  const reset = (blockId) => {
+    const t = _timers[blockId]; if (!t) return;
+    clearInterval(t.interval); t.running = false; t.remaining = 0; t.started = false; _render(blockId, null);
+  };
+
+  const set = (blockId, seconds) => {
+    const t = _timers[blockId]; if (!t) return;
+    clearInterval(t.interval); t.running = false; t.remaining = seconds; t.started = false; _render(blockId, null);
+  };
+
+  const setCustom = (blockId) => {
+    const m = parseInt(document.getElementById('tm-' + blockId)?.value) || 0;
+    const s = parseInt(document.getElementById('ts-' + blockId)?.value) || 0;
+    const total = m * 60 + s;
+    if (total > 0) set(blockId, total);
+  };
+
+  return { init, start, pause, reset, set, setCustom };
+})();
+
+// ══ SISTEMA CALENDARIO IN-GAME ══
+const Calendario = (() => {
+
+  const PRESET = {
+    forgotten_realms: {
+      tipo: 'forgotten_realms', nome: 'Calendario delle Tempeste',
+      mesi: [
+        { nome: 'Hammer', giorni: 30, it: 'Martello (Deepwinter)' },
+        { nome: 'Alturiak', giorni: 30, it: 'Alturiak (La Maschera)' },
+        { nome: 'Ches', giorni: 30, it: 'Ches (La Stella)' },
+        { nome: 'Tarsakh', giorni: 30, it: 'Tarsakh (Lo Scudo)' },
+        { nome: 'Mirtul', giorni: 30, it: 'Mirtul (Le Fioriture)' },
+        { nome: 'Kythorn', giorni: 30, it: 'Kythorn (Il Tempo dei Fiori)' },
+        { nome: 'Flamerule', giorni: 30, it: 'Flamerule (La Fiamma)' },
+        { nome: 'Eleasis', giorni: 30, it: 'Eleasis (La Fiamma d\'Estate)' },
+        { nome: 'Eleint', giorni: 30, it: 'Eleint (Il Falcone)' },
+        { nome: 'Marpenoth', giorni: 30, it: 'Marpenoth (La Foglia)' },
+        { nome: 'Uktar', giorni: 30, it: 'Uktar (La Caccia)' },
+        { nome: 'Nightal', giorni: 30, it: 'Nightal (Il Lungo Buio)' },
+      ],
+      giorni_settimana: ['Luna', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab', 'Dom'],
+      anno_base: 1492, prefisso_anno: 'Anno del Drago',
+      festivita: [
+        { mese:0, giorno:1, nome:'Midwinter (Giorno del Martello)' },
+        { mese:3, giorno:30, nome:'Greengrass' },
+        { mese:6, giorno:30, nome:'Midsummer' },
+        { mese:8, giorno:30, nome:'Highharvestide' },
+        { mese:11, giorno:20, nome:'Feast of the Moon' },
+      ],
+    },
+    greyhawk: {
+      tipo: 'greyhawk', nome: 'Calendario di Oerth',
+      mesi: [
+        { nome: 'Needfest', giorni: 7, it: 'Needfest' },
+        { nome: 'Fireseek', giorni: 28, it: 'Fireseek (Caccia al Fuoco)' },
+        { nome: 'Readying', giorni: 28, it: 'Readying (Preparazione)' },
+        { nome: 'Coldeven', giorni: 28, it: 'Coldeven (Freddo Uguale)' },
+        { nome: 'Growfest', giorni: 7, it: 'Growfest' },
+        { nome: 'Planting', giorni: 28, it: 'Planting (La Semina)' },
+        { nome: 'Flocktime', giorni: 28, it: 'Flocktime (Tempo del Gregge)' },
+        { nome: 'Wealsun', giorni: 28, it: 'Wealsun (Sole Fiorente)' },
+        { nome: 'Richfest', giorni: 7, it: 'Richfest' },
+        { nome: 'Reaping', giorni: 28, it: 'Reaping (Il Raccolto)' },
+        { nome: 'Goodmonth', giorni: 28, it: 'Goodmonth (Buon Mese)' },
+        { nome: 'Harvester', giorni: 28, it: 'Harvester (Il Mietitore)' },
+        { nome: 'Brewfest', giorni: 7, it: 'Brewfest' },
+        { nome: 'Patchwall', giorni: 28, it: 'Patchwall (Il Muro di Toppe)' },
+        { nome: 'Ready\'reat', giorni: 28, it: 'Ready\'reat (Preparazione al Gelo)' },
+        { nome: 'Sunsebb', giorni: 28, it: 'Sunsebb (Sole Calante)' },
+      ],
+      giorni_settimana: ['Starday', 'Sunday', 'Moonday', 'Godsday', 'Waterday', 'Earthday', 'Freeday'],
+      anno_base: 591, prefisso_anno: 'AC',
+      festivita: [],
+    },
+    eberron: {
+      tipo: 'eberron', nome: 'Calendario di Khorvaire',
+      mesi: [
+        { nome: 'Zarantyr', giorni: 28, it: 'Zarantyr (Tempesta di Metà Inverno)' },
+        { nome: 'Olarune', giorni: 28, it: 'Olarune (Custode)' },
+        { nome: 'Therendor', giorni: 28, it: 'Therendor (Primavera Nascente)' },
+        { nome: 'Eyre', giorni: 28, it: 'Eyre (Il Fabbro)' },
+        { nome: 'Dravago', giorni: 28, it: 'Dravago (La Fioritura)' },
+        { nome: 'Nymm', giorni: 28, it: 'Nymm (Abbondanza)' },
+        { nome: 'Lharvion', giorni: 28, it: 'Lharvion (La Mietitrice)' },
+        { nome: 'Barrakas', giorni: 28, it: 'Barrakas (La Lanterna)' },
+        { nome: 'Rhaan', giorni: 28, it: 'Rhaan (Il Libro)' },
+        { nome: 'Sypheros', giorni: 28, it: 'Sypheros (L\'Ombra)' },
+        { nome: 'Aryth', giorni: 28, it: 'Aryth (L\'Ancoraggio)' },
+        { nome: 'Vult', giorni: 28, it: 'Vult (La Torre)' },
+      ],
+      giorni_settimana: ['Sul', 'Mol', 'Zol', 'Wir', 'Zor', 'Far', 'Sar'],
+      anno_base: 998, prefisso_anno: 'YK',
+      festivita: [],
+    },
+    fantasy: {
+      tipo: 'fantasy', nome: 'Calendario Fantasy',
+      mesi: [
+        { nome: 'Frostmonth', it: 'Gelo', giorni: 30 },
+        { nome: 'Icemonth', it: 'Ghiaccio', giorni: 30 },
+        { nome: 'Bloommonth', it: 'Fioriture', giorni: 30 },
+        { nome: 'Rainmonth', it: 'Piogge', giorni: 30 },
+        { nome: 'Seedmonth', it: 'Semina', giorni: 30 },
+        { nome: 'Greenmonth', it: 'Verdura', giorni: 30 },
+        { nome: 'Sunmonth', it: 'Sole', giorni: 30 },
+        { nome: 'Firemonth', it: 'Fiamma', giorni: 30 },
+        { nome: 'Harvestmonth', it: 'Raccolto', giorni: 30 },
+        { nome: 'Leafmonth', it: 'Foglie', giorni: 30 },
+        { nome: 'Windmonth', it: 'Vento', giorni: 30 },
+        { nome: 'Darkmonth', it: 'Oscurità', giorni: 30 },
+      ],
+      giorni_settimana: ['Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato', 'Domenica'],
+      anno_base: 1, prefisso_anno: 'Anno',
+      festivita: [],
+    },
+    custom: {
+      tipo: 'custom', nome: 'Calendario Personalizzato',
+      mesi: [
+        { nome: 'Mese 1', it: 'Primo Mese', giorni: 30 },
+        { nome: 'Mese 2', it: 'Secondo Mese', giorni: 30 },
+        { nome: 'Mese 3', it: 'Terzo Mese', giorni: 30 },
+        { nome: 'Mese 4', it: 'Quarto Mese', giorni: 30 },
+        { nome: 'Mese 5', it: 'Quinto Mese', giorni: 30 },
+        { nome: 'Mese 6', it: 'Sesto Mese', giorni: 30 },
+        { nome: 'Mese 7', it: 'Settimo Mese', giorni: 30 },
+        { nome: 'Mese 8', it: 'Ottavo Mese', giorni: 30 },
+        { nome: 'Mese 9', it: 'Nono Mese', giorni: 30 },
+        { nome: 'Mese 10', it: 'Decimo Mese', giorni: 30 },
+        { nome: 'Mese 11', it: 'Undicesimo Mese', giorni: 30 },
+        { nome: 'Mese 12', it: 'Dodicesimo Mese', giorni: 30 },
+      ],
+      giorni_settimana: ['Giorno 1','Giorno 2','Giorno 3','Giorno 4','Giorno 5','Giorno 6','Giorno 7'],
+      anno_base: 1, prefisso_anno: 'Anno',
+      festivita: [],
+    },
+  };
+
+  const initPreset = (tipo) => {
+    const preset = PRESET[tipo] || PRESET.fantasy;
+    return {
+      ...preset,
+      giorno: 1, mese: 0, anno: preset.anno_base,
+      ora: 8, minuti: 0,
+    };
+  };
+
+  const getDateStr = (cal) => {
+    if (!cal) return '';
+    const mese = cal.mesi[cal.mese];
+    const nomeMese = mese?.it || mese?.nome || '';
+    const giorno = cal.giorno;
+    const anno = cal.anno;
+    const gg = cal.giorni_settimana?.[(giorno-1) % (cal.giorni_settimana?.length||7)] || '';
+    return `${gg}, ${giorno} ${nomeMese} — ${cal.prefisso_anno} ${anno}`;
+  };
+
+  const getTimeStr = (cal) => {
+    if (!cal) return '';
+    const h = String(cal.ora||0).padStart(2,'0');
+    const m = String(cal.minuti||0).padStart(2,'0');
+    return h + ':' + m;
+  };
+
+  const advance = (cal, unit, amount) => {
+    const c = { ...cal, mesi: [...cal.mesi] };
+    if (unit === 'minuti') {
+      c.minuti = (c.minuti||0) + amount;
+      while (c.minuti >= 60) { c.minuti -= 60; c.ora = (c.ora||0)+1; }
+      while (c.minuti < 0)  { c.minuti += 60; c.ora = (c.ora||0)-1; }
+    }
+    if (unit === 'ore') { c.ora = (c.ora||0) + amount; }
+    if (unit === 'giorni' || c.ora >= 24 || c.ora < 0) {
+      const daysFromHours = c.ora >= 24 ? Math.floor(c.ora/24) : c.ora < 0 ? -Math.ceil(Math.abs(c.ora)/24) : 0;
+      c.ora = ((c.ora % 24) + 24) % 24;
+      const extraDays = (unit === 'giorni' ? amount : 0) + daysFromHours;
+      c.giorno += extraDays;
+      // Avanza mese/anno
+      while (c.giorno > (c.mesi[c.mese]?.giorni||30)) {
+        c.giorno -= (c.mesi[c.mese]?.giorni||30);
+        c.mese++;
+        if (c.mese >= c.mesi.length) { c.mese = 0; c.anno++; }
+      }
+      while (c.giorno < 1) {
+        c.mese--;
+        if (c.mese < 0) { c.mese = c.mesi.length-1; c.anno--; }
+        c.giorno += (c.mesi[c.mese]?.giorni||30);
+      }
+    }
+    if (unit === 'mesi') { c.mese += amount; while(c.mese>=c.mesi.length){c.mese-=c.mesi.length;c.anno++;} while(c.mese<0){c.mese+=c.mesi.length;c.anno--;} }
+    return c;
+  };
+
+  const save = (cal) => App.saveActiveCampaign({ calendario: cal });
+  const get = () => App.getActiveCampaign()?.calendario || null;
+
+  return { initPreset, getDateStr, getTimeStr, advance, save, get, PRESET };
+})();
+
+
 const NoteCampagna = (() => {
   let _catIdx = 0;
   let _pageIdx = 0;
