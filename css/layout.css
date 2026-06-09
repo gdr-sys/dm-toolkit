@@ -263,6 +263,13 @@
   display: block;
 }
 
+#page-campagna.active {
+  display: flex !important;
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
 .page-header {
   display: flex;
   align-items: flex-start;
@@ -1491,12 +1498,6 @@
 }
 
 /* Note Campagna — la card occupa tutto il resto della pagina */
-#page-campagna.active {
-  display: flex;
-  flex-direction: column;
-  overflow-y: auto;
-  overflow-x: hidden;
-}
 #page-campagna > *:not(:last-child) { flex-shrink: 0; }
 #page-campagna > div.card:last-child {
   flex: 1;
