@@ -1491,7 +1491,7 @@
 }
 
 /* Note Campagna — la card occupa tutto il resto della pagina */
-#page-campagna {
+#page-campagna.active {
   display: flex;
   flex-direction: column;
   overflow-y: auto;
@@ -1504,12 +1504,4 @@
   flex-direction: column;
   min-height: 400px;
   overflow: hidden;
-}
-
-/* ── Combat Log — responsive ── */
-@media (max-width: 768px) {
-  #sessione-content > div:first-child {
-    grid-template-columns: 1fr !important;
-  }
-  #combat-log-list { max-height: 200px; }
 }
