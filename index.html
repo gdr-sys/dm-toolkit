@@ -278,23 +278,12 @@
       </div>
 
       <div id="sessione-content">
-        <div style="display:grid;grid-template-columns:1fr 260px;gap:var(--space-lg);align-items:flex-start;">
+        <div class="grid-2" style="gap:var(--space-lg);align-items:flex-start;">
 
           <!-- Colonna sinistra: Combat Tracker -->
-          <div>
+          <div style="grid-column:1/3;">
             <div class="card" style="padding:0;overflow:hidden;">
               <div id="combat-tracker"></div>
-            </div>
-          </div>
-
-          <!-- Colonna destra: Log Combat -->
-          <div class="card" style="padding:0;overflow:hidden;">
-            <div class="card-header" style="padding:10px 12px;">
-              <h3 class="card-title" style="font-size:0.85rem;">📋 Log Scontro</h3>
-              <button class="btn btn-ghost btn-sm" style="font-size:0.7rem;" onclick="Sessione.clearCombatLog()">🗑️</button>
-            </div>
-            <div id="combat-log-list" style="max-height:400px;overflow-y:auto;padding:6px 10px;font-size:0.75rem;">
-              <div class="text-muted text-sm" style="text-align:center;padding:8px;">Nessun evento</div>
             </div>
           </div>
 
@@ -2042,7 +2031,6 @@ const Storage = (() => {
     getActiveCampaignId, setActiveCampaign,
     getSettings, updateSettings,
     getDiceHistory, addDiceRoll,
-    getCampaign: (id) => Storage._get('campaigns', []).find(c => c.id === id) || null,
     exportCampaign, importCampaign,
     getMasterScreen, saveMasterScreen,
     getStorageInfo,
@@ -4137,11 +4125,10 @@ const Sessione = (() => {
     _combat = {
       id: 'scontro_' + Date.now(),
       nome: 'Scontro ' + new Date().toLocaleDateString('it-IT'),
-      turno: 0,
+      turno: 0,           // indice del combatant attivo
       round: 1,
-      status: 'attivo',
+      status: 'attivo',   // attivo | pausa | concluso
       combatants: [],
-      log: [],
       iniziataAt: Date.now(),
       campagnaId: camp?.id || '',
     };
@@ -4164,7 +4151,6 @@ const Sessione = (() => {
   const renderCombat = () => {
     const el = document.getElementById('combat-tracker');
     if (!el) return;
-    setTimeout(() => renderCombatLog(), 30);
 
     if (!_combat || !_combat.combatants.length) {
       el.innerHTML = `
@@ -4288,47 +4274,6 @@ const Sessione = (() => {
   };
 
   // ── Turni ──
-  const renderCombatLog = (el) => {
-    const container = el || document.getElementById('combat-log-list');
-    if (!container) return;
-    const log = _combat?.log || [];
-    if (!log.length) {
-      container.innerHTML = '<div class="text-muted text-sm" style="text-align:center;padding:8px;">Nessun evento</div>';
-      return;
-    }
-    const icons = { round:'🔔', danno:'💥', cura:'💚', morte:'💀', condizione:'🔮', info:'ℹ️' };
-    container.innerHTML = log.map(entry => {
-      const icon = icons[entry.tipo] || '•';
-      const isRound = entry.tipo === 'round';
-      return isRound
-        ? `<div style="text-align:center;font-family:var(--font-display);font-size:0.65rem;color:var(--text-muted);letter-spacing:0.08em;text-transform:uppercase;padding:5px 0 3px;border-top:1px solid var(--border);margin-top:3px;">${entry.messaggio}</div>`
-        : `<div style="display:flex;gap:5px;align-items:baseline;padding:2px 0;border-bottom:1px solid var(--border);">
-            <span style="flex-shrink:0;">${icon}</span>
-            <span style="flex:1;color:var(--text-secondary);">${entry.messaggio}</span>
-            <span style="flex-shrink:0;color:var(--text-muted);font-size:0.65rem;">${entry.ts}</span>
-           </div>`;
-    }).join('');
-  };
-
-  const clearCombatLog = () => {
-    if (!_combat) return;
-    _combat.log = [];
-    saveCombat(_combat);
-    renderCombatLog();
-  };
-
-  const _logCombat = (tipo, messaggio, extra) => {
-    if (!_combat) return;
-    if (!_combat.log) _combat.log = [];
-    const round = _combat.round || 1;
-    const ts = new Date().toLocaleTimeString('it-IT', {hour:'2-digit',minute:'2-digit'});
-    _combat.log.unshift({ tipo, messaggio, round, ts, extra: extra||null });
-    if (_combat.log.length > 100) _combat.log = _combat.log.slice(0, 100);
-    // Aggiorna solo il log senza re-render completo
-    const logEl = document.getElementById('combat-log-list');
-    if (logEl) renderCombatLog(logEl);
-  };
-
   const prevTurn = () => {
     if (!_combat || !_sortedCombatants.length) return;
     _combat.turno = (_combat.turno - 1 + _sortedCombatants.length) % _sortedCombatants.length;
@@ -4337,7 +4282,6 @@ const Sessione = (() => {
     }
     saveCombat(_combat);
     renderCombat();
-    Debug.log('prevTurn: turno ' + _combat.turno);
   };
 
   const nextTurn = () => {
@@ -4346,7 +4290,6 @@ const Sessione = (() => {
     if (_combat.turno === 0) {
       _combat.round++;
       Toast.show(`Round ${_combat.round} iniziato`, 'info');
-      _logCombat('round', `--- Round ${_combat.round} ---`);
     }
     // Aggiorna ordine in _combat.combatants
     _combat.combatants = _sortedCombatants.map(c => {
@@ -4399,9 +4342,7 @@ const Sessione = (() => {
     const amount = parseInt(val);
     if (isNaN(amount) || amount < 0) { Toast.show('Valore non valido', 'warning'); return; }
     c.hp = Math.max(0, Math.min(c.maxHp || 9999, c.hp + (delta > 0 ? amount : -amount)));
-    const verb = delta > 0 ? 'curato' : 'danneggiato';
-    _logCombat(delta > 0 ? 'cura' : 'danno', `${c.nome}: ${delta > 0 ? '+' : '-'}${amount} PF (→ ${c.hp}/${c.maxHp})`);
-    if (c.hp === 0) { Toast.show(`${c.nome} è a 0 PF!`, 'warning'); _logCombat('morte', `${c.nome} è a 0 PF!`); }
+    if (c.hp === 0) Toast.show(`${c.nome} è a 0 PF!`, 'warning');
     saveCombat(_combat);
     _syncPartyHP(c);
     renderCombat();
@@ -4428,8 +4369,7 @@ const Sessione = (() => {
     const amount = parseInt(val);
     if (isNaN(amount)) return;
     c.hp = Math.max(0, c.hp - amount);
-    _logCombat('danno', `${c.nome}: -${amount} PF (→ ${c.hp}/${c.maxHp})`);
-    if (c.hp === 0) { Toast.show(`💀 ${c.nome} è a 0 PF!`, 'warning'); _logCombat('morte', `💀 ${c.nome} è a 0 PF!`); }
+    if (c.hp === 0) Toast.show(`💀 ${c.nome} è a 0 PF!`, 'warning');
     saveCombat(_combat);
     _syncPartyHP(c);
     renderCombat();
@@ -4458,7 +4398,6 @@ const Sessione = (() => {
     if (!c) return;
     const checked = [...document.querySelectorAll('#cond-list input:checked')].map(i => i.value);
     c.condizioni = checked;
-    if (checked.length) _logCombat('condizione', `${c.nome}: condizioni → ${checked.join(', ')}`);
     saveCombat(_combat);
     Modal.close('cond-modal');
     renderCombat();
@@ -4923,7 +4862,6 @@ const Sessione = (() => {
     toggleConcentrazione, openNote,
     addMonsterQuick, searchMonster, addMonsterFromCompendio, addHomebrewMonster,
     addNPCFromWorld, _addNPCById,
-    renderCombatLog, clearCombatLog,
     addCustomCombatant, submitCustomCombatant, removeCombatant,
     saveCombatSession, endCombat, loadCombatSession,
     openCombatantSheet, _rollAction,
@@ -7213,7 +7151,7 @@ const Schermo = (() => {
   return {
     init, render, addBlock, submitAddBlock,
     removeBlock, resizeBlock, moveBlock, editBlock, resetLayout,
-    rollDie, generateMeteo, saveNote,
+    rollDie, generateMeteo, saveNote, advanceTime, refreshCombat,
     setCompendioRef, _refreshCombat, _refreshFavoriti, _swapBlocks,
     _refreshNoteSessione, _avanzaTempo,
   };
