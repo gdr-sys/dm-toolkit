@@ -2341,7 +2341,9 @@ const openNewCampaignModal = () => {
   // Reset form
   document.getElementById('nc-name').value = '';
   document.getElementById('nc-type').value = 'campagna';
-  document.getElementById('nc-system').value = '5e2024';
+  // Ricorda l'ultima edizione usata (default 5e2024)
+  const lastSystem = localStorage.getItem('dm_toolkit_last_system') || '5e2024';
+  document.getElementById('nc-system').value = lastSystem;
   Modal.open('new-campaign');
   setTimeout(() => document.getElementById('nc-name')?.focus(), 100);
 };
@@ -2356,6 +2358,8 @@ const submitNewCampaign = () => {
 
   if (!name) { Toast.show('Inserisci un nome', 'warning'); return; }
 
+  // Ricorda l'edizione scelta per la prossima volta
+  localStorage.setItem('dm_toolkit_last_system', system);
   const camp = Storage.createCampaign(name, type);
   const updates = { system, useElettro };
   if (useCalendario) {
@@ -2742,6 +2746,8 @@ const App = (() => {
     const camp = Storage.getCampaign(id);
     if (!camp) { Toast.show('Campagna non trovata', 'error'); return; }
     setActiveCampaign(camp);
+    // Forza ricaricamento Compendio se il sistema è cambiato
+    try { if (typeof Compendio !== 'undefined') Compendio.changeSistema(camp.system || '5e2024'); } catch(e) {}
     navigateTo('campagna');
     Toast.show(`Campagna aperta: ${camp.name}`, 'success');
   };
@@ -5064,6 +5070,9 @@ const Compendio = (() => {
     // Aggiorna il badge sistema nell'UI
     const badge = document.getElementById('comp-sistema-badge');
     if (badge) badge.textContent = _sistema === '5e2014' ? '5e 2014' : '5e 2024';
+    // Aggiorna anche il select nel UI
+    const sel = document.getElementById('comp-sistema-select');
+    if (sel) sel.value = _sistema;
 
     try {
       const base = 'data/';
