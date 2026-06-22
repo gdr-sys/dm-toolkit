@@ -127,7 +127,78 @@ const Schermo = (() => {
     },
   ];
 
-  // ── Blocchi disponibili ──
+  // ── Tabelle XP per GS ──
+  const XP_PER_GS = {
+    0: 10, 0.125: 25, 0.25: 50, 0.5: 100,
+    1: 200, 2: 450, 3: 700, 4: 1100, 5: 1800,
+    6: 2300, 7: 2900, 8: 3900, 9: 5000, 10: 5900,
+    11: 7200, 12: 8400, 13: 10000, 14: 11500, 15: 13000,
+    16: 15000, 17: 18000, 18: 20000, 19: 22000, 20: 25000,
+    21: 33000, 22: 41000, 23: 50000, 24: 62000, 30: 155000,
+  };
+
+  // Soglie XP 2014 per difficoltà [Facile, Medio, Difficile, Mortale]
+  const XP_SOGLIE_2014 = {
+    1:  [25,50,75,100],    2:  [50,100,150,200],
+    3:  [75,150,225,400],  4:  [125,250,375,500],
+    5:  [250,500,750,1100],6:  [300,600,900,1400],
+    7:  [350,750,1100,1700],8: [450,900,1400,2100],
+    9:  [550,1100,1600,2400],10:[600,1200,1900,2800],
+    11: [800,1600,2400,3600],12:[1000,2000,3000,4500],
+    13: [1100,2200,3400,5100],14:[1250,2500,3800,5700],
+    15: [1400,2800,4300,6400],16:[1600,3200,4800,7200],
+    17: [2000,3900,5900,8800],18:[2100,4200,6300,9500],
+    19: [2400,4900,7300,10900],20:[2800,5700,8500,12700],
+  };
+
+  // XP Budget 2024 per difficoltà [Basso, Moderato, Alto]
+  const XP_BUDGET_2024 = {
+    1:  [50,75,100],    2:  [100,150,200],
+    3:  [150,225,400],  4:  [250,375,500],
+    5:  [500,750,1100], 6:  [600,900,1400],
+    7:  [750,1100,1700],8:  [900,1400,2100],
+    9:  [1100,1600,2400],10:[1200,1900,2800],
+    11: [1600,2400,3600],12:[2000,3000,4500],
+    13: [2200,3400,5100],14:[2500,3800,5700],
+    15: [2800,4300,6400],16:[3200,4800,7200],
+    17: [3900,5900,8800],18:[4200,6300,9500],
+    19: [4900,7300,10900],20:[5700,8500,12700],
+  };
+
+  // Moltiplicatori 2014 per numero mostri
+  const MOLTIPLICATORI_2014 = [
+    { max: 1, mult: 1 }, { max: 2, mult: 1.5 }, { max: 6, mult: 2 },
+    { max: 10, mult: 2.5 }, { max: 14, mult: 3 }, { max: Infinity, mult: 4 },
+  ];
+
+  const getMolt2014 = (numMostri, numPG) => {
+    let m = MOLTIPLICATORI_2014.find(x => numMostri <= x.max)?.mult || 4;
+    if (numPG < 3) m = Math.min(m * 1.5, 4);
+    if (numPG > 5) m = Math.max(m * 0.5, 0.5);
+    return m;
+  };
+
+  const gsToNum = (gs) => {
+    if (gs === '1/8') return 0.125;
+    if (gs === '1/4') return 0.25;
+    if (gs === '1/2') return 0.5;
+    return parseFloat(gs) || 0;
+  };
+
+  const xpForGs = (gs) => {
+    const n = gsToNum(gs);
+    const keys = Object.keys(XP_PER_GS).map(Number).sort((a,b)=>a-b);
+    const exact = XP_PER_GS[n];
+    if (exact !== undefined) return exact;
+    // Arrotonda al GS più vicino
+    const closest = keys.reduce((a,b) => Math.abs(b-n) < Math.abs(a-n) ? b : a);
+    return XP_PER_GS[closest] || 0;
+  };
+
+  // ── Stato calcolatore ──
+  let _encMostri = []; // [{nome, gs, qty}]
+
+  // ── Blocchi disponibili ──  // ── Blocchi disponibili ──
   const BLOCK_TYPES = {
     percezioni: {
       label: 'Percezioni Passive Party',
@@ -182,6 +253,12 @@ const Schermo = (() => {
       icon: '✏️',
       desc: 'Testo libero con titolo personalizzato',
       defaultSize: 'md',
+    },
+    encounter_calc: {
+      label: 'Calcolatore Incontri',
+      icon: '⚖️',
+      desc: 'XP Budget e difficoltà incontro per edizione',
+      defaultSize: 'lg',
     },
   };
 
@@ -264,7 +341,8 @@ const Schermo = (() => {
       case 'condizioni':  el.innerHTML = renderCondizioni(block.id); break;
       case 'dc':          el.innerHTML = renderDC(); break;
       case 'tempo':       el.innerHTML = renderTempo(); break;
-      case 'custom':      el.innerHTML = renderCustom(block); break;
+      case 'custom':        el.innerHTML = renderCustom(block); break;
+      case 'encounter_calc': el.innerHTML = renderEncounterCalc(); break;
       default:            el.innerHTML = `<div class="text-muted text-sm">Blocco sconosciuto</div>`;
     }
   };
@@ -433,7 +511,135 @@ const Schermo = (() => {
     Toast.show(`Tempo: ${cal.timeHours.toString().padStart(2,'0')}:${cal.timeMinutes.toString().padStart(2,'0')} Giorno ${cal.day}`, 'info');
   };
 
-  const renderCustom = (block) => `
+  const renderEncounterCalc = () => {
+    const camp = App.getActiveCampaign();
+    const party = camp?.party || [];
+    const system = camp?.system || '5e2024';
+    const is2024 = system === '5e2024';
+
+    // Calcolo XP mostri
+    const totXPMostri = _encMostri.reduce((sum, m) => sum + xpForGs(m.gs) * m.qty, 0);
+    const numMostri = _encMostri.reduce((sum, m) => sum + m.qty, 0);
+    const numPG = party.length || 4;
+
+    // Calcolo difficoltà
+    let difficolta = '—';
+    let difficoltaColor = 'var(--text-muted)';
+    let xpAggSoglia = '';
+
+    if (totXPMostri > 0 && numPG > 0) {
+      if (is2024) {
+        // 2024: XP Budget per PG × numPG
+        const livMedio = party.length
+          ? Math.round(party.reduce((s, pg) => s + (pg.livello || 1), 0) / party.length)
+          : 1;
+        const lv = Math.max(1, Math.min(20, livMedio));
+        const budget = XP_BUDGET_2024[lv] || XP_BUDGET_2024[1];
+        const budgetTot = [budget[0] * numPG, budget[1] * numPG, budget[2] * numPG];
+
+        if (totXPMostri < budgetTot[0]) { difficolta = 'Banale'; difficoltaColor = 'var(--text-muted)'; }
+        else if (totXPMostri < budgetTot[1]) { difficolta = 'Basso'; difficoltaColor = 'var(--accent-success)'; }
+        else if (totXPMostri < budgetTot[2]) { difficolta = 'Moderato'; difficoltaColor = 'var(--accent-warning)'; }
+        else { difficolta = 'Alto'; difficoltaColor = 'var(--accent-danger)'; }
+
+        xpAggSoglia = `Soglie (Lv ${lv} × ${numPG} PG): Basso ${budgetTot[0]} · Moderato ${budgetTot[1]} · Alto ${budgetTot[2]}`;
+      } else {
+        // 2014: XP soglie per PG + moltiplicatore
+        const xpAdj = totXPMostri * getMolt2014(numMostri, numPG);
+        const livMedio = party.length
+          ? Math.round(party.reduce((s, pg) => s + (pg.livello || 1), 0) / party.length)
+          : 1;
+        const lv = Math.max(1, Math.min(20, livMedio));
+        const soglie = XP_SOGLIE_2014[lv] || XP_SOGLIE_2014[1];
+        const sogleTot = soglie.map(s => s * numPG);
+
+        if (xpAdj < sogleTot[0]) { difficolta = 'Banale'; difficoltaColor = 'var(--text-muted)'; }
+        else if (xpAdj < sogleTot[1]) { difficolta = 'Facile'; difficoltaColor = 'var(--accent-success)'; }
+        else if (xpAdj < sogleTot[2]) { difficolta = 'Medio'; difficoltaColor = 'var(--accent-warning)'; }
+        else if (xpAdj < sogleTot[3]) { difficolta = 'Difficile'; difficoltaColor = '#f97316'; }
+        else { difficolta = 'Mortale'; difficoltaColor = 'var(--accent-danger)'; }
+
+        const molt = getMolt2014(numMostri, numPG);
+        xpAggSoglia = `XP raw: ${totXPMostri} × ${molt} = ${Math.round(xpAdj)} · Soglie: F${sogleTot[0]} M${sogleTot[1]} D${sogleTot[2]} Mo${sogleTot[3]}`;
+      }
+    }
+
+    const gsList = ['0','1/8','1/4','1/2',...Array.from({length:30},(_,i)=>String(i+1))];
+
+    return \`
+      <div style="display:flex;flex-direction:column;gap:8px;">
+
+        <!-- Aggiungi mostro -->
+        <div style="display:flex;gap:6px;align-items:center;">
+          <select id="enc-gs-select" class="form-select" style="font-size:0.8rem;flex:0 0 80px;">
+            \${gsList.map(g => \`<option value="\${g}">GS \${g}</option>\`).join('')}
+          </select>
+          <input type="text" id="enc-nome-input" class="form-input" placeholder="Nome (opz.)" style="font-size:0.8rem;flex:1;">
+          <input type="number" id="enc-qty-input" class="form-input" min="1" max="50" value="1" style="font-size:0.8rem;flex:0 0 50px;">
+          <button class="btn btn-primary btn-sm" style="font-size:0.75rem;white-space:nowrap;" onclick="Schermo.addToEncounter()">+ Add</button>
+        </div>
+
+        <!-- Lista mostri aggiunti -->
+        <div id="enc-mostri-list" style="display:flex;flex-direction:column;gap:3px;min-height:24px;">
+          \${_encMostri.length === 0
+            ? '<div class="text-muted" style="font-size:0.75rem;text-align:center;padding:4px 0;">Nessun mostro aggiunto</div>'
+            : _encMostri.map((m, i) => \`
+              <div style="display:flex;align-items:center;gap:6px;padding:2px 4px;border-radius:var(--radius-sm);background:var(--bg-secondary);">
+                <span style="font-size:0.75rem;color:var(--accent-secondary);font-family:var(--font-mono);flex:0 0 50px;">GS \${m.gs}</span>
+                <span style="font-size:0.78rem;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">\${m.nome || 'Mostro'} ×\${m.qty}</span>
+                <span style="font-size:0.7rem;color:var(--text-muted);font-family:var(--font-mono);">\${xpForGs(m.gs) * m.qty} XP</span>
+                <button class="btn btn-ghost btn-icon-sm" style="font-size:0.65rem;" onclick="Schermo.removeFromEncounter(\${i})">✕</button>
+              </div>\`).join('')
+          }
+        </div>
+
+        <!-- Risultato -->
+        \${totXPMostri > 0 ? \`
+          <div style="border-top:1px solid var(--border);padding-top:8px;">
+            <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px;">
+              <span style="font-size:0.75rem;color:var(--text-muted);">XP totale mostri</span>
+              <span style="font-family:var(--font-mono);font-size:0.85rem;font-weight:700;">\${totXPMostri.toLocaleString('it-IT')}</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;">
+              <span style="font-size:0.75rem;color:var(--text-muted);">Difficoltà (\${is2024 ? '2024' : '2014'})</span>
+              <span style="font-family:var(--font-display);font-size:1.1rem;font-weight:700;color:\${difficoltaColor};">\${difficolta}</span>
+            </div>
+            <div style="font-size:0.68rem;color:var(--text-muted);line-height:1.6;">\${xpAggSoglia}</div>
+          </div>
+          <button class="btn btn-ghost btn-sm" style="font-size:0.72rem;" onclick="Schermo.clearEncounter()">🗑️ Svuota</button>
+        \` : ''}
+
+        <!-- Party info -->
+        <div style="font-size:0.7rem;color:var(--text-muted);border-top:1px solid var(--border);padding-top:6px;">
+          Party: \${numPG} PG\${party.length ? ' · Lv medio ' + (party.reduce((s,p)=>s+(p.livello||1),0)/party.length).toFixed(1) : ''} · \${is2024 ? 'Ed. 2024' : 'Ed. 2014'}
+        </div>
+      </div>\`;
+  };
+
+  const addToEncounter = () => {
+    const gs = document.getElementById('enc-gs-select')?.value || '1';
+    const nome = document.getElementById('enc-nome-input')?.value?.trim() || '';
+    const qty = Math.max(1, parseInt(document.getElementById('enc-qty-input')?.value) || 1);
+    // Cerca se esiste già stesso gs+nome
+    const existing = _encMostri.find(m => m.gs === gs && m.nome === nome);
+    if (existing) { existing.qty += qty; }
+    else { _encMostri.push({ gs, nome, qty }); }
+    // Aggiorna tutti i blocchi encounter
+    _blocks.filter(b => b.type === 'encounter_calc').forEach(b => updateBlockContent(b));
+    Debug.log(\`Encounter: aggiunto GS \${gs} ×\${qty}\`);
+  };
+
+  const removeFromEncounter = (idx) => {
+    _encMostri.splice(idx, 1);
+    _blocks.filter(b => b.type === 'encounter_calc').forEach(b => updateBlockContent(b));
+  };
+
+  const clearEncounter = () => {
+    _encMostri = [];
+    _blocks.filter(b => b.type === 'encounter_calc').forEach(b => updateBlockContent(b));
+  };
+
+  const renderCustom = (block) => \`
     <div style="font-size:0.85rem;color:var(--text-secondary);white-space:pre-wrap;line-height:1.6;">${block.content || '<span class="text-muted">Clicca ✏️ per modificare</span>'}</div>`;
 
   // ── Gestione blocchi ──
@@ -532,5 +738,6 @@ const Schermo = (() => {
     init, render, addBlock, submitAddBlock,
     removeBlock, resizeBlock, moveBlock, editBlock, resetLayout,
     rollDie, generateMeteo, saveNote, advanceTime, refreshCombat,
+    addToEncounter, removeFromEncounter, clearEncounter,
   };
 })();
