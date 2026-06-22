@@ -46,7 +46,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1rem;
+  color: #fff;
 }
 
 .logo-text {
@@ -135,9 +135,11 @@
   white-space: nowrap;
 }
 
-.nav-item:hover {
+.nav-item:hover,
+.nav-item:focus-visible {
   background: rgba(255,255,255,0.06);
   color: var(--nav-active);
+  outline: none;
 }
 
 .nav-item.active {
@@ -157,9 +159,11 @@
 }
 
 .nav-icon {
-  font-size: 1.1rem;
   width: 24px;
-  text-align: center;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
 }
 
@@ -189,8 +193,8 @@
 
 /* ── Collapse Toggle ── */
 .sidebar-toggle {
-  width: 28px;
-  height: 28px;
+  width: 36px;
+  height: 36px;
   background: rgba(255,255,255,0.08);
   border: none;
   border-radius: var(--radius-sm);
@@ -199,7 +203,6 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.8rem;
   transition: all var(--transition-fast);
   flex-shrink: 0;
 }
@@ -257,6 +260,8 @@
   flex: 1;
   padding: var(--space-lg);
   overflow-y: auto;
+  max-width: 1600px;
+  width: 100%;
 }
 
 .page.active {
@@ -335,8 +340,9 @@
 .home-hero-title {
   font-family: var(--font-display);
   font-size: 2.2rem;
-  color: var(--text-primary);
+  color: var(--accent-primary);
   margin-bottom: var(--space-sm);
+  letter-spacing: 0.04em;
 }
 
 .home-hero-subtitle {
@@ -440,8 +446,13 @@
   transition: opacity var(--transition-fast);
 }
 
-.campaign-card:hover .campaign-card-actions {
+.campaign-card:hover .campaign-card-actions,
+.campaign-card:focus-within .campaign-card-actions {
   opacity: 1;
+}
+
+@media (hover: none) {
+  .campaign-card-actions { opacity: 1; }
 }
 
 /* ── DICE WIDGET ── */
@@ -764,7 +775,7 @@
   .mobile-nav-item.active { color: var(--nav-active); }
   .mobile-nav-item:hover { color: var(--nav-active); }
 
-  .mobile-nav-icon { font-size: 1.1rem; line-height: 1; }
+  .mobile-nav-icon { display: flex; align-items: center; justify-content: center; line-height: 1; }
   .mobile-nav-label {
     font-family: var(--font-display);
     font-size: 0.52rem;
@@ -1222,8 +1233,10 @@
 }
 .schermo-block:hover { box-shadow: var(--shadow-md); }
 .schermo-block-body {
-  overflow: hidden;
+  overflow: auto;
   border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+  padding: var(--space-md);
+  max-height: 340px;
 }
 
 .schermo-block-header {
@@ -1256,13 +1269,14 @@
   opacity: 0;
   transition: opacity var(--transition-fast);
 }
-.schermo-block:hover .schermo-block-actions { opacity: 1; }
+.schermo-block:hover .schermo-block-actions,
+.schermo-block:focus-within .schermo-block-actions { opacity: 1; }
 
-.schermo-block-body {
-  padding: var(--space-md);
-  overflow: auto;
-  max-height: 340px;
+@media (hover: none) {
+  .schermo-block-actions { opacity: 1; }
 }
+
+/* rimosso: vedi definizione unificata sopra */
 
 .schermo-stat {
   font-family: var(--font-mono);

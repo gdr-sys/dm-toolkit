@@ -84,15 +84,15 @@
 .btn-sm { padding: 5px 12px; font-size: 0.72rem; }
 .btn-lg { padding: 12px 28px; font-size: 0.9rem; }
 .btn-icon {
-  padding: 8px;
-  width: 36px;
-  height: 36px;
+  padding: 10px;
+  width: 44px;
+  height: 44px;
   border-radius: var(--radius-md);
 }
 .btn-icon-sm {
-  padding: 4px;
-  width: 28px;
-  height: 28px;
+  padding: 6px;
+  width: 32px;
+  height: 32px;
   border-radius: var(--radius-sm);
 }
 
