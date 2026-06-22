@@ -4,6 +4,129 @@
 
 const Schermo = (() => {
 
+  // ── Dati condizioni completi per edizione ──
+  const CONDIZIONI_2014 = [
+    {
+      nome: 'Accecato',
+      desc: 'Non vede. Fallisce prove che richiedono la vista. Attacchi contro di lui: Vantaggio. Suoi attacchi: Svantaggio.'
+    },
+    {
+      nome: 'Affascinato',
+      desc: 'Non può attaccare o bersagliare la fonte con effetti nocivi. La fonte ha Vantaggio alle prove sociali contro di lui.'
+    },
+    {
+      nome: 'Afferrato',
+      desc: 'Velocità 0. Termina se l\'afferratore è Incapacitato o il bersaglio viene spostato fuori portata.'
+    },
+    {
+      nome: 'Assordato',
+      desc: 'Non sente. Fallisce prove che richiedono l\'udito.'
+    },
+    {
+      nome: 'Avvelenato',
+      desc: 'Svantaggio a tutte le prove di caratteristica e ai tiri per colpire.'
+    },
+    {
+      nome: 'Esausto',
+      desc: 'Liv.1: Svantaggio prove. Liv.2: Vel.÷2. Liv.3: Svant. attacchi/TS. Liv.4: Max PF÷2. Liv.5: Vel.0. Liv.6: Morte.'
+    },
+    {
+      nome: 'Incapacitato',
+      desc: 'Nessuna azione né reazione.'
+    },
+    {
+      nome: 'Invisibile',
+      desc: 'Pesantemente oscurato. Tiri per colpire contro di lui: Svantaggio. Suoi attacchi: Vantaggio.'
+    },
+    {
+      nome: 'Paralizzato',
+      desc: 'Incapacitato + immobile. Fallisce TS FOR/DES. Attacchi contro: Vantaggio. Critici automatici da mischia entro 1,5 m.'
+    },
+    {
+      nome: 'Pietrificato',
+      desc: 'Incapacitato + immobile + peso ×10. Fallisce TS FOR/DES. Attacchi contro: Vantaggio. Immune a veleni/malattie. Resistenza a tutti i danni.'
+    },
+    {
+      nome: 'Prono',
+      desc: 'Svantaggio ai tiri per colpire. Attacchi in mischia contro: Vantaggio. Attacchi a distanza contro: Svantaggio. Muoversi: costo doppio.'
+    },
+    {
+      nome: 'Spaventato',
+      desc: 'Svantaggio a prove e attacchi se la fonte è nel campo visivo. Non può avvicinarsi volontariamente alla fonte.'
+    },
+    {
+      nome: 'Stordito',
+      desc: 'Incapacitato. Fallisce TS FOR/DES. Attacchi contro: Vantaggio.'
+    },
+    {
+      nome: 'Trattenuto',
+      desc: 'Velocità 0. Attacchi contro: Vantaggio. Suoi attacchi: Svantaggio. Svantaggio ai TS DES.'
+    },
+  ];
+
+  const CONDIZIONI_2024 = [
+    {
+      nome: 'Accecato',
+      desc: 'Non vede. Fallisce prove che richiedono la vista. Attacchi contro: Vantaggio. Suoi attacchi: Svantaggio.'
+    },
+    {
+      nome: 'Affascinato',
+      desc: 'Non può attaccare o bersagliare la fonte con effetti nocivi. La fonte ha Vantaggio alle prove sociali contro di lui.'
+    },
+    {
+      nome: 'Afferrato',
+      desc: 'Velocità 0. Termina se l\'afferratore è Incapacitato o il bersaglio viene spostato fuori portata.'
+    },
+    {
+      nome: 'Assordato',
+      desc: 'Non sente. Fallisce prove che richiedono l\'udito.'
+    },
+    {
+      nome: 'Avvelenato',
+      desc: 'Svantaggio a tutte le prove di caratteristica e ai tiri per colpire.'
+    },
+    {
+      nome: 'Esausto',
+      desc: 'Ogni livello: –2 a tutti i tiri d20 e –1,5 m di velocità. Livello 6: morte. Si recupera 1 livello per Riposo Lungo.'
+    },
+    {
+      nome: 'Incapacitato',
+      desc: 'Nessuna azione né reazione. Non può parlare. Svantaggio ai tiri di Iniziativa. [NUOVO nel 2024]'
+    },
+    {
+      nome: 'Invisibile',
+      desc: 'Pesantemente oscurato. Tiri per colpire contro: Svantaggio. Suoi attacchi: Vantaggio.'
+    },
+    {
+      nome: 'Paralizzato',
+      desc: 'Incapacitato + immobile. Fallisce TS FOR/DES. Attacchi contro: Vantaggio. Critici automatici da mischia entro 1,5 m.'
+    },
+    {
+      nome: 'Pietrificato',
+      desc: 'Incapacitato + immobile + peso ×10. Fallisce TS FOR/DES. Attacchi contro: Vantaggio. Immune a veleni/malattie. Resistenza a tutti i danni.'
+    },
+    {
+      nome: 'Privo di sensi',
+      desc: 'Condizione separata da Incapacitato [NUOVO 2024]. Incapacitato + Prono + incosciente. Critico automatico da mischia entro 1,5 m. Si ottiene a 0 PF.'
+    },
+    {
+      nome: 'Prono',
+      desc: 'Svantaggio ai tiri per colpire. Attacchi in mischia contro: Vantaggio. Attacchi a distanza contro: Svantaggio. Muoversi: costo doppio.'
+    },
+    {
+      nome: 'Spaventato',
+      desc: 'Svantaggio a prove e attacchi se la fonte è nel campo visivo. Non può avvicinarsi volontariamente alla fonte.'
+    },
+    {
+      nome: 'Stordito',
+      desc: 'Incapacitato. Fallisce TS FOR/DES. Attacchi contro: Vantaggio.'
+    },
+    {
+      nome: 'Trattenuto',
+      desc: 'Velocità 0. Attacchi contro: Vantaggio. Suoi attacchi: Svantaggio. Svantaggio ai TS DES.'
+    },
+  ];
+
   // ── Blocchi disponibili ──
   const BLOCK_TYPES = {
     percezioni: {
@@ -37,9 +160,9 @@ const Schermo = (() => {
       defaultSize: 'lg',
     },
     condizioni: {
-      label: 'Riferimento Condizioni',
+      label: 'Condizioni (Tabella Compatta)',
       icon: '🔴',
-      desc: 'Lista rapida delle condizioni 5e',
+      desc: 'Effetti meccanici completi per edizione',
       defaultSize: 'md',
     },
     dc: {
@@ -69,9 +192,8 @@ const Schermo = (() => {
     xl: { label: 'Intero',  cols: 4 },
   };
 
-  let _blocks = []; // { id, type, size, title?, content? }
+  let _blocks = [];
 
-  // ── Storage ──
   const load = () => {
     try {
       const saved = Storage.getMasterScreen();
@@ -85,14 +207,12 @@ const Schermo = (() => {
     Storage.saveMasterScreen({ blocks: _blocks });
   };
 
-  // ── Init ──
   const init = () => {
     load();
     render();
     Debug.log(`Schermo.init(): ${_blocks.length} blocchi`);
   };
 
-  // ── Render griglia ──
   const render = () => {
     const grid = document.getElementById('schermo-grid');
     const empty = document.getElementById('schermo-empty');
@@ -106,8 +226,6 @@ const Schermo = (() => {
     if (empty) empty.style.display = 'none';
 
     grid.innerHTML = _blocks.map((block, idx) => renderBlock(block, idx)).join('');
-
-    // Aggiorna contenuti dinamici
     _blocks.forEach(b => updateBlockContent(b));
   };
 
@@ -130,23 +248,20 @@ const Schermo = (() => {
             <button class="btn btn-ghost btn-icon-sm" onclick="Schermo.removeBlock('${block.id}')" title="Rimuovi">✕</button>
           </div>
         </div>
-        <div class="schermo-block-body" id="sbody-${block.id}">
-          <!-- Popolato da updateBlockContent -->
-        </div>
+        <div class="schermo-block-body" id="sbody-${block.id}"></div>
       </div>`;
   };
 
   const updateBlockContent = (block) => {
     const el = document.getElementById(`sbody-${block.id}`);
     if (!el) return;
-
     switch (block.type) {
       case 'percezioni':  el.innerHTML = renderPercezioni(); break;
       case 'dadi':        el.innerHTML = renderDadiMini(block.id); break;
       case 'meteo':       el.innerHTML = renderMeteoMini(block.id); break;
       case 'note':        el.innerHTML = renderNote(block); break;
       case 'combat_mini': el.innerHTML = renderCombatMini(); break;
-      case 'condizioni':  el.innerHTML = renderCondizioni(); break;
+      case 'condizioni':  el.innerHTML = renderCondizioni(block.id); break;
       case 'dc':          el.innerHTML = renderDC(); break;
       case 'tempo':       el.innerHTML = renderTempo(); break;
       case 'custom':      el.innerHTML = renderCustom(block); break;
@@ -155,11 +270,11 @@ const Schermo = (() => {
   };
 
   // ── Contenuti blocchi ──
+
   const renderPercezioni = () => {
     const camp = App.getActiveCampaign();
     const party = camp?.party || [];
     if (!party.length) return `<div class="text-muted text-sm">Nessun PG nel party. Aggiungili nella Sessione.</div>`;
-
     return `<div style="display:flex;flex-direction:column;gap:6px;">` +
       party.map(pg => `
         <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
@@ -189,7 +304,6 @@ const Schermo = (() => {
     if (el) { el.textContent = result; el.style.animation = 'none'; void el.offsetWidth; el.style.animation = 'diceResult 0.3s ease'; }
     if (formula) formula.textContent = `d${faces}`;
     Storage.addDiceRoll(`d${faces}`, [result], result);
-    Debug.log(`Schermo dice: d${faces} → ${result}`);
   };
 
   const renderMeteoMini = (blockId) => `
@@ -229,13 +343,11 @@ const Schermo = (() => {
     const camp = App.getActiveCampaign();
     const combat = camp?.activeCombat;
     if (!combat || !combat.combatants?.length) {
-      return `<div class="text-muted text-sm">Nessuno scontro attivo. Avvia uno scontro nella Sessione.</div>
+      return `<div class="text-muted text-sm">Nessuno scontro attivo.</div>
               <button class="btn btn-secondary btn-sm" style="margin-top:8px;" onclick="App.navigateTo('sessione')">→ Vai alla Sessione</button>`;
     }
-
     const sorted = [...combat.combatants].sort((a,b) => b.iniziativa - a.iniziativa);
     const activeIdx = combat.turno || 0;
-
     return `
       <div style="font-family:var(--font-mono);font-size:0.7rem;color:var(--text-muted);margin-bottom:6px;">Round ${combat.round || 1}</div>
       <div style="display:flex;flex-direction:column;gap:3px;">
@@ -246,6 +358,7 @@ const Schermo = (() => {
           return `<div style="display:flex;align-items:center;gap:6px;padding:3px 6px;border-radius:var(--radius-sm);background:${isActive ? 'rgba(139,38,53,0.15)' : 'transparent'};border-left:2px solid ${isActive ? 'var(--accent-primary)' : 'transparent'};">
             <span style="font-family:var(--font-mono);font-size:0.75rem;width:24px;text-align:right;color:var(--accent-secondary);">${c.iniziativa}</span>
             <span style="flex:1;font-size:0.82rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;${c.hp <= 0 ? 'opacity:0.4;text-decoration:line-through;' : ''}">${c.nome}</span>
+            ${c.concentrazione ? '<span style="font-size:0.6rem;color:var(--accent-tertiary);">🔮</span>' : ''}
             <div style="width:40px;height:4px;background:var(--bg-tertiary);border-radius:2px;"><div style="height:100%;width:${hpPct}%;background:${hpCol};border-radius:2px;"></div></div>
             <span style="font-family:var(--font-mono);font-size:0.7rem;color:${hpCol};">${c.hp}</span>
           </div>`;
@@ -253,29 +366,26 @@ const Schermo = (() => {
       </div>`;
   };
 
-  const renderCondizioni = () => {
-    const condizioni = [
-      ['Accecato', 'Svantaggio attacchi. Vantaggio vs lui.'],
-      ['Affascinato', 'Non può attaccare la fonte.'],
-      ['Afferrato', 'Velocità 0.'],
-      ['Assordato', 'Non sente.'],
-      ['Avvelenato', 'Svantaggio a tutto.'],
-      ['Incapacitato', 'Niente azioni/reazioni.'],
-      ['Invisibile', 'Vantaggio attacchi. Svantaggio vs lui.'],
-      ['Paralizzato', 'Incap. + critici da mischia.'],
-      ['Pietrificato', 'Pietra. Resist. tutti danni.'],
-      ['Prono', 'Svant. attacchi. Vantaggi vs lui in mischia.'],
-      ['Spaventato', 'Svant. se fonte visibile.'],
-      ['Stordito', 'Incap. + TS FOR/DES auto-fallisce.'],
-      ['Trattenuto', 'Vel. 0. Svant. attacchi. Vantaggi vs lui.'],
-    ];
-    return `<div style="display:flex;flex-direction:column;gap:3px;">` +
-      condizioni.map(([nome, desc]) => `
-        <div style="display:flex;gap:6px;align-items:baseline;padding:2px 0;border-bottom:1px solid var(--border);">
-          <span style="font-family:var(--font-display);font-size:0.72rem;font-weight:600;white-space:nowrap;min-width:90px;">${nome}</span>
-          <span style="font-size:0.72rem;color:var(--text-muted);">${desc}</span>
-        </div>`).join('') +
-      `</div>`;
+  // ── CONDIZIONI — versione completa con toggle edizione ──
+  const renderCondizioni = (blockId) => {
+    const camp = App.getActiveCampaign();
+    const system = camp?.system || '5e2024';
+    const is2024 = system === '5e2024';
+    const lista = is2024 ? CONDIZIONI_2024 : CONDIZIONI_2014;
+    const edLabel = is2024 ? 'Edizione 2024' : 'Edizione 2014';
+    const edColor = is2024 ? 'var(--accent-tertiary)' : 'var(--accent-secondary)';
+
+    return `
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+        <span style="font-size:0.7rem;font-family:var(--font-display);letter-spacing:0.05em;text-transform:uppercase;color:${edColor};">${edLabel}</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:0;">
+        ${lista.map(c => `
+          <div style="display:grid;grid-template-columns:100px 1fr;gap:6px;align-items:baseline;padding:4px 0;border-bottom:1px solid var(--border);">
+            <span style="font-family:var(--font-display);font-size:0.75rem;font-weight:700;color:var(--text-primary);letter-spacing:0.02em;">${c.nome}</span>
+            <span style="font-size:0.72rem;color:var(--text-muted);line-height:1.5;">${c.desc}</span>
+          </div>`).join('')}
+      </div>`;
   };
 
   const renderDC = () => {
@@ -319,9 +429,8 @@ const Schermo = (() => {
     cal.timeMinutes = totalMins % 60;
     cal.day = (cal.day || 1) + extraDays;
     App.saveActiveCampaign({ calendar: cal });
-    // Aggiorna tutti i blocchi tempo
     _blocks.filter(b => b.type === 'tempo').forEach(b => updateBlockContent(b));
-    Toast.show(`Tempo avanzato: ${cal.timeHours.toString().padStart(2,'0')}:${cal.timeMinutes.toString().padStart(2,'0')} Giorno ${cal.day}`, 'info');
+    Toast.show(`Tempo: ${cal.timeHours.toString().padStart(2,'0')}:${cal.timeMinutes.toString().padStart(2,'0')} Giorno ${cal.day}`, 'info');
   };
 
   const renderCustom = (block) => `
@@ -329,7 +438,6 @@ const Schermo = (() => {
 
   // ── Gestione blocchi ──
   const addBlock = () => {
-    // Popola il select nel modal
     const sel = document.getElementById('schermo-block-type');
     if (sel) {
       sel.innerHTML = Object.entries(BLOCK_TYPES).map(([key, def]) =>
@@ -342,12 +450,8 @@ const Schermo = (() => {
         `<option value="${key}" ${key === 'md' ? 'selected' : ''}>${def.label}</option>`
       ).join('');
     }
-    if (document.getElementById('schermo-block-title')) {
-      document.getElementById('schermo-block-title').value = '';
-    }
-    if (document.getElementById('schermo-block-content')) {
-      document.getElementById('schermo-block-content').value = '';
-    }
+    if (document.getElementById('schermo-block-title')) document.getElementById('schermo-block-title').value = '';
+    if (document.getElementById('schermo-block-content')) document.getElementById('schermo-block-content').value = '';
     Modal.open('schermo-add-modal');
   };
 
@@ -420,7 +524,6 @@ const Schermo = (() => {
     });
   };
 
-  // Aggiorna schermo se il combat cambia
   const refreshCombat = () => {
     _blocks.filter(b => b.type === 'combat_mini').forEach(b => updateBlockContent(b));
   };
