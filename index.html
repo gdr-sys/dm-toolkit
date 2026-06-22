@@ -188,13 +188,13 @@
         </div>
         <div id="nc-container" style="display:flex;flex:1;overflow:hidden;border-top:1px solid var(--border);">
           <!-- Pannello categorie -->
-          <div id="nc-sidebar" style="width:160px;flex-shrink:0;border-right:1px solid var(--border);overflow-y:auto;background:var(--bg-secondary);height:100%;">
+          <div id="nc-sidebar" style="width:130px;flex-shrink:0;border-right:1px solid var(--border);overflow-y:auto;background:var(--bg-secondary);height:100%;">
           </div>
           <!-- Pannello pagine -->
-          <div id="nc-pages" style="width:150px;flex-shrink:0;border-right:1px solid var(--border);overflow-y:auto;background:var(--bg-card);height:100%;">
+          <div id="nc-pages" style="width:130px;flex-shrink:0;border-right:1px solid var(--border);overflow-y:auto;background:var(--bg-card);height:100%;">
           </div>
           <!-- Editor -->
-          <div id="nc-editor-wrap" style="flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden;">
+          <div id="nc-editor-wrap" style="flex:1;display:flex;flex-direction:column;min-width:200px;overflow:hidden;">
             <div id="nc-editor-header" style="padding:6px 10px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:6px;">
               <input id="nc-page-title" class="form-input" style="flex:1;font-family:var(--font-display);font-size:0.88rem;" placeholder="Titolo pagina..." oninput="NoteCampagna.savePage()">
               <button class="btn btn-ghost btn-icon-sm" onclick="NoteCampagna.deletePage()" title="Elimina pagina">🗑️</button>
@@ -8989,8 +8989,8 @@ const NoteCampagna = (() => {
     const sidebar = document.getElementById('nc-sidebar');
     const pages = document.getElementById('nc-pages');
     const editorWrap = document.getElementById('nc-editor-wrap');
-    if (sidebar) { sidebar.style.display = ''; sidebar.style.width = '160px'; sidebar.style.borderRight = '1px solid var(--border)'; sidebar.style.borderBottom = 'none'; }
-    if (pages) { pages.style.display = ''; pages.style.width = '150px'; pages.style.borderRight = '1px solid var(--border)'; pages.style.borderBottom = 'none'; }
+    if (sidebar) { sidebar.style.display = ''; sidebar.style.width = '130px'; sidebar.style.borderRight = '1px solid var(--border)'; sidebar.style.borderBottom = 'none'; }
+    if (pages) { pages.style.display = ''; pages.style.width = '130px'; pages.style.borderRight = '1px solid var(--border)'; pages.style.borderBottom = 'none'; }
     if (editorWrap) editorWrap.style.display = '';
 
     renderSidebar(); renderPages(); renderEditor();
