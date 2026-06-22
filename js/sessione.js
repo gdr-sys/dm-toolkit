@@ -7,6 +7,7 @@ const Sessione = (() => {
   // ── Stato ──
   let _combat = null;       // scontro attivo in memoria
   let _sortedCombatants = []; // ordinati per iniziativa
+  let _viewingNPCId = null; // ID del PNG attualmente visualizzato nella view
 
   // ── Condizioni D&D 5e ──
   const CONDIZIONI = [
@@ -40,7 +41,6 @@ const Sessione = (() => {
     const camp = App.getActiveCampaign();
     if (!camp) { renderNoCampaign(); return; }
 
-    // Controlla se ci sono combatant in arrivo dal Compendio
     if (camp.pendingCombatants && camp.pendingCombatants.length > 0) {
       if (_combat) {
         camp.pendingCombatants.forEach(c => addCombatantToCurrent(c));
@@ -55,7 +55,6 @@ const Sessione = (() => {
     Debug.log('Sessione.init()');
   };
 
-  // ── Render: nessuna campagna ──
   const renderNoCampaign = () => {
     const el = document.getElementById('sessione-content');
     if (el) el.innerHTML = `<div class="empty-state"><div class="empty-state-icon">⚔️</div><h3>Seleziona una campagna</h3><p class="text-sm text-muted">Apri una campagna dalla home per usare il Combat Tracker</p></div>`;
@@ -78,13 +77,14 @@ const Sessione = (() => {
     el.innerHTML = party.map(pg => {
       const hpPct = pg.hpMax > 0 ? Math.max(0, Math.round((pg.hpAttuali || pg.hpMax) / pg.hpMax * 100)) : 100;
       const hpCol = hpPct > 66 ? 'var(--accent-success)' : hpPct > 33 ? 'var(--accent-warning)' : 'var(--accent-danger)';
+      const metaParts = [pg.giocatore, pg.razza, pg.classe, pg.livello ? 'Liv. ' + pg.livello : ''].filter(Boolean);
       return `
       <div class="party-card">
         <!-- Header: nome + azioni -->
         <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:6px;gap:4px;">
           <div style="min-width:0;flex:1;">
             <div class="party-name">${pg.nome}</div>
-            <div class="party-meta">${[pg.giocatore, pg.classe, pg.livello ? 'Liv. ' + pg.livello : ''].filter(Boolean).join(' · ')}</div>
+            <div class="party-meta">${metaParts.join(' · ')}</div>
           </div>
           <div style="display:flex;gap:2px;flex-shrink:0;">
             <button class="btn btn-ghost btn-icon-sm" onclick="Sessione.editPG('${pg.id}')" title="Modifica">✏️</button>
@@ -92,28 +92,47 @@ const Sessione = (() => {
           </div>
         </div>
 
+        <!-- Stats rapide: CA, Velocità, Iniziativa, Bonus Comp. -->
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:3px;margin-bottom:6px;">
+          <div class="party-stat-box" title="Classe Armatura">
+            <span class="party-stat-label">CA</span>
+            <span class="party-stat-value">${pg.ca || '?'}</span>
+          </div>
+          <div class="party-stat-box" title="Bonus Iniziativa">
+            <span class="party-stat-label">Init.</span>
+            <span class="party-stat-value">${pg.iniziativaBonus >= 0 ? '+' : ''}${pg.iniziativaBonus || 0}</span>
+          </div>
+          <div class="party-stat-box" title="Velocità">
+            <span class="party-stat-label">Vel.</span>
+            <span class="party-stat-value" style="font-size:0.7rem;">${pg.velocita || '9 m'}</span>
+          </div>
+          <div class="party-stat-box" title="Bonus Competenza">
+            <span class="party-stat-label">PB</span>
+            <span class="party-stat-value">+${pg.profBonus || 2}</span>
+          </div>
+        </div>
+
         <!-- Percezioni passive -->
         <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:3px;margin-bottom:6px;">
           <div class="party-stat-box" title="Percezione Passiva">
-            <span class="party-stat-label">Perc.</span>
+            <span class="party-stat-label">👁️ Perc.</span>
             <span class="party-stat-value">${pg.percezionePassiva || 10}</span>
           </div>
           <div class="party-stat-box" title="Investigazione Passiva">
-            <span class="party-stat-label">Invest.</span>
+            <span class="party-stat-label">🔍 Inv.</span>
             <span class="party-stat-value">${pg.investigazionePassiva || 10}</span>
           </div>
           <div class="party-stat-box" title="Intuizione Passiva">
-            <span class="party-stat-label">Intui.</span>
+            <span class="party-stat-label">💡 Int.</span>
             <span class="party-stat-value">${pg.intuizionePassiva || 10}</span>
           </div>
         </div>
 
-        <!-- HP barra + CA + Ispirazione -->
+        <!-- HP barra + Ispirazione -->
         <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap;">
           <div style="flex:1;min-width:80px;">
             <div style="display:flex;justify-content:space-between;margin-bottom:2px;">
               <span class="party-pill">PF ${pg.hpAttuali ?? pg.hpMax ?? '?'}/${pg.hpMax || '?'}</span>
-              <span class="party-pill">CA ${pg.ca || '?'}</span>
             </div>
             <div style="height:4px;background:var(--bg-tertiary);border-radius:var(--radius-full);overflow:hidden;">
               <div style="height:100%;width:${hpPct}%;background:${hpCol};border-radius:var(--radius-full);transition:width 0.3s;"></div>
@@ -129,7 +148,6 @@ const Sessione = (() => {
     }).join('');
   };
 
-  // Toggle ispirazione senza aprire modal
   const toggleInspirazione = (id) => {
     const camp = App.getActiveCampaign();
     if (!camp) return;
@@ -140,9 +158,7 @@ const Sessione = (() => {
     saveParty(party);
     renderParty();
     Toast.show(party[idx].inspirazione ? `✨ ${party[idx].nome} ha ispirazione!` : `${party[idx].nome}: ispirazione rimossa`, 'info');
-    Debug.log(`Ispirazione ${party[idx].nome}: ${party[idx].inspirazione}`);
   };
-
 
   const addPG = () => openPGModal(null);
   const editPG = (id) => {
@@ -164,8 +180,11 @@ const Sessione = (() => {
     const fields = {
       'pg-nome': pg?.nome || '', 'pg-giocatore': pg?.giocatore || '',
       'pg-livello': pg?.livello || '', 'pg-classe': pg?.classe || '',
+      'pg-razza': pg?.razza || '',
       'pg-hp-max': pg?.hpMax || '', 'pg-hp-attuali': pg?.hpAttuali || '',
       'pg-ca': pg?.ca || '', 'pg-iniziativa-bonus': pg?.iniziativaBonus || '0',
+      'pg-velocita': pg?.velocita || '9 m',
+      'pg-prof-bonus': pg?.profBonus || '2',
       'pg-perc': pg?.percezionePassiva || '10',
       'pg-invest': pg?.investigazionePassiva || '10',
       'pg-intui': pg?.intuizionePassiva || '10',
@@ -194,6 +213,9 @@ const Sessione = (() => {
       giocatore: document.getElementById('pg-giocatore')?.value?.trim() || '',
       livello:   parseInt(document.getElementById('pg-livello')?.value) || 1,
       classe:    document.getElementById('pg-classe')?.value?.trim() || '',
+      razza:     document.getElementById('pg-razza')?.value?.trim() || '',
+      velocita:  document.getElementById('pg-velocita')?.value?.trim() || '9 m',
+      profBonus: parseInt(document.getElementById('pg-prof-bonus')?.value) || 2,
       hpMax,
       hpAttuali: parseInt(document.getElementById('pg-hp-attuali')?.value) || hpMax,
       ca:        parseInt(document.getElementById('pg-ca')?.value) || 10,
@@ -217,7 +239,6 @@ const Sessione = (() => {
     Debug.log(`PG ${id ? 'aggiornato' : 'aggiunto'}: ${nome}`);
   };
 
-  // Aggiunge PG al combat tracker dalla lista party
   const addPGtoCombat = () => {
     const camp = App.getActiveCampaign();
     const party = camp?.party || [];
@@ -249,6 +270,41 @@ const Sessione = (() => {
     Toast.show('Party aggiunto al combat', 'success');
   };
 
+  // ── Aggiungi PNG dal Mondo al Combat ──
+  const addNPCToCombat = (npcId) => {
+    const camp = App.getActiveCampaign();
+    const npc = (camp?.npcs || []).find(n => n.id === npcId);
+    if (!npc) { Toast.show('PNG non trovato', 'warning'); return; }
+    if (!_combat) newCombat();
+
+    const hpVal = parseInt(npc.hp) || 10;
+    const dexMod = npc.dex ? Math.floor((parseInt(npc.dex) - 10) / 2) : 0;
+
+    _combat.combatants.push({
+      id: 'comb_' + Date.now() + '_' + Math.random().toString(36).slice(2,5),
+      nome: npc.name,
+      tipo: 'npc',
+      npcId: npc.id,
+      hp: hpVal,
+      maxHp: hpVal,
+      ca: parseInt(npc.ac) || 10,
+      gs: npc.cr || '?',
+      iniziativa: rollInit(dexMod),
+      iniziativaBonus: dexMod,
+      condizioni: [],
+      note: npc.morale ? `Morale: ${npc.morale}` : '',
+      concentrazione: false,
+    });
+
+    sortCombatants();
+    saveCombat(_combat);
+    renderCombat();
+    App.navigateTo('sessione');
+    Modal.close('npc-view');
+    Toast.show(`${npc.name} aggiunto al combat!`, 'success');
+    Debug.log(`NPC aggiunto al combat: ${npc.name}`);
+  };
+
   // ══════════════════════════════════════════════════════
   // COMBAT TRACKER
   // ══════════════════════════════════════════════════════
@@ -257,9 +313,9 @@ const Sessione = (() => {
     _combat = {
       id: 'scontro_' + Date.now(),
       nome: 'Scontro ' + new Date().toLocaleDateString('it-IT'),
-      turno: 0,           // indice del combatant attivo
+      turno: 0,
       round: 1,
-      status: 'attivo',   // attivo | pausa | concluso
+      status: 'attivo',
       combatants: [],
       iniziataAt: Date.now(),
       campagnaId: camp?.id || '',
@@ -273,7 +329,6 @@ const Sessione = (() => {
     if (!_combat) return;
     _sortedCombatants = [..._combat.combatants].sort((a, b) => {
       if (b.iniziativa !== a.iniziativa) return b.iniziativa - a.iniziativa;
-      // parità: PG prima di mostri
       if (a.tipo === 'pg' && b.tipo !== 'pg') return -1;
       if (b.tipo === 'pg' && a.tipo !== 'pg') return 1;
       return a.nome.localeCompare(b.nome, 'it');
@@ -307,7 +362,6 @@ const Sessione = (() => {
     const activeCombatant = _sortedCombatants[turnoIdx] || null;
 
     el.innerHTML = `
-      <!-- Header combat -->
       <div class="combat-header">
         <div style="display:flex;align-items:center;gap:var(--space-md);">
           <div class="combat-round-badge">Round ${round}</div>
@@ -325,12 +379,10 @@ const Sessione = (() => {
         </div>
       </div>
 
-      <!-- Lista combatenti -->
       <div class="combat-list" id="combat-list">
         ${_sortedCombatants.map((c, idx) => renderCombatant(c, idx === turnoIdx)).join('')}
       </div>
 
-      <!-- Footer: aggiungi -->
       <div class="combat-footer">
         <button class="btn btn-ghost btn-sm" onclick="Sessione.addPGtoCombat()">👥 + Party</button>
         <button class="btn btn-ghost btn-sm" onclick="Sessione.addMonsterQuick()">🐉 + Mostro</button>
@@ -343,33 +395,30 @@ const Sessione = (() => {
     const hpPct = c.maxHp > 0 ? Math.max(0, Math.round((c.hp / c.maxHp) * 100)) : 100;
     const hpColor = hpPct > 66 ? 'var(--accent-success)' : hpPct > 33 ? 'var(--accent-warning)' : 'var(--accent-danger)';
     const isDead = c.hp <= 0;
+    const tipoIcon = c.tipo === 'pg' ? '👤' : c.tipo === 'npc' ? '🧑' : c.tipo === 'mostro' ? '🐉' : '⚔️';
     const condizioniHTML = (c.condizioni || []).map(cond =>
       `<span class="badge badge-primary" style="font-size:0.6rem;cursor:pointer;" onclick="Sessione.removeCondizione('${c.id}','${cond}')" title="Rimuovi">${cond} ✕</span>`
     ).join('');
 
     return `
       <div class="combat-row ${isActive ? 'combat-row-active' : ''} ${isDead ? 'combat-row-dead' : ''}" id="combatant-${c.id}">
-        <!-- Iniziativa -->
         <div class="combat-init-col">
           <input type="number" class="combat-init-input" value="${c.iniziativa}"
             onchange="Sessione.updateInit('${c.id}', this.value)"
             title="Iniziativa">
         </div>
-
-        <!-- Nome e tipo -->
         <div class="combat-name-col">
           <div style="display:flex;align-items:center;gap:6px;">
-            <span style="font-size:0.9rem;">${c.tipo === 'pg' ? '👤' : c.tipo === 'mostro' ? '🐉' : '⚔️'}</span>
+            <span style="font-size:0.9rem;">${tipoIcon}</span>
             <div>
               <div style="font-family:var(--font-display);font-size:0.88rem;${isDead ? 'text-decoration:line-through;opacity:0.5;' : ''}">${c.nome}</div>
               ${c.gs ? `<span class="text-xs text-muted">GS ${c.gs}</span>` : ''}
-              ${c.concentrazione ? '<span class="badge badge-blue" style="font-size:0.6rem;">CONC.</span>' : ''}
+              ${c.concentrazione ? '<span class="badge badge-blue" style="font-size:0.6rem;">🔮 CONC.</span>' : ''}
             </div>
           </div>
           ${condizioniHTML ? `<div style="display:flex;flex-wrap:wrap;gap:3px;margin-top:4px;">${condizioniHTML}</div>` : ''}
+          ${c.note ? `<div style="font-size:0.7rem;color:var(--text-muted);margin-top:2px;font-style:italic;">📝 ${c.note}</div>` : ''}
         </div>
-
-        <!-- HP -->
         <div class="combat-hp-col">
           <div style="display:flex;align-items:center;gap:4px;">
             <button class="btn btn-ghost btn-icon-sm" onclick="Sessione.changeHP('${c.id}', -1)" title="Danno">−</button>
@@ -385,14 +434,10 @@ const Sessione = (() => {
             <div class="combat-hp-fill" style="width:${hpPct}%;background:${hpColor};"></div>
           </div>
         </div>
-
-        <!-- CA -->
         <div class="combat-ca-col">
           <div class="text-xs text-muted">CA</div>
           <div style="font-family:var(--font-mono);font-size:0.9rem;">${c.ca || '—'}</div>
         </div>
-
-        <!-- Azioni rapide -->
         <div class="combat-actions-col">
           <button class="btn btn-ghost btn-icon-sm" title="Aggiungi condizione" onclick="Sessione.openCondizioneModal('${c.id}')">🔴</button>
           <button class="btn btn-ghost btn-icon-sm" title="Concentrazione" onclick="Sessione.toggleConcentrazione('${c.id}')" style="${c.concentrazione ? 'color:var(--accent-tertiary);' : ''}">🔮</button>
@@ -411,7 +456,6 @@ const Sessione = (() => {
       _combat.round++;
       Toast.show(`Round ${_combat.round} iniziato`, 'info');
     }
-    // Aggiorna ordine in _combat.combatants
     _combat.combatants = _sortedCombatants.map(c => {
       const orig = _combat.combatants.find(x => x.id === c.id);
       return orig || c;
@@ -444,14 +488,17 @@ const Sessione = (() => {
   const changeHP = (id, delta) => {
     const c = _combat?.combatants.find(x => x.id === id);
     if (!c) return;
-    const step = delta > 0 ? 1 : -1;
-    // Apre prompt veloce
     const val = prompt(`${delta > 0 ? 'Cura' : 'Danno'} per ${c.nome} (HP attuali: ${c.hp}/${c.maxHp}):`, '');
     if (val === null) return;
     const amount = parseInt(val);
     if (isNaN(amount) || amount < 0) { Toast.show('Valore non valido', 'warning'); return; }
     c.hp = Math.max(0, Math.min(c.maxHp || 9999, c.hp + (delta > 0 ? amount : -amount)));
-    if (c.hp === 0) Toast.show(`${c.nome} è a 0 PF!`, 'warning');
+    if (c.hp === 0) Toast.show(`💀 ${c.nome} è a 0 PF!`, 'warning');
+    // Concentrazione: avvisa se subisce danno
+    if (delta < 0 && c.concentrazione && amount > 0) {
+      const dc = Math.max(10, Math.floor(amount / 2));
+      Toast.show(`🔮 ${c.nome} concentrazione! DC ${dc} TS Cos.`, 'warning', 5000);
+    }
     saveCombat(_combat);
     renderCombat();
     Debug.log(`${c.nome}: HP ${c.hp}/${c.maxHp}`);
@@ -462,7 +509,6 @@ const Sessione = (() => {
     if (!c) return;
     c.hp = Math.max(0, Math.min(c.maxHp || 9999, parseInt(val) || 0));
     saveCombat(_combat);
-    // Aggiorna solo la barra senza re-render completo
     const bar = document.querySelector(`#combatant-${id} .combat-hp-fill`);
     const pct = c.maxHp > 0 ? Math.round((c.hp / c.maxHp) * 100) : 100;
     const col = pct > 66 ? 'var(--accent-success)' : pct > 33 ? 'var(--accent-warning)' : 'var(--accent-danger)';
@@ -478,6 +524,10 @@ const Sessione = (() => {
     if (isNaN(amount)) return;
     c.hp = Math.max(0, c.hp - amount);
     if (c.hp === 0) Toast.show(`💀 ${c.nome} è a 0 PF!`, 'warning');
+    if (c.concentrazione && amount > 0) {
+      const dc = Math.max(10, Math.floor(amount / 2));
+      Toast.show(`🔮 ${c.nome} concentrazione! DC ${dc} TS Cos.`, 'warning', 5000);
+    }
     saveCombat(_combat);
     renderCombat();
   };
@@ -522,6 +572,7 @@ const Sessione = (() => {
     const c = _combat?.combatants.find(x => x.id === id);
     if (!c) return;
     c.concentrazione = !c.concentrazione;
+    if (c.concentrazione) Toast.show(`🔮 ${c.nome} sta concentrando un incantesimo`, 'info');
     saveCombat(_combat);
     renderCombat();
   };
@@ -590,7 +641,6 @@ const Sessione = (() => {
     if (!m) return;
     if (!_combat) newCombat();
 
-    // Chiede quante copie
     const qty = parseInt(prompt(`Quanti ${m.nome} aggiungere?`, '1')) || 1;
     const pf = m.punti_ferita?.media || 10;
 
@@ -620,7 +670,6 @@ const Sessione = (() => {
   };
 
   const addCustomCombatant = () => {
-    // Apre il modal per combatente custom/homebrew
     ['custom-nome','custom-tipo','custom-hp','custom-ca','custom-gs','custom-init-bonus','custom-qty']
       .forEach(id => { const el = document.getElementById(id); if (el) el.value = el.id === 'custom-qty' ? '1' : el.id === 'custom-tipo' ? 'mostro' : ''; });
     Modal.open('custom-combatant-modal');
@@ -657,7 +706,6 @@ const Sessione = (() => {
     Toast.show(`${qty > 1 ? qty + '× ' : ''}${nome} aggiunto`, 'success');
     Debug.log(`Combatente custom: ${nome} x${qty}`);
   };
-
 
   const removeCombatant = (id) => {
     if (!_combat) return;
@@ -741,5 +789,7 @@ const Sessione = (() => {
     addMonsterQuick, searchMonster, addMonsterFromCompendio,
     addCustomCombatant, submitCustomCombatant, removeCombatant,
     saveCombatSession, endCombat, loadCombatSession,
+    // NPC
+    addNPCToCombat,
   };
 })();
