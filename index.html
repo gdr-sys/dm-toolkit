@@ -1198,6 +1198,10 @@
           <div class="form-group"><label class="form-label">Cosa vuole dai PG</label><textarea id="nm-wants" class="form-textarea" rows="2" placeholder="Obiettivo o richiesta..."></textarea></div>
           <div class="form-group"><label class="form-label">Cosa offre ai PG</label><textarea id="nm-offers" class="form-textarea" rows="2" placeholder="Informazioni, servizi, oggetti..."></textarea></div>
         </div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">🎯 Obiettivo segreto DM 🔒</label><textarea id="nm-obiettivo-segreto" class="form-textarea" rows="2" placeholder="Il vero scopo nascosto (solo il DM lo sa)..."></textarea></div>
+          <div class="form-group"><label class="form-label">⚔️ Morale</label><select id="nm-morale" class="form-select"><option value="">—</option><option value="coraggioso">Coraggioso (combatte fino alla morte)</option><option value="determinato">Determinato (fugge sotto il 25% PF)</option><option value="cauto">Cauto (fugge sotto il 50% PF)</option><option value="codardo">Codardo (fugge al primo danno subito)</option><option value="fanatico">Fanatico (non si arrende mai)</option><option value="mercenario">Mercenario (si arrende se offri oro)</option></select></div>
+        </div>
         <div class="form-group"><label class="form-label">Legami e relazioni</label><input type="text" id="nm-links" class="form-input" placeholder="es. Dipendente di: Locanda del Drago | Nemico di: Alaric"></div>
         <div style="margin-top:var(--space-md);">
           <label class="form-label">Relazione col Party — <span id="nm-rel-label" style="color:var(--accent-secondary);">Neutrale</span> (<span id="nm-rel-val">50</span>)</label>
@@ -1271,8 +1275,9 @@
           <div class="text-xs text-muted" id="npc-view-meta">—</div>
         </div>
       </div>
-      <div style="display:flex;gap:var(--space-sm);align-items:center;">
+      <div style="display:flex;gap:var(--space-sm);align-items:center;flex-wrap:wrap;">
         <button class="btn btn-gold btn-sm" id="npc-flip-btn" onclick="NPC.flipCard()">⚔️ Combattimento</button>
+        <button class="btn btn-primary btn-sm" id="npc-add-combat-btn" onclick="NPC.addCurrentToCombat()" title="Aggiungi al Combat Tracker">⚔️ + Combat</button>
         <button class="btn btn-secondary btn-sm" onclick="NPC.editFromView()">✏️ Modifica</button>
         <button class="btn btn-ghost btn-icon" onclick="Modal.close('npc-view')">✕</button>
       </div>
@@ -1303,9 +1308,13 @@
                   <div class="text-xs text-muted" style="font-family:var(--font-display);letter-spacing:0.05em;text-transform:uppercase;margin-bottom:2px;">Voce & Tic</div>
                   <div class="text-sm" id="npc-view-voice">—</div>
                 </div>
-                <div class="card card-gold" style="padding:var(--space-sm) var(--space-md);">
+                <div class="card card-gold" style="padding:var(--space-sm) var(--space-md);margin-bottom:var(--space-sm);">
                   <div class="text-xs" style="font-family:var(--font-display);letter-spacing:0.05em;text-transform:uppercase;margin-bottom:2px;color:var(--accent-secondary);">🔒 Segreto</div>
                   <div class="text-sm" id="npc-view-secret">—</div>
+                </div>
+                <div class="card" style="padding:var(--space-sm) var(--space-md);">
+                  <div class="text-xs text-muted" style="font-family:var(--font-display);letter-spacing:0.05em;text-transform:uppercase;margin-bottom:2px;">🎯 Obiettivo segreto DM</div>
+                  <div class="text-sm" id="npc-view-obiettivo">—</div>
                 </div>
               </div>
               <div>
@@ -1317,9 +1326,13 @@
                   <div class="text-xs text-muted" style="font-family:var(--font-display);letter-spacing:0.05em;text-transform:uppercase;margin-bottom:2px;">Offre ai PG</div>
                   <div class="text-sm" id="npc-view-offers">—</div>
                 </div>
-                <div class="card" style="padding:var(--space-sm) var(--space-md);">
+                <div class="card" style="padding:var(--space-sm) var(--space-md);margin-bottom:var(--space-sm);">
                   <div class="text-xs text-muted" style="font-family:var(--font-display);letter-spacing:0.05em;text-transform:uppercase;margin-bottom:2px;">Legami</div>
                   <div class="text-sm" id="npc-view-links">—</div>
+                </div>
+                <div class="card" id="npc-view-morale-wrap" style="padding:var(--space-sm) var(--space-md);display:none;">
+                  <div class="text-xs text-muted" style="font-family:var(--font-display);letter-spacing:0.05em;text-transform:uppercase;margin-bottom:2px;">⚔️ Morale</div>
+                  <div class="text-sm" id="npc-view-morale">—</div>
                 </div>
               </div>
             </div>
@@ -1371,7 +1384,12 @@
       <div class="form-row-3">
         <div class="form-group"><label class="form-label">Livello</label><input type="number" id="pg-livello" class="form-input" min="1" max="20" placeholder="1"></div>
         <div class="form-group"><label class="form-label">Classe</label><input type="text" id="pg-classe" class="form-input" placeholder="es. Guerriero"></div>
+        <div class="form-group"><label class="form-label">Razza / Specie</label><input type="text" id="pg-razza" class="form-input" placeholder="es. Elfo"></div>
+      </div>
+      <div class="form-row-3">
         <div class="form-group"><label class="form-label">Bonus Iniziativa</label><input type="number" id="pg-iniziativa-bonus" class="form-input" placeholder="0"></div>
+        <div class="form-group"><label class="form-label">Velocità</label><input type="text" id="pg-velocita" class="form-input" placeholder="es. 9 m"></div>
+        <div class="form-group"><label class="form-label">Bonus Competenza</label><input type="number" id="pg-prof-bonus" class="form-input" placeholder="2"></div>
       </div>
       <div class="form-row-3">
         <div class="form-group"><label class="form-label">HP Max</label><input type="number" id="pg-hp-max" class="form-input" min="1" placeholder="es. 45"></div>
@@ -3150,6 +3168,7 @@ const NPC = (() => {
       'nm-voice': npc?.voice || '', 'nm-tic':  npc?.tic  || '',
       'nm-trait':  npc?.trait  || '', 'nm-secret': npc?.secret || '',
       'nm-wants':  npc?.wants  || '', 'nm-offers': npc?.offers || '',
+      'nm-obiettivo-segreto': npc?.obiettivoSegreto || '',
       'nm-links':  npc?.links  || '',
       'nm-cr':    npc?.cr    || '', 'nm-hp':    npc?.hp    || '',
       'nm-ac':    npc?.ac    || '', 'nm-speed': npc?.speed || '',
@@ -3170,6 +3189,10 @@ const NPC = (() => {
 
     const alignEl = document.getElementById('nm-align');
     if (alignEl) alignEl.value = npc?.align || '';
+    const moraleEl = document.getElementById('nm-morale');
+    if (moraleEl) moraleEl.value = npc?.morale || '';
+    const obiettivoEl = document.getElementById('nm-obiettivo-segreto');
+    if (obiettivoEl) obiettivoEl.value = npc?.obiettivoSegreto || '';
     const facEl = document.getElementById('nm-faction');
     if (facEl) facEl.value = npc?.factionId || '';
 
@@ -3240,6 +3263,8 @@ const NPC = (() => {
       combatNotes: document.getElementById('nm-combat-notes')?.value?.trim() || '',
       actions: getActions(),
       immagine: document.getElementById('npc-img-url')?.value?.trim() || '',
+      obiettivoSegreto: document.getElementById('nm-obiettivo-segreto')?.value?.trim() || '',
+      morale: document.getElementById('nm-morale')?.value || '',
     };
 
     if (_editingId) {
@@ -3302,6 +3327,29 @@ const NPC = (() => {
     setText('npc-view-offers', npc.offers);
     setText('npc-view-links',  npc.links);
     setText('npc-view-voice',  [npc.voice, npc.tic].filter(Boolean).join(' · '));
+    setText('npc-view-obiettivo', npc.obiettivoSegreto);
+    // Morale
+    const moraleWrap = document.getElementById('npc-view-morale-wrap');
+    const moraleEl   = document.getElementById('npc-view-morale');
+    if (moraleWrap && moraleEl) {
+      if (npc.morale) {
+        const moraleLabels = {
+          coraggioso: '🗡️ Coraggioso — combatte fino alla morte',
+          determinato: '⚠️ Determinato — fugge sotto il 25% PF',
+          cauto: '🏃 Cauto — fugge sotto il 50% PF',
+          codardo: '💨 Codardo — fugge al primo danno subito',
+          fanatico: '🔥 Fanatico — non si arrende mai',
+          mercenario: '💰 Mercenario — si arrende se offri oro',
+        };
+        moraleEl.textContent = moraleLabels[npc.morale] || npc.morale;
+        moraleWrap.style.display = '';
+      } else {
+        moraleWrap.style.display = 'none';
+      }
+    }
+    // Bottone + Combat: mostra sempre se ha dati combattimento
+    const combatBtn = document.getElementById('npc-add-combat-btn');
+    if (combatBtn) combatBtn.style.display = npc.hp ? '' : 'none';
 
     setText('sb-name',     npc.name);
     setText('sb-subtitle', [npc.type || 'Umanoide', npc.align].filter(Boolean).join(', '));
@@ -3487,12 +3535,23 @@ const NPC = (() => {
     Debug.log('NPC.init()');
   };
 
+  const addCurrentToCombat = () => {
+    if (!_viewingId) return;
+    if (typeof Sessione !== 'undefined' && Sessione.addNPCToCombat) {
+      Sessione.addNPCToCombat(_viewingId);
+    } else {
+      Toast.show('Modulo Sessione non disponibile', 'warning');
+    }
+  };
+
   return {
     init, render, filter,
     openModal, submitModal,
     openView, flipCard, editFromView,
     quickRelChange, updateRelationPreview,
     addAction, deleteNPC, switchModalTab,
+    addCurrentToCombat,
+    _getById,
   };
 })();
 
