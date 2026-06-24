@@ -694,7 +694,7 @@
       <div id="comp-content">
         <!-- Tabs -->
         <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:var(--space-md);margin-bottom:var(--space-md);">
-          <div class="tabs" style="max-width:520px;">
+          <div class="tabs" style="flex-wrap:wrap;">
             <button class="tab-btn active" id="comp-tab-monsters"    onclick="Compendio.switchTab('monsters')">Mostri</button>
             <button class="tab-btn"        id="comp-tab-magic_items" onclick="Compendio.switchTab('magic_items')">Oggetti Magici</button>
             <button class="tab-btn"        id="comp-tab-equipment"   onclick="Compendio.switchTab('equipment')">Equipaggiamento</button>
@@ -3686,7 +3686,6 @@ const NPC = (() => {
     quickRelChange, updateRelationPreview,
     addAction, deleteNPC, switchModalTab,
     addCurrentToCombat,
-    _getById,
   };
 })();
 

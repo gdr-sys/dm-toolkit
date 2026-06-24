@@ -56,6 +56,13 @@
 .grid-auto { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:var(--space-md); }
 .grid-auto-sm { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:var(--space-md); }
 
+/* ── Generatori — contenimento overflow ── */
+.gen-card { overflow:hidden; }
+.gen-card .card-header { flex-wrap:wrap; gap:var(--space-xs); }
+.gen-card [id$="-result"], .gen-card [id$="-output"] { overflow-x:auto; word-break:break-word; min-width:0; }
+.gen-card table { max-width:100%; word-break:break-word; }
+.gen-card pre { white-space:pre-wrap; word-break:break-word; }
+
 /* ── HOME ── */
 #page-home { background:var(--bg-primary); }
 /* ── HOME HERO v2 ── */
