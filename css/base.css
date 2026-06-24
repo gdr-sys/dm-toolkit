@@ -88,7 +88,7 @@
 
   --text-primary:   #f0ebe4;
   --text-secondary: #c0b8ae;
-  --text-muted:     #7a7068;
+  --text-muted:     #9a9088;   /* Fix: era #7a7068 ~3.5:1 contrasto, ora ~4.8:1 WCAG AA */
 
   --border:        #2e2a24;
   --border-strong: #3e3830;

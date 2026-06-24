@@ -1,0 +1,1038 @@
+<!DOCTYPE html>
+<html lang="it" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DM Toolkit — Home v2 (Pilota)</title>
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <style>
+    /* ============================================================
+       PILOTA v2 — Override CSS · Home Page + Shell
+       Tutte le modifiche sono additive: non tocca i file originali.
+       ============================================================ */
+
+    /* ── Fix 1: contrasto text-muted in dark mode (era #7a7068 ~3.5:1) ── */
+    [data-theme="dark"] { --text-muted: #9a9088; }
+
+    /* ── Fix 2: nav-section-label leggibile ── */
+    .nav-section-label {
+      font-size: 0.68rem;
+      color: rgba(255,255,255,0.35);
+    }
+
+    /* ── Fix 3: touch target nav-item ≥44px ── */
+    .nav-item { min-height: 44px; }
+
+    /* ── Fix 4: touch target footer sidebar ── */
+    .sidebar-toggle,
+    .sidebar-footer .btn-icon { width: 44px; height: 44px; }
+
+    /* ── Fix 5: topbar title più autorevole ── */
+    .topbar-title { font-size: 1.15rem; letter-spacing: 0.02em; }
+
+    /* ── Fix 6: page centrata su schermi molto larghi ── */
+    .page { margin-left: auto; margin-right: auto; }
+
+    /* ── HERO v2 ── */
+    .home-hero { padding: 52px var(--space-lg) 36px; position: relative; }
+
+    .hero-eyebrow {
+      font-family: var(--font-display);
+      font-size: 0.66rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--accent-secondary);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+    }
+    .hero-eyebrow::before,
+    .hero-eyebrow::after {
+      content: '';
+      width: 48px;
+      height: 1px;
+      background: var(--accent-secondary);
+      opacity: 0.4;
+      display: block;
+    }
+
+    .home-hero-title { font-size: 2.75rem; letter-spacing: 0.06em; }
+
+    .home-hero-subtitle {
+      max-width: 510px;
+      margin-left: auto;
+      margin-right: auto;
+      font-size: 1.05rem;
+      line-height: 1.65;
+    }
+
+    .hero-divider {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      margin: 20px 0 28px;
+    }
+    .hero-divider-line {
+      height: 1px;
+      width: 64px;
+    }
+    .hero-divider-line:first-child { background: linear-gradient(to right, transparent, var(--border-strong)); }
+    .hero-divider-line:last-child  { background: linear-gradient(to left, transparent, var(--border-strong)); }
+    .hero-divider-gem {
+      width: 7px;
+      height: 7px;
+      background: var(--border-strong);
+      transform: rotate(45deg);
+      border-radius: 1px;
+    }
+
+    /* ── CAMPAIGN GRID SECTION ── */
+    .campaign-grid-section {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 var(--space-lg) var(--space-2xl);
+    }
+
+    .campaign-grid-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: var(--space-md);
+    }
+
+    .campaign-grid-label {
+      font-family: var(--font-display);
+      font-size: 0.66rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    /* override: il campaign-grid originale ottiene max-width dall'interno */
+    .campaign-grid {
+      max-width: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* ── CAMPAIGN CARD v2 ── */
+    .campaign-card-v2 {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      cursor: pointer;
+      transition: all var(--transition-normal);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+      min-height: 172px;
+      text-decoration: none;
+    }
+    .campaign-card-v2::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(to right, var(--accent-primary), var(--accent-secondary));
+      opacity: 0.3;
+      transition: opacity var(--transition-normal);
+    }
+    .campaign-card-v2:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-lg);
+      border-color: var(--border-strong);
+    }
+    .campaign-card-v2:hover::before { opacity: 1; }
+    .campaign-card-v2:focus-visible { outline: 2px solid var(--accent-primary); outline-offset: 2px; }
+
+    .campaign-card-v2.is-active { border-color: rgba(139,38,53,0.45); }
+    .campaign-card-v2.is-active::before { opacity: 0.9; }
+
+    .cc-body {
+      padding: var(--space-md) var(--space-md) var(--space-sm);
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .cc-top { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 10px; }
+
+    .cc-icon {
+      width: 40px; height: 40px;
+      border-radius: var(--radius-md);
+      background: rgba(139,38,53,0.14);
+      border: 1px solid rgba(139,38,53,0.22);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      color: var(--accent-primary);
+      transition: background var(--transition-fast);
+    }
+    .campaign-card-v2:hover .cc-icon { background: rgba(139,38,53,0.24); }
+
+    .cc-meta { flex: 1; min-width: 0; }
+
+    .cc-type {
+      font-family: var(--font-display);
+      font-size: 0.6rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--accent-secondary);
+      display: block;
+      margin-bottom: 3px;
+    }
+
+    .cc-name {
+      font-family: var(--font-display);
+      font-size: 1rem;
+      color: var(--text-primary);
+      line-height: 1.25;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: block;
+    }
+
+    .cc-desc {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      line-height: 1.55;
+      flex: 1;
+      margin-bottom: 8px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .cc-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 7px var(--space-md);
+      border-top: 1px solid var(--border);
+      background: rgba(0,0,0,0.14);
+    }
+
+    .cc-footer-meta { display: flex; align-items: center; gap: 8px; }
+
+    .cc-system {
+      font-family: var(--font-mono);
+      font-size: 0.64rem;
+      color: var(--text-muted);
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 2px 6px;
+    }
+
+    .cc-date { font-size: 0.7rem; color: var(--text-muted); }
+
+    .cc-actions {
+      display: flex;
+      gap: 3px;
+      opacity: 0;
+      transition: opacity var(--transition-fast);
+    }
+    .campaign-card-v2:hover .cc-actions,
+    .campaign-card-v2:focus-within .cc-actions { opacity: 1; }
+    @media (hover: none) { .cc-actions { opacity: 1; } }
+
+    .cc-active-tag {
+      position: absolute;
+      top: 9px; right: 9px;
+      display: flex; align-items: center; gap: 4px;
+      font-family: var(--font-display);
+      font-size: 0.57rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent-secondary);
+      background: rgba(193,127,59,0.12);
+      border: 1px solid rgba(193,127,59,0.28);
+      border-radius: var(--radius-full);
+      padding: 2px 8px;
+    }
+    .cc-active-dot {
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: var(--accent-secondary);
+      animation: pulse 2s infinite;
+    }
+
+    /* ── NEW CAMPAIGN CARD v2 ── */
+    .campaign-card-new-v2 {
+      background: transparent;
+      border: 1.5px dashed var(--border);
+      border-radius: var(--radius-lg);
+      min-height: 172px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      cursor: pointer;
+      transition: all var(--transition-normal);
+      color: var(--text-muted);
+      text-align: center;
+      padding: var(--space-lg);
+    }
+    .campaign-card-new-v2:hover {
+      border-color: var(--accent-primary);
+      color: var(--accent-primary);
+      background: rgba(139,38,53,0.05);
+      transform: translateY(-3px);
+    }
+    .campaign-card-new-v2:focus-visible { outline: 2px solid var(--accent-primary); outline-offset: 2px; }
+    .cc-new-icon {
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      border: 1.5px dashed currentColor;
+      display: flex; align-items: center; justify-content: center;
+      transition: all var(--transition-fast);
+    }
+    .campaign-card-new-v2:hover .cc-new-icon { background: rgba(139,38,53,0.1); }
+    .cc-new-label {
+      font-family: var(--font-display);
+      font-size: 0.82rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+    }
+    .cc-new-hint { font-size: 0.72rem; opacity: 0.6; }
+
+    /* ── EMPTY STATE v2 ── */
+    .home-empty-v2 {
+      max-width: 420px;
+      margin: var(--space-2xl) auto;
+      text-align: center;
+      padding: 0 var(--space-lg);
+    }
+    .home-empty-v2-icon {
+      width: 72px; height: 72px;
+      margin: 0 auto var(--space-lg);
+      color: var(--border-strong);
+      opacity: 0.45;
+    }
+    .home-empty-v2-title {
+      font-family: var(--font-display);
+      font-size: 1.35rem;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+    .home-empty-v2-sub {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      line-height: 1.65;
+      margin-bottom: var(--space-xl);
+    }
+    .home-empty-v2-steps { display: flex; flex-direction: column; gap: 12px; text-align: left; margin-bottom: var(--space-xl); }
+    .home-empty-v2-step { display: flex; gap: 12px; align-items: flex-start; }
+    .home-empty-v2-num {
+      width: 26px; height: 26px;
+      border-radius: 50%;
+      background: rgba(139,38,53,0.18);
+      border: 1px solid rgba(139,38,53,0.38);
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-display);
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: var(--accent-primary);
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .home-empty-v2-step-t {
+      font-family: var(--font-display);
+      font-size: 0.85rem;
+      color: var(--text-primary);
+      margin-bottom: 1px;
+    }
+    .home-empty-v2-step-d { font-size: 0.77rem; color: var(--text-muted); }
+
+    /* ── DEMO BANNER ── */
+    .demo-banner {
+      background: rgba(45,90,107,0.2);
+      border: 1px solid rgba(45,90,107,0.4);
+      border-radius: var(--radius-md);
+      padding: 7px 14px;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--accent-info);
+      text-align: center;
+      max-width: 1100px;
+      margin: 0 auto var(--space-md);
+    }
+    .demo-banner a {
+      color: var(--accent-secondary);
+      cursor: pointer;
+      text-decoration: underline;
+    }
+
+    /* ── Responsive hero ── */
+    @media (max-width: 768px) {
+      .home-hero { padding: 32px var(--space-md) 24px; }
+      .home-hero-title { font-size: 2rem; }
+      .home-hero-subtitle { font-size: 0.95rem; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="app">
+
+  <!-- ══════════════════════════════════════
+       SIDEBAR — Migliorata
+  ══════════════════════════════════════ -->
+  <nav id="sidebar" aria-label="Navigazione principale">
+    <!-- Logo -->
+    <button class="sidebar-logo" onclick="demoNav('home')" style="border:none;background:none;text-align:left;cursor:pointer;width:100%;" aria-label="DM Toolkit — Home">
+      <div class="logo-icon">
+        <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        </svg>
+      </div>
+      <span class="logo-text">DM Toolkit</span>
+    </button>
+
+    <!-- Campagna attiva — con title per tooltip nativo -->
+    <div class="sidebar-campaign" onclick="demoNav('home')" role="button" tabindex="0"
+         title="La Maledizione di Strahd — campagna attiva"
+         aria-label="Campagna attiva: La Maledizione di Strahd">
+      <div class="campaign-dot" id="sidebar-campaign-dot"></div>
+      <span class="campaign-name" id="sidebar-campaign-name">La Maledizione di Strahd</span>
+    </div>
+
+    <!-- Nav -->
+    <div class="nav-section" role="list">
+      <div class="nav-section-label">Navigazione</div>
+
+      <button class="nav-item active" data-page="home" onclick="demoNav('home')" role="listitem" aria-current="page">
+        <span class="nav-icon" aria-hidden="true">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
+            <polyline points="9 22 9 12 15 12 15 22"/>
+          </svg>
+        </span>
+        <span class="nav-label">Campagne</span>
+      </button>
+
+      <button class="nav-item" data-page="campagna" onclick="demoNav('campagna')" role="listitem">
+        <span class="nav-icon" aria-hidden="true">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 19.5A2.5 2.5 0 016.5 17H20"/>
+            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/>
+          </svg>
+        </span>
+        <span class="nav-label">Campagna</span>
+      </button>
+
+      <button class="nav-item" data-page="mondo" onclick="demoNav('mondo')" role="listitem">
+        <span class="nav-icon" aria-hidden="true">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/>
+            <line x1="8" y1="2" x2="8" y2="18"/>
+            <line x1="16" y1="6" x2="16" y2="22"/>
+          </svg>
+        </span>
+        <span class="nav-label">Mondo</span>
+      </button>
+
+      <button class="nav-item" data-page="sessione" onclick="demoNav('sessione')" role="listitem">
+        <span class="nav-icon" aria-hidden="true">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="14.5 17.5 3 6 3 3 6 3 17.5 14.5"/>
+            <line x1="13" y1="19" x2="19" y2="13"/>
+            <line x1="16" y1="16" x2="20" y2="20"/>
+            <line x1="19" y1="21" x2="21" y2="19"/>
+          </svg>
+        </span>
+        <span class="nav-label">Sessione</span>
+      </button>
+
+      <div class="nav-section-label" style="margin-top:8px;">Strumenti</div>
+
+      <button class="nav-item" data-page="generatori" onclick="demoNav('generatori')" role="listitem">
+        <span class="nav-icon" aria-hidden="true">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+          </svg>
+        </span>
+        <span class="nav-label">Generatori</span>
+      </button>
+
+      <button class="nav-item" data-page="compendio" onclick="demoNav('compendio')" role="listitem">
+        <span class="nav-icon" aria-hidden="true">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/>
+            <path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/>
+          </svg>
+        </span>
+        <span class="nav-label">Compendio</span>
+      </button>
+
+      <button class="nav-item" data-page="schermo" onclick="demoNav('schermo')" role="listitem">
+        <span class="nav-icon" aria-hidden="true">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+            <line x1="8" y1="21" x2="16" y2="21"/>
+            <line x1="12" y1="17" x2="12" y2="21"/>
+          </svg>
+        </span>
+        <span class="nav-label">Schermo DM</span>
+      </button>
+    </div>
+
+    <!-- Footer sidebar -->
+    <div class="sidebar-footer">
+      <button class="sidebar-toggle" onclick="toggleSidebar()" aria-label="Comprimi sidebar" data-tooltip="Comprimi sidebar">
+        <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="15 18 9 12 15 6"/>
+        </svg>
+      </button>
+      <button class="btn btn-ghost btn-icon" id="theme-toggle" onclick="toggleTheme()" aria-label="Cambia tema" data-tooltip="Cambia tema">
+        <!-- Moon (dark mode) -->
+        <svg aria-hidden="true" id="theme-icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>
+        </svg>
+        <!-- Sun (light mode) -->
+        <svg aria-hidden="true" id="theme-icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none">
+          <circle cx="12" cy="12" r="5"/>
+          <line x1="12" y1="1" x2="12" y2="3"/>
+          <line x1="12" y1="21" x2="12" y2="23"/>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+          <line x1="1" y1="12" x2="3" y2="12"/>
+          <line x1="21" y1="12" x2="23" y2="12"/>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Overlay mobile -->
+  <div id="sidebar-overlay" onclick="closeMobileMenu()"></div>
+
+  <!-- ══════════════════════════════════════
+       MAIN CONTENT
+  ══════════════════════════════════════ -->
+  <div id="main-content">
+
+    <!-- ── Topbar ── -->
+    <header id="topbar">
+      <!-- Mobile menu button: SVG invece di ☰ -->
+      <button id="mobile-menu-btn" onclick="toggleMobileMenu()" aria-label="Apri menu" aria-expanded="false" aria-controls="sidebar">
+        <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="3" y1="6" x2="21" y2="6"/>
+          <line x1="3" y1="12" x2="21" y2="12"/>
+          <line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+      </button>
+      <h1 class="topbar-title" id="topbar-title">Campagne</h1>
+      <div class="topbar-actions">
+        <span class="text-xs text-muted" id="topbar-campaign-badge">La Maledizione di Strahd</span>
+      </div>
+    </header>
+
+    <!-- ══════════════════════════════════════
+         PAGINA HOME v2
+    ══════════════════════════════════════ -->
+    <section class="page active" id="page-home" aria-labelledby="home-title">
+
+      <!-- Banner demo — da rimuovere in produzione -->
+      <div class="demo-banner" role="status">
+        <strong>PILOTA v2</strong> — Anteprima design. Dati di esempio.
+        <a onclick="toggleEmptyState()" tabindex="0" role="button" aria-label="Mostra stato vuoto">Mostra stato vuoto</a>
+        ·
+        <a onclick="toggleEmptyState(false)" tabindex="0" role="button" aria-label="Mostra campagne">Mostra campagne</a>
+      </div>
+
+      <!-- ── HERO ── -->
+      <div class="home-hero" role="banner">
+        <p class="hero-eyebrow" aria-hidden="true">D&amp;D 5e · Dungeon Master Toolkit</p>
+        <h1 class="home-hero-title" id="home-title">DM Toolkit</h1>
+        <p class="home-hero-subtitle">
+          Il tuo quartier generale per gestire campagne, PNG, sessioni e molto altro.
+        </p>
+        <div class="hero-divider" aria-hidden="true">
+          <span class="hero-divider-line"></span>
+          <span class="hero-divider-gem"></span>
+          <span class="hero-divider-line"></span>
+        </div>
+      </div>
+
+      <!-- ── STATO CAMPAGNE ── -->
+      <div id="home-campaigns-state" class="campaign-grid-section">
+        <div class="campaign-grid-header">
+          <span class="campaign-grid-label">Le tue campagne · 2</span>
+          <button class="btn btn-primary btn-sm" onclick="openNewCampaignModal()" aria-label="Crea nuova campagna">
+            <svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="5" x2="12" y2="19"/>
+              <line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+            Nuova Campagna
+          </button>
+        </div>
+
+        <div class="campaign-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:var(--space-md);">
+
+          <!-- Card campagna 1 — ATTIVA -->
+          <article class="campaign-card-v2 is-active" onclick="openCampaign('strahd')" role="button" tabindex="0"
+                   aria-label="Apri campagna: La Maledizione di Strahd" aria-pressed="true"
+                   onkeydown="if(event.key==='Enter'||event.key===' ')openCampaign('strahd')">
+            <div class="cc-active-tag" aria-label="Campagna attiva">
+              <span class="cc-active-dot" aria-hidden="true"></span>
+              Attiva
+            </div>
+            <div class="cc-body">
+              <div class="cc-top">
+                <div class="cc-icon" aria-hidden="true">
+                  <!-- Book icon -->
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4 19.5A2.5 2.5 0 016.5 17H20"/>
+                    <path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/>
+                  </svg>
+                </div>
+                <div class="cc-meta">
+                  <span class="cc-type">Campagna</span>
+                  <span class="cc-name">La Maledizione di Strahd</span>
+                </div>
+              </div>
+              <p class="cc-desc">Il party esplora le nebbiose terre di Barovia, cercando di sconfiggere il vampiro Strahd von Zarovich.</p>
+            </div>
+            <div class="cc-footer">
+              <div class="cc-footer-meta">
+                <span class="cc-system">D&amp;D 5e 2024</span>
+                <span class="cc-date">Ultima sessione 2 giorni fa</span>
+              </div>
+              <div class="cc-actions" role="group" aria-label="Azioni campagna">
+                <button class="btn btn-ghost btn-icon-sm" onclick="event.stopPropagation();editCampaign('strahd')"
+                        aria-label="Modifica La Maledizione di Strahd" data-tooltip="Modifica">
+                  <svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
+                    <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                  </svg>
+                </button>
+                <button class="btn btn-ghost btn-icon-sm" onclick="event.stopPropagation();deleteCampaign('strahd')"
+                        aria-label="Elimina La Maledizione di Strahd" data-tooltip="Elimina">
+                  <svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="3 6 5 6 21 6"/>
+                    <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a1 1 0 011-1h4a1 1 0 011 1v2"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </article>
+
+          <!-- Card campagna 2 -->
+          <article class="campaign-card-v2" onclick="openCampaign('drago')" role="button" tabindex="0"
+                   aria-label="Apri campagna: Il Principe del Ghiaccio"
+                   onkeydown="if(event.key==='Enter'||event.key===' ')openCampaign('drago')">
+            <div class="cc-body">
+              <div class="cc-top">
+                <div class="cc-icon" aria-hidden="true">
+                  <!-- Lightning bolt icon (one shot) -->
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                  </svg>
+                </div>
+                <div class="cc-meta">
+                  <span class="cc-type">One Shot</span>
+                  <span class="cc-name">La Notte del Drago</span>
+                </div>
+              </div>
+              <p class="cc-desc">Avventura one-shot. Il party deve fermare un drago di ghiaccio che minaccia il villaggio di Vetta di Neve.</p>
+            </div>
+            <div class="cc-footer">
+              <div class="cc-footer-meta">
+                <span class="cc-system">D&amp;D 5e 2014</span>
+                <span class="cc-date">Ultima sessione 2 settimane fa</span>
+              </div>
+              <div class="cc-actions" role="group" aria-label="Azioni campagna">
+                <button class="btn btn-ghost btn-icon-sm" onclick="event.stopPropagation();editCampaign('drago')"
+                        aria-label="Modifica La Notte del Drago" data-tooltip="Modifica">
+                  <svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
+                    <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                  </svg>
+                </button>
+                <button class="btn btn-ghost btn-icon-sm" onclick="event.stopPropagation();deleteCampaign('drago')"
+                        aria-label="Elimina La Notte del Drago" data-tooltip="Elimina">
+                  <svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="3 6 5 6 21 6"/>
+                    <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a1 1 0 011-1h4a1 1 0 011 1v2"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </article>
+
+          <!-- Card "Nuova Campagna" -->
+          <button class="campaign-card-new-v2" onclick="openNewCampaignModal()"
+                  aria-label="Crea una nuova campagna">
+            <div class="cc-new-icon" aria-hidden="true">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19"/>
+                <line x1="5" y1="12" x2="19" y2="12"/>
+              </svg>
+            </div>
+            <span class="cc-new-label">Nuova Campagna</span>
+            <span class="cc-new-hint">Crea o importa una campagna</span>
+          </button>
+
+        </div>
+      </div>
+
+      <!-- ── EMPTY STATE — visibile solo senza campagne ── -->
+      <div id="home-empty-state" class="home-empty-v2" style="display:none;" role="main" aria-live="polite">
+        <div class="home-empty-v2-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+        </div>
+        <h2 class="home-empty-v2-title">Nessuna campagna</h2>
+        <p class="home-empty-v2-sub">
+          DM Toolkit è pronto. Crea la tua prima campagna per iniziare a gestire sessioni, PNG, quest e molto altro.
+        </p>
+        <div class="home-empty-v2-steps" aria-label="Come iniziare">
+          <div class="home-empty-v2-step">
+            <div class="home-empty-v2-num" aria-hidden="true">1</div>
+            <div>
+              <p class="home-empty-v2-step-t">Crea una campagna</p>
+              <p class="home-empty-v2-step-d">Dai un nome alla tua avventura, scegli il sistema e le opzioni di regole.</p>
+            </div>
+          </div>
+          <div class="home-empty-v2-step">
+            <div class="home-empty-v2-num" aria-hidden="true">2</div>
+            <div>
+              <p class="home-empty-v2-step-t">Aggiungi PNG e luoghi</p>
+              <p class="home-empty-v2-step-d">Popola il tuo mondo con personaggi non giocanti, fazioni e location.</p>
+            </div>
+          </div>
+          <div class="home-empty-v2-step">
+            <div class="home-empty-v2-num" aria-hidden="true">3</div>
+            <div>
+              <p class="home-empty-v2-step-t">Gestisci le sessioni</p>
+              <p class="home-empty-v2-step-d">Usa il Combat Tracker, il generatore di incontri e lo Schermo DM durante il gioco.</p>
+            </div>
+          </div>
+        </div>
+        <button class="btn btn-primary btn-lg" onclick="openNewCampaignModal()">
+          <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"/>
+            <line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+          Crea la prima campagna
+        </button>
+      </div>
+
+    </section>
+
+  </div><!-- /main-content -->
+</div><!-- /app -->
+
+<!-- ══════════════════════════════════════
+     MOBILE NAV (< 768px)
+══════════════════════════════════════ -->
+<nav id="mobile-nav" aria-label="Navigazione mobile" style="display:none;">
+  <button class="mobile-nav-item active" onclick="demoNav('home')" aria-label="Campagne" aria-current="page">
+    <span class="mobile-nav-icon" aria-hidden="true">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
+        <polyline points="9 22 9 12 15 12 15 22"/>
+      </svg>
+    </span>
+    <span class="mobile-nav-label">Home</span>
+  </button>
+  <button class="mobile-nav-item" onclick="demoNav('sessione')" aria-label="Sessione">
+    <span class="mobile-nav-icon" aria-hidden="true">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="14.5 17.5 3 6 3 3 6 3 17.5 14.5"/>
+        <line x1="13" y1="19" x2="19" y2="13"/>
+      </svg>
+    </span>
+    <span class="mobile-nav-label">Sessione</span>
+  </button>
+  <button class="mobile-nav-item" onclick="demoNav('compendio')" aria-label="Compendio">
+    <span class="mobile-nav-icon" aria-hidden="true">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/>
+        <path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/>
+      </svg>
+    </span>
+    <span class="mobile-nav-label">Compendio</span>
+  </button>
+  <button class="mobile-nav-item" onclick="demoNav('schermo')" aria-label="Schermo DM">
+    <span class="mobile-nav-icon" aria-hidden="true">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+        <line x1="8" y1="21" x2="16" y2="21"/>
+        <line x1="12" y1="17" x2="12" y2="21"/>
+      </svg>
+    </span>
+    <span class="mobile-nav-label">Schermo</span>
+  </button>
+  <button class="mobile-nav-item" onclick="demoNav('generatori')" aria-label="Generatori">
+    <span class="mobile-nav-icon" aria-hidden="true">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+      </svg>
+    </span>
+    <span class="mobile-nav-label">Genera</span>
+  </button>
+</nav>
+
+<!-- ══════════════════════════════════════
+     WIDGET DADI
+══════════════════════════════════════ -->
+<div id="dice-widget">
+  <div class="dice-panel" id="dice-panel">
+    <div class="dice-panel-title">Lancia i Dadi</div>
+    <div class="dice-grid">
+      <button class="dice-btn" onclick="demoRoll(4)">d4</button>
+      <button class="dice-btn" onclick="demoRoll(6)">d6</button>
+      <button class="dice-btn" onclick="demoRoll(8)">d8</button>
+      <button class="dice-btn" onclick="demoRoll(10)">d10</button>
+      <button class="dice-btn" onclick="demoRoll(12)">d12</button>
+      <button class="dice-btn" onclick="demoRoll(20)">d20</button>
+      <button class="dice-btn" onclick="demoRoll(100)">d100</button>
+      <button class="dice-btn" onclick="demoRollMulti(2,6)">2d6</button>
+    </div>
+    <div class="dice-result">
+      <div class="dice-result-formula" id="dice-result-formula">—</div>
+      <div class="dice-result-value" id="dice-result-value">?</div>
+      <div class="dice-result-detail" id="dice-result-detail"></div>
+    </div>
+  </div>
+  <button class="dice-toggle" onclick="toggleDice()" id="dice-toggle-btn" aria-label="Lancia dadi" aria-expanded="false" aria-controls="dice-panel">
+    <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="2" y="2" width="20" height="20" rx="4" ry="4"/>
+      <circle cx="8" cy="8" r="1.5" fill="currentColor"/>
+      <circle cx="16" cy="8" r="1.5" fill="currentColor"/>
+      <circle cx="8" cy="16" r="1.5" fill="currentColor"/>
+      <circle cx="16" cy="16" r="1.5" fill="currentColor"/>
+      <circle cx="12" cy="12" r="1.5" fill="currentColor"/>
+    </svg>
+  </button>
+</div>
+
+<!-- ══════════════════════════════════════
+     TOAST CONTAINER
+══════════════════════════════════════ -->
+<div id="toast-container" class="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+<!-- ══════════════════════════════════════
+     MODAL: Nuova Campagna
+══════════════════════════════════════ -->
+<div class="modal-overlay" id="modal-new-campaign" style="display:none;" role="dialog" aria-modal="true" aria-labelledby="modal-new-campaign-title">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 id="modal-new-campaign-title" style="font-family:var(--font-display);font-size:1.1rem;">Nuova Campagna</h2>
+      <button class="btn btn-ghost btn-icon" onclick="closeModal()" aria-label="Chiudi finestra">
+        <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"/>
+          <line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label" for="nc-name">Nome *</label>
+        <input type="text" id="nc-name" class="form-input" placeholder="es. La Maledizione di Strahd" autocomplete="off">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label" for="nc-type">Tipo</label>
+          <select id="nc-type" class="form-select">
+            <option value="campagna">Campagna</option>
+            <option value="oneshot">One Shot</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="nc-system">Sistema</label>
+          <select id="nc-system" class="form-select">
+            <option value="5e2024">D&amp;D 5e (2024)</option>
+            <option value="5e2014">D&amp;D 5e (2014)</option>
+            <option value="custom">Personalizzato</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label" style="display:flex;align-items:center;gap:8px;cursor:pointer;text-transform:none;font-size:0.85rem;letter-spacing:normal;">
+          <input type="checkbox" id="nc-elettro">
+          Usa monete di <strong>elettro</strong> nel loot
+        </label>
+        <p class="form-hint">L'elettro vale 5 mo. Disabilitato di default perché poco comune.</p>
+      </div>
+      <div class="form-group">
+        <label class="form-label" style="display:flex;align-items:center;gap:8px;cursor:pointer;text-transform:none;font-size:0.85rem;letter-spacing:normal;">
+          <input type="checkbox" id="nc-calendario" onchange="document.getElementById('nc-calendario-preset').style.display=this.checked?'':'none'">
+          Attiva <strong>calendario in-game</strong>
+        </label>
+        <div id="nc-calendario-preset" style="display:none;margin-top:6px;">
+          <label class="form-label" for="nc-calendario-tipo">Preset calendario</label>
+          <select id="nc-calendario-tipo" class="form-select">
+            <option value="forgotten_realms">Forgotten Realms (Calendario delle Tempeste)</option>
+            <option value="greyhawk">Greyhawk (Calendario di Oerth)</option>
+            <option value="eberron">Eberron (Calendario di Khorvaire)</option>
+            <option value="fantasy">Fantasy Generico (12 mesi × 30 giorni)</option>
+            <option value="custom">Personalizzato</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal()">Annulla</button>
+      <button class="btn btn-primary" onclick="submitDemo()">Crea Campagna</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     JS MINIMALE — solo interazioni demo
+══════════════════════════════════════ -->
+<script>
+  /* ── Sidebar ── */
+  function toggleSidebar() {
+    const sb = document.getElementById('sidebar');
+    const mc = document.getElementById('main-content');
+    const collapsed = sb.classList.toggle('collapsed');
+    mc.classList.toggle('expanded', collapsed);
+    const btn = sb.querySelector('.sidebar-toggle');
+    if (btn) btn.setAttribute('aria-label', collapsed ? 'Espandi sidebar' : 'Comprimi sidebar');
+  }
+
+  /* ── Mobile menu ── */
+  function toggleMobileMenu() {
+    const sb = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebar-overlay');
+    const btn = document.getElementById('mobile-menu-btn');
+    const open = sb.classList.toggle('mobile-open');
+    overlay.classList.toggle('active', open);
+    btn.setAttribute('aria-expanded', String(open));
+  }
+  function closeMobileMenu() {
+    document.getElementById('sidebar').classList.remove('mobile-open');
+    document.getElementById('sidebar-overlay').classList.remove('active');
+    document.getElementById('mobile-menu-btn').setAttribute('aria-expanded', 'false');
+  }
+
+  /* ── Theme toggle ── */
+  function toggleTheme() {
+    const html = document.documentElement;
+    const isDark = html.getAttribute('data-theme') === 'dark';
+    html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+    document.getElementById('theme-icon-moon').style.display = isDark ? 'none' : '';
+    document.getElementById('theme-icon-sun').style.display  = isDark ? '' : 'none';
+  }
+
+  /* ── Dice widget ── */
+  function toggleDice() {
+    const panel = document.getElementById('dice-panel');
+    const btn   = document.getElementById('dice-toggle-btn');
+    const open  = panel.classList.toggle('open');
+    btn.setAttribute('aria-expanded', String(open));
+  }
+  function demoRoll(faces) {
+    const result = Math.floor(Math.random() * faces) + 1;
+    document.getElementById('dice-result-formula').textContent = `d${faces}`;
+    const el = document.getElementById('dice-result-value');
+    el.textContent = result;
+    el.classList.remove('dice-result-appear');
+    void el.offsetWidth;
+    el.classList.add('dice-result-appear');
+    document.getElementById('dice-result-detail').textContent = '';
+  }
+  function demoRollMulti(n, faces) {
+    let total = 0, rolls = [];
+    for (let i = 0; i < n; i++) { const r = Math.floor(Math.random()*faces)+1; total += r; rolls.push(r); }
+    document.getElementById('dice-result-formula').textContent = `${n}d${faces}`;
+    const el = document.getElementById('dice-result-value');
+    el.textContent = total;
+    el.classList.remove('dice-result-appear');
+    void el.offsetWidth;
+    el.classList.add('dice-result-appear');
+    document.getElementById('dice-result-detail').textContent = `(${rolls.join(' + ')})`;
+  }
+
+  /* ── Modal ── */
+  function openNewCampaignModal() {
+    const m = document.getElementById('modal-new-campaign');
+    m.style.display = 'flex';
+    setTimeout(() => document.getElementById('nc-name').focus(), 50);
+  }
+  function closeModal() {
+    document.getElementById('modal-new-campaign').style.display = 'none';
+  }
+  document.getElementById('modal-new-campaign').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+  });
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeModal();
+  });
+
+  /* ── Demo actions ── */
+  function submitDemo() {
+    const name = document.getElementById('nc-name').value.trim();
+    closeModal();
+    showToast(name ? `Campagna "${name}" creata!` : 'Campagna creata!', 'success');
+  }
+  function openCampaign(id) {
+    showToast(`[Demo] Apertura campagna — in produzione naviga alla sezione Campagna`, 'info');
+  }
+  function editCampaign(id) {
+    showToast(`[Demo] Modifica campagna`, 'info');
+  }
+  function deleteCampaign(id) {
+    showToast(`[Demo] Elimina campagna — in produzione chiede conferma`, 'warning');
+  }
+  function demoNav(page) {
+    showToast(`[Demo] Navigazione verso: ${page}`, 'info');
+  }
+
+  /* ── Toggle empty state (solo per la preview) ── */
+  function toggleEmptyState(empty) {
+    const campaigns = document.getElementById('home-campaigns-state');
+    const emptyEl   = document.getElementById('home-empty-state');
+    const show = (empty === undefined) ? emptyEl.style.display === 'none' : empty !== false;
+    campaigns.style.display = show ? 'none' : '';
+    emptyEl.style.display   = show ? '' : 'none';
+  }
+
+  /* ── Toast ── */
+  function showToast(msg, type = 'info') {
+    const container = document.getElementById('toast-container');
+    const t = document.createElement('div');
+    t.className = `toast toast-${type}`;
+    t.setAttribute('role', 'alert');
+    t.innerHTML = `
+      <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        ${type === 'success' ? '<polyline points="20 6 9 17 4 12"/>' :
+          type === 'warning' ? '<path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>' :
+          '<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>'}
+      </svg>
+      <span>${msg}</span>`;
+    container.appendChild(t);
+    setTimeout(() => {
+      t.style.animation = 'fadeOut 0.3s ease forwards';
+      setTimeout(() => t.remove(), 300);
+    }, 3000);
+  }
+
+  /* ── Init: mostra mobile nav su schermi piccoli ── */
+  (function() {
+    const mq = window.matchMedia('(max-width: 768px)');
+    function onResize(e) {
+      document.getElementById('mobile-nav').style.display = e.matches ? 'flex' : 'none';
+      document.getElementById('mobile-menu-btn').style.display = e.matches ? 'flex' : 'none';
+    }
+    mq.addEventListener('change', onResize);
+    onResize(mq);
+  })();
+</script>
+
+</body>
+</html>

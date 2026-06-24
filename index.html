@@ -92,7 +92,11 @@
 
     <!-- Topbar -->
     <header id="topbar">
-      <button id="mobile-menu-btn" onclick="toggleMobileMenu()" style="display:none;">☰</button>
+      <button id="mobile-menu-btn" onclick="toggleMobileMenu()" aria-label="Apri menu" aria-expanded="false" aria-controls="sidebar" style="display:none;">
+        <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+      </button>
       <h1 class="topbar-title" id="topbar-title">Campagne</h1>
       <div class="topbar-actions">
         <span class="text-xs text-muted" id="topbar-campaign-badge"></span>
@@ -102,13 +106,31 @@
     <!-- ════════════════════════
          PAGINA: HOME
     ════════════════════════ -->
-    <section class="page active" id="page-home">
-      <div class="home-hero">
-        <h1 class="home-hero-title">DM Toolkit</h1>
+    <section class="page active" id="page-home" aria-labelledby="home-title">
+      <div class="home-hero" role="banner">
+        <p class="hero-eyebrow" aria-hidden="true">D&amp;D 5e · Dungeon Master Toolkit</p>
+        <h1 class="home-hero-title" id="home-title">DM Toolkit</h1>
         <p class="home-hero-subtitle">Il tuo quartier generale per gestire campagne, PNG, sessioni e molto altro</p>
+        <div class="hero-divider" aria-hidden="true">
+          <span class="hero-divider-line"></span>
+          <span class="hero-divider-gem"></span>
+          <span class="hero-divider-line"></span>
+        </div>
       </div>
-      <div class="campaign-grid" id="campaign-grid">
-        <!-- Popolato da JS -->
+      <div class="campaign-grid-section">
+        <div class="campaign-grid-header">
+          <span class="campaign-grid-label" id="campaign-grid-count"></span>
+          <button class="btn btn-primary btn-sm" onclick="openNewCampaignModal()" aria-label="Crea nuova campagna">
+            <svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+            Nuova Campagna
+          </button>
+        </div>
+        <div class="campaign-grid" id="campaign-grid" aria-label="Le tue campagne">
+          <!-- Popolato da JS -->
+        </div>
+        <div class="campaign-grid-actions" id="campaign-grid-actions"></div>
       </div>
     </section>
 
@@ -126,7 +148,7 @@
       <!-- Riepilogo ultima sessione -->
       <div class="card card-accent" style="margin-bottom:var(--space-lg);">
         <div class="card-header">
-          <h3 class="card-title">📝 Riepilogo Ultima Sessione</h3>
+          <h3 class="card-title">Riepilogo Ultima Sessione</h3>
           <button class="btn btn-primary btn-sm" onclick="App.saveRecap()">Salva</button>
         </div>
         <div class="card-body">
@@ -141,7 +163,7 @@
         <!-- QUEST TRACKER -->
         <div class="card">
           <div class="card-header">
-            <h3 class="card-title">🗡️ Quest Tracker</h3>
+            <h3 class="card-title">Quest Tracker</h3>
             <button class="btn btn-primary btn-sm" onclick="App.addQuest()">+ Aggiungi</button>
           </div>
           <div class="tabs" style="margin-bottom:var(--space-md);">
@@ -162,7 +184,7 @@
           <!-- TIMELINE -->
           <div class="card">
             <div class="card-header">
-              <h3 class="card-title">📅 Cronologia Eventi</h3>
+              <h3 class="card-title">Cronologia Eventi</h3>
               <button class="btn btn-primary btn-sm" onclick="App.addTimelineEvent()">+ Evento</button>
             </div>
             <div id="timeline-list" style="max-height:240px;overflow-y:auto;"></div>
@@ -171,7 +193,7 @@
           <!-- FAZIONI -->
           <div class="card">
             <div class="card-header">
-              <h3 class="card-title">🏛️ Fazioni</h3>
+              <h3 class="card-title">Fazioni</h3>
               <button class="btn btn-primary btn-sm" onclick="App.addFaction()">+ Aggiungi</button>
             </div>
             <div id="faction-list" style="max-height:280px;overflow-y:auto;"></div>
@@ -183,7 +205,7 @@
       <!-- NOTE CAMPAGNA stile OneNote -->
       <div class="card" style="margin-top:var(--space-lg);display:flex;flex-direction:column;">
         <div class="card-header">
-          <h3 class="card-title">📓 Note Campagna</h3>
+          <h3 class="card-title">Note Campagna</h3>
           <button class="btn btn-primary btn-sm" onclick="NoteCampagna.addCategoria()">+ Categoria</button>
         </div>
         <div id="nc-container" style="display:flex;flex:1;overflow:hidden;border-top:1px solid var(--border);">
@@ -197,7 +219,9 @@
           <div id="nc-editor-wrap" style="flex:1;display:flex;flex-direction:column;min-width:200px;overflow:hidden;">
             <div id="nc-editor-header" style="padding:6px 10px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:6px;">
               <input id="nc-page-title" class="form-input" style="flex:1;font-family:var(--font-display);font-size:0.88rem;" placeholder="Titolo pagina..." oninput="NoteCampagna.savePage()">
-              <button class="btn btn-ghost btn-icon-sm" onclick="NoteCampagna.deletePage()" title="Elimina pagina">🗑️</button>
+              <button class="btn btn-ghost btn-icon-sm" onclick="NoteCampagna.deletePage()" aria-label="Elimina pagina" title="Elimina pagina">
+                <svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>
+              </button>
             </div>
             <textarea id="nc-page-content" style="flex:1;border:none;resize:none;font-size:0.85rem;line-height:1.8;padding:14px 18px;background:transparent;color:var(--text-primary);font-family:var(--font-body);outline:none;min-height:0;"
               placeholder="Scrivi le tue note qui...&#10;&#10;Perfetto per lore, segreti, dialoghi, piani narrativi..."
@@ -214,7 +238,7 @@
     <section class="page" id="page-mondo">
       <div class="page-header">
         <div>
-          <h1 class="page-title">🗺️ Mondo</h1>
+          <h1 class="page-title">Mondo</h1>
           <p class="page-subtitle">PNG, Luoghi e Fazioni della campagna</p>
         </div>
       </div>
@@ -275,12 +299,18 @@
     <section class="page" id="page-sessione">
       <div class="page-header">
         <div>
-          <h1 class="page-title">⚔️ Sessione</h1>
+          <h1 class="page-title">Sessione</h1>
           <p class="page-subtitle">Combat Tracker · Party · Scontri salvati</p>
         </div>
         <div style="display:flex;gap:var(--space-sm);">
-          <button class="btn btn-primary" onclick="Sessione.newCombat()">⚔️ Nuovo Scontro</button>
-          <button class="btn btn-secondary" onclick="Sessione.addPGtoCombat()">👥 Party in Combat</button>
+          <button class="btn btn-primary" onclick="Sessione.newCombat()">
+            <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="14.5 17.5 3 6 3 3 6 3 17.5 14.5"/><line x1="13" y1="19" x2="19" y2="13"/><line x1="16" y1="16" x2="20" y2="20"/><line x1="19" y1="21" x2="21" y2="19"/></svg>
+            Nuovo Scontro
+          </button>
+          <button class="btn btn-secondary" onclick="Sessione.addPGtoCombat()">
+            <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+            Party in Combat
+          </button>
         </div>
       </div>
 
@@ -302,7 +332,7 @@
           <!-- Party -->
           <div class="card">
             <div class="card-header">
-              <h3 class="card-title">👥 Party</h3>
+              <h3 class="card-title">Party</h3>
               <button class="btn btn-primary btn-sm" onclick="Sessione.addPG()">+ PG Party</button>
             </div>
             <div id="party-list" class="grid-auto-sm" style="gap:var(--space-sm);"></div>
@@ -311,7 +341,7 @@
           <!-- Sessioni salvate -->
           <div class="card">
             <div class="card-header">
-              <h3 class="card-title">💾 Scontri Salvati</h3>
+              <h3 class="card-title">Scontri Salvati</h3>
             </div>
             <div id="saved-sessions-list" class="comp-list"></div>
           </div>
@@ -321,10 +351,12 @@
         <!-- Note Sessione -->
         <div class="card" style="margin-top:var(--space-lg);">
           <div class="card-header">
-            <h3 class="card-title">📝 Note Sessione</h3>
+            <h3 class="card-title">Note Sessione</h3>
             <div style="display:flex;gap:6px;">
               <button class="btn btn-secondary btn-sm" onclick="NoteSessione.addVoce()">+ Nota</button>
-              <button class="btn btn-ghost btn-sm" onclick="NoteSessione.clear()" title="Cancella tutte le note">🗑️</button>
+              <button class="btn btn-ghost btn-icon-sm" onclick="NoteSessione.clear()" aria-label="Cancella tutte le note" title="Cancella tutte le note">
+                <svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>
+              </button>
             </div>
           </div>
           <div id="note-sessione-list" style="min-height:60px;"></div>
@@ -338,11 +370,12 @@
     <section class="page" id="page-generatori">
       <div class="page-header">
         <div>
-          <h1 class="page-title">✨ Generatori</h1>
+          <h1 class="page-title">Generatori</h1>
           <p class="page-subtitle">Strumenti one-click per l'improvvisazione</p>
         </div>
         <button class="btn btn-secondary btn-sm" onclick="Generatori.toggleSettings()" id="gen-settings-btn">
-          ⚙️ Personalizza
+          <svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+          Personalizza
         </button>
       </div>
 
@@ -355,8 +388,8 @@
           <!-- Popolato da JS -->
         </div>
         <div style="margin-top:var(--space-sm);display:flex;gap:8px;">
-          <button class="btn btn-ghost btn-sm" onclick="Generatori.toggleAll(true)">✅ Tutti</button>
-          <button class="btn btn-ghost btn-sm" onclick="Generatori.toggleAll(false)">❌ Nessuno</button>
+          <button class="btn btn-ghost btn-sm" onclick="Generatori.toggleAll(true)">Tutti</button>
+          <button class="btn btn-ghost btn-sm" onclick="Generatori.toggleAll(false)">Nessuno</button>
         </div>
       </div>
 
@@ -366,11 +399,11 @@
         <!-- PNG Completo — full width -->
         <div class="card card-gold gen-card" data-gen-id="npc" style="grid-column:1/-1;">
           <div class="card-header">
-            <h3 class="card-title">👤 Generatore PNG Completo</h3>
+            <h3 class="card-title">Generatore PNG Completo</h3>
             <div style="display:flex;gap:var(--space-sm);">
-              <button class="btn btn-gold btn-sm" onclick="Generatori.rollNPC()">🎲 Genera</button>
-              <button class="btn btn-secondary btn-sm" id="gen-npc-edit-btn" style="display:none;" onclick="Generatori.openGeneratedNPC()">✏️ Modifica Scheda</button>
-              <button class="btn btn-primary btn-sm" id="gen-npc-save-btn" style="display:none;" onclick="Generatori.saveGeneratedNPC()">💾 Salva nel Mondo</button>
+              <button class="btn btn-gold btn-sm" onclick="Generatori.rollNPC()">Genera</button>
+              <button class="btn btn-secondary btn-sm" id="gen-npc-edit-btn" style="display:none;" onclick="Generatori.openGeneratedNPC()">Modifica Scheda</button>
+              <button class="btn btn-primary btn-sm" id="gen-npc-save-btn" style="display:none;" onclick="Generatori.saveGeneratedNPC()">Salva nel Mondo</button>
             </div>
           </div>
           <div id="gen-npc-result" style="min-height:80px;">
@@ -381,7 +414,7 @@
         </div>
         <div class="card gen-card" data-gen-id="meteo">
           <div class="card-header">
-            <h3 class="card-title">🌤️ Meteo</h3>
+            <h3 class="card-title">Meteo</h3>
             <select id="gen-meteo-stagione" class="form-select" style="width:auto;font-size:0.75rem;">
               <option value="primavera">🌸 Primavera</option>
               <option value="estate">☀️ Estate</option>
@@ -390,7 +423,7 @@
               <option value="tropicale">🌴 Tropicale</option>
               <option value="artico">🧊 Artico</option>
             </select>
-            <button class="btn btn-secondary btn-sm" onclick="Generatori.rollWeather()">🎲 Genera</button>
+            <button class="btn btn-secondary btn-sm" onclick="Generatori.rollWeather()">Genera</button>
           </div>
           <div id="gen-weather-result" style="min-height:60px;">
             <div class="text-muted text-sm">Seleziona la stagione e genera</div>
@@ -398,7 +431,7 @@
         </div>
         <div class="card gen-card" data-gen-id="sensori">
           <div class="card-header">
-            <h3 class="card-title">👁️ Rumori & Odori</h3>
+            <h3 class="card-title">Rumori &amp; Odori</h3>
             <div style="display:flex;gap:4px;">
               <select id="gen-sensori-type" class="form-select" style="width:auto;font-size:0.75rem;">
                 <option value="dungeon">Dungeon</option>
@@ -407,7 +440,7 @@
                 <option value="corte">Corte</option>
                 <option value="fogne">Fogne</option>
               </select>
-              <button class="btn btn-secondary btn-sm" onclick="Generatori.rollSensori()">🎲</button>
+              <button class="btn btn-secondary btn-sm" onclick="Generatori.rollSensori()">Genera</button>
             </div>
           </div>
           <div id="gen-sensori-result">
@@ -416,8 +449,8 @@
         </div>
         <div class="card gen-card" data-gen-id="rumors">
           <div class="card-header">
-            <h3 class="card-title">💬 Voci di Corridoio</h3>
-            <button class="btn btn-secondary btn-sm" onclick="Generatori.rollRumors()">🎲 Genera</button>
+            <h3 class="card-title">Voci di Corridoio</h3>
+            <button class="btn btn-secondary btn-sm" onclick="Generatori.rollRumors()">Genera</button>
           </div>
           <div id="gen-rumors-result">
             <div class="text-muted text-sm">Genera 3 voci (2 vere, 1 falsa)</div>
@@ -425,8 +458,8 @@
         </div>
         <div class="card gen-card" data-gen-id="accento">
           <div class="card-header">
-            <h3 class="card-title">🎭 Voce & Accento</h3>
-            <button class="btn btn-secondary btn-sm" onclick="Generatori.rollAccent()">🎲 Genera</button>
+            <h3 class="card-title">Voce &amp; Accento</h3>
+            <button class="btn btn-secondary btn-sm" onclick="Generatori.rollAccent()">Genera</button>
           </div>
           <div id="gen-accent-result">
             <div class="text-muted text-sm">Genera suggerimenti per un PNG</div>
@@ -435,8 +468,8 @@
         <!-- Shop Generator -->
         <div class="card gen-card" data-gen-id="shop">
           <div class="card-header">
-            <h3 class="card-title">🏪 Shop Generator</h3>
-            <button class="btn btn-secondary btn-sm" onclick="Generatori.rollShop()">🎲 Genera</button>
+            <h3 class="card-title">Shop Generator</h3>
+            <button class="btn btn-secondary btn-sm" onclick="Generatori.rollShop()">Genera</button>
           </div>
           <div class="form-row" style="margin-bottom:var(--space-sm);">
             <div class="form-group" style="margin-bottom:0;">
@@ -481,7 +514,7 @@
         <!-- Calcolatore Viaggio -->
         <div class="card gen-card" data-gen-id="viaggio">
           <div class="card-header">
-            <h3 class="card-title">🧭 Calcolatore Viaggio</h3>
+            <h3 class="card-title">Calcolatore Viaggio</h3>
             <button class="btn btn-secondary btn-sm" onclick="Generatori.calcViaggio()">Calcola</button>
           </div>
           <div class="form-row" style="margin-bottom:var(--space-xs);">
@@ -528,8 +561,8 @@
 
         <div class="card gen-card" data-gen-id="loot">
           <div class="card-header">
-            <h3 class="card-title">🎁 Generatore Loot</h3>
-            <button class="btn btn-secondary btn-sm" onclick="Generatori.rollLoot()">🎲 Genera Loot</button>
+            <h3 class="card-title">Generatore Loot</h3>
+            <button class="btn btn-secondary btn-sm" onclick="Generatori.rollLoot()">Genera Loot</button>
           </div>
           <div class="form-row" style="margin-bottom:var(--space-sm);">
             <div class="form-group" style="margin-bottom:0;">
@@ -559,13 +592,13 @@
         <!-- Biblioteca / Pergamene -->
         <div class="card gen-card" data-gen-id="biblioteca">
           <div class="card-header">
-            <h3 class="card-title">📚 Biblioteca & Pergamene</h3>
+            <h3 class="card-title">Biblioteca &amp; Pergamene</h3>
             <select id="gen-bib-size" class="form-select" style="width:auto;font-size:0.75rem;" onchange="Generatori.rollBiblioteca()">
               <option value="piccola">Piccola</option>
               <option value="grande">Grande</option>
               <option value="enorme">Enorme</option>
             </select>
-            <button class="btn btn-secondary btn-sm" onclick="Generatori.rollBiblioteca()">🎲</button>
+            <button class="btn btn-secondary btn-sm" onclick="Generatori.rollBiblioteca()">Genera</button>
           </div>
           <div id="gen-bib-result">
             <div class="text-muted text-sm">Seleziona la dimensione e genera l'inventario</div>
@@ -575,7 +608,7 @@
         <!-- Generatore Nomi per Razza -->
         <div class="card gen-card" data-gen-id="nomi">
           <div class="card-header">
-            <h3 class="card-title">📛 Generatore Nomi</h3>
+            <h3 class="card-title">Generatore Nomi</h3>
             <select id="gen-nomi-razza" class="form-select" style="width:auto;font-size:0.75rem;">
               <option value="umano">Umano</option>
               <option value="elfo">Elfo</option>
@@ -586,7 +619,7 @@
               <option value="gnomo">Gnomo</option>
               <option value="mezzorco">Mezz'Orco</option>
             </select>
-            <button class="btn btn-secondary btn-sm" onclick="Generatori.rollNomi()">🎲</button>
+            <button class="btn btn-secondary btn-sm" onclick="Generatori.rollNomi()">Genera</button>
           </div>
           <div id="gen-nomi-result" style="min-height:60px;">
             <div class="text-muted text-sm">Seleziona la razza e genera</div>
@@ -596,7 +629,7 @@
         <!-- Incontri Casuali -->
         <div class="card gen-card" data-gen-id="incontri">
           <div class="card-header">
-            <h3 class="card-title">⚠️ Incontri Casuali</h3>
+            <h3 class="card-title">Incontri Casuali</h3>
             <select id="gen-incontri-ambiente" class="form-select" style="width:auto;font-size:0.75rem;">
               <option value="foresta">🌲 Foresta</option>
               <option value="dungeon">🏚️ Dungeon</option>
@@ -612,7 +645,7 @@
               <option value="medio" selected>Liv. 5–10</option>
               <option value="alto">Liv. 11+</option>
             </select>
-            <button class="btn btn-secondary btn-sm" onclick="Generatori.rollIncontro()">🎲</button>
+            <button class="btn btn-secondary btn-sm" onclick="Generatori.rollIncontro()">Genera</button>
           </div>
           <div id="gen-incontri-result" style="min-height:60px;">
             <div class="text-muted text-sm">Seleziona l'ambiente e genera</div>
@@ -622,13 +655,13 @@
         <!-- Tabelle Follia -->
         <div class="card gen-card" data-gen-id="follia">
           <div class="card-header">
-            <h3 class="card-title">🌀 Follia</h3>
+            <h3 class="card-title">Follia</h3>
             <select id="gen-follia-tipo" class="form-select" style="width:auto;font-size:0.75rem;">
               <option value="breve">Breve (1d10 minuti)</option>
               <option value="prolungata">Prolungata (1d10×10 ore)</option>
               <option value="permanente">Permanente</option>
             </select>
-            <button class="btn btn-secondary btn-sm" onclick="Generatori.rollFollia()">🎲</button>
+            <button class="btn btn-secondary btn-sm" onclick="Generatori.rollFollia()">Genera</button>
           </div>
           <div id="gen-follia-result" style="min-height:60px;">
             <div class="text-muted text-sm">Seleziona il tipo e genera</div>
@@ -645,14 +678,16 @@
     <section class="page" id="page-compendio">
       <div class="page-header">
         <div>
-          <h1 class="page-title">📚 Compendio</h1>
+          <h1 class="page-title">Compendio</h1>
           <p class="page-subtitle">D&D 5e 2024 — Mostri, Oggetti Magici, Equipaggiamento, Regole</p>
         </div>
       </div>
 
       <!-- Loading -->
       <div id="comp-loading" style="display:none;align-items:center;justify-content:center;min-height:200px;flex-direction:column;gap:var(--space-md);">
-        <div style="font-size:2rem;animation:pulse 1.5s infinite;">📚</div>
+        <div style="animation:pulse 1.5s infinite;color:var(--accent-primary);">
+          <svg aria-hidden="true" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+        </div>
         <div class="text-muted text-sm">Caricamento dati in corso...</div>
       </div>
 
@@ -665,8 +700,8 @@
             <button class="tab-btn"        id="comp-tab-equipment"   onclick="Compendio.switchTab('equipment')">Equipaggiamento</button>
             <button class="tab-btn"        id="comp-tab-rules"       onclick="Compendio.switchTab('rules')">Regole</button>
             <button class="tab-btn"        id="comp-tab-spells"      onclick="Compendio.switchTab('spells')">Incantesimi</button>
-            <button class="tab-btn"        id="comp-tab-homebrew"    onclick="Compendio.switchTab('homebrew')">🔧 Homebrew</button>
-            <button class="tab-btn"        id="comp-tab-cerca"       onclick="Compendio.switchTab('cerca')">🔍 Cerca tutto</button>
+            <button class="tab-btn"        id="comp-tab-homebrew"    onclick="Compendio.switchTab('homebrew')">Homebrew</button>
+            <button class="tab-btn"        id="comp-tab-cerca"       onclick="Compendio.switchTab('cerca')">Cerca tutto</button>
           </div>
           <div style="display:flex;align-items:center;gap:var(--space-sm);">
             <span class="badge badge-muted" id="comp-sistema-badge">5e 2024</span>
@@ -809,7 +844,7 @@
     <section class="page" id="page-schermo">
       <div class="page-header">
         <div>
-          <h1 class="page-title">🖥️ Schermo del Master</h1>
+          <h1 class="page-title">Schermo del Master</h1>
           <p class="page-subtitle">La tua area di gioco personalizzabile</p>
         </div>
         <div style="display:flex;gap:var(--space-sm);">
@@ -820,7 +855,11 @@
 
       <!-- Istruzioni -->
       <div id="schermo-empty" class="module-placeholder" style="display:none;">
-        <div class="module-placeholder-icon">🖥️</div>
+        <div class="module-placeholder-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" style="width:3rem;height:3rem;opacity:0.45;color:var(--border-strong);" aria-hidden="true">
+            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>
+          </svg>
+        </div>
         <h3>Schermo vuoto</h3>
         <p class="text-sm text-muted" style="max-width:360px;margin:0 auto;">Clicca "+ Aggiungi Blocco" per personalizzare il tuo schermo con i widget che ti servono durante la sessione.</p>
         <button class="btn btn-primary" style="margin-top:var(--space-md);" onclick="Schermo.addBlock()">+ Aggiungi il primo blocco</button>
@@ -840,7 +879,7 @@
 <div id="dice-widget">
   <!-- Panel -->
   <div class="dice-panel" id="dice-panel">
-    <div class="dice-panel-title">🎲 Lancia i Dadi</div>
+    <div class="dice-panel-title">Lancia i Dadi</div>
 
     <!-- Dadi veloci -->
     <div class="dice-grid">
@@ -862,7 +901,9 @@
         <input type="number" id="dice-custom-faces" class="dice-custom-input" value="6" min="2" max="1000" placeholder="F">
         <span class="text-muted" style="font-size:0.8rem;">+</span>
         <input type="number" id="dice-custom-mod" class="dice-custom-input" value="0" placeholder="mod">
-        <button class="btn btn-primary btn-sm" style="flex-shrink:0;" onclick="Dadi.rollCustom()">🎲</button>
+        <button class="btn btn-primary btn-sm" style="flex-shrink:0;" onclick="Dadi.rollCustom()" aria-label="Lancia dado custom">
+          <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="4" ry="4"/><circle cx="8" cy="8" r="1.5" fill="currentColor"/><circle cx="16" cy="16" r="1.5" fill="currentColor"/></svg>
+        </button>
       </div>
       <div style="display:flex;gap:4px;">
         <input type="text" id="dice-formula-field" class="dice-formula-input" placeholder="Formula: 4d6kh3, 2d8+5..." 
@@ -883,7 +924,16 @@
   </div>
 
   <!-- Toggle button -->
-  <button class="dice-toggle" onclick="Dadi.togglePanel()" id="dice-toggle-icon" title="Lancia dadi">🎲</button>
+  <button class="dice-toggle" onclick="Dadi.togglePanel()" id="dice-toggle-icon" aria-label="Lancia dadi" aria-expanded="false" aria-controls="dice-panel" title="Lancia dadi">
+    <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="2" y="2" width="20" height="20" rx="4" ry="4"/>
+      <circle cx="8" cy="8" r="1.5" fill="currentColor"/>
+      <circle cx="16" cy="8" r="1.5" fill="currentColor"/>
+      <circle cx="8" cy="16" r="1.5" fill="currentColor"/>
+      <circle cx="16" cy="16" r="1.5" fill="currentColor"/>
+      <circle cx="12" cy="12" r="1.5" fill="currentColor"/>
+    </svg>
+  </button>
 </div>
 
 
@@ -919,7 +969,7 @@
   <div class="modal">
     <div class="modal-header">
       <h2 style="font-family:var(--font-display);font-size:1.1rem;">Nuova Campagna</h2>
-      <button class="btn btn-ghost btn-icon" onclick="Modal.close('new-campaign')">✕</button>
+      <button class="btn btn-ghost btn-icon" onclick="Modal.close('new-campaign')" aria-label="Chiudi"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
     <div class="modal-body">
       <div class="form-group">
@@ -980,7 +1030,7 @@
   <div class="modal">
     <div class="modal-header">
       <h2 style="font-family:var(--font-display);font-size:1.1rem;">Modifica Campagna</h2>
-      <button class="btn btn-ghost btn-icon" onclick="Modal.close('edit-campaign')">✕</button>
+      <button class="btn btn-ghost btn-icon" onclick="Modal.close('edit-campaign')" aria-label="Chiudi"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
     <div class="modal-body">
       <input type="hidden" id="ec-id">
@@ -1036,7 +1086,7 @@
   <div class="modal" style="max-width:420px;">
     <div class="modal-header">
       <h2 style="font-family:var(--font-display);font-size:1.1rem;" id="confirm-title">Conferma</h2>
-      <button class="btn btn-ghost btn-icon" onclick="Modal.close('confirm')">✕</button>
+      <button class="btn btn-ghost btn-icon" onclick="Modal.close('confirm')" aria-label="Chiudi"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
     <div class="modal-body">
       <p id="confirm-body" class="text-secondary"></p>
@@ -1053,7 +1103,7 @@
   <div class="modal">
     <div class="modal-header">
       <h2 style="font-family:var(--font-display);font-size:1.1rem;" id="quest-modal-title">Nuova Quest</h2>
-      <button class="btn btn-ghost btn-icon" onclick="Modal.close('quest')">✕</button>
+      <button class="btn btn-ghost btn-icon" onclick="Modal.close('quest')" aria-label="Chiudi"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
     <div class="modal-body">
       <div class="form-group">
@@ -1092,7 +1142,7 @@
   <div class="modal" style="max-width:480px;">
     <div class="modal-header">
       <h2 style="font-family:var(--font-display);font-size:1.1rem;">Nuovo Evento</h2>
-      <button class="btn btn-ghost btn-icon" onclick="Modal.close('timeline')">✕</button>
+      <button class="btn btn-ghost btn-icon" onclick="Modal.close('timeline')" aria-label="Chiudi"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
     <div class="modal-body">
       <div class="form-row">
@@ -1129,7 +1179,7 @@
   <div class="modal">
     <div class="modal-header">
       <h2 style="font-family:var(--font-display);font-size:1.1rem;" id="faction-modal-title">Nuova Fazione</h2>
-      <button class="btn btn-ghost btn-icon" onclick="Modal.close('faction')">✕</button>
+      <button class="btn btn-ghost btn-icon" onclick="Modal.close('faction')" aria-label="Chiudi"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
     <div class="modal-body">
       <div class="form-group">
@@ -1164,12 +1214,12 @@
   <div class="modal modal-xl">
     <div class="modal-header">
       <h2 style="font-family:var(--font-display);font-size:1.1rem;" id="npc-modal-title">Nuovo PNG</h2>
-      <button class="btn btn-ghost btn-icon" onclick="Modal.close('npc')">✕</button>
+      <button class="btn btn-ghost btn-icon" onclick="Modal.close('npc')" aria-label="Chiudi"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
     <div class="modal-body">
       <div class="tabs" style="margin-bottom:var(--space-lg);max-width:340px;">
-        <button class="tab-btn active" id="npc-tab-ruolo-btn" onclick="NPC.switchModalTab('ruolo')">🎭 Ruolo</button>
-        <button class="tab-btn" id="npc-tab-combat-btn" onclick="NPC.switchModalTab('combat')">⚔️ Combattimento</button>
+        <button class="tab-btn active" id="npc-tab-ruolo-btn" onclick="NPC.switchModalTab('ruolo')">Ruolo</button>
+        <button class="tab-btn" id="npc-tab-combat-btn" onclick="NPC.switchModalTab('combat')">Combattimento</button>
       </div>
       <!-- TAB RUOLO -->
       <div id="npc-modal-ruolo">
@@ -1193,21 +1243,21 @@
           </div>
           <input type="file" id="npc-img-file" accept="image/*" style="display:none;" onchange="handleImgUpload('npc')">
           <input type="text" id="npc-img-url" class="form-input" placeholder="oppure incolla URL immagine..." style="margin-top:6px;" oninput="handleImgUrl('npc')">
-          <button class="btn btn-ghost btn-sm" id="npc-img-clear" style="display:none;margin-top:4px;" onclick="clearImg('npc')">✕ Rimuovi immagine</button>
+          <button class="btn btn-ghost btn-sm" id="npc-img-clear" style="display:none;margin-top:4px;" onclick="clearImg('npc')">Rimuovi immagine</button>
         </div>
         <div class="form-row">
           <div class="form-group"><label class="form-label">Voce</label><input type="text" id="nm-voice" class="form-input" placeholder="es. Bassa e roca"></div>
           <div class="form-group"><label class="form-label">Tic / Gesto</label><input type="text" id="nm-tic" class="form-input" placeholder="es. Si tocca sempre l'orecchio"></div>
         </div>
         <div class="form-group"><label class="form-label">Tratto caratteriale</label><textarea id="nm-trait" class="form-textarea" rows="2" placeholder="Come si comporta, cosa lo rende memorabile..."></textarea></div>
-        <div class="form-group"><label class="form-label">Segreto 🔒</label><textarea id="nm-secret" class="form-textarea" rows="2" placeholder="Cosa nasconde (solo il DM lo sa)..."></textarea></div>
+        <div class="form-group"><label class="form-label">Segreto DM</label><textarea id="nm-secret" class="form-textarea" rows="2" placeholder="Cosa nasconde (solo il DM lo sa)..."></textarea></div>
         <div class="form-row">
           <div class="form-group"><label class="form-label">Cosa vuole dai PG</label><textarea id="nm-wants" class="form-textarea" rows="2" placeholder="Obiettivo o richiesta..."></textarea></div>
           <div class="form-group"><label class="form-label">Cosa offre ai PG</label><textarea id="nm-offers" class="form-textarea" rows="2" placeholder="Informazioni, servizi, oggetti..."></textarea></div>
         </div>
         <div class="form-row">
-          <div class="form-group"><label class="form-label">🎯 Obiettivo segreto DM 🔒</label><textarea id="nm-obiettivo-segreto" class="form-textarea" rows="2" placeholder="Il vero scopo nascosto (solo il DM lo sa)..."></textarea></div>
-          <div class="form-group"><label class="form-label">⚔️ Morale</label><select id="nm-morale" class="form-select"><option value="">—</option><option value="coraggioso">Coraggioso (combatte fino alla morte)</option><option value="determinato">Determinato (fugge sotto il 25% PF)</option><option value="cauto">Cauto (fugge sotto il 50% PF)</option><option value="codardo">Codardo (fugge al primo danno subito)</option><option value="fanatico">Fanatico (non si arrende mai)</option><option value="mercenario">Mercenario (si arrende se offri oro)</option></select></div>
+          <div class="form-group"><label class="form-label">Obiettivo segreto DM</label><textarea id="nm-obiettivo-segreto" class="form-textarea" rows="2" placeholder="Il vero scopo nascosto (solo il DM lo sa)..."></textarea></div>
+          <div class="form-group"><label class="form-label">Morale</label><select id="nm-morale" class="form-select"><option value="">—</option><option value="coraggioso">Coraggioso (combatte fino alla morte)</option><option value="determinato">Determinato (fugge sotto il 25% PF)</option><option value="cauto">Cauto (fugge sotto il 50% PF)</option><option value="codardo">Codardo (fugge al primo danno subito)</option><option value="fanatico">Fanatico (non si arrende mai)</option><option value="mercenario">Mercenario (si arrende se offri oro)</option></select></div>
         </div>
         <div class="form-group"><label class="form-label">Legami e relazioni</label><input type="text" id="nm-links" class="form-input" placeholder="es. Dipendente di: Locanda del Drago | Nemico di: Alaric"></div>
         <div style="margin-top:var(--space-md);">
@@ -1283,10 +1333,10 @@
         </div>
       </div>
       <div style="display:flex;gap:var(--space-sm);align-items:center;flex-wrap:wrap;">
-        <button class="btn btn-gold btn-sm" id="npc-flip-btn" onclick="NPC.flipCard()">⚔️ Combattimento</button>
-        <button class="btn btn-primary btn-sm" id="npc-add-combat-btn" onclick="NPC.addCurrentToCombat()" title="Aggiungi al Combat Tracker">⚔️ + Combat</button>
-        <button class="btn btn-secondary btn-sm" onclick="NPC.editFromView()">✏️ Modifica</button>
-        <button class="btn btn-ghost btn-icon" onclick="Modal.close('npc-view')">✕</button>
+        <button class="btn btn-gold btn-sm" id="npc-flip-btn" onclick="NPC.flipCard()">Combattimento</button>
+        <button class="btn btn-primary btn-sm" id="npc-add-combat-btn" onclick="NPC.addCurrentToCombat()" title="Aggiungi al Combat Tracker">+ Combat</button>
+        <button class="btn btn-secondary btn-sm" onclick="NPC.editFromView()">Modifica</button>
+        <button class="btn btn-ghost btn-icon" onclick="Modal.close('npc-view')" aria-label="Chiudi"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
       </div>
     </div>
     <div class="modal-body" style="padding:var(--space-md);">
@@ -1316,11 +1366,11 @@
                   <div class="text-sm" id="npc-view-voice">—</div>
                 </div>
                 <div class="card card-gold" style="padding:var(--space-sm) var(--space-md);margin-bottom:var(--space-sm);">
-                  <div class="text-xs" style="font-family:var(--font-display);letter-spacing:0.05em;text-transform:uppercase;margin-bottom:2px;color:var(--accent-secondary);">🔒 Segreto</div>
+                  <div class="text-xs" style="font-family:var(--font-display);letter-spacing:0.05em;text-transform:uppercase;margin-bottom:2px;color:var(--accent-secondary);">Segreto DM</div>
                   <div class="text-sm" id="npc-view-secret">—</div>
                 </div>
                 <div class="card" style="padding:var(--space-sm) var(--space-md);">
-                  <div class="text-xs text-muted" style="font-family:var(--font-display);letter-spacing:0.05em;text-transform:uppercase;margin-bottom:2px;">🎯 Obiettivo segreto DM</div>
+                  <div class="text-xs text-muted" style="font-family:var(--font-display);letter-spacing:0.05em;text-transform:uppercase;margin-bottom:2px;">Obiettivo segreto DM</div>
                   <div class="text-sm" id="npc-view-obiettivo">—</div>
                 </div>
               </div>
@@ -1338,7 +1388,7 @@
                   <div class="text-sm" id="npc-view-links">—</div>
                 </div>
                 <div class="card" id="npc-view-morale-wrap" style="padding:var(--space-sm) var(--space-md);display:none;">
-                  <div class="text-xs text-muted" style="font-family:var(--font-display);letter-spacing:0.05em;text-transform:uppercase;margin-bottom:2px;">⚔️ Morale</div>
+                  <div class="text-xs text-muted" style="font-family:var(--font-display);letter-spacing:0.05em;text-transform:uppercase;margin-bottom:2px;">Morale</div>
                   <div class="text-sm" id="npc-view-morale">—</div>
                 </div>
               </div>
@@ -1380,7 +1430,7 @@
   <div class="modal">
     <div class="modal-header">
       <h2 style="font-family:var(--font-display);font-size:1.1rem;" id="pg-modal-title">Aggiungi Personaggio</h2>
-      <button class="btn btn-ghost btn-icon" onclick="Modal.close('pg-modal')">✕</button>
+      <button class="btn btn-ghost btn-icon" onclick="Modal.close('pg-modal')" aria-label="Chiudi"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
     <div class="modal-body">
       <input type="hidden" id="pg-modal-id">
@@ -1410,7 +1460,7 @@
       </div>
       <div class="form-group">
         <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:0.85rem;">
-          <input type="checkbox" id="pg-inspirazione"> ✨ Ha ispirazione
+          <input type="checkbox" id="pg-inspirazione"> Ha ispirazione
         </label>
       </div>
     </div>
@@ -1426,7 +1476,7 @@
   <div class="modal" style="max-width:400px;">
     <div class="modal-header">
       <h2 style="font-family:var(--font-display);font-size:1.1rem;" id="cond-modal-title">Condizioni</h2>
-      <button class="btn btn-ghost btn-icon" onclick="Modal.close('cond-modal')">✕</button>
+      <button class="btn btn-ghost btn-icon" onclick="Modal.close('cond-modal')" aria-label="Chiudi"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
     <div class="modal-body">
       <input type="hidden" id="cond-combatant-id">
@@ -1444,7 +1494,7 @@
   <div class="modal">
     <div class="modal-header">
       <h2 style="font-family:var(--font-display);font-size:1.1rem;">Aggiungi Mostro</h2>
-      <button class="btn btn-ghost btn-icon" onclick="Modal.close('monster-search-modal')">✕</button>
+      <button class="btn btn-ghost btn-icon" onclick="Modal.close('monster-search-modal')" aria-label="Chiudi"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
     <div class="modal-body">
       <input type="text" id="monster-search-input" class="form-input" placeholder="🔍 Cerca mostro nel Compendio..." oninput="Sessione.searchMonster()" style="margin-bottom:var(--space-md);">
@@ -1461,7 +1511,7 @@
   <div class="modal modal-lg">
     <div class="modal-header">
       <h2 style="font-family:var(--font-display);font-size:1.1rem;" id="luogo-modal-title">Nuovo Luogo</h2>
-      <button class="btn btn-ghost btn-icon" onclick="Modal.close('luogo')">✕</button>
+      <button class="btn btn-ghost btn-icon" onclick="Modal.close('luogo')" aria-label="Chiudi"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
     <div class="modal-body">
       <input type="hidden" id="luogo-id">
@@ -1478,7 +1528,7 @@
         </div>
         <input type="file" id="luogo-img-file" accept="image/*" style="display:none;" onchange="handleImgUpload('luogo')">
         <input type="text" id="luogo-img-url" class="form-input" placeholder="oppure incolla un URL immagine..." style="margin-top:6px;" oninput="handleImgUrl('luogo')">
-        <button class="btn btn-ghost btn-sm" id="luogo-img-clear" style="display:none;margin-top:4px;" onclick="clearImg('luogo')">✕ Rimuovi immagine</button>
+        <button class="btn btn-ghost btn-sm" id="luogo-img-clear" style="display:none;margin-top:4px;" onclick="clearImg('luogo')">Rimuovi immagine</button>
       </div>
 
       <div class="form-row">
@@ -1545,7 +1595,7 @@
   <div class="modal">
     <div class="modal-header">
       <h2 style="font-family:var(--font-display);font-size:1.1rem;" id="fazione-mondo-title">Nuova Fazione</h2>
-      <button class="btn btn-ghost btn-icon" onclick="Modal.close('fazione-mondo')">✕</button>
+      <button class="btn btn-ghost btn-icon" onclick="Modal.close('fazione-mondo')" aria-label="Chiudi"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
     <div class="modal-body">
       <input type="hidden" id="fazione-mondo-id">
@@ -1562,7 +1612,7 @@
         </div>
         <input type="file" id="fazione-img-file" accept="image/*" style="display:none;" onchange="handleImgUpload('fazione')">
         <input type="text" id="fazione-img-url" class="form-input" placeholder="oppure URL immagine..." style="margin-top:6px;" oninput="handleImgUrl('fazione')">
-        <button class="btn btn-ghost btn-sm" id="fazione-img-clear" style="display:none;margin-top:4px;" onclick="clearImg('fazione')">✕ Rimuovi</button>
+        <button class="btn btn-ghost btn-sm" id="fazione-img-clear" style="display:none;margin-top:4px;" onclick="clearImg('fazione')">Rimuovi</button>
       </div>
 
       <div class="form-row">
@@ -1610,7 +1660,7 @@
   <div class="modal" style="max-width:480px;">
     <div class="modal-header">
       <h2 style="font-family:var(--font-display);font-size:1.1rem;">Combattente Custom / Homebrew</h2>
-      <button class="btn btn-ghost btn-icon" onclick="Modal.close('custom-combatant-modal')">✕</button>
+      <button class="btn btn-ghost btn-icon" onclick="Modal.close('custom-combatant-modal')" aria-label="Chiudi"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
     <div class="modal-body">
       <div class="form-row">
@@ -1668,7 +1718,7 @@
   <div class="modal" style="max-width:440px;">
     <div class="modal-header">
       <h2 style="font-family:var(--font-display);font-size:1.1rem;">Aggiungi Blocco</h2>
-      <button class="btn btn-ghost btn-icon" onclick="Modal.close('schermo-add-modal')">✕</button>
+      <button class="btn btn-ghost btn-icon" onclick="Modal.close('schermo-add-modal')" aria-label="Chiudi"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
     <div class="modal-body">
       <div class="form-group">
@@ -1707,8 +1757,8 @@
     <div class="modal-header">
       <h2 style="font-family:var(--font-display);font-size:1.1rem;" id="comp-detail-title">—</h2>
       <div style="display:flex;gap:var(--space-sm);align-items:center;">
-        <button class="btn btn-primary btn-sm" id="comp-detail-combat-btn" style="display:none;" onclick="Compendio.sendCurrentToCombat()">⚔️ Aggiungi al Combat</button>
-        <button class="btn btn-ghost btn-icon" onclick="Modal.close('comp-detail')">✕</button>
+        <button class="btn btn-primary btn-sm" id="comp-detail-combat-btn" style="display:none;" onclick="Compendio.sendCurrentToCombat()">Aggiungi al Combat</button>
+        <button class="btn btn-ghost btn-icon" onclick="Modal.close('comp-detail')" aria-label="Chiudi"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
       </div>
     </div>
     <div class="modal-body" id="comp-detail-body"></div>
@@ -2193,7 +2243,7 @@ const Dadi = (() => {
         icon.classList.remove('dice-rolling');
         // Mostra numero sul bottone
         icon.innerHTML = `<span style="font-size:1.1rem;font-weight:900;font-family:var(--font-mono);">${result.total}</span>`;
-        setTimeout(() => { icon.textContent = '🎲'; }, 3000);
+        setTimeout(() => { icon.innerHTML = '<svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="4" ry="4"/><circle cx="8" cy="8" r="1.5" fill="currentColor"/><circle cx="16" cy="8" r="1.5" fill="currentColor"/><circle cx="8" cy="16" r="1.5" fill="currentColor"/><circle cx="16" cy="16" r="1.5" fill="currentColor"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/></svg>'; }, 3000);
       }, 400);
     }
 
@@ -2696,50 +2746,118 @@ const App = (() => {
     const campaigns = Storage.getCampaigns();
     Debug.log(`renderHomePage: ${campaigns.length} campagne`);
 
+    // Aggiorna contatore
+    const countEl = document.getElementById('campaign-grid-count');
+    if (countEl) countEl.textContent = campaigns.length > 0 ? `${campaigns.length} campagn${campaigns.length === 1 ? 'a' : 'e'}` : '';
+
+    // Aggiorna pulsanti azione header
+    const actionsEl = document.getElementById('campaign-grid-actions');
+    if (actionsEl) actionsEl.innerHTML = `
+      <button class="btn btn-ghost btn-sm" onclick="importCampaignFromFile()" title="Importa da file">
+        <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Importa
+      </button>
+      <button class="btn btn-ghost btn-sm" onclick="BackupSystem.exportAll()" title="Backup">
+        <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        Backup
+      </button>
+    `;
+
     grid.innerHTML = '';
 
-    // Campagne esistenti PRIMA
-    campaigns.sort((a, b) => b.updatedAt - a.updatedAt).forEach(camp => {
-      const card = document.createElement('div');
-      card.className = 'campaign-card';
-      if (activeCampaign && activeCampaign.id === camp.id) {
-        card.style.borderColor = 'var(--accent-primary)';
-        card.style.boxShadow = '0 0 0 2px rgba(139,38,53,0.2)';
-      }
+    if (campaigns.length === 0) {
+      // Empty state
+      grid.innerHTML = `
+        <div class="home-empty-v2" style="grid-column:1/-1;">
+          <div class="home-empty-v2-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2L3 7v10l9 5 9-5V7z"/>
+              <path d="M12 2v20"/><path d="M3 7l9 5 9-5"/>
+            </svg>
+          </div>
+          <h3 style="font-family:var(--font-display);font-size:1.1rem;margin-bottom:8px;">Inizia la tua avventura</h3>
+          <p class="text-sm text-muted" style="margin-bottom:var(--space-lg);">Crea la tua prima campagna per accedere a tutti gli strumenti del DM.</p>
+          <div class="home-empty-v2-steps">
+            <div style="display:flex;align-items:center;gap:12px;">
+              <div class="home-empty-v2-num">1</div>
+              <span class="text-sm">Crea una campagna o One Shot</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;">
+              <div class="home-empty-v2-num">2</div>
+              <span class="text-sm">Aggiungi PNG, luoghi e fazioni</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;">
+              <div class="home-empty-v2-num">3</div>
+              <span class="text-sm">Gestisci sessioni e combattimenti</span>
+            </div>
+          </div>
+          <button class="btn btn-primary" onclick="openNewCampaignModal()">Nuova Campagna</button>
+        </div>
+      `;
+      return;
+    }
 
+    // Campagne esistenti
+    const svgPencil = '<svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>';
+    const svgExport = '<svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>';
+    const svgTrash = '<svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>';
+
+    campaigns.sort((a, b) => b.updatedAt - a.updatedAt).forEach(camp => {
+      const isActive = activeCampaign && activeCampaign.id === camp.id;
       const date = new Date(camp.updatedAt).toLocaleDateString('it-IT', {
         day: '2-digit', month: 'short', year: 'numeric'
       });
+      const typeLabel = camp.type === 'oneshot' ? 'One Shot' : 'Campagna';
+
+      const card = document.createElement('article');
+      card.className = 'campaign-card' + (isActive ? ' is-active' : '');
+      card.setAttribute('role', 'button');
+      card.setAttribute('tabindex', '0');
+      card.setAttribute('aria-label', `Apri campagna ${camp.name}`);
 
       card.innerHTML = `
-        <div style="display:flex;align-items:center;gap:8px;">
-          <span style="font-size:1.6rem;">${camp.icon || '📖'}</span>
-          <div>
-            <div class="campaign-card-type">${camp.type === 'oneshot' ? '⚡ One Shot' : '📖 Campagna'} · ${camp.system || '5e'}</div>
-            <div class="campaign-card-name">${camp.name}</div>
+        ${isActive ? '<div class="cc-active-tag"><span class="cc-active-dot"></span> Attiva</div>' : ''}
+        <div class="cc-body">
+          <div class="cc-top">
+            <div class="cc-icon">
+              <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+            </div>
+            <div style="min-width:0;flex:1;">
+              <span class="cc-type">${typeLabel} · ${camp.system || '5e'}</span>
+              <span class="cc-name" title="${camp.name}">${camp.name}</span>
+            </div>
+          </div>
+          <div class="cc-desc">${camp.description || 'Nessuna descrizione.'}</div>
+        </div>
+        <div class="cc-footer">
+          <div class="cc-footer-meta">
+            <span class="cc-date">${date}</span>
+          </div>
+          <div class="cc-actions">
+            <button class="btn btn-ghost btn-icon-sm" title="Modifica" aria-label="Modifica campagna" onclick="event.stopPropagation();App.editCampaign('${camp.id}')">${svgPencil}</button>
+            <button class="btn btn-ghost btn-icon-sm" title="Esporta" aria-label="Esporta campagna" onclick="event.stopPropagation();Storage.exportCampaign('${camp.id}')">${svgExport}</button>
+            <button class="btn btn-ghost btn-icon-sm" title="Elimina" aria-label="Elimina campagna" style="color:var(--accent-danger);" onclick="event.stopPropagation();App.confirmDeleteCampaign('${camp.id}')">${svgTrash}</button>
           </div>
         </div>
-        <div class="campaign-card-meta">Ultima modifica: ${date}</div>
-        <div class="campaign-card-actions">
-          <button class="btn btn-primary btn-sm" onclick="event.stopPropagation();App.openCampaign('${camp.id}')">Apri</button>
-          <button class="btn btn-secondary btn-sm" onclick="event.stopPropagation();App.editCampaign('${camp.id}')">✏️</button>
-          <button class="btn btn-secondary btn-sm" onclick="event.stopPropagation();Storage.exportCampaign('${camp.id}')">📤</button>
-          <button class="btn btn-secondary btn-sm" onclick="event.stopPropagation();App.confirmDeleteCampaign('${camp.id}')">🗑️</button>
-        </div>
       `;
+
       card.onclick = () => App.openCampaign(camp.id);
+      card.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); App.openCampaign(camp.id); } };
       grid.appendChild(card);
     });
 
-    // Pulsanti azione in fondo — piccoli e discreti
-    const actionsRow = document.createElement('div');
-    actionsRow.style.cssText = 'grid-column:1/-1;display:flex;gap:8px;flex-wrap:wrap;padding:var(--space-sm) 0;';
-    actionsRow.innerHTML = `
-      <button class="btn btn-secondary btn-sm" onclick="openNewCampaignModal()">➕ Nuova Campagna / One Shot</button>
-      <button class="btn btn-ghost btn-sm" onclick="importCampaignFromFile()">📥 Importa da file</button>
-      <button class="btn btn-ghost btn-sm" onclick="BackupSystem.exportAll()">💾 Backup</button>
+    // Card "Nuova Campagna"
+    const newCard = document.createElement('button');
+    newCard.className = 'campaign-card-new';
+    newCard.setAttribute('aria-label', 'Crea nuova campagna o One Shot');
+    newCard.onclick = openNewCampaignModal;
+    newCard.innerHTML = `
+      <div class="cc-new-icon">
+        <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      </div>
+      <span style="font-family:var(--font-display);font-size:0.75rem;letter-spacing:0.06em;color:inherit;">Nuova Campagna</span>
     `;
-    grid.appendChild(actionsRow);
+    grid.appendChild(newCard);
   };
 
   const openCampaign = (id) => {
@@ -2822,8 +2940,8 @@ const App = (() => {
             <div style="font-family:var(--font-display);font-size:0.9rem;">${q.title}</div>
             <div style="display:flex;gap:4px;">
               <span class="badge ${colors[q.status]}">${labels[q.status]}</span>
-              <button class="btn btn-ghost btn-icon-sm" onclick="App.editQuest('${q.id}')">✏️</button>
-              <button class="btn btn-ghost btn-icon-sm" onclick="App.deleteQuest('${q.id}')">🗑️</button>
+              <button class="btn btn-ghost btn-icon-sm" onclick="App.editQuest('${q.id}')"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+              <button class="btn btn-ghost btn-icon-sm" onclick="App.deleteQuest('${q.id}')"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>
             </div>
           </div>
           ${q.notes ? `<div class="text-sm text-muted">${q.notes}</div>` : ''}
@@ -2875,7 +2993,7 @@ const App = (() => {
           <div style="font-size:0.9rem;">${e.event}</div>
           ${e.type ? `<span class="badge badge-muted" style="margin-top:4px;">${e.type}</span>` : ''}
         </div>
-        <button class="btn btn-ghost btn-icon-sm" onclick="App.deleteTimelineEvent('${e.id}')">🗑️</button>
+        <button class="btn btn-ghost btn-icon-sm" onclick="App.deleteTimelineEvent('${e.id}')"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>
       </div>
     `).join('');
   };
@@ -2913,8 +3031,8 @@ const App = (() => {
               ${f.influence ? `<div class="text-xs text-muted">${f.influence}</div>` : ''}
             </div>
             <div style="display:flex;gap:4px;">
-              <button class="btn btn-ghost btn-icon-sm" onclick="App.editFaction('${f.id}')">✏️</button>
-              <button class="btn btn-ghost btn-icon-sm" onclick="App.deleteFaction('${f.id}')">🗑️</button>
+              <button class="btn btn-ghost btn-icon-sm" onclick="App.editFaction('${f.id}')"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+              <button class="btn btn-ghost btn-icon-sm" onclick="App.deleteFaction('${f.id}')"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>
             </div>
           </div>
           <div style="display:flex;align-items:center;gap:8px;">
@@ -3119,7 +3237,7 @@ const NPC = (() => {
         <input type="text" class="form-input action-name" placeholder="Nome azione (es. Spada corta)" style="margin-bottom:4px;">
         <input type="text" class="form-input action-desc" placeholder="Descrizione (es. +4 al colpire, 1d6+2 perforanti)">
       </div>
-      <button class="btn btn-ghost btn-icon-sm" onclick="this.closest('.action-item').remove()" style="flex-shrink:0;margin-top:4px;">🗑️</button>
+      <button class="btn btn-ghost btn-icon-sm" onclick="this.closest('.action-item').remove()" style="flex-shrink:0;margin-top:4px;"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>
     `;
     list.appendChild(row);
   };
@@ -3146,7 +3264,7 @@ const NPC = (() => {
           <input type="text" class="form-input action-name" value="${a.name}" placeholder="Nome azione" style="margin-bottom:4px;">
           <input type="text" class="form-input action-desc" value="${a.desc}" placeholder="Descrizione">
         </div>
-        <button class="btn btn-ghost btn-icon-sm" onclick="this.closest('.action-item').remove()" style="flex-shrink:0;margin-top:4px;">🗑️</button>
+        <button class="btn btn-ghost btn-icon-sm" onclick="this.closest('.action-item').remove()" style="flex-shrink:0;margin-top:4px;"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>
       `;
       list.appendChild(row);
     });
@@ -3327,7 +3445,7 @@ const NPC = (() => {
     const inner = document.getElementById('npc-flip-inner');
     if (inner) inner.classList.remove('flipped');
     const flipBtn = document.getElementById('npc-flip-btn');
-    if (flipBtn) flipBtn.textContent = '⚔️ Combattimento';
+    if (flipBtn) flipBtn.textContent = 'Combattimento';
 
     const rel = npc.relation ?? 50;
     const fill = document.getElementById('npc-view-rel-fill');
@@ -3421,7 +3539,7 @@ const NPC = (() => {
     _flipped = !_flipped;
     document.getElementById('npc-flip-inner')?.classList.toggle('flipped', _flipped);
     const btn = document.getElementById('npc-flip-btn');
-    if (btn) btn.textContent = _flipped ? '🎭 Ruolo' : '⚔️ Combattimento';
+    if (btn) btn.textContent = _flipped ? 'Ruolo' : 'Combattimento';
   };
 
   // ── Modifica dalla view ──
@@ -3519,9 +3637,9 @@ const NPC = (() => {
             </div>
             <div style="display:flex;flex-direction:column;gap:4px;" onclick="event.stopPropagation()">
               <button class="btn btn-ghost btn-icon-sm" title="Modifica"
-                onclick="NPC.openModal((App.getActiveCampaign()?.npcs||[]).find(n=>n.id==='${npc.id}'))">✏️</button>
+                onclick="NPC.openModal((App.getActiveCampaign()?.npcs||[]).find(n=>n.id==='${npc.id}'))"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
               <button class="btn btn-ghost btn-icon-sm" title="Elimina"
-                onclick="NPC.deleteNPC('${npc.id}')">🗑️</button>
+                onclick="NPC.deleteNPC('${npc.id}')"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>
             </div>
           </div>
           <div class="npc-card-body">
@@ -3630,8 +3748,8 @@ const Luoghi = (() => {
               <div class="npc-meta">${l.tipo || ''} ${parent ? '· in ' + parent.nome : ''}</div>
             </div>
             <div style="display:flex;flex-direction:column;gap:4px;" onclick="event.stopPropagation()">
-              <button class="btn btn-ghost btn-icon-sm" onclick="Luoghi.openModal(Luoghi._getById('${l.id}'))">✏️</button>
-              <button class="btn btn-ghost btn-icon-sm" onclick="Luoghi.delete('${l.id}')">🗑️</button>
+              <button class="btn btn-ghost btn-icon-sm" onclick="Luoghi.openModal(Luoghi._getById('${l.id}'))"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+              <button class="btn btn-ghost btn-icon-sm" onclick="Luoghi.delete('${l.id}')"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>
             </div>
           </div>
           <div class="npc-card-body">
@@ -3810,8 +3928,8 @@ const Fazioni = (() => {
               <div class="npc-meta">${f.influence || ''}</div>
             </div>
             <div style="display:flex;flex-direction:column;gap:4px;" onclick="event.stopPropagation()">
-              <button class="btn btn-ghost btn-icon-sm" onclick="Fazioni.openModal(Fazioni._getById('${f.id}'))">✏️</button>
-              <button class="btn btn-ghost btn-icon-sm" onclick="Fazioni.delete('${f.id}')">🗑️</button>
+              <button class="btn btn-ghost btn-icon-sm" onclick="Fazioni.openModal(Fazioni._getById('${f.id}'))"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+              <button class="btn btn-ghost btn-icon-sm" onclick="Fazioni.delete('${f.id}')"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>
             </div>
           </div>
           <div class="npc-card-body">
@@ -4031,8 +4149,8 @@ const Sessione = (() => {
             <div class="party-meta">${[pg.giocatore, pg.classe, pg.livello ? 'Liv. ' + pg.livello : ''].filter(Boolean).join(' · ')}</div>
           </div>
           <div style="display:flex;gap:2px;flex-shrink:0;">
-            <button class="btn btn-ghost btn-icon-sm" onclick="Sessione.editPG('${pg.id}')" title="Modifica">✏️</button>
-            <button class="btn btn-ghost btn-icon-sm" onclick="Sessione.deletePG('${pg.id}')" title="Rimuovi">🗑️</button>
+            <button class="btn btn-ghost btn-icon-sm" onclick="Sessione.editPG('${pg.id}')" title="Modifica"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+            <button class="btn btn-ghost btn-icon-sm" onclick="Sessione.deletePG('${pg.id}')" title="Rimuovi"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>
           </div>
         </div>
 
@@ -4066,7 +4184,7 @@ const Sessione = (() => {
           <button class="party-inspiration-btn ${pg.inspirazione ? 'active' : ''}"
             onclick="Sessione.toggleInspirazione('${pg.id}')"
             title="Clicca per toggle ispirazione">
-            ✨ Ispirazione
+            Ispirazione
           </button>
         </div>
       </div>`;
@@ -4233,9 +4351,9 @@ const Sessione = (() => {
         <div class="combat-header" style="justify-content:space-between;">
           <div style="font-family:var(--font-display);font-size:1rem;color:var(--text-muted);">Nessuno scontro attivo</div>
           <div style="display:flex;gap:var(--space-sm);flex-wrap:wrap;">
-            <button class="btn btn-primary btn-sm" onclick="Sessione.newCombat()">⚔️ Nuovo Scontro</button>
-            <button class="btn btn-secondary btn-sm" onclick="Sessione.addPGtoCombat()">👥 Aggiungi Party</button>
-            <button class="btn btn-secondary btn-sm" onclick="Sessione.addMonsterQuick()">🐉 Aggiungi Mostro</button>
+            <button class="btn btn-primary btn-sm" onclick="Sessione.newCombat()">Nuovo Scontro</button>
+            <button class="btn btn-secondary btn-sm" onclick="Sessione.addPGtoCombat()">Aggiungi Party</button>
+            <button class="btn btn-secondary btn-sm" onclick="Sessione.addMonsterQuick()">Aggiungi Mostro</button>
           </div>
         </div>
         <div style="padding:var(--space-lg);text-align:center;color:var(--text-muted);">
@@ -4263,8 +4381,8 @@ const Sessione = (() => {
         <div style="display:flex;gap:var(--space-sm);">
           <button class="btn btn-primary btn-sm" onclick="Sessione.nextTurn()">▶ Avanti</button>
           <button class="btn btn-secondary btn-sm" onclick="Sessione.addMonsterQuick()">+ Mostro</button>
-          <button class="btn btn-secondary btn-sm" onclick="Sessione.rollAllInitiative()">🎲 Init tutti</button>
-          <button class="btn btn-ghost btn-sm" onclick="Sessione.saveCombatSession()">💾 Salva</button>
+          <button class="btn btn-secondary btn-sm" onclick="Sessione.rollAllInitiative()">Init tutti</button>
+          <button class="btn btn-ghost btn-sm" onclick="Sessione.saveCombatSession()">Salva</button>
           <button class="btn btn-danger btn-sm" onclick="Sessione.endCombat()">■ Fine</button>
         </div>
       </div>
@@ -4276,10 +4394,10 @@ const Sessione = (() => {
 
       <!-- Footer: aggiungi -->
       <div class="combat-footer">
-        <button class="btn btn-ghost btn-sm" onclick="Sessione.addPGtoCombat()">👥 + Party</button>
-        <button class="btn btn-ghost btn-sm" onclick="Sessione.addMonsterQuick()">🐉 + Mostro</button>
-        <button class="btn btn-ghost btn-sm" onclick="Sessione.addNPCFromWorld()">👤 + NPC</button>
-        <button class="btn btn-ghost btn-sm" onclick="Sessione.addCustomCombatant()">🧑 + Combattente/Homebrew</button>
+        <button class="btn btn-ghost btn-sm" onclick="Sessione.addPGtoCombat()">+ Party</button>
+        <button class="btn btn-ghost btn-sm" onclick="Sessione.addMonsterQuick()">+ Mostro</button>
+        <button class="btn btn-ghost btn-sm" onclick="Sessione.addNPCFromWorld()">+ NPC</button>
+        <button class="btn btn-ghost btn-sm" onclick="Sessione.addCustomCombatant()">+ Homebrew</button>
       </div>
     `;
   };
@@ -4339,12 +4457,12 @@ const Sessione = (() => {
 
         <!-- Azioni rapide -->
         <div class="combat-actions-col">
-          ${c.tipo !== 'pg' ? `<button class="btn btn-ghost btn-icon-sm" title="Scheda mostro" onclick="Sessione.openCombatantSheet('${c.id}')">📋</button>` : ''}
-          <button class="btn btn-ghost btn-icon-sm" title="Aggiungi condizione" onclick="Sessione.openCondizioneModal('${c.id}')">🔴</button>
+          ${c.tipo !== 'pg' ? `<button class="btn btn-ghost btn-icon-sm" title="Scheda mostro" onclick="Sessione.openCombatantSheet('${c.id}')"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></button>` : ''}
+          <button class="btn btn-ghost btn-icon-sm" title="Aggiungi condizione" onclick="Sessione.openCondizioneModal('${c.id}')"><span style="color:#e74c3c;"><svg aria-hidden="true" width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="8"/></svg></span></button>
           <button class="btn btn-ghost btn-icon-sm" title="Concentrazione" onclick="Sessione.toggleConcentrazione('${c.id}')" style="${c.concentrazione ? 'color:var(--accent-tertiary);' : ''}">🔮</button>
-          <button class="btn btn-ghost btn-icon-sm" title="Danno rapido" onclick="Sessione.quickDamage('${c.id}')">💥</button>
+          <button class="btn btn-ghost btn-icon-sm" title="Danno rapido" onclick="Sessione.quickDamage('${c.id}')"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></button>
           <button class="btn btn-ghost btn-icon-sm" title="Note" onclick="Sessione.openNote('${c.id}')" style="${c.note ? 'color:var(--accent-secondary);' : ''}">📝</button>
-          <button class="btn btn-ghost btn-icon-sm" title="Rimuovi" onclick="Sessione.removeCombatant('${c.id}')">🗑️</button>
+          <button class="btn btn-ghost btn-icon-sm" title="Rimuovi" onclick="Sessione.removeCombatant('${c.id}')"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>
         </div>
       </div>`;
   };
@@ -4608,8 +4726,8 @@ const Sessione = (() => {
     modal.style.cssText = 'display:flex;';
     modal.innerHTML = `<div class="modal" style="max-width:540px;">
       <div class="modal-header">
-        <h2 style="font-family:var(--font-display);font-size:1rem;">📋 ${c.nome}</h2>
-        <button class="btn btn-ghost btn-icon" onclick="document.getElementById('combat-sheet-modal')?.remove()">✕</button>
+        <h2 style="font-family:var(--font-display);font-size:1rem;">${c.nome}</h2>
+        <button class="btn btn-ghost btn-icon" onclick="document.getElementById('combat-sheet-modal')?.remove()" aria-label="Chiudi"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
       </div>
       <div class="modal-body" style="padding:0;">${content}</div>
     </div>`;
@@ -4706,7 +4824,7 @@ const Sessione = (() => {
     modal.innerHTML = `<div class="modal" style="max-width:420px;">
       <div class="modal-header">
         <h2 style="font-family:var(--font-display);font-size:1rem;">👤 Aggiungi NPC al Combat</h2>
-        <button class="btn btn-ghost btn-icon" onclick="this.closest('.modal-overlay').remove()">✕</button>
+        <button class="btn btn-ghost btn-icon" onclick="this.closest('.modal-overlay').remove()" aria-label="Chiudi"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
       </div>
       <div class="modal-body" style="padding:0;max-height:50vh;overflow-y:auto;">
         <div class="comp-filters" style="padding:8px;border-bottom:1px solid var(--border);">
@@ -5861,8 +5979,8 @@ const Compendio = (() => {
         '<div class="comp-row-stats">' +
           '<span class="badge ' + (catBadge[h.categoria]||'badge-muted') + '" style="font-size:0.62rem;">' + (catLabel[h.categoria]||h.categoria) + '</span>' +
           favBtn(h.id, h.nome, 'homebrew') +
-          '<button class="btn btn-ghost btn-icon-sm" style="font-size:0.7rem;" onclick="Compendio.editHomebrew(\'' + h.id + '\')" title="Modifica">✏️</button>' +
-          '<button class="btn btn-ghost btn-icon-sm" style="font-size:0.7rem;color:var(--accent-danger);" onclick="Compendio.deleteHomebrew(\'' + h.id + '\')" title="Elimina">🗑️</button>' +
+          '<button class="btn btn-ghost btn-icon-sm" style="font-size:0.7rem;" onclick="Compendio.editHomebrew(\'' + h.id + '\')" title="Modifica"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>' +
+          '<button class="btn btn-ghost btn-icon-sm" style="font-size:0.7rem;color:var(--accent-danger);" onclick="Compendio.deleteHomebrew(\'' + h.id + '\')" title="Elimina"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>' +
         '</div>' +
       '</div>'
     ).join('');
@@ -5906,7 +6024,7 @@ const Compendio = (() => {
           (h.azioni ? '<div style="font-family:var(--font-display);font-size:0.7rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--accent-primary);margin:8px 0 4px;">Azioni</div><div style="font-size:0.85rem;white-space:pre-wrap;line-height:1.6;">' + h.azioni + '</div>' : '') +
           (h.legact ? '<div style="font-family:var(--font-display);font-size:0.7rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--accent-primary);margin:8px 0 4px;">Azioni Leggendarie</div><div style="font-size:0.85rem;white-space:pre-wrap;line-height:1.6;">' + h.legact + '</div>' : '') +
           '<div style="margin-top:12px;padding-top:8px;border-top:1px solid var(--border);">' +
-            '<button class="btn btn-primary btn-sm" onclick="Sessione.addHomebrewMonster(\''+id+'\');this.closest(\'.modal-overlay\').remove()">⚔️ Aggiungi al Combat Tracker</button>' +
+            '<button class="btn btn-primary btn-sm" onclick="Sessione.addHomebrewMonster(\''+id+'\');this.closest(\'.modal-overlay\').remove()">Aggiungi al Combat Tracker</button>' +
           '</div>' +
         '</div>';
         break;
@@ -6130,7 +6248,7 @@ const Compendio = (() => {
       '<div class="modal" style="max-width:580px;">' +
         '<div class="modal-header">' +
           '<h2 style="font-family:var(--font-display);font-size:1.1rem;">' + (h?'Modifica':'Nuovo') + ' Homebrew</h2>' +
-          '<button class="btn btn-ghost btn-icon" onclick="this.closest(\'.modal-overlay\').remove()">✕</button>' +
+          '<button class="btn btn-ghost btn-icon" onclick="this.closest(\'.modal-overlay\').remove()" aria-label="Chiudi"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>' +
         '</div>' +
         '<div class="modal-body" style="max-height:70vh;overflow-y:auto;">' +
           '<div class="form-row" style="margin-bottom:var(--space-md);">' +
@@ -6149,7 +6267,7 @@ const Compendio = (() => {
         '</div>' +
         '<div class="modal-footer">' +
           '<button class="btn btn-ghost" onclick="this.closest(\'.modal-overlay\').remove()">Annulla</button>' +
-          '<button class="btn btn-primary" onclick="Compendio.saveHomebrew(\'' + (h?.id||'') + '\',this)">💾 Salva</button>' +
+          '<button class="btn btn-primary" onclick="Compendio.saveHomebrew(\'' + (h?.id||'') + '\',this)">Salva</button>' +
         '</div>' +
       '</div>';
 
@@ -6509,8 +6627,8 @@ const Schermo = (() => {
             <button class="btn btn-ghost btn-icon-sm" onclick="Schermo.resizeBlock('${block.id}')" title="Ridimensiona">⇔</button>
             <button class="btn btn-ghost btn-icon-sm" onclick="Schermo.moveBlock('${block.id}', -1)" title="Sposta su">↑</button>
             <button class="btn btn-ghost btn-icon-sm" onclick="Schermo.moveBlock('${block.id}', 1)" title="Sposta giù">↓</button>
-            ${block.type === 'custom' || block.type === 'note' ? `<button class="btn btn-ghost btn-icon-sm" onclick="Schermo.editBlock('${block.id}')" title="Modifica">✏️</button>` : ''}
-            <button class="btn btn-ghost btn-icon-sm" onclick="Schermo.removeBlock('${block.id}')" title="Rimuovi">✕</button>
+            ${block.type === 'custom' || block.type === 'note' ? `<button class="btn btn-ghost btn-icon-sm" onclick="Schermo.editBlock('${block.id}')" title="Modifica"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>` : ''}
+            <button class="btn btn-ghost btn-icon-sm" onclick="Schermo.removeBlock('${block.id}')" title="Rimuovi" aria-label="Rimuovi"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
           </div>
         </div>
         <div class="schermo-block-body" id="sbody-${block.id}">
@@ -6605,7 +6723,7 @@ const Schermo = (() => {
           '<span style="flex-shrink:0;font-size:0.85rem;">' + (n.tipo||'📌') + '</span>' +
           '<span style="flex:1;font-size:0.8rem;line-height:1.4;word-break:break-word;">' + (n.testo||'') + '</span>' +
           '<button class="btn btn-ghost btn-icon-sm" style="flex-shrink:0;font-size:0.65rem;opacity:0.5;" ' +
-            'onclick="NoteSessione.remove('+i+');Schermo._refreshNoteSessione()" title="Rimuovi">✕</button>' +
+            'onclick="NoteSessione.remove('+i+');Schermo._refreshNoteSessione()" title="Rimuovi" aria-label="Rimuovi"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>' +
         '</div>'
       ).join('') +
     '</div>' +
@@ -6636,7 +6754,7 @@ const Schermo = (() => {
             '<div style="font-family:var(--font-display);font-size:0.85rem;">' + pg.nome + '</div>' +
             '<div style="font-size:0.7rem;color:var(--text-muted);">' + [pg.giocatore, pg.classe, pg.livello ? 'Liv.'+pg.livello : ''].filter(Boolean).join(' · ') + '</div>' +
           '</div>' +
-          (pg.inspirazione ? '<span class="badge badge-gold" style="font-size:0.6rem;">✨ Ispirazione</span>' : '') +
+          (pg.inspirazione ? '<span class="badge badge-gold" style="font-size:0.6rem;">Ispirazione</span>' : '') +
         '</div>' +
         '<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:3px;margin-bottom:6px;">' +
           ['percezionePassiva:👁️Perc.', 'investigazionePassiva:🔍Inv.', 'intuizionePassiva:💡Int.', 'ca:🛡️CA', 'hpAttuali:❤️HP'].map(s => {
@@ -6676,7 +6794,7 @@ const Schermo = (() => {
 
   const renderMeteoMini = (blockId) => `
     <div id="schermo-meteo-${blockId}" class="text-sm text-muted" style="margin-bottom:8px;">Clicca per generare il meteo</div>
-    <button class="btn btn-secondary btn-sm w-full" onclick="Schermo.generateMeteo('${blockId}')">🎲 Genera Meteo</button>`;
+    <button class="btn btn-secondary btn-sm w-full" onclick="Schermo.generateMeteo('${blockId}')">Genera Meteo</button>`;
 
   const generateMeteo = async (blockId) => {
     const el = document.getElementById(`schermo-meteo-${blockId}`);
@@ -6755,13 +6873,13 @@ const Schermo = (() => {
         </div>
         <div class="combat-actions-col" style="display:flex;gap:2px;">
           <button class="btn btn-ghost btn-icon-sm" style="width:24px;height:24px;font-size:0.65rem;"
-            onclick="Sessione.changeHP('${c.id}',-1);setTimeout(()=>Schermo._refreshCombat(),100)" title="Danno">💥</button>
+            onclick="Sessione.changeHP('${c.id}',-1);setTimeout(()=>Schermo._refreshCombat(),100)" title="Danno"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></button>
           <button class="btn btn-ghost btn-icon-sm" style="width:24px;height:24px;font-size:0.65rem;"
             onclick="Sessione.changeHP('${c.id}',1);setTimeout(()=>Schermo._refreshCombat(),100)" title="Cura">💚</button>
           ${c.tipo !== 'pg' ? `<button class="btn btn-ghost btn-icon-sm" style="width:24px;height:24px;font-size:0.65rem;"
-            onclick="Sessione.openCombatantSheet('${c.id}')" title="Scheda">📋</button>` : ''}
+            onclick="Sessione.openCombatantSheet('${c.id}')" title="Scheda"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></button>` : ''}
           <button class="btn btn-ghost btn-icon-sm" style="width:24px;height:24px;font-size:0.65rem;"
-            onclick="Sessione.openCondizioneModal('${c.id}')" title="Condizioni">🔴</button>
+            onclick="Sessione.openCondizioneModal('${c.id}')" title="Condizioni"><span style="color:#e74c3c;"><svg aria-hidden="true" width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="8"/></svg></span></button>
         </div>
       </div>`;
     }).join('');
@@ -6771,7 +6889,7 @@ const Schermo = (() => {
           Round ${combat.round || 1} · <span style="color:var(--accent-secondary);">${sorted[activeIdx]?.nome || ''}</span>
         </div>
         <div style="display:flex;gap:4px;">
-          <button class="btn btn-secondary btn-sm" onclick="Sessione.rollAllInitiative();setTimeout(()=>Schermo._refreshCombat(),200)">🎲 Init</button>
+          <button class="btn btn-secondary btn-sm" onclick="Sessione.rollAllInitiative();setTimeout(()=>Schermo._refreshCombat(),200)">Init</button>
           <button class="btn btn-ghost btn-sm" onclick="Sessione.prevTurn();setTimeout(()=>Schermo._refreshCombat(),200)">◀</button>
           <button class="btn btn-primary btn-sm" onclick="Sessione.nextTurn();setTimeout(()=>Schermo._refreshCombat(),200)">▶ Avanti</button>
         </div>
@@ -6790,7 +6908,7 @@ const Schermo = (() => {
     if (!combat || !combat.combatants?.length) {
       return '<div class="text-muted text-sm" style="margin-bottom:8px;">Nessuno scontro attivo.</div>' +
              '<div style="display:flex;gap:4px;flex-wrap:wrap;">' +
-               '<button class="btn btn-primary btn-sm" onclick="App.navigateTo(\'sessione\');Sessione.newCombat()">⚔️ Nuovo Scontro</button>' +
+               '<button class="btn btn-primary btn-sm" onclick="App.navigateTo(\'sessione\');Sessione.newCombat()">Nuovo Scontro</button>' +
                '<button class="btn btn-secondary btn-sm" onclick="App.navigateTo(\'sessione\')">→ Sessione</button>' +
              '</div>';
     }
@@ -6803,7 +6921,7 @@ const Schermo = (() => {
           '<span style="color:var(--accent-secondary);">' + (sorted[activeIdx]?.nome||'') + '</span></div>' +
         '<div style="display:flex;gap:4px;">' +
           '<button class="btn btn-primary btn-sm" onclick="Sessione.nextTurn();Schermo._refreshCombat()">▶ Avanti</button>' +
-          '<button class="btn btn-secondary btn-sm" onclick="Sessione.rollAllInitiative();Schermo._refreshCombat()">🎲</button>' +
+          '<button class="btn btn-secondary btn-sm" onclick="Sessione.rollAllInitiative();Schermo._refreshCombat()" title="Init tutti">Init</button>' +
         '</div>' +
       '</div>' +
       '<div style="display:flex;flex-direction:column;gap:2px;">' +
@@ -6829,8 +6947,8 @@ const Schermo = (() => {
             '<span style="font-family:var(--font-mono);font-size:0.68rem;color:' + hpCol + ';min-width:24px;">' + c.hp + '</span>' +
           '</div>' +
           '<div style="display:flex;gap:1px;">' +
-            '<button class="btn btn-ghost btn-icon-sm" style="width:22px;height:22px;font-size:0.65rem;" onclick="Sessione.quickDamage(\'' + c.id + '\');Schermo._refreshCombat()" title="Danno">💥</button>' +
-            '<button class="btn btn-ghost btn-icon-sm" style="width:22px;height:22px;font-size:0.65rem;" onclick="Sessione.openCondizioneModal(\'' + c.id + '\')" title="Condizioni">🔴</button>' +
+            '<button class="btn btn-ghost btn-icon-sm" style="width:22px;height:22px;font-size:0.65rem;" onclick="Sessione.quickDamage(\'' + c.id + '\');Schermo._refreshCombat()" title="Danno"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></button>' +
+            '<button class="btn btn-ghost btn-icon-sm" style="width:22px;height:22px;font-size:0.65rem;" onclick="Sessione.openCondizioneModal(\'' + c.id + '\')" title="Condizioni"><span style="color:#e74c3c;"><svg aria-hidden="true" width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="8"/></svg></span></button>' +
           '</div>' +
         '</div>';
       }).join('') +
@@ -7301,7 +7419,7 @@ const Generatori = {
     if (!isOpen) {
       Generatori._renderToggles();
       panel.style.display = '';
-      document.getElementById('gen-settings-btn').textContent = '✕ Chiudi';
+      document.getElementById('gen-settings-btn').textContent = 'Chiudi';
     } else {
       panel.style.display = 'none';
       document.getElementById('gen-settings-btn').textContent = '⚙️ Personalizza';
@@ -7528,7 +7646,7 @@ const Generatori = {
         '</div>';
       }).join('') +
     '</div>' +
-    '<button class="btn btn-ghost btn-sm w-full" style="margin-top:6px;font-size:0.72rem;" onclick="Generatori.rollNomi()">🎲 Altri nomi</button>';
+    '<button class="btn btn-ghost btn-sm w-full" style="margin-top:6px;font-size:0.72rem;" onclick="Generatori.rollNomi()">Altri nomi</button>';
     Debug.log('Nomi generati per ' + razza);
   },
 
@@ -7812,7 +7930,7 @@ const Generatori = {
         '<span class="badge badge-muted">📍 ' + distanza + '</span>' +
         '<span class="badge badge-muted">⚔️ ' + lvLabel + '</span>' +
       '</div>' +
-      '<button class="btn btn-ghost btn-sm w-full" style="margin-top:6px;font-size:0.72rem;" onclick="Generatori.rollIncontro()">🎲 Nuovo incontro</button>';
+      '<button class="btn btn-ghost btn-sm w-full" style="margin-top:6px;font-size:0.72rem;" onclick="Generatori.rollIncontro()">Nuovo incontro</button>';
     Debug.log('Incontro: ' + ambiente + ' / ' + livello);
   },
 
@@ -7872,7 +7990,7 @@ const Generatori = {
     el.innerHTML =
       '<div style="background:var(--bg-secondary);border-left:3px solid var(--accent-danger);border-radius:0 var(--radius-sm) var(--radius-sm) 0;padding:8px;margin-bottom:6px;font-size:0.85rem;line-height:1.5;">' + effetto + '</div>' +
       '<div class="badge badge-muted" style="font-size:0.72rem;">' + durata + '</div>' +
-      '<button class="btn btn-ghost btn-sm w-full" style="margin-top:6px;font-size:0.72rem;" onclick="Generatori.rollFollia()">🎲 Nuovo effetto</button>';
+      '<button class="btn btn-ghost btn-sm w-full" style="margin-top:6px;font-size:0.72rem;" onclick="Generatori.rollFollia()">Nuovo effetto</button>';
     Debug.log('Follia: ' + tipo);
   },
 
@@ -9036,8 +9154,8 @@ const NoteCampagna = (() => {
         '<div onclick="NoteCampagna.selectCat(' + i + ')" style="padding:9px 10px;cursor:pointer;font-size:0.82rem;font-family:var(--font-display);border-left:3px solid ' + (i===_catIdx?'var(--accent-primary)':'transparent') + ';background:' + (i===_catIdx?'var(--bg-card)':'transparent') + ';display:flex;align-items:center;gap:4px;border-bottom:1px solid var(--border);">' +
           '<span style="flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + (cat.nome||'Categoria') + '</span>' +
           (isMob ? '<span style="color:var(--text-muted);font-size:0.8rem;">›</span>' : '') +
-          '<button class="btn btn-ghost btn-icon-sm" style="font-size:0.6rem;opacity:0.5;flex-shrink:0;" onclick="event.stopPropagation();NoteCampagna.renameCategoria(' + i + ')">✏️</button>' +
-          '<button class="btn btn-ghost btn-icon-sm" style="font-size:0.6rem;opacity:0.5;flex-shrink:0;color:var(--accent-danger);" onclick="event.stopPropagation();NoteCampagna.deleteCategoria(' + i + ')">✕</button>' +
+          '<button class="btn btn-ghost btn-icon-sm" style="font-size:0.6rem;opacity:0.5;flex-shrink:0;" onclick="event.stopPropagation();NoteCampagna.renameCategoria(' + i + ')"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>' +
+          '<button class="btn btn-ghost btn-icon-sm" style="opacity:0.5;flex-shrink:0;color:var(--accent-danger);" aria-label="Elimina categoria" onclick="event.stopPropagation();NoteCampagna.deleteCategoria(' + i + ')"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>' +
         '</div>'
       ).join('');
   };
@@ -9217,7 +9335,7 @@ const NoteSessione = (() => {
           onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();NoteSessione.addVoce();}"
           placeholder="Scrivi nota...">${n.testo}</textarea>
         <button class="btn btn-ghost btn-icon-sm" style="flex-shrink:0;opacity:0.4;font-size:0.7rem;"
-          onclick="NoteSessione.remove(${i})" title="Rimuovi">✕</button>
+          onclick="NoteSessione.remove(${i})" title="Rimuovi" aria-label="Rimuovi"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
       </div>`).join('');
     // Auto-resize textarea
     el.querySelectorAll('textarea').forEach(t => {
@@ -9532,3 +9650,4 @@ document.addEventListener('DOMContentLoaded', initMobileNav);
 
 </body>
 </html>
+
