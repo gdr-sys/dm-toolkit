@@ -1237,7 +1237,7 @@
           <div class="img-upload-area" id="npc-img-area" onclick="document.getElementById('npc-img-file').click()" style="max-height:100px;">
             <img id="npc-img-preview" src="" style="display:none;max-height:80px;border-radius:var(--radius-md);object-fit:cover;width:100%;">
             <div id="npc-img-placeholder" style="text-align:center;color:var(--text-muted);padding:var(--space-sm);">
-              <div style="font-size:1.5rem;">👤</div>
+              <div style="opacity:0.4;margin-bottom:4px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="width:1.8rem;height:1.8rem;" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
               <div class="text-xs">Clicca per caricare un'immagine</div>
             </div>
           </div>
@@ -1606,7 +1606,7 @@
         <div class="img-upload-area" id="fazione-img-area" onclick="document.getElementById('fazione-img-file').click()" style="max-height:100px;">
           <img id="fazione-img-preview" src="" style="display:none;max-height:80px;border-radius:var(--radius-md);object-fit:cover;width:100%;">
           <div id="fazione-img-placeholder" style="text-align:center;color:var(--text-muted);padding:var(--space-sm);">
-            <div style="font-size:1.5rem;">🏛️</div>
+            <div style="opacity:0.4;margin-bottom:4px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="width:1.8rem;height:1.8rem;" aria-hidden="true"><path d="M3 21h18"/><path d="M3 10h18"/><path d="M5 6l7-3 7 3"/><path d="M4 10v11"/><path d="M20 10v11"/><path d="M8 14v3"/><path d="M12 14v3"/><path d="M16 14v3"/></svg></div>
             <div class="text-xs">Clicca per caricare</div>
           </div>
         </div>
@@ -2935,17 +2935,17 @@ const App = (() => {
         return;
       }
       el.innerHTML = filtered.map(q => `
-        <div class="card card-accent" style="margin-bottom:var(--space-sm);padding:var(--space-md);">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
-            <div style="font-family:var(--font-display);font-size:0.9rem;">${q.title}</div>
-            <div style="display:flex;gap:4px;">
+        <div class="quest-item status-${q.status}">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:var(--space-sm);margin-bottom:4px;">
+            <div class="quest-item-title">${q.title}</div>
+            <div style="display:flex;gap:4px;align-items:center;flex-shrink:0;">
               <span class="badge ${colors[q.status]}">${labels[q.status]}</span>
-              <button class="btn btn-ghost btn-icon-sm" onclick="App.editQuest('${q.id}')"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
-              <button class="btn btn-ghost btn-icon-sm" onclick="App.deleteQuest('${q.id}')"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>
+              <button class="btn btn-ghost btn-icon-sm" onclick="App.editQuest('${q.id}')" title="Modifica"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+              <button class="btn btn-ghost btn-icon-sm" onclick="App.deleteQuest('${q.id}')" title="Elimina"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>
             </div>
           </div>
           ${q.notes ? `<div class="text-sm text-muted">${q.notes}</div>` : ''}
-          ${q.reward ? `<div class="text-xs text-gold" style="margin-top:4px;">🏆 ${q.reward}</div>` : ''}
+          ${q.reward ? `<div class="quest-reward"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2z"/></svg>${q.reward}</div>` : ''}
         </div>
       `).join('');
     });
@@ -2983,17 +2983,24 @@ const App = (() => {
       return;
     }
 
-    el.innerHTML = events.map(e => `
-      <div style="display:flex;gap:var(--space-md);margin-bottom:var(--space-sm);align-items:flex-start;">
-        <div style="flex-shrink:0;width:56px;text-align:right;">
-          <span style="font-family:var(--font-mono);font-size:0.72rem;color:var(--accent-secondary);">Giorno ${e.day}</span>
+    el.innerHTML = events.map((e, i) => `
+      <div class="timeline-item">
+        <div class="timeline-day">
+          <span style="font-family:var(--font-mono);font-size:0.7rem;color:var(--accent-secondary);">G${e.day}</span>
         </div>
-        <div style="width:2px;background:var(--border);border-radius:2px;flex-shrink:0;"></div>
-        <div style="flex:1;padding-bottom:var(--space-sm);">
-          <div style="font-size:0.9rem;">${e.event}</div>
-          ${e.type ? `<span class="badge badge-muted" style="margin-top:4px;">${e.type}</span>` : ''}
+        <div class="timeline-track">
+          <div class="timeline-dot"></div>
+          ${i < events.length - 1 ? '<div class="timeline-line"></div>' : ''}
         </div>
-        <button class="btn btn-ghost btn-icon-sm" onclick="App.deleteTimelineEvent('${e.id}')"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>
+        <div class="timeline-content">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:4px;">
+            <div>
+              <div class="timeline-event-text">${e.event}</div>
+              ${e.type ? `<span class="badge badge-muted" style="margin-top:4px;">${e.type}</span>` : ''}
+            </div>
+            <button class="btn btn-ghost btn-icon-sm" onclick="App.deleteTimelineEvent('${e.id}')" title="Elimina"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>
+          </div>
+        </div>
       </div>
     `).join('');
   };
@@ -3017,32 +3024,32 @@ const App = (() => {
     if (!el) return;
 
     if (factions.length === 0) {
-      el.innerHTML = `<div class="empty-state"><div class="empty-state-icon">🏛️</div><div class="text-muted text-sm">Nessuna fazione registrata</div></div>`;
+      el.innerHTML = `<div class="empty-state"><div class="module-placeholder-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" style="width:2.4rem;height:2.4rem;opacity:0.4;" aria-hidden="true"><path d="M3 21h18"/><path d="M3 10h18"/><path d="M5 6l7-3 7 3"/><path d="M4 10v11"/><path d="M20 10v11"/><path d="M8 14v3"/><path d="M12 14v3"/><path d="M16 14v3"/></svg></div><div class="text-muted text-sm">Nessuna fazione registrata</div></div>`;
       return;
     }
 
     el.innerHTML = factions.map(f => {
       const pct = Math.round(f.power || 50);
       return `
-        <div class="card" style="margin-bottom:var(--space-sm);padding:var(--space-md);">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+        <div class="faction-item">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
             <div>
-              <div style="font-family:var(--font-display);font-size:0.95rem;">${f.name}</div>
+              <div class="faction-item-name">${f.name}</div>
               ${f.influence ? `<div class="text-xs text-muted">${f.influence}</div>` : ''}
             </div>
             <div style="display:flex;gap:4px;">
-              <button class="btn btn-ghost btn-icon-sm" onclick="App.editFaction('${f.id}')"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
-              <button class="btn btn-ghost btn-icon-sm" onclick="App.deleteFaction('${f.id}')"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>
+              <button class="btn btn-ghost btn-icon-sm" onclick="App.editFaction('${f.id}')" title="Modifica"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+              <button class="btn btn-ghost btn-icon-sm" onclick="App.deleteFaction('${f.id}')" title="Elimina"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>
             </div>
           </div>
           <div style="display:flex;align-items:center;gap:8px;">
-            <span class="text-xs text-muted">Potere</span>
+            <span class="text-xs text-muted" style="flex-shrink:0;">Potere</span>
             <div class="progress-bar" style="flex:1;">
               <div class="progress-fill ${pct > 66 ? 'progress-ally' : pct > 33 ? 'progress-neutral' : 'progress-hostil'}" style="width:${pct}%"></div>
             </div>
             <span class="text-xs text-mono">${pct}%</span>
           </div>
-          ${f.notes ? `<div class="text-xs text-muted" style="margin-top:6px;">${f.notes}</div>` : ''}
+          ${f.notes ? `<div class="text-xs text-muted" style="margin-top:5px;">${f.notes}</div>` : ''}
         </div>
       `;
     }).join('');
@@ -3613,7 +3620,7 @@ const NPC = (() => {
 
     if (npcs.length === 0) {
       el.innerHTML = `<div class="empty-state" style="grid-column:1/-1;">
-        <div class="empty-state-icon">👤</div>
+        <div class="module-placeholder-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" style="width:2.6rem;height:2.6rem;opacity:0.4;" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
         <h3>${camp?.npcs?.length ? 'Nessun PNG trovato' : 'Nessun PNG ancora'}</h3>
         <p class="text-sm text-muted">${camp?.npcs?.length ? 'Prova a modificare i filtri' : 'Clicca "+ Nuovo PNG" per cominciare'}</p>
       </div>`;
@@ -3725,7 +3732,7 @@ const Luoghi = (() => {
 
     if (list.length === 0) {
       el.innerHTML = `<div class="empty-state" style="grid-column:1/-1;">
-        <div class="empty-state-icon">🏰</div>
+        <div class="module-placeholder-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" style="width:2.6rem;height:2.6rem;opacity:0.4;" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
         <h3>${getAll().length ? 'Nessun luogo trovato' : 'Nessun luogo ancora'}</h3>
         <p class="text-sm text-muted">Clicca "+ Nuovo Luogo" per cominciare</p>
       </div>`;
@@ -3906,7 +3913,7 @@ const Fazioni = (() => {
 
     if (list.length === 0) {
       el.innerHTML = `<div class="empty-state" style="grid-column:1/-1;">
-        <div class="empty-state-icon">🏛️</div>
+        <div class="module-placeholder-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" style="width:2.6rem;height:2.6rem;opacity:0.4;" aria-hidden="true"><path d="M3 21h18"/><path d="M3 10h18"/><path d="M5 6l7-3 7 3"/><path d="M4 10v11"/><path d="M20 10v11"/><path d="M8 14v3"/><path d="M12 14v3"/><path d="M16 14v3"/></svg></div>
         <h3>${getAll().length ? 'Nessuna fazione trovata' : 'Nessuna fazione ancora'}</h3>
         <p class="text-sm text-muted">Clicca "+ Nuova Fazione" per cominciare</p>
       </div>`;
@@ -4119,7 +4126,7 @@ const Sessione = (() => {
   // ── Render: nessuna campagna ──
   const renderNoCampaign = () => {
     const el = document.getElementById('sessione-content');
-    if (el) el.innerHTML = `<div class="empty-state"><div class="empty-state-icon">⚔️</div><h3>Seleziona una campagna</h3><p class="text-sm text-muted">Apri una campagna dalla home per usare il Combat Tracker</p></div>`;
+    if (el) el.innerHTML = `<div class="empty-state"><div class="module-placeholder-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" style="width:2.6rem;height:2.6rem;opacity:0.4;" aria-hidden="true"><line x1="14.5" y1="17.5" x2="3" y2="6"/><line x1="13" y1="19" x2="19" y2="13"/><line x1="16" y1="16" x2="20" y2="20"/><line x1="19" y1="21" x2="21" y2="19"/></svg></div><h3>Seleziona una campagna</h3><p class="text-sm text-muted">Apri una campagna dalla home per usare il Combat Tracker</p></div>`;
   };
 
   // ══════════════════════════════════════════════════════
@@ -4356,7 +4363,7 @@ const Sessione = (() => {
           </div>
         </div>
         <div style="padding:var(--space-lg);text-align:center;color:var(--text-muted);">
-          <div style="font-size:2.5rem;margin-bottom:var(--space-sm);">⚔️</div>
+          <div style="margin-bottom:var(--space-sm);opacity:0.4;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" style="width:2.4rem;height:2.4rem;" aria-hidden="true"><line x1="14.5" y1="17.5" x2="3" y2="6"/><line x1="13" y1="19" x2="19" y2="13"/><line x1="16" y1="16" x2="20" y2="20"/><line x1="19" y1="21" x2="21" y2="19"/></svg></div>
           <div class="text-sm">Inizia un nuovo scontro o riprendi uno salvato qui sotto</div>
         </div>`;
       return;
@@ -4421,7 +4428,11 @@ const Sessione = (() => {
         <!-- Nome e tipo -->
         <div class="combat-name-col">
           <div style="display:flex;align-items:center;gap:6px;">
-            <span style="font-size:0.9rem;">${c.tipo === 'pg' ? '👤' : c.tipo === 'mostro' ? '🐉' : '⚔️'}</span>
+            ${c.tipo === 'pg'
+              ? `<svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--accent-tertiary)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`
+              : c.tipo === 'mostro'
+              ? `<svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--accent-danger)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>`
+              : `<svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--accent-secondary)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><line x1="14.5" y1="17.5" x2="3" y2="6"/><line x1="13" y1="19" x2="19" y2="13"/><line x1="16" y1="16" x2="20" y2="20"/><line x1="19" y1="21" x2="21" y2="19"/></svg>`}
             <div>
               <div style="font-family:var(--font-display);font-size:0.88rem;${isDead ? 'text-decoration:line-through;opacity:0.5;' : ''}">${c.nome}</div>
               ${c.gs ? `<span class="text-xs text-muted">GS ${c.gs}</span>` : ''}
@@ -4458,9 +4469,9 @@ const Sessione = (() => {
         <div class="combat-actions-col">
           ${c.tipo !== 'pg' ? `<button class="btn btn-ghost btn-icon-sm" title="Scheda mostro" onclick="Sessione.openCombatantSheet('${c.id}')"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></button>` : ''}
           <button class="btn btn-ghost btn-icon-sm" title="Aggiungi condizione" onclick="Sessione.openCondizioneModal('${c.id}')"><span style="color:#e74c3c;"><svg aria-hidden="true" width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="8"/></svg></span></button>
-          <button class="btn btn-ghost btn-icon-sm" title="Concentrazione" onclick="Sessione.toggleConcentrazione('${c.id}')" style="${c.concentrazione ? 'color:var(--accent-tertiary);' : ''}">🔮</button>
+          <button class="btn btn-ghost btn-icon-sm" title="Concentrazione" onclick="Sessione.toggleConcentrazione('${c.id}')" style="${c.concentrazione ? 'color:var(--accent-tertiary);' : ''}"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></button>
           <button class="btn btn-ghost btn-icon-sm" title="Danno rapido" onclick="Sessione.quickDamage('${c.id}')"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></button>
-          <button class="btn btn-ghost btn-icon-sm" title="Note" onclick="Sessione.openNote('${c.id}')" style="${c.note ? 'color:var(--accent-secondary);' : ''}">📝</button>
+          <button class="btn btn-ghost btn-icon-sm" title="Note" onclick="Sessione.openNote('${c.id}')" style="${c.note ? 'color:var(--accent-secondary);' : ''}"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></button>
           <button class="btn btn-ghost btn-icon-sm" title="Rimuovi" onclick="Sessione.removeCombatant('${c.id}')"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>
         </div>
       </div>`;
@@ -5375,7 +5386,9 @@ const Compendio = (() => {
     App.saveActiveCampaign({ compendioFavoriti: favoriti });
     // Aggiorna stella nella riga senza re-render completo
     const btn = document.querySelector(`.comp-fav-btn[data-id="${id}"]`);
-    if (btn) btn.textContent = idx !== -1 ? '☆' : '⭐';
+    if (btn) btn.innerHTML = idx !== -1
+      ? `<svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`
+      : `<svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="var(--accent-secondary)" stroke="var(--accent-secondary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
     // Se siamo nel tab favoriti, re-render
     if (_activeTab === 'favoriti') render();
     // Aggiorna blocco schermo se presente
@@ -5385,11 +5398,14 @@ const Compendio = (() => {
 
   // Riga con stella favorito
   const favBtn = (id, nome, tipo) => {
-    const star = _isFavorito(id) ? '⭐' : '☆';
+    const isFav = _isFavorito(id);
+    const starSvg = isFav
+      ? `<svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="var(--accent-secondary)" stroke="var(--accent-secondary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`
+      : `<svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
     return `<button class="comp-fav-btn btn btn-ghost btn-icon-sm" data-id="${id}"
       onclick="Compendio.toggleFavorito('${id}','${nome.replace(/'/g,"\'")}','${tipo}',event)"
-      title="${_isFavorito(id) ? 'Rimuovi dai preferiti' : 'Aggiungi ai preferiti'}"
-      style="font-size:0.9rem;padding:0 4px;">${star}</button>`;
+      title="${isFav ? 'Rimuovi dai preferiti' : 'Aggiungi ai preferiti'}"
+      style="padding:0 4px;">${starSvg}</button>`;
   };
 
   // Sezione preferiti fissata in cima
@@ -5426,7 +5442,7 @@ const Compendio = (() => {
 
     const hasContent = favRows || hbRows;
     if (!hasContent) return '';
-    return `<div class="comp-cat-header" style="color:var(--accent-secondary);">${favs.length ? '⭐ Preferiti' : ''}${favs.length && hbItems.length ? ' · ' : ''}${hbItems.length ? '🔧 Homebrew' : ''}</div>` +
+    return `<div class="comp-cat-header" style="color:var(--accent-secondary);">${favs.length ? 'Preferiti' : ''}${favs.length && hbItems.length ? ' · ' : ''}${hbItems.length ? 'Homebrew' : ''}</div>` +
       favRows + hbRows +
       `<div style="height:1px;background:var(--border);margin:6px 0 8px;"></div>`;
   };
@@ -6445,101 +6461,102 @@ const Compendio = (() => {
 const Schermo = (() => {
 
   // ── Blocchi disponibili ──
+  const _svgIcon = (path) => `<svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${path}</svg>`;
   const BLOCK_TYPES = {
     percezioni: {
       label: 'Party',
-      icon: '👥',
+      icon: _svgIcon('<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>'),
       desc: 'HP, CA, percezioni passive e ispirazione dei PG',
       defaultSize: 'md',
     },
     dadi: {
       label: 'Dadi Rapidi',
-      icon: '🎲',
+      icon: _svgIcon('<rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 8h.01"/><path d="M8 8h.01"/><path d="M8 16h.01"/><path d="M16 16h.01"/><path d="M12 12h.01"/>'),
       desc: 'Lancia qualsiasi dado al volo',
       defaultSize: 'sm',
     },
     meteo: {
       label: 'Meteo',
-      icon: '🌤️',
+      icon: _svgIcon('<path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/>'),
       desc: 'Genera e mostra il meteo del giorno',
       defaultSize: 'sm',
     },
     note_sessione: {
       label: 'Note Sessione',
-      icon: '📝',
+      icon: _svgIcon('<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>'),
       desc: 'Note rapide della sessione attiva — sincronizzate con la Sessione',
       defaultSize: 'md',
     },
     note: {
       label: 'Note Rapide',
-      icon: '📝',
+      icon: _svgIcon('<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>'),
       desc: 'Blocco note libero per la sessione',
       defaultSize: 'md',
     },
     combat_mini: {
       label: 'Combat Tracker (ridotto)',
-      icon: '⚔️',
+      icon: _svgIcon('<line x1="14.5" y1="17.5" x2="3" y2="6"/><line x1="13" y1="19" x2="19" y2="13"/><line x1="16" y1="16" x2="20" y2="20"/><line x1="19" y1="21" x2="21" y2="19"/>'),
       desc: 'Iniziativa, HP, turno attivo con pulsanti essenziali',
       defaultSize: 'lg',
     },
     combat_full: {
       label: 'Combat Tracker (completo)',
-      icon: '🗡️',
+      icon: _svgIcon('<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>'),
       desc: 'Combat tracker identico alla sezione Sessione',
       defaultSize: 'xl',
     },
     condizioni: {
       label: 'Condizioni (tabella compatta)',
-      icon: '🔴',
+      icon: _svgIcon('<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>'),
       desc: 'Lista rapida delle condizioni 5e',
       defaultSize: 'md',
     },
     compendio_ref: {
       label: 'Riferimento Compendio',
-      icon: '📖',
+      icon: _svgIcon('<path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>'),
       desc: 'Scegli una sezione del compendio (ripetibile)',
       defaultSize: 'md',
       repeatable: true,
     },
     dc: {
       label: 'Tabella DC',
-      icon: '🎯',
+      icon: _svgIcon('<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>'),
       desc: 'Classi di difficoltà di riferimento',
       defaultSize: 'sm',
     },
     tempo: {
       label: 'Tempo & Calendario',
-      icon: '⏰',
+      icon: _svgIcon('<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>'),
       desc: 'Gestione del tempo di gioco e calendario in-game',
       defaultSize: 'sm',
     },
     timer: {
       label: 'Timer / Conto alla rovescia',
-      icon: '⏱️',
+      icon: _svgIcon('<circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2"/><path d="M5 3 2 6"/><path d="m22 6-3-3"/><path d="M6.38 18.7 4 21"/><path d="M17.64 18.67 20 21"/>'),
       desc: 'Timer funzionante con allarme visivo',
       defaultSize: 'sm',
     },
     preferiti: {
       label: 'Preferiti Compendio',
-      icon: '⭐',
+      icon: _svgIcon('<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>'),
       desc: 'I tuoi preferiti dal Compendio — accesso rapido',
       defaultSize: 'md',
     },
     stili_vita: {
       label: 'Stili di Vita & Servizi',
-      icon: '🏨',
+      icon: _svgIcon('<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>'),
       desc: 'Costi giornalieri stili di vita e tariffe servizi comuni',
       defaultSize: 'md',
     },
     proprieta_armi: {
       label: 'Proprietà delle Armi',
-      icon: '⚔️',
+      icon: _svgIcon('<line x1="14.5" y1="17.5" x2="3" y2="6"/><line x1="13" y1="19" x2="19" y2="13"/><line x1="16" y1="16" x2="20" y2="20"/><line x1="19" y1="21" x2="21" y2="19"/>'),
       desc: 'Tabella completa delle proprietà (2014/2024)',
       defaultSize: 'md',
     },
     custom: {
       label: 'Blocco Personalizzato',
-      icon: '✏️',
+      icon: _svgIcon('<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>'),
       desc: 'Testo libero con titolo personalizzato',
       defaultSize: 'md',
       repeatable: true,
@@ -6623,9 +6640,9 @@ const Schermo = (() => {
           <span class="schermo-block-icon">${def.icon}</span>
           <span class="schermo-block-title">${title}</span>
           <div class="schermo-block-actions">
-            <button class="btn btn-ghost btn-icon-sm" onclick="Schermo.resizeBlock('${block.id}')" title="Ridimensiona">⇔</button>
-            <button class="btn btn-ghost btn-icon-sm" onclick="Schermo.moveBlock('${block.id}', -1)" title="Sposta su">↑</button>
-            <button class="btn btn-ghost btn-icon-sm" onclick="Schermo.moveBlock('${block.id}', 1)" title="Sposta giù">↓</button>
+            <button class="btn btn-ghost btn-icon-sm" onclick="Schermo.resizeBlock('${block.id}')" title="Ridimensiona"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg></button>
+            <button class="btn btn-ghost btn-icon-sm" onclick="Schermo.moveBlock('${block.id}', -1)" title="Sposta su"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg></button>
+            <button class="btn btn-ghost btn-icon-sm" onclick="Schermo.moveBlock('${block.id}', 1)" title="Sposta giù"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg></button>
             ${block.type === 'custom' || block.type === 'note' ? `<button class="btn btn-ghost btn-icon-sm" onclick="Schermo.editBlock('${block.id}')" title="Modifica"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>` : ''}
             <button class="btn btn-ghost btn-icon-sm" onclick="Schermo.removeBlock('${block.id}')" title="Rimuovi" aria-label="Rimuovi"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
           </div>
@@ -6673,7 +6690,7 @@ const Schermo = (() => {
       equipment: 'openEquipment', rules: 'openRule', spells: 'openSpell',
     };
     const tipoLabel = {
-      monsters: '🐉', magic_items: '✨', equipment: '⚔️', rules: '📖', spells: '💫',
+      monsters: 'Mostri', magic_items: 'Oggetti Magici', equipment: 'Equipaggiamento', rules: 'Regole', spells: 'Incantesimi',
     };
 
     // Raggruppa per tipo
@@ -6696,7 +6713,7 @@ const Schermo = (() => {
             '</span>' +
             '<button class="btn btn-ghost btn-icon-sm" style="font-size:0.8rem;" ' +
               'onclick="Compendio.toggleFavorito(\'' + f.id + '\',\'' + f.nome.replace(/'/g,"\'") + '\',\'' + tipo + '\',event);Schermo._refreshFavoriti()" ' +
-              'title="Rimuovi">⭐</button>' +
+              'title="Rimuovi"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="var(--accent-secondary)" stroke="var(--accent-secondary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></button>' +
           '</div>'
         ).join('') +
       '</div>'
