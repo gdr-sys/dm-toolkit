@@ -486,14 +486,12 @@
   .nc-mobile-hidden { display:none !important; }
 }
 
-/* Note Campagna — card occupa tutto */
+/* Note Campagna — card a padding zero, editor occupa tutto lo spazio */
 #page-campagna > *:not(:last-child) { flex-shrink:0; }
-#page-campagna > div.card:last-child { flex:1; display:flex; flex-direction:column; min-height:400px; overflow:hidden; }
-
-/* PATCH: Note Campagna — editor prioritario sullo spazio */
-#nc-container { min-height:0; }
+#page-campagna > div.card:last-child { overflow:hidden; }
+#nc-container { flex:1; }
 #nc-editor-wrap { flex:1 !important; min-width:0; }
-#nc-editor { flex:1; width:100%; resize:none; }
+#nc-page-content { flex:1; width:100%; resize:none; }
 
 /* Animazioni */
 @keyframes pulse { 0%, 100% { opacity:1; } 50% { opacity:0.5; } }
