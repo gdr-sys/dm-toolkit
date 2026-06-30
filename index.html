@@ -390,7 +390,7 @@
       </div>
 
       <!-- Griglia generatori riordinabile — tutte le card inclusa PNG -->
-      <div class="generatori-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:var(--space-md);">
+      <div class="generatori-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:var(--space-md);align-items:start;">
 
         <!-- PNG Completo — full width -->
         <div class="card card-gold gen-card" data-gen-id="npc" style="grid-column:1/-1;">
@@ -1388,8 +1388,24 @@
                   <div class="text-sm" id="npc-view-trait">—</div>
                 </div>
                 <div class="card" style="margin-bottom:var(--space-sm);padding:var(--space-sm) var(--space-md);">
+                  <div class="text-xs text-muted" style="font-family:var(--font-display);letter-spacing:0.05em;text-transform:uppercase;margin-bottom:2px;">🎭 Archetipo</div>
+                  <div class="text-sm" id="npc-view-archetipo">—</div>
+                </div>
+                <div class="card" style="margin-bottom:var(--space-sm);padding:var(--space-sm) var(--space-md);">
                   <div class="text-xs text-muted" style="font-family:var(--font-display);letter-spacing:0.05em;text-transform:uppercase;margin-bottom:2px;">Voce & Tic</div>
                   <div class="text-sm" id="npc-view-voice">—</div>
+                </div>
+                <div class="card" style="margin-bottom:var(--space-sm);padding:var(--space-sm) var(--space-md);">
+                  <div class="text-xs text-muted" style="font-family:var(--font-display);letter-spacing:0.05em;text-transform:uppercase;margin-bottom:2px;">Cadenza verbale</div>
+                  <div class="text-sm" id="npc-view-cadenza">—</div>
+                </div>
+                <div class="card" style="margin-bottom:var(--space-sm);padding:var(--space-sm) var(--space-md);">
+                  <div class="text-xs text-muted" style="font-family:var(--font-display);letter-spacing:0.05em;text-transform:uppercase;margin-bottom:2px;">Saluto</div>
+                  <div class="text-sm" id="npc-view-saluto">—</div>
+                </div>
+                <div class="card" style="margin-bottom:var(--space-sm);padding:var(--space-sm) var(--space-md);">
+                  <div class="text-xs text-muted" style="font-family:var(--font-display);letter-spacing:0.05em;text-transform:uppercase;margin-bottom:2px;">Argomento ricorrente</div>
+                  <div class="text-sm" id="npc-view-argomento">—</div>
                 </div>
                 <div class="card card-gold" style="padding:var(--space-sm) var(--space-md);margin-bottom:var(--space-sm);">
                   <div class="text-xs" style="font-family:var(--font-display);letter-spacing:0.05em;text-transform:uppercase;margin-bottom:2px;color:var(--accent-secondary);">Segreto DM</div>
@@ -1398,6 +1414,10 @@
                 <div class="card" style="padding:var(--space-sm) var(--space-md);">
                   <div class="text-xs text-muted" style="font-family:var(--font-display);letter-spacing:0.05em;text-transform:uppercase;margin-bottom:2px;">Obiettivo segreto DM</div>
                   <div class="text-sm" id="npc-view-obiettivo">—</div>
+                </div>
+                <div class="card" style="padding:var(--space-sm) var(--space-md);background:rgba(139,38,53,0.06);">
+                  <div class="text-xs" style="font-family:var(--font-display);letter-spacing:0.05em;text-transform:uppercase;margin-bottom:2px;color:var(--accent-primary);">🎬 Ora sta facendo</div>
+                  <div class="text-sm" id="npc-view-hook">—</div>
                 </div>
               </div>
               <div>
@@ -1436,6 +1456,13 @@
               <div class="stat-row" id="sb-senses-row" style="display:none;"><strong>Sensi</strong> <span id="sb-senses">—</span></div>
               <div class="stat-row" id="sb-lang-row" style="display:none;"><strong>Linguaggi</strong> <span id="sb-languages">—</span></div>
               <div class="stat-row"><strong>GS</strong> <span id="sb-cr">—</span></div>
+              <div class="stat-row" id="sb-attacco-row"><strong>Attacco</strong> <span id="sb-attacco">—</span> &nbsp; <strong>Save DC</strong> <span id="sb-savedc">—</span></div>
+              <div class="stat-row" id="sb-nat-row"><strong>Attacchi/round</strong> <span id="sb-num-attacchi">—</span></div>
+              <div class="stat-block-divider"></div>
+              <div id="npc-view-ruolo-wrap" style="display:none;">
+                <div style="font-size:0.78rem;margin-bottom:4px;"><strong>Ruolo combattivo:</strong> <span id="npc-view-ruolo" style="color:var(--accent-secondary);">—</span></div>
+                <div style="font-size:0.78rem;color:var(--text-muted);"><em><span id="npc-view-abilita">—</span></em></div>
+              </div>
               <div class="stat-block-divider"></div>
               <div id="sb-special" style="margin-bottom:var(--space-sm);font-size:0.85rem;"></div>
               <div style="font-family:var(--font-display);font-size:0.9rem;font-weight:700;color:var(--accent-primary);margin-bottom:4px;border-bottom:1px solid var(--accent-primary);padding-bottom:2px;">Azioni</div>
@@ -3495,7 +3522,25 @@ const NPC = (() => {
     setText('npc-view-offers', npc.offers);
     setText('npc-view-links',  npc.links);
     setText('npc-view-voice',  [npc.voice, npc.tic].filter(Boolean).join(' · '));
+    setText('npc-view-cadenza',  npc.cadenza);
+    setText('npc-view-saluto',   npc.saluto);
+    setText('npc-view-argomento', npc.argomentoRicorrente);
     setText('npc-view-obiettivo', npc.obiettivoSegreto);
+    setText('npc-view-hook',     npc.hookSituazionale);
+    // Archetipo
+    const archEl = document.getElementById('npc-view-archetipo');
+    if (archEl) { archEl.textContent = npc.archetipo || '—'; archEl.closest('.card')?.style.setProperty('display', npc.archetipo ? '' : 'none'); }
+    // Ruolo combattivo + abilità speciale
+    const ruoloWrap = document.getElementById('npc-view-ruolo-wrap');
+    if (ruoloWrap) ruoloWrap.style.display = npc.ruoloCombattivo ? '' : 'none';
+    setText('npc-view-ruolo', npc.ruoloCombattivo);
+    setText('npc-view-abilita', npc.abilitaSpeciale);
+    // Stat block esteso dal generatore
+    if (npc.attaccoBonus !== undefined) {
+      setText('sb-attacco', `+${npc.attaccoBonus}`);
+      setText('sb-savedc',  npc.saveDC || npc.save_dc || '—');
+      setText('sb-num-attacchi', npc.numAttacchi ? `${npc.numAttacchi}× ~${npc.dannoPerAttacco} danni` : '—');
+    }
     // Morale
     const moraleWrap = document.getElementById('npc-view-morale-wrap');
     const moraleEl   = document.getElementById('npc-view-morale');
