@@ -1,0 +1,488 @@
+{
+  "meta": {
+    "fonte": "Living Mount and Creature Speeds (Metric Version)",
+    "note": "Tutti i valori in km. Difficile = terreno difficile. 1 Giorno = 8h, salvo diversa indicazione."
+  },
+  "categorie": ["terrestri", "acquatici", "volanti", "veicoli", "magia_terra", "magia_aria"],
+  "creature": [
+    {
+      "nome": "Umano (a piedi)",
+      "categoria": "terrestri",
+      "tipo": "piedi",
+      "vel_6s_norm": 4.5, "vel_6s_diff": 4.5, "vel_6s_dash": 9.0,
+      "vel_1h_lento": 3.2, "vel_1h_norm": 4.8, "vel_1h_fast": 6.4,
+      "vel_8h_lento": 25.7, "vel_8h_norm": 38.6, "vel_8h_fast": 51.5,
+      "vel_ud_lento": 19.3, "vel_ud_norm": 29.0, "vel_ud_fast": 38.6
+    },
+    {
+      "nome": "Cammello",
+      "categoria": "terrestri",
+      "tipo": "cavalcatura",
+      "vel_6s_norm": 7.5, "vel_6s_diff": 7.5, "vel_6s_dash": 15.0,
+      "vel_1h_lento": 5.4, "vel_1h_norm": 8.0, "vel_1h_fast": 10.7,
+      "vel_8h_lento": 42.9, "vel_8h_norm": 64.4, "vel_8h_fast": 85.8,
+      "vel_ud_lento": 32.2, "vel_ud_norm": 48.3, "vel_ud_fast": 64.4
+    },
+    {
+      "nome": "Asino / Mulo",
+      "categoria": "terrestri",
+      "tipo": "cavalcatura",
+      "vel_6s_norm": 6.0, "vel_6s_diff": 6.0, "vel_6s_dash": 12.0,
+      "vel_1h_lento": 4.3, "vel_1h_norm": 6.4, "vel_1h_fast": 8.6,
+      "vel_8h_lento": 34.3, "vel_8h_norm": 51.5, "vel_8h_fast": 68.7,
+      "vel_ud_lento": 25.7, "vel_ud_norm": 38.6, "vel_ud_fast": 51.5
+    },
+    {
+      "nome": "Cavallo da tiro",
+      "categoria": "terrestri",
+      "tipo": "cavalcatura",
+      "vel_6s_norm": 6.0, "vel_6s_diff": 6.0, "vel_6s_dash": 12.0,
+      "vel_1h_lento": 4.3, "vel_1h_norm": 6.4, "vel_1h_fast": 8.6,
+      "vel_8h_lento": 34.3, "vel_8h_norm": 51.5, "vel_8h_fast": 68.7,
+      "vel_ud_lento": 25.7, "vel_ud_norm": 38.6, "vel_ud_fast": 51.5
+    },
+    {
+      "nome": "Elefante",
+      "categoria": "terrestri",
+      "tipo": "cavalcatura",
+      "vel_6s_norm": 6.0, "vel_6s_diff": 6.0, "vel_6s_dash": 12.0,
+      "vel_1h_lento": 4.3, "vel_1h_norm": 6.4, "vel_1h_fast": 8.6,
+      "vel_8h_lento": 34.3, "vel_8h_norm": 51.5, "vel_8h_fast": 68.7,
+      "vel_ud_lento": 25.7, "vel_ud_norm": 38.6, "vel_ud_fast": 51.5
+    },
+    {
+      "nome": "Mastino",
+      "categoria": "terrestri",
+      "tipo": "cavalcatura",
+      "vel_6s_norm": 6.0, "vel_6s_diff": 6.0, "vel_6s_dash": 12.0,
+      "vel_1h_lento": 4.3, "vel_1h_norm": 6.4, "vel_1h_fast": 8.6,
+      "vel_8h_lento": 34.3, "vel_8h_norm": 51.5, "vel_8h_fast": 68.7,
+      "vel_ud_lento": 25.7, "vel_ud_norm": 38.6, "vel_ud_fast": 51.5
+    },
+    {
+      "nome": "Pony",
+      "categoria": "terrestri",
+      "tipo": "cavalcatura",
+      "vel_6s_norm": 6.0, "vel_6s_diff": 6.0, "vel_6s_dash": 12.0,
+      "vel_1h_lento": 4.3, "vel_1h_norm": 6.4, "vel_1h_fast": 8.6,
+      "vel_8h_lento": 34.3, "vel_8h_norm": 51.5, "vel_8h_fast": 68.7,
+      "vel_ud_lento": 25.7, "vel_ud_norm": 38.6, "vel_ud_fast": 51.5
+    },
+    {
+      "nome": "Cavallo da sella",
+      "categoria": "terrestri",
+      "tipo": "cavalcatura",
+      "vel_6s_norm": 9.0, "vel_6s_diff": 9.0, "vel_6s_dash": 18.0,
+      "vel_1h_lento": 6.4, "vel_1h_norm": 9.7, "vel_1h_fast": 12.9,
+      "vel_8h_lento": 51.5, "vel_8h_norm": 77.2, "vel_8h_fast": 103.0,
+      "vel_ud_lento": 38.6, "vel_ud_norm": 57.9, "vel_ud_fast": 77.2
+    },
+    {
+      "nome": "Cavallo da guerra",
+      "categoria": "terrestri",
+      "tipo": "cavalcatura",
+      "vel_6s_norm": 9.0, "vel_6s_diff": 9.0, "vel_6s_dash": 18.0,
+      "vel_1h_lento": 6.4, "vel_1h_norm": 9.7, "vel_1h_fast": 12.9,
+      "vel_8h_lento": 51.5, "vel_8h_norm": 77.2, "vel_8h_fast": 103.0,
+      "vel_ud_lento": 38.6, "vel_ud_norm": 57.9, "vel_ud_fast": 77.2
+    },
+    {
+      "nome": "Lupo Terribile",
+      "categoria": "terrestri",
+      "tipo": "cavalcatura",
+      "vel_6s_norm": 7.5, "vel_6s_diff": 7.5, "vel_6s_dash": 15.0,
+      "vel_1h_lento": 5.4, "vel_1h_norm": 8.0, "vel_1h_fast": 10.7,
+      "vel_8h_lento": 42.9, "vel_8h_norm": 64.4, "vel_8h_fast": 85.8,
+      "vel_ud_lento": 32.2, "vel_ud_norm": 48.3, "vel_ud_fast": 64.4
+    },
+    {
+      "nome": "Alce",
+      "categoria": "terrestri",
+      "tipo": "cavalcatura",
+      "vel_6s_norm": 7.5, "vel_6s_diff": 7.5, "vel_6s_dash": 15.0,
+      "vel_1h_lento": 5.4, "vel_1h_norm": 8.0, "vel_1h_fast": 10.7,
+      "vel_8h_lento": 42.9, "vel_8h_norm": 64.4, "vel_8h_fast": 85.8,
+      "vel_ud_lento": 32.2, "vel_ud_norm": 48.3, "vel_ud_fast": 64.4
+    },
+    {
+      "nome": "Alce Gigante",
+      "categoria": "terrestri",
+      "tipo": "cavalcatura",
+      "vel_6s_norm": 9.0, "vel_6s_diff": 9.0, "vel_6s_dash": 18.0,
+      "vel_1h_lento": 6.4, "vel_1h_norm": 9.7, "vel_1h_fast": 12.9,
+      "vel_8h_lento": 51.5, "vel_8h_norm": 77.2, "vel_8h_fast": 103.0,
+      "vel_ud_lento": 38.6, "vel_ud_norm": 57.9, "vel_ud_fast": 77.2
+    },
+    {
+      "nome": "Maiale Gigante",
+      "categoria": "terrestri",
+      "tipo": "cavalcatura",
+      "vel_6s_norm": 6.0, "vel_6s_diff": 6.0, "vel_6s_dash": 12.0,
+      "vel_1h_lento": 4.3, "vel_1h_norm": 6.4, "vel_1h_fast": 8.6,
+      "vel_8h_lento": 34.3, "vel_8h_norm": 51.5, "vel_8h_fast": 68.7,
+      "vel_ud_lento": 25.7, "vel_ud_norm": 38.6, "vel_ud_fast": 51.5
+    },
+    {
+      "nome": "Capra Gigante",
+      "categoria": "terrestri",
+      "tipo": "cavalcatura",
+      "vel_6s_norm": 7.5, "vel_6s_diff": 7.5, "vel_6s_dash": 15.0,
+      "vel_1h_lento": 5.4, "vel_1h_norm": 8.0, "vel_1h_fast": 10.7,
+      "vel_8h_lento": 42.9, "vel_8h_norm": 64.4, "vel_8h_fast": 85.8,
+      "vel_ud_lento": 32.2, "vel_ud_norm": 48.3, "vel_ud_fast": 64.4
+    },
+    {
+      "nome": "Mucca Gigante",
+      "categoria": "terrestri",
+      "tipo": "cavalcatura",
+      "vel_6s_norm": 6.0, "vel_6s_diff": 6.0, "vel_6s_dash": 12.0,
+      "vel_1h_lento": 4.3, "vel_1h_norm": 6.4, "vel_1h_fast": 8.6,
+      "vel_8h_lento": 34.3, "vel_8h_norm": 51.5, "vel_8h_fast": 68.7,
+      "vel_ud_lento": 25.7, "vel_ud_norm": 38.6, "vel_ud_fast": 51.5
+    },
+    {
+      "nome": "Centopiedi Gigante",
+      "categoria": "terrestri",
+      "tipo": "cavalcatura",
+      "vel_6s_norm": 4.5, "vel_6s_diff": 4.5, "vel_6s_dash": 9.0,
+      "vel_1h_lento": 3.2, "vel_1h_norm": 4.8, "vel_1h_fast": 6.4,
+      "vel_8h_lento": 25.7, "vel_8h_norm": 38.6, "vel_8h_fast": 51.5,
+      "vel_ud_lento": 19.3, "vel_ud_norm": 29.0, "vel_ud_fast": 38.6
+    },
+    {
+      "nome": "Cinghiale Gigante",
+      "categoria": "terrestri",
+      "tipo": "cavalcatura",
+      "vel_6s_norm": 6.0, "vel_6s_diff": 6.0, "vel_6s_dash": 12.0,
+      "vel_1h_lento": 4.3, "vel_1h_norm": 6.4, "vel_1h_fast": 8.6,
+      "vel_8h_lento": 34.3, "vel_8h_norm": 51.5, "vel_8h_fast": 68.7,
+      "vel_ud_lento": 25.7, "vel_ud_norm": 38.6, "vel_ud_fast": 51.5
+    },
+    {
+      "nome": "Pipistrello Gigante",
+      "categoria": "terrestri",
+      "tipo": "cavalcatura",
+      "vel_6s_norm": 9.0, "vel_6s_diff": 9.0, "vel_6s_dash": 18.0,
+      "vel_1h_lento": 6.4, "vel_1h_norm": 9.7, "vel_1h_fast": 12.9,
+      "vel_8h_lento": 51.5, "vel_8h_norm": 77.2, "vel_8h_fast": 103.0,
+      "vel_ud_lento": 38.6, "vel_ud_norm": 57.9, "vel_ud_fast": 77.2
+    },
+    {
+      "nome": "Scorpione Gigante",
+      "categoria": "terrestri",
+      "tipo": "cavalcatura",
+      "vel_6s_norm": 6.0, "vel_6s_diff": 6.0, "vel_6s_dash": 12.0,
+      "vel_1h_lento": 4.3, "vel_1h_norm": 6.4, "vel_1h_fast": 8.6,
+      "vel_8h_lento": 34.3, "vel_8h_norm": 51.5, "vel_8h_fast": 68.7,
+      "vel_ud_lento": 25.7, "vel_ud_norm": 38.6, "vel_ud_fast": 51.5
+    },
+    {
+      "nome": "Ragno Gigante",
+      "categoria": "terrestri",
+      "tipo": "cavalcatura",
+      "vel_6s_norm": 4.5, "vel_6s_diff": 4.5, "vel_6s_dash": 9.0,
+      "vel_1h_lento": 3.2, "vel_1h_norm": 4.8, "vel_1h_fast": 6.4,
+      "vel_8h_lento": 25.7, "vel_8h_norm": 38.6, "vel_8h_fast": 51.5,
+      "vel_ud_lento": 19.3, "vel_ud_norm": 29.0, "vel_ud_fast": 38.6
+    },
+    {
+      "nome": "Tasso Gigante",
+      "categoria": "terrestri",
+      "tipo": "cavalcatura",
+      "vel_6s_norm": 4.5, "vel_6s_diff": 4.5, "vel_6s_dash": 9.0,
+      "vel_1h_lento": 3.2, "vel_1h_norm": 4.8, "vel_1h_fast": 6.4,
+      "vel_8h_lento": 25.7, "vel_8h_norm": 38.6, "vel_8h_fast": 51.5,
+      "vel_ud_lento": 19.3, "vel_ud_norm": 29.0, "vel_ud_fast": 38.6
+    },
+    {
+      "nome": "Granchio Gigante",
+      "categoria": "terrestri",
+      "tipo": "cavalcatura",
+      "vel_6s_norm": 4.5, "vel_6s_diff": 4.5, "vel_6s_dash": 9.0,
+      "vel_1h_lento": 3.2, "vel_1h_norm": 4.8, "vel_1h_fast": 6.4,
+      "vel_8h_lento": 25.7, "vel_8h_norm": 38.6, "vel_8h_fast": 51.5,
+      "vel_ud_lento": 19.3, "vel_ud_norm": 29.0, "vel_ud_fast": 38.6
+    },
+    {
+      "nome": "Donnola Gigante",
+      "categoria": "terrestri",
+      "tipo": "cavalcatura",
+      "vel_6s_norm": 6.0, "vel_6s_diff": 6.0, "vel_6s_dash": 12.0,
+      "vel_1h_lento": 4.3, "vel_1h_norm": 6.4, "vel_1h_fast": 8.6,
+      "vel_8h_lento": 34.3, "vel_8h_norm": 51.5, "vel_8h_fast": 68.7,
+      "vel_ud_lento": 25.7, "vel_ud_norm": 38.6, "vel_ud_fast": 51.5
+    },
+    {
+      "nome": "Bestia Dislocatrice",
+      "categoria": "terrestri",
+      "tipo": "cavalcatura",
+      "vel_6s_norm": 6.0, "vel_6s_diff": 6.0, "vel_6s_dash": 12.0,
+      "vel_1h_lento": 4.3, "vel_1h_norm": 6.4, "vel_1h_fast": 8.6,
+      "vel_8h_lento": 34.3, "vel_8h_norm": 51.5, "vel_8h_fast": 68.7,
+      "vel_ud_lento": 25.7, "vel_ud_norm": 38.6, "vel_ud_fast": 51.5
+    },
+    {
+      "nome": "Tartaruga Scattante Gigante (Nuoto)",
+      "categoria": "acquatici",
+      "tipo": "nuoto",
+      "vel_6s_norm": 6.0, "vel_6s_diff": 6.0, "vel_6s_dash": 12.0,
+      "vel_1h_lento": 4.3, "vel_1h_norm": 6.4, "vel_1h_fast": 8.6,
+      "vel_8h_lento": 34.3, "vel_8h_norm": 51.5, "vel_8h_fast": 68.7,
+      "vel_ud_lento": 25.7, "vel_ud_norm": 38.6, "vel_ud_fast": 51.5
+    },
+    {
+      "nome": "Capodoglio (Nuoto)",
+      "categoria": "acquatici",
+      "tipo": "nuoto",
+      "vel_6s_norm": 9.0, "vel_6s_diff": 9.0, "vel_6s_dash": 18.0,
+      "vel_1h_lento": 6.4, "vel_1h_norm": 9.7, "vel_1h_fast": 12.9,
+      "vel_8h_lento": 51.5, "vel_8h_norm": 77.2, "vel_8h_fast": 103.0,
+      "vel_ud_lento": 38.6, "vel_ud_norm": 57.9, "vel_ud_fast": 77.2
+    },
+    {
+      "nome": "Polpo Gigante (Nuoto)",
+      "categoria": "acquatici",
+      "tipo": "nuoto",
+      "vel_6s_norm": 9.0, "vel_6s_diff": 9.0, "vel_6s_dash": 18.0,
+      "vel_1h_lento": 6.4, "vel_1h_norm": 9.7, "vel_1h_fast": 12.9,
+      "vel_8h_lento": 51.5, "vel_8h_norm": 77.2, "vel_8h_fast": 103.0,
+      "vel_ud_lento": 38.6, "vel_ud_norm": 57.9, "vel_ud_fast": 77.2
+    },
+    {
+      "nome": "Aquila Gigante (Volo)",
+      "categoria": "volanti",
+      "tipo": "volo",
+      "vel_6s_norm": 12.0, "vel_6s_diff": 12.0, "vel_6s_dash": 24.0,
+      "vel_1h_lento": 8.6, "vel_1h_norm": 12.9, "vel_1h_fast": 17.2,
+      "vel_8h_lento": 77.2, "vel_8h_norm": 115.9, "vel_8h_fast": 154.5,
+      "vel_ud_lento": 57.9, "vel_ud_norm": 86.9, "vel_ud_fast": 115.9,
+      "vel_volo_9h": 128.7
+    },
+    {
+      "nome": "Gufo Gigante (Volo)",
+      "categoria": "volanti",
+      "tipo": "volo",
+      "vel_6s_norm": 9.0, "vel_6s_diff": 9.0, "vel_6s_dash": 18.0,
+      "vel_1h_lento": 6.4, "vel_1h_norm": 9.7, "vel_1h_fast": 12.9,
+      "vel_8h_lento": 57.9, "vel_8h_norm": 86.9, "vel_8h_fast": 115.9,
+      "vel_ud_lento": 43.5, "vel_ud_norm": 65.2, "vel_ud_fast": 86.9,
+      "vel_volo_9h": 96.6
+    },
+    {
+      "nome": "Pegaso (Volo)",
+      "categoria": "volanti",
+      "tipo": "volo",
+      "vel_6s_norm": 13.5, "vel_6s_diff": 13.5, "vel_6s_dash": 27.0,
+      "vel_1h_lento": 9.7, "vel_1h_norm": 14.5, "vel_1h_fast": 19.3,
+      "vel_8h_lento": 86.9, "vel_8h_norm": 130.4, "vel_8h_fast": 173.8,
+      "vel_ud_lento": 65.2, "vel_ud_norm": 97.8, "vel_ud_fast": 130.4,
+      "vel_volo_9h": 144.8
+    },
+    {
+      "nome": "Grifone (Volo)",
+      "categoria": "volanti",
+      "tipo": "volo",
+      "vel_6s_norm": 12.0, "vel_6s_diff": 12.0, "vel_6s_dash": 24.0,
+      "vel_1h_lento": 8.6, "vel_1h_norm": 12.9, "vel_1h_fast": 17.2,
+      "vel_8h_lento": 77.2, "vel_8h_norm": 115.9, "vel_8h_fast": 154.5,
+      "vel_ud_lento": 57.9, "vel_ud_norm": 86.9, "vel_ud_fast": 115.9,
+      "vel_volo_9h": 128.7
+    },
+    {
+      "nome": "Destriero Fantasma",
+      "categoria": "magia_terra",
+      "tipo": "magia",
+      "vel_6s_norm": 15.0, "vel_6s_diff": 15.0, "vel_6s_dash": 60.0,
+      "vel_1h_lento": 10.7, "vel_1h_norm": 16.1, "vel_1h_fast": 21.5,
+      "vel_8h_lento": 85.8, "vel_8h_norm": 128.7, "vel_8h_fast": 171.7,
+      "vel_16h_lento": 171.7, "vel_16h_norm": 257.5, "vel_16h_fast": 343.3,
+      "vel_24h_lento": 257.5, "vel_24h_norm": 386.2, "vel_24h_fast": 515.0,
+      "note": "Instancabile"
+    },
+    {
+      "nome": "Tappeto Volante 3×5",
+      "categoria": "magia_aria",
+      "tipo": "magia_volo",
+      "vel_6s_norm": 12.0,
+      "vel_1h_norm": 12.9,
+      "vel_8h_norm": 103.0, "vel_16h_norm": 206.0, "vel_24h_norm": 309.0,
+      "capacita": "Fino a 2 persone",
+      "note": "Instancabile"
+    },
+    {
+      "nome": "Tappeto Volante 4×6",
+      "categoria": "magia_aria",
+      "tipo": "magia_volo",
+      "vel_6s_norm": 9.0,
+      "vel_1h_norm": 9.7,
+      "vel_8h_norm": 77.2, "vel_16h_norm": 154.5, "vel_24h_norm": 231.7,
+      "capacita": "Fino a 4 persone",
+      "note": "Instancabile"
+    },
+    {
+      "nome": "Tappeto Volante 5×7",
+      "categoria": "magia_aria",
+      "tipo": "magia_volo",
+      "vel_6s_norm": 6.0,
+      "vel_1h_norm": 6.4,
+      "vel_8h_norm": 51.5, "vel_16h_norm": 103.0, "vel_24h_norm": 154.5,
+      "capacita": "Fino a 6 persone",
+      "note": "Instancabile"
+    },
+    {
+      "nome": "Tappeto Volante 6×9",
+      "categoria": "magia_aria",
+      "tipo": "magia_volo",
+      "vel_6s_norm": 4.5,
+      "vel_1h_norm": 4.8,
+      "vel_8h_norm": 38.6, "vel_16h_norm": 77.2, "vel_24h_norm": 115.9,
+      "capacita": "Fino a 10 persone",
+      "note": "Instancabile"
+    },
+    {
+      "nome": "Scopa Volante",
+      "categoria": "magia_aria",
+      "tipo": "magia_volo",
+      "vel_6s_norm": 7.5,
+      "vel_1h_norm": 8.0,
+      "vel_8h_norm": 64.4, "vel_16h_norm": 128.7, "vel_24h_norm": 193.1,
+      "note": "Instancabile"
+    },
+    {
+      "nome": "Camminare nel Vento (incantesimo)",
+      "categoria": "magia_aria",
+      "tipo": "magia_volo",
+      "vel_6s_norm": 45.0,
+      "vel_1h_norm": 48.3,
+      "vel_8h_norm": 386.2, "vel_16h_norm": 772.5, "vel_24h_norm": 1158.7,
+      "note": "Forma gassosa instancabile"
+    },
+    {
+      "nome": "Galea (PHB)",
+      "categoria": "veicoli",
+      "tipo": "imbarcazione",
+      "vel_6s_norm": 7.5,
+      "vel_1h_norm": 8.0,
+      "vel_8h_lento": 48.3, "vel_8h_norm": 72.4, "vel_8h_fast": 96.6,
+      "vel_16h_lento": 96.6, "vel_16h_norm": 144.8, "vel_16h_fast": 193.1,
+      "vel_24h_lento": 144.8, "vel_24h_norm": 217.3, "vel_24h_fast": 289.7,
+      "note": "Remi e vela"
+    },
+    {
+      "nome": "Barcone (Keelboat, PHB)",
+      "categoria": "veicoli",
+      "tipo": "imbarcazione",
+      "vel_6s_norm": 7.5,
+      "vel_1h_norm": 8.0,
+      "vel_8h_lento": 48.3, "vel_8h_norm": 72.4, "vel_8h_fast": 96.6,
+      "vel_16h_lento": 96.6, "vel_16h_norm": 144.8, "vel_16h_fast": 193.1,
+      "vel_24h_lento": 144.8, "vel_24h_norm": 217.3, "vel_24h_fast": 289.7
+    },
+    {
+      "nome": "Nave Vichinga (Longship, PHB)",
+      "categoria": "veicoli",
+      "tipo": "imbarcazione",
+      "vel_6s_norm": 7.5,
+      "vel_1h_norm": 8.0,
+      "vel_8h_lento": 48.3, "vel_8h_norm": 72.4, "vel_8h_fast": 96.6,
+      "vel_16h_lento": 96.6, "vel_16h_norm": 144.8, "vel_16h_fast": 193.1,
+      "vel_24h_lento": 144.8, "vel_24h_norm": 217.3, "vel_24h_fast": 289.7
+    },
+    {
+      "nome": "Barca a remi (Rowboat, PHB)",
+      "categoria": "veicoli",
+      "tipo": "imbarcazione",
+      "vel_6s_norm": 7.5,
+      "vel_1h_norm": 8.0,
+      "vel_8h_lento": 48.3, "vel_8h_norm": 72.4, "vel_8h_fast": 96.6,
+      "vel_16h_lento": 96.6, "vel_16h_norm": 144.8, "vel_16h_fast": 193.1,
+      "vel_24h_lento": 144.8, "vel_24h_norm": 217.3, "vel_24h_fast": 289.7
+    },
+    {
+      "nome": "Nave da vela (Sailing Ship, PHB)",
+      "categoria": "veicoli",
+      "tipo": "imbarcazione",
+      "vel_6s_norm": 7.5,
+      "vel_1h_norm": 8.0,
+      "vel_8h_lento": 48.3, "vel_8h_norm": 72.4, "vel_8h_fast": 96.6,
+      "vel_16h_lento": 96.6, "vel_16h_norm": 144.8, "vel_16h_fast": 193.1,
+      "vel_24h_lento": 144.8, "vel_24h_norm": 217.3, "vel_24h_fast": 289.7
+    },
+    {
+      "nome": "Nave da guerra (Warship, PHB)",
+      "categoria": "veicoli",
+      "tipo": "imbarcazione",
+      "vel_6s_norm": 7.5,
+      "vel_1h_norm": 8.0,
+      "vel_8h_lento": 48.3, "vel_8h_norm": 72.4, "vel_8h_fast": 96.6,
+      "vel_16h_lento": 96.6, "vel_16h_norm": 144.8, "vel_16h_fast": 193.1,
+      "vel_24h_lento": 144.8, "vel_24h_norm": 217.3, "vel_24h_fast": 289.7
+    },
+    {
+      "nome": "Pallone da Battaglia (Acquisizioni Inc.)",
+      "categoria": "veicoli",
+      "tipo": "aeronave",
+      "vel_6s_norm": 7.5,
+      "vel_1h_norm": 8.0,
+      "vel_8h_lento": 48.3, "vel_8h_norm": 72.4, "vel_8h_fast": 96.6,
+      "vel_16h_lento": 96.6, "vel_16h_norm": 144.8, "vel_16h_fast": 193.1,
+      "vel_24h_lento": 144.8, "vel_24h_norm": 217.3, "vel_24h_fast": 289.7
+    },
+    {
+      "nome": "Beholder Meccanico (Acquisizioni Inc.)",
+      "categoria": "veicoli",
+      "tipo": "aeronave",
+      "vel_6s_norm": 7.5,
+      "vel_1h_norm": 8.0,
+      "vel_8h_lento": 48.3, "vel_8h_norm": 72.4, "vel_8h_fast": 96.6,
+      "vel_16h_lento": 96.6, "vel_16h_norm": 144.8, "vel_16h_fast": 193.1,
+      "vel_24h_lento": 144.8, "vel_24h_norm": 217.3, "vel_24h_fast": 289.7
+    },
+    {
+      "nome": "Dirigibile Lyrandar (Eberron)",
+      "categoria": "veicoli",
+      "tipo": "aeronave",
+      "vel_6s_norm": 30.0,
+      "vel_1h_norm": 32.2,
+      "vel_8h_lento": 171.7, "vel_8h_norm": 257.5, "vel_8h_fast": 343.3,
+      "vel_16h_lento": 343.3, "vel_16h_norm": 515.0, "vel_16h_fast": 686.7,
+      "vel_24h_lento": 515.0, "vel_24h_norm": 772.5, "vel_24h_fast": 1030.0
+    },
+    {
+      "nome": "Galeone Lyrandar (Eberron)",
+      "categoria": "veicoli",
+      "tipo": "imbarcazione",
+      "vel_6s_norm": 6.0,
+      "vel_1h_norm": 6.4,
+      "vel_8h_lento": 85.8, "vel_8h_norm": 128.7, "vel_8h_fast": 171.7,
+      "vel_16h_lento": 171.7, "vel_16h_norm": 257.5, "vel_16h_fast": 343.3,
+      "vel_24h_lento": 257.5, "vel_24h_norm": 386.2, "vel_24h_fast": 515.0
+    },
+    {
+      "nome": "Treno Lampo Orien (Eberron)",
+      "categoria": "veicoli",
+      "tipo": "terrestre",
+      "vel_6s_norm": 9.0,
+      "vel_1h_norm": 9.7,
+      "vel_8h_lento": 51.5, "vel_8h_norm": 77.2, "vel_8h_fast": 103.0,
+      "vel_16h_lento": 103.0, "vel_16h_norm": 154.5, "vel_16h_fast": 206.0,
+      "vel_24h_lento": 154.5, "vel_24h_norm": 231.7, "vel_24h_fast": 309.0,
+      "note": "Instancabile, via rotaia"
+    }
+  ],
+  "monture_generiche": [
+    {"vel_base_ft": 10, "vel_base_m": 3, "vel_6s_norm": 3.0, "vel_6s_diff": 1.5, "vel_6s_dash": 6.0, "vel_1h_lento": 1.1, "vel_1h_norm": 1.6, "vel_8h_lento": 8.6, "vel_8h_norm": 12.9, "vel_8h_fast": 17.2, "vel_ud_lento": 6.4, "vel_ud_norm": 9.7, "vel_ud_fast": 12.9},
+    {"vel_base_ft": 15, "vel_base_m": 4.5, "vel_6s_norm": 4.5, "vel_6s_diff": 2.3, "vel_6s_dash": 9.0, "vel_1h_lento": 1.6, "vel_1h_norm": 2.4, "vel_8h_lento": 12.9, "vel_8h_norm": 19.3, "vel_8h_fast": 25.7, "vel_ud_lento": 9.7, "vel_ud_norm": 14.5, "vel_ud_fast": 19.3},
+    {"vel_base_ft": 20, "vel_base_m": 6.0, "vel_6s_norm": 6.0, "vel_6s_diff": 3.0, "vel_6s_dash": 12.0, "vel_1h_lento": 2.1, "vel_1h_norm": 3.2, "vel_8h_lento": 17.2, "vel_8h_norm": 25.7, "vel_8h_fast": 34.3, "vel_ud_lento": 12.9, "vel_ud_norm": 19.3, "vel_ud_fast": 25.7},
+    {"vel_base_ft": 25, "vel_base_m": 7.5, "vel_6s_norm": 7.5, "vel_6s_diff": 3.8, "vel_6s_dash": 15.0, "vel_1h_lento": 2.7, "vel_1h_norm": 4.0, "vel_8h_lento": 21.5, "vel_8h_norm": 32.2, "vel_8h_fast": 42.9, "vel_ud_lento": 16.1, "vel_ud_norm": 24.1, "vel_ud_fast": 32.2},
+    {"vel_base_ft": 30, "vel_base_m": 9.0, "vel_6s_norm": 9.0, "vel_6s_diff": 4.5, "vel_6s_dash": 18.0, "vel_1h_lento": 3.2, "vel_1h_norm": 4.8, "vel_8h_lento": 25.7, "vel_8h_norm": 38.6, "vel_8h_fast": 51.5, "vel_ud_lento": 19.3, "vel_ud_norm": 29.0, "vel_ud_fast": 38.6},
+    {"vel_base_ft": 35, "vel_base_m": 10.5, "vel_6s_norm": 10.5, "vel_6s_diff": 5.3, "vel_6s_dash": 21.0, "vel_1h_lento": 3.8, "vel_1h_norm": 5.6, "vel_8h_lento": 30.0, "vel_8h_norm": 45.1, "vel_8h_fast": 60.1, "vel_ud_lento": 22.5, "vel_ud_norm": 33.8, "vel_ud_fast": 45.1},
+    {"vel_base_ft": 40, "vel_base_m": 12.0, "vel_6s_norm": 12.0, "vel_6s_diff": 6.0, "vel_6s_dash": 24.0, "vel_1h_lento": 4.3, "vel_1h_norm": 6.4, "vel_8h_lento": 34.3, "vel_8h_norm": 51.5, "vel_8h_fast": 68.7, "vel_ud_lento": 25.7, "vel_ud_norm": 38.6, "vel_ud_fast": 51.5},
+    {"vel_base_ft": 50, "vel_base_m": 15.0, "vel_6s_norm": 15.0, "vel_6s_diff": 7.5, "vel_6s_dash": 30.0, "vel_1h_lento": 5.4, "vel_1h_norm": 8.0, "vel_8h_lento": 42.9, "vel_8h_norm": 64.4, "vel_8h_fast": 85.8, "vel_ud_lento": 32.2, "vel_ud_norm": 48.3, "vel_ud_fast": 64.4},
+    {"vel_base_ft": 60, "vel_base_m": 18.0, "vel_6s_norm": 18.0, "vel_6s_diff": 9.0, "vel_6s_dash": 36.0, "vel_1h_lento": 6.4, "vel_1h_norm": 9.7, "vel_8h_lento": 51.5, "vel_8h_norm": 77.2, "vel_8h_fast": 103.0, "vel_ud_lento": 38.6, "vel_ud_norm": 57.9, "vel_ud_fast": 77.2},
+    {"vel_base_ft": 70, "vel_base_m": 21.0, "vel_6s_norm": 21.0, "vel_6s_diff": 10.5, "vel_6s_dash": 42.0, "vel_1h_lento": 7.5, "vel_1h_norm": 11.3, "vel_8h_lento": 60.1, "vel_8h_norm": 90.1, "vel_8h_fast": 120.2, "vel_ud_lento": 45.1, "vel_ud_norm": 67.6, "vel_ud_fast": 90.1},
+    {"vel_base_ft": 80, "vel_base_m": 24.0, "vel_6s_norm": 24.0, "vel_6s_diff": 12.0, "vel_6s_dash": 48.0, "vel_1h_lento": 8.6, "vel_1h_norm": 12.9, "vel_8h_lento": 68.7, "vel_8h_norm": 103.0, "vel_8h_fast": 137.3, "vel_ud_lento": 51.5, "vel_ud_norm": 77.2, "vel_ud_fast": 103.0},
+    {"vel_base_ft": 90, "vel_base_m": 27.0, "vel_6s_norm": 27.0, "vel_6s_diff": 13.5, "vel_6s_dash": 54.0, "vel_1h_lento": 9.7, "vel_1h_norm": 14.5, "vel_8h_lento": 77.2, "vel_8h_norm": 115.9, "vel_8h_fast": 154.5, "vel_ud_lento": 57.9, "vel_ud_norm": 86.9, "vel_ud_fast": 115.9},
+    {"vel_base_ft": 100, "vel_base_m": 30.0, "vel_6s_norm": 30.0, "vel_6s_diff": 15.0, "vel_6s_dash": 60.0, "vel_1h_lento": 10.7, "vel_1h_norm": 16.1, "vel_8h_lento": 85.8, "vel_8h_norm": 128.7, "vel_8h_fast": 171.7, "vel_ud_lento": 64.4, "vel_ud_norm": 96.6, "vel_ud_fast": 128.7}
+  ]
+}
