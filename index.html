@@ -727,6 +727,7 @@
             <button class="tab-btn"        id="comp-tab-rules"       onclick="Compendio.switchTab('rules')">Regole</button>
             <button class="tab-btn"        id="comp-tab-spells"      onclick="Compendio.switchTab('spells')">Incantesimi</button>
             <button class="tab-btn"        id="comp-tab-homebrew"    onclick="Compendio.switchTab('homebrew')">Homebrew</button>
+            <button class="tab-btn"        id="comp-tab-velocita"  onclick="Compendio.switchTab('velocita')">🐎 Velocità</button>
             <button class="tab-btn"        id="comp-tab-cerca"       onclick="Compendio.switchTab('cerca')">Cerca tutto</button>
           </div>
           <div style="display:flex;align-items:center;gap:var(--space-sm);">
@@ -849,6 +850,35 @@
         <div class="tab-content" id="comp-panel-equipment">
           <div id="comp-list-equip" class="comp-list"></div>
         </div>
+        <div class="tab-content" id="comp-panel-velocita">
+          <div class="comp-filters" style="flex-wrap:wrap;gap:6px;">
+            <input type="text" id="vel-search" class="form-input" placeholder="🔍 Cerca creatura o veicolo..." oninput="Compendio.searchVelocita()" style="flex:1;min-width:160px;">
+            <select id="vel-cat" class="form-select" onchange="Compendio.searchVelocita()" style="width:auto;font-size:0.8rem;">
+              <option value="">Tutti i tipi</option>
+              <option value="terrestri">🦶 Terrestri</option>
+              <option value="acquatici">🌊 Acquatici</option>
+              <option value="volanti">🦅 Volanti</option>
+              <option value="veicoli">⚓ Veicoli</option>
+              <option value="magia_terra">✨ Magia (terra)</option>
+              <option value="magia_aria">✨ Magia (aria)</option>
+            </select>
+            <select id="vel-durata" class="form-select" onchange="Compendio.searchVelocita()" style="width:auto;font-size:0.8rem;">
+              <option value="1h">Per ora (km)</option>
+              <option value="8h" selected>1 Giorno / 8h (km)</option>
+              <option value="16h">16 ore (km)</option>
+              <option value="24h">24 ore (km)</option>
+            </select>
+          </div>
+          <div id="vel-generic-wrap" style="margin-bottom:var(--space-sm);">
+            <div class="comp-cat-header">Montura generica — per velocità base</div>
+            <div class="comp-list" id="vel-generic-list"></div>
+          </div>
+          <div class="comp-cat-header">Creature e Veicoli</div>
+          <div class="comp-list" id="vel-results-list">
+            <div class="text-muted text-sm" style="padding:var(--space-md);">Digita per cercare o seleziona un tipo</div>
+          </div>
+        </div>
+
         <div class="tab-content" id="comp-panel-cerca">
           <div id="comp-list-cerca" class="comp-list"></div>
         </div>
@@ -6512,8 +6542,99 @@ const Compendio = (() => {
     Debug.log(`Compendio.init() sistema=${_sistema}`);
   };
 
+  // ── Velocità di Viaggio ──
+  let _velData = null;
+
+  const loadVelocita = async () => {
+    if (_velData) return _velData;
+    try {
+      const r = await fetch('data/velocita.json');
+      _velData = await r.json();
+    } catch(e) { _velData = { creature: [], monture_generiche: [] }; }
+    return _velData;
+  };
+
+  const searchVelocita = async () => {
+    const q = (document.getElementById('vel-search')?.value || '').toLowerCase().trim();
+    const cat = document.getElementById('vel-cat')?.value || '';
+    const durata = document.getElementById('vel-durata')?.value || '8h';
+    const data = await loadVelocita();
+
+    const durKeys = {
+      '1h':  { lento: 'vel_1h_lento', norm: 'vel_1h_norm', fast: 'vel_1h_fast' },
+      '8h':  { lento: 'vel_8h_lento', norm: 'vel_8h_norm', fast: 'vel_8h_fast' },
+      '16h': { lento: 'vel_16h_lento', norm: 'vel_16h_norm', fast: 'vel_16h_fast' },
+      '24h': { lento: 'vel_24h_lento', norm: 'vel_24h_norm', fast: 'vel_24h_fast' },
+    };
+    const keys = durKeys[durata] || durKeys['8h'];
+
+    // Monture generiche — visibili solo se filtro tipo vuoto o "terrestri"
+    const genWrap = document.getElementById('vel-generic-wrap');
+    const genList = document.getElementById('vel-generic-list');
+    if (genWrap && genList) {
+      const showGen = !cat || cat === 'terrestri';
+      genWrap.style.display = showGen ? '' : 'none';
+      if (showGen) {
+        genList.innerHTML = data.monture_generiche.map(m => {
+          const norm = m[keys.norm] ?? '—';
+          const lento = m[keys.lento] ?? '—';
+          const fast = m[keys.fast] ?? '—';
+          return `<div class="comp-row">
+            <div class="comp-row-main">
+              <span class="comp-row-name">${m.vel_base_ft}ft / ${m.vel_base_m}m base</span>
+            </div>
+            <div class="comp-row-stats">
+              <span class="comp-stat-pill" title="Lento">🐢 ${lento}</span>
+              <span class="comp-stat-pill" title="Normale">🚶 ${norm}</span>
+              <span class="comp-stat-pill" title="Veloce">💨 ${fast}</span>
+            </div>
+          </div>`;
+        }).join('');
+      }
+    }
+
+    // Creature e veicoli
+    const el = document.getElementById('vel-results-list');
+    if (!el) return;
+
+    let lista = data.creature || [];
+    if (cat) lista = lista.filter(c => c.categoria === cat);
+    if (q) lista = lista.filter(c => c.nome.toLowerCase().includes(q));
+
+    if (!lista.length) {
+      el.innerHTML = '<div class="text-muted text-sm" style="padding:var(--space-md);">Nessun risultato</div>';
+      return;
+    }
+
+    el.innerHTML = lista.map(c => {
+      const norm = c[keys.norm] ?? '—';
+      const lento = c[keys.lento] ?? '—';
+      const fast = c[keys.fast] ?? '—';
+      const badges = { terrestri:'🦶', acquatici:'🌊', volanti:'🦅', veicoli:'⚓', magia_terra:'✨', magia_aria:'✨' };
+      const badge = badges[c.categoria] || '';
+      const noteHtml = c.note ? `<span class="text-xs text-muted" style="margin-left:6px;">${c.note}</span>` : '';
+      return `<div class="comp-row">
+        <div class="comp-row-main">
+          <span class="comp-row-name">${badge} ${c.nome}</span>
+          <span class="comp-row-meta">${c.tipo || c.categoria}${noteHtml ? ' · ' + c.note : ''}</span>
+        </div>
+        <div class="comp-row-stats">
+          ${lento !== '—' ? `<span class="comp-stat-pill" title="Lento">🐢 ${lento} km</span>` : ''}
+          ${norm !== '—' ? `<span class="comp-stat-pill" title="Normale">🚶 ${norm} km</span>` : ''}
+          ${fast !== '—' ? `<span class="comp-stat-pill" title="Veloce">💨 ${fast} km</span>` : ''}
+        </div>
+      </div>`;
+    }).join('');
+  };
+
+  // Override switchTab per init velocita al primo click
+  const _origSwitchTab = switchTab;
+
   return {
-    init, switchTab, onSearch, onFilter,
+    init, switchTab: (tab) => {
+      _origSwitchTab(tab);
+      if (tab === 'velocita') searchVelocita();
+    }, onSearch, onFilter,
     openMonster, openMagicItem, openEquipment, openRule, openSpell,
     openHomebrew, openHomebrewModal, editHomebrew, saveHomebrew, deleteHomebrew,
     _refreshHBForm, _getHB: _getHomebrew,
@@ -6632,6 +6753,13 @@ const Schermo = (() => {
       defaultSize: 'md',
       repeatable: true,
     },
+    velocita: {
+      label: 'Velocità di Viaggio',
+      icon: _svgIcon('<path d="M3 12a9 9 0 1 0 18 0 9 9 0 0 0-18 0"/><path d="M12 8v4l2 2"/>'),
+      desc: 'Cerca creature, cavalcature e veicoli con velocità',
+      defaultSize: 'lg',
+      repeatable: false,
+    },
   };
 
   const SIZES = {
@@ -6745,6 +6873,7 @@ const Schermo = (() => {
       case 'tempo':          el.innerHTML = renderTempo(); break;
       case 'timer':          TimerBlock.init(block.id, el); break; // el è già il body
       case 'custom':         el.innerHTML = renderCustom(block); break;
+      case 'velocita':       el.innerHTML = renderVelocita(block.id); break;
       default:               el.innerHTML = '<div class="text-muted text-sm">Blocco sconosciuto</div>';
     }
   };
@@ -7322,6 +7451,73 @@ const Schermo = (() => {
   };
 
   const advanceTime = (minutes) => _avanzaTempo('minuti', minutes); // compatibilità
+
+  const renderVelocita = (blockId) => {
+    const durata = document.getElementById(`vel-schermo-dur-${blockId}`)?.value || '8h';
+    return `
+      <div style="margin-bottom:6px;display:flex;gap:6px;align-items:center;">
+        <input type="text" id="vel-schermo-q-${blockId}" class="form-input"
+          placeholder="🔍 Cerca..." style="flex:1;font-size:0.78rem;padding:4px 8px;"
+          oninput="Schermo.filterVelocita('${blockId}')">
+        <select id="vel-schermo-dur-${blockId}" class="form-select"
+          style="font-size:0.72rem;width:auto;" onchange="Schermo.filterVelocita('${blockId}')">
+          <option value="1h">1h</option>
+          <option value="8h" selected>8h</option>
+          <option value="16h">16h</option>
+          <option value="24h">24h</option>
+        </select>
+      </div>
+      <div id="vel-schermo-list-${blockId}" class="text-muted text-sm">Digita per cercare...</div>`;
+  };
+
+  const filterVelocita = async (blockId) => {
+    const q = (document.getElementById(`vel-schermo-q-${blockId}`)?.value || '').toLowerCase().trim();
+    const durata = document.getElementById(`vel-schermo-dur-${blockId}`)?.value || '8h';
+    const el = document.getElementById(`vel-schermo-list-${blockId}`);
+    if (!el) return;
+    if (!q) { el.innerHTML = '<span class="text-muted text-sm">Digita per cercare...</span>'; return; }
+
+    let data = null;
+    try { const r = await fetch('data/velocita.json'); data = await r.json(); } catch(e) { return; }
+
+    const durKeys = {
+      '1h':  { norm: 'vel_1h_norm', lento: 'vel_1h_lento', fast: 'vel_1h_fast' },
+      '8h':  { norm: 'vel_8h_norm', lento: 'vel_8h_lento', fast: 'vel_8h_fast' },
+      '16h': { norm: 'vel_16h_norm', lento: 'vel_16h_lento', fast: 'vel_16h_fast' },
+      '24h': { norm: 'vel_24h_norm', lento: 'vel_24h_lento', fast: 'vel_24h_fast' },
+    };
+    const keys = durKeys[durata] || durKeys['8h'];
+
+    // Cerca anche nelle monture generiche se l'utente digita un numero ft/m
+    const numQ = parseFloat(q);
+    const generics = isNaN(numQ) ? [] : (data.monture_generiche || []).filter(m =>
+      String(m.vel_base_ft).includes(q) || String(m.vel_base_m).includes(q)
+    );
+
+    const results = (data.creature || []).filter(c => c.nome.toLowerCase().includes(q));
+    const allResults = [...generics.map(m => ({
+      nome: `${m.vel_base_ft}ft / ${m.vel_base_m}m base`,
+      tipo: 'montatura generica',
+      ...m
+    })), ...results];
+
+    if (!allResults.length) { el.innerHTML = '<span class="text-muted text-sm">Nessun risultato</span>'; return; }
+
+    el.innerHTML = '<div style="display:flex;flex-direction:column;gap:3px;">' +
+      allResults.slice(0, 8).map(c => {
+        const norm = c[keys.norm] ?? '—';
+        const lento = c[keys.lento] ?? '—';
+        const fast = c[keys.fast] ?? '—';
+        return `<div style="display:flex;align-items:baseline;justify-content:space-between;gap:6px;padding:3px 0;border-bottom:1px solid var(--border);">
+          <span style="font-size:0.75rem;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${c.nome}</span>
+          <div style="display:flex;gap:4px;flex-shrink:0;">
+            ${lento !== '—' ? `<span class="schermo-stat" title="Lento">🐢${lento}</span>` : ''}
+            <span class="schermo-stat" title="Normale">🚶${norm}</span>
+            ${fast !== '—' ? `<span class="schermo-stat" title="Veloce">💨${fast}</span>` : ''}
+          </div>
+        </div>`;
+      }).join('') + '</div>';
+  };
 
   const renderCustom = (block) => `
     <div style="font-size:0.85rem;color:var(--text-secondary);white-space:pre-wrap;line-height:1.6;">${block.content || '<span class="text-muted">Clicca ✏️ per modificare</span>'}</div>`;
