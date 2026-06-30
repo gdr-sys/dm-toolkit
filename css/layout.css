@@ -284,6 +284,21 @@
 }
 .schermo-stat { font-family:var(--font-mono); font-size:0.78rem; padding:2px 6px; background:var(--bg-secondary); border:1px solid var(--border); border-radius:var(--radius-sm); white-space:nowrap; }
 
+/* ── Gen-card: altezza sempre automatica ── */
+.gen-card {
+  height: auto !important;
+  align-self: start;
+}
+.gen-card .card-header {
+  flex-wrap: wrap;
+  row-gap: 6px;
+  align-items: flex-start;
+}
+.gen-card .card-body,
+.gen-card > *:not(.card-header) {
+  overflow: visible;
+}
+
 /* ══════════════════════════════════════
    MOBILE VERTICALE — FIX SPECIFICI
 ══════════════════════════════════════ */
@@ -336,7 +351,8 @@
 
   /* PATCH: generatori no taglio verticale */
   #page-generatori { overflow-y:auto; }
-  .gen-card { overflow:hidden; max-width:100%; }
+  .gen-card { overflow:visible; max-width:100%; height:auto !important; min-height:0; }
+  .gen-card .card-header { flex-wrap:wrap; row-gap:6px; }
 
   /* Sessione combat */
   .combat-header { flex-wrap:wrap; gap:6px; }
@@ -355,7 +371,7 @@
   #page-sessione .grid-2 { grid-template-columns:1fr; }
 
   /* Generatori grids */
-  .generatori-grid { grid-template-columns:1fr !important; }
+  .generatori-grid { grid-template-columns:1fr !important; grid-auto-rows:auto; }
   #page-generatori .grid-2 { grid-template-columns:1fr; }
   #page-generatori .grid-4 { grid-template-columns:1fr 1fr; }
 
@@ -367,8 +383,8 @@
   /* Schermo */
   .schermo-grid { grid-template-columns:1fr !important; }
   .schermo-block { grid-column:span 1 !important; }
-  #page-schermo { overflow-y:auto; display:block; }
-  #page-schermo.active { display:block !important; }
+  #page-schermo { overflow-y:auto !important; display:block !important; min-height:50px; }
+  #page-schermo.active { display:block !important; visibility:visible !important; }
 
   /* Grids generiche */
   .grid-2, .grid-3, .grid-4 { grid-template-columns:1fr; }
