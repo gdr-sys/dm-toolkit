@@ -41,38 +41,6 @@ Web app per Dungeon Master di **D&D 5e** (edizioni 2014 e 2024), pensata per ges
 
 ---
 
-## 🛠️ Stack tecnico
-
-- **Vanilla JS** (moduli IIFE), nessun framework, nessuna build
-- **HTML/CSS/JS tutto inline** in `index.html` — scelta deliberata per evitare problemi di cache aggressiva con GitHub Pages sui file JS esterni
-- **localStorage** per la persistenza dei dati (nessun backend)
-- [SortableJS](https://github.com/SortableJS/Sortable) per il drag & drop dello Schermo DM
-
-## 📁 Struttura
-
-```
-dm-toolkit/
-├── index.html          ← App completa (HTML + CSS + JS inline)
-├── css/                 ← Stili (base, componenti, layout responsive)
-└── data/                 ← Dataset SRD 5e 2014/2024 in JSON
-    ├── srd_5_1_*.json    (mostri, oggetti, equip, regole, incantesimi 2014)
-    ├── srd_5_2_1_*.json  (stessi dataset, edizione 2024)
-    ├── sane_prices.json  (prezzi oggetti magici)
-    ├── dm_screen_*.json
-    └── tabelle.json      (dati per i generatori)
-```
-
-## 🚀 Sviluppo locale
-
-Nessuna build richiesta — è un sito statico.
-
-```bash
-git clone https://github.com/gdr-sys/dm-toolkit.git
-cd dm-toolkit
-python3 -m http.server 8000
-# apri http://localhost:8000
-```
-
 ## 📝 Licenza
 
 I dati di gioco provengono dal System Reference Document (SRD) di D&D, rilasciato sotto licenza OGL/ORC da Wizards of the Coast.
