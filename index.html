@@ -394,9 +394,39 @@
 
         <!-- PNG Completo — full width -->
         <div class="card card-gold gen-card" data-gen-id="npc" style="grid-column:1/-1;">
-          <div class="card-header">
+          <div class="card-header" style="flex-wrap:wrap;gap:6px;">
             <h3 class="card-title">Generatore PNG Completo</h3>
-            <div style="display:flex;gap:var(--space-sm);">
+            <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
+              <select id="gen-npc-tono" class="form-select" style="width:auto;font-size:0.72rem;" title="Filtra per tono di campagna">
+                <option value="tutti">Tutti i toni</option>
+                <option value="comico">Comico</option>
+                <option value="cupo">Cupo</option>
+                <option value="drammatico">Drammatico</option>
+                <option value="caldo">Caldo</option>
+                <option value="misterioso">Misterioso</option>
+                <option value="neutro">Neutro</option>
+              </select>
+              <select id="gen-npc-cr" class="form-select" style="width:auto;font-size:0.72rem;" title="Grado di sfida del combattimento">
+                <option value="auto">CR auto (Civile)</option>
+                <option value="0">CR 0</option>
+                <option value="1/8">CR 1/8</option>
+                <option value="1/4">CR 1/4</option>
+                <option value="1/2">CR 1/2</option>
+                <option value="1">CR 1</option>
+                <option value="2">CR 2</option>
+                <option value="3">CR 3</option>
+                <option value="4">CR 4</option>
+                <option value="5">CR 5</option>
+                <option value="6">CR 6</option>
+                <option value="7">CR 7</option>
+                <option value="8">CR 8</option>
+                <option value="9">CR 9</option>
+                <option value="10">CR 10</option>
+              </select>
+              <select id="gen-npc-dettaglio" class="form-select" style="width:auto;font-size:0.72rem;" title="Livello di dettaglio">
+                <option value="base">Base</option>
+                <option value="espandi">Espandi (background, legame, hook)</option>
+              </select>
               <button class="btn btn-gold btn-sm" onclick="Generatori.rollNPC()">Genera</button>
               <button class="btn btn-secondary btn-sm" id="gen-npc-edit-btn" style="display:none;" onclick="Generatori.openGeneratedNPC()">Modifica Scheda</button>
               <button class="btn btn-primary btn-sm" id="gen-npc-save-btn" style="display:none;" onclick="Generatori.saveGeneratedNPC()">Salva nel Mondo</button>
@@ -7466,46 +7496,134 @@ const Generatori = {
     Generatori.applyVisibility();
   },
 
+  // ══════════════════════════════════════════════════════
+  // GENERATORE PNG COMPLETO — segue Documento di Riferimento
+  // Parte 1: tabelle narrative modulari guidate da Archetipo
+  // Parte 2: stat block CR 0-10 con ruolo combattivo
+  // ══════════════════════════════════════════════════════
+
   rollNPC: async () => {
     const t = await loadTabelle();
     if (!t) return;
 
+    // ── Parametri scelti dall'utente (select nel form) ──
+    const tonoFiltro = document.getElementById('gen-npc-tono')?.value || 'tutti';
+    const crScelto   = document.getElementById('gen-npc-cr')?.value || 'auto';
+    const dettaglio  = document.getElementById('gen-npc-dettaglio')?.value || 'base';
+
+    // ── 1.1 Archetipo — spina dorsale, vincola tutto il resto ──
+    let archetipiPool = t.archetipi || [];
+    if (tonoFiltro !== 'tutti') {
+      const filtrati = archetipiPool.filter(a => a.tono?.includes(tonoFiltro));
+      if (filtrati.length) archetipiPool = filtrati;
+    }
+    const archetipo = rnd(archetipiPool);
+
+    // Razza, nome
     const razza = rnd(t.razze);
     const razzaKey = razza.toLowerCase().replace(/['\s]/g, k => k === "'" ? '' : '_').replace(/mezz_orco.*/, 'mezz_orco');
     const nomiPool = t.nomi[razzaKey] || t.nomi['umano'];
     const nome = rnd(nomiPool);
-    const prof = rnd(t.professioni);
-    const tratto = rnd(t.tratti);
+
+    // Mestiere coerente con l'archetipo (fallback su professioni generiche)
+    const prof = archetipo.mestieri?.length ? rnd(archetipo.mestieri) : rnd(t.professioni);
+
+    // Tratto coerente con l'archetipo (fallback su tratti generici)
+    const tratto = archetipo.tratti_coerenti?.length ? rnd(archetipo.tratti_coerenti) : rnd(t.tratti);
+
+    // Altri campi narrativi base
     const segreto = rnd(t.segreti);
     const desiderio = rnd(t.desideri);
     const obiettivo = rnd(t.obiettivi || []);
-    const difetto = rnd(t.difetti || []);
-    const legame = rnd(t.legami || []);
     const apparenza = rnd(t.apparenza || []);
     const voce = rnd(t.accenti_voci.voce);
     const tic = rnd(t.accenti_voci.tic);
-    const background = rnd(t.background_npc || []);
 
-    // Genera stat block base (medio per default)
-    const statTpl = t.stat_array_templates?.['medio'] || [10,10,10,12,12,14];
-    const statsShuffled = [...statTpl].sort(() => Math.random() - 0.5);
-    const statNames = ['FOR','DES','COS','INT','SAG','CAR'];
+    // 1.2 — cadenza, saluto, argomento ricorrente (nuovi campi)
+    const cadenza = rnd(t.cadenza_verbale || []);
+    const saluto = rnd(t.saluto_caratteristico || []);
+    const argomentoRicorrente = rnd(t.argomento_ricorrente || []);
+
+    // ── Espandi (livello di dettaglio progressivo, 1.6) ──
+    let difetto = '', legame = '', background = '', hookSituazionale = '', legameTesto = '';
+    if (dettaglio === 'espandi') {
+      difetto = rnd(t.difetti || []);
+      background = rnd(t.background_npc || []);
+      hookSituazionale = rnd(t.hook_situazionali || []);
+
+      // 1.3 — Relazioni: pesca da fazioni/NPC/luoghi salvati nella campagna se esistono
+      const camp = App.getActiveCampaign();
+      const tipiLegame = Object.keys(t.tipi_legame || {});
+      const tipoLegame = rnd(tipiLegame);
+      const fraseLegame = rnd(t.tipi_legame[tipoLegame]);
+
+      let target = null;
+      const pool = [];
+      (camp?.factions || []).forEach(f => pool.push(f.name));
+      (camp?.npcs || []).forEach(n => pool.push(n.name));
+      (camp?.luoghi || []).forEach(l => pool.push(l.name));
+      if (pool.length) target = rnd(pool);
+      else target = rnd(t.legame_target_fallback || ['una gilda locale']);
+
+      legameTesto = `${fraseLegame} ${target}`;
+      legame = legameTesto;
+    }
+
+    // ══════════════════════════════════════════════════════
+    // PARTE 2 — Stat Block da Combattimento
+    // ══════════════════════════════════════════════════════
+    const crTable = t.cr_stat_table || {};
+    const crKeys = Object.keys(crTable);
+    const cr = crScelto === 'auto' ? '0' : crScelto;
+    const rigaCR = crTable[cr] || crTable['0'];
+
+    const ruoloKey = archetipo.ruolo_combattivo || 'civile';
+    const ruoloInfo = (t.ruoli_combattivi || {})[ruoloKey] || { label: 'Civile', num_attacchi: 0, descrizione: '' };
+    const abilitaPool = (t.abilita_speciali_per_ruolo || {})[ruoloKey] || [];
+    const abilitaSpeciale = abilitaPool.length ? rnd(abilitaPool) : null;
+
+    // AC con variazione narrativa leggera (-1/+1)
+    const acVariazione = Math.floor(Math.random() * 3) - 1;
+    const ac = Math.max(8, rigaCR.ac + acVariazione);
+
+    // PF nel range della tabella CR
+    const pf = Math.floor(Math.random() * (rigaCR.pf_max - rigaCR.pf_min + 1)) + rigaCR.pf_min;
+
+    // Danno totale a round, diviso per numero di attacchi del ruolo
+    const numAttacchi = Math.max(1, ruoloInfo.num_attacchi || 1);
+    const dannoTotale = Math.floor(Math.random() * (rigaCR.danno_max - rigaCR.danno_min + 1)) + rigaCR.danno_min;
+    const dannoPerAttacco = Math.max(1, Math.round(dannoTotale / numAttacchi));
+
+    // ── 2.5 — Caratteristiche generate per ruolo ──
+    const fasceRuolo = (t.caratteristiche_per_ruolo || {})[ruoloKey] || { alta: [], media: [], basse: [] };
+    const rangeC = t.range_caratteristiche || { alta: [14,18], media: [11,13], bassa: [8,10] };
     const statKeys = ['forza','destrezza','costituzione','intelligenza','saggezza','carisma'];
     const stats = {};
-    statKeys.forEach((k, i) => { stats[k] = statsShuffled[i]; });
+    statKeys.forEach(k => {
+      let range;
+      if (fasceRuolo.alta?.includes(k)) range = rangeC.alta;
+      else if (fasceRuolo.media?.includes(k)) range = rangeC.media;
+      else if (ruoloKey === 'civile') range = [9, 11];
+      else range = rangeC.bassa;
+      stats[k] = Math.floor(Math.random() * (range[1] - range[0] + 1)) + range[0];
+    });
     const modStr = v => { const m = Math.floor((v - 10) / 2); return (m >= 0 ? '+' : '') + m; };
-    const gsInfo = t.gs_npc?.['civile'] || { ca: 10, pf: '2d8', attacco: '+2', danno: '1d4' };
-    const icon = ['👨', '👩', '🧙', '⚔️', '🗡️', '🛡️', '🎭', '🧝', '🐉'][Math.floor(Math.random()*9)];
 
-    // Salva l'NPC generato per uso futuro
+    const icon = ['👨','👩','🧙','⚔️','🗡️','🛡️','🎭','🧝','🐉'][Math.floor(Math.random()*9)];
+
+    // ── Salva l'NPC generato per uso futuro (modifica/salvataggio) ──
     Generatori._lastGeneratedNPC = {
       name: nome, race: razza, job: prof, icon,
+      archetipo: archetipo.nome,
       trait: tratto, secret: segreto, wants: desiderio,
-      voice: voce, tic,
-      obiettivo, difetto, legame, apparenza, background,
+      voice: voce, tic, cadenza, saluto, argomentoRicorrente,
+      obiettivo, difetto, legame: legameTesto, apparenza, background,
+      hookSituazionale,
+      ruoloCombattivo: ruoloInfo.label, abilitaSpeciale,
       str: stats.forza, dex: stats.destrezza, con: stats.costituzione,
       int_: stats.intelligenza, wis: stats.saggezza, cha: stats.carisma,
-      ac: gsInfo.ca, hp: gsInfo.pf, cr: '0', relation: 50,
+      ac, hp: pf, cr, dannoPerAttacco, numAttacchi, attaccoBonus: rigaCR.attacco, saveDC: rigaCR.save_dc,
+      relation: 50,
     };
 
     const el = document.getElementById('gen-npc-result');
@@ -7513,53 +7631,59 @@ const Generatori = {
     if (!el) return;
     if (saveBtn) saveBtn.style.display = '';
 
+    const espansoHTML = dettaglio === 'espandi' ? `
+          <div class="text-sm" style="margin-bottom:4px;"><strong>Background:</strong> ${background}</div>
+          <div class="text-sm" style="margin-bottom:4px;"><strong>Legame:</strong> ${legameTesto}</div>
+          <div class="text-sm" style="margin-bottom:4px;"><strong>Difetto:</strong> ${difetto}</div>
+          <div class="text-sm" style="margin-bottom:4px;"><strong>🎬 Ora sta facendo:</strong> <em>${hookSituazionale}</em></div>` : '';
+
     el.innerHTML = `
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-md);">
-        <!-- Colonna sinistra: Ruolo -->
+        <!-- Colonna sinistra: Ruolo narrativo -->
         <div>
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:var(--space-sm);">
             <span style="font-size:1.8rem;">${icon}</span>
             <div>
               <div style="font-family:var(--font-display);font-size:1.1rem;">${nome}</div>
               <div><span class="badge badge-muted">${razza}</span> <span class="badge badge-gold">${prof}</span></div>
+              <div class="text-xs text-muted" style="margin-top:2px;">🎭 ${archetipo.nome}</div>
             </div>
           </div>
           <div class="text-sm" style="margin-bottom:4px;"><strong>Apparenza:</strong> ${apparenza}</div>
           <div class="text-sm" style="margin-bottom:4px;"><strong>Tratto:</strong> ${tratto}</div>
           <div class="text-sm" style="margin-bottom:4px;"><strong>Voce:</strong> ${voce} · <em>${tic}</em></div>
-          <div class="text-sm" style="margin-bottom:4px;"><strong>Background:</strong> ${background}</div>
-          <div class="text-sm" style="margin-bottom:4px;"><strong>Legame:</strong> ${legame}</div>
+          <div class="text-sm" style="margin-bottom:4px;"><strong>Cadenza:</strong> ${cadenza}</div>
+          <div class="text-sm" style="margin-bottom:4px;"><strong>Saluto:</strong> ${saluto}</div>
+          <div class="text-sm" style="margin-bottom:4px;"><strong>Argomento ricorrente:</strong> ${argomentoRicorrente}</div>
           <div class="text-sm" style="margin-bottom:4px;"><strong>Obiettivo:</strong> ${obiettivo}</div>
-          <div class="text-sm" style="margin-bottom:4px;"><strong>Difetto:</strong> ${difetto}</div>
-          <div class="text-sm" style="margin-bottom:4px;"><strong style="color:var(--accent-secondary);">Vuole dai PG:</strong> ${desiderio}</div>
-          <div class="text-sm"><strong style="color:var(--accent-primary);">🔒 Segreto:</strong> ${segreto}</div>
-        </div>
-        <!-- Colonna destra: Stat block -->
-        <div>
-          <div class="stat-block">
-            <div class="stat-block-title" style="font-size:0.85rem;">${nome}</div>
-            <div class="stat-block-subtitle">Umanoide (${razza}), varia</div>
-            <div class="stat-block-divider"></div>
-            <div class="stat-row" style="font-size:0.78rem;"><strong>CA</strong> <span>${gsInfo.ca}</span></div>
-            <div class="stat-row" style="font-size:0.78rem;"><strong>PF</strong> <span>${gsInfo.pf}</span></div>
-            <div class="stat-block-divider"></div>
-            <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:3px;margin:4px 0;">
-              ${statNames.map((abbr, i) => {
-                const v = statsShuffled[i];
-                return `<div class="stat-ability-box">
-                  <div class="stat-ability-name">${abbr}</div>
-                  <div class="stat-ability-score" style="font-size:0.85rem;">${v}</div>
-                  <div class="stat-ability-mod">${modStr(v)}</div>
-                </div>`;
-              }).join('')}
-            </div>
-            <div class="stat-block-divider"></div>
-            <div class="stat-row" style="font-size:0.78rem;"><strong>GS</strong> <span>0 (PE 10)</span></div>
+          <div class="text-sm" style="margin-bottom:4px;"><strong>Desiderio dai PG:</strong> ${desiderio}</div>
+          ${espansoHTML}
+          <div class="card card-gold" style="padding:6px 10px;margin-top:6px;">
+            <div class="text-xs" style="color:var(--accent-secondary);"><strong>🔒 Segreto:</strong> ${segreto}</div>
           </div>
         </div>
-      </div>
-    `;
-    Debug.log(`PNG completo generato: ${nome} (${razza}, ${prof})`);
+
+        <!-- Colonna destra: Stat block -->
+        <div class="stat-block">
+          <div class="stat-block-title">${nome}</div>
+          <div class="stat-block-subtitle">${razza} · ${ruoloInfo.label} · CR ${cr}</div>
+          <div class="stat-block-divider"></div>
+          <div class="stat-row"><strong>AC</strong> ${ac} &nbsp; <strong>PF</strong> ${pf}</div>
+          <div class="stat-row"><strong>Tiro per colpire</strong> ${rigaCR.attacco >= 0 ? '+' : ''}${rigaCR.attacco} &nbsp; <strong>Save DC</strong> ${rigaCR.save_dc}</div>
+          <div class="stat-row"><strong>Attacchi</strong> ${numAttacchi}× ~${dannoPerAttacco} danni l'uno</div>
+          <div class="stat-abilities">
+            ${statKeys.map(k => `
+              <div class="stat-ability-box">
+                <div class="stat-ability-name">${k.slice(0,3).toUpperCase()}</div>
+                <div class="stat-ability-score">${stats[k]}</div>
+                <div class="stat-ability-mod">${modStr(stats[k])}</div>
+              </div>`).join('')}
+          </div>
+          <div class="stat-block-divider"></div>
+          <div class="text-xs text-muted" style="margin-bottom:4px;">${ruoloInfo.descrizione}</div>
+          ${abilitaSpeciale ? `<div class="sb-action"><strong>${abilitaSpeciale.split('(')[0].trim()}.</strong> ${(abilitaSpeciale.match(/\(([^)]+)\)/)||[])[1] || ''}</div>` : ''}
+        </div>
+      </div>`;
   },
 
   _lastGeneratedNPC: null,
@@ -9666,4 +9790,3 @@ document.addEventListener('DOMContentLoaded', initMobileNav);
 
 </body>
 </html>
-
