@@ -5414,8 +5414,8 @@ const Compendio = (() => {
   // ── Cambio tab ──
   const switchTab = (tab) => {
     _activeTab = tab;
-    const tabKeys = ['monsters', 'magic_items', 'equipment', 'rules', 'spells', 'homebrew', 'cerca'];
-    const countIds = { monsters: 'comp-count-monsters', magic_items: 'comp-count-magic', equipment: 'comp-count-equip', rules: 'comp-count-rules', spells: 'comp-count-spells', homebrew: 'comp-count-homebrew', cerca: 'comp-count-cerca' };
+    const tabKeys = ['monsters', 'magic_items', 'equipment', 'rules', 'spells', 'homebrew', 'cerca', 'velocita'];
+    const countIds = { monsters: 'comp-count-monsters', magic_items: 'comp-count-magic', equipment: 'comp-count-equip', rules: 'comp-count-rules', spells: 'comp-count-spells', homebrew: 'comp-count-homebrew', cerca: 'comp-count-cerca', velocita: '' };
     tabKeys.forEach(t => {
       document.getElementById(`comp-tab-${t}`)?.classList.toggle('active', t === tab);
       document.getElementById(`comp-panel-${t}`)?.classList.toggle('active', t === tab);
@@ -5423,9 +5423,14 @@ const Compendio = (() => {
       const countEl = document.getElementById(countIds[t]);
       if (countEl) countEl.style.display = t === tab ? '' : 'none';
     });
-    if (!_loaded && tab !== 'homebrew' && tab !== 'cerca') { load(); return; }
+    if (!_loaded && tab !== 'homebrew' && tab !== 'cerca' && tab !== 'velocita') { load(); return; }
     if (tab === 'cerca') {
       setTimeout(() => document.getElementById('comp-search-cerca')?.focus(), 100);
+    }
+    if (tab === 'velocita') {
+      // Non caricare i dati normali del compendio per questo tab
+      searchVelocita();
+      return;
     }
     render();
     Debug.log(`Compendio tab: ${tab}`);
@@ -6627,14 +6632,8 @@ const Compendio = (() => {
     }).join('');
   };
 
-  // Override switchTab per init velocita al primo click
-  const _origSwitchTab = switchTab;
-
   return {
-    init, switchTab: (tab) => {
-      _origSwitchTab(tab);
-      if (tab === 'velocita') searchVelocita();
-    }, onSearch, onFilter,
+    init, switchTab, onSearch, onFilter,
     openMonster, openMagicItem, openEquipment, openRule, openSpell,
     openHomebrew, openHomebrewModal, editHomebrew, saveHomebrew, deleteHomebrew,
     _refreshHBForm, _getHB: _getHomebrew,
