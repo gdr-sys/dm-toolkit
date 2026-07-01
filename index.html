@@ -962,6 +962,35 @@
 </div><!-- /app -->
 
 
+<!-- Modal: Cronologia Snapshot -->
+<div class="modal-overlay hidden" id="modal-snapshots">
+  <div class="modal" style="max-width:560px;">
+    <div class="modal-header">
+      <h2 style="font-family:var(--font-display);font-size:1.1rem;">🕐 Cronologia Backup</h2>
+      <button class="btn btn-ghost btn-icon" onclick="Modal.close('modal-snapshots')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="display:flex;gap:var(--space-sm);margin-bottom:var(--space-md);flex-wrap:wrap;">
+        <button class="btn btn-primary btn-sm" onclick="Storage.createSnapshot('Manuale');Toast.show('Snapshot salvato','success');renderSnapshotList();">
+          + Salva snapshot ora
+        </button>
+        <button class="btn btn-secondary btn-sm" onclick="BackupSystem.importFile && BackupSystem.importFile()">
+          📥 Importa backup
+        </button>
+        <button class="btn btn-ghost btn-sm" onclick="Storage.exportSnapshot()">
+          📤 Esporta tutto
+        </button>
+      </div>
+      <div style="font-size:0.78rem;color:var(--text-muted);margin-bottom:var(--space-md);">
+        Gli snapshot vengono creati automaticamente ad ogni sessione. Vengono conservati gli ultimi 10.
+      </div>
+      <div id="snapshot-list" style="display:flex;flex-direction:column;gap:6px;max-height:400px;overflow-y:auto;">
+        <div class="text-muted text-sm">Caricamento...</div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- ════════════════════════════════════════════════════════
      WIDGET DADI (fisso)
 ════════════════════════════════════════════════════════ -->
@@ -2876,6 +2905,14 @@ const App = (() => {
         <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
         Importa
       </button>
+      <button class="btn btn-ghost btn-sm" onclick="Storage.createSnapshot('Manuale');Toast.show('Snapshot salvato', \'success\');renderSnapshotList();" title="Salva snapshot">
+        <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        Snapshot
+      </button>
+      <button class="btn btn-ghost btn-sm" onclick="Modal.open('modal-snapshots');renderSnapshotList();" title="Cronologia backup">
+        <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        Cronologia
+      </button>
       <button class="btn btn-ghost btn-sm" onclick="BackupSystem.exportAll()" title="Backup">
         <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
         Backup
@@ -2979,7 +3016,42 @@ const App = (() => {
     grid.appendChild(newCard);
   };
 
-  const openCampaign = (id) => {
+  // ── Snapshot UI ──
+const renderSnapshotList = () => {
+  const el = document.getElementById('snapshot-list');
+  if (!el) return;
+  const info = Storage.getSnapshotInfo();
+  if (!info.list.length) {
+    el.innerHTML = '<div class="text-muted text-sm">Nessuno snapshot salvato.</div>';
+    return;
+  }
+  el.innerHTML = info.list.map(s => `
+    <div style="display:flex;align-items:center;gap:var(--space-sm);padding:8px 10px;background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-md);">
+      <div style="flex:1;min-width:0;">
+        <div style="font-family:var(--font-display);font-size:0.82rem;">${s.label}</div>
+        <div style="font-size:0.72rem;color:var(--text-muted);">${s.dateStr} · ${s.campagneCount} campagne</div>
+      </div>
+      <button class="btn btn-ghost btn-sm" style="font-size:0.72rem;" onclick="Storage.exportSnapshot('${s.id}')">📤</button>
+      <button class="btn btn-secondary btn-sm" style="font-size:0.72rem;" onclick="
+        openConfirmModal('Ripristinare questo snapshot?','Tutte le campagne attuali verranno sostituite con quelle dello snapshot.',()=>{
+          if(Storage.restoreSnapshot('${s.id}')){
+            renderSnapshotList();
+            renderHomePage();
+            Toast.show('Snapshot ripristinato','success');
+          }
+        })">↩ Ripristina</button>
+      <button class="btn btn-ghost btn-sm" style="font-size:0.72rem;" onclick="
+        Storage.deleteSnapshot('${s.id}');
+        renderSnapshotList();
+        Toast.show('Snapshot eliminato','info');">🗑️</button>
+    </div>`).join('');
+  const counter = document.getElementById('snapshot-counter');
+  if (counter) counter.textContent = `${info.count}/${info.max}`;
+};
+
+window.addEventListener('open-modal-snapshots', renderSnapshotList);
+
+const openCampaign = (id) => {
     const camp = Storage.getCampaign(id);
     if (!camp) { Toast.show('Campagna non trovata', 'error'); return; }
     setActiveCampaign(camp);
@@ -10006,6 +10078,7 @@ document.addEventListener('DOMContentLoaded', () => {
   );
   App.init();
   BackupSystem.autoBackup();
+  Storage.autoBackup(); // snapshot versionati #8
   // Carica cache mostri e compendio in background
   setTimeout(() => MonsterCache.load(), 500);
 
