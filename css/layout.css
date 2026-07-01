@@ -353,8 +353,8 @@
   .comp-filters select { flex:0 1 auto; font-size:0.78rem; }
   #comp-sistema-select { display:none; }
 
-  /* PATCH: lista scrollabile flex invece di height fissa */
-  #page-compendio { display:flex; flex-direction:column; }
+  /* PATCH: lista scrollabile flex invece di height fissa — SOLO quando active */
+  #page-compendio.active { display:flex !important; flex-direction:column; }
   #page-compendio .comp-list { flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; min-height:200px; }
 
   .comp-row { gap:4px; padding:5px 4px; overflow:hidden; }
