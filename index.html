@@ -6564,7 +6564,6 @@ const Compendio = (() => {
     const cat = document.getElementById('vel-cat')?.value || '';
     const durata = document.getElementById('vel-durata')?.value || '8h';
     const data = await loadVelocita();
-    Debug.log(`searchVelocita: q="${q}" cat="${cat}" dur="${durata}" creature=${data?.creature?.length}`);
 
     const durKeys = {
       '1h':  { lento: 'vel_1h_lento', norm: 'vel_1h_norm', fast: 'vel_1h_fast' },
@@ -6587,13 +6586,12 @@ const Compendio = (() => {
           const fast = m[keys.fast] ?? '—';
           return `<div class="comp-row">
             <div class="comp-row-main">
-              <span class="comp-row-name">${m.vel_base_ft}ft / ${m.vel_base_m}m</span>
-              <span class="comp-row-meta">Montura generica</span>
+              <span class="comp-row-name">${m.vel_base_ft}ft / ${m.vel_base_m}m base</span>
             </div>
             <div class="comp-row-stats">
-              ${lento !== '—' ? `<span class="comp-stat-pill" title="Lento">L ${lento}</span>` : ''}
-              <span class="comp-stat-pill" title="Normale">N ${norm}</span>
-              ${fast !== '—' ? `<span class="comp-stat-pill" title="Veloce">V ${fast}</span>` : ''}
+              <span class="comp-stat-pill" title="Lento">🐢 ${lento}</span>
+              <span class="comp-stat-pill" title="Normale">🚶 ${norm}</span>
+              <span class="comp-stat-pill" title="Veloce">💨 ${fast}</span>
             </div>
           </div>`;
         }).join('');
@@ -6617,17 +6615,18 @@ const Compendio = (() => {
       const norm = c[keys.norm] ?? '—';
       const lento = c[keys.lento] ?? '—';
       const fast = c[keys.fast] ?? '—';
-      const tipoLabel = { terrestri:'Terra', acquatici:'Acqua', volanti:'Volo', veicoli:'Veicolo', magia_terra:'Magia', magia_aria:'Magia Volo' };
-      const noteStr = c.note ? ' · ' + c.note : '';
+      const badges = { terrestri:'🦶', acquatici:'🌊', volanti:'🦅', veicoli:'⚓', magia_terra:'✨', magia_aria:'✨' };
+      const badge = badges[c.categoria] || '';
+      const noteHtml = c.note ? `<span class="text-xs text-muted" style="margin-left:6px;">${c.note}</span>` : '';
       return `<div class="comp-row">
         <div class="comp-row-main">
-          <span class="comp-row-name">${c.nome}</span>
-          <span class="comp-row-meta">${tipoLabel[c.categoria] || c.categoria} · ${c.tipo || ''}${noteStr}</span>
+          <span class="comp-row-name">${badge} ${c.nome}</span>
+          <span class="comp-row-meta">${c.tipo || c.categoria}${noteHtml ? ' · ' + c.note : ''}</span>
         </div>
         <div class="comp-row-stats">
-          ${lento !== '—' ? `<span class="comp-stat-pill" title="Lento">L ${lento}</span>` : ''}
-          ${norm !== '—' ? `<span class="comp-stat-pill" title="Normale">N ${norm}</span>` : ''}
-          ${fast !== '—' ? `<span class="comp-stat-pill" title="Veloce">V ${fast}</span>` : ''}
+          ${lento !== '—' ? `<span class="comp-stat-pill" title="Lento">L ${lento} km</span>` : ''}
+          ${norm !== '—' ? `<span class="comp-stat-pill" title="Normale">N ${norm} km</span>` : ''}
+          ${fast !== '—' ? `<span class="comp-stat-pill" title="Veloce">V ${fast} km</span>` : ''}
         </div>
       </div>`;
     }).join('');
@@ -7513,7 +7512,7 @@ const Schermo = (() => {
           <span style="font-size:0.75rem;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${c.nome}</span>
           <div style="display:flex;gap:4px;flex-shrink:0;">
             ${lento !== '—' ? `<span class="schermo-stat" title="Lento">L ${lento}</span>` : ''}
-            <span class="schermo-stat" title="Normale">N ${norm}</span>
+            <span class="schermo-stat" title="Normale">🚶${norm}</span>
             ${fast !== '—' ? `<span class="schermo-stat" title="Veloce">V ${fast}</span>` : ''}
           </div>
         </div>`;
@@ -9968,6 +9967,10 @@ document.addEventListener('DOMContentLoaded', () => {
     <span class="mobile-nav-icon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></span>
     <span class="mobile-nav-label">Schermo</span>
   </button>
+  <button class="mobile-nav-item" data-page="schermo" onclick="App.navigateTo('schermo');setMobileActive(this)">
+    <span class="mobile-nav-icon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></span>
+    <span class="mobile-nav-label">Schermo</span>
+  </button>
 </nav>
 
 <script>
@@ -10011,7 +10014,7 @@ const syncMobileActive = (page) => {
     b.classList.toggle('active', b.dataset.page === page);
   });
   // Pagine non in navbar: deseleziona tutto
-  const navPages = ['home','campagna','mondo','sessione','generatori'];
+  const navPages = ['home','campagna','mondo','sessione','generatori','compendio','schermo'];
   if (!navPages.includes(page)) {
     document.querySelectorAll('.mobile-nav-item').forEach(b => b.classList.remove('active'));
   }
