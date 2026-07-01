@@ -263,7 +263,7 @@
 /* ══════════════════════════════════════
    SCHERMO DEL MASTER
 ══════════════════════════════════════ */
-.schermo-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:var(--space-md); align-items:start; }
+.schermo-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:var(--space-md); align-items:start; grid-auto-flow:dense; }
 @media (max-width: 1200px) { .schermo-grid { grid-template-columns:repeat(2,1fr); } }
 @media (max-width: 768px) { .schermo-grid { grid-template-columns:1fr; } }
 
