@@ -7795,9 +7795,6 @@ const Schermo = (() => {
     render();
   };
 
-  return {
-    init, render, addBlock, submitAddBlock,
-    removeBlock, resizeBlock, moveBlock, editBlock, resetLayout,
   const startResize = (e, blockId) => {
     e.preventDefault();
     const bodyEl = document.getElementById(`sbody-${blockId}`);
@@ -7816,7 +7813,10 @@ const Schermo = (() => {
     document.addEventListener('mouseup', onUp);
   };
 
-      rollDie, generateMeteo, saveNote, advanceTime, refreshCombat,
+  return {
+    init, render, addBlock, submitAddBlock,
+    removeBlock, resizeBlock, moveBlock, editBlock, resetLayout,
+    rollDie, generateMeteo, saveNote, advanceTime, refreshCombat,
     setCompendioRef, _refreshCombat, _refreshFavoriti, _swapBlocks,
     _refreshNoteSessione, _avanzaTempo,
     startResize,
