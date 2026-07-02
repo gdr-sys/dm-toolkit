@@ -955,7 +955,7 @@
       </div>
 
       <!-- Griglia blocchi -->
-      <div id="schermo-grid" class="schermo-grid" style="grid-auto-flow:dense;"></div>
+      <div id="schermo-grid" class="schermo-grid"></div>
     </section>
 
   </div><!-- /main-content -->
@@ -7000,7 +7000,7 @@ const Schermo = (() => {
     const title = block.title || def.label;
 
     return `
-      <div class="schermo-block schermo-block-${size}" id="sblock-${block.id}" style="grid-column:span ${cols};">
+      <div class="schermo-block schermo-block-${size}" id="sblock-${block.id}">
         <div class="schermo-block-header">
           <span class="schermo-block-icon" style="cursor:grab;" title="Trascina per spostare">${def.icon}</span>
           <span class="schermo-block-title">${title}</span>
@@ -7012,7 +7012,7 @@ const Schermo = (() => {
             <button class="btn btn-ghost btn-icon-sm" onclick="Schermo.removeBlock('${block.id}')" title="Rimuovi" aria-label="Rimuovi"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
           </div>
         </div>
-        <div class="schermo-block-body" id="sbody-${block.id}" style="max-height:${block.bodyHeight ? block.bodyHeight+'px' : '340px'};">
+        <div class="schermo-block-body" id="sbody-${block.id}" style="max-height:${block.bodyHeight ? block.bodyHeight+'px' : '380px'};overflow:auto;">
           <!-- Popolato da updateBlockContent -->
         </div>
         <div class="schermo-block-resize" onmousedown="Schermo.startResize(event,'${block.id}')"></div>
@@ -7797,17 +7797,32 @@ const Schermo = (() => {
 
   const startResize = (e, blockId) => {
     e.preventDefault();
+    e.stopPropagation();
     const bodyEl = document.getElementById(`sbody-${blockId}`);
     if (!bodyEl) return;
     const startY = e.clientY;
-    const startH = bodyEl.offsetHeight;
-    const onMove = (ev) => { bodyEl.style.maxHeight = Math.max(80, startH + (ev.clientY - startY)) + 'px'; };
+    // Usa la altezza visibile attuale (non max-height)
+    const startH = bodyEl.getBoundingClientRect().height;
+    document.body.style.userSelect = 'none';
+    document.body.style.cursor = 'ns-resize';
+
+    const onMove = (ev) => {
+      const delta = ev.clientY - startY;
+      const newH = Math.max(60, Math.round(startH + delta));
+      bodyEl.style.maxHeight = newH + 'px';
+      bodyEl.style.overflow = 'auto';
+    };
     const onUp = () => {
+      document.body.style.userSelect = '';
+      document.body.style.cursor = '';
       document.removeEventListener('mousemove', onMove);
       document.removeEventListener('mouseup', onUp);
       const screen = Storage.getMasterScreen();
       const blk = (screen.blocks || []).find(b => b.id === blockId);
-      if (blk) { blk.bodyHeight = parseInt(bodyEl.style.maxHeight); Storage.saveMasterScreen(screen); }
+      if (blk) {
+        blk.bodyHeight = parseInt(bodyEl.style.maxHeight);
+        Storage.saveMasterScreen(screen);
+      }
     };
     document.addEventListener('mousemove', onMove);
     document.addEventListener('mouseup', onUp);
