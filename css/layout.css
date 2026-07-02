@@ -263,9 +263,22 @@
 /* ══════════════════════════════════════
    SCHERMO DEL MASTER
 ══════════════════════════════════════ */
-.schermo-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:var(--space-md); align-items:start; grid-auto-flow:dense; }
-@media (max-width: 1200px) { .schermo-grid { grid-template-columns:repeat(2,1fr); } }
-@media (max-width: 768px) { .schermo-grid { grid-template-columns:1fr; } }
+/* CSS Columns — layout masonry senza buchi, i blocchi si impilano verticalmente */
+.schermo-grid {
+  column-count: 4;
+  column-gap: var(--space-md);
+}
+.schermo-grid .schermo-block {
+  break-inside: avoid;
+  -webkit-column-break-inside: avoid;
+  display: inline-block;
+  width: 100%;
+  margin-bottom: var(--space-md);
+  vertical-align: top;
+}
+@media (max-width: 1400px) { .schermo-grid { column-count: 3; } }
+@media (max-width: 1024px) { .schermo-grid { column-count: 2; } }
+@media (max-width: 768px)  { .schermo-grid { column-count: 1; } }
 
 .schermo-block { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-lg); overflow:visible; transition:box-shadow var(--transition-fast); }
 .schermo-block:hover { box-shadow:var(--shadow-md); }
