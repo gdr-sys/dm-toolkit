@@ -250,7 +250,7 @@
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-md);flex-wrap:wrap;gap:var(--space-sm);">
           <div style="display:flex;gap:var(--space-sm);flex-wrap:wrap;">
             <div style="position:relative;display:inline-flex;align-items:center;flex:1;">
-            <input type="text" id="npc-search" class="form-input" placeholder="Cerca PNG..." aria-label="Cerca PNG" style="padding-right:28px;width:220px;" oninput="NPC.filter()">
+            <input type="text" id="npc-search" class="form-input" placeholder="Cerca PNG..." aria-label="Cerca PNG" style="width:220px;" oninput="NPC.filter()">
             <button onclick="document.getElementById('npc-search').value='';NPC.filter();" style="position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:0.85rem;padding:2px 4px;line-height:1;border-radius:var(--radius-sm);" title="Cancella ricerca">✕</button>
           </div>
             <select id="npc-filter-faction" class="form-select" style="width:auto;" onchange="NPC.filter()">
@@ -266,7 +266,7 @@
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-md);flex-wrap:wrap;gap:var(--space-sm);">
           <div style="display:flex;gap:var(--space-sm);flex-wrap:wrap;">
             <div style="position:relative;display:inline-flex;align-items:center;flex:1;">
-            <input type="text" id="luoghi-search" class="form-input" placeholder="Cerca luogo..." aria-label="Cerca luogo" style="padding-right:28px;width:220px;" oninput="Luoghi.filter()">
+            <input type="text" id="luoghi-search" class="form-input" placeholder="Cerca luogo..." aria-label="Cerca luogo" style="width:220px;" oninput="Luoghi.filter()">
             <button onclick="document.getElementById('luoghi-search').value='';Luoghi.filter();" style="position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:0.85rem;padding:2px 4px;line-height:1;border-radius:var(--radius-sm);" title="Cancella ricerca">✕</button>
           </div>
             <select id="luoghi-filter-tipo" class="form-select" style="width:auto;" onchange="Luoghi.filter()">
@@ -289,7 +289,7 @@
       <div id="mondo-tab-fazioni" class="tab-content">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-md);flex-wrap:wrap;gap:var(--space-sm);">
           <div style="position:relative;display:inline-flex;align-items:center;flex:1;">
-            <input type="text" id="fazioni-search" class="form-input" placeholder="Cerca fazione..." aria-label="Cerca fazione" style="padding-right:28px;width:220px;" oninput="Fazioni.filter()">
+            <input type="text" id="fazioni-search" class="form-input" placeholder="Cerca fazione..." aria-label="Cerca fazione" style="width:220px;" oninput="Fazioni.filter()">
             <button onclick="document.getElementById('fazioni-search').value='';Fazioni.filter();" style="position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:0.85rem;padding:2px 4px;line-height:1;border-radius:var(--radius-sm);" title="Cancella ricerca">✕</button>
           </div>
           <button class="btn btn-primary" onclick="Fazioni.openModal(null)">+ Nuova Fazione</button>
@@ -758,7 +758,7 @@
         <!-- Filtri Mostri -->
         <div id="comp-filters-monsters" class="comp-filters">
           <div style="position:relative;display:inline-flex;align-items:center;flex:1;min-width:0;">
-            <input type="text" id="comp-search-monsters" class="form-input" placeholder="Cerca mostro..." style="padding-right:28px;flex:1;min-width:180px;" oninput="Compendio.onSearch('monsters')">
+            <input type="text" id="comp-search-monsters" class="form-input" placeholder="Cerca mostro..." style="flex:1;min-width:180px;" oninput="Compendio.onSearch('monsters')">
             <button onclick="document.getElementById('comp-search-monsters').value='';Compendio.onSearch('monsters')" style="position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:0.85rem;padding:2px 4px;line-height:1;border-radius:var(--radius-sm);" title="Cancella">✕</button>
           </div>
           <select class="form-select" id="comp-filter-tipo-monsters" style="width:auto;" onchange="Compendio.onFilter('monsters','tipo',this.value)">
@@ -775,7 +775,7 @@
         <!-- Filtri Oggetti Magici -->
         <div id="comp-filters-magic_items" class="comp-filters hidden">
           <div style="position:relative;display:inline-flex;align-items:center;flex:1;min-width:0;">
-            <input type="text" id="comp-search-magic_items" class="form-input" placeholder="Cerca oggetto..." style="padding-right:28px;flex:1;min-width:180px;" oninput="Compendio.onSearch('magic_items')">
+            <input type="text" id="comp-search-magic_items" class="form-input" placeholder="Cerca oggetto..." style="flex:1;min-width:180px;" oninput="Compendio.onSearch('magic_items')">
             <button onclick="document.getElementById('comp-search-magic_items').value='';Compendio.onSearch('magic_items')" style="position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:0.85rem;padding:2px 4px;line-height:1;border-radius:var(--radius-sm);" title="Cancella">✕</button>
           </div>
           <select class="form-select" id="comp-filter-tipo-magic" style="width:auto;" onchange="Compendio.onFilter('magic_items','tipo_base',this.value)">
@@ -796,7 +796,7 @@
         <!-- Filtri Equipaggiamento -->
         <div id="comp-filters-equipment" class="comp-filters hidden">
           <div style="position:relative;display:inline-flex;align-items:center;flex:1;min-width:0;">
-            <input type="text" id="comp-search-equipment" class="form-input" placeholder="Cerca equipaggiamento..." style="padding-right:28px;flex:1;min-width:180px;" oninput="Compendio.onSearch('equipment')">
+            <input type="text" id="comp-search-equipment" class="form-input" placeholder="Cerca equipaggiamento..." style="flex:1;min-width:180px;" oninput="Compendio.onSearch('equipment')">
             <button onclick="document.getElementById('comp-search-equipment').value='';Compendio.onSearch('equipment')" style="position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:0.85rem;padding:2px 4px;line-height:1;border-radius:var(--radius-sm);" title="Cancella">✕</button>
           </div>
           <select class="form-select" id="comp-filter-tipo-equip" style="width:auto;" onchange="Compendio.onFilter('equipment','tipo',this.value)">
@@ -810,7 +810,7 @@
         <!-- Filtri Incantesimi -->
         <div id="comp-filters-spells" class="comp-filters hidden">
           <div style="position:relative;display:inline-flex;align-items:center;flex:1;min-width:0;">
-            <input type="text" id="comp-search-spells" class="form-input" placeholder="Cerca incantesimo..." style="padding-right:28px;flex:1;min-width:180px;" oninput="Compendio.onSearch('spells')">
+            <input type="text" id="comp-search-spells" class="form-input" placeholder="Cerca incantesimo..." style="flex:1;min-width:180px;" oninput="Compendio.onSearch('spells')">
             <button onclick="document.getElementById('comp-search-spells').value='';Compendio.onSearch('spells')" style="position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:0.85rem;padding:2px 4px;line-height:1;border-radius:var(--radius-sm);" title="Cancella">✕</button>
           </div>
           <select class="form-select" id="comp-filter-livello-spells" style="width:auto;" onchange="Compendio.onFilter('spells','livello',this.value)">
@@ -834,7 +834,7 @@
         <!-- Filtri Homebrew -->
         <div id="comp-filters-homebrew" class="comp-filters hidden">
           <div style="position:relative;display:inline-flex;align-items:center;flex:1;min-width:0;">
-            <input type="text" id="comp-search-homebrew" class="form-input" placeholder="Cerca homebrew..." style="padding-right:28px;flex:1;min-width:150px;" oninput="Compendio.onSearch('homebrew')">
+            <input type="text" id="comp-search-homebrew" class="form-input" placeholder="Cerca homebrew..." style="flex:1;min-width:150px;" oninput="Compendio.onSearch('homebrew')">
             <button onclick="document.getElementById('comp-search-homebrew').value='';Compendio.onSearch('homebrew')" style="position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:0.85rem;padding:2px 4px;line-height:1;border-radius:var(--radius-sm);" title="Cancella">✕</button>
           </div>
           <select class="form-select" id="comp-filter-cat-homebrew" style="width:auto;" onchange="Compendio.onFilter('homebrew','categoria',this.value)">
@@ -852,7 +852,7 @@
         <!-- Filtri Cerca tutto -->
         <div id="comp-filters-cerca" class="comp-filters hidden">
           <div style="position:relative;display:inline-flex;align-items:center;flex:1;min-width:0;">
-            <input type="text" id="comp-search-cerca" class="form-input" placeholder="Cerca in tutto il Compendio..." style="padding-right:28px;flex:1;min-width:200px;"
+            <input type="text" id="comp-search-cerca" class="form-input" placeholder="Cerca in tutto il Compendio..." style="flex:1;min-width:200px;"
             oninput="Compendio.onSearch('cerca')" autofocus>
             <button onclick="document.getElementById('comp-search-cerca').value='';Compendio.onSearch('cerca')" style="position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:0.85rem;padding:2px 4px;line-height:1;border-radius:var(--radius-sm);" title="Cancella">✕</button>
           </div>
@@ -862,7 +862,7 @@
         <!-- Filtri Regole -->
         <div id="comp-filters-rules" class="comp-filters hidden">
           <div style="position:relative;display:inline-flex;align-items:center;flex:1;min-width:0;">
-            <input type="text" id="comp-search-rules" class="form-input" placeholder="Cerca regola..." style="padding-right:28px;flex:1;min-width:180px;" oninput="Compendio.onSearch('rules')">
+            <input type="text" id="comp-search-rules" class="form-input" placeholder="Cerca regola..." style="flex:1;min-width:180px;" oninput="Compendio.onSearch('rules')">
             <button onclick="document.getElementById('comp-search-rules').value='';Compendio.onSearch('rules')" style="position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:0.85rem;padding:2px 4px;line-height:1;border-radius:var(--radius-sm);" title="Cancella">✕</button>
           </div>
           <select class="form-select" id="comp-filter-cat-rules" style="width:auto;" onchange="Compendio.onFilter('rules','categoria',this.value)">
@@ -883,7 +883,7 @@
         <div class="tab-content" id="comp-panel-velocita">
           <div class="comp-filters" style="flex-wrap:wrap;gap:6px;">
             <div style="position:relative;display:inline-flex;align-items:center;flex:1;min-width:0;">
-            <input type="text" id="vel-search" class="form-input" placeholder="Cerca creatura o veicolo..." oninput="Compendio.searchVelocita()" style="padding-right:28px;flex:1;min-width:160px;">
+            <input type="text" id="vel-search" class="form-input" placeholder="Cerca creatura o veicolo..." oninput="Compendio.searchVelocita()" style="flex:1;min-width:160px;">
             <button onclick="document.getElementById('vel-search').value='';Compendio.searchVelocita()" style="position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:0.85rem;padding:2px 4px;line-height:1;border-radius:var(--radius-sm);" title="Cancella">✕</button>
           </div>
             <select id="vel-cat" class="form-select" onchange="Compendio.searchVelocita()" style="width:auto;font-size:0.8rem;">
@@ -1544,6 +1544,7 @@
               <div class="stat-block-divider"></div>
               <div class="stat-abilities" id="sb-abilities"></div>
               <div class="stat-block-divider"></div>
+              <div class="stat-row" id="sb-saves-row" style="display:none;"><strong>Tiri Salvezza</strong> <span id="sb-saves">—</span></div>
               <div class="stat-row" id="sb-immunities-row" style="display:none;"><strong>Immunità/Resistenze</strong> <span id="sb-immunities">—</span></div>
               <div class="stat-row" id="sb-senses-row" style="display:none;"><strong>Sensi</strong> <span id="sb-senses">—</span></div>
               <div class="stat-row" id="sb-lang-row" style="display:none;"><strong>Linguaggi</strong> <span id="sb-languages">—</span></div>
@@ -1643,7 +1644,7 @@
     </div>
     <div class="modal-body">
       <div style="position:relative;display:inline-flex;align-items:center;flex:1;">
-            <input type="text" id="monster-search-input" class="form-input" placeholder="🔍 Cerca mostro nel Compendio..." oninput="Sessione.searchMonster()" style="padding-right:28px;margin-bottom:var(--space-md);">
+            <input type="text" id="monster-search-input" class="form-input" placeholder="🔍 Cerca mostro nel Compendio..." oninput="Sessione.searchMonster()" style="margin-bottom:var(--space-md);">
             <button onclick="document.getElementById('monster-search-input').value='';Sessione.searchMonster();" style="position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:0.85rem;padding:2px 4px;line-height:1;border-radius:var(--radius-sm);" title="Cancella ricerca">✕</button>
           </div>
       <div id="monster-search-results" class="comp-list" style="max-height:360px;overflow-y:auto;"></div>
@@ -3731,6 +3732,38 @@ const NPC = (() => {
     showRow('sb-senses-row',     'sb-senses',     npc.senses);
     showRow('sb-lang-row',       'sb-languages',  npc.languages);
 
+    // Tiri Salvezza — mostra per PNG da compendio (savingThrows) o generati (attaccoBonus)
+    const sbSavesRow = document.getElementById('sb-saves-row');
+    const sbSaves = document.getElementById('sb-saves');
+    if (sbSavesRow && sbSaves) {
+      if (npc.savingThrows) {
+        sbSaves.textContent = npc.savingThrows;
+        sbSavesRow.style.display = '';
+      } else if (npc.attaccoBonus !== undefined) {
+        // Genera tiri salvezza dalla caratteristica principale del ruolo
+        const profBonus = npc.profBonus || 2;
+        const statsMap = {
+          for: npc.str || 10, des: npc.dex || 10, cos: npc.con || 10,
+          int: npc.int_ || 10, sag: npc.wis || 10, car: npc.cha || 10,
+        };
+        const labels = { for:'FOR', des:'DES', cos:'COS', int:'INT', sag:'SAG', car:'CAR' };
+        // Caratteristiche principali per ruolo
+        const primaCaratteristica = {
+          Brute: ['for'], Skirmisher: ['des'], Artillery: ['des'],
+          Controller: ['sag', 'car'], Soldier: ['for', 'cos'], Civile: [],
+        }[npc.ruoloCombattivo] || [];
+        const savesStr = Object.entries(statsMap).map(([k, v]) => {
+          const mod = Math.floor((v - 10) / 2);
+          const bonus = primaCaratteristica.includes(k) ? mod + profBonus : mod;
+          return `${labels[k]} ${bonus >= 0 ? '+' : ''}${bonus}`;
+        }).join(', ');
+        sbSaves.textContent = savesStr;
+        sbSavesRow.style.display = '';
+      } else {
+        sbSavesRow.style.display = 'none';
+      }
+    }
+
     const special = document.getElementById('sb-special');
     if (special) special.innerHTML = npc.special
       ? npc.special.split('\n').map(l => `<p style="margin-bottom:4px;font-size:0.85rem;">${l}</p>`).join('')
@@ -3738,9 +3771,34 @@ const NPC = (() => {
 
     const actList = document.getElementById('sb-actions');
     if (actList) {
-      actList.innerHTML = (npc.actions || []).map(a =>
+      let actions = (npc.actions || []).map(a =>
         `<li class="action-item"><div><strong>${a.name}.</strong> ${a.desc}</div></li>`
-      ).join('') || '<li class="text-muted text-sm" style="padding:6px 0;">Nessuna azione inserita</li>';
+      );
+      // Se non ci sono azioni manuali ma il PNG è stato generato, costruisci l'attacco
+      if (!actions.length && npc.nomeArma && npc.dadoAttacco) {
+        const tipoAtk = (npc.ruoloCombattivo || '').toLowerCase().includes('artillery')
+          ? 'Attacco con arma a distanza' : 'Attacco con arma da mischia';
+        const portata = (npc.ruoloCombattivo || '').toLowerCase().includes('artillery')
+          ? 'gittata 30/120 m' : 'portata 1,5 m';
+        const atkBonus = npc.attaccoBonus !== undefined ? `+${npc.attaccoBonus}` : '';
+        actions.push(`<li class="action-item"><div>
+          <strong>${npc.nomeArma}.</strong> ${tipoAtk}: ${atkBonus} al tiro per colpire, ${portata}, un bersaglio.
+          <em>Danno: ${npc.dadoAttacco} danni da ${npc.tipoDanno || 'contundente'}.</em>
+        </div></li>`);
+        if (npc.numAttacchi > 1) {
+          actions.unshift(`<li class="action-item"><div>
+            <strong>Multiattacco.</strong> Il PNG effettua ${npc.numAttacchi} attacchi con ${npc.nomeArma}.
+          </div></li>`);
+        }
+        if (npc.abilitaSpeciale) {
+          const [nome, desc] = npc.abilitaSpeciale.split('(');
+          actions.push(`<li class="action-item"><div>
+            <strong>${nome.trim()}.</strong> ${desc ? desc.replace(')', '') : ''}
+          </div></li>`);
+        }
+      }
+      actList.innerHTML = actions.join('') ||
+        '<li class="text-muted text-sm" style="padding:6px 0;">Nessuna azione inserita</li>';
     }
 
     const notes = document.getElementById('sb-notes');
@@ -6944,7 +7002,7 @@ const Schermo = (() => {
     return `
       <div class="schermo-block schermo-block-${size}" id="sblock-${block.id}" style="grid-column:span ${cols};">
         <div class="schermo-block-header">
-          <span class="schermo-block-icon">${def.icon}</span>
+          <span class="schermo-block-icon" style="cursor:grab;" title="Trascina per spostare">${def.icon}</span>
           <span class="schermo-block-title">${title}</span>
           <div class="schermo-block-actions">
             <button class="btn btn-ghost btn-icon-sm" onclick="Schermo.resizeBlock('${block.id}')" title="Ridimensiona"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg></button>
@@ -6954,9 +7012,10 @@ const Schermo = (() => {
             <button class="btn btn-ghost btn-icon-sm" onclick="Schermo.removeBlock('${block.id}')" title="Rimuovi" aria-label="Rimuovi"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
           </div>
         </div>
-        <div class="schermo-block-body" id="sbody-${block.id}">
+        <div class="schermo-block-body" id="sbody-${block.id}" style="max-height:${block.bodyHeight ? block.bodyHeight+'px' : '340px'};">
           <!-- Popolato da updateBlockContent -->
         </div>
+        <div class="schermo-block-resize" onmousedown="Schermo.startResize(event,'${block.id}')"></div>
       </div>`;
   };
 
@@ -7565,7 +7624,7 @@ const Schermo = (() => {
     return `
       <div style="margin-bottom:6px;display:flex;gap:6px;align-items:center;">
         <input type="text" id="vel-schermo-q-${blockId}" class="form-input"
-          placeholder="Cerca..." style="flex:1;font-size:0.78rem;padding:4px 8px;"
+          placeholder="🔍 Cerca..." style="flex:1;font-size:0.78rem;padding:4px 8px;"
           oninput="Schermo.filterVelocita('${blockId}')">
         <select id="vel-schermo-dur-${blockId}" class="form-select"
           style="font-size:0.72rem;width:auto;" onchange="Schermo.filterVelocita('${blockId}')">
@@ -7586,14 +7645,7 @@ const Schermo = (() => {
     if (!q) { el.innerHTML = '<span class="text-muted text-sm">Digita per cercare...</span>'; return; }
 
     let data = null;
-    try {
-      const r = await fetch('data/velocita.json');
-      if (!r.ok) throw new Error('HTTP ' + r.status);
-      data = await r.json();
-    } catch(e) {
-      el.innerHTML = '<div style="font-size:0.78rem;color:var(--accent-warning);padding:4px;">Errore: ' + e.message + '</div>';
-      return;
-    }
+    try { const r = await fetch('data/velocita.json'); data = await r.json(); } catch(e) { return; }
 
     const durKeys = {
       '1h':  { norm: 'vel_1h_norm', lento: 'vel_1h_lento', fast: 'vel_1h_fast' },
@@ -7746,9 +7798,28 @@ const Schermo = (() => {
   return {
     init, render, addBlock, submitAddBlock,
     removeBlock, resizeBlock, moveBlock, editBlock, resetLayout,
-    rollDie, generateMeteo, saveNote, advanceTime, refreshCombat,
+  const startResize = (e, blockId) => {
+    e.preventDefault();
+    const bodyEl = document.getElementById(`sbody-${blockId}`);
+    if (!bodyEl) return;
+    const startY = e.clientY;
+    const startH = bodyEl.offsetHeight;
+    const onMove = (ev) => { bodyEl.style.maxHeight = Math.max(80, startH + (ev.clientY - startY)) + 'px'; };
+    const onUp = () => {
+      document.removeEventListener('mousemove', onMove);
+      document.removeEventListener('mouseup', onUp);
+      const screen = Storage.getMasterScreen();
+      const blk = (screen.blocks || []).find(b => b.id === blockId);
+      if (blk) { blk.bodyHeight = parseInt(bodyEl.style.maxHeight); Storage.saveMasterScreen(screen); }
+    };
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onUp);
+  };
+
+      rollDie, generateMeteo, saveNote, advanceTime, refreshCombat,
     setCompendioRef, _refreshCombat, _refreshFavoriti, _swapBlocks,
     _refreshNoteSessione, _avanzaTempo,
+    startResize,
   };
 })();
 
