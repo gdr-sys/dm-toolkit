@@ -955,7 +955,12 @@
       </div>
 
       <!-- Griglia blocchi -->
-      <div id="schermo-grid" class="schermo-grid"></div>
+      <div class="schermo-cols">
+        <div class="schermo-col" id="schermo-col-0" data-col="0"></div>
+        <div class="schermo-col" id="schermo-col-1" data-col="1"></div>
+        <div class="schermo-col" id="schermo-col-2" data-col="2"></div>
+        <div class="schermo-col" id="schermo-col-3" data-col="3"></div>
+      </div>
     </section>
 
   </div><!-- /main-content -->
@@ -6973,14 +6978,15 @@ const Schermo = (() => {
 
   // ── Render griglia ──
   const render = () => {
-    const grid = document.getElementById('schermo-grid');
+    // Usa le colonne invece di schermo-grid
+    const cols = [0,1,2,3].map(c => document.getElementById(`schermo-col-${c}`));
     const empty = document.getElementById('schermo-empty');
-    if (!grid) return;
+    if (!cols[0]) return;
 
     App.reloadActiveCampaign();
 
     if (_blocks.length === 0) {
-      grid.innerHTML = '';
+      cols.forEach(c => { if (c) c.innerHTML = ''; });
       if (empty) empty.style.display = '';
       return;
     }
@@ -6988,7 +6994,15 @@ const Schermo = (() => {
 
     // Ricostruisce sempre la griglia per garantire drag & drop corretto
     SchermoDD.reset();
-    grid.innerHTML = _blocks.map((block, idx) => renderBlock(block, idx)).join('');
+    // Distribuisce nelle colonne
+    const cols = [0,1,2,3].map(c => document.getElementById(`schermo-col-${c}`));
+    cols.forEach(c => { if (c) c.innerHTML = ''; });
+    _blocks.forEach((block, idx) => {
+      const colIdx = Math.min(Math.max(block.col ?? (idx % 4), 0), 3);
+      block.col = colIdx;
+      const col = cols[colIdx];
+      if (col) col.insertAdjacentHTML('beforeend', renderBlock(block, idx));
+    });
     _blocks.forEach(b => updateBlockContent(b));
     requestAnimationFrame(() => SchermoDD.enable());
   };
@@ -7726,6 +7740,9 @@ const Schermo = (() => {
       content,
     };
 
+    // Colonna con meno blocchi
+    const colCounts = [0,1,2,3].map(c => _blocks.filter(b => (b.col ?? 0) === c).length);
+    block.col = colCounts.indexOf(Math.min(...colCounts));
     _blocks.push(block);
     save();
     Modal.close('schermo-add-modal');
@@ -7835,6 +7852,22 @@ const Schermo = (() => {
     setCompendioRef, _refreshCombat, _refreshFavoriti, _swapBlocks,
     _refreshNoteSessione, _avanzaTempo,
     startResize,
+    _blocks: () => _blocks,
+    _syncFromDOM: () => {
+      // Ricostruisce _blocks nell'ordine e colonne attuali dal DOM
+      const newOrder = [];
+      for (let c = 0; c < 4; c++) {
+        const col = document.getElementById(`schermo-col-${c}`);
+        if (!col) continue;
+        col.querySelectorAll('.schermo-block').forEach(el => {
+          const id = el.id.replace('sblock-', '');
+          const blk = _blocks.find(b => b.id === id);
+          if (blk) { blk.col = c; newOrder.push(blk); }
+        });
+      }
+      _blocks = newOrder;
+      save();
+    },
   };
 })();
 
@@ -10012,24 +10045,41 @@ const SchermoDD = (() => {
   let _sortable = null;
 
   const enable = () => {
-    const grid = document.getElementById('schermo-grid');
-    if (!grid || typeof Sortable === 'undefined') return;
+    if (typeof Sortable === 'undefined') return;
 
-    // Distruggi istanza precedente se esiste
-    if (_sortable) { _sortable.destroy(); _sortable = null; }
+    // Distruggi istanze precedenti
+    if (_sortable) {
+      if (Array.isArray(_sortable)) _sortable.forEach(s => s.destroy());
+      else _sortable.destroy();
+      _sortable = null;
+    }
 
-    _sortable = Sortable.create(grid, {
-      animation: 150,
-      handle: '.schermo-block-header',
-      ghostClass: 'sortable-ghost',
-      chosenClass: 'sortable-chosen',
-      dragClass: 'sortable-drag',
-      forceFallback: false,
-      onEnd: (evt) => {
-        if (evt.oldIndex === evt.newIndex) return;
-        Schermo._swapBlocks(evt.oldIndex, evt.newIndex);
-      },
-    });
+    // Crea un Sortable per ogni colonna con group condiviso
+    // così i blocchi si possono spostare tra colonne
+    const sortables = [];
+    for (let c = 0; c < 4; c++) {
+      const col = document.getElementById(`schermo-col-${c}`);
+      if (!col) continue;
+      sortables.push(Sortable.create(col, {
+        group: 'schermo-blocks', // stesso gruppo = cross-column drag
+        animation: 150,
+        handle: '.schermo-block-header',
+        ghostClass: 'sortable-ghost',
+        chosenClass: 'sortable-chosen',
+        dragClass: 'sortable-drag',
+        forceFallback: false,
+        onEnd: (evt) => {
+          // Aggiorna col e ordine in _blocks
+          const blockId = evt.item.id.replace('sblock-', '');
+          const newCol = parseInt(evt.to.dataset.col ?? 0);
+          const blk = Schermo._blocks().find(b => b.id === blockId);
+          if (blk) blk.col = newCol;
+          // Ricostruisce l'ordine dalla DOM
+          Schermo._syncFromDOM();
+        },
+      }));
+    }
+    _sortable = sortables;
 
     // Cursore grab sull'header
     grid.querySelectorAll('.schermo-block-header').forEach(h => {
