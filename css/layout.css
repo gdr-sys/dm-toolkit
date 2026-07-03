@@ -263,16 +263,35 @@
 /* ══════════════════════════════════════
    SCHERMO DEL MASTER
 ══════════════════════════════════════ */
-.schermo-grid {
+.schermo-cols {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  grid-auto-rows: min-content;
   gap: var(--space-md);
   align-items: start;
 }
-@media (max-width: 1400px) { .schermo-grid { grid-template-columns: repeat(3, 1fr); } }
-@media (max-width: 1024px) { .schermo-grid { grid-template-columns: repeat(2, 1fr); } }
-@media (max-width: 768px)  { .schermo-grid { grid-template-columns: 1fr; } }
+.schermo-col {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  min-height: 80px; /* area drop visibile anche quando vuota */
+}
+/* Indicatore colonna vuota per drop */
+.schermo-col:empty::after {
+  content: 'Trascina qui';
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 60px;
+  border: 2px dashed var(--border);
+  border-radius: var(--radius-lg);
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  font-family: var(--font-display);
+  letter-spacing: 0.04em;
+}
+@media (max-width: 1400px) { .schermo-cols { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 1024px) { .schermo-cols { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 768px)  { .schermo-cols { grid-template-columns: 1fr; } }
 
 .schermo-block { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-lg); overflow:visible; transition:box-shadow var(--transition-fast); }
 .schermo-block:hover { box-shadow:var(--shadow-md); }
