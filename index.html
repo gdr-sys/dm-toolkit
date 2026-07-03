@@ -7012,7 +7012,7 @@ const Schermo = (() => {
             <button class="btn btn-ghost btn-icon-sm" onclick="Schermo.removeBlock('${block.id}')" title="Rimuovi" aria-label="Rimuovi"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
           </div>
         </div>
-        <div class="schermo-block-body" id="sbody-${block.id}" style="max-height:${block.bodyHeight ? block.bodyHeight+'px' : '380px'};overflow:auto;">
+        <div class="schermo-block-body" id="sbody-${block.id}" style="min-height:${block.bodyHeight ? block.bodyHeight+'px' : 'auto'};overflow:auto;">
           <!-- Popolato da updateBlockContent -->
         </div>
         <div class="schermo-block-resize" onmousedown="Schermo.startResize(event,'${block.id}')"></div>
@@ -7801,16 +7801,16 @@ const Schermo = (() => {
     const bodyEl = document.getElementById(`sbody-${blockId}`);
     if (!bodyEl) return;
     const startY = e.clientY;
-    // Usa la altezza visibile attuale (non max-height)
+    // Altezza visibile attuale (già comprensiva di min-height)
     const startH = bodyEl.getBoundingClientRect().height;
     document.body.style.userSelect = 'none';
     document.body.style.cursor = 'ns-resize';
 
     const onMove = (ev) => {
       const delta = ev.clientY - startY;
-      const newH = Math.max(60, Math.round(startH + delta));
-      bodyEl.style.maxHeight = newH + 'px';
-      bodyEl.style.overflow = 'auto';
+      const newH = Math.max(40, Math.round(startH + delta));
+      bodyEl.style.minHeight = newH + 'px';
+      bodyEl.style.maxHeight = 'none';
     };
     const onUp = () => {
       document.body.style.userSelect = '';
@@ -7820,7 +7820,7 @@ const Schermo = (() => {
       const screen = Storage.getMasterScreen();
       const blk = (screen.blocks || []).find(b => b.id === blockId);
       if (blk) {
-        blk.bodyHeight = parseInt(bodyEl.style.maxHeight);
+        blk.bodyHeight = parseInt(bodyEl.style.minHeight) || blk.bodyHeight;
         Storage.saveMasterScreen(screen);
       }
     };
