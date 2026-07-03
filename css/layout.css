@@ -276,7 +276,7 @@
 
 .schermo-block { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-lg); overflow:visible; transition:box-shadow var(--transition-fast); }
 .schermo-block:hover { box-shadow:var(--shadow-md); }
-.schermo-block-body { overflow:auto; border-radius:0 0 var(--radius-lg) var(--radius-lg); padding:var(--space-md); max-height:340px; }
+.schermo-block-body { overflow:auto; border-radius:0 0 var(--radius-lg) var(--radius-lg); padding:var(--space-md); /* no max-height — resize usa min-height */ }
 .schermo-block-header { display:flex; align-items:center; gap:var(--space-sm); padding:8px var(--space-md); background:var(--bg-secondary); border-bottom:1px solid var(--border); }
 .schermo-block-icon { font-size:0.9rem; flex-shrink:0; }
 .schermo-block-title { font-family:var(--font-display); font-size:0.75rem; font-weight:600; letter-spacing:0.04em; text-transform:uppercase; color:var(--text-secondary); flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
@@ -287,7 +287,7 @@
 /* PATCH: azioni sempre visibili e body scrollabile su mobile */
 @media (max-width: 768px) {
   .schermo-block-actions { opacity:1 !important; }
-  .schermo-block-body { max-height:300px; overflow-y:auto; }
+  /* schermo-block-body su mobile: gestito da min-height via resize */
 }
 .schermo-stat { font-family:var(--font-mono); font-size:0.78rem; padding:2px 6px; background:var(--bg-secondary); border:1px solid var(--border); border-radius:var(--radius-sm); white-space:nowrap; }
 
