@@ -6995,7 +6995,6 @@ const Schermo = (() => {
     // Ricostruisce sempre la griglia per garantire drag & drop corretto
     SchermoDD.reset();
     // Distribuisce nelle colonne
-    const cols = [0,1,2,3].map(c => document.getElementById(`schermo-col-${c}`));
     cols.forEach(c => { if (c) c.innerHTML = ''; });
     _blocks.forEach((block, idx) => {
       const colIdx = Math.min(Math.max(block.col ?? (idx % 4), 0), 3);
