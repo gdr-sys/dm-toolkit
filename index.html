@@ -10041,44 +10041,37 @@ const NoteSessione = (() => {
 
 
 const SchermoDD = (() => {
-  let _sortable = null;
+  let _sortables = [];
 
   const enable = () => {
     if (typeof Sortable === 'undefined') return;
 
-    // Distruggi istanze precedenti
-    if (_sortable) {
-      if (Array.isArray(_sortable)) _sortable.forEach(s => s.destroy());
-      else _sortable.destroy();
-      _sortable = null;
-    }
+    // Distruggi sempre tutte le istanze precedenti
+    _sortables.forEach(s => { try { s.destroy(); } catch(e) {} });
+    _sortables = [];
 
     // Crea un Sortable per ogni colonna con group condiviso
-    // così i blocchi si possono spostare tra colonne
-    const sortables = [];
     for (let c = 0; c < 4; c++) {
       const col = document.getElementById(`schermo-col-${c}`);
       if (!col) continue;
-      sortables.push(Sortable.create(col, {
-        group: 'schermo-blocks', // stesso gruppo = cross-column drag
+      const s = Sortable.create(col, {
+        group: { name: 'schermo-blocks', pull: true, put: true },
         animation: 150,
         handle: '.schermo-block-header',
         ghostClass: 'sortable-ghost',
         chosenClass: 'sortable-chosen',
         dragClass: 'sortable-drag',
         forceFallback: false,
+        fallbackOnBody: true,
+        swapThreshold: 0.5,
         onEnd: (evt) => {
-          // Aggiorna col e ordine in _blocks
-          const blockId = evt.item.id.replace('sblock-', '');
-          const newCol = parseInt(evt.to.dataset.col ?? 0);
-          const blk = Schermo._blocks().find(b => b.id === blockId);
-          if (blk) blk.col = newCol;
-          // Ricostruisce l'ordine dalla DOM
+          if (!evt.to || !evt.item) return;
+          // Aggiorna la colonna e salva l'ordine dalla DOM
           Schermo._syncFromDOM();
         },
-      }));
+      });
+      _sortables.push(s);
     }
-    _sortable = sortables;
 
     // Cursore grab sull'header
     document.querySelectorAll('.schermo-block-header').forEach(h => {
@@ -10087,7 +10080,8 @@ const SchermoDD = (() => {
   };
 
   const reset = () => {
-    if (_sortable) { _sortable.destroy(); _sortable = null; }
+    _sortables.forEach(s => { try { s.destroy(); } catch(e) {} });
+    _sortables = [];
   };
 
   return { enable, reset };
