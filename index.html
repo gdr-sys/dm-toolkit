@@ -703,6 +703,66 @@
           </div>
         </div>
 
+
+        <!-- Encounter Builder + Loot RNG — full width -->
+        <div class="card gen-card" data-gen-id="encounter" style="grid-column:1/-1;">
+          <div class="card-header">
+            <h3 class="card-title">⚔️ Encounter Builder</h3>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
+              <select id="enc-livello" class="form-select" style="width:auto;font-size:0.75rem;">
+                <option value="1">Liv. 1</option><option value="2">Liv. 2</option><option value="3">Liv. 3</option>
+                <option value="4">Liv. 4</option><option value="5" selected>Liv. 5</option><option value="6">Liv. 6</option>
+                <option value="7">Liv. 7</option><option value="8">Liv. 8</option><option value="9">Liv. 9</option>
+                <option value="10">Liv. 10</option><option value="11">Liv. 11</option><option value="12">Liv. 12</option>
+                <option value="13">Liv. 13</option><option value="14">Liv. 14</option><option value="15">Liv. 15</option>
+                <option value="16">Liv. 16</option><option value="17">Liv. 17</option><option value="18">Liv. 18</option>
+                <option value="19">Liv. 19</option><option value="20">Liv. 20</option>
+              </select>
+              <select id="enc-difficolta" class="form-select" style="width:auto;font-size:0.75rem;">
+                <option value="facile">🟢 Facile</option>
+                <option value="media" selected>🟡 Media</option>
+                <option value="difficile">🟠 Difficile</option>
+                <option value="mortale">🔴 Mortale</option>
+              </select>
+              <select id="enc-npg" class="form-select" style="width:auto;font-size:0.75rem;">
+                <option value="2">2 PG</option><option value="3">3 PG</option>
+                <option value="4" selected>4 PG</option><option value="5">5 PG</option><option value="6">6 PG</option>
+              </select>
+              <button class="btn btn-primary btn-sm" onclick="EncounterBuilder.genera()">⚔️ Genera</button>
+            </div>
+          </div>
+
+          <!-- Selezione macrocategorie -->
+          <div style="padding:8px 12px;border-bottom:1px solid var(--border);">
+            <div style="font-size:0.72rem;color:var(--text-muted);margin-bottom:6px;font-family:var(--font-display);text-transform:uppercase;letter-spacing:0.05em;">Tipo nemici (multi-selezione)</div>
+            <div id="enc-categorie" style="display:flex;flex-wrap:wrap;gap:6px;">
+              <!-- Popolato da JS -->
+            </div>
+          </div>
+
+          <!-- Risultato encounter -->
+          <div id="enc-result" style="padding:10px 12px;">
+            <div class="text-muted text-sm">Seleziona livello, difficoltà e categorie, poi genera l'encounter.</div>
+          </div>
+
+          <!-- Sezione Loot -->
+          <div id="enc-loot-section" style="display:none;border-top:1px solid var(--border);">
+            <div style="padding:8px 12px;display:flex;align-items:center;justify-content:space-between;">
+              <span style="font-family:var(--font-display);font-size:0.82rem;">🎲 Loot Post-Combat</span>
+              <div style="display:flex;gap:6px;">
+                <select id="enc-loot-stato" class="form-select" style="width:auto;font-size:0.72rem;">
+                  <option value="intatto">✓ Intatto</option>
+                  <option value="danneggiato">⚠ Danneggiato</option>
+                  <option value="inutilizzabile">✗ Inutilizzabile</option>
+                  <option value="maledetto">☠ Maledetto</option>
+                </select>
+                <button class="btn btn-secondary btn-sm" onclick="EncounterBuilder.generaLoot()">🎲 Genera Loot</button>
+              </div>
+            </div>
+            <div id="enc-loot-result" style="padding:0 12px 10px;"></div>
+          </div>
+        </div>
+
       </div><!-- fine generatori-grid -->
 
     </section>
@@ -2823,7 +2883,7 @@ const App = (() => {
         break;
       case 'sessione':   try { Sessione.init(); setTimeout(() => NoteSessione.render(), 100); } catch(e) {} break;
       case 'generatori':
-        setTimeout(() => { GeneratoriDD.enable(); Generatori.applyVisibility(); }, 100);
+        setTimeout(() => { GeneratoriDD.enable(); Generatori.applyVisibility(); EncounterBuilder.init(); }, 100);
         break;
       case 'compendio':  try { Compendio.init(); } catch(e) {} break;
       case 'schermo':    try { Schermo.init(); } catch(e) {} break;
@@ -5051,6 +5111,24 @@ const Sessione = (() => {
     });
   };
 
+  const addMonsterDirect = (dati) => {
+    // Aggiunge un mostro direttamente al combat senza modal
+    if (!_combat) newCombat();
+    const bonusInit = dati.iniziativaBonus || 0;
+    const init = rollInit(bonusInit);
+    _combat.combatants.push({
+      id: 'c_enc_' + Date.now() + '_' + Math.random().toString(36).slice(2,5),
+      nome: dati.nome || 'Mostro',
+      tipo: 'mostro',
+      hp: dati.hp || 10, maxHp: dati.maxHp || dati.hp || 10,
+      ca: dati.ca || 12,
+      iniziativa: init, iniziativaBonus: bonusInit,
+      condizioni: [], concentrazione: false, note: '',
+    });
+    saveCombat(_combat);
+    renderCombat();
+  };
+
   const addMonsterQuick = () => {
     document.getElementById('monster-search-input').value = '';
     document.getElementById('monster-search-results').innerHTML = '<div class="text-muted text-sm">Digita per cercare...</div>';
@@ -5336,7 +5414,7 @@ const Sessione = (() => {
     changeHP, setHP, quickDamage,
     openCondizioneModal, submitCondizioni, removeCondizione,
     toggleConcentrazione, openNote,
-    addMonsterQuick, searchMonster, addMonsterFromCompendio, addHomebrewMonster,
+    addMonsterQuick, addMonsterDirect, searchMonster, addMonsterFromCompendio, addHomebrewMonster,
     addNPCFromWorld, _addNPCById,
     addCustomCombatant, submitCustomCombatant, removeCombatant,
     saveCombatSession, endCombat, loadCombatSession,
@@ -7907,6 +7985,7 @@ const Generatori = {
     nomi:      { label: 'Generatore Nomi',      emoji: '📛' },
     incontri:  { label: 'Incontri Casuali',     emoji: '⚠️' },
     follia:    { label: 'Follia',               emoji: '🌀' },
+    encounter:  { label: 'Encounter Builder',    emoji: '⚔️' },
   },
 
   _getEnabledGen: () => {
@@ -9268,6 +9347,23 @@ const Generatori = {
     Debug.log(`Viaggio: ${kmTotali}km in ${giorni}gg (${mezzo}, ${terreno}, ${ritmo})`);
   },
 
+
+  // ══════════════════════════════════════════════════════
+  // ENCOUNTER BUILDER + LOOT RNG
+  // ══════════════════════════════════════════════════════
+
+  _initEncounter: () => {
+    // Popola le categorie al primo render
+    const el = document.getElementById('enc-categorie');
+    if (!el || el.children.length > 0) return;
+    const categorie = EncounterBuilder._CATS;
+    el.innerHTML = categorie.map(c =>
+      `<label style="display:flex;align-items:center;gap:4px;cursor:pointer;padding:3px 8px;border-radius:var(--radius-sm);background:var(--bg-secondary);font-size:0.75rem;border:1px solid var(--border);">
+        <input type="checkbox" data-enc-cat="${c.id}" checked> ${c.emoji} ${c.nome}
+      </label>`
+    ).join('');
+  },
+
 }; // fine Generatori
 
 /* ── TABS HELPER ── */
@@ -9466,6 +9562,381 @@ const apriFavoritoSchermo = async (tipo, id) => {
   }[tipo];
   if (fn && Compendio[fn]) Compendio[fn](id);
 };
+
+// ══ ENCOUNTER BUILDER + LOOT RNG ══
+const EncounterBuilder = (() => {
+
+  // Tabella XP soglie per livello e difficoltà (DMG pag. 82)
+  const XP_SOGLIE = {
+    1:  {facile:25,   media:50,   difficile:75,   mortale:100},
+    2:  {facile:50,   media:100,  difficile:150,  mortale:200},
+    3:  {facile:75,   media:150,  difficile:225,  mortale:400},
+    4:  {facile:125,  media:250,  difficile:375,  mortale:500},
+    5:  {facile:250,  media:500,  difficile:750,  mortale:1100},
+    6:  {facile:300,  media:600,  difficile:900,  mortale:1400},
+    7:  {facile:350,  media:750,  difficile:1100, mortale:1700},
+    8:  {facile:450,  media:900,  difficile:1400, mortale:2100},
+    9:  {facile:550,  media:1100, difficile:1600, mortale:2400},
+    10: {facile:600,  media:1200, difficile:1900, mortale:2800},
+    11: {facile:800,  media:1600, difficile:2400, mortale:3600},
+    12: {facile:1000, media:2000, difficile:3000, mortale:4500},
+    13: {facile:1100, media:2200, difficile:3400, mortale:5100},
+    14: {facile:1250, media:2500, difficile:3800, mortale:5700},
+    15: {facile:1400, media:2800, difficile:4300, mortale:6400},
+    16: {facile:1600, media:3200, difficile:4800, mortale:7200},
+    17: {facile:2000, media:3900, difficile:5900, mortale:8800},
+    18: {facile:2100, media:4200, difficile:6300, mortale:9500},
+    19: {facile:2400, media:4900, difficile:7300, mortale:10900},
+    20: {facile:2800, media:5700, difficile:8500, mortale:12700},
+  };
+
+  // XP per CR (DMG Appendice B)
+  const XP_PER_CR = {
+    '0':10,'1/8':25,'1/4':50,'1/2':100,
+    '1':200,'2':450,'3':700,'4':1100,'5':1800,
+    '6':2300,'7':2900,'8':3900,'9':5000,'10':5900,
+    '11':7200,'12':8400,'13':10000,'14':11500,'15':13000,
+    '16':15000,'17':18000,'18':20000,'19':22000,'20':25000,
+    '21':33000,'22':41000,'23':50000,'24':62000,
+    '25':75000,'26':90000,'27':105000,'28':120000,'29':135000,'30':155000,
+  };
+
+  // Moltiplicatore numero mostri (DMG pag. 83)
+  const _moltiplicatore = (n) => {
+    if (n === 1) return 1;
+    if (n === 2) return 1.5;
+    if (n <= 6) return 2;
+    if (n <= 10) return 2.5;
+    if (n <= 14) return 3;
+    return 4;
+  };
+
+  // CR adatti per livello e difficoltà
+  const _crAdatti = (livello, difficolta) => {
+    const maxCR = {
+      facile:   Math.max(1, Math.floor(livello / 4)),
+      media:    Math.max(1, Math.floor(livello / 2)),
+      difficile:Math.max(1, livello - 2),
+      mortale:  livello,
+    }[difficolta] || Math.floor(livello / 2);
+
+    const minCR = Math.max(0, maxCR - 4);
+
+    return Object.keys(XP_PER_CR).filter(cr => {
+      const val = cr.includes('/') ? eval(cr) : parseFloat(cr);
+      return val >= (minCR === 0 ? 0 : minCR - 0.5) && val <= maxCR;
+    });
+  };
+
+  // Categorie nemici (dal loot-rng-system)
+  const CATS = [
+    { id:'humanoid-warrior',    nome:'Umanoidi — Guerriero',    emoji:'⚔️',  tipi:['umanoide','goblinoide','orco','umano'] },
+    { id:'humanoid-caster',     nome:'Umanoidi — Incantatore',  emoji:'🧙',  tipi:['umanoide'] },
+    { id:'humanoid-rogue',      nome:'Umanoidi — Ladro/Ranger', emoji:'🏹',  tipi:['umanoide'] },
+    { id:'beasts',              nome:'Bestie',                  emoji:'🐺',  tipi:['bestia'] },
+    { id:'undead-physical',     nome:'Non Morti — Fisico',      emoji:'💀',  tipi:['non morto'] },
+    { id:'undead-incorporeal',  nome:'Non Morti — Incorporeo',  emoji:'👻',  tipi:['non morto'] },
+    { id:'demons',              nome:'Demoni',                  emoji:'😈',  tipi:['demone','aberrazione'] },
+    { id:'devils',              nome:'Diavoli',                 emoji:'🔱',  tipi:['diavolo'] },
+    { id:'dragons',             nome:'Draghi',                  emoji:'🐉',  tipi:['drago'] },
+    { id:'constructs',          nome:'Costrutti',               emoji:'🤖',  tipi:['costrutto'] },
+    { id:'aberrations',         nome:'Aberrazioni',             emoji:'🦑',  tipi:['aberrazione'] },
+    { id:'fey-benevolent',      nome:'Fate Benevole',           emoji:'🧚',  tipi:['folletto','fata'] },
+    { id:'fey-malevolent',      nome:'Fate Malvagie',           emoji:'🧟',  tipi:['folletto','fata'] },
+    { id:'giants',              nome:'Giganti',                 emoji:'🗿',  tipi:['gigante'] },
+    { id:'oozes',               nome:'Melme & Ooze',            emoji:'🟢',  tipi:['melma'] },
+    { id:'plants',              nome:'Piante',                  emoji:'🌿',  tipi:['pianta'] },
+    { id:'elemental-fire',      nome:'Elementali — Fuoco',      emoji:'🔥',  tipi:['elementale'] },
+    { id:'elemental-water',     nome:'Elementali — Acqua',      emoji:'💧',  tipi:['elementale'] },
+    { id:'elemental-earth',     nome:'Elementali — Terra',      emoji:'⛰️',  tipi:['elementale'] },
+    { id:'elemental-air',       nome:'Elementali — Aria',       emoji:'🌪️',  tipi:['elementale'] },
+    { id:'celestials',          nome:'Celestiali',              emoji:'✨',  tipi:['celestiale'] },
+  ];
+
+  // Tabelle loot per categoria (dal loot-rng-system)
+  const LOOT_TABLES = /* inserito dopo */ null;
+
+  // Loot tables inline (subset dalle tabelle loot-rng)
+  const PROB_STANDARD = [
+    { rarity:'Niente',    minion:[1,40],  elite:[1,20],  boss:null },
+    { rarity:'Comune',    minion:[41,75], elite:[21,50], boss:[1,20] },
+    { rarity:'Non Comune',minion:[76,90], elite:[51,80], boss:[21,55] },
+    { rarity:'Raro',      minion:[91,98], elite:[81,95], boss:[56,85] },
+    { rarity:'Epico',     minion:[99,100],elite:[96,99], boss:[86,97] },
+    { rarity:'Leggendario',minion:null,   elite:[100,100],boss:[98,100]},
+  ];
+
+  const _rollD = (sides) => Math.floor(Math.random() * sides) + 1;
+  const _rnd = (a) => a[Math.floor(Math.random() * a.length)];
+
+  // Determina rango per loot in base alla posizione nel combat
+  const _rangoNemico = (nome, isLast) => {
+    const n = nome.toLowerCase();
+    if (isLast) return 'Boss';
+    if (n.includes('capo') || n.includes('leader') || n.includes('signore') || n.includes('capitano')) return 'Elite';
+    return 'Minion';
+  };
+
+  const _rollLootItem = (rango, catId) => {
+    const d100 = _rollD(100);
+    const table = PROB_STANDARD;
+    let rarita = 'Niente';
+    const key = rango === 'Boss' ? 'boss' : rango === 'Elite' ? 'elite' : 'minion';
+
+    for (const row of table) {
+      const range = row[key];
+      if (!range) continue;
+      if (d100 >= range[0] && d100 <= range[1]) { rarita = row.rarity; break; }
+    }
+
+    // Luck test (75 o 90)
+    let luckyUpgrade = false;
+    if ((d100 === 75 || d100 === 90) && rarita !== 'Niente' && rarita !== 'Leggendario') {
+      if (_rollD(4) > 2) {
+        const up = { 'Comune':'Non Comune','Non Comune':'Raro','Raro':'Epico','Epico':'Leggendario' };
+        if (up[rarita]) { rarita = up[rarita]; luckyUpgrade = true; }
+      }
+    }
+
+    return { d100, rarita, luckyUpgrade, rango };
+  };
+
+  // Loot items generici per rarità (usati quando non c'è tabella specifica)
+  const LOOT_GENERICI = {
+    'Comune':     ['Pozione di Guarigione', '1d6×10 mo', 'Gemma grezza (10 mo)', 'Componenti magici comuni', 'Olio magico'],
+    'Non Comune': ['Pozione di Guarigione Superiore', 'Pergamena incantesimo (1°-2° lv)', 'Anello di Protezione', '2d6×25 mo + gemme', 'Mantello della Protezione'],
+    'Raro':       ['Pozione di Guarigione Suprema', 'Arma +1', 'Scudo +1', 'Pergamena (3°-4° lv)', 'Stivali di Elven Kind'],
+    'Epico':      ['Arma +2', 'Armatura +1', 'Mantello di Spostamento', 'Pergamena (5°-6° lv)', 'Anello di Resistenza'],
+    'Leggendario':['Arma +3', 'Armatura +2', 'Mantello dell\'Invisibilità', 'Pergamena (7°-9° lv)', 'Anello dei Tre Desideri'],
+  };
+
+  let _ultimoEncounter = null;
+
+  const init = () => {
+    const el = document.getElementById('enc-categorie');
+    if (!el || el.children.length > 0) return;
+    el.innerHTML = CATS.map(c =>
+      `<label style="display:flex;align-items:center;gap:4px;cursor:pointer;padding:3px 8px;border-radius:var(--radius-sm);background:var(--bg-secondary);font-size:0.75rem;border:1px solid var(--border);">
+        <input type="checkbox" data-enc-cat="${c.id}" checked> ${c.emoji} ${c.nome}
+      </label>`
+    ).join('');
+  };
+
+  const genera = async () => {
+    const livello   = parseInt(document.getElementById('enc-livello')?.value) || 5;
+    const difficolta= document.getElementById('enc-difficolta')?.value || 'media';
+    const nPG       = parseInt(document.getElementById('enc-npg')?.value) || 4;
+    const el        = document.getElementById('enc-result');
+    const lootSec   = document.getElementById('enc-loot-section');
+    if (!el) return;
+
+    // Categorie selezionate
+    const catChecks = document.querySelectorAll('[data-enc-cat]:checked');
+    const catIds    = [...catChecks].map(c => c.dataset.encCat);
+    if (!catIds.length) {
+      Toast.show('Seleziona almeno una categoria', 'warning'); return;
+    }
+
+    // Budget XP
+    const sogliaPerPG = XP_SOGLIE[livello]?.[difficolta] || 500;
+    const budgetTotale= sogliaPerPG * nPG;
+
+    // CR adatti
+    const crAdatti = _crAdatti(livello, difficolta);
+    if (!crAdatti.length) {
+      el.innerHTML = '<div class="text-muted text-sm">Nessun CR adatto trovato.</div>'; return;
+    }
+
+    // Carica mostri dal Compendio
+    const dati = Compendio.getData();
+    const monsters = [...(dati.monsters || [])];
+
+    // Filtra mostri per categoria e CR
+    const catSelezionate = CATS.filter(c => catIds.includes(c.id));
+    const tipiAccettati  = [...new Set(catSelezionate.flatMap(c => c.tipi))];
+
+    const monstriValidi = monsters.filter(m => {
+      const tipo = (m.tipo || '').toLowerCase();
+      const cr   = m.grado_sfida?.valore;
+      const crStr= cr != null ? (cr < 1 ? (cr === 0 ? '0' : cr === 0.125 ? '1/8' : cr === 0.25 ? '1/4' : '1/2') : String(Math.floor(cr))) : null;
+      const tipoOk = tipiAccettati.some(t => tipo.includes(t));
+      const crOk  = crStr && crAdatti.includes(crStr);
+      return tipoOk && crOk;
+    });
+
+    // Fallback: usa tutti i mostri con CR adatto se nessun match per tipo
+    const pool = monstriValidi.length >= 3 ? monstriValidi :
+      monsters.filter(m => {
+        const cr  = m.grado_sfida?.valore;
+        const crStr = cr != null ? (cr < 1 ? (cr === 0 ? '0' : cr === 0.125 ? '1/8' : cr === 0.25 ? '1/4' : '1/2') : String(Math.floor(cr))) : null;
+        return crStr && crAdatti.includes(crStr);
+      });
+
+    if (!pool.length) {
+      el.innerHTML = '<div class="text-muted text-sm">Nessun mostro trovato per questi criteri. Prova a cambiare livello o categorie.</div>';
+      return;
+    }
+
+    // Genera encounter rispettando il budget XP
+    const encounter = [];
+    let xpTotale = 0;
+    let tentativi = 0;
+
+    while (xpTotale < budgetTotale * 0.7 && tentativi < 50) {
+      tentativi++;
+      const m = _rnd(pool);
+      const cr = m.grado_sfida?.valore ?? 1;
+      const crStr = cr < 1 ? (cr === 0 ? '0' : cr === 0.125 ? '1/8' : cr === 0.25 ? '1/4' : '1/2') : String(Math.floor(cr));
+      const xpMostro = XP_PER_CR[crStr] || 200;
+
+      // Verifica se aggiungere questo mostro non supera troppo il budget
+      const nAttuali = encounter.reduce((s, e) => s + e.qty, 0) + 1;
+      const mult = _moltiplicatore(nAttuali);
+      const nuovoXP = encounter.reduce((s, e) => s + XP_PER_CR[e.cr] * e.qty, 0) + xpMostro;
+      if (nuovoXP * mult > budgetTotale * 1.5) continue;
+
+      // Raggruppa mostri uguali
+      const esistente = encounter.find(e => e.id === m.id);
+      if (esistente) {
+        esistente.qty++;
+      } else {
+        encounter.push({
+          id: m.id, nome: m.nome || 'Mostro', cr: crStr,
+          xp: xpMostro, qty: 1, hp: m.punti_ferita?.media || 10,
+          ca: m.classe_armatura?.valore || m.classe_armatura || 12,
+          catId: _rnd(catIds),
+        });
+      }
+
+      xpTotale = encounter.reduce((s, e) => s + XP_PER_CR[e.cr] * e.qty, 0);
+    }
+
+    if (!encounter.length) {
+      el.innerHTML = '<div class="text-muted text-sm">Non riesco a generare un encounter. Prova a variare i parametri.</div>';
+      return;
+    }
+
+    const nMostri = encounter.reduce((s, e) => s + e.qty, 0);
+    const mult    = _moltiplicatore(nMostri);
+    const xpAdj   = Math.round(xpTotale * mult);
+    const diffLabel = { facile:'🟢 Facile', media:'🟡 Media', difficile:'🟠 Difficile', mortale:'🔴 Mortale' }[difficolta];
+
+    _ultimoEncounter = encounter;
+
+    el.innerHTML =
+      `<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+        <span class="badge badge-muted">${diffLabel}</span>
+        <span class="badge badge-muted">Liv. ${livello} · ${nPG} PG</span>
+        <span class="badge badge-muted">Budget: ${budgetTotale} XP</span>
+        <span class="badge badge-muted">XP encounter: ${xpAdj}</span>
+      </div>` +
+      `<table style="width:100%;border-collapse:collapse;font-size:0.82rem;margin-bottom:10px;">
+        <thead><tr>
+          <th style="text-align:left;padding:4px 0;border-bottom:1px solid var(--border);font-family:var(--font-display);font-size:0.65rem;letter-spacing:0.05em;text-transform:uppercase;color:var(--text-muted);">Mostro</th>
+          <th style="text-align:center;padding:4px 4px;border-bottom:1px solid var(--border);font-family:var(--font-display);font-size:0.65rem;letter-spacing:0.05em;text-transform:uppercase;color:var(--text-muted);">N.</th>
+          <th style="text-align:center;padding:4px 0;border-bottom:1px solid var(--border);font-family:var(--font-display);font-size:0.65rem;letter-spacing:0.05em;text-transform:uppercase;color:var(--text-muted);">CR</th>
+          <th style="text-align:center;padding:4px 0;border-bottom:1px solid var(--border);font-family:var(--font-display);font-size:0.65rem;letter-spacing:0.05em;text-transform:uppercase;color:var(--text-muted);">PF</th>
+          <th style="text-align:center;padding:4px 0;border-bottom:1px solid var(--border);font-family:var(--font-display);font-size:0.65rem;letter-spacing:0.05em;text-transform:uppercase;color:var(--text-muted);">CA</th>
+          <th style="text-align:right;padding:4px 0;border-bottom:1px solid var(--border);font-family:var(--font-display);font-size:0.65rem;letter-spacing:0.05em;text-transform:uppercase;color:var(--text-muted);">XP</th>
+        </tr></thead>
+        <tbody>` +
+      encounter.map(e =>
+        `<tr>
+          <td style="padding:4px 0;border-bottom:1px solid var(--border);">${e.nome}</td>
+          <td style="padding:4px 4px;border-bottom:1px solid var(--border);text-align:center;font-family:var(--font-mono);">×${e.qty}</td>
+          <td style="padding:4px 0;border-bottom:1px solid var(--border);text-align:center;font-family:var(--font-mono);color:var(--text-muted);">GS ${e.cr}</td>
+          <td style="padding:4px 0;border-bottom:1px solid var(--border);text-align:center;font-family:var(--font-mono);">${e.hp}</td>
+          <td style="padding:4px 0;border-bottom:1px solid var(--border);text-align:center;font-family:var(--font-mono);">${e.ca}</td>
+          <td style="padding:4px 0;border-bottom:1px solid var(--border);text-align:right;font-family:var(--font-mono);color:var(--accent-secondary);">${XP_PER_CR[e.cr] * e.qty}</td>
+        </tr>`
+      ).join('') +
+      `</tbody></table>` +
+      `<div style="display:flex;gap:6px;">
+        <button class="btn btn-primary btn-sm" onclick="EncounterBuilder.aggiungiAlCombat()">⚔️ Aggiungi al Combat Tracker</button>
+        <button class="btn btn-secondary btn-sm" onclick="EncounterBuilder.genera()">🎲 Rigenera</button>
+      </div>`;
+
+    if (lootSec) lootSec.style.display = '';
+    Debug.log('Encounter generato: ' + encounter.map(e => e.qty + '× ' + e.nome).join(', '));
+  };
+
+  const aggiungiAlCombat = () => {
+    if (!_ultimoEncounter?.length) return;
+    const camp = App.getActiveCampaign();
+    if (!camp) { Toast.show('Apri una campagna prima', 'warning'); return; }
+
+    let aggiunti = 0;
+    _ultimoEncounter.forEach(entry => {
+      for (let i = 0; i < entry.qty; i++) {
+        const nome = entry.qty > 1 ? `${entry.nome} #${i+1}` : entry.nome;
+        const bonusInit = 0;
+        Sessione.addMonsterDirect({
+          nome, tipo:'mostro',
+          hp: entry.hp, maxHp: entry.hp, ca: entry.ca,
+          iniziativaBonus: bonusInit,
+        });
+        aggiunti++;
+      }
+    });
+
+    App.navigateTo('sessione');
+    Toast.show(`${aggiunti} nemici aggiunti al Combat Tracker!`, 'success', 3000);
+  };
+
+  const generaLoot = () => {
+    const el = document.getElementById('enc-loot-result');
+    if (!el || !_ultimoEncounter?.length) return;
+    const stato = document.getElementById('enc-loot-stato')?.value || 'intatto';
+    const statoLabel = { intatto:'✓ Intatto', danneggiato:'⚠ Danneggiato', inutilizzabile:'✗ Inutilizzabile', maledetto:'☠ Maledetto' }[stato] || '';
+
+    const risultati = [];
+    _ultimoEncounter.forEach((entry, idx) => {
+      const isLast = idx === _ultimoEncounter.length - 1;
+      for (let i = 0; i < entry.qty; i++) {
+        const nome = entry.qty > 1 ? `${entry.nome} #${i+1}` : entry.nome;
+        const rango = _rangoNemico(nome, isLast && i === entry.qty - 1);
+        const roll = _rollLootItem(rango, entry.catId);
+
+        if (roll.rarita === 'Niente') {
+          risultati.push({ nome, rango, rarita: 'Niente', item: '—' });
+        } else {
+          const itemsPool = LOOT_GENERICI[roll.rarita] || [];
+          const item = itemsPool[Math.floor(Math.random() * itemsPool.length)] || roll.rarita;
+          const itemLabel = stato !== 'intatto' ? `${item} (${statoLabel})` : item;
+          risultati.push({ nome, rango, rarita: roll.rarita, item: itemLabel, lucky: roll.luckyUpgrade });
+        }
+      }
+    });
+
+    const coloreRarita = {
+      'Niente':'var(--text-muted)', 'Comune':'var(--text-secondary)',
+      'Non Comune':'#69cc85', 'Raro':'#5ba4f5', 'Epico':'#c97bea', 'Leggendario':'#f5a623',
+    };
+
+    el.innerHTML =
+      `<table style="width:100%;border-collapse:collapse;font-size:0.78rem;">
+        <thead><tr>
+          <th style="text-align:left;padding:3px 0;border-bottom:1px solid var(--border);font-family:var(--font-display);font-size:0.62rem;letter-spacing:0.05em;text-transform:uppercase;color:var(--text-muted);">Nemico</th>
+          <th style="text-align:center;padding:3px 4px;border-bottom:1px solid var(--border);font-family:var(--font-display);font-size:0.62rem;letter-spacing:0.05em;text-transform:uppercase;color:var(--text-muted);">Rango</th>
+          <th style="text-align:left;padding:3px 0;border-bottom:1px solid var(--border);font-family:var(--font-display);font-size:0.62rem;letter-spacing:0.05em;text-transform:uppercase;color:var(--text-muted);">Loot</th>
+        </tr></thead>
+        <tbody>` +
+      risultati.map(r =>
+        `<tr>
+          <td style="padding:3px 0;border-bottom:1px solid var(--border);">${r.nome}</td>
+          <td style="padding:3px 4px;border-bottom:1px solid var(--border);text-align:center;font-size:0.7rem;color:var(--text-muted);">${r.rango}</td>
+          <td style="padding:3px 0;border-bottom:1px solid var(--border);color:${coloreRarita[r.rarita] || 'inherit'};">
+            ${r.item}${r.lucky ? ' ✨' : ''}
+          </td>
+        </tr>`
+      ).join('') +
+      `</tbody></table>`;
+
+    Debug.log('Loot generato per encounter');
+  };
+
+  return { init, genera, aggiungiAlCombat, generaLoot, CATS };
+})();
 
 // ══ TIMER BLOCK (conto alla rovescia funzionante) ══
 const TimerBlock = (() => {
