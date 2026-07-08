@@ -7086,6 +7086,8 @@ const Schermo = (() => {
 
   const renderBlock = (block, idx) => {
     const def = BLOCK_TYPES[block.type] || BLOCK_TYPES.custom;
+    const isFullWidth = def.fullWidth && (block.size === 'xl');
+    const fullWidthStyle = isFullWidth ? 'grid-column:1/-1;' : '';
     const size = block.size || def.defaultSize;
     const cols = SIZES[size]?.cols || 2;
     const title = block.title || def.label;
@@ -7316,62 +7318,71 @@ const Schermo = (() => {
     const sorted = [...combat.combatants].sort((a, b) => b.iniziativa - a.iniziativa);
     const activeIdx = combat.turno || 0;
 
-    // Stessa struttura renderCombat di Sessione, con onclick che chiamano Sessione.*
     const rows = sorted.map((c, i) => {
       const isActive = i === activeIdx;
       const hpPct = c.maxHp > 0 ? Math.max(0, Math.round((c.hp / c.maxHp) * 100)) : 100;
       const hpCol = hpPct > 66 ? 'var(--accent-success)' : hpPct > 33 ? 'var(--accent-warning)' : 'var(--accent-danger)';
       const condBadges = (c.condizioni || []).map(cond =>
-        `<span class="badge badge-primary" style="font-size:0.55rem;padding:1px 3px;">${cond.slice(0,4)}</span>`
+        `<span class="badge badge-primary" style="font-size:0.6rem;padding:1px 4px;">${cond.slice(0,6)}</span>`
       ).join('');
+      const icon = c.tipo === 'pg' ? '👤' : c.tipo === 'mostro' ? '🐉' : '⚔️';
 
       return `<div class="combat-row${isActive ? ' combat-active' : ''}${c.hp <= 0 ? ' combat-dead' : ''}"
-          id="schermo-comb-${c.id}" style="padding:4px 6px;">
-        <div class="combat-init-col" style="width:32px;">
-          <span class="combat-init-value" style="font-size:0.78rem;">${c.iniziativa}</span>
+          id="schermo-comb-${c.id}"
+          style="display:grid;grid-template-columns:36px 1fr 140px auto;align-items:center;gap:8px;padding:5px 8px;">
+
+        <!-- Iniziativa -->
+        <div style="text-align:center;">
+          <span style="font-family:var(--font-mono);font-size:0.9rem;font-weight:700;">${c.iniziativa}</span>
         </div>
-        <div class="combat-name-col" style="flex:1;min-width:0;">
-          <span style="font-size:0.8rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;">
-            ${c.tipo === 'pg' ? '👤' : c.tipo === 'mostro' ? '🐉' : '⚔️'} ${c.nome}
-            ${c.concentrazione ? ' 🔮' : ''}
-          </span>
+
+        <!-- Nome + condizioni -->
+        <div style="min-width:0;">
+          <div style="display:flex;align-items:center;gap:5px;">
+            <span style="font-size:0.85rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${icon} ${c.nome}${c.concentrazione ? ' 🔮' : ''}</span>
+            ${c.tipo === 'pg' ? '' : `<button class="btn btn-ghost btn-icon-sm" style="flex-shrink:0;width:22px;height:22px;font-size:0.6rem;" onclick="Sessione.openCombatantSheet('${c.id}')" title="Scheda">📋</button>`}
+          </div>
           ${condBadges ? `<div style="display:flex;flex-wrap:wrap;gap:2px;margin-top:2px;">${condBadges}</div>` : ''}
         </div>
-        <div class="combat-hp-col" style="min-width:90px;">
-          <div style="display:flex;align-items:center;gap:4px;">
-            <div style="flex:1;height:5px;background:var(--bg-tertiary);border-radius:3px;overflow:hidden;">
-              <div class="combat-hp-fill" style="height:100%;width:${hpPct}%;background:${hpCol};border-radius:3px;transition:width 0.3s;"></div>
+
+        <!-- HP barra + valori -->
+        <div>
+          <div style="display:flex;align-items:center;gap:5px;">
+            <div style="flex:1;height:6px;background:var(--bg-tertiary);border-radius:3px;overflow:hidden;">
+              <div style="height:100%;width:${hpPct}%;background:${hpCol};border-radius:3px;transition:width 0.3s;"></div>
             </div>
-            <span style="font-family:var(--font-mono);font-size:0.72rem;color:${hpCol};min-width:30px;text-align:right;">${c.hp}/${c.maxHp}</span>
+            <span style="font-family:var(--font-mono);font-size:0.75rem;color:${hpCol};min-width:44px;text-align:right;">${c.hp}/${c.maxHp}</span>
           </div>
         </div>
-        <div class="combat-actions-col" style="display:flex;gap:2px;">
-          <button class="btn btn-ghost btn-icon-sm" style="width:24px;height:24px;font-size:0.65rem;"
-            onclick="Sessione.changeHP('${c.id}',-1);setTimeout(()=>Schermo._refreshCombat(),100)" title="Danno"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></button>
-          <button class="btn btn-ghost btn-icon-sm" style="width:24px;height:24px;font-size:0.65rem;"
-            onclick="Sessione.changeHP('${c.id}',1);setTimeout(()=>Schermo._refreshCombat(),100)" title="Cura">💚</button>
-          ${c.tipo !== 'pg' ? `<button class="btn btn-ghost btn-icon-sm" style="width:24px;height:24px;font-size:0.65rem;"
-            onclick="Sessione.openCombatantSheet('${c.id}')" title="Scheda"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></button>` : ''}
-          <button class="btn btn-ghost btn-icon-sm" style="width:24px;height:24px;font-size:0.65rem;"
-            onclick="Sessione.openCondizioneModal('${c.id}')" title="Condizioni"><span style="color:#e74c3c;"><svg aria-hidden="true" width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="8"/></svg></span></button>
+
+        <!-- Azioni -->
+        <div style="display:flex;gap:4px;flex-shrink:0;">
+          <button class="btn btn-ghost btn-sm" style="padding:2px 8px;font-size:0.72rem;"
+            onclick="Sessione.changeHP('${c.id}',-1);setTimeout(()=>Schermo._refreshCombat(),100)" title="Danno">💥 Danno</button>
+          <button class="btn btn-ghost btn-sm" style="padding:2px 8px;font-size:0.72rem;"
+            onclick="Sessione.changeHP('${c.id}',1);setTimeout(()=>Schermo._refreshCombat(),100)" title="Cura">💚 Cura</button>
+          <button class="btn btn-ghost btn-sm" style="padding:2px 8px;font-size:0.72rem;"
+            onclick="Sessione.openCondizioneModal('${c.id}')" title="Condizioni">🔴 Cond.</button>
         </div>
       </div>`;
     }).join('');
 
-    return `<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:4px;">
-        <div style="font-family:var(--font-display);font-size:0.85rem;">
-          Round ${combat.round || 1} · <span style="color:var(--accent-secondary);">${sorted[activeIdx]?.nome || ''}</span>
+    return `
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:6px;">
+        <div>
+          <span style="font-family:var(--font-display);font-size:0.95rem;font-weight:700;">Round ${combat.round || 1}</span>
+          <span style="color:var(--accent-secondary);margin-left:8px;font-size:0.85rem;">🎯 ${sorted[activeIdx]?.nome || '—'}</span>
         </div>
-        <div style="display:flex;gap:4px;">
-          <button class="btn btn-secondary btn-sm" onclick="Sessione.rollAllInitiative();setTimeout(()=>Schermo._refreshCombat(),200)">Init</button>
-          <button class="btn btn-ghost btn-sm" onclick="Sessione.prevTurn();setTimeout(()=>Schermo._refreshCombat(),200)">◀</button>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          <button class="btn btn-ghost btn-sm" onclick="Sessione.rollAllInitiative();setTimeout(()=>Schermo._refreshCombat(),200)">🎲 Init tutti</button>
+          <button class="btn btn-secondary btn-sm" onclick="Sessione.prevTurn();setTimeout(()=>Schermo._refreshCombat(),200)">◀ Indietro</button>
           <button class="btn btn-primary btn-sm" onclick="Sessione.nextTurn();setTimeout(()=>Schermo._refreshCombat(),200)">▶ Avanti</button>
+          <button class="btn btn-ghost btn-sm" onclick="App.navigateTo('sessione');closeMobileMenu()">→ Sessione</button>
         </div>
       </div>
-      <div style="display:flex;flex-direction:column;gap:1px;">${rows}</div>
-      <div style="display:flex;gap:4px;margin-top:8px;flex-wrap:wrap;">
-        <button class="btn btn-ghost btn-sm" style="font-size:0.72rem;" onclick="Sessione.newCombat();setTimeout(()=>Schermo._refreshCombat(),300)">🆕 Nuovo</button>
-        <button class="btn btn-ghost btn-sm" style="font-size:0.72rem;" onclick="App.navigateTo('sessione');closeMobileMenu()">→ Sessione</button>
+      <div style="display:flex;flex-direction:column;gap:2px;">${rows}</div>
+      <div style="margin-top:8px;">
+        <button class="btn btn-ghost btn-sm" style="font-size:0.72rem;" onclick="Sessione.newCombat();setTimeout(()=>Schermo._refreshCombat(),300)">🆕 Nuovo Scontro</button>
       </div>`;
   };
 
