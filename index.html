@@ -8003,6 +8003,8 @@ const Generatori = {
     const enabled = Generatori._getEnabledGen();
     document.querySelectorAll('.gen-card[data-gen-id]').forEach(card => {
       const id = card.dataset.genId;
+      // encounter è sempre visibile
+      if (id === 'encounter') { card.style.display = ''; return; }
       card.style.display = enabled.includes(id) ? '' : 'none';
     });
   },
@@ -9359,7 +9361,7 @@ const Generatori = {
     const categorie = EncounterBuilder._CATS;
     el.innerHTML = categorie.map(c =>
       `<label style="display:flex;align-items:center;gap:4px;cursor:pointer;padding:3px 8px;border-radius:var(--radius-sm);background:var(--bg-secondary);font-size:0.75rem;border:1px solid var(--border);">
-        <input type="checkbox" data-enc-cat="${c.id}" checked> ${c.emoji} ${c.nome}
+        <input type="checkbox" data-enc-cat="${c.id}"> ${c.emoji} ${c.nome}
       </label>`
     ).join('');
   },
@@ -9717,7 +9719,7 @@ const EncounterBuilder = (() => {
     if (!el || el.children.length > 0) return;
     el.innerHTML = CATS.map(c =>
       `<label style="display:flex;align-items:center;gap:4px;cursor:pointer;padding:3px 8px;border-radius:var(--radius-sm);background:var(--bg-secondary);font-size:0.75rem;border:1px solid var(--border);">
-        <input type="checkbox" data-enc-cat="${c.id}" checked> ${c.emoji} ${c.nome}
+        <input type="checkbox" data-enc-cat="${c.id}"> ${c.emoji} ${c.nome}
       </label>`
     ).join('');
   };
