@@ -763,6 +763,38 @@
           </div>
         </div>
 
+
+        <!-- Descrizione Luoghi -->
+        <div class="card gen-card" data-gen-id="descrizione" style="grid-column:1/-1;">
+          <div class="card-header">
+            <h3 class="card-title">🏙️ Descrizione Luoghi</h3>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
+              <select id="gen-desc-tipo" class="form-select" style="width:auto;font-size:0.75rem;" onchange="DescrizioneGen.aggiornaSottotipo()">
+                <option value="taverna">🍺 Taverna</option>
+                <option value="bottega">🛒 Bottega</option>
+                <option value="strada">🛤️ Strada</option>
+                <option value="quartiere">🏘️ Quartiere</option>
+                <option value="dungeon">🏚️ Dungeon</option>
+                <option value="foresta">🌲 Foresta</option>
+                <option value="tempio">⛪ Tempio</option>
+                <option value="castello">🏰 Castello</option>
+                <option value="porto">⚓ Porto</option>
+                <option value="mercato">🏪 Mercato</option>
+              </select>
+              <select id="gen-desc-qualita" class="form-select" style="width:auto;font-size:0.75rem;">
+                <option value="squallido">💀 Squallido</option>
+                <option value="normale" selected>⚖️ Normale</option>
+                <option value="lusso">👑 Lusso</option>
+              </select>
+              <button class="btn btn-primary btn-sm" onclick="DescrizioneGen.genera()">🎲 Genera</button>
+              <button class="btn btn-ghost btn-sm" onclick="DescrizioneGen.genera()">↺ Rigenera</button>
+            </div>
+          </div>
+          <div id="gen-desc-result" style="padding:10px 12px;min-height:80px;">
+            <div class="text-muted text-sm">Seleziona tipo e qualità, poi genera.</div>
+          </div>
+        </div>
+
       </div><!-- fine generatori-grid -->
 
     </section>
@@ -7997,6 +8029,7 @@ const Generatori = {
     incontri:  { label: 'Incontri Casuali',     emoji: '⚠️' },
     follia:    { label: 'Follia',               emoji: '🌀' },
     encounter:  { label: 'Encounter Builder',    emoji: '⚔️' },
+    descrizione: { label: 'Descrizione Luoghi',    emoji: '🏙️' },
   },
 
   _getEnabledGen: () => {
@@ -8015,7 +8048,7 @@ const Generatori = {
     document.querySelectorAll('.gen-card[data-gen-id]').forEach(card => {
       const id = card.dataset.genId;
       // encounter è sempre visibile
-      if (id === 'encounter') { card.style.display = ''; return; }
+      if (id === 'encounter' || id === 'descrizione') { card.style.display = ''; return; }
       card.style.display = enabled.includes(id) ? '' : 'none';
     });
   },
@@ -9949,6 +9982,356 @@ const EncounterBuilder = (() => {
   };
 
   return { init, genera, aggiungiAlCombat, generaLoot, CATS };
+})();
+
+// ══ GENERATORE DESCRIZIONI LUOGHI ══
+const DescrizioneGen = (() => {
+
+  const rnd = (a) => a[Math.floor(Math.random() * a.length)];
+  const rndN = (a, n) => {
+    const copy = [...a].sort(() => Math.random() - 0.5);
+    return copy.slice(0, n);
+  };
+
+  // ── NOMI per tipo e qualità ──
+  const NOMI = {
+    taverna: {
+      squallido: ['La Bettola del Topo','Il Cinghiale Pelato','La Fogna Allegra','Il Secchio Bucato','L\'Orso Puzzolente','La Carcassa Ubriaca','Il Lurido Calice','La Muffa Dorata'],
+      normale:   ['La Locanda del Viandante','Il Cavallo Stanco','La Luna Mezza','Il Cervo Rosso','L\'Ancora e la Brocca','Il Falco Grigio','La Stella Cadente','Il Cinghiale Sano'],
+      lusso:     ['La Dimora del Cigno d\'Argento','Il Palazzo delle Maree','La Corona Dorata','L\'Olimpo dei Viaggiatori','La Villa del Drago Addormentato','Il Nettare degli Dei','La Residenza Imperiale','Il Calice di Platino'],
+    },
+    bottega: {
+      squallido: ['Rigattiere di Quarta Mano','Merci Dubbie di Varno','Lo Scantinato del Mercante','Cianfrusaglie e Rifiuti','Il Bazar del Lerciume','Merce Usata - Non Chiedere'],
+      normale:   ['Bottega del Fabbro','Emporio delle Spezie','La Merceria','Forniture dell\'Avventuriero','Il Negozio di Urist','Commercio e Baratto'],
+      lusso:     ['La Gioielleria della Corona','Emporio delle Rarità Esotiche','Il Mercante di Oggetti Magici','La Boutique Arcana','Preziosi e Manufatti d\'Arte','Il Collezionista Raffinato'],
+    },
+    strada: {
+      squallido: ['Vicolo del Pericolo','Budello dei Mendicanti','Strada dei Rifiuti','Il Corridoio Buio','Viuzza delle Ombre','Traversa Malfamata'],
+      normale:   ['Via del Mercante','Strada Principale','Corso delle Botteghe','Via del Porto','Viale della Fiera','Strada Rotabile'],
+      lusso:     ['Viale dei Nobili','Corso della Corona','Via dei Palazzi','Promenade Dorata','Boulevard delle Fontane','Viale del Giardino Reale'],
+    },
+    quartiere: {
+      squallido: ['Il Ghetto','I Bassifondi','Il Quartiere dei Reietti','La Fogna della Città','Il Ventre Marcio','Zona delle Baracche'],
+      normale:   ['Il Quartiere dei Mercanti','Il Distretto Artigiano','La Zona Residenziale','Il Quartiere del Porto','Il Rione dei Lavoratori','Il Settore Civile'],
+      lusso:     ['Il Quartiere Nobile','Il Distretto della Corona','Il Rione dei Signori','La Zona delle Ville','Il Quartiere delle Ambasciate','Il Settore Imperiale'],
+    },
+    dungeon: {
+      squallido: ['Le Fogne Dimenticate','Il Tugurio Sotterraneo','Le Catacombe Abbandonate','La Tana dei Rifiuti','Il Budello Marcio','Le Rovine Allagate'],
+      normale:   ['Le Tombe Antiche','Il Dungeon del Castello','Le Cripte dei Caduti','Il Labirinto di Pietra','Le Sale dei Guardiani','Il Sotterraneo di Guardia'],
+      lusso:     ['Il Palazzo Sotterraneo','Le Camere del Re Sepolto','Il Santuario Nascosto','La Volta dei Tesori','Le Sale del Trono Perduto','Il Mausoleo Imperiale'],
+    },
+    foresta: {
+      squallido: ['Il Bosco Malato','La Palude Boscosa','Il Sottobosco Marcio','La Foresta dei Sussurri Oscuri','Il Bosco Infestato','La Selva dei Perduti'],
+      normale:   ['La Foresta di Quercia','Il Bosco dei Cacciatori','La Selva Verde','Il Bosco dei Cervi','La Foresta Antica','Il Bosco del Confine'],
+      lusso:     ['Il Bosco Incantato','La Foresta degli Elfi','Il Giardino Eterno','La Selva d\'Argento','Il Bosco del Re','La Foresta delle Fate'],
+    },
+    tempio: {
+      squallido: ['La Cappella Abbandonata','Il Santuario Diroccato','L\'Altare Profanato','La Cappella dei Reietti','Il Tempietto Maledetto','L\'Oratorio in Rovina'],
+      normale:   ['Il Tempio di Pelor','La Chiesa del Villaggio','Il Santuario della Luce','La Cappella dei Pellegrini','Il Tempio degli Antenati','La Casa della Preghiera'],
+      lusso:     ['La Grande Cattedrale','Il Tempio d\'Oro','Il Santuario Imperiale','La Basilica della Speranza','Il Duomo della Corona','Il Tempio dei Mille Dei'],
+    },
+    castello: {
+      squallido: ['La Torre Diroccata','Il Forte Abbandonato','Le Rovine del Castello','Il Fortilizio Fatiscente','La Fortezza Dimenticata','Il Castello in Rovina'],
+      normale:   ['Il Castello del Signore','La Fortezza di Confine','Il Forte Militare','La Rocca del Guardiano','Il Castello di Pietra','La Torre di Guardia'],
+      lusso:     ['Il Palazzo Reale','La Fortezza della Corona','Il Gran Castello','Il Bastione Imperiale','Il Castello delle Cento Torri','La Reggia d\'Oro'],
+    },
+    porto: {
+      squallido: ['Il Molo Marcio','Il Porto dei Contrabbandieri','La Banchina dei Naufraghi','Il Molo Abbandonato','Il Porto Malfamato','La Banchina Lercia'],
+      normale:   ['Il Porto del Pescatore','La Banchina dei Mercanti','Il Molo delle Barche','Il Porto Commerciale','La Banchina del Re','Il Porto dei Viaggiatori'],
+      lusso:     ['Il Porto Imperiale','La Marina Reale','Il Gran Bacino','Il Porto delle Navi d\'Oro','La Darsena di Platino','Il Porto delle Flotte'],
+    },
+    mercato: {
+      squallido: ['Il Mercatino delle Pulci','Il Bazar dei Rifiuti','Il Mercato dei Ladri','La Fiera degli Scarti','Il Bazaruccio','Il Mercato Nero'],
+      normale:   ['Il Mercato della Piazza','La Fiera del Villaggio','Il Bazar dei Mercanti','Il Mercato Settimanale','La Fiera dell\'Est','Il Mercato Coperto'],
+      lusso:     ['Il Gran Bazar','La Fiera delle Rarità','Il Mercato d\'Oro','Il Bazaar Imperiale','La Grande Fiera della Corona','Il Mercato delle Meraviglie'],
+    },
+  };
+
+  // ── TABELLE DESCRIZIONE per tipo e qualità ──
+  const DESC = {
+    taverna: {
+      squallido: {
+        aspetto:    ['un locale buio e soffocante con travi marce','una stanza unica con il soffitto basso e annerito dal fumo','un ambiente angusto che puzza di muffa e birra acida','quattro mura scrostate con un pavimento di terra battuta'],
+        odori:      ['birra rancida e vomito secco','fumo acre e sudore','muffa e cibo bruciato','sporcizia e umanità ammassata'],
+        atmosfera:  ['i clienti si guardano storto e evitano il contatto visivo','un silenzio pesante rotto solo da qualche tosse','risse che scoppiano e finiscono nel giro di pochi secondi','borbottii e sussurri tra ubriachi'],
+        dettagli:   ['un barista sdentato con uno sguardo vuoto','topie che corrono liberamente tra i tavoli','panche di legno marce che scricchiolano','un cane spelacchiato dorme accanto al fuoco spento'],
+        cliente:    ['un mendicante che russa sul bancone','tre scaricatori di porto con le nocche sbucciate','un individuo incappucciato che non consuma nulla','una prostituta stanca che aspetta clienti'],
+      },
+      normale: {
+        aspetto:    ['un locale accogliente con tavoli in legno robusto','una sala ampia illuminata da torce e un focolare centrale','un ambiente caldo con trofei di caccia alle pareti','un inn pulito e funzionale con odore di stufato'],
+        odori:      ['pane appena sfornato e spezie','birra fresca e legno di quercia','stufato di verdure e fumo di pino','cera delle candele e foin di erbe aromatiche'],
+        atmosfera:  ['chiacchiere e risate da ogni tavolo','un menestrello che suona in un angolo','mercanti che discutono affari a voce alta','viaggiatori stanchi che si godono un pasto caldo'],
+        dettagli:   ['la barista serve con un sorriso stanco ma sincero','un menu scritto su una lavagna di ardesia','boccali di stagno appesi alle travi','un gatto arancione dorme sul bancone'],
+        cliente:    ['un gruppo di avventurieri che confrontano cicatrici','un mercante che conta monete sotto il tavolo','un vecchio che fissa il fuoco stringendo il suo boccale','due guardie fuori servizio che ridono di qualcosa'],
+      },
+      lusso: {
+        aspetto:    ['una sala elegante con arazzi colorati alle pareti','un locale su due piani con balconate in legno intagliato','un ambiente sontuoso con lampadari di cristallo','una sala raffinata con tavoli distanziati e tovaglie di lino'],
+        odori:      ['vino pregiato e profumi esotici','carne arrosto e salse alle erbe fini','fiori freschi e candele alla vaniglia','spezie d\'oltre mare e pane al rosmarino'],
+        atmosfera:  ['conversazioni sommesse e musica discreta','nobili che si ignorano con eleganza','servitori silenziosi che si muovono come ombre','un\'aria di esclusività che pesa come seta'],
+        dettagli:   ['un maggiordomo che valuta ogni cliente con un\'occhiata','posate d\'argento e bicchieri di vetro soffiato','un fuoco nel caminetto ornato di sculture','fiori freschi in vasi di ceramica dipinta'],
+        cliente:    ['un nobile in incognito con troppo oro','un mercante straniero che cerca accordi riservati','una coppia di ricchi che non si parlano','un diplomatico con la sua scorta discreta'],
+      },
+    },
+
+    bottega: {
+      squallido: {
+        aspetto:    ['un buco nel muro con merci ammucchiate senza ordine','un banco di legno traballante con polvere ovunque','uno scantinato con scaffali piegati sotto il peso','una tenda rattoppata con oggetti appesi a fili'],
+        odori:      ['muffa, olio vecchio e metallo arrugginito','grasso e polvere di anni','merce avariata e legno marcio','sudore e qualcosa di indefinibile e sgradevole'],
+        atmosfera:  ['il venditore ti guarda come se stessi rubando','silenzio imbarazzante rotto dal cigolìo del legno','il mercante negozia ogni rame con ferocia','nessuno fa domande su come è arrivata la merce'],
+        dettagli:   ['oggetti di dubbia provenienza senza etichetta','una bilancia chiaramente manomessa','il mercante nasconde qualcosa sotto il bancone','polvere così spessa che si vedono le impronte'],
+        merce:      ['attrezzi arrugginiti ma funzionanti','vestiti usati di taglie sbagliate','cibo quasi scaduto a metà prezzo','oggetti di cui non si capisce lo scopo'],
+      },
+      normale: {
+        aspetto:    ['un negozio ordinato con scaffali pieni','una bottega dall\'insegna colorata e leggibile','un locale pulito con merci disposte con cura','un emporio con vetrina e banco ben tenuto'],
+        odori:      ['legno fresco e olio di manutenzione','spezie e tessuti nuovi','ferro lavorato e cuoio','carta e inchiostro'],
+        atmosfera:  ['il venditore saluta con un cenno professionale','altri clienti valutano la merce tranquillamente','un apprendista sistema gli scaffali in fondo','scambi rapidi e onesti senza fronzoli'],
+        dettagli:   ['listini prezzi scritti chiaramente','campioni di merce esposti sul bancone','un registro clienti tenuto bene','strumenti del mestiere esposti alle pareti'],
+        merce:      ['attrezzi in buone condizioni con garanzia orale','forniture standard a prezzi ragionevoli','una piccola selezione di oggetti insoliti','componenti per incantesimi di base'],
+      },
+      lusso: {
+        aspetto:    ['una boutique con vetrine illuminate e insegna dorata','un emporio elegante con merce esposta su cuscini di velluto','un negozio esclusivo che sembra un museo privato','una galleria commerciale con guardie discrete'],
+        odori:      ['cedro e sandalo','profumo d\'oriente e cera pregiata','pelle conciata finemente e metalli rari','aria pulita filtrata da erbe aromatiche'],
+        atmosfera:  ['il commesso ti valuta prima ancora di salutare','ogni oggetto ha una storia raccontata con orgoglio','la discrezione è parte del servizio','si compra con un cenno, si paga con una firma'],
+        dettagli:   ['vetrine con serrature','oggetti con certificato di autenticità','il proprietario è in fondo e riceve solo su appuntamento','illuminazione a incantesimo che valorizza i colori'],
+        merce:      ['oggetti magici di rarità provata','manufatti artistici di artigiani famosi','componenti per incantesimi rari e potenti','materie prime di qualità eccezionale'],
+      },
+    },
+
+    strada: {
+      squallido: {
+        aspetto:    ['un vicolo stretto tra muri scrostati e umidi','un budello lastricato da ciottoli rotti e fango','una strada buia fiancheggiata da baracche di tavole','un corridoio tra edifici ammassati che toglie il sole'],
+        odori:      ['fognature e immondizia','cibo andato a male e cenere','urina e fumo di carbone','muffa e acqua stagnante'],
+        atmosfera:  ['occhi che ti seguono dalle finestre sbarrate','qualcuno scappa quando ti senti avvicinarti','un silenzio che fa scattare l\'istinto di sopravvivenza','nessuno sembra essere lì per caso'],
+        dettagli:   ['graffiti incomprensibili sui muri','ratti che spariscono negli angoli','una porta sbarrata con troppe catene','panni stesi che nascondono le finestre'],
+        persone:    ['mendicanti che non chiedono più nulla','bambini che ti osservano senza espressione','una figura incappucciata che si allontana in fretta','qualcuno che dorme in un angolo — o forse no'],
+      },
+      normale: {
+        aspetto:    ['una via acciottolata larga quanto due carri','una strada trafficata con negozi ai lati','un corso lastricato con marciapiede rialzato','una via dritta con insegne che si dondolano al vento'],
+        odori:      ['pane caldo e fumo di camino','spezie e merce dei mercanti','cavalli e paglia','pioggia su pietra calda'],
+        atmosfera:  ['il traffico scorre con qualche intoppo','voci che si mescolano in un brusio vivo','venditori ambulanti che gridano la merce','la normalità caotica di una città che funziona'],
+        dettagli:   ['lanterne sui pali che aspettano la sera','carri che scaricano davanti alle botteghe','una fontana pubblica circondata di gente','un crieur che annuncia le notizie del giorno'],
+        persone:    ['famiglie con borse della spesa','artigiani che tornano dal lavoro','soldati di pattuglia senza fretta','un bambino che insegue un pollo fuggito'],
+      },
+      lusso: {
+        aspetto:    ['un boulevard ampio con alberi potati ai lati','un viale lastricato di pietra bianca e pulita','una promenade con statue e fontane ornamentali','una strada privata con cancelli e guardie'],
+        odori:      ['fiori di stagione e acqua di rose','cera per il pavimento e profumi dei passanti','erba tagliata dei giardini dietro i muri','aria pulita con sentore di legno di qualità'],
+        atmosfera:  ['il silenzio è una forma di privilegio','carrozze private che sfilano lente','nessuno cammina veloce — qui si passeggia','uno sguardo di troppo viene notato dalla guardia'],
+        dettagli:   ['lampioni di ferro battuto con decorazioni floreali','banchine per le carrozze davanti ai portoni','stemmi di famiglia sopra ogni cancello','giardinieri che curano i vasi con precisione chirurgica'],
+        persone:    ['nobili con scorta che ignorano tutti','dame con abiti che valgono più di una casa','diplomatici stranieri in visita ufficiale','servitori in livrea che corrono commissioni'],
+      },
+    },
+
+    quartiere: {
+      squallido: {
+        aspetto:    ['un dedalo di baracche di legno e lamiera','casupole ammassate che si sostengono a vicenda','edifici costruiti uno sopra l\'altro senza piano','strade di fango che diventano torrenti quando piove'],
+        odori:      ['fuochi di spazzatura e cibo povero','fogna scoperta e animali da cortile','sudore collettivo e fumo di carbone'],
+        atmosfera:  ['la povertà ha il suo rumore — basso e continuo','bambini che giocano tra rifiuti con un\'allegria strana','adulti che guardano i forestieri con sospetto esperto','la comunità si stringe contro il mondo esterno'],
+        dettagli:   ['panni stesi tra le finestre che toccano quasi l\'altra sponda','animali da cortile che girano liberi','orti improvvisati su ogni superficie piana','graffiti che segnano il territorio'],
+        persone:    ['famiglie di sei in due stanze','ex-soldati con lo sguardo perso','contrabbandieri che usano i vicoli come corridoi','bambini che conoscono ogni angolo meglio degli adulti'],
+      },
+      normale: {
+        aspetto:    ['case a due piani in mattoni con tegole rosse','un quartiere con strade regolari e incroci ben definiti','edifici ben mantenuti con orti sul retro','una zona viva con botteghe al piano terra'],
+        odori:      ['pane dal forno di quartiere','profumo di stufato dalle finestre aperte','legno lavorato e metallo caldo'],
+        atmosfera:  ['la vita normale della gente normale','i bambini giocano, gli adulti lavorano','i vicini si conoscono e si guardano le spalle','c\'è un ordine non scritto che funziona'],
+        dettagli:   ['una piazza centrale con pozzo e panchine','la chiesa o il tempio del quartiere al centro','un\'osteria di quartiere dove si decide tutto','il mercatino del mattino ogni tre giorni'],
+        persone:    ['artigiani e bottegai','famiglie di classe media che ci tengono alla reputazione','l\'anziana che sa tutto di tutti','il giovane guardiaspalle di qualche commerciante'],
+      },
+      lusso: {
+        aspetto:    ['villette con giardini curati dietro muri alti','palazzi con portoni in legno intagliato','un quartiere dove ogni edificio è un\'opera d\'arte','strade private con accesso controllato'],
+        odori:      ['fiori e erbe del giardino','cedro e cuoio delle carrozze','profumi esotici dalle finestre aperte'],
+        atmosfera:  ['il privilegio ha il profumo del silenzio','servi che entrano ed escono dai portoni sul retro','rarissimi passanti — qui non si passeggia senza motivo','ogni cosa comunica potere e separazione'],
+        dettagli:   ['stemmi di casato sopra ogni ingresso','fontane private nei cortili interni','guardie private in livrea ai cancelli','carrozze che escono solo all\'ora giusta'],
+        persone:    ['nobili che non camminano mai da soli','ambasciatori stranieri in visita','il mercante arricchito che imita i nobili','servitori che sanno tutto e non dicono nulla'],
+      },
+    },
+
+    dungeon: {
+      squallido: {
+        aspetto:    ['corridoi di pietra grezza umida di condensa','fogne abbandonate con il soffitto che crolla','un sistema di cunicoli scavati male e senza ordine','catacombe dimenticate con ossa sparse'],
+        odori:      ['muffa densa e acqua stagnante','marciume organico e ruggine','un\'umidità fredda che si attacca ai vestiti','qualcosa di morto, non troppo lontano'],
+        atmosfera:  ['silenzio totale rotto da gocce d\'acqua','l\'oscurità è quasi tangibile senza luce magica','ogni passo risuona in modi che non tornano','la sensazione costante di essere osservati'],
+        dettagli:   ['graffiti in lingue dimenticate sulle pareti','ossa sparse senza ordine né sepoltura','trappole già scattate — ma da chi?','residui di fuochi vecchi di mesi o anni'],
+        pericolo:   ['il soffitto ha crepe che non ispirano fiducia','acqua che scorre verso il basso — verso cosa?','l\'aria si fa più fredda procedendo','suoni di unghie su pietra, forse ratti'],
+      },
+      normale: {
+        aspetto:    ['corridoi di pietra squadrata con torce spente','sale vuote un tempo usate come prigione','un dungeon di costruzione militare, funzionale','catacombe ordinate di una casata nobile'],
+        odori:      ['pietra fredda e ferro vecchio','cera bruciata e polvere','aria ferma che non circola da anni'],
+        atmosfera:  ['la storia di questo posto si sente nel silenzio','porte rinforzate sfondate da dentro o da fuori','qualcuno ha vissuto qui — i segni sono ovunque','la struttura è solida, il pericolo viene da altro'],
+        dettagli:   ['celle con sbarre ancora funzionanti','braci spente in bracieri di pietra','equipaggiamento militare arrugginito alle pareti','incisioni che segnano i livelli e le direzioni'],
+        pericolo:   ['porte che si chiudono da sole','un corridoio che sembra più lungo all\'andata','la mappa non torna con la realtà','rumori che sembrano rispondere ai vostri'],
+      },
+      lusso: {
+        aspetto:    ['sale intagliate con rilievi di battaglie dimenticate','corridoi con mosaici ancora vividi sul pavimento','un palazzo sotterraneo costruito per durare secoli','camere funerarie con soffitti a volta decorati'],
+        odori:      ['incenso vecchio di decenni','metallo prezioso e pietra levigata','magia residua con sentore di ozono'],
+        atmosfera:  ['la grandezza di un\'epoca perduta è ancora palpabile','ogni sala racconta qualcosa a chi sa guardare','un silenzio reverenziale, quasi sacro','si ha la sensazione di essere ospiti non invitati'],
+        dettagli:   ['colonne con capitelli intagliati ancora integri','porte di bronzo con iscrizioni in lingue antiche','trappole magiche ancora attive dopo secoli','tesori dimenticati che aspettano da generazioni'],
+        pericolo:   ['guardiani costrutti ancora fedeli al loro scopo','maledizioni attive incise sulle soglie','sigilli magici che reagiscono alla magia','la struttura si adatta per tenere fuori gli intrusi'],
+      },
+    },
+
+    foresta: {
+      squallido: {
+        aspetto:    ['alberi storti e malati con la corteccia nera','fango profondo che rallenta ogni passo','vegetazione densa e intricata senza sentiero','un bosco che sembra rifiutarsi di lasciarti passare'],
+        odori:      ['decomposizione e funghi velenosi','acqua stagnante e foglie marce','un\'umidità pesante che soffoca'],
+        atmosfera:  ['il silenzio degli animali è il primo avvertimento','la luce filtra appena, grigia e fredda','ci si sente osservati da ogni direzione','i sentieri spariscono mentre si cammina'],
+        dettagli:   ['alberi caduti che bloccano il cammino','ragnatele enormi tra i rami','tracce di animali malati nel fango','un odore di bruciato senza fonte visibile'],
+        suoni:      ['cigolìo di rami senza vento','fruscii troppo grandi per essere ratti','silenzio improvviso di tutti gli uccelli','qualcosa che cammina parallelo al sentiero'],
+      },
+      normale: {
+        aspetto:    ['un bosco misto con querce e pini alti','sentieri battuti da cacciatori e boscaioli','una foresta viva con chiome che filtrano la luce','alberi centenari con radici che emergono dal terreno'],
+        odori:      ['resina e foglie umide','muschio e terra smossa','fiori selvatici e legno fresco'],
+        atmosfera:  ['il bosco è vivo e lo si sente','uccelli che cantano e rispondono','il vento muove le chiome in modo ritmico','ci si sente piccoli nel modo giusto'],
+        dettagli:   ['ruscelli che attraversano il sentiero','nidi in ogni ramo abbastanza alto','funghi e bacche identificabili ai lati del sentiero','tracce di cervi e cinghiali nel fango'],
+        suoni:      ['picchio sul legno in lontananza','foglie mosse dal vento','acqua corrente ovunque ci si fermi','il canto di uccelli che non si vedono'],
+      },
+      lusso: {
+        aspetto:    ['una foresta antica e protetta da incantesimi','alberi di grandezza straordinaria con corteccia luminosa','un bosco di fate con vegetazione che sembra curata','sentieri di muschio morbido che guidano da soli'],
+        odori:      ['fiori magici e aria purissima','magia leggera come profumo di primavera eterna','legno prezioso e rugiada mattutina'],
+        atmosfera:  ['la bellezza qui fa quasi male a guardarla','il tempo sembra scorrere diversamente','ogni pianta sembra consapevole della tua presenza','ci si sente ospiti di qualcosa di molto più antico'],
+        dettagli:   ['piante curative rare che crescono spontanee','fuochi fatui che illuminano il cammino','animali non spaventati dagli avventurieri','fiori che sbocciano e appassiscono in pochi secondi'],
+        suoni:      ['musica senza strumenti tra le foglie','il canto di creature mai viste prima','silenzio perfetto quando ci si ferma ad ascoltare','voci lontane in lingue sconosciute'],
+      },
+    },
+
+    tempio: {
+      squallido: {
+        aspetto:    ['una cappella abbandonata con il tetto sfondato','muri scrostati con affreschi vandalizzati','un altare rovesciato e profanato','un luogo sacro che non lo è più da tempo'],
+        odori:      ['muffa e legno marcio','cenere vecchia e cera bruciata','qualcosa di metallico — sangue? ruggine?'],
+        atmosfera:  ['il silenzio di un dio che non risponde più','freddo innaturale anche in estate','la sensazione di una presenza non benevolente','oggetti sacri distrutti o trafugati'],
+        dettagli:   ['simboli divini cancellati o invertiti','candele consumate da anni','testi sacri strappati e dispersi','tracce di riti non ortodossi sull\'altare'],
+      },
+      normale: {
+        aspetto:    ['un tempio di pietra locale con campanile','navate semplici illuminate da candele e finestre','un luogo di culto pulito e funzionale','un santuario con i simboli del dio ben visibili'],
+        odori:      ['incenso e cera','fiori freschi sull\'altare','legno di sandalo e olio sacro'],
+        atmosfera:  ['pellegrini che pregano in silenzio','sacerdoti che si muovono con ritmo quotidiano','un senso di pace genuino e non performativo','la comunità si riconosce in questo luogo'],
+        dettagli:   ['offerte votive lasciate dai fedeli','un libro delle preghiere condiviso','una cassetta per offerte in legno','vetrate colorate che proiettano luce colorata'],
+      },
+      lusso: {
+        aspetto:    ['una cattedrale con soffitti a volta altissimi','colonne di marmo e pavimenti di mosaico','un tempio dorato visibile da mezza città','sale enormi con acustica progettata per il canto'],
+        odori:      ['incenso raro bruciato in quantità','fiori esotici e olii preziosi','oro e pietra calda'],
+        atmosfera:  ['il potere religioso e temporale si fondono qui','il silenzio è imposto dall\'architettura stessa','i fedeli si sentono piccoli — è lo scopo','preti di alto rango che non guardano i comuni'],
+        dettagli:   ['statue di divinità alte quanto edifici','reliquie in teche di vetro e oro','donazioni di nobili che comprano perdono','guardiani armati in abiti religiosi'],
+      },
+    },
+
+    castello: {
+      squallido: {
+        aspetto:    ['una torre solitaria con mura crepate','rovine di un forte militare abbandonato','un fortilizio tenuto in piedi a stento','mura che grondano acqua dopo ogni pioggia'],
+        odori:      ['muffa, polvere e ferro vecchio','fumo di torce economiche','umidità di pietra mai asciutta'],
+        atmosfera:  ['le guardie sembrano più a disagio dei visitatori','non si sa chi comanda o se qualcuno comanda','ogni stanza racconta una sconfitta','manutenzione zero, morale sotto zero'],
+        dettagli:   ['ponte levatoio bloccato a metà','stendardi strappati ancora appesi','armature arrugginite in piedi per abitudine','un fossato asciutto usato come discarica'],
+      },
+      normale: {
+        aspetto:    ['un castello funzionale con mura solide','torri di guardia con sentinelle attive','cortile interno con attività militare quotidiana','un forte ben organizzato senza eccessi'],
+        odori:      ['ferro e cuoio delle armature','fuochi dei fabbri e cucine','fieno dalle stalle e cavalli'],
+        atmosfera:  ['efficienza militare senza cerimonie','guardie che fanno il loro lavoro senza commenti','una gerarchia chiara e rispettata','si capisce subito chi comanda e come'],
+        dettagli:   ['armerie ben fornite e organizzate','stalle con cavalli curati','una sala del consiglio con mappe alle pareti','un\'armeria con armi di ogni tipo etichettate'],
+      },
+      lusso: {
+        aspetto:    ['torri eleganti visibili da giorni di cammino','cortili con giardini e fontane','sale del trono decorate con arazzi di seta','un palazzo-fortezza che è anche manifesto di potere'],
+        odori:      ['cera e legno pregiato','fiori dei giardini interni','cucine che lavorano sempre per ospiti importanti'],
+        atmosfera:  ['ogni movimento è politica','il protocollo è la vera armatura di questo posto','le guardie sembrano statue — eppure non perdono nulla','la ricchezza è esibita come forma di deterrenza'],
+        dettagli:   ['arazzi che raccontano la storia della casata','banchi di marmo nel cortile','guardie d\'élite con armature su misura','stemmi ovunque — anche sul cibo'],
+      },
+    },
+
+    porto: {
+      squallido: {
+        aspetto:    ['banchine di legno marcio che cigolano','barche abbandonate mezzo affondate','magazzini diroccati con tetti sfondati','reti ammonticchiate e mai riparate'],
+        odori:      ['pesce marcio e alghe','carburante di nave e ruggine','acqua di sentina e salsedine rancida'],
+        atmosfera:  ['contrabbandieri che lavorano alla luce del giorno','guardie che guardano dall\'altra parte','ogni affare si chiude senza parlare troppo','si sa che alcune domande non si fanno'],
+        dettagli:   ['casse senza marchio che spariscono in fretta','pescatori che sembrano aspettare più che pescare','gabbiani enormi che rubano senza essere cacciati','una locanda sul molo che non chiude mai'],
+      },
+      normale: {
+        aspetto:    ['un porto attivo con navi di diversi tipi','banchine in legno solido ben tenuto','magazzini pieni di mercanzia in entrata e uscita','una dogana che rallenta ma non ferma il commercio'],
+        odori:      ['sale e pesce fresco','catrame e legno umido','spezie esotiche dai carichi'],
+        atmosfera:  ['il rumore di un porto è come nessun altro','doganieri che fanno il loro lavoro con noia professionale','marinai di ogni nazionalità che si capiscono a gesti','le notizie arrivano prima qui che ovunque'],
+        dettagli:   ['aste del pesce al mattino presto','navi in riparazione in secca','un faro che funziona — quasi sempre','taverne per ogni nazionalità di marinai'],
+      },
+      lusso: {
+        aspetto:    ['una marina con navi da guerra e mercantili d\'alto bordo','banchine di pietra lavorata con corrimano di bronzo','magazzini sicuri con guardie armate','un porto imperiale con cerimonie di arrivo'],
+        odori:      ['spezie rare e legni pregiati','cera e pulizia — raro per un porto','profumo dei carichi di lusso'],
+        atmosfera:  ['le navi più belle del mondo passano di qui','commercianti con lettera di credito, non monete','le trattative avvengono nelle sale private','il porto parla il linguaggio del potere'],
+        dettagli:   ['guardie navali in armatura completa','uffici di compagnie commerciali lungo la banchina','una sala di accoglienza per i capitani di rango','navi da guerra ancorate come monito permanente'],
+      },
+    },
+
+    mercato: {
+      squallido: {
+        aspetto:    ['bancarelle di fortuna su cassette capovolte','merce esposta su teli di sacco a terra','tende rattoppate che non riparano dalla pioggia','un mercato che si smonta in cinque minuti se arrivano le guardie'],
+        odori:      ['cibo avanzato e spezie economiche','animali vivi ammassati','sudore e troppa gente in poco spazio'],
+        atmosfera:  ['urla e contrattazioni senza esclusione di colpi','ladri che lavorano nella folla','merce di provenienza incerta a prezzi bassissimi','il mercato più onesto nella disonestà'],
+        dettagli:   ['bambini che fanno da palo','un venditore di informazioni travestito da fruttivendolo','merce rubata mischiata a merce legale','la guardia passa — tutti aspettano che ripassi'],
+      },
+      normale: {
+        aspetto:    ['bancarelle ordinate su una piazza acciottolata','tendoni colorati che danno ombra e identità','un mercato che si svolge ai giorni stabiliti','venditori con posto fisso e clientela affezionata'],
+        odori:      ['pane fresco e frutta di stagione','spezie e formaggi','animali vivi e fieno'],
+        atmosfera:  ['il ritmo del mercato è il ritmo del paese','contrattare è normale, quasi obbligatorio','si trovano notizie tanto quanto merci','famiglie che si incontrano per caso ogni settimana'],
+        dettagli:   ['un banditore che annuncia le offerte del giorno','pesatori pubblici per garantire le misure','una fontana centrale dove tutti si incontrano','il banco della locanda con stuzzichini'],
+      },
+      lusso: {
+        aspetto:    ['un bazar coperto con gallerie illuminate','stand permanenti con vetrine e sicurezza','un mercato privato su invito','padiglioni eleganti per ogni categoria di merce'],
+        odori:      ['spezie esotiche e profumi d\'oltre mare','cibo di alta cucina preparato sul posto','seta e pelli pregiate'],
+        atmosfera:  ['si parla sottovoce e si mostra poco','ogni acquisto è un\'operazione diplomatica','i prezzi non si chiedono — si conoscono già','il bello è essere ammessi, non comprare'],
+        dettagli:   ['guardie private discrete a ogni angolo','dimostrazioni di artigiani di fama','degustazioni di vini e cibi rari','contratti firmati davanti a testimoni notarili'],
+      },
+    },
+  };
+
+  const genera = () => {
+    const tipo    = document.getElementById('gen-desc-tipo')?.value || 'taverna';
+    const qualita = document.getElementById('gen-desc-qualita')?.value || 'normale';
+    const el      = document.getElementById('gen-desc-result');
+    if (!el) return;
+
+    const t = DESC[tipo];
+    const q = t?.[qualita];
+    if (!q) { el.innerHTML = '<div class="text-muted text-sm">Tipo non trovato.</div>'; return; }
+
+    // Genera il nome
+    const nomi   = NOMI[tipo]?.[qualita] || ['Luogo senza nome'];
+    const nome   = rnd(nomi);
+
+    // Seleziona elementi casuali
+    const aspetto   = rnd(q.aspetto);
+    const odori     = rnd(q.odori);
+    const atmosfera = rnd(q.atmosfera);
+    const dettagli  = rndN(q.dettagli || [], 2);
+    const extra     = q.persone || q.merce || q.suoni || q.pericolo || q.cliente || [];
+    const extItem   = extra.length ? rnd(extra) : null;
+
+    // Labels qualità
+    const qualLabel = { squallido:'💀 Squallido', normale:'⚖️ Normale', lusso:'👑 Lusso' }[qualita] || '';
+    const tipoLabel = {
+      taverna:'🍺 Taverna', bottega:'🛒 Bottega', strada:'🛤️ Strada',
+      quartiere:'🏘️ Quartiere', dungeon:'🏚️ Dungeon', foresta:'🌲 Foresta',
+      tempio:'⛪ Tempio', castello:'🏰 Castello', porto:'⚓ Porto', mercato:'🏪 Mercato',
+    }[tipo] || tipo;
+
+    el.innerHTML =
+      `<div style="margin-bottom:10px;">
+        <div style="font-family:var(--font-display);font-size:1.1rem;color:var(--accent-secondary);margin-bottom:3px;">${nome}</div>
+        <div style="display:flex;gap:6px;">
+          <span class="badge badge-muted">${tipoLabel}</span>
+          <span class="badge badge-muted">${qualLabel}</span>
+        </div>
+      </div>
+      <div style="background:var(--bg-secondary);border-left:3px solid var(--accent-primary);border-radius:0 var(--radius-sm) var(--radius-sm) 0;padding:12px 14px;font-size:0.85rem;line-height:1.85;color:var(--text-secondary);">
+        ${aspetto.charAt(0).toUpperCase() + aspetto.slice(1)}.
+        Nell'aria si sente ${odori}.
+        ${atmosfera.charAt(0).toUpperCase() + atmosfera.slice(1)}.
+        ${dettagli.map(d => d.charAt(0).toUpperCase() + d.slice(1) + '.').join(' ')}
+        ${extItem ? extItem.charAt(0).toUpperCase() + extItem.slice(1) + '.' : ''}
+      </div>`;
+
+    Debug.log('Descrizione generata: ' + nome + ' [' + tipo + '/' + qualita + ']');
+  };
+
+  const aggiornaSottotipo = () => {
+    // placeholder per futuri sottotipi
+  };
+
+  return { genera, aggiornaSottotipo };
 })();
 
 // ══ TIMER BLOCK (conto alla rovescia funzionante) ══
