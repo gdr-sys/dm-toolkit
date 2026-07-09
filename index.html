@@ -850,6 +850,36 @@
           <div id="gen-oracolo-result" style="padding:0 12px 10px;min-height:50px;"></div>
         </div>
 
+
+        <!-- Generatore Missioni Secondarie -->
+        <div class="card gen-card" data-gen-id="missioni" style="grid-column:1/-1;">
+          <div class="card-header">
+            <h3 class="card-title">📜 Missioni Secondarie</h3>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
+              <select id="gen-miss-livello" class="form-select" style="width:auto;font-size:0.75rem;">
+                <option value="1-4">Liv. 1–4</option>
+                <option value="5-10" selected>Liv. 5–10</option>
+                <option value="11-16">Liv. 11–16</option>
+                <option value="17-20">Liv. 17–20</option>
+              </select>
+              <select id="gen-miss-tipo" class="form-select" style="width:auto;font-size:0.75rem;">
+                <option value="tutti">Tutti i tipi</option>
+                <option value="caccia">⚔️ Caccia/Sterminio</option>
+                <option value="recupero">📦 Recupero</option>
+                <option value="scorta">🛡️ Scorta</option>
+                <option value="esplorazione">🗺️ Esplorazione</option>
+                <option value="intriga">🎭 Intriga</option>
+                <option value="salvataggio">💚 Salvataggio</option>
+              </select>
+              <button class="btn btn-primary btn-sm" onclick="MissioniGen.genera()">🎲 Genera</button>
+              <button class="btn btn-ghost btn-sm" onclick="MissioniGen.genera()">↺ Rigenera</button>
+            </div>
+          </div>
+          <div id="gen-miss-result" style="padding:10px 12px;min-height:80px;">
+            <div class="text-muted text-sm">Seleziona livello e tipo, poi genera la missione.</div>
+          </div>
+        </div>
+
       </div><!-- fine generatori-grid -->
 
     </section>
@@ -8088,6 +8118,7 @@ const Generatori = {
     nomi_luoghi:  { label: 'Nomi Luoghi',             emoji: '🗺️' },
     ganci:        { label: 'Ganci Narrativi',          emoji: '🎣' },
     oracolo:      { label: 'Oracolo',                  emoji: '🔮' },
+    missioni:     { label: 'Missioni Secondarie',      emoji: '📜' },
   },
 
   _getEnabledGen: () => {
@@ -8106,7 +8137,7 @@ const Generatori = {
     document.querySelectorAll('.gen-card[data-gen-id]').forEach(card => {
       const id = card.dataset.genId;
       // encounter è sempre visibile
-      if (['encounter','descrizione','nomi_luoghi','ganci','oracolo'].includes(id)) { card.style.display = ''; return; }
+      if (['encounter','descrizione','nomi_luoghi','ganci','oracolo','missioni'].includes(id)) { card.style.display = ''; return; }
       card.style.display = enabled.includes(id) ? '' : 'none';
     });
   },
@@ -10700,6 +10731,267 @@ const OracoloGen = (() => {
   };
 
   return { lancia };
+})();
+
+// ══ GENERATORE MISSIONI SECONDARIE ══
+const MissioniGen = (() => {
+  const rnd = (a) => a[Math.floor(Math.random()*a.length)];
+
+  // Committenti per livello
+  const COMMITTENTI = {
+    '1-4':   ['Un contadino disperato','La guardia del villaggio','Un mercante locale','Il prete del tempio','La figlia del mugnaio','Un anziano saggio','Un bambino coraggioso','Il sindaco nervoso'],
+    '5-10':  ['Il capitano della guardia','Un nobile minore','Il maestro della gilda','Un mago eccentrico','La badessa del convento','Un mercante ricco','Il borgomastro','Un cavaliere in pensione'],
+    '11-16': ['Un lord potente','Il gran maestro della gilda','Un alto sacerdote','Un ambasciatore straniero','Un arcimago','Il comandante dell\'esercito','Un re in incognito','Una spia reale'],
+    '17-20': ['Il consiglio dei re','Un dio minore incarnato','Un\'antica entità che chiede favori','Il papa della chiesa','L\'imperatore stesso','Un drago che tratta da pari','Il guardiano di un piano cosmico','Un profeta di un\'era futura'],
+  };
+
+  // Ricompense per livello
+  const RICOMPENSE = {
+    '1-4':   ['20 mo','50 mo','Un oggetto comune','30 mo e una stanza gratis per un mese','Una pozione di guarigione','La gratitudine di un artigiano esperto','Un favore del sindaco','40 mo e informazioni utili'],
+    '5-10':  ['200 mo','Un oggetto non comune','500 mo','Una mappa verso un dungeon inesplorato','Un oggetto magico minore','Il titolo di campione del villaggio','300 mo e una lettera di credito','Un cavallo di razza'],
+    '11-16': ['1000 mo','Un oggetto raro','Un terreno e una piccola proprietà','2000 mo','Un oggetto magico raro','Il titolo di nobile minore','Accesso a un archivio segreto','Un artefatto incompleto da completare'],
+    '17-20': ['10000 mo','Un oggetto molto raro','Un castello in dono','Un artefatto leggendario','Il titolo di paladino del regno','L\'appoggio di un esercito','Un desiderio parziale concesso','La mappa di un piano cosmico'],
+  };
+
+  // Complicazioni per livello
+  const COMPLICAZIONI = {
+    '1-4':   [
+      'In realtà il committente non può permettersi la ricompensa promessa.',
+      'La missione è più pericolosa di quanto sembri — qualcuno ha mentito.',
+      'C\'è un secondo gruppo che vuole la stessa cosa.',
+      'Il target ha una famiglia che supplica pietà.',
+      'La missione è illegale secondo la legge locale.',
+      'Un amico del party è coinvolto nel problema.',
+    ],
+    '5-10':  [
+      'Una fazione rivale sta seguendo il party.',
+      'Il committente ha un secondo obiettivo nascosto.',
+      'La missione attira l\'attenzione di una gilda criminale.',
+      'Completarla creerà un nemico potente altrove.',
+      'Il target è innocente — è stato incastrato.',
+      'Qualcuno all\'interno del gruppo del party ha interessi contrari.',
+    ],
+    '11-16': [
+      'La missione è una trappola elaborata di un nemico del party.',
+      'Completarla destabilizzerà l\'equilibrio politico della regione.',
+      'Il committente è controllato da un\'entità superiore.',
+      'La ricompensa è maledetta.',
+      'Completarla risveglia qualcosa di antico e pericoloso.',
+      'Un altro potere vuole il party fuori dai giochi.',
+    ],
+    '17-20': [
+      'La missione è parte di una profezia cosmica che nessuno ha letto per intero.',
+      'Completarla altererà il piano astrale in modo permanente.',
+      'Il committente non è ciò che sembra — è un\'entità travestita.',
+      'La ricompensa ha un costo nascosto che si svelerà dopo.',
+      'Divinità rivali stanno usando il party come pedine.',
+      'Il successo della missione è già "scritto" — ma non il modo.',
+    ],
+  };
+
+  // Missioni per tipo e livello
+  const MISSIONI = {
+    caccia: {
+      '1-4': [
+        { titolo: 'I Ratti del Mugnaio', obiettivo: 'Eliminare un nido di ratti giganti che infestano il mulino del villaggio.', luogo: 'Cantina del mulino', nemico: 'Ratti giganti (GS 1/4)', dettaglio: 'Il mugnio teme che si siano già mangiati parte delle scorte invernali.' },
+        { titolo: 'Il Lupo di Pietrabianca', obiettivo: 'Cacciare un lupo enorme che attacca gli animali da fattoria.', luogo: 'Bosco vicino al villaggio', nemico: 'Lupo gigante (GS 1)', dettaglio: 'Alcune impronte suggeriscono che il lupo sia in realtà un licantropo.' },
+        { titolo: 'Nido di Goblin', obiettivo: 'Ripulire un accampamento di goblin che derubano i viaggiatori.', luogo: 'Grotta a due ore dal villaggio', nemico: 'Banda di goblin (6-8)', dettaglio: 'I goblin sembrano guidati da qualcuno di più intelligente di loro.' },
+        { titolo: 'La Bestia della Palude', obiettivo: 'Uccidere o scacciare la creatura che terrorizza i pescatori.', luogo: 'Palude meridionale', nemico: 'Coccodrillo gigante (GS 2)', dettaglio: 'I pescatori giurano che la bestia sia intelligente e abbia già teso un\'imboscata.' },
+      ],
+      '5-10': [
+        { titolo: 'Il Troll di Pietraforte', obiettivo: 'Eliminare il troll che ha preso il controllo del ponte principale.', luogo: 'Ponte sul fiume Eanor', nemico: 'Troll (GS 5)', dettaglio: 'Il troll porta un amuleto di fattura nanica — da dove viene?' },
+        { titolo: 'La Gorgone della Valle', obiettivo: 'Cacciare la gorgone che ha pietrificato tre pastori.', luogo: 'Valle di Greystone', nemico: 'Gorgone (GS 5)', dettaglio: 'I pastori pietrificati sono ancora vivi — si può salvarli entro sette giorni.' },
+        { titolo: 'Il Wyvern di Capo Nero', obiettivo: 'Uccidere o scacciare il wyvern che attacca le navi mercantili.', luogo: 'Scogliere a nord del porto', nemico: 'Wyvern (GS 6)', dettaglio: 'Il wyvern sembra proteggere qualcosa sulle scogliere — un nido? Un tesoro?' },
+        { titolo: 'La Banda degli Squartatori', obiettivo: 'Eliminare un gruppo di banditi d\'élite che ha saccheggiato tre villaggi.', luogo: 'Fortino abbandonato nelle colline', nemico: 'Banditi con capo veterano (GS 3+5)', dettaglio: 'La banda ha connessioni con qualcuno in città — qualcuno li protegge.' },
+      ],
+      '11-16': [
+        { titolo: 'Il Drago di Morathis', obiettivo: 'Sconfiggere il drago giovane che rivendica la regione come suo territorio.', luogo: 'Caverne di Morathis', nemico: 'Drago giovane (GS 10-13)', dettaglio: 'Il drago sta raccogliendo metallo per qualcosa — non solo tesoro.' },
+        { titolo: 'Il Lich Senza Nome', obiettivo: 'Distruggere il lich che sta risvegliando i morti nelle città costiere.', luogo: 'Mausoleo imperiale sommerso', nemico: 'Lich (GS 21 — indebolito GS 14)', dettaglio: 'Il lich cerca il suo phylactery perduto — qualcuno del party potrebbe averlo.' },
+        { titolo: 'L\'Esercito degli Occhi', obiettivo: 'Sconfiggere il beholder che controlla un\'intera città come marionettista.', luogo: 'La città di Valdris', nemico: 'Beholder (GS 13)', dettaglio: 'I cittadini sotto controllo hanno ancora frammenti di volontà propria.' },
+        { titolo: 'La Caccia al Vampiro', obiettivo: 'Trovare e distruggere il vampiro che svuota di sangue i nobili della città.', luogo: 'Palazzo aristocratico / catacomba', nemico: 'Vampiro (GS 13) + spawn', dettaglio: 'Il vampiro è uno dei nobili più rispettati. Tutti lo proteggono inconsciamente.' },
+      ],
+      '17-20': [
+        { titolo: 'Il Signore dei Demoni', obiettivo: 'Sconfiggere il principe demoniaco che ha aperto un portale permanente.', luogo: 'Piano dell\'Abisso (strato 113)', nemico: 'Principe demoniaco (GS 20+)', dettaglio: 'Chiudere il portale richiede un sacrificio — ma non necessariamente di sangue.' },
+        { titolo: 'Il Dio Caduto', obiettivo: 'Fermare un dio morente che nella sua agonia sta distruggendo il piano materiale.', luogo: 'Cuore della divinità ferita', nemico: 'Avatar divino (GS 20+)', dettaglio: 'Il dio non è malvagio — è semplicemente disperato. Si può salvare?' },
+        { titolo: 'L\'Antidrago', obiettivo: 'Distruggere l\'antidrago primordiale risvegliato da un rituale proibito.', luogo: 'Piana di Ashveld', nemico: 'Antidrago (leggendario)', dettaglio: 'Cinque armi specifiche possono ferirlo — il party ne ha già una senza saperlo.' },
+      ],
+    },
+
+    recupero: {
+      '1-4': [
+        { titolo: 'La Spada del Nonno', obiettivo: 'Recuperare una spada di famiglia rubata da goblin e portata nel loro covo.', luogo: 'Grotta dei goblin', nemico: 'Goblin (5-6)', dettaglio: 'La spada ha un\'iscrizione che il committente non ha mai saputo leggere.' },
+        { titolo: 'Il Libro del Vecchio Mago', obiettivo: 'Recuperare un grimorio rubato dalla camera di un mago anziano.', luogo: 'Casa del ladro in città', nemico: 'Ladro (GS 1/2) + guardie', dettaglio: 'Il ladro non sapeva cosa stesse rubando — sta cercando di venderlo.' },
+        { titolo: 'Le Provviste del Villaggio', obiettivo: 'Recuperare le scorte invernali rubate da una banda di razziatori.', luogo: 'Accampamento razziatori a nord', nemico: 'Banditi (4-6)', dettaglio: 'Le provviste sono già state in parte consumate — ne manca un terzo.' },
+      ],
+      '5-10': [
+        { titolo: 'L\'Artefatto Rubato', obiettivo: 'Recuperare un artefatto museale rubato da una gilda di ladri professionisti.', luogo: 'Quartiere generale della gilda', nemico: 'Ladri esperti (GS 2-4)', dettaglio: 'L\'artefatto è già stato rivenduto — bisogna seguire la catena.' },
+        { titolo: 'Il Sigillo del Re', obiettivo: 'Recuperare il sigillo reale prima che venga usato per firmare documenti falsi.', luogo: 'Nave mercantile in partenza', nemico: 'Spie straniere (4-6, GS 3)', dettaglio: 'Il sigillo è già stato usato una volta — per cosa?' },
+        { titolo: 'La Reliquia Perduta', obiettivo: 'Recuperare una reliquia sacra da un dungeon dove era stata nascosta secoli fa.', luogo: 'Cripta sotto le rovine', nemico: 'Non morti (GS 1-4)', dettaglio: 'La reliquia è protetta da una maledizione — chi la tocca vede il passato.' },
+      ],
+      '11-16': [
+        { titolo: 'Il Cuore del Golem', obiettivo: 'Recuperare il nucleo di un golem antico prima che venga attivato dal nemico.', luogo: 'Laboratorio segreto sotterraneo', nemico: 'Cultisti + golem parziali', dettaglio: 'Il nucleo è un essere cosciente intrappolato da secoli.' },
+        { titolo: 'La Corona Spezzata', obiettivo: 'Recuperare i tre frammenti della corona del re antico sparsi per il regno.', luogo: 'Tre siti diversi in sequenza', nemico: 'Vari (cambiano per sito)', dettaglio: 'Chi porta tutti e tre i frammenti ne viene corrotto lentamente.' },
+      ],
+      '17-20': [
+        { titolo: 'Il Nome del Dio', obiettivo: 'Recuperare il vero nome di un dio rubato da un arcivampiro per usarlo come arma.', luogo: 'Fortezza extradimensionale', nemico: 'Arcivampiro (GS 20) + esercito', dettaglio: 'Pronunciare il nome nel posto sbagliato potrebbe distruggere un piano.' },
+        { titolo: 'L\'Anima del Mondo', obiettivo: 'Recuperare il cristallo che contiene l\'essenza del piano materiale, rubato da un titano.', luogo: 'Isola fluttuante nel piano astrale', nemico: 'Titano del caos (GS 20+)', dettaglio: 'Rompere il cristallo restaura il piano — ma uccide chi lo porta.' },
+      ],
+    },
+
+    scorta: {
+      '1-4': [
+        { titolo: 'Il Mercante Nervoso', obiettivo: 'Scortare un mercante con un carico prezioso fino alla città successiva.', luogo: 'Strada commerciale (due giorni)', nemico: 'Banditi in agguato (1d4+2)', dettaglio: 'Il mercante sa di essere seguito — ma non dice da chi.' },
+        { titolo: 'Il Pellegrino Anziano', obiettivo: 'Accompagnare un anziano prete al tempio sul monte sacro.', luogo: 'Sentiero di montagna (tre giorni)', nemico: 'Goblin + pericoli naturali', dettaglio: 'L\'anziano porta qualcosa di nascosto nelle vesti — e qualcuno lo sa.' },
+      ],
+      '5-10': [
+        { titolo: 'L\'Ambasciatore', obiettivo: 'Scortare un diplomatico straniero attraverso territorio ostile.', luogo: 'Foresta di confine (quattro giorni)', nemico: 'Assassini (3-4, GS 3)', dettaglio: 'Uno degli assassini potrebbe essere nella scorta ufficiale.' },
+        { titolo: 'Il Prigioniero Illustre', obiettivo: 'Trasportare un nobile prigioniero in un castello sicuro per il processo.', luogo: 'Strada reale sorvegliata', nemico: 'Alleati del nobile che tentano il salvataggio', dettaglio: 'Il nobile è innocente. O forse no.' },
+        { titolo: 'Il Carico Magico', obiettivo: 'Scortare una cassa sigillata con rune a destinazione — senza aprirla.', luogo: 'Rotta commerciale con tre checkpoint', nemico: 'Ladri di magia (GS 2-4)', dettaglio: 'La cassa emette suoni. A volte parla.' },
+      ],
+      '11-16': [
+        { titolo: 'L\'Erede al Trono', obiettivo: 'Portare in salvo l\'erede reale mentre il castello viene assaltato.', luogo: 'Dal castello alla frontiera sicura', nemico: 'Esercito ribelle e assassini reali', dettaglio: 'L\'erede conosce qualcosa che i ribelli vogliono disperatamente.' },
+        { titolo: 'Il Profeta', obiettivo: 'Proteggere un profeta che ha previsto l\'assassinio di un re — incluso il proprio.', luogo: 'Città-capitale durante un festival', nemico: 'Culto segreto + sicari', dettaglio: 'Il profeta accetta serenamente il proprio destino. Il party no.' },
+      ],
+      '17-20': [
+        { titolo: 'L\'Ultimo Dio', obiettivo: 'Scortare l\'avatar di un dio morente al suo luogo di riposo finale.', luogo: 'Attraverso tre piani cosmici', nemico: 'Demoni che vogliono la morte del dio + angeli che vogliono accelerarla', dettaglio: 'Il dio offre risposte — ma ogni risposta ha un prezzo.' },
+      ],
+    },
+
+    esplorazione: {
+      '1-4': [
+        { titolo: 'La Grotta dei Cristalli', obiettivo: 'Esplorare e mappare una grotta inesplorata segnalata da un pastore.', luogo: 'Colline a est del villaggio', nemico: 'Sciame di pipistrelli + trappole naturali', dettaglio: 'La grotta ha cristalli che brillano da soli — e segni di presenza recente.' },
+        { titolo: 'Le Rovine del Vecchio Forte', obiettivo: 'Investigare le rovine abbandonate da cui arrivano luci notturne strane.', luogo: 'Rovine a nord del bosco', nemico: 'Scheletri animati (2-3)', dettaglio: 'Qualcuno usa le rovine come base. Non i morti.' },
+      ],
+      '5-10': [
+        { titolo: 'La Città Sommersa', obiettivo: 'Esplorare i resti di una città antica sommersa in un lago e riportare una mappa.', luogo: 'Lago di Miravar', nemico: 'Sahuagin + elementali d\'acqua', dettaglio: 'La città è parzialmente abitata ancora. Da chi?' },
+        { titolo: 'Il Passo Dimenticato', obiettivo: 'Trovare e cartografare un passo di montagna che appare solo in vecchie mappe nanice.', luogo: 'Catena montuosa settentrionale', nemico: 'Bestie di montagna + intemperie', dettaglio: 'Il passo è reale — e qualcuno lo usa già.' },
+        { titolo: 'L\'Isola Senza Nome', obiettivo: 'Raggiungere e mappare un\'isola che appare sulle carte solo durante le tempeste.', luogo: 'Mare aperto a ovest', nemico: 'Pirati + creature marine', dettaglio: 'L\'isola non è sempre nello stesso posto.' },
+      ],
+      '11-16': [
+        { titolo: 'Il Piano Specchio', obiettivo: 'Esplorare il riflesso del piano materiale dove tutto è invertito.', luogo: 'Piano Etereo (zona specchio)', nemico: 'Versioni corrotte di entità conosciute', dettaglio: 'Nel piano specchio esiste una versione del party. Non è amica.' },
+        { titolo: 'La Biblioteca Proibita', obiettivo: 'Raggiungere e saccheggiare la biblioteca di un lich decaduto piena di conoscenze proibite.', luogo: 'Dungeon extradimensionale sigillato', nemico: 'Costrutti bibliotecari + trappole magiche', dettaglio: 'Alcuni libri non vogliono essere letti. Altri vogliono essere portati via.' },
+      ],
+      '17-20': [
+        { titolo: 'Il Centro del Mondo', obiettivo: 'Raggiungere il punto fisico dove il piano materiale ha avuto origine.', luogo: 'Core planetario (viaggio extradimensionale)', nemico: 'Entità primordiali che proteggono il segreto', dettaglio: 'Il centro non è un luogo — è un momento. E si sta per concludere.' },
+      ],
+    },
+
+    intriga: {
+      '1-4': [
+        { titolo: 'Chi ha Rubato il Pane?', obiettivo: 'Scoprire chi sta rubando cibo dai magazzini del villaggio di notte.', luogo: 'Villaggio', nemico: 'Nessun combattimento previsto', dettaglio: 'Il ladro è qualcuno di disperato — la risposta non è semplice.' },
+        { titolo: 'La Lettera Falsa', obiettivo: 'Scoprire chi ha scritto una lettera falsa che ha rovinato la reputazione di un mercante.', luogo: 'Città mercantile', nemico: 'Rivale commerciale + tirapiedi', dettaglio: 'La lettera contiene un errore grammaticale che svela l\'autore a chi sa cercarlo.' },
+      ],
+      '5-10': [
+        { titolo: 'La Spia nella Gilda', obiettivo: 'Identificare la talpa all\'interno della gilda degli avventurieri che vende informazioni.', luogo: 'Sede della gilda', nemico: 'Spia addestrata (GS 3-4)', dettaglio: 'La spia ha mimetizzato le sue tracce scaricando i sospetti su altri.' },
+        { titolo: 'Il Successore Sbagliato', obiettivo: 'Provare che il candidato al titolo nobiliare è un impostore.', luogo: 'Palazzo nobiliare', nemico: 'Guardie private + complici', dettaglio: 'L\'impostore crede di essere il vero erede — è stato ingannato anche lui.' },
+        { titolo: 'Il Veleno Lento', obiettivo: 'Scoprire chi sta avvelenando lentamente il borgomastro senza che lui lo sappia.', luogo: 'Palazzo municipale', nemico: 'Avvelenatore professionista (GS 4)', dettaglio: 'Il movente è politico, ma l\'esecutore è personale.' },
+      ],
+      '11-16': [
+        { titolo: 'Il Doppio Gioco', obiettivo: 'Smascherare un generale che serve contemporaneamente due regni nemici.', luogo: 'Quartier generale militare', nemico: 'Spie d\'élite (GS 5-7)', dettaglio: 'Il generale crede di poter controllare entrambi i regni. Potrebbe avere ragione.' },
+        { titolo: 'Il Conclave dei Veleni', obiettivo: 'Infiltrarsi in una gilda di assassini e scoprire il prossimo obiettivo.', luogo: 'Rete di tunnel sotto la capitale', nemico: 'Assassini (GS 5-8)', dettaglio: 'Il prossimo obiettivo è qualcuno che il party conosce.' },
+      ],
+      '17-20': [
+        { titolo: 'Il Grande Tradimento', obiettivo: 'Scoprire quale dei re alleati ha venduto i piani di guerra al nemico.', luogo: 'Concilio dei re + ambienti diplomatici', nemico: 'Nessun combattimento diretto — tutto è politica', dettaglio: 'Tutti e tre i re hanno buone ragioni. Uno solo ha tradito. O forse due.' },
+      ],
+    },
+
+    salvataggio: {
+      '1-4': [
+        { titolo: 'Il Bambino nel Bosco', obiettivo: 'Trovare un bambino scomparso nel bosco prima che arrivi la notte.', luogo: 'Bosco vicino al villaggio', nemico: 'Goblin che l\'hanno catturato', dettaglio: 'Il bambino si è allontanato di proposito — stava inseguendo qualcosa.' },
+        { titolo: 'I Minatori Intrappolati', obiettivo: 'Liberare un gruppo di minatori intrappolati da un crollo in miniera.', luogo: 'Miniera abbandonata', nemico: 'Bestie sotterranee risvegliate', dettaglio: 'Il crollo non è stato accidentale — qualcuno voleva tenerli dentro.' },
+      ],
+      '5-10': [
+        { titolo: 'Il Prigioniero della Torre', obiettivo: 'Liberare un alchimista imprigionato da un nobile corrotto prima che venga giustiziato.', luogo: 'Torre di guardia del castello', nemico: 'Guardie (GS 1-3) + il nobile (GS 5)', dettaglio: 'L\'alchimista sa qualcosa sul nobile. Per questo è in prigione.' },
+        { titolo: 'L\'Equipaggio Perduto', obiettivo: 'Salvare l\'equipaggio di una nave naufragata su un\'isola abitata da creature ostili.', luogo: 'Isola al largo della costa', nemico: 'Lizardfolk + creature dell\'isola', dettaglio: 'Due marinai si sono adattati all\'isola e non vogliono più andarsene.' },
+        { titolo: 'La Città sotto Assedio', obiettivo: 'Infiltrarsi in una città assediata e aiutare i civili a fuggire dai tunnel sotterranei.', luogo: 'Città assediata + tunnel sotterranei', nemico: 'Soldati nemici + pericoli nei tunnel', dettaglio: 'Non tutti i civili possono essere salvati. Il party deve scegliere.' },
+      ],
+      '11-16': [
+        { titolo: 'L\'Anima Imprigionata', obiettivo: 'Liberare l\'anima di un eroe del passato intrappolata in un oggetto maledetto da un lich.', luogo: 'Piano Astrale + sede del lich', nemico: 'Guardiani del lich (GS 8-12)', dettaglio: 'L\'eroe non vuole essere liberato — si sente in colpa per qualcosa.' },
+        { titolo: 'Il Drago Prigioniero', obiettivo: 'Salvare un drago buono intrappolato in una gabbia magica da un culto.', luogo: 'Tempio del culto in caverna', nemico: 'Cultisti (GS 3-8) + guardiani costrutti', dettaglio: 'Il drago chiede di essere ucciso piuttosto che liberato così indebolito.' },
+      ],
+      '17-20': [
+        { titolo: 'Il Mondo Intrappolato', obiettivo: 'Liberare un intero piano di esistenza intrappolato in una gemma da un archimago pazzo.', luogo: 'Dentro la gemma (piano in miniatura) + laboratorio dell\'archimago', nemico: 'L\'archimago (GS 20) + costrutti difensivi', dettaglio: 'Gli abitanti del piano intrappolato si sono adattati. Alcuni non vogliono uscire.' },
+      ],
+    },
+  };
+
+  const genera = () => {
+    const livello  = document.getElementById('gen-miss-livello')?.value || '5-10';
+    const tipo     = document.getElementById('gen-miss-tipo')?.value || 'tutti';
+    const el       = document.getElementById('gen-miss-result');
+    if (!el) return;
+
+    // Raccoglie il pool
+    let pool = [];
+    const tipi = tipo === 'tutti' ? Object.keys(MISSIONI) : [tipo];
+    tipi.forEach(t => {
+      const missPerLiv = MISSIONI[t]?.[livello] || [];
+      pool.push(...missPerLiv.map(m => ({ ...m, tipo: t })));
+    });
+
+    if (!pool.length) {
+      el.innerHTML = '<div class="text-muted text-sm">Nessuna missione disponibile per questa combinazione. Prova un altro livello o tipo.</div>';
+      return;
+    }
+
+    const missione = rnd(pool);
+    const committente = rnd(COMMITTENTI[livello] || COMMITTENTI['5-10']);
+    const ricompensa  = rnd(RICOMPENSE[livello] || RICOMPENSE['5-10']);
+    const complicazione = rnd(COMPLICAZIONI[livello] || COMPLICAZIONI['5-10']);
+
+    const tipoLabel = {
+      caccia:'⚔️ Caccia/Sterminio', recupero:'📦 Recupero', scorta:'🛡️ Scorta',
+      esplorazione:'🗺️ Esplorazione', intriga:'🎭 Intriga', salvataggio:'💚 Salvataggio'
+    }[missione.tipo] || missione.tipo;
+
+    const livLabel = { '1-4':'Liv. 1–4','5-10':'Liv. 5–10','11-16':'Liv. 11–16','17-20':'Liv. 17–20' }[livello] || livello;
+
+    el.innerHTML =
+      `<div style="margin-bottom:10px;display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
+        <span style="font-family:var(--font-display);font-size:1.05rem;color:var(--accent-secondary);">${missione.titolo}</span>
+        <span class="badge badge-muted">${tipoLabel}</span>
+        <span class="badge badge-muted">${livLabel}</span>
+      </div>
+      <div style="display:grid;gap:8px;font-size:0.83rem;">
+        <div style="background:var(--bg-secondary);border-radius:var(--radius-sm);padding:8px 10px;">
+          <div style="font-family:var(--font-display);font-size:0.65rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:3px;">📋 Obiettivo</div>
+          <div style="line-height:1.6;">${missione.obiettivo}</div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+          <div style="background:var(--bg-secondary);border-radius:var(--radius-sm);padding:8px 10px;">
+            <div style="font-family:var(--font-display);font-size:0.65rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:3px;">👤 Committente</div>
+            <div>${committente}</div>
+          </div>
+          <div style="background:var(--bg-secondary);border-radius:var(--radius-sm);padding:8px 10px;">
+            <div style="font-family:var(--font-display);font-size:0.65rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:3px;">📍 Luogo</div>
+            <div>${missione.luogo}</div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+          <div style="background:var(--bg-secondary);border-radius:var(--radius-sm);padding:8px 10px;">
+            <div style="font-family:var(--font-display);font-size:0.65rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:3px;">⚔️ Nemici</div>
+            <div>${missione.nemico}</div>
+          </div>
+          <div style="background:var(--bg-secondary);border-radius:var(--radius-sm);padding:8px 10px;">
+            <div style="font-family:var(--font-display);font-size:0.65rem;color:var(--accent-secondary);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:3px;">🎁 Ricompensa</div>
+            <div style="color:var(--accent-secondary);">${ricompensa}</div>
+          </div>
+        </div>
+        <div style="background:var(--bg-secondary);border-left:3px solid #e07b39;border-radius:0 var(--radius-sm) var(--radius-sm) 0;padding:8px 10px;">
+          <div style="font-family:var(--font-display);font-size:0.65rem;color:#e07b39;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:3px;">💡 Dettaglio segreto</div>
+          <div style="color:var(--text-secondary);font-style:italic;">${missione.dettaglio}</div>
+        </div>
+        <div style="background:var(--bg-secondary);border-left:3px solid var(--accent-danger);border-radius:0 var(--radius-sm) var(--radius-sm) 0;padding:8px 10px;">
+          <div style="font-family:var(--font-display);font-size:0.65rem;color:var(--accent-danger);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:3px;">⚡ Complicazione</div>
+          <div style="color:var(--text-secondary);">${complicazione}</div>
+        </div>
+      </div>
+      <button class="btn btn-ghost btn-sm w-full" style="margin-top:10px;font-size:0.72rem;" onclick="MissioniGen.genera()">🎲 Altra missione</button>`;
+
+    Debug.log('Missione generata: ' + missione.titolo + ' [' + livello + '/' + missione.tipo + ']');
+  };
+
+  return { genera };
 })();
 
 // ══ TIMER BLOCK (conto alla rovescia funzionante) ══
