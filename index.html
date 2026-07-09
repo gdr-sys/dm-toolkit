@@ -795,6 +795,61 @@
           </div>
         </div>
 
+
+        <!-- Nomi Luoghi -->
+        <div class="card gen-card" data-gen-id="nomi_luoghi">
+          <div class="card-header">
+            <h3 class="card-title">🗺️ Nomi Luoghi</h3>
+            <select id="gen-nomluogo-tipo" class="form-select" style="width:auto;font-size:0.75rem;">
+              <option value="citta">🏙️ Città</option>
+              <option value="villaggio">🏘️ Villaggio</option>
+              <option value="fiume">🌊 Fiume</option>
+              <option value="montagna">⛰️ Montagna</option>
+              <option value="foresta">🌲 Foresta</option>
+              <option value="dungeon">🏚️ Dungeon/Rovina</option>
+              <option value="regno">👑 Regno/Regione</option>
+            </select>
+            <button class="btn btn-secondary btn-sm" onclick="NomiLuoghiGen.genera()">🎲</button>
+          </div>
+          <div id="gen-nomluogo-result" style="min-height:60px;">
+            <div class="text-muted text-sm">Seleziona il tipo e genera</div>
+          </div>
+        </div>
+
+        <!-- Ganci Narrativi -->
+        <div class="card gen-card" data-gen-id="ganci">
+          <div class="card-header">
+            <h3 class="card-title">🎣 Gancio Narrativo</h3>
+            <select id="gen-gancio-tipo" class="form-select" style="width:auto;font-size:0.75rem;">
+              <option value="tutti">Tutti</option>
+              <option value="mistero">🔍 Mistero</option>
+              <option value="azione">⚔️ Azione</option>
+              <option value="sociale">💬 Sociale</option>
+              <option value="esplorazione">🗺️ Esplorazione</option>
+              <option value="soprannaturale">🌀 Soprannaturale</option>
+            </select>
+            <button class="btn btn-secondary btn-sm" onclick="GanciGen.genera()">🎲</button>
+          </div>
+          <div id="gen-gancio-result" style="min-height:60px;">
+            <div class="text-muted text-sm">Genera un gancio narrativo</div>
+          </div>
+        </div>
+
+        <!-- Oracolo del Sì/No -->
+        <div class="card gen-card" data-gen-id="oracolo">
+          <div class="card-header">
+            <h3 class="card-title">🔮 Oracolo</h3>
+          </div>
+          <div style="padding:8px 12px 4px;">
+            <div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:6px;">Pensa alla domanda, poi lancia</div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;">
+              <button class="btn btn-primary btn-sm" style="flex:1;" onclick="OracoloGen.lancia('standard')">🎲 Lancia</button>
+              <button class="btn btn-secondary btn-sm" style="flex:1;" onclick="OracoloGen.lancia('complicato')">⚡ Con Twist</button>
+            </div>
+          </div>
+          <div id="gen-oracolo-result" style="padding:0 12px 10px;min-height:50px;"></div>
+        </div>
+
       </div><!-- fine generatori-grid -->
 
     </section>
@@ -8029,7 +8084,10 @@ const Generatori = {
     incontri:  { label: 'Incontri Casuali',     emoji: '⚠️' },
     follia:    { label: 'Follia',               emoji: '🌀' },
     encounter:  { label: 'Encounter Builder',    emoji: '⚔️' },
-    descrizione: { label: 'Descrizione Luoghi',    emoji: '🏙️' },
+    descrizione:  { label: 'Descrizione Luoghi',    emoji: '🏙️' },
+    nomi_luoghi:  { label: 'Nomi Luoghi',             emoji: '🗺️' },
+    ganci:        { label: 'Ganci Narrativi',          emoji: '🎣' },
+    oracolo:      { label: 'Oracolo',                  emoji: '🔮' },
   },
 
   _getEnabledGen: () => {
@@ -8048,7 +8106,7 @@ const Generatori = {
     document.querySelectorAll('.gen-card[data-gen-id]').forEach(card => {
       const id = card.dataset.genId;
       // encounter è sempre visibile
-      if (id === 'encounter' || id === 'descrizione') { card.style.display = ''; return; }
+      if (['encounter','descrizione','nomi_luoghi','ganci','oracolo'].includes(id)) { card.style.display = ''; return; }
       card.style.display = enabled.includes(id) ? '' : 'none';
     });
   },
@@ -8126,6 +8184,52 @@ const Generatori = {
 
     // Mestiere coerente con l'archetipo (fallback su professioni generiche)
     const prof = archetipo.mestieri?.length ? rnd(archetipo.mestieri) : rnd(t.professioni);
+
+    // ── Stat caratteristiche per professione ──
+    const STAT_PROF = {
+      // Combattenti
+      'Guardia':       {for:14,des:11,cos:13,int:10,sag:11,car:10, arma:'Spada corta', armatura:'Armatura di cuoio'},
+      'Soldato':       {for:15,des:12,cos:14,int:10,sag:12,car:10, arma:'Spada lunga', armatura:'Cotta di maglia'},
+      'Mercenario':    {for:15,des:13,cos:14,int:11,sag:11,car:12, arma:'Ascia da guerra', armatura:'Cotta di maglia'},
+      'Cavaliere':     {for:16,des:11,cos:15,int:11,sag:12,car:13, arma:'Lancia', armatura:'Armatura a piastre'},
+      'Cacciatore':    {for:12,des:15,cos:12,int:12,sag:14,car:10, arma:'Arco lungo', armatura:'Armatura di cuoio'},
+      'Assassino':     {for:11,des:17,cos:12,int:13,sag:13,car:12, arma:'Pugnale', armatura:'Armatura di cuoio'},
+      // Maghi
+      'Mago':          {for:8, des:13,cos:12,int:17,sag:12,car:11, arma:'Bastone', armatura:'Nessuna'},
+      'Stregone':      {for:9, des:14,cos:13,int:12,sag:12,car:17, arma:'Bastone', armatura:'Nessuna'},
+      'Chierico':      {for:13,des:10,cos:13,int:12,sag:16,car:13, arma:'Mazza', armatura:'Armatura a piastre'},
+      'Druido':        {for:11,des:13,cos:12,int:14,sag:17,car:11, arma:'Bastone', armatura:'Nessuna'},
+      'Bardo':         {for:10,des:14,cos:11,int:13,sag:12,car:17, arma:'Stocco', armatura:'Armatura di cuoio'},
+      'Strega':        {for:9, des:14,cos:11,int:15,sag:15,car:14, arma:'Bastone', armatura:'Nessuna'},
+      // Civili con ruoli specifici
+      'Mercante':      {for:10,des:11,cos:11,int:13,sag:12,car:16, arma:'Pugnale', armatura:'Nessuna'},
+      'Taverniere':    {for:13,des:10,cos:14,int:11,sag:12,car:15, arma:'Mazza da osteria', armatura:'Nessuna'},
+      'Fabbro':        {for:16,des:10,cos:15,int:11,sag:10,car:10, arma:'Martello da fabbro', armatura:'Grembiule di cuoio'},
+      'Ladro':         {for:11,des:17,cos:12,int:13,sag:12,car:13, arma:'Pugnale', armatura:'Armatura di cuoio'},
+      'Nobile':        {for:10,des:12,cos:11,int:14,sag:13,car:16, arma:'Stocco', armatura:'Nessuna'},
+      'Contadino':     {for:13,des:10,cos:14,int:9, sag:11,car:9,  arma:'Falce', armatura:'Nessuna'},
+      'Pescatore':     {for:12,des:13,cos:13,int:10,sag:12,car:9,  arma:'Fiocina', armatura:'Nessuna'},
+      'Mendicante':    {for:9, des:12,cos:10,int:10,sag:13,car:11, arma:'Bastone', armatura:'Nessuna'},
+      'Guaritore':     {for:9, des:12,cos:11,int:14,sag:16,car:13, arma:'Bastone', armatura:'Nessuna'},
+      'Sacerdote':     {for:11,des:10,cos:12,int:13,sag:16,car:14, arma:'Mazza', armatura:'Armatura a piastre'},
+      'Esploratore':   {for:12,des:16,cos:13,int:13,sag:15,car:11, arma:'Spada corta', armatura:'Armatura di cuoio'},
+      'Marinaio':      {for:13,des:14,cos:13,int:11,sag:12,car:11, arma:'Sciabola', armatura:'Nessuna'},
+      'Bibliotecario': {for:8, des:11,cos:10,int:17,sag:14,car:11, arma:'Bastone', armatura:'Nessuna'},
+      'Alchimista':    {for:9, des:13,cos:11,int:17,sag:13,car:11, arma:'Pugnale', armatura:'Nessuna'},
+      'Spia':          {for:11,des:16,cos:12,int:15,sag:14,car:15, arma:'Pugnale', armatura:'Armatura di cuoio'},
+      'Criminale':     {for:13,des:15,cos:13,int:12,sag:11,car:13, arma:'Pugnale', armatura:'Armatura di cuoio'},
+    };
+
+    const statProf = STAT_PROF[prof] || {for:10,des:10,cos:10,int:10,sag:10,car:10,arma:'Nessuna',armatura:'Nessuna'};
+    // Aggiunge variazione ±1 per rendere ogni PNG unico
+    const statVar = (v) => Math.max(6, Math.min(20, v + (Math.floor(Math.random()*3)-1)));
+    const charStats = {
+      for: statVar(statProf.for), des: statVar(statProf.des), cos: statVar(statProf.cos),
+      int: statVar(statProf.int), sag: statVar(statProf.sag), car: statVar(statProf.car),
+      arma: statProf.arma, armatura: statProf.armatura,
+    };
+    const mod = (v) => Math.floor((v-10)/2);
+    const modStr = (v) => (mod(v)>=0?'+':'')+mod(v);
 
     // Tratto coerente con l'archetipo (fallback su tratti generici)
     const tratto = archetipo.tratti_coerenti?.length ? rnd(archetipo.tratti_coerenti) : rnd(t.tratti);
@@ -8242,7 +8346,6 @@ const Generatori = {
       else range = rangeC.bassa;
       stats[k] = Math.floor(Math.random() * (range[1] - range[0] + 1)) + range[0];
     });
-    const modStr = v => { const m = Math.floor((v - 10) / 2); return (m >= 0 ? '+' : '') + m; };
 
     const icon = ['👨','👩','🧙','⚔️','🗡️','🛡️','🎭','🧝','🐉'][Math.floor(Math.random()*9)];
 
@@ -8256,8 +8359,10 @@ const Generatori = {
       hookSituazionale,
       ruoloCombattivo: ruoloInfo.label, abilitaSpeciale,
       nomeArma, tipoDanno, dadoAttacco: dadoAttacco.dado,
-      str: stats.forza, dex: stats.destrezza, con: stats.costituzione,
-      int_: stats.intelligenza, wis: stats.saggezza, cha: stats.carisma,
+      // Stat da professione (sovrascrivono le generiche da CR)
+      str: charStats.for, dex: charStats.des, con: charStats.cos,
+      int_: charStats.int, wis: charStats.sag, cha: charStats.car,
+      nomeArma: charStats.arma || nomeArma, armatura: charStats.armatura,
       ac, hp: pf, cr, dannoPerAttacco, numAttacchi, attaccoBonus: rigaCR.attacco, saveDC: rigaCR.save_dc,
       relation: 50,
     };
@@ -10332,6 +10437,269 @@ const DescrizioneGen = (() => {
   };
 
   return { genera, aggiornaSottotipo };
+})();
+
+// ══ GENERATORE NOMI LUOGHI ══
+const NomiLuoghiGen = (() => {
+  const rnd = (a) => a[Math.floor(Math.random()*a.length)];
+
+  const PREFISSI = {
+    citta:    ['Alta','Nuova','Pietra','Torre','Ferro','Porto','Gran','Santa','Antica','Forte','Valle','Monte'],
+    villaggio:['Piccola','Bassa','Verde','Vecchia','Rossa','Bianca','Scura','Buona','Dolce','Grigia'],
+    fiume:    ['Argento','Rapido','Chiaro','Buio','Freddo','Morto','Lungo','Amaro','Bianco','Nero'],
+    montagna: ['Alta','Bianca','Nera','Rossa','Grande','Fredda','Antica','Aspra','Spezzata','Solitaria'],
+    foresta:  ['Verde','Oscura','Antica','Silenziosa','Nebbiosa','Morta','Fonda','Mille','Sacra','Perduta'],
+    dungeon:  ['Tomba','Cripta','Abisso','Prigione','Sala','Volta','Camera','Labirinto','Torre','Fossa'],
+    regno:    ['Alto','Gran','Nuovo','Antico','Libero','Eterno','Glorioso','Oscuro','Fiero','Sacro'],
+  };
+  const RADICI = {
+    citta:    ['haven','vale','burg','shire','ford','wick','moor','bridge','holm','gate','field','cross','mere','thorpe'],
+    villaggio:['brook','mill','ton','stead','ford','wick','ham','field','green','wood','mere','low','nook'],
+    fiume:    ['un','ia','ara','eno','asso','ello','ina','ora','ane','olo'],
+    montagna: ['peak','horn','berg','fell','crag','tor','stein','fang','spire','ridge'],
+    foresta:  ['wood','vale','glade','dell','thicket','grove','hollow','moor','fen','weald'],
+    dungeon:  ['del Vecchio Re','Senza Ritorno','delle Ombre','Maledetta','dei Caduti','Dimenticata','Perduta','Antica','Oscura'],
+    regno:    ['ia','ar','or','un','eld','ath','em','ion','imar','ador'],
+  };
+  const SUFFISSI = {
+    citta:    ['sul Fiume','delle Mille Torri','del Nord','dei Mercanti','Imperiale','della Costa','Alta','Libera'],
+    villaggio:['sul Colle','del Bosco','dei Cacciatori','dei Pescatori','al Crocevia','della Palude','dei Mulini'],
+    fiume:    ['Argentato','che Canta','Oscuro','Eterno','del Nord','Profondo','delle Lacrime','Antico'],
+    montagna: ['Innevata','del Drago','dei Giganti','Maledetta','degli Spiriti','Solitaria','Eterna','Spezzata'],
+    foresta:  ['degli Elfi','dei Lupi','Incantata','Proibita','dei Sussurri','Perduta','Eterna','Antica'],
+    dungeon:  ['','','',''],  // usa solo prefisso+radice
+    regno:    ['del Nord','dei Mari','Orientale','Imperiale','delle Montagne','delle Pianure','del Sole','della Luna'],
+  };
+  const NOMI_FANTASIA = {
+    citta:    ['Silverkeep','Ironhaven','Stormwall','Goldenmere','Duskport','Ashford','Ravenmoor','Brightholm','Shadowgate','Crystalvale'],
+    villaggio:['Millbrook','Thornwick','Greenvale','Oakham','Dustford','Mossystone','Redfield','Willowmere','Fernholt','Thistledown'],
+    fiume:    ['Silvara','Eanor','Miruvor','Dunath','Celebrant','Anduin','Rhosfar','Imladris','Gwathló','Narog'],
+    montagna: ['Doomspire','Frosthorn','Ironpeak','Grimfang','Stormcrest','Voidtop','Greystone','Blackhorn','Coldreach','Ashpeak'],
+    foresta:  ['Shadowmere','Whisperwood','Moonvale','Darkfen','Greenweald','Mistwood','Thornthicket','Elderglade','Hollowbrook','Feygrove'],
+    dungeon:  ['Le Tombe di Varath','Il Labirinto di Kessir','Le Catacombe dei Re Perduti','La Prigione di Morath','Le Sale di Drathûn','Il Sepolcro di Zara','La Cripta dell\'Immortale','Il Dungeon di Gorth'],
+    regno:    ['Aldamor','Verantia','Khorun','Selindra','Orvanthar','Duskemeria','Irontheld','Vaeloria','Grimholt','Surantis'],
+  };
+
+  const genera = () => {
+    const tipo = document.getElementById('gen-nomluogo-tipo')?.value || 'citta';
+    const el = document.getElementById('gen-nomluogo-result');
+    if (!el) return;
+
+    // Genera 3 opzioni con tecniche diverse
+    const nomi = [];
+
+    // Opzione 1: fantasia pura
+    nomi.push(rnd(NOMI_FANTASIA[tipo] || NOMI_FANTASIA.citta));
+
+    // Opzione 2: prefisso + radice + suffisso
+    const pref = rnd(PREFISSI[tipo] || PREFISSI.citta);
+    const rad  = rnd(RADICI[tipo] || RADICI.citta);
+    const suff = rnd(SUFFISSI[tipo] || SUFFISSI.citta);
+    const opzione2 = tipo === 'dungeon'
+      ? (rnd(NOMI_FANTASIA.dungeon))
+      : (pref + rad + (suff ? ' ' + suff : '')).trim();
+    nomi.push(opzione2);
+
+    // Opzione 3: variazione su fantasia
+    const pref2 = rnd(PREFISSI[tipo]);
+    const rad2  = rnd(RADICI[tipo]);
+    nomi.push((pref2 + rad2).replace(/([a-z])([A-Z])/g, '$1 $2'));
+
+    const tipoLabel = {
+      citta:'🏙️ Città', villaggio:'🏘️ Villaggio', fiume:'🌊 Fiume',
+      montagna:'⛰️ Montagna', foresta:'🌲 Foresta', dungeon:'🏚️ Dungeon/Rovina', regno:'👑 Regno'
+    }[tipo] || tipo;
+
+    el.innerHTML =
+      '<div style="font-size:0.72rem;color:var(--text-muted);margin-bottom:8px;font-family:var(--font-display);text-transform:uppercase;letter-spacing:0.05em;">' + tipoLabel + '</div>' +
+      nomi.map((n, i) =>
+        '<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);">' +
+          '<span style="font-family:var(--font-display);font-size:' + (i===0?'1rem':'0.88rem') + ';' + (i===0?'color:var(--accent-secondary);':'') + '">' + n + '</span>' +
+          (i===0 ? '<span class="badge badge-muted" style="font-size:0.6rem;">suggerito</span>' : '') +
+        '</div>'
+      ).join('') +
+      '<button class="btn btn-ghost btn-sm w-full" style="margin-top:6px;font-size:0.72rem;" onclick="NomiLuoghiGen.genera()">🎲 Altri nomi</button>';
+
+    Debug.log('Nomi luoghi generati per ' + tipo);
+  };
+
+  return { genera };
+})();
+
+
+// ══ GENERATORE GANCI NARRATIVI ══
+const GanciGen = (() => {
+  const rnd = (a) => a[Math.floor(Math.random()*a.length)];
+
+  const GANCI = {
+    mistero: [
+      'Un mercante viene trovato morto nella sua stanza chiusa dall\'interno. Le sue ultime parole scritte: "loro sanno".',
+      'I bambini del villaggio smettono tutti di parlare lo stesso giorno. Non hanno paura — sembrano in attesa.',
+      'Una nave arriva al porto senza equipaggio. Il pasto è ancora caldo nelle cucine.',
+      'Le statue del tempio piangono sangue ogni notte di luna piena. I sacerdoti fingono di non saperlo.',
+      'Un libro appare nella biblioteca del mago con la sua calligrafia — ma lui non l\'ha mai scritto.',
+      'Tutti nel villaggio hanno lo stesso sogno da tre notti. E ora qualcuno è sparito.',
+      'Un anello viene ritrovato dopo cinquant\'anni — sul dito di qualcuno che ha trent\'anni.',
+      'Le campane della città suonano da sole a mezzanotte. Solo il party le sente.',
+      'Un cadavere viene sepolto. La mattina dopo è seduto alla sua tavola, come se nulla fosse.',
+      'Le ombre del party puntano sempre nella stessa direzione — anche quando il sole è altrove.',
+    ],
+    azione: [
+      'Un corriere ferito crolla ai piedi del party: "Portate questo a..." muore prima di finire.',
+      'Il castello viene assediato. Il party è dentro. Le provviste bastano tre giorni.',
+      'Una carovana viene assaltata davanti al party. I banditi sono troppi — o sembrano troppi.',
+      'La gilda dei ladri ha messo una taglia sulla testa di uno dei PG. Motivo: sconosciuto.',
+      'Un prigioniero fugge dalla prigione della città. Il borgomastro offre una taglia. Qualcuno nel party lo conosce.',
+      'Un mercenario si avvicina al party: "Vi offro il doppio di quello che vi stanno pagando per smettere".',
+      'Il ponte sul fiume viene fatto saltare. Il party è nel mezzo di due eserciti.',
+      'Un drago sorvola la città ogni notte. Nessuno sa cosa vuole. Ieri ha bruciato un quartiere.',
+      'La città viene messa in quarantena. Nessuno esce. Qualcuno nel party deve uscire.',
+      'Un torneo richiede campioni. Il premio è qualcosa che il party vuole disperatamente.',
+    ],
+    sociale: [
+      'Un nobile offre una cena al party. Nel dessert rivela di sapere tutto su di loro.',
+      'Due famiglie potenti si sfidano a duello. Il party è l\'unico a sapere che entrambe hanno ragione.',
+      'Un mercante vuole assumere il party come scorta. In realtà vuole testimonial per la sua merce.',
+      'La figlia del sindaco è innamorata di qualcuno di sbagliato. Il padre offre molto per "risolvere".',
+      'Un diplomatico straniero arriva in città. Il suo interprete sta mentendo — e solo il party se ne accorge.',
+      'Il party viene invitato a un banchetto reale. Sono gli unici senza invito di sangue nobile.',
+      'Un vecchio amico di uno dei PG ricompare — e chiede un favore difficile da rifiutare.',
+      'Due gilde sono in guerra commerciale. Entrambe offrono lavoro al party. Simultaneamente.',
+      'Il party viene accusato di un crimine che non ricorda di aver commesso — ma le prove ci sono.',
+      'Un bambino segue il party ovunque. Dice di essere stato mandato da loro stessi, dal futuro.',
+    ],
+    esplorazione: [
+      'Una mappa viene trovata nel ventre di un pesce grande abbastanza da ingoiare un uomo.',
+      'Una porta compare su una parete che ieri era piena. Porta a un posto che non dovrebbe esistere.',
+      'Il sentiero nella foresta si chiude dietro al party. Davanti, una luce che si allontana.',
+      'Un faro lampeggia da una costa dove non ci dovrebbe essere terra.',
+      'Un antico dungeon viene scoperto sotto le fondamenta di un edificio in costruzione.',
+      'Una nebbia strana avvolge il party. Quando si dirada, il paesaggio è cambiato.',
+      'Una stella che nessuno ha mai visto appare nel cielo e punta sempre verso est.',
+      'Una mappa mostra una città che non esiste in nessun libro — ma le coordinate sono precise.',
+      'Un passaggio segreto nella locanda porta a una rete di tunnel che attraversa tutta la città.',
+      'Il party trova un accampamento fresco — e le impronte portano verso un muro di roccia solida.',
+    ],
+    soprannaturale: [
+      'Gli specchi della città non riflettono più le persone — solo i loro peccati.',
+      'Ogni persona che muore in città risorge entro un\'ora. Sembra un dono. Forse è una trappola.',
+      'Un dio minore si materializza davanti al party e chiede aiuto. Non sembra in grado di farlo da solo.',
+      'Il tempo si ferma per tutti tranne il party. Hanno finché il sole non tramonta per fare qualcosa.',
+      'La magia smette di funzionare in un raggio di un miglio dalla città. Non si sa perché.',
+      'Un portale si apre nel centro della piazza. Da dentro si sente una voce familiare.',
+      'Il party inizia ad avere tutti lo stesso sogno profetico — ma ognuno vede una fine diversa.',
+      'Una maledizione si diffonde: chiunque dica bugie perde temporaneamente la voce.',
+      'Un fantasma può essere visto solo dai PG. Vuole qualcosa — ma non sa più cosa.',
+      'Il piano astrale si sovrappone alla realtà per una notte. I morti camminano tra i vivi.',
+    ],
+  };
+
+  const CONTESTI = [
+    'Accade mentre il party si trova in una taverna.',
+    'Succede la mattina dopo una lunga notte di viaggio.',
+    'Avviene proprio mentre il party stava per lasciare la città.',
+    'Capita durante una fiera di paese affollata.',
+    'Si verifica nel momento di maggiore tranquillità.',
+    'Accade nel mezzo di un\'altra missione.',
+    'Succede all\'alba, prima che chiunque altro sia sveglio.',
+    'Si manifesta durante una guardia notturna.',
+  ];
+
+  const genera = () => {
+    const tipo = document.getElementById('gen-gancio-tipo')?.value || 'tutti';
+    const el = document.getElementById('gen-gancio-result');
+    if (!el) return;
+
+    let pool = [];
+    if (tipo === 'tutti') {
+      Object.values(GANCI).forEach(arr => pool.push(...arr));
+    } else {
+      pool = GANCI[tipo] || [];
+    }
+
+    const gancio  = rnd(pool);
+    const contesto = rnd(CONTESTI);
+    const tipoLabel = {
+      tutti:'🎣', mistero:'🔍 Mistero', azione:'⚔️ Azione',
+      sociale:'💬 Sociale', esplorazione:'🗺️ Esplorazione', soprannaturale:'🌀 Soprannaturale'
+    }[tipo] || '🎣';
+
+    el.innerHTML =
+      '<div style="background:var(--bg-secondary);border-left:3px solid var(--accent-secondary);border-radius:0 var(--radius-sm) var(--radius-sm) 0;padding:10px 12px;margin-bottom:8px;font-size:0.85rem;line-height:1.7;">' + gancio + '</div>' +
+      '<div style="font-size:0.75rem;color:var(--text-muted);font-style:italic;margin-bottom:8px;">📍 ' + contesto + '</div>' +
+      '<div style="display:flex;gap:4px;">' +
+        '<span class="badge badge-muted">' + tipoLabel + '</span>' +
+      '</div>' +
+      '<button class="btn btn-ghost btn-sm w-full" style="margin-top:8px;font-size:0.72rem;" onclick="GanciGen.genera()">🎲 Altro gancio</button>';
+
+    Debug.log('Gancio generato: ' + tipo);
+  };
+
+  return { genera };
+})();
+
+
+// ══ ORACOLO DEL SÌ/NO ══
+const OracoloGen = (() => {
+  const lancia = (modalita) => {
+    const el = document.getElementById('gen-oracolo-result');
+    if (!el) return;
+
+    const d100 = Math.floor(Math.random() * 100) + 1;
+    const dTwist = Math.floor(Math.random() * 6) + 1;
+
+    // Risposta base
+    let risposta, colore, emoji;
+    if (d100 <= 10) {
+      risposta = 'NO, e inoltre...'; colore = 'var(--accent-danger)'; emoji = '❌❌';
+    } else if (d100 <= 35) {
+      risposta = 'No'; colore = 'var(--accent-danger)'; emoji = '❌';
+    } else if (d100 <= 45) {
+      risposta = 'No, ma...'; colore = '#e07b39'; emoji = '❌✨';
+    } else if (d100 <= 55) {
+      risposta = 'Sì, ma...'; colore = '#c8a43a'; emoji = '✅⚠️';
+    } else if (d100 <= 75) {
+      risposta = 'Sì'; colore = 'var(--accent-success)'; emoji = '✅';
+    } else if (d100 <= 90) {
+      risposta = 'Sì, e inoltre...'; colore = 'var(--accent-success)'; emoji = '✅✅';
+    } else {
+      risposta = 'Sì, assolutamente!'; colore = '#5bc85b'; emoji = '✅✅✅';
+    }
+
+    // Twist (solo in modalità complicato o risultati estremi)
+    const TWIST = [
+      'ma qualcuno lo nota',
+      'ma costa più del previsto',
+      'ma non nel modo che ti aspettavi',
+      'ma introduce una complicazione',
+      'ma qualcuno si opporrà',
+      'ma richiede tempo extra',
+      'ma ha un effetto collaterale',
+      'ma dipende da una terza parte',
+      'ma le cose cambieranno presto',
+      'ma non tutti saranno d\'accordo',
+      'e cambia qualcosa di importante',
+      'e apre una nuova possibilità',
+    ];
+
+    let twistTesto = '';
+    if (modalita === 'complicato' || d100 <= 10 || d100 >= 91) {
+      twistTesto = ['No, e inoltre...','No, ma...','Sì, ma...','Sì, e inoltre...'].includes(risposta)
+        ? '' : ' — ' + (TWIST[dTwist - 1] || TWIST[0]);
+    }
+
+    el.innerHTML =
+      '<div style="text-align:center;padding:8px 0;">' +
+        '<div style="font-size:2rem;margin-bottom:4px;">' + emoji + '</div>' +
+        '<div style="font-family:var(--font-display);font-size:1.4rem;font-weight:700;color:' + colore + ';margin-bottom:4px;">' + risposta + '</div>' +
+        (twistTesto ? '<div style="font-size:0.8rem;color:var(--text-muted);font-style:italic;">' + twistTesto + '</div>' : '') +
+        '<div style="font-size:0.65rem;color:var(--text-muted);margin-top:6px;">d100: ' + d100 + '</div>' +
+      '</div>';
+
+    Debug.log('Oracolo: ' + risposta + ' (d100=' + d100 + ')');
+  };
+
+  return { lancia };
 })();
 
 // ══ TIMER BLOCK (conto alla rovescia funzionante) ══
