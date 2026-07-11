@@ -594,34 +594,70 @@
         </div>
 
 
-        <div class="card gen-card" data-gen-id="loot">
+        <!-- LOOT GENERATOR — due modalità -->
+        <div class="card gen-card" data-gen-id="loot" style="grid-column:1/-1;">
           <div class="card-header">
-            <h3 class="card-title">Generatore Loot</h3>
-            <button class="btn btn-secondary btn-sm" onclick="Generatori.rollLoot()">Genera Loot</button>
-          </div>
-          <div class="form-row" style="margin-bottom:var(--space-sm);">
-            <div class="form-group" style="margin-bottom:0;">
-              <label class="form-label">Tipo loot</label>
-              <select id="gen-loot-tipo" class="form-select">
-                <option value="mostro">🐉 Da Mostro (per CR)</option>
-                <option value="scrigno">📦 Scrigno / Tesoro</option>
-                <option value="bandito">🗡️ Bandito / Brigante</option>
-                <option value="guardia">🛡️ Guardia / Soldato</option>
-                <option value="mago">🧙 Mago / Stregone</option>
-                <option value="sacerdote">⛪ Sacerdote / Chierico</option>
-                <option value="mercante">🏪 Mercante</option>
-                <option value="non_morto">💀 Non Morto</option>
-                <option value="drago">🐲 Drago (hoard)</option>
-                <option value="tomba">⚰️ Tomba / Cripta</option>
-              </select>
-            </div>
-            <div class="form-group" style="margin-bottom:0;">
-              <label class="form-label">CR (per mostro e scrigno)</label>
-              <input type="number" id="gen-loot-cr" class="form-input" min="0" max="30" value="5" placeholder="es. 5">
+            <h3 class="card-title">💰 Loot Generator</h3>
+            <div style="display:flex;gap:4px;">
+              <button id="loot-tab-rng" class="btn btn-primary btn-sm" onclick="LootPanel.switchTab('rng')">🎲 RNG System</button>
+              <button id="loot-tab-dmg" class="btn btn-ghost btn-sm" onclick="LootPanel.switchTab('dmg')">📚 DMG Ufficiale</button>
             </div>
           </div>
-          <div id="gen-loot-result">
-            <div class="text-muted text-sm">Seleziona il tipo e genera il loot</div>
+
+          <!-- Tab RNG System -->
+          <div id="loot-panel-rng">
+            <div class="form-row" style="padding:8px 12px 0;margin-bottom:var(--space-sm);">
+              <div class="form-group" style="margin-bottom:0;">
+                <label class="form-label">Tipo loot</label>
+                <select id="gen-loot-tipo" class="form-select">
+                  <option value="mostro">🐉 Da Mostro (per CR)</option>
+                  <option value="scrigno">📦 Scrigno / Tesoro</option>
+                  <option value="bandito">🗡️ Bandito / Brigante</option>
+                  <option value="guardia">🛡️ Guardia / Soldato</option>
+                  <option value="mago">🧙 Mago / Stregone</option>
+                  <option value="sacerdote">⛪ Sacerdote / Chierico</option>
+                  <option value="mercante">🏪 Mercante</option>
+                  <option value="non_morto">💀 Non Morto</option>
+                  <option value="drago">🐲 Drago (hoard)</option>
+                  <option value="tomba">⚰️ Tomba / Cripta</option>
+                </select>
+              </div>
+              <div class="form-group" style="margin-bottom:0;">
+                <label class="form-label">CR</label>
+                <input type="number" id="gen-loot-cr" class="form-input" min="0" max="30" value="5" placeholder="es. 5">
+              </div>
+              <div class="form-group" style="margin-bottom:0;display:flex;align-items:flex-end;">
+                <button class="btn btn-secondary btn-sm" onclick="Generatori.rollLoot()">🎲 Genera</button>
+              </div>
+            </div>
+            <div id="gen-loot-result" style="padding:0 12px 10px;">
+              <div class="text-muted text-sm">Seleziona il tipo e genera il loot</div>
+            </div>
+          </div>
+
+          <!-- Tab DMG Ufficiale -->
+          <div id="loot-panel-dmg" style="display:none;">
+            <div style="padding:6px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+              <span style="font-size:0.78rem;color:var(--text-muted);">Tabelle ufficiali DMG 2014 e 2024 — 400+ oggetti magici, gemme, oggetti d'arte</span>
+              <a href="https://dnd-loot-generator-sepia.vercel.app/" target="_blank" class="btn btn-ghost btn-sm" style="font-size:0.72rem;">↗ Apri in nuova tab</a>
+            </div>
+            <div style="position:relative;width:100%;height:600px;">
+              <iframe
+                id="loot-dmg-iframe"
+                src=""
+                data-src="https://dnd-loot-generator-sepia.vercel.app/"
+                style="width:100%;height:100%;border:none;border-radius:0 0 var(--radius-lg) var(--radius-lg);"
+                title="D&D Loot Generator — Tabelle Ufficiali DMG"
+                loading="lazy"
+                allow="clipboard-write">
+              </iframe>
+              <div id="loot-iframe-placeholder" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--bg-secondary);border-radius:0 0 var(--radius-lg) var(--radius-lg);">
+                <div style="font-size:2rem;margin-bottom:12px;">📚</div>
+                <div style="font-family:var(--font-display);font-size:0.9rem;margin-bottom:6px;">DMG Loot Generator</div>
+                <div class="text-muted text-sm" style="margin-bottom:16px;text-align:center;max-width:280px;">Tabelle ufficiali DMG 2014 e 2024<br>400+ oggetti magici tradotti in italiano</div>
+                <button class="btn btn-primary btn-sm" onclick="LootPanel.loadIframe()">Carica Tool</button>
+              </div>
+            </div>
           </div>
         </div>
         <!-- Biblioteca / Pergamene -->
@@ -10992,6 +11028,42 @@ const MissioniGen = (() => {
   };
 
   return { genera };
+})();
+
+// ══ LOOT PANEL — switcher tra RNG System e DMG Ufficiale ══
+const LootPanel = (() => {
+
+  const switchTab = (tab) => {
+    const rngPanel = document.getElementById('loot-panel-rng');
+    const dmgPanel = document.getElementById('loot-panel-dmg');
+    const btnRng   = document.getElementById('loot-tab-rng');
+    const btnDmg   = document.getElementById('loot-tab-dmg');
+    if (!rngPanel || !dmgPanel) return;
+
+    if (tab === 'rng') {
+      rngPanel.style.display = '';
+      dmgPanel.style.display = 'none';
+      btnRng?.classList.replace('btn-ghost', 'btn-primary');
+      btnDmg?.classList.replace('btn-primary', 'btn-ghost');
+    } else {
+      rngPanel.style.display = 'none';
+      dmgPanel.style.display = '';
+      btnRng?.classList.replace('btn-primary', 'btn-ghost');
+      btnDmg?.classList.replace('btn-ghost', 'btn-primary');
+    }
+  };
+
+  const loadIframe = () => {
+    const iframe = document.getElementById('loot-dmg-iframe');
+    const placeholder = document.getElementById('loot-iframe-placeholder');
+    if (!iframe) return;
+    // Carica solo quando richiesto (lazy load)
+    iframe.src = iframe.dataset.src || 'https://dnd-loot-generator-sepia.vercel.app/';
+    if (placeholder) placeholder.style.display = 'none';
+    Debug.log('LootPanel: iframe DMG caricato');
+  };
+
+  return { switchTab, loadIframe };
 })();
 
 // ══ TIMER BLOCK (conto alla rovescia funzionante) ══
