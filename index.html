@@ -11732,15 +11732,8 @@ const GeneratoriDD = (() => {
   };
 
   const applyOrder = () => {
-    const grid = document.querySelector('#page-generatori .generatori-grid');
-    if (!grid) return;
-    let order = [];
-    try { order = JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; } catch {}
-    if (!order.length) return;
-    order.forEach(id => {
-      const card = grid.querySelector(`.gen-card[data-gen-id="${id}"]`);
-      if (card) grid.appendChild(card);
-    });
+    // Con le categorie l'ordine è fisso — no riordinamento automatico
+    return;
   };
 
   const move = (genId, dir) => {
