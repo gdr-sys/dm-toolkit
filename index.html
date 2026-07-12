@@ -248,7 +248,7 @@
                 <svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>
               </button>
             </div>
-            <textarea id="nc-page-content" style="flex:1;border:none;resize:none;font-size:0.9rem;line-height:1.8;padding:16px 24px;background:transparent;color:var(--text-primary);font-family:var(--font-body);outline:none;min-height:0;width:100%;box-sizing:border-box;"
+            <textarea id="nc-page-content" style="flex:1;border:none;resize:none;font-size:0.9rem;line-height:1.8;padding:var(--space-md);background:transparent;color:var(--text-primary);outline:none;width:100%;min-height:70vh;box-sizing:border-box;"
               placeholder="Scrivi le tue note qui...&#10;&#10;Perfetto per lore, segreti, dialoghi, piani narrativi..."
               oninput="NoteCampagna.savePage()"></textarea>
           </div>
@@ -643,23 +643,32 @@
             </div>
           </div>
           <div id="loot-panel-rng">
-            <div style="padding:10px 12px;display:flex;flex-direction:column;gap:10px;">
+            <div style="padding:10px 12px;display:flex;flex-direction:column;gap:12px;">
 
               <!-- Rango -->
               <div>
-                <div style="font-size:0.7rem;color:var(--text-muted);margin-bottom:5px;font-family:var(--font-display);text-transform:uppercase;letter-spacing:0.05em;">⚔️ Rango Nemico</div>
-                <div style="display:flex;gap:6px;">
-                  <button id="rng-rank-Minion" class="btn btn-primary btn-sm" style="flex:1;" onclick="RNGLoot.setRank('Minion')">⚔️ Minion<br><span style="font-size:0.65rem;opacity:0.7;">Multi-categoria</span></button>
-                  <button id="rng-rank-Elite" class="btn btn-ghost btn-sm" style="flex:1;" onclick="RNGLoot.setRank('Elite')">🛡️ Elite<br><span style="font-size:0.65rem;opacity:0.7;">Singola categoria</span></button>
-                  <button id="rng-rank-Boss" class="btn btn-ghost btn-sm" style="flex:1;" onclick="RNGLoot.setRank('Boss')">👑 Boss<br><span style="font-size:0.65rem;opacity:0.7;">Singola categoria</span></button>
+                <div style="font-size:0.7rem;color:var(--text-muted);margin-bottom:6px;font-family:var(--font-display);text-transform:uppercase;letter-spacing:0.05em;">⚔️ Rango Nemico</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;">
+                  <button id="rng-rank-Minion" class="btn btn-primary btn-sm" onclick="RNGLoot.setRank('Minion')" style="display:flex;flex-direction:column;align-items:center;padding:6px 4px;gap:1px;">
+                    <span>⚔️ Minion</span>
+                    <span style="font-size:0.6rem;opacity:0.7;font-weight:400;">Multi-categoria</span>
+                  </button>
+                  <button id="rng-rank-Elite" class="btn btn-ghost btn-sm" onclick="RNGLoot.setRank('Elite')" style="display:flex;flex-direction:column;align-items:center;padding:6px 4px;gap:1px;">
+                    <span>🛡️ Elite</span>
+                    <span style="font-size:0.6rem;opacity:0.7;font-weight:400;">Singola cat.</span>
+                  </button>
+                  <button id="rng-rank-Boss" class="btn btn-ghost btn-sm" onclick="RNGLoot.setRank('Boss')" style="display:flex;flex-direction:column;align-items:center;padding:6px 4px;gap:1px;">
+                    <span>👑 Boss</span>
+                    <span style="font-size:0.6rem;opacity:0.7;font-weight:400;">Singola cat.</span>
+                  </button>
                 </div>
               </div>
 
-              <!-- Condizione oggetto -->
+              <!-- Stato oggetti -->
               <div>
-                <div style="font-size:0.7rem;color:var(--text-muted);margin-bottom:5px;font-family:var(--font-display);text-transform:uppercase;letter-spacing:0.05em;">📦 Stato Oggetti (opzionale)</div>
-                <div style="display:flex;gap:4px;flex-wrap:wrap;">
-                  <button id="rng-cond-null" class="btn btn-ghost btn-sm" onclick="RNGLoot.setCond(null)">Qualsiasi</button>
+                <div style="font-size:0.7rem;color:var(--text-muted);margin-bottom:3px;font-family:var(--font-display);text-transform:uppercase;letter-spacing:0.05em;">📦 Stato Oggetti <span style="font-weight:400;text-transform:none;letter-spacing:0;">(opzionale)</span></div>
+                <div style="font-size:0.72rem;color:var(--text-muted);margin-bottom:6px;font-style:italic;">Clicca per applicare una condizione al bottino generato. Utile se il combattimento ha danneggiato gli oggetti, se il DM vuole aggiungere un maleficio narrativo o se l'ambiente (es. acido, fuoco) ha rovinato l'equipaggiamento nemico.</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;">
                   <button id="rng-cond-intatto" class="btn btn-ghost btn-sm" onclick="RNGLoot.setCond('intatto')">✓ Intatto</button>
                   <button id="rng-cond-danneggiato" class="btn btn-ghost btn-sm" onclick="RNGLoot.setCond('danneggiato')">⚠ Danneggiato</button>
                   <button id="rng-cond-inutilizzabile" class="btn btn-ghost btn-sm" onclick="RNGLoot.setCond('inutilizzabile')">✗ Inutilizzabile</button>
@@ -667,33 +676,31 @@
                 </div>
               </div>
 
-              <!-- Categorie nemici -->
+              <!-- Categorie -->
               <div>
-                <div style="font-size:0.7rem;color:var(--text-muted);margin-bottom:5px;font-family:var(--font-display);text-transform:uppercase;letter-spacing:0.05em;">🐉 Tipo Nemico <span id="rng-cat-hint" style="color:var(--accent-secondary);font-family:var(--font-body);">— Minion: clicca più categorie</span></div>
-                <div id="rng-cat-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:4px;max-height:200px;overflow-y:auto;">
-                </div>
+                <div style="font-size:0.7rem;color:var(--text-muted);margin-bottom:6px;font-family:var(--font-display);text-transform:uppercase;letter-spacing:0.05em;">🐉 Tipo Nemico <span id="rng-cat-hint" style="color:var(--accent-secondary);font-family:var(--font-body);text-transform:none;letter-spacing:0;font-size:0.68rem;"></span></div>
+                <div id="rng-cat-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:3px;max-height:220px;overflow-y:auto;"></div>
               </div>
 
-              <!-- Quante volte tirare -->
-              <div style="display:flex;align-items:center;gap:10px;background:var(--bg-secondary);border-radius:var(--radius-md);padding:8px 12px;">
-                <span style="font-size:0.78rem;color:var(--text-muted);flex-shrink:0;">Quante volte tirare:</span>
-                <button class="btn btn-ghost btn-sm" onclick="RNGLoot.adjMult(-1)">−</button>
-                <input type="number" id="rng-multiplier" min="1" max="99" value="1" class="form-input" style="width:60px;text-align:center;font-family:var(--font-mono);font-size:1rem;font-weight:700;" oninput="RNGLoot.setMult(this.value)">
-                <button class="btn btn-ghost btn-sm" onclick="RNGLoot.adjMult(1)">+</button>
+              <!-- Quante volte -->
+              <div style="display:flex;align-items:center;gap:8px;background:var(--bg-secondary);border-radius:var(--radius-md);padding:8px 10px;flex-wrap:wrap;">
+                <span style="font-size:0.78rem;color:var(--text-muted);">Quante volte tirare:</span>
+                <button class="btn btn-ghost btn-sm" onclick="RNGLoot.adjMult(-1)" style="width:28px;padding:0;">−</button>
+                <input type="number" id="rng-multiplier" min="1" max="99" value="1" class="form-input" style="width:52px;text-align:center;font-weight:700;" oninput="RNGLoot.setMult(this.value)">
+                <button class="btn btn-ghost btn-sm" onclick="RNGLoot.adjMult(1)" style="width:28px;padding:0;">+</button>
                 <div style="display:flex;gap:3px;">
                   <button class="btn btn-ghost btn-sm" onclick="RNGLoot.setMult(1)">×1</button>
                   <button class="btn btn-ghost btn-sm" onclick="RNGLoot.setMult(3)">×3</button>
                   <button class="btn btn-ghost btn-sm" onclick="RNGLoot.setMult(5)">×5</button>
                   <button class="btn btn-ghost btn-sm" onclick="RNGLoot.setMult(10)">×10</button>
                 </div>
-                <button class="btn btn-primary btn-sm" style="margin-left:auto;" onclick="RNGLoot.genera()">🎲 Tira!</button>
+                <button class="btn btn-primary btn-sm" onclick="RNGLoot.genera()" style="margin-left:auto;">🎲 Tira!</button>
               </div>
             </div>
-
             <div id="gen-loot-result" style="padding:0 12px 10px;min-height:40px;">
               <div class="text-muted text-sm">Seleziona rango, categorie e tira i dadi.</div>
             </div>
-          </div></div>
+          </div>
           <div id="loot-panel-dmg" style="display:none;">
             <div style="padding:6px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
               <span style="font-size:0.78rem;color:var(--text-muted);">Tabelle ufficiali DMG 2014 e 2024 — 400+ oggetti magici</span>
@@ -3386,17 +3393,22 @@ const openCampaign = (id) => {
         return;
       }
       el.innerHTML = filtered.map(q => `
-        <div class="quest-item status-${q.status}">
-          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:var(--space-sm);margin-bottom:4px;">
-            <div class="quest-item-title">${q.title}</div>
-            <div style="display:flex;gap:4px;align-items:center;flex-shrink:0;">
-              <span class="badge ${colors[q.status]}">${labels[q.status]}</span>
-              <button class="btn btn-ghost btn-icon-sm" onclick="App.editQuest('${q.id}')" title="Modifica"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
-              <button class="btn btn-ghost btn-icon-sm" onclick="App.deleteQuest('${q.id}')" title="Elimina"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>
+        <div class="quest-item status-${q.status}" style="border-left:3px solid var(--${q.status === 'disponibile' ? 'border' : q.status === 'in_corso' ? 'accent-primary' : q.status === 'completata' ? 'accent-success' : 'accent-danger'});padding-left:10px;margin-bottom:8px;">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;">
+            <div style="flex:1;min-width:0;">
+              <div style="font-family:var(--font-display);font-size:0.9rem;font-weight:600;color:var(--text-primary);margin-bottom:2px;">${q.title}</div>
+              ${q.notes ? `<div style="font-size:0.78rem;color:var(--text-muted);margin-bottom:4px;">${q.notes}</div>` : ''}
+              ${q.reward ? `<div style="font-size:0.78rem;color:var(--accent-secondary);display:flex;align-items:center;gap:4px;margin-top:4px;">🏆 <span style="font-weight:600;">Ricompensa:</span> ${q.reward}</div>` : ''}
+              ${q.steps?.length ? `<div style="font-size:0.72rem;color:var(--text-muted);margin-top:3px;">📋 ${q.steps.filter(s=>s.done).length}/${q.steps.length} obiettivi completati</div>` : ''}
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0;">
+              <span class="badge ${colors[q.status]}" style="font-size:0.65rem;">${labels[q.status]}</span>
+              <div style="display:flex;gap:2px;">
+                <button class="btn btn-ghost btn-icon-sm" onclick="App.editQuest('${q.id}')" title="Modifica">✏️</button>
+                <button class="btn btn-ghost btn-icon-sm" onclick="App.deleteQuest('${q.id}')" title="Elimina" style="color:var(--accent-danger);">🗑️</button>
+              </div>
             </div>
           </div>
-          ${q.notes ? `<div class="text-sm text-muted">${q.notes}</div>` : ''}
-          ${q.reward ? `<div class="quest-reward"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2z"/></svg>${q.reward}</div>` : ''}
         </div>
       `).join('');
     });
@@ -3434,26 +3446,38 @@ const openCampaign = (id) => {
       return;
     }
 
-    el.innerHTML = events.map((e, i) => `
-      <div class="timeline-item">
-        <div class="timeline-day">
-          <span style="font-family:var(--font-mono);font-size:0.7rem;color:var(--accent-secondary);">G${e.day}</span>
-        </div>
-        <div class="timeline-track">
-          <div class="timeline-dot"></div>
-          ${i < events.length - 1 ? '<div class="timeline-line"></div>' : ''}
-        </div>
-        <div class="timeline-content">
-          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:4px;">
-            <div>
-              <div class="timeline-event-text">${e.event}</div>
-              ${e.type ? `<span class="badge badge-muted" style="margin-top:4px;">${e.type}</span>` : ''}
-            </div>
-            <button class="btn btn-ghost btn-icon-sm" onclick="App.deleteTimelineEvent('${e.id}')" title="Elimina"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>
+    el.innerHTML = (() => {
+      const typeColors = {
+        '':             { dot:'var(--border-strong)', badge:'badge-muted',    label:'Generico'       },
+        'politico':     { dot:'#5ba4f5',              badge:'badge-primary',  label:'⚖️ Politico'    },
+        'combattimento':{ dot:'var(--accent-danger)', badge:'badge-danger',   label:'⚔️ Combattimento'},
+        'magia':        { dot:'#c97bea',              badge:'badge-secondary',label:'🔮 Magia'        },
+        'disastro':     { dot:'#f5a623',              badge:'badge-warning',  label:'⚠️ Disastro'    },
+        'scoperta':     { dot:'#69cc85',              badge:'badge-success',  label:'🔍 Scoperta'    },
+      };
+      return events.map((e, i) => {
+        const tc = typeColors[e.type || ''] || typeColors[''];
+        return `
+        <div class="timeline-item">
+          <div class="timeline-day">
+            <span style="font-family:var(--font-mono);font-size:0.7rem;color:var(--accent-secondary);">G${e.day}</span>
           </div>
-        </div>
-      </div>
-    `).join('');
+          <div class="timeline-track">
+            <div class="timeline-dot" style="background:${tc.dot};border-color:${tc.dot};"></div>
+            ${i < events.length - 1 ? '<div class="timeline-line"></div>' : ''}
+          </div>
+          <div class="timeline-content" style="border-left:2px solid ${tc.dot};padding-left:8px;">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:4px;">
+              <div style="flex:1;min-width:0;">
+                <div class="timeline-event-text" style="margin-bottom:3px;">${e.event}</div>
+                ${e.type ? `<span class="badge ${tc.badge}" style="font-size:0.6rem;">${tc.label}</span>` : ''}
+              </div>
+              <button class="btn btn-ghost btn-icon-sm" onclick="App.deleteTimelineEvent('${e.id}')" title="Elimina" style="color:var(--text-muted);flex-shrink:0;">🗑️</button>
+            </div>
+          </div>
+        </div>`;
+      }).join('');
+    })();
   };
 
   const addTimelineEvent = () => {
@@ -5782,6 +5806,41 @@ const Compendio = (() => {
         } catch (e) { /* skip */ }
       }
 
+      // Normalizza mostri — unifica diversi formati JSON
+      _data.monsters.forEach(m => {
+        // Normalizza grado_sfida
+        if (!m.grado_sfida) {
+          // Formato 5e2024: challenge_rating come numero diretto
+          const cr = m.challenge_rating ?? m.cr ?? m.grado_sfida_val;
+          m.grado_sfida = { valore: cr != null ? parseFloat(cr) : null, raw: cr != null ? String(cr) : '?' };
+        } else if (m.grado_sfida.valore === null || m.grado_sfida.valore === undefined) {
+          // grado_sfida esiste ma valore è null
+          const raw = m.grado_sfida.raw || m.grado_sfida.testo;
+          if (raw === '1/8') m.grado_sfida.valore = 0.125;
+          else if (raw === '1/4') m.grado_sfida.valore = 0.25;
+          else if (raw === '1/2') m.grado_sfida.valore = 0.5;
+          else if (raw) m.grado_sfida.valore = parseFloat(raw) || null;
+        }
+        // Assicura che raw sia presente
+        if (m.grado_sfida && !m.grado_sfida.raw) {
+          const v = m.grado_sfida.valore;
+          if (v === 0.125) m.grado_sfida.raw = '1/8';
+          else if (v === 0.25) m.grado_sfida.raw = '1/4';
+          else if (v === 0.5) m.grado_sfida.raw = '1/2';
+          else if (v != null) m.grado_sfida.raw = String(v);
+          else m.grado_sfida.raw = '?';
+        }
+        // Normalizza punti_ferita
+        if (!m.punti_ferita && m.hit_points != null) {
+          m.punti_ferita = { media: m.hit_points, dado: m.hit_dice || '' };
+        }
+        // Normalizza classe_armatura
+        if (!m.classe_armatura && m.armor_class != null) {
+          m.classe_armatura = typeof m.armor_class === 'object'
+            ? (m.armor_class[0]?.value || m.armor_class) : m.armor_class;
+        }
+      });
+
       // Normalizza rarità oggetti magici
       _data.magic_items.forEach(i => {
         i._rarita_norm = normalizzaRarita(i.rarita);
@@ -5966,6 +6025,7 @@ const Compendio = (() => {
     const openFn = {
       monsters: 'openMonster', magic_items: 'openMagicItem',
       equipment: 'openEquipment', rules: 'openRule', spells: 'openSpell',
+      homebrew: 'openHomebrew', velocita: null,
     }[tipo] || 'openMonster';
 
     const favRows = favs.map(f => `
@@ -11228,7 +11288,7 @@ const RNGLoot = (() => {
     _selectedCats = [CATS[0].id];
     renderCats();
     setRank('Minion');
-    setCond(null);
+    _condition = null;
   };
 
   const renderCats = () => {
@@ -11278,10 +11338,10 @@ const RNGLoot = (() => {
   const setCond = (cond) => {
     _condition = cond;
     // Aggiorna pulsanti condizione
-    ['null','intatto','danneggiato','inutilizzabile','maledetto'].forEach(c => {
+    ['intatto','danneggiato','inutilizzabile','maledetto'].forEach(c => {
       const btn = document.getElementById('rng-cond-' + c);
       if (!btn) return;
-      const key = c === 'null' ? null : c;
+      const key = c;
       btn.className = _condition === key ? 'btn btn-primary btn-sm' : 'btn btn-ghost btn-sm';
     });
   };
