@@ -643,59 +643,57 @@
             </div>
           </div>
           <div id="loot-panel-rng">
-            <div style="padding:8px 12px;display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;border-bottom:1px solid var(--border);">
-              <div class="form-group" style="margin-bottom:0;flex:1;min-width:160px;">
-                <label class="form-label">Categoria nemico</label>
-                <select id="rng-loot-cat" class="form-select" onchange="RNGLoot.updateProbTable()">
-                  <option value="humanoid-warrior">⚔️ Umanoidi — Guerriero</option>
-                  <option value="humanoid-caster">🧙 Umanoidi — Incantatore</option>
-                  <option value="humanoid-rogue">🏹 Umanoidi — Ladro/Ranger</option>
-                  <option value="beasts">🐺 Bestie</option>
-                  <option value="undead-physical">💀 Non Morti — Fisico</option>
-                  <option value="undead-incorporeal">👻 Non Morti — Incorporeo</option>
-                  <option value="demons">😈 Demoni</option>
-                  <option value="devils">🔱 Diavoli</option>
-                  <option value="dragons">🐉 Draghi</option>
-                  <option value="constructs">🤖 Costrutti</option>
-                  <option value="aberrations">🦑 Aberrazioni</option>
-                  <option value="fey-benevolent">🧚 Fate Benevole</option>
-                  <option value="fey-malevolent">🧟 Fate Malvagie</option>
-                  <option value="giants">🗿 Giganti</option>
-                  <option value="oozes">🟢 Melme & Ooze</option>
-                  <option value="plants">🌿 Piante</option>
-                  <option value="elemental-fire">🔥 Elementali — Fuoco</option>
-                  <option value="elemental-water">💧 Elementali — Acqua</option>
-                  <option value="elemental-earth">⛰️ Elementali — Terra</option>
-                  <option value="elemental-air">🌪️ Elementali — Aria</option>
-                  <option value="celestials">✨ Celestiali</option>
-                </select>
+            <div style="padding:10px 12px;display:flex;flex-direction:column;gap:10px;">
+
+              <!-- Rango -->
+              <div>
+                <div style="font-size:0.7rem;color:var(--text-muted);margin-bottom:5px;font-family:var(--font-display);text-transform:uppercase;letter-spacing:0.05em;">⚔️ Rango Nemico</div>
+                <div style="display:flex;gap:6px;">
+                  <button id="rng-rank-Minion" class="btn btn-primary btn-sm" style="flex:1;" onclick="RNGLoot.setRank('Minion')">⚔️ Minion<br><span style="font-size:0.65rem;opacity:0.7;">Multi-categoria</span></button>
+                  <button id="rng-rank-Elite" class="btn btn-ghost btn-sm" style="flex:1;" onclick="RNGLoot.setRank('Elite')">🛡️ Elite<br><span style="font-size:0.65rem;opacity:0.7;">Singola categoria</span></button>
+                  <button id="rng-rank-Boss" class="btn btn-ghost btn-sm" style="flex:1;" onclick="RNGLoot.setRank('Boss')">👑 Boss<br><span style="font-size:0.65rem;opacity:0.7;">Singola categoria</span></button>
+                </div>
               </div>
-              <div class="form-group" style="margin-bottom:0;">
-                <label class="form-label">Rango</label>
-                <select id="rng-loot-rank" class="form-select">
-                  <option value="Minion">⚔️ Minion</option>
-                  <option value="Elite" selected>🛡️ Elite</option>
-                  <option value="Boss">👑 Boss</option>
-                </select>
+
+              <!-- Condizione oggetto -->
+              <div>
+                <div style="font-size:0.7rem;color:var(--text-muted);margin-bottom:5px;font-family:var(--font-display);text-transform:uppercase;letter-spacing:0.05em;">📦 Stato Oggetti (opzionale)</div>
+                <div style="display:flex;gap:4px;flex-wrap:wrap;">
+                  <button id="rng-cond-null" class="btn btn-ghost btn-sm" onclick="RNGLoot.setCond(null)">Qualsiasi</button>
+                  <button id="rng-cond-intatto" class="btn btn-ghost btn-sm" onclick="RNGLoot.setCond('intatto')">✓ Intatto</button>
+                  <button id="rng-cond-danneggiato" class="btn btn-ghost btn-sm" onclick="RNGLoot.setCond('danneggiato')">⚠ Danneggiato</button>
+                  <button id="rng-cond-inutilizzabile" class="btn btn-ghost btn-sm" onclick="RNGLoot.setCond('inutilizzabile')">✗ Inutilizzabile</button>
+                  <button id="rng-cond-maledetto" class="btn btn-ghost btn-sm" onclick="RNGLoot.setCond('maledetto')">☠ Maledetto</button>
+                </div>
               </div>
-              <div class="form-group" style="margin-bottom:0;">
-                <label class="form-label">Quantità</label>
-                <select id="rng-loot-qty" class="form-select">
-                  <option value="1">1 nemico</option>
-                  <option value="3" selected>3 nemici</option>
-                  <option value="5">5 nemici</option>
-                  <option value="10">10 nemici</option>
-                </select>
+
+              <!-- Categorie nemici -->
+              <div>
+                <div style="font-size:0.7rem;color:var(--text-muted);margin-bottom:5px;font-family:var(--font-display);text-transform:uppercase;letter-spacing:0.05em;">🐉 Tipo Nemico <span id="rng-cat-hint" style="color:var(--accent-secondary);font-family:var(--font-body);">— Minion: clicca più categorie</span></div>
+                <div id="rng-cat-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:4px;max-height:200px;overflow-y:auto;">
+                </div>
               </div>
-              <button class="btn btn-primary btn-sm" onclick="RNGLoot.genera()">🎲 Genera Loot</button>
+
+              <!-- Quante volte tirare -->
+              <div style="display:flex;align-items:center;gap:10px;background:var(--bg-secondary);border-radius:var(--radius-md);padding:8px 12px;">
+                <span style="font-size:0.78rem;color:var(--text-muted);flex-shrink:0;">Quante volte tirare:</span>
+                <button class="btn btn-ghost btn-sm" onclick="RNGLoot.adjMult(-1)">−</button>
+                <input type="number" id="rng-multiplier" min="1" max="99" value="1" class="form-input" style="width:60px;text-align:center;font-family:var(--font-mono);font-size:1rem;font-weight:700;" oninput="RNGLoot.setMult(this.value)">
+                <button class="btn btn-ghost btn-sm" onclick="RNGLoot.adjMult(1)">+</button>
+                <div style="display:flex;gap:3px;">
+                  <button class="btn btn-ghost btn-sm" onclick="RNGLoot.setMult(1)">×1</button>
+                  <button class="btn btn-ghost btn-sm" onclick="RNGLoot.setMult(3)">×3</button>
+                  <button class="btn btn-ghost btn-sm" onclick="RNGLoot.setMult(5)">×5</button>
+                  <button class="btn btn-ghost btn-sm" onclick="RNGLoot.setMult(10)">×10</button>
+                </div>
+                <button class="btn btn-primary btn-sm" style="margin-left:auto;" onclick="RNGLoot.genera()">🎲 Tira!</button>
+              </div>
             </div>
-            <div id="rng-prob-table" style="padding:6px 12px;font-size:0.7rem;color:var(--text-muted);border-bottom:1px solid var(--border);">
-              Tabella: Standard — Minion: 40% niente / 35% Comune / 15% Non Comune / 8% Raro / 2% Epico
+
+            <div id="gen-loot-result" style="padding:0 12px 10px;min-height:40px;">
+              <div class="text-muted text-sm">Seleziona rango, categorie e tira i dadi.</div>
             </div>
-            <div id="gen-loot-result" style="padding:8px 12px;min-height:60px;">
-              <div class="text-muted text-sm">Seleziona categoria, rango e genera il loot.</div>
-            </div>
-          </div>
+          </div></div>
           <div id="loot-panel-dmg" style="display:none;">
             <div style="padding:6px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
               <span style="font-size:0.78rem;color:var(--text-muted);">Tabelle ufficiali DMG 2014 e 2024 — 400+ oggetti magici</span>
@@ -1211,7 +1209,6 @@
       </div>
 
       <!-- Griglia blocchi -->
-      <div id="schermo-full-row" style="display:flex;flex-direction:column;gap:var(--space-md);margin-bottom:var(--space-md);"></div>
       <div class="schermo-cols">
         <div class="schermo-col" id="schermo-col-0" data-col="0"></div>
         <div class="schermo-col" id="schermo-col-1" data-col="1"></div>
@@ -3080,7 +3077,7 @@ const App = (() => {
         break;
       case 'sessione':   try { Sessione.init(); setTimeout(() => NoteSessione.render(), 100); } catch(e) {} break;
       case 'generatori':
-        setTimeout(() => { GeneratoriDD.enable(); Generatori.applyVisibility(); EncounterBuilder.init(); }, 100);
+        setTimeout(() => { GeneratoriDD.enable(); Generatori.applyVisibility(); EncounterBuilder.init(); RNGLoot.init(); }, 100);
         break;
       case 'compendio':  try { Compendio.init(); } catch(e) {} break;
       case 'schermo':    try { Schermo.init(); } catch(e) {} break;
@@ -7272,21 +7269,11 @@ const Schermo = (() => {
     SchermoDD.reset();
     cols.forEach(c => { if (c) c.innerHTML = ''; });
 
-    // Blocchi XL → riga full-width sopra le colonne
-    const fullRowEl = document.getElementById('schermo-full-row');
-    if (fullRowEl) fullRowEl.innerHTML = '';
-
     _blocks.forEach((block, idx) => {
-      const size = block.size || 'md';
-      if (size === 'xl') {
-        // Blocco full-width: va nel full-row, non nelle colonne
-        if (fullRowEl) fullRowEl.insertAdjacentHTML('beforeend', renderBlock(block, idx));
-      } else {
-        const colIdx = Math.min(Math.max(block.col ?? (idx % 4), 0), 3);
-        block.col = colIdx;
-        const col = cols[colIdx];
-        if (col) col.insertAdjacentHTML('beforeend', renderBlock(block, idx));
-      }
+      const colIdx = Math.min(Math.max(block.col ?? (idx % 4), 0), 3);
+      block.col = colIdx;
+      const col = cols[colIdx];
+      if (col) col.insertAdjacentHTML('beforeend', renderBlock(block, idx));
     });
     _blocks.forEach(b => updateBlockContent(b));
     requestAnimationFrame(() => SchermoDD.enable());
@@ -7306,7 +7293,7 @@ const Schermo = (() => {
           <span class="schermo-block-icon" style="cursor:grab;" title="Trascina per spostare">${def.icon}</span>
           <span class="schermo-block-title">${title}</span>
           <div class="schermo-block-actions">
-            <button class="btn btn-ghost btn-icon-sm" onclick="Schermo.resizeBlock('${block.id}')" title="Dimensione: ${size.toUpperCase()} — clicca per cambiare" style="font-family:var(--font-mono);font-size:0.6rem;width:auto;padding:0 4px;">${size.toUpperCase()}</button>
+            <button class="btn btn-ghost btn-icon-sm" onclick="Schermo.resizeBlock('${block.id}')" title="Altezza: ${size.toUpperCase()}" style="font-family:var(--font-mono);font-size:0.6rem;width:auto;padding:0 4px;opacity:0.6;">${size.toUpperCase()}</button>
             <button class="btn btn-ghost btn-icon-sm" onclick="Schermo.moveBlock('${block.id}', -1)" title="Sposta su"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg></button>
             <button class="btn btn-ghost btn-icon-sm" onclick="Schermo.moveBlock('${block.id}', 1)" title="Sposta giù"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg></button>
             ${block.type === 'custom' || block.type === 'note' ? `<button class="btn btn-ghost btn-icon-sm" onclick="Schermo.editBlock('${block.id}')" title="Modifica"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>` : ''}
@@ -11097,300 +11084,280 @@ const MissioniGen = (() => {
   return { genera };
 })();
 
-// ══ RNG LOOT SYSTEM (da loot-rng-system) ══
+// ══ RNG LOOT SYSTEM (fedele a loot-rng-system) ══
 const RNGLoot = (() => {
 
-  // Tabelle probabilità per categoria
-  const PROB_TABLES = {
+  // Stato interno
+  let _rank = 'Minion';          // 'Minion' | 'Elite' | 'Boss'
+  let _selectedCats = [];        // array id categorie selezionate
+  let _condition = null;         // null | 'intatto' | 'danneggiato' | 'inutilizzabile' | 'maledetto'
+  let _multiplier = 1;           // quante volte tirare
+
+  // Tutte le categorie con nome e probabilityTable
+  const CATS = [
+    { id:'humanoid-warrior',   name:'⚔️ Umanoidi — Guerriero',   prob:'Standard' },
+    { id:'humanoid-caster',    name:'🧙 Umanoidi — Incantatore',  prob:'Standard' },
+    { id:'humanoid-rogue',     name:'🏹 Umanoidi — Ladro/Ranger', prob:'Standard' },
+    { id:'beasts',             name:'🐺 Bestie',                  prob:'Bestie'   },
+    { id:'undead-physical',    name:'💀 Non Morti — Fisico',      prob:'Standard' },
+    { id:'undead-incorporeal', name:'👻 Non Morti — Incorporeo',  prob:'Standard' },
+    { id:'demons',             name:'😈 Demoni',                  prob:'Standard' },
+    { id:'devils',             name:'🔱 Diavoli',                 prob:'Standard' },
+    { id:'dragons',            name:'🐉 Draghi',                  prob:'Standard' },
+    { id:'constructs',         name:'🤖 Costrutti',               prob:'Standard' },
+    { id:'aberrations',        name:'🦑 Aberrazioni',             prob:'Standard' },
+    { id:'fey-benevolent',     name:'🧚 Fate Benevole',           prob:'Standard' },
+    { id:'fey-malevolent',     name:'🧟 Fate Malvagie',           prob:'Standard' },
+    { id:'giants',             name:'🗿 Giganti',                  prob:'Standard' },
+    { id:'oozes',              name:'🟢 Melme & Ooze',            prob:'Melme'    },
+    { id:'plants',             name:'🌿 Piante',                  prob:'Piante'   },
+    { id:'elemental-fire',     name:'🔥 Elementali — Fuoco',      prob:'Standard' },
+    { id:'elemental-water',    name:'💧 Elementali — Acqua',      prob:'Standard' },
+    { id:'elemental-earth',    name:'⛰️ Elementali — Terra',      prob:'Standard' },
+    { id:'elemental-air',      name:'🌪️ Elementali — Aria',      prob:'Standard' },
+    { id:'celestials',         name:'✨ Celestiali',               prob:'Celestiali'},
+  ];
+
+  // Tabelle probabilità cumulative [Niente, Comune, NonComune, Raro, Epico, Leggendario]
+  const PROB = {
     Standard:   { Minion:[40,75,90,98,100,0],  Elite:[20,50,80,95,99,100],  Boss:[0,20,55,85,97,100]  },
     Bestie:     { Minion:[70,90,98,100,0,0],    Elite:[50,80,95,99,100,0],   Boss:[30,60,85,97,100,0]  },
     Melme:      { Minion:[80,95,99,100,0,0],    Elite:[60,85,97,100,0,0],    Boss:[40,70,90,98,100,0]  },
     Piante:     { Minion:[75,93,99,100,0,0],    Elite:[55,83,97,100,0,0],    Boss:[35,65,87,97,100,0]  },
     Celestiali: { Minion:[20,55,85,97,100,0],   Elite:[10,35,70,92,99,100],  Boss:[0,15,45,80,95,100]  },
   };
-
-  // Rarità in ordine
   const RARITIES = ['Niente','Comune','Non Comune','Raro','Epico','Leggendario'];
-  const RARITY_COLORS = {
-    'Niente':'var(--text-muted)', 'Comune':'var(--text-secondary)',
-    'Non Comune':'#69cc85', 'Raro':'#5ba4f5', 'Epico':'#c97bea', 'Leggendario':'#f5a623',
+  const RARITY_COLOR = {
+    'Niente':'var(--text-muted)','Comune':'var(--text-secondary)',
+    'Non Comune':'#69cc85','Raro':'#5ba4f5','Epico':'#c97bea','Leggendario':'#f5a623',
   };
 
-  // Mappa categoria → tabella probabilità
-  const CAT_PROB_TABLE = {
-    'humanoid-warrior':'Standard', 'humanoid-caster':'Standard', 'humanoid-rogue':'Standard',
-    'beasts':'Bestie', 'undead-physical':'Standard', 'undead-incorporeal':'Standard',
-    'demons':'Standard', 'devils':'Standard', 'dragons':'Standard', 'constructs':'Standard',
-    'aberrations':'Standard', 'fey-benevolent':'Standard', 'fey-malevolent':'Standard',
-    'giants':'Standard', 'oozes':'Melme', 'plants':'Piante',
-    'elemental-fire':'Standard', 'elemental-water':'Standard',
-    'elemental-earth':'Standard', 'elemental-air':'Standard', 'celestials':'Celestiali',
+  // Tabelle loot per categoria e rarità
+  const LOOT = {
+    'humanoid-warrior':   { 'Comune':['2d6 monete d\'oro','Spada corta usurata','Scudo di legno scheggiato','Pozione di Guarigione','Torcia e acciarino','Razioni da viaggio (1d4 giorni)','Armatura di cuoio rattoppata','Fiala di veleno comune'],'Non Comune':['Spada lunga ben mantenuta','Cotta di maglia','Pozione di Guarigione Superiore','2d10 mo + 1d6 gemme grezze','Arco lungo con faretra (20 frecce)','Armatura di cuoio borchiato','Pergamena incantesimo 1° lv.','Mantello della Protezione'],'Raro':['Spada lunga +1','Armatura a maglie +1','Scudo +1','Pozione di Guarigione Suprema','Stivali di Elven Kind','Guanti dell\'Ogre','Pergamena incantesimo 3° lv.','Cintura della forza del gigante (minore)'],'Epico':['Spada lunga +2','Armatura a piastre +1','Scudo +2','Mantello di Spostamento','Anello di Protezione','Elmo della Telepatia','Stivali della Velocità','Guanti di Destrezza'],'Leggendario':['Spada lunga +3','Armatura a piastre +2','Spada Vorpal','Scudo +3','Mantello dell\'Invisibilità','Anello di Resistenza agli Incantesimi','Armatura Invulnerabile','Cintura della forza del gigante (superiore)'] },
+    'humanoid-caster':    { 'Comune':['2d6 mo','Componenti materiali varie','Libro di appunti arcani','Candele e incenso rituale','Pozione di Guarigione','Bastone nodoso','Amuleto simbolico','Razioni ed erbe essiccate'],'Non Comune':['Pergamena incantesimo 1° lv.','Focus arcano di cristallo','Pozione di Chiaroveggenza','2d10 mo + simbolo cultista','Libro degli incantesimi (1d4 incant. 1° lv.)','Bacchetta con 1d4 cariche (1° lv.)','Pozione di Guarigione Superiore','Mantello della Protezione'],'Raro':['Libro degli incantesimi (1d4 incant. 2-3° lv.)','Bacchetta dei Dardi Magici','Pergamena incantesimo 3° lv.','Sfera di cristallo (minore)','Collana di Palle di Fuoco','Anello di Contenimento degli Incantesimi','Cappello dell\'Intelletto','Mantello dell\'Elfo'],'Epico':['Libro degli incantesimi (1d4 incant. 4-5° lv.)','Bacchetta dei Raggi di Gelo','Pergamena incantesimo 5° lv.','Sfera di Cristallo','Anello della Mente','Diadema dell\'Intelletto','Mantello del Mago','Bacchetta di Paralisi'],'Leggendario':['Libro degli incantesimi (1d4 incant. 6-9° lv.)','Bastone dei Maghi','Sfera di Cristallo superiore','Anello di Resistenza agli Incantesimi','Mantello dell\'Invisibilità','Amuleto della Salute','Bacchetta delle Meraviglie','Tomo della Comprensione'] },
+    'humanoid-rogue':     { 'Comune':['2d6 mo','Pugnale affilato','Corda di canapa (15 m)','Kit da scasso','Faretra con 1d10 frecce','Mantello scuro consumato','Razioni da viaggio','Trappola da caccia'],'Non Comune':['Arco corto ben mantenuto','Due pugnali bilanciati','Mantello dell\'Elfo','Kit da scasso di qualità','Pozione di Guarigione Superiore','2d10 mo + mappa parziale','Stivali silenziosi','Veleno da contatto (1d4 dosi)'],'Raro':['Arco lungo +1','Pugnale +1','Stivali di Elven Kind','Mantello dell\'Elfo (magico)','Guanti del Ladro','Pozione di Invisibilità','Frecce di Ricerca (1d6)','Anello del Salto'],'Epico':['Arco lungo +2','Pugnale +2','Mantello di Spostamento','Stivali della Velocità','Anello dell\'Evasione','Occhiali della Notte','Scimitarra della Velocità','Bracciali della Difesa'],'Leggendario':['Arco lungo +3','Pugnale +3','Mantello dell\'Invisibilità','Anello dell\'Invisibilità','Stivali dei Piani','Guanti di Destrezza','Scimitarra della Velocità +3','Anello di Resistenza agli Incantesimi'] },
+    'beasts':             { 'Comune':['Dente o artiglio (ricordo)','Collare bestia addestrata','Borsa marcia 1d6 mo (vittima)','Anello semplice (vittima)','Pugnale arrugginito (vittima)','Amuleto spezzato (vittima)','Monete sparse 1d10 (vittima)','Gemma grezza (vittima)'],'Non Comune':['Borsa 2d10 mo (vittima)','Anello d\'argento semplice (vittima)','Pozione di Guarigione (vittima)','Amuleto semplice (vittima)','Mappa parziale (vittima)','Pergamena incantesimo 1° lv. (vittima)','Gemme semipreziose 1d4 (vittima)','Sigillo nobiliare (vittima)'],'Raro':['Borsa 2d6 mo e gemme (vittima)','Anello di Protezione (vittima)','Amuleto della Salute (vittima)','Pozione di Guarigione Superiore (vittima)','Pergamena incantesimo 2-3° lv. (vittima)','Gemme preziose 1d4 (vittima)','Collana magica minore (vittima)','Medaglione dei Pensieri (vittima)'],'Epico':['Anello dell\'Evasione (vittima)','Anello della Mente (vittima)','Pozione di Guarigione Suprema (vittima)','Pergamena incantesimo 4-5° lv. (vittima)','Gemme rare 1d4 (vittima)','Amuleto degli Scudi (vittima)','Anello di Resistenza (vittima)','Collana di Adattamento (vittima)'] },
+    'undead-physical':    { 'Comune':['1d6 mo arrugginite','Osso inciso con rune','Armatura di cuoio marcita','Spada corta scheggiata','Amuleto funerario semplice','Bende con unguenti','Simbolo religioso corrotto','Anello funerario semplice'],'Non Comune':['2d10 mo antiche','Spada lunga ben conservata','Armatura a maglie funzionale','Pozione di Guarigione','Amuleto oscuro','Pergamena incantesimo 1° lv. (oscuro)','Gemme funebri 1d4','Simbolo sacro profanato'],'Raro':['Spada lunga +1 (antica)','Armatura a maglie +1 (antica)','Amuleto della Salute','Pozione di Guarigione Superiore','Pergamena incantesimo 2-3° lv.','Anello di Protezione','Scudo +1 (antico)','Simbolo sacro animato'],'Epico':['Spada lunga +2 (con iscrizioni)','Armatura a piastre +1 (antica)','Mantello di Spostamento','Anello dell\'Evasione','Pergamena incantesimo 4-5° lv.','Scudo +2 (antico)','Elmo della Telepatia','Amuleto degli Scudi'],'Leggendario':['Spada lunga +3 (con nome)','Armatura a piastre +2','Falce della Morte','Anello di Resistenza agli Incantesimi','Mantello dell\'Invisibilità','Pergamena incantesimo 6-9° lv.','Corona del non morto','Amuleto della Salute superiore'] },
+    'undead-incorporeal': { 'Comune':['Monete antiche sparse 1d10','Candele votive consumate','Libro di preghiere corrotto','Gemma grezza opaca','Lettera sbiadita illeggibile','Simbolo religioso abbandonato','Gioiello spezzato','Frammento di lapide'],'Non Comune':['2d10 mo antiche','Diario con indizi narrativi','Gemme funebri 1d4','Pergamena incantesimo 1° lv.','Gioiello antico integro','Simbolo sacro profanato funzionale','Pozione di Guarigione','Lettera con segreto narrativo'],'Raro':['Gemme preziose 1d4','Pergamena incantesimo 2-3° lv.','Anello di Protezione','Amuleto della Salute','Pozione di Guarigione Superiore','Libro degli incantesimi parziale','Gioiello antico (2d6×10 mo)','Medaglione dei Pensieri'],'Epico':['Pergamena incantesimo 4-5° lv.','Anello dell\'Evasione','Mantello di Spostamento','Gemme rare 1d4','Libro degli incantesimi completo','Diadema dell\'Intelletto','Pozione di Guarigione Suprema','Gioiello rarissimo (2d6×100 mo)'],'Leggendario':['Pergamena incantesimo 6-9° lv.','Anello di Resistenza agli Incantesimi','Mantello dell\'Invisibilità','Libro degli incantesimi leggendario','Corona antica','Amuleto della Salute superiore','Sfera di Cristallo','Reliquia sacra perduta'] },
+    'demons':             { 'Comune':['Frammento osso demoniaco','Sangue dem. cristallizzato','Simbolo dell\'Abisso corrotto','Dente o artiglio demoniaco','Monete abissali','Amuleto corrotto','Frammento armatura inutilizzabile','Pietra abissale grezza'],'Non Comune':['Arma corrotta +0 (conta come magica)','Sangue dem. concentrato (veleno)','Pergamena incantesimo 1° lv. (oscuro)','Simbolo abissale funzionale','Gemme corrotte 1d4','Pozione di Guarigione (vittima)','Frammento pietra abissale rara','Amuleto della Resistenza minore'],'Raro':['Arma demoniaca +1 (maledetta)','Armatura demoniaca +1 (maledetta)','Pergamena incantesimo 2-3° lv.','Gemme abissali rare 1d4','Anello di Resistenza al Fuoco','Pozione di Resistenza','Amuleto della Salute corrotto','Scudo demoniaco +1'],'Epico':['Arma demoniaca +2','Armatura demoniaca +1 (pesante)','Pergamena incantesimo 4-5° lv.','Anello di Resistenza agli Elementi','Mantello di Spostamento corrotto','Gemme abissali leggendarie 1d4','Amuleto degli Scudi demoniaco','Scudo demoniaco +2'],'Leggendario':['Arma demoniaca +3 (fortemente maledetta)','Armatura demoniaca +2','Pergamena incantesimo 6-9° lv.','Anello di Resistenza agli Incantesimi','Mantello dell\'Invisibilità corrotto','Reliquia abissale','Sfera di Cristallo corrotta','Corona demoniaca'] },
+    'devils':             { 'Comune':['Contratto infernale vuoto','Monete infernali nere','Simbolo delle Nove Inferno','Gemma rossa grezza','Sigillo di un Arcidiavolo','Penna di scrittura infernale','Frammento armatura infernale','Pietra infernale levigata'],'Non Comune':['Contratto infernale parziale','Arma infernale +0','Pergamena incantesimo 1° lv.','Gemme rosse 1d4','Simbolo infernale funzionale','Pozione di Resistenza al Fuoco','Amuleto infernale minore','Sigillo di convocazione'],'Raro':['Arma infernale +1','Armatura infernale +1','Pergamena incantesimo 2-3° lv.','Contratto con clausola attiva','Anello di Resistenza al Fuoco','Gemme preziose infernali 1d4','Amuleto della Salute infernale','Scudo infernale +1'],'Epico':['Arma infernale +2','Armatura infernale +1 (pesante)','Pergamena incantesimo 4-5° lv.','Contratto con potere attivo','Anello di Resistenza agli Elementi','Mantello di Spostamento infernale','Diadema dell\'Intelletto infernale','Scudo infernale +2'],'Leggendario':['Arma infernale +3','Armatura infernale +2','Pergamena incantesimo 6-9° lv.','Contratto leggendario','Anello di Resistenza agli Incantesimi','Mantello dell\'Invisibilità infernale','Corona infernale','Reliquia delle Nove Inferno'] },
+    'dragons':            { 'Comune':['4d6 mo','Gemme grezze 1d6','Gioiello antico semplice','Arma mundana di qualità','Monete di civiltà scomparse','Scultura preziosa piccola (2d6×10 mo)','Armatura mundana di qualità','Pergamena incantesimo 1° lv.'],'Non Comune':['4d10 mo + 1d6 gemme','Gemme semipreziose 1d6','Gioiello antico elaborato (2d6×50 mo)','Spada lunga di qualità superiore','Pozione di Guarigione Superiore (1d4 fiale)','Pergamena incantesimo 2-3° lv.','Scultura preziosa rara','Armatura a maglie di qualità superiore'],'Raro':['4d10×10 mo + gemme preziose','Spada lunga +1 (antica)','Armatura a maglie +1 (antica)','Pozione di Guarigione Suprema (1d4 fiale)','Pergamena incantesimo 3-4° lv.','Anello di Protezione','Gemme rare 1d6','Opera d\'arte rarissima'],'Epico':['4d10×100 mo + gemme leggendarie','Spada lunga +2 (con nome)','Armatura a piastre +1 (antica)','Mantello di Spostamento','Pergamena incantesimo 5-6° lv.','Anello di Resistenza agli Incantesimi','Sfera di Cristallo','Opera d\'arte leggendaria'],'Leggendario':['4d10×1000 mo + gemme rarissime','Spada lunga +3 (leggendaria)','Armatura a piastre +2 (leggendaria)','Mantello dell\'Invisibilità','Pergamena incantesimo 7-9° lv.','Bastone dei Maghi','Anello dei Tre Desideri','Reliquia draconiana unica'] },
+    'constructs':         { 'Comune':['Ingranaggi e viti metalliche','Frammento pietra incisa','Monete del creatore 1d6','Strumenti da fabbro semplici','Simbolo del creatore inciso','Frammento armatura metallica','Pietra grezza non incantata','Documento tecnico illeggibile'],'Non Comune':['Nucleo energetico minore','Monete del creatore 2d10','Pergamena incantesimo 1° lv.','Strumenti da fabbro di qualità','Gemme grezze 1d4','Documento tecnico leggibile','Pozione di Guarigione','Amuleto del creatore'],'Raro':['Nucleo energetico (focus arcano)','Pergamena incantesimo 2-3° lv.','Gemme preziose 1d4','Anello di Protezione','Pozione di Guarigione Superiore','Documento tecnico raro','Armatura di cuoio +1','Amuleto della Salute'],'Epico':['Nucleo energetico superiore','Pergamena incantesimo 4-5° lv.','Gemme rare 1d4','Anello di Resistenza agli Incantesimi','Mantello di Spostamento','Documento tecnico leggendario','Diadema dell\'Intelletto','Armatura a maglie +1'],'Leggendario':['Nucleo energetico leggendario','Pergamena incantesimo 6-9° lv.','Gemme leggendarie 1d4','Anello dei Tre Desideri','Mantello dell\'Invisibilità','Bastone dei Maghi','Sfera di Cristallo superiore','Tomo della Comprensione'] },
+    'aberrations':        { 'Comune':['Frammento chitinoso','Monete vittima 1d6','Occhio cristallizzato','Simbolo psionico inciso','Amuleto vittima','Pietra extraplanare grezza','Documento illeggibile','Gemma grezza opaca'],'Non Comune':['Monete 2d10','Cristallo psionico minore','Pergamena incantesimo 1° lv.','Gemme grezze 1d4','Amuleto della Salute (vittima)','Documento parziale leggibile','Pozione di Guarigione','Pietra extraplanare rara'],'Raro':['Cristallo psionico','Pergamena incantesimo 2-3° lv.','Gemme preziose 1d4','Anello di Protezione','Elmo della Telepatia','Pozione di Guarigione Superiore','Medaglione dei Pensieri','Documento raro'],'Epico':['Cristallo psionico superiore','Pergamena incantesimo 4-5° lv.','Diadema dell\'Intelletto','Gemme rare 1d4','Anello della Mente','Mantello di Spostamento','Sfera di Cristallo','Elmo della Brillanza'],'Leggendario':['Cristallo psionico leggendario','Pergamena incantesimo 6-9° lv.','Anello di Resistenza agli Incantesimi','Mantello dell\'Invisibilità','Sfera di Cristallo superiore','Tomo della Comprensione','Reliquia extraplanare unica','Corona psionica'] },
+    'fey-benevolent':     { 'Comune':['Fiori magici appassiti','Bacche selvatiche','Monete fatate','Piuma colorata rara','Pietra levigata con runa','Filo d\'oro fatato','Gemma grezza luminosa','Foglia perennemente verde'],'Non Comune':['Pozione di Guarigione fatata','Pergamena incantesimo 1° lv. (natura)','Gemme luminose 1d4','Polvere fatata','Amuleto della natura','Monete d\'oro fatate 2d10','Fiala di rugiada (Guarigione Superiore)','Simbolo druidico funzionale'],'Raro':['Pergamena incantesimo 2-3° lv. (natura)','Mantello dell\'Elfo','Stivali di Elven Kind','Pozione di Guarigione Superiore fatata','Gemme rare luminose 1d4','Anello di Protezione fatato','Bacchetta fatata','Amuleto della Salute fatato'],'Epico':['Pergamena incantesimo 4-5° lv.','Mantello di Spostamento fatato','Stivali della Velocità fatati','Anello dell\'Evasione','Gemme leggendarie luminose 1d4','Bacchetta delle Meraviglie','Diadema dell\'Intelletto fatato','Arpa delle Fate'],'Leggendario':['Pergamena incantesimo 6-9° lv.','Mantello dell\'Invisibilità fatato','Anello dei Tre Desideri fatato','Reliquia fatata unica','Corona delle Fate','Bacchetta leggendaria','Tomo della Comprensione fatato','Sfera di Cristallo fatata'] },
+    'fey-malevolent':     { 'Comune':['Osso inciso con maledizione','Monete fatate corrotte','Erbe velenose essiccate','Occhio di vetro inquietante','Dente di creatura sconosciuta','Filo nero intrecciato con capelli','Gemma grezza opaca','Simbolo maledetto'],'Non Comune':['Pozione di veleno','Pergamena incantesimo 1° lv. (oscuro)','Gemme corrotte 1d4','Ingredienti per rituale','Amuleto maledetto minore','Monete d\'oro corrotte 2d10','Libro di ricette oscure','Simbolo fatato corrotto funzionale'],'Raro':['Pergamena incantesimo 2-3° lv. (oscuro)','Pozione di Guarigione Superiore (rubata)','Gemme preziose corrotte 1d4','Anello di Protezione maledetto','Mantello dell\'Elfo corrotto','Bacchetta corrotta','Libro degli incantesimi oscuro parziale','Amuleto della Salute corrotto'],'Epico':['Pergamena incantesimo 4-5° lv.','Mantello di Spostamento corrotto','Gemme rare corrotte 1d4','Anello dell\'Evasione corrotto','Libro degli incantesimi oscuro completo','Diadema dell\'Intelletto corrotto','Bacchetta delle Meraviglie corrotta','Reliquia fatata oscura'],'Leggendario':['Pergamena incantesimo 6-9° lv.','Mantello dell\'Invisibilità corrotto','Anello dei Tre Desideri corrotto (maledetto)','Corona delle Fate Oscure','Reliquia maledetta leggendaria','Sfera di Cristallo oscura','Tomo della Comprensione oscuro','Bacchetta leggendaria corrotta'] },
+    'giants':             { 'Comune':['4d6 mo','Gemme grezze 1d4 (ciondoli)','Arma taglia enorme inutilizzabile','Oggetto mundano schiacciato','Osso enorme intagliato','Pelle animale grezza','Monete antiche schiacciate 1d10','Pietra decorativa'],'Non Comune':['2d10×10 mo','Gemme semipreziose 1d4','Arma taglia normale (rubata)','Pozione di Guarigione (rubata)','Gioiello rozzo (2d6×50 mo)','Pergamena incantesimo 1° lv. (rubata)','Scultura rozza (2d6×100 mo)','Armatura taglia normale (rubata)'],'Raro':['2d10×100 mo','Gemme preziose 1d4','Spada lunga +1 (rubata)','Armatura a maglie +1 (rubata)','Pozione di Guarigione Superiore','Pergamena incantesimo 2-3° lv.','Gioiello antico (2d6×250 mo)','Anello di Protezione (rubato)'],'Epico':['2d10×500 mo + gemme rare','Spada lunga +2 (rubata)','Armatura a piastre +1 (rubata)','Mantello di Spostamento (rubato)','Pergamena incantesimo 4-5° lv.','Anello di Resistenza agli Incantesimi','Opera d\'arte leggendaria','Scudo +2 (rubato)'],'Leggendario':['2d10×1000 mo + gemme leggendarie','Spada lunga +3 (leggendaria)','Armatura a piastre +2 (leggendaria)','Mantello dell\'Invisibilità','Pergamena incantesimo 6-9° lv.','Bastone dei Maghi (rubato)','Anello dei Tre Desideri','Reliquia dei giganti'] },
+    'oozes':              { 'Comune':['Monete corrose 1d6','Gemma grezza resistente agli acidi','Frammento metallico inutilizzabile','Anello semplice corroso','Amuleto parzialmente dissolto','Pietra resistente agli acidi','Monete d\'oro 1d10 resistenti','Dente o osso resistente'],'Non Comune':['Monete 2d10 resistenti','Gemme semipreziose 1d4 (insolubili)','Anello d\'argento integro (vittima)','Amuleto integro (vittima)','Pergamena magica resistente 1° lv.','Gemme luminose resistenti 1d4','Pozione di Guarigione integra (vittima)','Gioiello resistente (2d6×10 mo)'],'Raro':['Gemme preziose resistenti 1d4','Anello di Protezione (vittima)','Amuleto della Salute (vittima)','Pergamena incantesimo 2-3° lv.','Pozione di Guarigione Superiore integra','Medaglione dei Pensieri (vittima)','Gioiello raro resistente (2d6×100 mo)','Anello di Resistenza agli Elementi'],'Epico':['Gemme rare resistenti 1d4','Anello dell\'Evasione','Pergamena incantesimo 4-5° lv.','Anello di Resistenza agli Incantesimi','Sfera di Cristallo integra (vittima)','Diadema dell\'Intelletto (vittima)','Gioiello leggendario resistente','Reliquia resistente (effetto DM)'] },
+    'plants':             { 'Comune':['Bacche velenose','Monete 1d6 (vittima)','Radice rara','Gemma grezza intrappolata','Seme magico dormiente','Anello semplice (vittima)','Frammento di legno duro','Amuleto intrappolato (vittima)'],'Non Comune':['Monete 2d10 (vittima)','Gemme grezze 1d4','Pergamena incantesimo 1° lv. (vittima)','Pozione di Guarigione (vittima)','Anello d\'argento (vittima)','Amuleto della natura funzionale','Seme magico attivo (effetto DM)','Gioiello intrappolato (2d6×10 mo)'],'Raro':['Gemme preziose 1d4','Pergamena incantesimo 2-3° lv.','Anello di Protezione (vittima)','Pozione di Guarigione Superiore','Amuleto della Salute (vittima)','Bastone druidico +1','Gioiello raro (2d6×100 mo)','Seme leggendario (effetto narrativo)'],'Epico':['Gemme rare 1d4','Pergamena incantesimo 4-5° lv.','Bastone druidico +2','Anello della natura (effetto DM)','Mantello dell\'Elfo superiore','Diadema vegetale (effetto DM)','Reliquia naturale unica','Seme leggendario potenziato'] },
+    'elemental-fire':     { 'Comune':['Cenere magica','Pietra vulcanica rara','Monete fuse e deformate','Cristallo di fuoco grezzo','Frammento di ossidiana','Gemma grezza annerita','Simbolo elementale del fuoco','Carbone magico'],'Non Comune':['Cristallo di fuoco (focus arcano)','Gemme grezze resistenti al fuoco 1d4','Pergamena incantesimo 1° lv. (fuoco)','Pozione di Resistenza al Fuoco','Pietra vulcanica lavorata (2d6×10 mo)','Amuleto resistenza fuoco minore','Monete d\'oro fuse recuperabili 2d10','Simbolo elementale funzionale'],'Raro':['Cristallo di fuoco superiore','Pergamena incantesimo 2-3° lv. (fuoco)','Anello di Resistenza al Fuoco','Gemme preziose resistenti al fuoco 1d4','Pozione di Resistenza al Fuoco superiore','Armatura +1 resistente al fuoco','Pietra del fuoco elementale (effetto DM)','Amuleto resistenza al fuoco'],'Epico':['Cristallo di fuoco leggendario','Pergamena incantesimo 4-5° lv.','Anello di Immunità al Fuoco','Armatura +2 resistente al fuoco','Mantello resistenza al fuoco','Gemme rare elementali 1d4','Spada Fiammeggiante +2','Reliquia elementale del fuoco'],'Leggendario':['Cuore elementale del fuoco','Pergamena incantesimo 6-9° lv.','Spada Fiammeggiante +3','Armatura +2 con immunità al fuoco','Anello dei Tre Desideri elementale','Mantello dell\'Invisibilità elementale','Bastone del fuoco leggendario','Reliquia elementale leggendaria'] },
+    'elemental-water':    { 'Comune':['Perla grezza','Conchiglia rara','Pietra levigata dall\'acqua','Cristallo d\'acqua grezzo','Alghe magiche essiccate','Gemma grezza bagnata','Simbolo elementale dell\'acqua','Sale marino cristallizzato'],'Non Comune':['Cristallo d\'acqua (focus arcano)','Perle semipreziose 1d4','Pergamena incantesimo 1° lv. (acqua)','Pozione di Respirazione Acquatica','Pietra marina lavorata (2d6×10 mo)','Amuleto resistenza freddo minore','Monete recuperate dal fondale 2d10','Simbolo elementale funzionale'],'Raro':['Cristallo d\'acqua superiore','Pergamena incantesimo 2-3° lv.','Anello di Resistenza al Freddo','Perle preziose 1d4','Pozione Respirazione Acquatica superiore','Stivali del camminatore sulle acque','Amuleto della resistenza al freddo','Tridente +1 elementale'],'Epico':['Cristallo d\'acqua leggendario','Pergamena incantesimo 4-5° lv.','Anello di Immunità al Freddo','Perle rare 1d4','Mantello resistenza al freddo','Tridente +2 elementale','Stivali del camminatore sulle acque sup.','Reliquia elementale dell\'acqua'],'Leggendario':['Cuore elementale dell\'acqua','Pergamena incantesimo 6-9° lv.','Tridente +3 elementale','Anello dei Tre Desideri elementale','Mantello dell\'Invisibilità elementale','Bastone dell\'acqua leggendario','Perle leggendarie 1d4','Reliquia elementale leggendaria'] },
+    'elemental-earth':    { 'Comune':['Pietra rara non lavorata','Cristallo di terra grezzo','Gemma grezza estratta','Minerale raro grezzo','Frammento di roccia magica','Polvere di pietra magica','Simbolo elementale della terra','Cristallo di quarzo grezzo'],'Non Comune':['Cristallo di terra (focus arcano)','Gemme grezze 1d4','Pergamena incantesimo 1° lv. (terra)','Minerale raro lavorato (2d6×10 mo)','Pozione di Resistenza agli Acidi','Amuleto resistenza acidi minore','Monete estratte dalla roccia 2d10','Simbolo elementale funzionale'],'Raro':['Cristallo di terra superiore','Pergamena incantesimo 2-3° lv.','Anello di Resistenza agli Acidi','Gemme preziose 1d4','Armatura di pietra +1','Amuleto della resistenza alla pietra','Minerale leggendario grezzo','Scudo di pietra +1 elementale'],'Epico':['Cristallo di terra leggendario','Pergamena incantesimo 4-5° lv.','Anello di Immunità agli Acidi','Gemme rare 1d4','Armatura di pietra +2','Scudo di pietra +2 elementale','Minerale rarissimo (2d6×500 mo)','Reliquia elementale della terra'],'Leggendario':['Cuore elementale della terra','Pergamena incantesimo 6-9° lv.','Armatura di pietra +3 leggendaria','Anello dei Tre Desideri elementale','Mantello dell\'Invisibilità elementale','Bastone della terra leggendario','Gemme leggendarie 1d4','Reliquia elementale leggendaria'] },
+    'elemental-air':      { 'Comune':['Piuma rara','Cristallo d\'aria grezzo','Polvere di vento cristallizzata','Gemma grezza trasparente','Frammento di nuvola solidificata','Simbolo elementale dell\'aria','Pietra levigata dal vento','Piuma magica'],'Non Comune':['Cristallo d\'aria (focus arcano)','Gemme grezze trasparenti 1d4','Pergamena incantesimo 1° lv. (aria)','Pozione di Volare minore (effetto DM)','Piume rare preziose (2d6×10 mo)','Amuleto della caduta lenta','Monete portate dal vento 2d10','Simbolo elementale funzionale'],'Raro':['Cristallo d\'aria superiore','Pergamena incantesimo 2-3° lv.','Anello di Caduta Lenta','Gemme trasparenti preziose 1d4','Stivali del vento (effetto DM)','Mantello della resistenza al fulmine','Piume leggendarie (2d6×100 mo)','Arco del vento +1'],'Epico':['Cristallo d\'aria leggendario','Pergamena incantesimo 4-5° lv.','Anello di Immunità al Fulmine','Stivali del vento superiori','Mantello dell\'Invisibilità elementale','Arco del vento +2','Gemme trasparenti rare 1d4','Reliquia elementale dell\'aria'],'Leggendario':['Cuore elementale dell\'aria','Pergamena incantesimo 6-9° lv.','Arco del vento +3','Anello dei Tre Desideri elementale','Mantello dell\'Invisibilità elementale sup.','Bastone dell\'aria leggendario','Gemme trasparenti leggendarie 1d4','Reliquia elementale leggendaria'] },
+    'celestials':         { 'Comune':['Piuma celestiale','Simbolo sacro semplice','Monete d\'oro benedette 1d6','Cristallo di luce grezzo','Pergamena di preghiera','Gemma grezza luminosa','Amuleto sacro semplice','Pietra benedetta'],'Non Comune':['Simbolo sacro funzionale','Pozione di Guarigione benedetta','Pergamena incantesimo 1° lv. (divino)','Gemme luminose 1d4','Monete d\'oro benedette 2d10','Amuleto della protezione sacra minore','Piume celestiali preziose (2d6×10 mo)','Cristallo di luce (focus divino)'],'Raro':['Pergamena incantesimo 2-3° lv. (divino)','Simbolo sacro +1','Armatura benedetta +1','Pozione di Guarigione Superiore benedetta','Anello di Protezione sacra','Gemme celestiali rare 1d4','Amuleto della Salute benedetto','Scudo sacro +1'],'Epico':['Pergamena incantesimo 4-5° lv. (divino)','Armatura benedetta +2','Spada sacra +2','Anello di Resistenza agli Incantesimi sacro','Mantello di Spostamento benedetto','Gemme celestiali 1d4','Diadema della saggezza celestiale','Scudo sacro +2'],'Leggendario':['Pergamena incantesimo 6-9° lv. (divino)','Armatura celestiale +3','Spada sacra +3','Anello dei Tre Desideri benedetto','Mantello dell\'Invisibilità benedetto','Bastone della saggezza divina','Reliquia celestiale unica','Corona celestiale'] },
   };
 
-  // Tabelle loot complete (estratte da loot-rng-system)
-  const LOOT_TABLES = {
-    'humanoid-warrior': {
-      'Comune':      ['2d6 monete d\'oro','Spada corta usurata','Scudo di legno scheggiato','Pozione di Guarigione','Torcia e acciarino','Razioni da viaggio (1d4 giorni)','Armatura di cuoio rattoppata','Fiala di veleno comune'],
-      'Non Comune':  ['Spada lunga ben mantenuta','Cotta di maglia','Pozione di Guarigione Superiore','2d10 mo + 1d6 gemme grezze','Arco lungo con faretra (20 frecce)','Armatura di cuoio borchiato','Pergamena incantesimo 1° livello','Mantello della Protezione'],
-      'Raro':        ['Spada lunga +1','Armatura a maglie +1','Scudo +1','Pozione di Guarigione Suprema','Stivali di Elven Kind','Guanti dell\'Ogre','Pergamena incantesimo 3° livello','Cintura della forza del gigante (minore)'],
-      'Epico':       ['Spada lunga +2','Armatura a piastre +1','Scudo +2','Mantello di Spostamento','Anello di Protezione','Elmo della Telepatia','Stivali della Velocità','Guanti di Destrezza'],
-      'Leggendario': ['Spada lunga +3','Armatura a piastre +2','Spada Vorpal','Scudo +3','Mantello dell\'Invisibilità','Anello di Resistenza agli Incantesimi','Armatura Invulnerabile','Cintura della forza del gigante (superiore)'],
-    },
-    'humanoid-caster': {
-      'Comune':      ['2d6 monete d\'oro','Componenti materiali varie','Libro di appunti arcani','Candele e incenso rituale','Pozione di Guarigione','Bastone da passeggio nodoso','Amuleto simbolico','Razioni ed erbe essiccate'],
-      'Non Comune':  ['Pergamena incantesimo 1° livello','Focus arcano di cristallo','Pozione di Chiaroveggenza','2d10 mo + simbolo cultista','Libro degli incantesimi (1d4 di 1° liv.)','Bacchetta con 1d4 cariche','Pozione di Guarigione Superiore','Mantello della Protezione'],
-      'Raro':        ['Libro degli incantesimi (1d4 di 2-3° liv.)','Bacchetta dei Dardi Magici','Pergamena incantesimo 3° livello','Sfera di cristallo (minore)','Collana di Palle di Fuoco','Anello di Contenimento degli Incantesimi','Cappello dell\'Intelletto','Mantello dell\'Elfo'],
-      'Epico':       ['Libro degli incantesimi (1d4 di 4-5° liv.)','Bacchetta dei Raggi di Gelo','Pergamena incantesimo 5° livello','Sfera di Cristallo','Anello della Mente','Diadema dell\'Intelletto','Mantello del Mago','Bacchetta di Paralisi'],
-      'Leggendario': ['Libro degli incantesimi (1d4 di 6-9° liv.)','Bastone dei Maghi','Sfera di Cristallo superiore','Anello di Resistenza agli Incantesimi','Mantello dell\'Invisibilità','Amuleto della Salute','Bacchetta delle Meraviglie','Tomo della Comprensione'],
-    },
-    'humanoid-rogue': {
-      'Comune':      ['2d6 monete d\'oro','Pugnale affilato','Corda di canapa (15 m)','Kit da scasso','Faretra con 1d10 frecce','Mantello scuro consumato','Razioni da viaggio (1d4 giorni)','Trappola da caccia'],
-      'Non Comune':  ['Arco corto ben mantenuto','Due pugnali bilanciati','Mantello dell\'Elfo','Kit da scasso di qualità','Pozione di Guarigione Superiore','2d10 mo + mappa parziale','Stivali silenziosi','Veleno da contatto (1d4 dosi)'],
-      'Raro':        ['Arco lungo +1','Pugnale +1','Stivali di Elven Kind','Mantello dell\'Elfo (magico)','Guanti del Ladro','Pozione di Invisibilità','Frecce di Ricerca (1d6)','Anello del Salto'],
-      'Epico':       ['Arco lungo +2','Pugnale +2','Mantello di Spostamento','Stivali della Velocità','Anello dell\'Evasione','Occhiali della Notte','Scimitarra della Velocità','Bracciali della Difesa'],
-      'Leggendario': ['Arco lungo +3','Pugnale +3','Mantello dell\'Invisibilità','Anello dell\'Invisibilità','Stivali dei Piani','Guanti di Destrezza','Scimitarra della Velocità +3','Anello di Resistenza agli Incantesimi'],
-    },
-    'beasts': {
-      'Comune':      ['Dente o artiglio (ricordo)','Collare bestia addestrata','Borsa marcia 1d6 mo (vittima prec.)','Anello semplice (vittima prec.)','Pugnale arrugginito (vittima prec.)','Amuleto spezzato (vittima prec.)','Monete sparse 1d10 (vittima prec.)','Gemma grezza (vittima prec.)'],
-      'Non Comune':  ['Borsa 2d10 mo (vittima prec.)','Anello d\'argento semplice','Pozione di Guarigione integra','Amuleto semplice (vittima prec.)','Mappa parziale (vittima prec.)','Pergamena incantesimo 1° livello','Gemme semipreziose 1d4','Sigillo nobiliare (vittima prec.)'],
-      'Raro':        ['Borsa 2d6 mo e gemme','Anello di Protezione (vittima prec.)','Amuleto della Salute','Pozione di Guarigione Superiore','Pergamena incantesimo 2-3° livello','Gemme preziose 1d4','Collana magica minore','Medaglione dei Pensieri'],
-      'Epico':       ['Anello dell\'Evasione','Anello della Mente','Pozione di Guarigione Suprema','Pergamena incantesimo 4-5° livello','Gemme rare 1d4','Amuleto degli Scudi','Anello di Resistenza','Collana di Adattamento'],
-    },
-    'undead-physical': {
-      'Comune':      ['1d6 mo arrugginite','Osso inciso con rune','Armatura di cuoio marcita','Spada corta scheggiata','Amuleto funerario semplice','Bende con unguenti','Simbolo religioso corrotto','Anello funerario semplice'],
-      'Non Comune':  ['2d10 mo antiche','Spada lunga ben conservata','Armatura a maglie funzionale','Pozione di Guarigione','Amuleto oscuro','Pergamena incantesimo 1° livello (oscuro)','Gemme funebri 1d4','Simbolo sacro profanato'],
-      'Raro':        ['Spada lunga +1 (antica)','Armatura a maglie +1 (antica)','Amuleto della Salute','Pozione di Guarigione Superiore','Pergamena incantesimo 2-3° livello','Anello di Protezione','Scudo +1 (antico)','Simbolo sacro animato'],
-      'Epico':       ['Spada lunga +2 (con iscrizioni)','Armatura a piastre +1 (antica)','Mantello di Spostamento','Anello dell\'Evasione','Pergamena incantesimo 4-5° livello','Scudo +2 (antico)','Elmo della Telepatia','Amuleto degli Scudi'],
-      'Leggendario': ['Spada lunga +3 (con nome)','Armatura a piastre +2','Falce della Morte','Anello di Resistenza agli Incantesimi','Mantello dell\'Invisibilità','Pergamena incantesimo 6-9° livello','Corona del non morto','Amuleto della Salute superiore'],
-    },
-    'undead-incorporeal': {
-      'Comune':      ['Monete antiche sparse 1d10','Candele votive consumate','Libro di preghiere corrotto','Gemma grezza opaca','Lettera sbiadita illeggibile','Simbolo religioso abbandonato','Gioiello spezzato','Frammento di lapide'],
-      'Non Comune':  ['2d10 mo antiche','Diario con indizi narrativi','Gemme funebri 1d4','Pergamena incantesimo 1° livello','Gioiello antico integro','Simbolo sacro profanato funzionale','Pozione di Guarigione','Lettera con segreto narrativo'],
-      'Raro':        ['Gemme preziose 1d4','Pergamena incantesimo 2-3° livello','Anello di Protezione','Amuleto della Salute','Pozione di Guarigione Superiore','Libro degli incantesimi parziale','Gioiello antico (2d6×10 mo)','Medaglione dei Pensieri'],
-      'Epico':       ['Pergamena incantesimo 4-5° livello','Anello dell\'Evasione','Mantello di Spostamento','Gemme rare 1d4','Libro degli incantesimi completo','Diadema dell\'Intelletto','Pozione di Guarigione Suprema','Gioiello rarissimo (2d6×100 mo)'],
-      'Leggendario': ['Pergamena incantesimo 6-9° livello','Anello di Resistenza agli Incantesimi','Mantello dell\'Invisibilità','Libro degli incantesimi leggendario','Corona antica','Amuleto della Salute superiore','Sfera di Cristallo','Reliquia sacra perduta'],
-    },
-    'demons': {
-      'Comune':      ['Frammento osso demoniaco','Sangue dem. cristallizzato','Simbolo dell\'Abisso corrotto','Dente o artiglio demoniaco','Monete abissali','Amuleto corrotto','Frammento armatura inutilizzabile','Pietra abissale grezza'],
-      'Non Comune':  ['Arma corrotta +0 (conta come magica)','Sangue dem. concentrato (veleno)','Pergamena incantesimo 1° livello (oscuro)','Simbolo abissale funzionale','Gemme corrotte 1d4','Pozione di Guarigione (vittima prec.)','Frammento pietra abissale rara','Amuleto della Resistenza minore'],
-      'Raro':        ['Arma demoniaca +1 (maledetta)','Armatura demoniaca +1 (maledetta)','Pergamena incantesimo 2-3° livello','Gemme abissali rare 1d4','Anello di Resistenza al Fuoco','Pozione di Resistenza','Amuleto della Salute corrotto','Scudo demoniaco +1'],
-      'Epico':       ['Arma demoniaca +2','Armatura demoniaca +1 (pesante)','Pergamena incantesimo 4-5° livello','Anello di Resistenza agli Elementi','Mantello di Spostamento corrotto','Gemme abissali leggendarie 1d4','Amuleto degli Scudi demoniaco','Scudo demoniaco +2'],
-      'Leggendario': ['Arma demoniaca +3 (fortemente maledetta)','Armatura demoniaca +2','Pergamena incantesimo 6-9° livello','Anello di Resistenza agli Incantesimi','Mantello dell\'Invisibilità corrotto','Reliquia abissale','Sfera di Cristallo corrotta','Corona demoniaca'],
-    },
-    'devils': {
-      'Comune':      ['Contratto infernale vuoto','Monete infernali nere','Simbolo delle Nove Inferno','Gemma rossa grezza','Sigillo di un Arcidiavolo','Penna di scrittura infernale','Frammento armatura infernale','Pietra infernale levigata'],
-      'Non Comune':  ['Contratto infernale parziale','Arma infernale +0','Pergamena incantesimo 1° livello','Gemme rosse 1d4','Simbolo infernale funzionale','Pozione di Resistenza al Fuoco','Amuleto infernale minore','Sigillo di convocazione'],
-      'Raro':        ['Arma infernale +1','Armatura infernale +1','Pergamena incantesimo 2-3° livello','Contratto con clausola attiva','Anello di Resistenza al Fuoco','Gemme preziose infernali 1d4','Amuleto della Salute infernale','Scudo infernale +1'],
-      'Epico':       ['Arma infernale +2','Armatura infernale +1 (pesante)','Pergamena incantesimo 4-5° livello','Contratto con potere attivo','Anello di Resistenza agli Elementi','Mantello di Spostamento infernale','Diadema dell\'Intelletto infernale','Scudo infernale +2'],
-      'Leggendario': ['Arma infernale +3','Armatura infernale +2','Pergamena incantesimo 6-9° livello','Contratto leggendario','Anello di Resistenza agli Incantesimi','Mantello dell\'Invisibilità infernale','Corona infernale','Reliquia delle Nove Inferno'],
-    },
-    'dragons': {
-      'Comune':      ['4d6 mo','Gemme grezze 1d6','Gioiello antico semplice','Arma mundana di qualità','Monete di civiltà scomparse','Scultura preziosa piccola (2d6×10 mo)','Armatura mundana di qualità','Pergamena incantesimo 1° livello'],
-      'Non Comune':  ['4d10 mo + 1d6 gemme','Gemme semipreziose 1d6','Gioiello antico elaborato (2d6×50 mo)','Spada lunga di qualità superiore','Pozione di Guarigione Superiore (1d4 fiale)','Pergamena incantesimo 2-3° livello','Scultura preziosa rara','Armatura a maglie di qualità superiore'],
-      'Raro':        ['4d10×10 mo + gemme preziose','Spada lunga +1 (antica)','Armatura a maglie +1 (antica)','Pozione di Guarigione Suprema (1d4 fiale)','Pergamena incantesimo 3-4° livello','Anello di Protezione','Gemme rare 1d6','Opera d\'arte rarissima'],
-      'Epico':       ['4d10×100 mo + gemme leggendarie','Spada lunga +2 (con nome)','Armatura a piastre +1 (antica)','Mantello di Spostamento','Pergamena incantesimo 5-6° livello','Anello di Resistenza agli Incantesimi','Sfera di Cristallo','Opera d\'arte leggendaria'],
-      'Leggendario': ['4d10×1000 mo + gemme rarissime','Spada lunga +3 (leggendaria)','Armatura a piastre +2 (leggendaria)','Mantello dell\'Invisibilità','Pergamena incantesimo 7-9° livello','Bastone dei Maghi','Anello dei Tre Desideri','Reliquia draconiana unica'],
-    },
-    'constructs': {
-      'Comune':      ['Ingranaggi e viti metalliche','Frammento pietra incisa','Monete del creatore 1d6','Strumenti da fabbro semplici','Simbolo del creatore inciso','Frammento armatura metallica','Pietra grezza non incantata','Documento tecnico illeggibile'],
-      'Non Comune':  ['Nucleo energetico minore','Monete del creatore 2d10','Pergamena incantesimo 1° livello','Strumenti da fabbro di qualità','Gemme grezze 1d4','Documento tecnico leggibile','Pozione di Guarigione','Amuleto del creatore'],
-      'Raro':        ['Nucleo energetico (focus arcano)','Pergamena incantesimo 2-3° livello','Gemme preziose 1d4','Anello di Protezione','Pozione di Guarigione Superiore','Documento tecnico raro','Armatura di cuoio +1','Amuleto della Salute'],
-      'Epico':       ['Nucleo energetico superiore','Pergamena incantesimo 4-5° livello','Gemme rare 1d4','Anello di Resistenza agli Incantesimi','Mantello di Spostamento','Documento tecnico leggendario','Diadema dell\'Intelletto','Armatura a maglie +1'],
-      'Leggendario': ['Nucleo energetico leggendario','Pergamena incantesimo 6-9° livello','Gemme leggendarie 1d4','Anello dei Tre Desideri','Mantello dell\'Invisibilità','Bastone dei Maghi','Sfera di Cristallo superiore','Tomo della Comprensione'],
-    },
-    'aberrations': {
-      'Comune':      ['Frammento chitinoso','Monete vittima prec. 1d6','Occhio cristallizzato','Simbolo psionico inciso','Amuleto vittima prec.','Pietra extraplanare grezza','Documento illeggibile','Gemma grezza opaca'],
-      'Non Comune':  ['Monete 2d10','Cristallo psionico minore','Pergamena incantesimo 1° livello','Gemme grezze 1d4','Amuleto della Salute (vittima prec.)','Documento parziale leggibile','Pozione di Guarigione','Pietra extraplanare rara'],
-      'Raro':        ['Cristallo psionico','Pergamena incantesimo 2-3° livello','Gemme preziose 1d4','Anello di Protezione','Elmo della Telepatia','Pozione di Guarigione Superiore','Medaglione dei Pensieri','Documento raro'],
-      'Epico':       ['Cristallo psionico superiore','Pergamena incantesimo 4-5° livello','Diadema dell\'Intelletto','Gemme rare 1d4','Anello della Mente','Mantello di Spostamento','Sfera di Cristallo','Elmo della Brillanza'],
-      'Leggendario': ['Cristallo psionico leggendario','Pergamena incantesimo 6-9° livello','Anello di Resistenza agli Incantesimi','Mantello dell\'Invisibilità','Sfera di Cristallo superiore','Tomo della Comprensione','Reliquia extraplanare unica','Corona psionica'],
-    },
-    'fey-benevolent': {
-      'Comune':      ['Fiori magici appassiti','Bacche selvatiche','Monete fatate','Piuma colorata rara','Pietra levigata con runa','Filo d\'oro fatato','Gemma grezza luminosa','Foglia perennemente verde'],
-      'Non Comune':  ['Pozione di Guarigione fatata','Pergamena incantesimo 1° livello (natura)','Gemme luminose 1d4','Polvere fatata','Amuleto della natura','Monete d\'oro fatate 2d10','Fiala di rugiada (Guarigione Superiore)','Simbolo druidico funzionale'],
-      'Raro':        ['Pergamena incantesimo 2-3° livello (natura)','Mantello dell\'Elfo','Stivali di Elven Kind','Pozione di Guarigione Superiore fatata','Gemme rare luminose 1d4','Anello di Protezione fatato','Bacchetta fatata','Amuleto della Salute fatato'],
-      'Epico':       ['Pergamena incantesimo 4-5° livello','Mantello di Spostamento fatato','Stivali della Velocità fatati','Anello dell\'Evasione','Gemme leggendarie luminose 1d4','Bacchetta delle Meraviglie','Diadema dell\'Intelletto fatato','Arpa delle Fate'],
-      'Leggendario': ['Pergamena incantesimo 6-9° livello','Mantello dell\'Invisibilità fatato','Anello dei Tre Desideri fatato','Reliquia fatata unica','Corona delle Fate','Bacchetta leggendaria','Tomo della Comprensione fatato','Sfera di Cristallo fatata'],
-    },
-    'fey-malevolent': {
-      'Comune':      ['Osso inciso con maledizione','Monete fatate corrotte','Erbe velenose essiccate','Occhio di vetro inquietante','Dente di creatura sconosciuta','Filo nero intrecciato con capelli','Gemma grezza opaca','Simbolo maledetto'],
-      'Non Comune':  ['Pozione di veleno','Pergamena incantesimo 1° livello (oscuro)','Gemme corrotte 1d4','Ingredienti per rituale','Amuleto maledetto minore','Monete d\'oro corrotte 2d10','Libro di ricette oscure','Simbolo fatato corrotto funzionale'],
-      'Raro':        ['Pergamena incantesimo 2-3° livello (oscuro)','Pozione di Guarigione Superiore (rubata)','Gemme preziose corrotte 1d4','Anello di Protezione maledetto','Mantello dell\'Elfo corrotto','Bacchetta corrotta','Libro degli incantesimi oscuro parziale','Amuleto della Salute corrotto'],
-      'Epico':       ['Pergamena incantesimo 4-5° livello','Mantello di Spostamento corrotto','Gemme rare corrotte 1d4','Anello dell\'Evasione corrotto','Libro degli incantesimi oscuro completo','Diadema dell\'Intelletto corrotto','Bacchetta delle Meraviglie corrotta','Reliquia fatata oscura'],
-      'Leggendario': ['Pergamena incantesimo 6-9° livello','Mantello dell\'Invisibilità corrotto','Anello dei Tre Desideri corrotto (maledetto)','Corona delle Fate Oscure','Reliquia maledetta leggendaria','Sfera di Cristallo oscura','Tomo della Comprensione oscuro','Bacchetta leggendaria corrotta'],
-    },
-    'giants': {
-      'Comune':      ['4d6 mo','Gemme grezze 1d4 (ciondoli)','Arma taglia enorme inutilizzabile','Oggetto mundano schiacciato','Osso enorme intagliato','Pelle animale grezza','Monete antiche schiacciate 1d10','Pietra decorativa'],
-      'Non Comune':  ['2d10×10 mo','Gemme semipreziose 1d4','Arma taglia normale (rubata)','Pozione di Guarigione (rubata)','Gioiello rozzo (2d6×50 mo)','Pergamena incantesimo 1° livello (rubata)','Scultura rozza (2d6×100 mo)','Armatura taglia normale (rubata)'],
-      'Raro':        ['2d10×100 mo','Gemme preziose 1d4','Spada lunga +1 (rubata)','Armatura a maglie +1 (rubata)','Pozione di Guarigione Superiore','Pergamena incantesimo 2-3° livello','Gioiello antico (2d6×250 mo)','Anello di Protezione (rubato)'],
-      'Epico':       ['2d10×500 mo + gemme rare','Spada lunga +2 (rubata)','Armatura a piastre +1 (rubata)','Mantello di Spostamento (rubato)','Pergamena incantesimo 4-5° livello','Anello di Resistenza agli Incantesimi','Opera d\'arte leggendaria','Scudo +2 (rubato)'],
-      'Leggendario': ['2d10×1000 mo + gemme leggendarie','Spada lunga +3 (leggendaria)','Armatura a piastre +2 (leggendaria)','Mantello dell\'Invisibilità','Pergamena incantesimo 6-9° livello','Bastone dei Maghi (rubato)','Anello dei Tre Desideri','Reliquia dei giganti'],
-    },
-    'oozes': {
-      'Comune':      ['Monete corrose 1d6','Gemma grezza resistente agli acidi','Frammento metallico inutilizzabile','Anello semplice corroso','Amuleto parzialmente dissolto','Pietra resistente agli acidi','Monete d\'oro 1d10 resistenti','Dente o osso resistente'],
-      'Non Comune':  ['Monete 2d10 resistenti','Gemme semipreziose 1d4 (insolubili)','Anello d\'argento integro','Amuleto integro','Pergamena magica resistente (1° livello)','Gemme luminose resistenti 1d4','Pozione integra (Guarigione)','Gioiello resistente (2d6×10 mo)'],
-      'Raro':        ['Gemme preziose resistenti 1d4','Anello di Protezione','Amuleto della Salute','Pergamena incantesimo 2-3° livello','Pozione di Guarigione Superiore integra','Medaglione dei Pensieri','Gioiello raro resistente (2d6×100 mo)','Anello di Resistenza agli Elementi'],
-      'Epico':       ['Gemme rare resistenti 1d4','Anello dell\'Evasione','Pergamena incantesimo 4-5° livello','Anello di Resistenza agli Incantesimi','Sfera di Cristallo integra','Diadema dell\'Intelletto','Gioiello leggendario resistente','Reliquia resistente'],
-    },
-    'plants': {
-      'Comune':      ['Bacche velenose','Monete 1d6 (vittima prec.)','Radice rara','Gemma grezza intrappolata','Seme magico dormiente','Anello semplice (vittima prec.)','Frammento di legno duro','Amuleto intrappolato'],
-      'Non Comune':  ['Monete 2d10','Gemme grezze 1d4','Pergamena incantesimo 1° livello','Pozione di Guarigione','Anello d\'argento','Amuleto della natura funzionale','Seme magico attivo','Gioiello intrappolato (2d6×10 mo)'],
-      'Raro':        ['Gemme preziose 1d4','Pergamena incantesimo 2-3° livello','Anello di Protezione','Pozione di Guarigione Superiore','Amuleto della Salute','Bastone druidico +1','Gioiello raro (2d6×100 mo)','Seme leggendario'],
-      'Epico':       ['Gemme rare 1d4','Pergamena incantesimo 4-5° livello','Bastone druidico +2','Anello della natura','Mantello dell\'Elfo superiore','Diadema vegetale','Reliquia naturale unica','Seme leggendario potenziato'],
-    },
-    'elemental-fire': {
-      'Comune':      ['Cenere magica','Pietra vulcanica rara','Monete fuse e deformate','Cristallo di fuoco grezzo','Frammento di ossidiana','Gemma grezza annerita','Simbolo elementale del fuoco','Carbone magico'],
-      'Non Comune':  ['Cristallo di fuoco (focus arcano)','Gemme grezze 1d4 (resistenti al fuoco)','Pergamena incantesimo 1° livello (fuoco)','Pozione di Resistenza al Fuoco','Pietra vulcanica lavorata (2d6×10 mo)','Amuleto resistenza fuoco minore','Monete d\'oro fuse recuperabili 2d10','Simbolo elementale funzionale'],
-      'Raro':        ['Cristallo di fuoco superiore','Pergamena incantesimo 2-3° livello (fuoco)','Anello di Resistenza al Fuoco','Gemme preziose resistenti al fuoco 1d4','Pozione di Resistenza al Fuoco superiore','Armatura +1 resistente al fuoco','Pietra del fuoco elementale','Amuleto resistenza al fuoco'],
-      'Epico':       ['Cristallo di fuoco leggendario','Pergamena incantesimo 4-5° livello','Anello di Immunità al Fuoco','Armatura +2 resistente al fuoco','Mantello di resistenza al fuoco','Gemme rare elementali 1d4','Spada Fiammeggiante +2','Reliquia elementale del fuoco'],
-      'Leggendario': ['Cuore elementale del fuoco','Pergamena incantesimo 6-9° livello','Spada Fiammeggiante +3','Armatura +2 con immunità al fuoco','Anello dei Tre Desideri elementale','Mantello dell\'Invisibilità elementale','Bastone del fuoco leggendario','Reliquia elementale leggendaria'],
-    },
-    'elemental-water': {
-      'Comune':      ['Perla grezza','Conchiglia rara','Pietra levigata dall\'acqua','Cristallo d\'acqua grezzo','Alghe magiche essiccate','Gemma grezza bagnata','Simbolo elementale dell\'acqua','Sale marino cristallizzato'],
-      'Non Comune':  ['Cristallo d\'acqua (focus arcano)','Perle semipreziose 1d4','Pergamena incantesimo 1° livello (acqua)','Pozione di Respirazione Acquatica','Pietra marina lavorata (2d6×10 mo)','Amuleto resistenza freddo minore','Monete recuperate dal fondale 2d10','Simbolo elementale funzionale'],
-      'Raro':        ['Cristallo d\'acqua superiore','Pergamena incantesimo 2-3° livello','Anello di Resistenza al Freddo','Perle preziose 1d4','Pozione Respirazione Acquatica superiore','Stivali del camminatore sulle acque','Amuleto della resistenza al freddo','Tridente +1 elementale'],
-      'Epico':       ['Cristallo d\'acqua leggendario','Pergamena incantesimo 4-5° livello','Anello di Immunità al Freddo','Perle rare 1d4','Mantello di resistenza al freddo','Tridente +2 elementale','Stivali del camminatore sulle acque sup.','Reliquia elementale dell\'acqua'],
-      'Leggendario': ['Cuore elementale dell\'acqua','Pergamena incantesimo 6-9° livello','Tridente +3 elementale','Anello dei Tre Desideri elementale','Mantello dell\'Invisibilità elementale','Bastone dell\'acqua leggendario','Perle leggendarie 1d4','Reliquia elementale leggendaria'],
-    },
-    'elemental-earth': {
-      'Comune':      ['Pietra rara non lavorata','Cristallo di terra grezzo','Gemma grezza estratta','Minerale raro grezzo','Frammento di roccia magica','Polvere di pietra magica','Simbolo elementale della terra','Cristallo di quarzo grezzo'],
-      'Non Comune':  ['Cristallo di terra (focus arcano)','Gemme grezze 1d4','Pergamena incantesimo 1° livello (terra)','Minerale raro lavorato (2d6×10 mo)','Pozione di Resistenza agli Acidi','Amuleto resistenza acidi minore','Monete estratte dalla roccia 2d10','Simbolo elementale funzionale'],
-      'Raro':        ['Cristallo di terra superiore','Pergamena incantesimo 2-3° livello','Anello di Resistenza agli Acidi','Gemme preziose 1d4','Armatura di pietra +1','Amuleto della resistenza alla pietra','Minerale leggendario grezzo','Scudo di pietra +1 elementale'],
-      'Epico':       ['Cristallo di terra leggendario','Pergamena incantesimo 4-5° livello','Anello di Immunità agli Acidi','Gemme rare 1d4','Armatura di pietra +2','Scudo di pietra +2 elementale','Minerale rarissimo (2d6×500 mo)','Reliquia elementale della terra'],
-      'Leggendario': ['Cuore elementale della terra','Pergamena incantesimo 6-9° livello','Armatura di pietra +3 leggendaria','Anello dei Tre Desideri elementale','Mantello dell\'Invisibilità elementale','Bastone della terra leggendario','Gemme leggendarie 1d4','Reliquia elementale leggendaria'],
-    },
-    'elemental-air': {
-      'Comune':      ['Piuma rara','Cristallo d\'aria grezzo','Polvere di vento cristallizzata','Gemma grezza trasparente','Frammento di nuvola solidificata','Simbolo elementale dell\'aria','Pietra levigata dal vento','Piuma magica'],
-      'Non Comune':  ['Cristallo d\'aria (focus arcano)','Gemme grezze trasparenti 1d4','Pergamena incantesimo 1° livello (aria)','Pozione di Volare minore','Piume rare preziose (2d6×10 mo)','Amuleto della caduta lenta','Monete portate dal vento 2d10','Simbolo elementale funzionale'],
-      'Raro':        ['Cristallo d\'aria superiore','Pergamena incantesimo 2-3° livello','Anello di Caduta Lenta','Gemme trasparenti preziose 1d4','Stivali del vento','Mantello della resistenza al fulmine','Piume leggendarie (2d6×100 mo)','Arco del vento +1'],
-      'Epico':       ['Cristallo d\'aria leggendario','Pergamena incantesimo 4-5° livello','Anello di Immunità al Fulmine','Stivali del vento superiori','Mantello dell\'Invisibilità elementale','Arco del vento +2','Gemme trasparenti rare 1d4','Reliquia elementale dell\'aria'],
-      'Leggendario': ['Cuore elementale dell\'aria','Pergamena incantesimo 6-9° livello','Arco del vento +3','Anello dei Tre Desideri elementale','Mantello dell\'Invisibilità elementale sup.','Bastone dell\'aria leggendario','Gemme trasparenti leggendarie 1d4','Reliquia elementale leggendaria'],
-    },
-    'celestials': {
-      'Comune':      ['Piuma celestiale','Simbolo sacro semplice','Monete d\'oro benedette 1d6','Cristallo di luce grezzo','Pergamena di preghiera','Gemma grezza luminosa','Amuleto sacro semplice','Pietra benedetta'],
-      'Non Comune':  ['Simbolo sacro funzionale','Pozione di Guarigione benedetta','Pergamena incantesimo 1° livello (divino)','Gemme luminose 1d4','Monete d\'oro benedette 2d10','Amuleto della protezione sacra minore','Piume celestiali preziose (2d6×10 mo)','Cristallo di luce (focus divino)'],
-      'Raro':        ['Pergamena incantesimo 2-3° livello (divino)','Simbolo sacro +1','Armatura benedetta +1','Pozione di Guarigione Superiore benedetta','Anello di Protezione sacra','Gemme celestiali rare 1d4','Amuleto della Salute benedetto','Scudo sacro +1'],
-      'Epico':       ['Pergamena incantesimo 4-5° livello (divino)','Armatura benedetta +2','Spada sacra +2','Anello di Resistenza agli Incantesimi sacro','Mantello di Spostamento benedetto','Gemme celestiali 1d4','Diadema della saggezza celestiale','Scudo sacro +2'],
-      'Leggendario': ['Pergamena incantesimo 6-9° livello (divino)','Armatura celestiale +3','Spada sacra +3','Anello dei Tre Desideri benedetto','Mantello dell\'Invisibilità benedetto','Bastone della saggezza divina','Reliquia celestiale unica','Corona celestiale'],
-    },
+  // Tabelle pergamene incantesimo
+  const SPELLS = {
+    1:['Dardo Incantato','Mani Brucianti','Charme su Persone','Dardo di Acido','Scudo','Sonno','Dardo di Gelo','Dardo di Fuoco'],
+    2:['Freccia Acida di Melf','Invisibilità','Oscurità','Ragnatela','Forza Fantasma','Suggestionare','Immagine Speculare','Nebbia Assassina'],
+    3:['Palla di Fuoco','Fulmine','Volare','Contrincantesimo','Dissolvere Magie','Ipnosi','Frecce di Fulmine','Timore'],
+    4:['Muro di Fuoco','Polimorfismo','Sfera Infuocata di Otiluke','Occhio Arcano','Grande Invisibilità','Confusione','Porta Dimensionale','Individuazione della Sfera'],
+    5:['Cono di Freddo','Animare Morti','Nube Mortale','Dominare Persone','Muro di Forza','Telecinesi','Modificare Memoria','Legame Planare'],
+    6:['Disintegrazione','Catena di Fulmini','Visione Vera','Sfera di Annientamento','Suggestione di Massa','Individuazione del Pensiero'],
+    7:['Dito della Morte','Teletrasporto','Inversione della Gravità','Prisma Spettrale','Tempesta di Fuoco','Forma Eterea'],
+    8:['Terremoto','Mente Vuota','Dominare Mostri','Nube Incendiaria'],
+    9:['Desiderio','Meteora','Proiezione Astrale','Arresto del Tempo'],
   };
 
-  // Tabelle pergamene incantesimo (dal loot-rng-system)
-  const SPELL_TABLES = {
-    1: ['Dardo Incantato','Mani Brucianti','Charme su Persone','Dardo di Acido','Scudo','Sonno','Dardo di Gelo','Dardo di Fuoco'],
-    2: ['Freccia Acida di Melf','Invisibilità','Oscurità','Ragnatela','Forza Fantasma','Suggestionare','Immagine Speculare','Nebbia Assassina'],
-    3: ['Palla di Fuoco','Fulmine','Volare','Contrincantesimo','Dissolvere Magie','Ipnosi','Frecce di Fulmine','Timore'],
-    4: ['Muro di Fuoco','Polimorfismo','Sfera Infuocata di Otiluke','Occhio Arcano','Grande Invisibilità','Confusione','Porta Dimensionale','Individuazione della Sfera'],
-    5: ['Cono di Freddo','Animare Morti','Nube Mortale','Dominare Persone','Muro di Forza','Telecinesi','Modificare Memoria','Legame Planare'],
-    6: ['Disintegrazione','Catena di Fulmini','Visione Vera','Sfera di Annientamento','Suggestione di Massa','Individuazione del Pensiero'],
-    7: ['Dito della Morte','Teletrasporto','Inversione della Gravità','Prisma Spettrale','Tempesta di Fuoco','Forma Eterea'],
-    8: ['Terremoto','Mente Vuota','Dominare Mostri','Nube Incendiaria'],
-    9: ['Desiderio','Meteora','Proiezione Astrale','Arresto del Tempo'],
-  };
+  const rnd = (a) => a[Math.floor(Math.random() * a.length)];
 
-  const rndArr = (a) => a[Math.floor(Math.random() * a.length)];
-  const rollD100 = () => Math.floor(Math.random() * 100) + 1;
-
-  const getRarity = (cat, rank) => {
-    const tableKey = CAT_PROB_TABLE[cat] || 'Standard';
-    const table = PROB_TABLES[tableKey];
-    const probs = table[rank] || table['Minion'];
-    const roll = rollD100();
-    const rarities = ['Niente','Comune','Non Comune','Raro','Epico','Leggendario'];
-    let cumulative = 0;
+  const rollRarity = (catId, rank) => {
+    const cat = CATS.find(c => c.id === catId);
+    const probKey = cat?.prob || 'Standard';
+    const probs = PROB[probKey]?.[rank] || PROB.Standard.Minion;
+    const d100 = Math.floor(Math.random() * 100) + 1;
+    let cum = 0;
     for (let i = 0; i < probs.length; i++) {
-      cumulative += probs[i];
-      if (roll <= cumulative && probs[i] > 0) return { rarity: rarities[i], roll };
+      if (probs[i] === 0) continue;
+      cum += probs[i];
+      if (d100 <= cum) return { rarity: RARITIES[i], d100 };
     }
-    return { rarity: 'Niente', roll };
+    return { rarity: 'Niente', d100 };
   };
 
-  const getItem = (cat, rarity) => {
+  // Lucky upgrade: se d100 === 75 o 90 e la rarità non è Niente/Leggendario
+  // tira 1d4: se >2 scala di una rarità
+  const luckyCheck = (rarity, d100) => {
+    if (rarity === 'Niente' || rarity === 'Leggendario') return { rarity, lucky: false };
+    if (d100 !== 75 && d100 !== 90) return { rarity, lucky: false };
+    const d4 = Math.floor(Math.random() * 4) + 1;
+    if (d4 <= 2) return { rarity, lucky: false };
+    const up = {'Comune':'Non Comune','Non Comune':'Raro','Raro':'Epico','Epico':'Leggendario'};
+    return { rarity: up[rarity] || rarity, lucky: true };
+  };
+
+  const getItem = (catId, rarity) => {
     if (rarity === 'Niente') return null;
-    const items = LOOT_TABLES[cat]?.[rarity] || [];
+    const items = LOOT[catId]?.[rarity] || [];
     if (!items.length) return null;
-    let item = rndArr(items);
-    // Se è una pergamena, aggiungi quale incantesimo
-    if (item.includes('Pergamena incantesimo')) {
-      const lvlMatch = item.match(/(\d+)[-°]/);
-      const lvlMatch2 = item.match(/(\d+)-(\d+)°/);
-      if (lvlMatch2) {
-        const l1 = parseInt(lvlMatch2[1]);
-        const l2 = parseInt(lvlMatch2[2]);
-        const lvl = l1 + Math.floor(Math.random() * (l2 - l1 + 1));
-        const spells = SPELL_TABLES[lvl] || SPELL_TABLES[1];
-        item += ` — ${rndArr(spells)} (${lvl}° lv.)`;
-      } else if (lvlMatch) {
-        const lvl = parseInt(lvlMatch[1]);
-        const spells = SPELL_TABLES[lvl] || SPELL_TABLES[1];
-        item += ` — ${rndArr(spells)}`;
-      }
+    let item = rnd(items);
+    // Pergamena → aggiungi incantesimo
+    const m2 = item.match(/(\d+)-(\d+)°\s*lv/);
+    const m1 = item.match(/(\d+)°\s*lv/);
+    if (m2) {
+      const l1 = parseInt(m2[1]), l2 = parseInt(m2[2]);
+      const lvl = l1 + Math.floor(Math.random() * (l2 - l1 + 1));
+      item += ` → ${rnd(SPELLS[lvl] || SPELLS[1])} (${lvl}° lv.)`;
+    } else if (m1) {
+      const lvl = parseInt(m1[1]);
+      item += ` → ${rnd(SPELLS[lvl] || SPELLS[1])}`;
     }
     return item;
   };
 
-  const updateProbTable = () => {
-    const cat = document.getElementById('rng-loot-cat')?.value || 'humanoid-warrior';
-    const tableKey = CAT_PROB_TABLE[cat] || 'Standard';
-    const table = PROB_TABLES[tableKey];
-    const el = document.getElementById('rng-prob-table');
+  const init = () => {
+    const grid = document.getElementById('rng-cat-grid');
+    if (!grid || grid.children.length > 0) return;
+    grid.innerHTML = CATS.map(cat =>
+      `<button class="btn btn-ghost btn-sm" id="rng-cat-${cat.id}"
+        style="text-align:left;padding:4px 8px;font-size:0.72rem;"
+        onclick="RNGLoot.toggleCat('${cat.id}')">${cat.name}</button>`
+    ).join('');
+    // Selezione default: prima categoria
+    _selectedCats = [CATS[0].id];
+    renderCats();
+    setRank('Minion');
+    setCond(null);
+  };
+
+  const renderCats = () => {
+    CATS.forEach(cat => {
+      const btn = document.getElementById('rng-cat-' + cat.id);
+      if (!btn) return;
+      const sel = _selectedCats.includes(cat.id);
+      btn.className = sel ? 'btn btn-primary btn-sm' : 'btn btn-ghost btn-sm';
+      btn.style.textAlign = 'left';
+      btn.style.padding = '4px 8px';
+      btn.style.fontSize = '0.72rem';
+    });
+  };
+
+  const toggleCat = (id) => {
+    if (_rank === 'Minion') {
+      // Multi-selezione: togli o aggiungi
+      if (_selectedCats.includes(id)) {
+        if (_selectedCats.length > 1) _selectedCats = _selectedCats.filter(c => c !== id);
+      } else {
+        _selectedCats = [..._selectedCats, id];
+      }
+    } else {
+      // Elite/Boss: selezione singola
+      _selectedCats = [id];
+    }
+    renderCats();
+  };
+
+  const setRank = (rank) => {
+    _rank = rank;
+    // Elite/Boss: mantieni solo prima categoria selezionata
+    if (rank !== 'Minion' && _selectedCats.length > 1) {
+      _selectedCats = [_selectedCats[0]];
+    }
+    // Aggiorna pulsanti rango
+    ['Minion','Elite','Boss'].forEach(r => {
+      const btn = document.getElementById('rng-rank-' + r);
+      if (btn) btn.className = r === rank ? 'btn btn-primary btn-sm' : 'btn btn-ghost btn-sm';
+    });
+    // Aggiorna hint
+    const hint = document.getElementById('rng-cat-hint');
+    if (hint) hint.textContent = rank === 'Minion' ? '— Minion: clicca più categorie' : '— ' + rank + ': selezione singola';
+    renderCats();
+  };
+
+  const setCond = (cond) => {
+    _condition = cond;
+    // Aggiorna pulsanti condizione
+    ['null','intatto','danneggiato','inutilizzabile','maledetto'].forEach(c => {
+      const btn = document.getElementById('rng-cond-' + c);
+      if (!btn) return;
+      const key = c === 'null' ? null : c;
+      btn.className = _condition === key ? 'btn btn-primary btn-sm' : 'btn btn-ghost btn-sm';
+    });
+  };
+
+  const adjMult = (delta) => {
+    const el = document.getElementById('rng-multiplier');
     if (!el) return;
-    el.innerHTML = `Tabella: <strong>${tableKey}</strong> &nbsp;|&nbsp; ` +
-      `Minion: ${table.Minion[0]}% niente / ${table.Minion[1]}% Comune / ${table.Minion[2]-table.Minion[1]}% Non Comune / ${table.Minion[3]-table.Minion[2]}% Raro &nbsp;|&nbsp; ` +
-      `Boss: ${table.Boss[0]}% niente / ${table.Boss[1]}% Comune / ${table.Boss[2]-table.Boss[1]}% Non Comune / ${table.Boss[3]-table.Boss[2]}% Raro`;
+    _multiplier = Math.max(1, Math.min(99, (_multiplier || 1) + delta));
+    el.value = _multiplier;
+  };
+
+  const setMult = (val) => {
+    _multiplier = Math.max(1, Math.min(99, parseInt(val) || 1));
+    const el = document.getElementById('rng-multiplier');
+    if (el) el.value = _multiplier;
   };
 
   const genera = () => {
-    const cat   = document.getElementById('rng-loot-cat')?.value || 'humanoid-warrior';
-    const rank  = document.getElementById('rng-loot-rank')?.value || 'Elite';
-    const qty   = parseInt(document.getElementById('rng-loot-qty')?.value) || 3;
-    const el    = document.getElementById('gen-loot-result');
+    const el = document.getElementById('gen-loot-result');
     if (!el) return;
+    if (!_selectedCats.length) { Toast.show('Seleziona almeno una categoria', 'warning'); return; }
+    const n = _multiplier || 1;
 
     const results = [];
-    for (let i = 0; i < qty; i++) {
-      const { rarity, roll } = getRarity(cat, rank);
-      const item = getItem(cat, rarity);
-      results.push({ n: i+1, rarity, roll, item });
+    for (let i = 0; i < n; i++) {
+      // Scegli categoria a caso tra quelle selezionate
+      const catId = rnd(_selectedCats);
+      const { rarity: r0, d100 } = rollRarity(catId, _rank);
+      const { rarity, lucky } = luckyCheck(r0, d100);
+      const item = getItem(catId, rarity);
+      const catName = CATS.find(c => c.id === catId)?.name || catId;
+      // Applica condizione se selezionata e c'è un oggetto
+      const condLabel = _condition && item ? ({
+        intatto:'✓ Intatto', danneggiato:'⚠ Danneggiato',
+        inutilizzabile:'✗ Inutilizzabile', maledetto:'☠ Maledetto',
+      }[_condition] || '') : '';
+      results.push({ n: i+1, catId, catName, rarity, d100, lucky, item, condLabel });
     }
 
-    const colore = {
-      'Niente':'var(--text-muted)', 'Comune':'var(--text-secondary)',
-      'Non Comune':'#69cc85', 'Raro':'#5ba4f5', 'Epico':'#c97bea', 'Leggendario':'#f5a623',
-    };
-
-    const totale = results.filter(r => r.rarity !== 'Niente').length;
-    const riepilogo = RARITIES.slice(1).map(r => {
-      const n = results.filter(x => x.rarity === r).length;
-      return n ? `<span style="color:${colore[r]};margin-right:6px;">${n}× ${r}</span>` : '';
-    }).filter(Boolean).join('');
+    const withLoot = results.filter(r => r.rarity !== 'Niente').length;
+    const summary = ['Comune','Non Comune','Raro','Epico','Leggendario'].map(r => {
+      const cnt = results.filter(x => x.rarity === r).length;
+      return cnt ? `<span style="color:${RARITY_COLOR[r]}">${cnt}× ${r}</span>` : '';
+    }).filter(Boolean).join('  ');
 
     el.innerHTML =
-      `<div style="margin-bottom:8px;font-size:0.75rem;">${totale}/${qty} nemici con loot — ${riepilogo || '<span class="text-muted">Nessun loot</span>'}</div>` +
-      `<table style="width:100%;border-collapse:collapse;font-size:0.8rem;">` +
-      `<thead><tr>
-        <th style="text-align:left;padding:3px 0;border-bottom:1px solid var(--border);font-family:var(--font-display);font-size:0.62rem;text-transform:uppercase;color:var(--text-muted);">Nemico</th>
-        <th style="text-align:center;padding:3px 4px;border-bottom:1px solid var(--border);font-family:var(--font-display);font-size:0.62rem;text-transform:uppercase;color:var(--text-muted);">d100</th>
-        <th style="text-align:left;padding:3px 0;border-bottom:1px solid var(--border);font-family:var(--font-display);font-size:0.62rem;text-transform:uppercase;color:var(--text-muted);">Rarità</th>
-        <th style="text-align:left;padding:3px 0;border-bottom:1px solid var(--border);font-family:var(--font-display);font-size:0.62rem;text-transform:uppercase;color:var(--text-muted);">Oggetto</th>
-      </tr></thead>
-      <tbody>` +
+      `<div style="font-size:0.75rem;margin-bottom:8px;">${withLoot}/${n} tiri con loot — ${summary || '<span class="text-muted">Nessun loot</span>'}</div>` +
+      `<div style="display:flex;flex-direction:column;gap:4px;">` +
       results.map(r =>
-        `<tr>
-          <td style="padding:3px 0;border-bottom:1px solid var(--border);color:var(--text-muted);">#${r.n}</td>
-          <td style="padding:3px 4px;border-bottom:1px solid var(--border);text-align:center;font-family:var(--font-mono);font-size:0.72rem;color:var(--text-muted);">${r.roll}</td>
-          <td style="padding:3px 0;border-bottom:1px solid var(--border);color:${colore[r.rarity]};font-size:0.75rem;">${r.rarity}</td>
-          <td style="padding:3px 0;border-bottom:1px solid var(--border);">${r.item || '—'}</td>
-        </tr>`
+        r.rarity === 'Niente'
+          ? `<div style="display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid var(--border);">
+              <span style="font-family:var(--font-mono);font-size:0.7rem;color:var(--text-muted);min-width:28px;">#${r.n}</span>
+              <span style="font-size:0.7rem;color:var(--text-muted);">d100: ${r.d100}</span>
+              <span style="color:var(--text-muted);font-size:0.78rem;">💀 Nessun loot</span>
+            </div>`
+          : `<div style="display:flex;align-items:flex-start;gap:8px;padding:4px 0;border-bottom:1px solid var(--border);">
+              <span style="font-family:var(--font-mono);font-size:0.7rem;color:var(--text-muted);min-width:28px;flex-shrink:0;">#${r.n}</span>
+              <div style="min-width:0;flex:1;">
+                <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+                  <span style="font-size:0.68rem;color:var(--text-muted);">d100:${r.d100}</span>
+                  <span style="font-size:0.72rem;color:${RARITY_COLOR[r.rarity]};font-weight:600;">${r.rarity}${r.lucky ? ' ✨' : ''}</span>
+                  <span style="font-size:0.65rem;color:var(--text-muted);">${n > 1 && _selectedCats.length > 1 ? r.catName : ''}</span>
+                </div>
+                <div style="font-size:0.82rem;margin-top:2px;">🎁 ${r.item}${r.condLabel ? ` <span style="font-size:0.68rem;color:var(--text-muted);">(${r.condLabel})</span>` : ''}</div>
+              </div>
+            </div>`
       ).join('') +
-      `</tbody></table>` +
-      `<button class="btn btn-ghost btn-sm w-full" style="margin-top:8px;font-size:0.72rem;" onclick="RNGLoot.genera()">🎲 Ritira tutto</button>`;
+      `</div>` +
+      `<button class="btn btn-ghost btn-sm w-full" style="margin-top:8px;font-size:0.72rem;" onclick="RNGLoot.genera()">🎲 Tira ancora ×${n}</button>`;
 
-    Debug.log('RNG Loot generato: ' + qty + '× ' + rank + ' / ' + cat);
+    Debug.log('RNGLoot: ' + n + '× ' + _rank + ' → ' + withLoot + ' con loot');
   };
 
-  return { genera, updateProbTable };
+  return { init, toggleCat, setRank, setCond, adjMult, setMult, genera };
 })();
+
 
 // ══ LOOT PANEL ══
 const LootPanel = (() => {
