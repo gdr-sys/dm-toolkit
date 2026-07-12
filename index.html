@@ -9,18 +9,14 @@
   <link rel="stylesheet" href="css/layout.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.2/Sortable.min.js"></script>
 <style>
-/* FIX SCHERMO DM OVERFLOW */
+/FIX SCHERMO DM — grid 5 colonne con span */
 #page-schermo { overflow-x: hidden !important; }
-.schermo-cols {
+.schermo-grid {
   display: grid !important;
-  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+  gap: var(--space-md) !important;
+  align-items: start !important;
   width: 100% !important;
-  box-sizing: border-box !important;
-  overflow: hidden !important;
-}
-.schermo-col {
-  min-width: 0 !important;
-  overflow: hidden !important;
   box-sizing: border-box !important;
 }
 .schermo-block {
@@ -29,14 +25,13 @@
   overflow: hidden !important;
 }
 .schermo-block-body {
-  overflow: auto !important;
-  min-width: 0 !important;
   word-break: break-word !important;
+  overflow: auto !important;
 }
-@media (max-width: 1400px) { .schermo-cols { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; } }
-@media (max-width: 1024px) { .schermo-cols { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; } }
-@media (max-width: 768px)  { .schermo-cols { grid-template-columns: 1fr !important; } }
-</style>
+@media (max-width: 1400px) { .schermo-grid { grid-template-columns: repeat(4, minmax(0, 1fr)) !important; } }
+@media (max-width: 1024px) { .schermo-grid { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; } }
+@media (max-width: 768px)  { .schermo-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; } }
+@media (max-width: 480px)  { .schermo-grid { grid-template-columns: 1fr !important; } }</style>
 </head>
 <body>
 
@@ -1216,12 +1211,7 @@
       </div>
 
       <!-- Griglia blocchi -->
-      <div class="schermo-cols">
-        <div class="schermo-col" id="schermo-col-0" data-col="0"></div>
-        <div class="schermo-col" id="schermo-col-1" data-col="1"></div>
-        <div class="schermo-col" id="schermo-col-2" data-col="2"></div>
-        <div class="schermo-col" id="schermo-col-3" data-col="3"></div>
-      </div>
+      <div class="schermo-grid" id="schermo-grid"></div>
     </section>
 
   </div><!-- /main-content -->
@@ -1626,7 +1616,8 @@
             </div>
           </div>
           <input type="file" id="npc-img-file" accept="image/*" style="display:none;" onchange="handleImgUpload('npc')">
-          <input type="text" id="npc-img-url" class="form-input" placeholder="oppure incolla URL immagine..." style="margin-top:6px;" oninput="handleImgUrl('npc')">
+          <div style="font-size:0.68rem;color:var(--text-muted);margin-bottom:3px;">💡 Usa un URL esterno (imgur, drive) per salvare. Upload file = solo anteprima temporanea.</div>
+<input type="text" id="npc-img-url" class="form-input" placeholder="URL immagine (es. https://... ) — unico modo per salvare" style="margin-top:6px;" oninput="handleImgUrl('npc')">
           <button class="btn btn-ghost btn-sm" id="npc-img-clear" style="display:none;margin-top:4px;" onclick="clearImg('npc')">Rimuovi immagine</button>
         </div>
         <div class="form-row">
@@ -2373,6 +2364,28 @@ const Storage = (() => {
       return true;
     } catch (e) {
       Debug.error(`Storage.set(${key}):`, e.message);
+      // Quota exceeded — rimuovi immagini base64 dalle campagne e riprova
+      if (key.includes('campaigns') && Array.isArray(value)) {
+        const cleaned = value.map(camp => {
+          const c = { ...camp };
+          const stripBase64 = (arr) => (arr||[]).map(x => ({
+            ...x, immagine: (x.immagine||'').startsWith('data:') ? '' : (x.immagine||'')
+          }));
+          c.npcs = stripBase64(c.npcs);
+          c.locations = stripBase64(c.locations);
+          c.factions = stripBase64(c.factions);
+          return c;
+        });
+        try {
+          localStorage.setItem(key, JSON.stringify(cleaned));
+          Toast.show('⚠️ Storage pieno: immagini file rimosse. Usa URL esterni per le immagini.', 'warning', 6000);
+          return true;
+        } catch(e2) {
+          Toast.show('Storage esaurito! Esporta la campagna e riduci il contenuto.', 'error', 8000);
+        }
+      } else {
+        Toast.show(`Storage pieno (${key}): riduci le note o esporta la campagna.`, 'error', 6000);
+      }
       return false;
     }
   };
@@ -4694,53 +4707,53 @@ const Sessione = (() => {
     }
 
     el.innerHTML = party.map(pg => {
-      const hpPct = pg.hpMax > 0 ? Math.max(0, Math.round((pg.hpAttuali || pg.hpMax) / pg.hpMax * 100)) : 100;
+      const hpAttuali = pg.hpAttuali ?? pg.hpMax ?? 0;
+      const hpMax = pg.hpMax || 1;
+      const hpPct = Math.max(0, Math.round(hpAttuali / hpMax * 100));
       const hpCol = hpPct > 66 ? 'var(--accent-success)' : hpPct > 33 ? 'var(--accent-warning)' : 'var(--accent-danger)';
       return `
-      <div class="party-card">
-        <!-- Header: nome + azioni -->
-        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:6px;gap:4px;">
-          <div style="min-width:0;flex:1;">
-            <div class="party-name">${pg.nome}</div>
-            <div class="party-meta">${[pg.giocatore, pg.classe, pg.livello ? 'Liv. ' + pg.livello : ''].filter(Boolean).join(' · ')}</div>
+      <div class="party-card" style="padding:var(--space-sm);border-radius:var(--radius-md);background:var(--bg-secondary);border:1px solid var(--border);">
+        <!-- Riga 1: nome + classe/livello + azioni -->
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">
+          <div style="flex:1;min-width:0;">
+            <div style="font-family:var(--font-display);font-size:0.88rem;font-weight:600;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${pg.nome}</div>
+            <div style="font-size:0.68rem;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${[pg.giocatore, pg.classe, pg.livello ? 'Lv.' + pg.livello : ''].filter(Boolean).join(' · ')}</div>
           </div>
-          <div style="display:flex;gap:2px;flex-shrink:0;">
-            <button class="btn btn-ghost btn-icon-sm" onclick="Sessione.editPG('${pg.id}')" title="Modifica"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
-            <button class="btn btn-ghost btn-icon-sm" onclick="Sessione.deletePG('${pg.id}')" title="Rimuovi"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>
-          </div>
-        </div>
-
-        <!-- Percezioni passive -->
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:3px;margin-bottom:6px;">
-          <div class="party-stat-box" title="Percezione Passiva">
-            <span class="party-stat-label">Perc.</span>
-            <span class="party-stat-value">${pg.percezionePassiva || 10}</span>
-          </div>
-          <div class="party-stat-box" title="Investigazione Passiva">
-            <span class="party-stat-label">Invest.</span>
-            <span class="party-stat-value">${pg.investigazionePassiva || 10}</span>
-          </div>
-          <div class="party-stat-box" title="Intuizione Passiva">
-            <span class="party-stat-label">Intui.</span>
-            <span class="party-stat-value">${pg.intuizionePassiva || 10}</span>
+          <div style="display:flex;gap:1px;flex-shrink:0;">
+            <button class="btn btn-ghost btn-icon-sm" onclick="Sessione.editPG('${pg.id}')" title="Modifica" style="width:22px;height:22px;font-size:0.6rem;">✏️</button>
+            <button class="btn btn-ghost btn-icon-sm" onclick="Sessione.deletePG('${pg.id}')" title="Rimuovi" style="width:22px;height:22px;font-size:0.6rem;color:var(--accent-danger);">🗑️</button>
           </div>
         </div>
 
-        <!-- HP barra + CA + Ispirazione -->
-        <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap;">
-          <div style="flex:1;min-width:80px;">
-            <div style="display:flex;justify-content:space-between;margin-bottom:2px;">
-              <span class="party-pill">PF ${pg.hpAttuali ?? pg.hpMax ?? '?'}/${pg.hpMax || '?'}</span>
-              <span class="party-pill">CA ${pg.ca || '?'}</span>
-            </div>
-            <div style="height:4px;background:var(--bg-tertiary);border-radius:var(--radius-full);overflow:hidden;">
-              <div style="height:100%;width:${hpPct}%;background:${hpCol};border-radius:var(--radius-full);transition:width 0.3s;"></div>
-            </div>
+        <!-- Riga 2: HP barra + valori -->
+        <div style="margin-bottom:6px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;">
+            <span style="font-family:var(--font-mono);font-size:0.78rem;color:${hpCol};font-weight:700;">PF ${hpAttuali}/${hpMax}</span>
+            <span style="font-family:var(--font-mono);font-size:0.72rem;color:var(--text-muted);">CA ${pg.ca || '?'}</span>
+          </div>
+          <div style="height:5px;background:var(--bg-tertiary);border-radius:var(--radius-full);overflow:hidden;">
+            <div style="height:100%;width:${hpPct}%;background:${hpCol};border-radius:var(--radius-full);transition:width 0.3s;"></div>
+          </div>
+        </div>
+
+        <!-- Riga 3: Percezioni + Ispirazione -->
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:3px;align-items:center;">
+          <div class="party-stat-box" title="Percezione Passiva" style="padding:2px;text-align:center;">
+            <span class="party-stat-label" style="font-size:0.55rem;">Perc</span>
+            <span class="party-stat-value" style="font-size:0.85rem;">${pg.percezionePassiva || 10}</span>
+          </div>
+          <div class="party-stat-box" title="Investigazione Passiva" style="padding:2px;text-align:center;">
+            <span class="party-stat-label" style="font-size:0.55rem;">Inv</span>
+            <span class="party-stat-value" style="font-size:0.85rem;">${pg.investigazionePassiva || 10}</span>
+          </div>
+          <div class="party-stat-box" title="Intuizione Passiva" style="padding:2px;text-align:center;">
+            <span class="party-stat-label" style="font-size:0.55rem;">Int</span>
+            <span class="party-stat-value" style="font-size:0.85rem;">${pg.intuizionePassiva || 10}</span>
           </div>
           <button class="party-inspiration-btn ${pg.inspirazione ? 'active' : ''}"
             onclick="Sessione.toggleInspirazione('${pg.id}')"
-            title="Clicca per toggle ispirazione">
-            Ispirazione
+            title="Ispirazione" style="font-size:0.6rem;padding:2px 5px;white-space:nowrap;">
+            ✨
           </button>
         </div>
       </div>`;
@@ -6594,20 +6607,37 @@ const Compendio = (() => {
     }
     const catLabel = { monsters:'🐉 Mostri', magic_items:'✨ Oggetti Magici', equipment:'⚔️ Equipaggiamento', spells:'💫 Incantesimi', rules:'📖 Regole', altro:'📌 Altro' };
     const catBadge = { monsters:'badge-primary', magic_items:'badge-gold', equipment:'badge-muted', spells:'badge-blue', rules:'badge-muted', altro:'badge-muted' };
-    el.innerHTML = list.map(h =>
-      '<div class="comp-row">' +
-        '<div class="comp-row-main" onclick="Compendio.openHomebrew(\'' + h.id + '\')" style="cursor:pointer;flex:1;">' +
+    el.innerHTML = list.map(h => {
+      // Stats specifiche per categoria — uguale alle voci native
+      let stats = '';
+      if (h.categoria === 'monsters') {
+        if (h.gs != null || h.grado_sfida) stats += '<span class="comp-stat-pill" title="Grado Sfida">GS ' + (h.gs ?? h.grado_sfida?.valore ?? '?') + '</span>';
+        if (h.pf != null || h.punti_ferita) stats += '<span class="comp-stat-pill" title="Punti Ferita">PF ' + (h.pf ?? h.punti_ferita?.media ?? '?') + '</span>';
+        if (h.ca != null || h.classe_armatura) stats += '<span class="comp-stat-pill" title="Classe Armatura">CA ' + (h.ca ?? h.classe_armatura ?? '?') + '</span>';
+      } else if (h.categoria === 'magic_items') {
+        const rarita = normalizzaRarita(h.rarita || '');
+        stats += '<span class="badge ' + (raritaBadge[rarita] || 'badge-muted') + '">' + (rarita || 'N/A') + '</span>';
+      } else if (h.categoria === 'equipment') {
+        if (h.danni) stats += '<span class="comp-stat-pill">' + h.danni + '</span>';
+        if (h.costo) stats += '<span class="comp-stat-pill">' + h.costo + '</span>';
+        if (h.peso) stats += '<span class="comp-stat-pill">' + h.peso + '</span>';
+      } else if (h.categoria === 'spells') {
+        if (h.livello != null) stats += '<span class="comp-stat-pill">' + (h.livello === 0 ? 'Trucchetto' : h.livello + '° lv.') + '</span>';
+        if (h.scuola) stats += '<span class="comp-stat-pill">' + h.scuola + '</span>';
+      }
+      return '<div class="comp-row" onclick="Compendio.openHomebrew(\'' + h.id + '\')">' +
+        '<div class="comp-row-main">' +
           '<span class="comp-row-name">' + highlight(h.nome, f.q) + '</span>' +
           '<span class="comp-row-meta">' + (h.sottotitolo||'') + '</span>' +
         '</div>' +
         '<div class="comp-row-stats">' +
-          '<span class="badge ' + (catBadge[h.categoria]||'badge-muted') + '" style="font-size:0.62rem;">' + (catLabel[h.categoria]||h.categoria) + '</span>' +
+          stats +
           favBtn(h.id, h.nome, 'homebrew') +
-          '<button class="btn btn-ghost btn-icon-sm" style="font-size:0.7rem;" onclick="Compendio.editHomebrew(\'' + h.id + '\')" title="Modifica"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>' +
-          '<button class="btn btn-ghost btn-icon-sm" style="font-size:0.7rem;color:var(--accent-danger);" onclick="Compendio.deleteHomebrew(\'' + h.id + '\')" title="Elimina"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>' +
+          '<button class="btn btn-ghost btn-icon-sm" style="font-size:0.7rem;" onclick="event.stopPropagation();Compendio.editHomebrew(\'' + h.id + '\')">✏️</button>' +
+          '<button class="btn btn-ghost btn-icon-sm" style="font-size:0.7rem;color:var(--accent-danger);" onclick="event.stopPropagation();Compendio.deleteHomebrew(\'' + h.id + '\')">🗑️</button>' +
         '</div>' +
-      '</div>'
-    ).join('');
+      '</div>';
+    }).join('');
   };
 
   const openHomebrew = (id) => {
@@ -7267,10 +7297,10 @@ const Schermo = (() => {
   };
 
   const SIZES = {
-    sm: { label: 'Piccolo', cols: 1 },
-    md: { label: 'Medio',   cols: 2 },
-    lg: { label: 'Grande',  cols: 3 },
-    xl: { label: 'Intero',  cols: 4 },
+    s1: { label: '1 col',  cols: 1 },
+    s2: { label: '2 col',  cols: 2 },
+    s3: { label: '3 col',  cols: 3 },
+    s5: { label: 'Pieno',  cols: 5 },
   };
 
   let _blocks = []; // { id, type, size, title?, content? }
@@ -7311,44 +7341,38 @@ const Schermo = (() => {
 
   // ── Render griglia ──
   const render = () => {
-    // Usa le colonne invece di schermo-grid
-    const cols = [0,1,2,3].map(c => document.getElementById(`schermo-col-${c}`));
+    const grid = document.getElementById('schermo-grid');
     const empty = document.getElementById('schermo-empty');
-    if (!cols[0]) return;
+    if (!grid) return;
 
     App.reloadActiveCampaign();
 
     if (_blocks.length === 0) {
-      cols.forEach(c => { if (c) c.innerHTML = ''; });
+      grid.innerHTML = '';
       if (empty) empty.style.display = '';
       return;
     }
     if (empty) empty.style.display = 'none';
 
-    // Ricostruisce sempre la griglia per garantire drag & drop corretto
     SchermoDD.reset();
-    cols.forEach(c => { if (c) c.innerHTML = ''; });
-
-    _blocks.forEach((block, idx) => {
-      const colIdx = Math.min(Math.max(block.col ?? (idx % 4), 0), 3);
-      block.col = colIdx;
-      const col = cols[colIdx];
-      if (col) col.insertAdjacentHTML('beforeend', renderBlock(block, idx));
-    });
+    grid.innerHTML = _blocks.map((block, idx) => renderBlock(block, idx)).join('');
     _blocks.forEach(b => updateBlockContent(b));
     requestAnimationFrame(() => SchermoDD.enable());
   };
 
   const renderBlock = (block, idx) => {
     const def = BLOCK_TYPES[block.type] || BLOCK_TYPES.custom;
-    const isFullWidth = def.fullWidth && (block.size === 'xl');
-    const fullWidthStyle = isFullWidth ? 'grid-column:1/-1;' : '';
-    const size = block.size || def.defaultSize;
+    // Mappa vecchie size alle nuove
+    const sizeMap = { sm:'s1', md:'s2', lg:'s3', xl:'s5' };
+    const rawSize = block.size || def.defaultSize || 's2';
+    const size = SIZES[rawSize] ? rawSize : (sizeMap[rawSize] || 's2');
+    if (block.size !== size) { block.size = size; }
     const cols = SIZES[size]?.cols || 2;
     const title = block.title || def.label;
+    const spanStyle = `grid-column: span ${cols};`;
 
     return `
-      <div class="schermo-block schermo-block-${size}" id="sblock-${block.id}">
+      <div class="schermo-block schermo-block-${size}" id="sblock-${block.id}" style="${spanStyle}">
         <div class="schermo-block-header">
           <span class="schermo-block-icon" style="cursor:grab;" title="Trascina per spostare">${def.icon}</span>
           <span class="schermo-block-title">${title}</span>
@@ -8209,17 +8233,14 @@ const Schermo = (() => {
     startResize,
     _blocks: () => _blocks,
     _syncFromDOM: () => {
-      // Ricostruisce _blocks nell'ordine e colonne attuali dal DOM
+      const grid = document.getElementById('schermo-grid');
+      if (!grid) return;
       const newOrder = [];
-      for (let c = 0; c < 4; c++) {
-        const col = document.getElementById(`schermo-col-${c}`);
-        if (!col) continue;
-        col.querySelectorAll('.schermo-block').forEach(el => {
-          const id = el.id.replace('sblock-', '');
-          const blk = _blocks.find(b => b.id === id);
-          if (blk) { blk.col = c; newOrder.push(blk); }
-        });
-      }
+      grid.querySelectorAll('.schermo-block').forEach(el => {
+        const id = el.id.replace('sblock-', '');
+        const blk = _blocks.find(b => b.id === id);
+        if (blk) newOrder.push(blk);
+      });
       _blocks = newOrder;
       save();
     },
@@ -9762,10 +9783,10 @@ const handleImgUpload = (key) => {
   const reader = new FileReader();
   reader.onload = (e) => {
     const src = e.target.result;
+    // Mostra preview temporanea ma NON salva base64 in localStorage (troppo pesante)
     setImgPreview(key, src);
-    // Aggiorna anche il campo URL
-    const urlEl = document.getElementById(`${key}-img-url`);
-    if (urlEl) urlEl.value = src;
+    // NON aggiornare il campo URL con il base64 — usa URL esterni per salvare
+    Toast.show('Anteprima temporanea — usa un URL esterno per salvare', 'info', 4000);
   };
   reader.readAsDataURL(file);
 };
@@ -12025,35 +12046,23 @@ const SchermoDD = (() => {
 
   const enable = () => {
     if (typeof Sortable === 'undefined') return;
-
-    // Distruggi sempre tutte le istanze precedenti
     _sortables.forEach(s => { try { s.destroy(); } catch(e) {} });
     _sortables = [];
 
-    // Crea un Sortable per ogni colonna con group condiviso
-    for (let c = 0; c < 4; c++) {
-      const col = document.getElementById(`schermo-col-${c}`);
-      if (!col) continue;
-      const s = Sortable.create(col, {
-        group: { name: 'schermo-blocks', pull: true, put: true },
-        animation: 150,
-        handle: '.schermo-block-header',
-        ghostClass: 'sortable-ghost',
-        chosenClass: 'sortable-chosen',
-        dragClass: 'sortable-drag',
-        forceFallback: false,
-        fallbackOnBody: true,
-        swapThreshold: 0.5,
-        onEnd: (evt) => {
-          if (!evt.to || !evt.item) return;
-          // Aggiorna la colonna e salva l'ordine dalla DOM
-          Schermo._syncFromDOM();
-        },
-      });
-      _sortables.push(s);
-    }
+    const grid = document.getElementById('schermo-grid');
+    if (!grid) return;
 
-    // Cursore grab sull'header
+    const s = Sortable.create(grid, {
+      animation: 150,
+      handle: '.schermo-block-header',
+      ghostClass: 'sortable-ghost',
+      chosenClass: 'sortable-chosen',
+      dragClass: 'sortable-drag',
+      forceFallback: false,
+      onEnd: () => Schermo._syncFromDOM(),
+    });
+    _sortables.push(s);
+
     document.querySelectorAll('.schermo-block-header').forEach(h => {
       h.style.cursor = 'grab';
     });
