@@ -7666,9 +7666,8 @@ const Schermo = (() => {
       const camp = App.getActiveCampaign();
       const sistema = camp?.system || '5e2024';
       const file = sistema === '5e2014' ? 'data/srd_5_1_rules.json' : 'data/srd_5_2_1_rules.json';
-      fetch(file).then(r => r.json()).then(data => {
-        // Inietta i dati nel Compendio senza re-init completo
-        if (Compendio._injectRules) Compendio._injectRules(data);
+      fetch(file).then(r => r.json()).then(rulesData => {
+        if (Compendio._injectRules) Compendio._injectRules(rulesData);
         setTimeout(() => updateBlockContent(block), 300);
       }).catch(() => {
         Compendio?.init?.();
@@ -7680,9 +7679,9 @@ const Schermo = (() => {
     const capitoli = _compendioSections();
 
     // Selector sezione
-    const opts = Object.entries(capitoli).map(([cap, rules]) =>
+    const opts = Object.entries(capitoli).map(([cap, capRules]) =>
       '<optgroup label="' + cap + '">' +
-      rules.map(r => '<option value="' + r.id + '"' + (r.id === sezione ? ' selected' : '') + '>' + r.nome + '</option>').join('') +
+      capRules.map(r => '<option value="' + r.id + '"' + (r.id === sezione ? ' selected' : '') + '>' + r.nome + '</option>').join('') +
       '</optgroup>'
     ).join('');
 
