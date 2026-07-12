@@ -428,10 +428,13 @@
       </div>
 
       <!-- Griglia generatori riordinabile — tutte le card inclusa PNG -->
-      <div class="generatori-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:var(--space-md);align-items:start;grid-auto-rows:auto;">
+            <div class="generatori-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:var(--space-md);">
 
-        <!-- PNG Completo — full width -->
-        <div class="card card-gold gen-card" data-gen-id="npc" style="grid-column:1/-1;">
+        <!-- ══ 👥 PNG & Personaggi ══ -->
+        <div style="grid-column:1/-1;margin-top:4px;margin-bottom:-4px;">
+          <div style="font-family:var(--font-display);font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);border-bottom:1px solid var(--border);padding-bottom:4px;">👥 PNG & Personaggi</div>
+        </div>
+<div class="card card-gold gen-card" data-gen-id="npc" style="grid-column:1/-1;">
           <div class="card-header" style="flex-wrap:wrap;gap:6px;">
             <h3 class="card-title">Generatore PNG Completo</h3>
             <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
@@ -476,7 +479,12 @@
             </div>
           </div>
         </div>
-        <div class="card gen-card" data-gen-id="meteo">
+
+        <!-- ══ 🌍 Ambiente & Atmosfera ══ -->
+        <div style="grid-column:1/-1;margin-top:4px;margin-bottom:-4px;">
+          <div style="font-family:var(--font-display);font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);border-bottom:1px solid var(--border);padding-bottom:4px;">🌍 Ambiente & Atmosfera</div>
+        </div>
+<div class="card gen-card" data-gen-id="meteo">
           <div class="card-header">
             <h3 class="card-title">Meteo</h3>
             <select id="gen-meteo-stagione" class="form-select" style="width:auto;font-size:0.75rem;">
@@ -493,7 +501,7 @@
             <div class="text-muted text-sm">Seleziona la stagione e genera</div>
           </div>
         </div>
-        <div class="card gen-card" data-gen-id="sensori">
+<div class="card gen-card" data-gen-id="sensori">
           <div class="card-header">
             <h3 class="card-title">Rumori &amp; Odori</h3>
             <div style="display:flex;gap:4px;">
@@ -511,26 +519,59 @@
             <div class="text-muted text-sm">Seleziona l'ambiente e genera</div>
           </div>
         </div>
-        <div class="card gen-card" data-gen-id="rumors">
+<div class="card gen-card" data-gen-id="descrizione" style="grid-column:1/-1;">
           <div class="card-header">
-            <h3 class="card-title">Voci di Corridoio</h3>
-            <button class="btn btn-secondary btn-sm" onclick="Generatori.rollRumors()">Genera</button>
+            <h3 class="card-title">🏙️ Descrizione Luoghi</h3>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
+              <select id="gen-desc-tipo" class="form-select" style="width:auto;font-size:0.75rem;" onchange="DescrizioneGen.aggiornaSottotipo()">
+                <option value="taverna">🍺 Taverna</option>
+                <option value="bottega">🛒 Bottega</option>
+                <option value="strada">🛤️ Strada</option>
+                <option value="quartiere">🏘️ Quartiere</option>
+                <option value="dungeon">🏚️ Dungeon</option>
+                <option value="foresta">🌲 Foresta</option>
+                <option value="tempio">⛪ Tempio</option>
+                <option value="castello">🏰 Castello</option>
+                <option value="porto">⚓ Porto</option>
+                <option value="mercato">🏪 Mercato</option>
+              </select>
+              <select id="gen-desc-qualita" class="form-select" style="width:auto;font-size:0.75rem;">
+                <option value="squallido">💀 Squallido</option>
+                <option value="normale" selected>⚖️ Normale</option>
+                <option value="lusso">👑 Lusso</option>
+              </select>
+              <button class="btn btn-primary btn-sm" onclick="DescrizioneGen.genera()">🎲 Genera</button>
+              <button class="btn btn-ghost btn-sm" onclick="DescrizioneGen.genera()">↺ Rigenera</button>
+            </div>
           </div>
-          <div id="gen-rumors-result">
-            <div class="text-muted text-sm">Genera 3 voci (2 vere, 1 falsa)</div>
+          <div id="gen-desc-result" style="padding:10px 12px;min-height:80px;">
+            <div class="text-muted text-sm">Seleziona tipo e qualità, poi genera.</div>
           </div>
         </div>
-        <div class="card gen-card" data-gen-id="accento">
+<div class="card gen-card" data-gen-id="nomi_luoghi">
           <div class="card-header">
-            <h3 class="card-title">Voce &amp; Accento</h3>
-            <button class="btn btn-secondary btn-sm" onclick="Generatori.rollAccent()">Genera</button>
+            <h3 class="card-title">🗺️ Nomi Luoghi</h3>
+            <select id="gen-nomluogo-tipo" class="form-select" style="width:auto;font-size:0.75rem;">
+              <option value="citta">🏙️ Città</option>
+              <option value="villaggio">🏘️ Villaggio</option>
+              <option value="fiume">🌊 Fiume</option>
+              <option value="montagna">⛰️ Montagna</option>
+              <option value="foresta">🌲 Foresta</option>
+              <option value="dungeon">🏚️ Dungeon/Rovina</option>
+              <option value="regno">👑 Regno/Regione</option>
+            </select>
+            <button class="btn btn-secondary btn-sm" onclick="NomiLuoghiGen.genera()">🎲</button>
           </div>
-          <div id="gen-accent-result">
-            <div class="text-muted text-sm">Genera suggerimenti per un PNG</div>
+          <div id="gen-nomluogo-result" style="min-height:60px;">
+            <div class="text-muted text-sm">Seleziona il tipo e genera</div>
           </div>
         </div>
-        <!-- Shop Generator -->
-        <div class="card gen-card" data-gen-id="shop">
+
+        <!-- ══ 🏪 Negozio & Economia ══ -->
+        <div style="grid-column:1/-1;margin-top:4px;margin-bottom:-4px;">
+          <div style="font-family:var(--font-display);font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);border-bottom:1px solid var(--border);padding-bottom:4px;">🏪 Negozio & Economia</div>
+        </div>
+<div class="card gen-card" data-gen-id="shop">
           <div class="card-header">
             <h3 class="card-title">Shop Generator</h3>
             <button class="btn btn-secondary btn-sm" onclick="Generatori.rollShop()">Genera</button>
@@ -574,9 +615,86 @@
             <div class="text-muted text-sm">Seleziona il tipo e genera l'inventario</div>
           </div>
         </div>
+<div class="card gen-card" data-gen-id="biblioteca">
+          <div class="card-header">
+            <h3 class="card-title">Biblioteca &amp; Pergamene</h3>
+            <select id="gen-bib-size" class="form-select" style="width:auto;font-size:0.75rem;" onchange="Generatori.rollBiblioteca()">
+              <option value="piccola">Piccola</option>
+              <option value="grande">Grande</option>
+              <option value="enorme">Enorme</option>
+            </select>
+            <button class="btn btn-secondary btn-sm" onclick="Generatori.rollBiblioteca()">Genera</button>
+          </div>
+          <div id="gen-bib-result">
+            <div class="text-muted text-sm">Seleziona la dimensione e genera l'inventario</div>
+          </div>
+        </div>
 
-        <!-- Calcolatore Viaggio -->
-        <div class="card gen-card" data-gen-id="viaggio">
+        <!-- ══ 💰 Loot & Tesori ══ -->
+        <div style="grid-column:1/-1;margin-top:4px;margin-bottom:-4px;">
+          <div style="font-family:var(--font-display);font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);border-bottom:1px solid var(--border);padding-bottom:4px;">💰 Loot & Tesori</div>
+        </div>
+        <div class="card gen-card" data-gen-id="loot" style="grid-column:1/-1;">
+          <div class="card-header">
+            <h3 class="card-title">💰 Loot Generator</h3>
+            <div style="display:flex;gap:4px;">
+              <button id="loot-tab-rng" class="btn btn-primary btn-sm" onclick="LootPanel.switchTab('rng')">🎲 RNG System</button>
+              <button id="loot-tab-dmg" class="btn btn-ghost btn-sm" onclick="LootPanel.switchTab('dmg')">📚 DMG Ufficiale</button>
+            </div>
+          </div>
+          <div id="loot-panel-rng">
+            <div class="form-row" style="padding:8px 12px 0;margin-bottom:var(--space-sm);">
+              <div class="form-group" style="margin-bottom:0;">
+                <label class="form-label">Tipo loot</label>
+                <select id="gen-loot-tipo" class="form-select">
+                  <option value="mostro">🐉 Da Mostro (per CR)</option>
+                  <option value="scrigno">📦 Scrigno / Tesoro</option>
+                  <option value="bandito">🗡️ Bandito / Brigante</option>
+                  <option value="guardia">🛡️ Guardia / Soldato</option>
+                  <option value="mago">🧙 Mago / Stregone</option>
+                  <option value="sacerdote">⛪ Sacerdote / Chierico</option>
+                  <option value="mercante">🏪 Mercante</option>
+                  <option value="non_morto">💀 Non Morto</option>
+                  <option value="drago">🐲 Drago (hoard)</option>
+                  <option value="tomba">⚰️ Tomba / Cripta</option>
+                </select>
+              </div>
+              <div class="form-group" style="margin-bottom:0;">
+                <label class="form-label">CR</label>
+                <input type="number" id="gen-loot-cr" class="form-input" min="0" max="30" value="5" placeholder="es. 5">
+              </div>
+              <div class="form-group" style="margin-bottom:0;display:flex;align-items:flex-end;">
+                <button class="btn btn-secondary btn-sm" onclick="Generatori.rollLoot()">🎲 Genera</button>
+              </div>
+            </div>
+            <div id="gen-loot-result" style="padding:0 12px 10px;">
+              <div class="text-muted text-sm">Seleziona il tipo e genera il loot</div>
+            </div>
+          </div>
+          <div id="loot-panel-dmg" style="display:none;">
+            <div style="padding:6px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+              <span style="font-size:0.78rem;color:var(--text-muted);">Tabelle ufficiali DMG 2014 e 2024 — 400+ oggetti magici</span>
+              <a href="https://dnd-loot-generator-sepia.vercel.app/" target="_blank" class="btn btn-ghost btn-sm" style="font-size:0.72rem;">↗ Apri separato</a>
+            </div>
+            <div style="position:relative;width:100%;height:600px;">
+              <iframe id="loot-dmg-iframe" src="" data-src="https://dnd-loot-generator-sepia.vercel.app/"
+                style="width:100%;height:100%;border:none;border-radius:0 0 var(--radius-lg) var(--radius-lg);"
+                title="D&D Loot Generator" loading="lazy"></iframe>
+              <div id="loot-iframe-placeholder" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--bg-secondary);border-radius:0 0 var(--radius-lg) var(--radius-lg);">
+                <div style="font-size:2.5rem;margin-bottom:12px;">📚</div>
+                <div style="font-family:var(--font-display);font-size:0.9rem;margin-bottom:6px;">DMG Loot Generator</div>
+                <div class="text-muted text-sm" style="margin-bottom:16px;text-align:center;max-width:280px;">Tabelle ufficiali DMG 2014 e 2024<br>400+ oggetti magici</div>
+                <button class="btn btn-primary btn-sm" onclick="LootPanel.loadIframe()">Carica Tool</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ══ 🗺️ Viaggio & Incontri ══ -->
+        <div style="grid-column:1/-1;margin-top:4px;margin-bottom:-4px;">
+          <div style="font-family:var(--font-display);font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);border-bottom:1px solid var(--border);padding-bottom:4px;">🗺️ Viaggio & Incontri</div>
+        </div>
+<div class="card gen-card" data-gen-id="viaggio">
           <div class="card-header">
             <h3 class="card-title">Calcolatore Viaggio</h3>
             <button class="btn btn-secondary btn-sm" onclick="Generatori.calcViaggio()">Calcola</button>
@@ -621,77 +739,7 @@
           </div>
           <div id="gen-viaggio-result" style="margin-top:var(--space-sm);"></div>
         </div>
-
-
-        <div class="card gen-card" data-gen-id="loot">
-          <div class="card-header">
-            <h3 class="card-title">Generatore Loot</h3>
-            <button class="btn btn-secondary btn-sm" onclick="Generatori.rollLoot()">Genera Loot</button>
-          </div>
-          <div class="form-row" style="margin-bottom:var(--space-sm);">
-            <div class="form-group" style="margin-bottom:0;">
-              <label class="form-label">Tipo loot</label>
-              <select id="gen-loot-tipo" class="form-select">
-                <option value="mostro">🐉 Da Mostro (per CR)</option>
-                <option value="scrigno">📦 Scrigno / Tesoro</option>
-                <option value="bandito">🗡️ Bandito / Brigante</option>
-                <option value="guardia">🛡️ Guardia / Soldato</option>
-                <option value="mago">🧙 Mago / Stregone</option>
-                <option value="sacerdote">⛪ Sacerdote / Chierico</option>
-                <option value="mercante">🏪 Mercante</option>
-                <option value="non_morto">💀 Non Morto</option>
-                <option value="drago">🐲 Drago (hoard)</option>
-                <option value="tomba">⚰️ Tomba / Cripta</option>
-              </select>
-            </div>
-            <div class="form-group" style="margin-bottom:0;">
-              <label class="form-label">CR (per mostro e scrigno)</label>
-              <input type="number" id="gen-loot-cr" class="form-input" min="0" max="30" value="5" placeholder="es. 5">
-            </div>
-          </div>
-          <div id="gen-loot-result">
-            <div class="text-muted text-sm">Seleziona il tipo e genera il loot</div>
-          </div>
-        </div>
-        <!-- Biblioteca / Pergamene -->
-        <div class="card gen-card" data-gen-id="biblioteca">
-          <div class="card-header">
-            <h3 class="card-title">Biblioteca &amp; Pergamene</h3>
-            <select id="gen-bib-size" class="form-select" style="width:auto;font-size:0.75rem;" onchange="Generatori.rollBiblioteca()">
-              <option value="piccola">Piccola</option>
-              <option value="grande">Grande</option>
-              <option value="enorme">Enorme</option>
-            </select>
-            <button class="btn btn-secondary btn-sm" onclick="Generatori.rollBiblioteca()">Genera</button>
-          </div>
-          <div id="gen-bib-result">
-            <div class="text-muted text-sm">Seleziona la dimensione e genera l'inventario</div>
-          </div>
-        </div>
-
-        <!-- Generatore Nomi per Razza -->
-        <div class="card gen-card" data-gen-id="nomi">
-          <div class="card-header">
-            <h3 class="card-title">Generatore Nomi</h3>
-            <select id="gen-nomi-razza" class="form-select" style="width:auto;font-size:0.75rem;">
-              <option value="umano">Umano</option>
-              <option value="elfo">Elfo</option>
-              <option value="nano">Nano</option>
-              <option value="halfling">Halfling</option>
-              <option value="tiefling">Tiefling</option>
-              <option value="dragonide">Dragonide</option>
-              <option value="gnomo">Gnomo</option>
-              <option value="mezzorco">Mezz'Orco</option>
-            </select>
-            <button class="btn btn-secondary btn-sm" onclick="Generatori.rollNomi()">Genera</button>
-          </div>
-          <div id="gen-nomi-result" style="min-height:60px;">
-            <div class="text-muted text-sm">Seleziona la razza e genera</div>
-          </div>
-        </div>
-
-        <!-- Incontri Casuali -->
-        <div class="card gen-card" data-gen-id="incontri">
+<div class="card gen-card" data-gen-id="incontri">
           <div class="card-header">
             <h3 class="card-title">Incontri Casuali</h3>
             <select id="gen-incontri-ambiente" class="form-select" style="width:auto;font-size:0.75rem;">
@@ -715,26 +763,7 @@
             <div class="text-muted text-sm">Seleziona l'ambiente e genera</div>
           </div>
         </div>
-
-        <!-- Tabelle Follia -->
-        <div class="card gen-card" data-gen-id="follia">
-          <div class="card-header">
-            <h3 class="card-title">Follia</h3>
-            <select id="gen-follia-tipo" class="form-select" style="width:auto;font-size:0.75rem;">
-              <option value="breve">Breve (1d10 minuti)</option>
-              <option value="prolungata">Prolungata (1d10×10 ore)</option>
-              <option value="permanente">Permanente</option>
-            </select>
-            <button class="btn btn-secondary btn-sm" onclick="Generatori.rollFollia()">Genera</button>
-          </div>
-          <div id="gen-follia-result" style="min-height:60px;">
-            <div class="text-muted text-sm">Seleziona il tipo e genera</div>
-          </div>
-        </div>
-
-
-        <!-- Encounter Builder + Loot RNG — full width -->
-        <div class="card gen-card" data-gen-id="encounter" style="grid-column:1/-1;">
+<div class="card gen-card" data-gen-id="encounter" style="grid-column:1/-1;">
           <div class="card-header">
             <h3 class="card-title">⚔️ Encounter Builder</h3>
             <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
@@ -792,61 +821,62 @@
           </div>
         </div>
 
-
-        <!-- Descrizione Luoghi -->
-        <div class="card gen-card" data-gen-id="descrizione" style="grid-column:1/-1;">
+        <!-- ══ 🎭 Strumenti Narrativi ══ -->
+        <div style="grid-column:1/-1;margin-top:4px;margin-bottom:-4px;">
+          <div style="font-family:var(--font-display);font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);border-bottom:1px solid var(--border);padding-bottom:4px;">🎭 Strumenti Narrativi</div>
+        </div>
+<div class="card gen-card" data-gen-id="rumors">
           <div class="card-header">
-            <h3 class="card-title">🏙️ Descrizione Luoghi</h3>
-            <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
-              <select id="gen-desc-tipo" class="form-select" style="width:auto;font-size:0.75rem;" onchange="DescrizioneGen.aggiornaSottotipo()">
-                <option value="taverna">🍺 Taverna</option>
-                <option value="bottega">🛒 Bottega</option>
-                <option value="strada">🛤️ Strada</option>
-                <option value="quartiere">🏘️ Quartiere</option>
-                <option value="dungeon">🏚️ Dungeon</option>
-                <option value="foresta">🌲 Foresta</option>
-                <option value="tempio">⛪ Tempio</option>
-                <option value="castello">🏰 Castello</option>
-                <option value="porto">⚓ Porto</option>
-                <option value="mercato">🏪 Mercato</option>
-              </select>
-              <select id="gen-desc-qualita" class="form-select" style="width:auto;font-size:0.75rem;">
-                <option value="squallido">💀 Squallido</option>
-                <option value="normale" selected>⚖️ Normale</option>
-                <option value="lusso">👑 Lusso</option>
-              </select>
-              <button class="btn btn-primary btn-sm" onclick="DescrizioneGen.genera()">🎲 Genera</button>
-              <button class="btn btn-ghost btn-sm" onclick="DescrizioneGen.genera()">↺ Rigenera</button>
-            </div>
+            <h3 class="card-title">Voci di Corridoio</h3>
+            <button class="btn btn-secondary btn-sm" onclick="Generatori.rollRumors()">Genera</button>
           </div>
-          <div id="gen-desc-result" style="padding:10px 12px;min-height:80px;">
-            <div class="text-muted text-sm">Seleziona tipo e qualità, poi genera.</div>
+          <div id="gen-rumors-result">
+            <div class="text-muted text-sm">Genera 3 voci (2 vere, 1 falsa)</div>
           </div>
         </div>
-
-
-        <!-- Nomi Luoghi -->
-        <div class="card gen-card" data-gen-id="nomi_luoghi">
+<div class="card gen-card" data-gen-id="accento">
           <div class="card-header">
-            <h3 class="card-title">🗺️ Nomi Luoghi</h3>
-            <select id="gen-nomluogo-tipo" class="form-select" style="width:auto;font-size:0.75rem;">
-              <option value="citta">🏙️ Città</option>
-              <option value="villaggio">🏘️ Villaggio</option>
-              <option value="fiume">🌊 Fiume</option>
-              <option value="montagna">⛰️ Montagna</option>
-              <option value="foresta">🌲 Foresta</option>
-              <option value="dungeon">🏚️ Dungeon/Rovina</option>
-              <option value="regno">👑 Regno/Regione</option>
-            </select>
-            <button class="btn btn-secondary btn-sm" onclick="NomiLuoghiGen.genera()">🎲</button>
+            <h3 class="card-title">Voce &amp; Accento</h3>
+            <button class="btn btn-secondary btn-sm" onclick="Generatori.rollAccent()">Genera</button>
           </div>
-          <div id="gen-nomluogo-result" style="min-height:60px;">
+          <div id="gen-accent-result">
+            <div class="text-muted text-sm">Genera suggerimenti per un PNG</div>
+          </div>
+        </div>
+<div class="card gen-card" data-gen-id="nomi">
+          <div class="card-header">
+            <h3 class="card-title">Generatore Nomi</h3>
+            <select id="gen-nomi-razza" class="form-select" style="width:auto;font-size:0.75rem;">
+              <option value="umano">Umano</option>
+              <option value="elfo">Elfo</option>
+              <option value="nano">Nano</option>
+              <option value="halfling">Halfling</option>
+              <option value="tiefling">Tiefling</option>
+              <option value="dragonide">Dragonide</option>
+              <option value="gnomo">Gnomo</option>
+              <option value="mezzorco">Mezz'Orco</option>
+            </select>
+            <button class="btn btn-secondary btn-sm" onclick="Generatori.rollNomi()">Genera</button>
+          </div>
+          <div id="gen-nomi-result" style="min-height:60px;">
+            <div class="text-muted text-sm">Seleziona la razza e genera</div>
+          </div>
+        </div>
+<div class="card gen-card" data-gen-id="follia">
+          <div class="card-header">
+            <h3 class="card-title">Follia</h3>
+            <select id="gen-follia-tipo" class="form-select" style="width:auto;font-size:0.75rem;">
+              <option value="breve">Breve (1d10 minuti)</option>
+              <option value="prolungata">Prolungata (1d10×10 ore)</option>
+              <option value="permanente">Permanente</option>
+            </select>
+            <button class="btn btn-secondary btn-sm" onclick="Generatori.rollFollia()">Genera</button>
+          </div>
+          <div id="gen-follia-result" style="min-height:60px;">
             <div class="text-muted text-sm">Seleziona il tipo e genera</div>
           </div>
         </div>
-
-        <!-- Ganci Narrativi -->
-        <div class="card gen-card" data-gen-id="ganci">
+<div class="card gen-card" data-gen-id="ganci">
           <div class="card-header">
             <h3 class="card-title">🎣 Gancio Narrativo</h3>
             <select id="gen-gancio-tipo" class="form-select" style="width:auto;font-size:0.75rem;">
@@ -863,9 +893,7 @@
             <div class="text-muted text-sm">Genera un gancio narrativo</div>
           </div>
         </div>
-
-        <!-- Oracolo del Sì/No -->
-        <div class="card gen-card" data-gen-id="oracolo">
+<div class="card gen-card" data-gen-id="oracolo">
           <div class="card-header">
             <h3 class="card-title">🔮 Oracolo</h3>
           </div>
@@ -878,10 +906,7 @@
           </div>
           <div id="gen-oracolo-result" style="padding:0 12px 10px;min-height:50px;"></div>
         </div>
-
-
-        <!-- Generatore Missioni Secondarie -->
-        <div class="card gen-card" data-gen-id="missioni" style="grid-column:1/-1;">
+<div class="card gen-card" data-gen-id="missioni" style="grid-column:1/-1;">
           <div class="card-header">
             <h3 class="card-title">📜 Missioni Secondarie</h3>
             <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
@@ -1161,6 +1186,7 @@
       </div>
 
       <!-- Griglia blocchi -->
+      <div id="schermo-full-row" style="display:flex;flex-direction:column;gap:var(--space-md);margin-bottom:var(--space-md);"></div>
       <div class="schermo-cols">
         <div class="schermo-col" id="schermo-col-0" data-col="0"></div>
         <div class="schermo-col" id="schermo-col-1" data-col="1"></div>
@@ -7219,13 +7245,23 @@ const Schermo = (() => {
 
     // Ricostruisce sempre la griglia per garantire drag & drop corretto
     SchermoDD.reset();
-    // Distribuisce nelle colonne
     cols.forEach(c => { if (c) c.innerHTML = ''; });
+
+    // Blocchi XL → riga full-width sopra le colonne
+    const fullRowEl = document.getElementById('schermo-full-row');
+    if (fullRowEl) fullRowEl.innerHTML = '';
+
     _blocks.forEach((block, idx) => {
-      const colIdx = Math.min(Math.max(block.col ?? (idx % 4), 0), 3);
-      block.col = colIdx;
-      const col = cols[colIdx];
-      if (col) col.insertAdjacentHTML('beforeend', renderBlock(block, idx));
+      const size = block.size || 'md';
+      if (size === 'xl') {
+        // Blocco full-width: va nel full-row, non nelle colonne
+        if (fullRowEl) fullRowEl.insertAdjacentHTML('beforeend', renderBlock(block, idx));
+      } else {
+        const colIdx = Math.min(Math.max(block.col ?? (idx % 4), 0), 3);
+        block.col = colIdx;
+        const col = cols[colIdx];
+        if (col) col.insertAdjacentHTML('beforeend', renderBlock(block, idx));
+      }
     });
     _blocks.forEach(b => updateBlockContent(b));
     requestAnimationFrame(() => SchermoDD.enable());
@@ -7245,7 +7281,7 @@ const Schermo = (() => {
           <span class="schermo-block-icon" style="cursor:grab;" title="Trascina per spostare">${def.icon}</span>
           <span class="schermo-block-title">${title}</span>
           <div class="schermo-block-actions">
-            <button class="btn btn-ghost btn-icon-sm" onclick="Schermo.resizeBlock('${block.id}')" title="Ridimensiona"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg></button>
+            <button class="btn btn-ghost btn-icon-sm" onclick="Schermo.resizeBlock('${block.id}')" title="Dimensione: ${size.toUpperCase()} — clicca per cambiare" style="font-family:var(--font-mono);font-size:0.6rem;width:auto;padding:0 4px;">${size.toUpperCase()}</button>
             <button class="btn btn-ghost btn-icon-sm" onclick="Schermo.moveBlock('${block.id}', -1)" title="Sposta su"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg></button>
             <button class="btn btn-ghost btn-icon-sm" onclick="Schermo.moveBlock('${block.id}', 1)" title="Sposta giù"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg></button>
             ${block.type === 'custom' || block.type === 'note' ? `<button class="btn btn-ghost btn-icon-sm" onclick="Schermo.editBlock('${block.id}')" title="Modifica"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>` : ''}
@@ -8179,7 +8215,7 @@ const Generatori = {
     document.querySelectorAll('.gen-card[data-gen-id]').forEach(card => {
       const id = card.dataset.genId;
       // encounter è sempre visibile
-      if (['encounter','descrizione','nomi_luoghi','ganci','oracolo','missioni'].includes(id)) { card.style.display = ''; return; }
+      if (['encounter','descrizione','nomi_luoghi','ganci','oracolo','missioni','loot'].includes(id)) { card.style.display = ''; return; }
       card.style.display = enabled.includes(id) ? '' : 'none';
     });
   },
@@ -11034,6 +11070,34 @@ const MissioniGen = (() => {
   };
 
   return { genera };
+})();
+
+// ══ LOOT PANEL ══
+const LootPanel = (() => {
+  const switchTab = (tab) => {
+    const rng = document.getElementById('loot-panel-rng');
+    const dmg = document.getElementById('loot-panel-dmg');
+    const btnRng = document.getElementById('loot-tab-rng');
+    const btnDmg = document.getElementById('loot-tab-dmg');
+    if (!rng || !dmg) return;
+    if (tab === 'rng') {
+      rng.style.display = ''; dmg.style.display = 'none';
+      btnRng?.classList.replace('btn-ghost','btn-primary');
+      btnDmg?.classList.replace('btn-primary','btn-ghost');
+    } else {
+      rng.style.display = 'none'; dmg.style.display = '';
+      btnRng?.classList.replace('btn-primary','btn-ghost');
+      btnDmg?.classList.replace('btn-ghost','btn-primary');
+    }
+  };
+  const loadIframe = () => {
+    const iframe = document.getElementById('loot-dmg-iframe');
+    const ph = document.getElementById('loot-iframe-placeholder');
+    if (!iframe) return;
+    iframe.src = iframe.dataset.src || 'https://dnd-loot-generator-sepia.vercel.app/';
+    if (ph) ph.style.display = 'none';
+  };
+  return { switchTab, loadIframe };
 })();
 
 // ══ TIMER BLOCK (conto alla rovescia funzionante) ══
