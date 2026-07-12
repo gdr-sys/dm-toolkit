@@ -230,10 +230,10 @@
         </div>
         <div id="nc-container" style="display:flex;overflow:hidden;min-height:480px;max-height:70vh;">
           <!-- Pannello categorie -->
-          <div id="nc-sidebar" style="width:140px;flex-shrink:0;border-right:1px solid var(--border);overflow-y:auto;background:var(--bg-secondary);">
+          <div id="nc-sidebar" style="width:180px;flex-shrink:0;border-right:1px solid var(--border);overflow-y:auto;background:var(--bg-secondary);">
           </div>
           <!-- Pannello pagine -->
-          <div id="nc-pages" style="width:160px;flex-shrink:0;border-right:1px solid var(--border);overflow-y:auto;background:var(--bg-card);">
+          <div id="nc-pages" style="width:200px;flex-shrink:0;border-right:1px solid var(--border);overflow-y:auto;background:var(--bg-card);">
           </div>
           <!-- Editor -->
           <div id="nc-editor-wrap" style="flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden;">
@@ -4197,7 +4197,7 @@ const NPC = (() => {
       const facName = camp?.factions?.find(f => f.id === npc.factionId)?.name || '';
       return `
         <div class="npc-card" onclick="NPC.openView('${npc.id}')">
-          ${npc.immagine ? `<div style="height:90px;background:url('${npc.immagine}') center/cover no-repeat;border-radius:var(--radius-lg) var(--radius-lg) 0 0;flex-shrink:0;"></div>` : ''}
+          ${npc.immagine ? renderImgPositionabile(npc.immagine, {h:'120px', dataId:'npc'+npc.id}) : ''}
           <div class="npc-card-header">
             <div class="npc-avatar">${npc.icon || '👤'}</div>
             <div style="flex:1;min-width:0;">
@@ -4405,7 +4405,7 @@ const Luoghi = (() => {
     const figli = getAll().filter(x => x.parentId === id);
 
     const content = `
-      ${l.immagine ? `<img src="${l.immagine}" style="width:100%;max-height:200px;object-fit:cover;border-radius:var(--radius-md);margin-bottom:var(--space-md);">` : ''}
+      ${l.immagine ? renderImgPositionabile(l.immagine, {h:'200px', dataId:'l'+l.id}) : ''}
       <div class="text-xs text-muted" style="font-family:var(--font-display);letter-spacing:0.05em;text-transform:uppercase;margin-bottom:var(--space-sm);">
         ${tipoIcon[l.tipo] || '📍'} ${l.tipo || ''} ${parent ? '· dentro ' + parent.nome : ''}
       </div>
@@ -4589,7 +4589,7 @@ const Fazioni = (() => {
     const col = relColor(pct);
 
     const content = `
-      ${f.immagine ? `<img src="${f.immagine}" style="width:100%;max-height:160px;object-fit:cover;border-radius:var(--radius-md);margin-bottom:var(--space-md);">` : ''}
+      ${f.immagine ? renderImgPositionabile(f.immagine, {h:'160px', dataId:'fa'+f.id}) : ''}
       <div style="margin-bottom:var(--space-md);">
         <div class="relation-bar-labels"><span>Debole</span><span style="color:${col};font-weight:600;">${pct}% potere</span><span>Dominante</span></div>
         <div class="relation-bar-track"><div class="relation-bar-fill" style="width:${pct}%;background:${col};"></div></div>
@@ -6106,22 +6106,47 @@ const Compendio = (() => {
       return;
     }
 
-    el.innerHTML = renderFavoritiSection('monsters') + list.map(m => {
-      const gs = gsDisplay(m);
-      const tipo = tipoPrincipale(m.tipo);
-      const pf = m.punti_ferita?.media || '?';
-      const ca = m.classe_armatura || '?';
+    // Aggiungi homebrew mostri in lista unificata
+    const hbMonsters = _getHomebrew().filter(h => h.categoria === 'monsters' &&
+      (!q || h.nome.toLowerCase().includes(q)));
+    const hbRows = hbMonsters.map(h => ({
+      _hb: true, id: h.id, nome: h.nome,
+      gs: h.gs ?? h.grado_sfida?.valore ?? null,
+      pf: h.pf ?? h.punti_ferita?.media ?? null,
+      ca: h.ca ?? h.classe_armatura ?? null,
+      tipo: h.tipo || 'Homebrew', dimensione: h.dimensione || '',
+    }));
+
+    const combined = [...list.map(m => ({
+      _hb: false, id: m.id, nome: m.nome,
+      gs: gsNumeric(m), gsDisplay: gsDisplay(m),
+      pf: m.punti_ferita?.media || '?', ca: m.classe_armatura || '?',
+      tipo: tipoPrincipale(m.tipo), dimensione: m.dimensione || '',
+    })), ...hbRows].sort((a, b) => {
+      const ga = a._hb ? (parseFloat(a.gs) || -1) : a.gs;
+      const gb = b._hb ? (parseFloat(b.gs) || -1) : b.gs;
+      if (ga !== gb) return ga - gb;
+      return a.nome.localeCompare(b.nome, 'it');
+    });
+
+    if (count) count.textContent = `${combined.length} mostri`;
+
+    el.innerHTML = renderFavoritiSection('monsters') + combined.map(m => {
+      const gs = m._hb ? (m.gs ?? '?') : m.gsDisplay;
+      const pf = m._hb ? (m.pf ?? '?') : m.pf;
+      const ca = m._hb ? (m.ca ?? '?') : m.ca;
+      const openFn = m._hb ? `Compendio.openHomebrew('${m.id}')` : `Compendio.openMonster('${m.id}')`;
       return `
-        <div class="comp-row" onclick="Compendio.openMonster('${m.id}')">
+        <div class="comp-row" onclick="${openFn}">
           <div class="comp-row-main">
-            <span class="comp-row-name">${highlight(m.nome, f.q)}</span>
-            <span class="comp-row-meta">${highlight(tipo, f.q)} · ${m.dimensione || ''}</span>
+            <span class="comp-row-name">${highlight(m.nome, f.q)}${m._hb ? ' <span style="font-size:0.6rem;color:var(--accent-secondary);">HB</span>' : ''}</span>
+            <span class="comp-row-meta">${highlight(m.tipo, f.q)} · ${m.dimensione}</span>
           </div>
           <div class="comp-row-stats">
             <span class="comp-stat-pill" title="Grado Sfida">GS ${gs}</span>
             <span class="comp-stat-pill" title="Punti Ferita">PF ${pf}</span>
             <span class="comp-stat-pill" title="Classe Armatura">CA ${ca}</span>
-            ${favBtn(m.id, m.nome, 'monsters')}
+            ${favBtn(m.id, m.nome, m._hb ? 'homebrew' : 'monsters')}
           </div>
         </div>`;
     }).join('');
@@ -6158,17 +6183,37 @@ const Compendio = (() => {
       return;
     }
 
-    el.innerHTML = renderFavoritiSection('magic_items') + list.map(i => `
-      <div class="comp-row" onclick="Compendio.openMagicItem('${i.id}')">
-        <div class="comp-row-main">
-          <span class="comp-row-name">${highlight(i.nome, f.q)}</span>
-          <span class="comp-row-meta">${i.tipo_base || ''} ${i.richiede_sintonia ? '· <em>richiede sintonia</em>' : ''}</span>
-        </div>
-        <div class="comp-row-stats">
-          <span class="badge ${raritaBadge[i._rarita_norm] || 'badge-muted'}">${i._rarita_norm}</span>
-          ${favBtn(i.id, i.nome, 'magic_items')}
-        </div>
-      </div>`).join('');
+    el.innerHTML = (() => {
+    // Aggiungi homebrew oggetti magici
+    const hbMagic = _getHomebrew().filter(h => h.categoria === 'magic_items' &&
+      (!q || h.nome.toLowerCase().includes(q)));
+    const hbMagicMapped = hbMagic.map(h => ({
+      _hb: true, id: h.id, nome: h.nome,
+      tipo_base: h.tipo_base || h.sottotitolo || 'Homebrew',
+      _rarita_norm: normalizzaRarita(h.rarita || ''),
+      richiede_sintonia: h.richiede_sintonia || false,
+    }));
+    const allMagic = [...list.map(i => ({...i, _hb:false})), ...hbMagicMapped]
+      .sort((a,b) => {
+        const ra = raritaOrder[a._rarita_norm]??99, rb = raritaOrder[b._rarita_norm]??99;
+        if (ra!==rb) return ra-rb;
+        return a.nome.localeCompare(b.nome,'it');
+      });
+    if (count) count.textContent = allMagic.length + ' oggetti';
+    return renderFavoritiSection('magic_items') + allMagic.map(i => {
+      const openFn = i._hb ? 'Compendio.openHomebrew(\'' + i.id + '\')' : 'Compendio.openMagicItem(\'' + i.id + '\')';
+      return '<div class="comp-row" onclick="' + openFn + '">' +
+        '<div class="comp-row-main">' +
+          '<span class="comp-row-name">' + highlight(i.nome, f.q) + (i._hb ? ' <span style="font-size:0.6rem;color:var(--accent-secondary);">HB</span>' : '') + '</span>' +
+          '<span class="comp-row-meta">' + (i.tipo_base||'') + (i.richiede_sintonia ? ' · <em>richiede sintonia</em>' : '') + '</span>' +
+        '</div>' +
+        '<div class="comp-row-stats">' +
+          '<span class="badge ' + (raritaBadge[i._rarita_norm]||'badge-muted') + '">' + i._rarita_norm + '</span>' +
+          favBtn(i.id, i.nome, i._hb ? 'homebrew' : 'magic_items') +
+        '</div>' +
+      '</div>';
+    }).join('');
+  })()
   };
 
   // ─────────────────────────────────────────────────
@@ -6197,17 +6242,26 @@ const Compendio = (() => {
       return;
     }
 
-    el.innerHTML = renderFavoritiSection('equipment') + list.map(e => `
-      <div class="comp-row" onclick="Compendio.openEquipment('${e.id}')">
+    // Aggiungi homebrew equipaggiamento
+    const hbEquip = _getHomebrew().filter(h => h.categoria === 'equipment' &&
+      (!q || h.nome.toLowerCase().includes(q)));
+    const allEquip = [...list.map(e => ({...e,_hb:false})),
+      ...hbEquip.map(h => ({_hb:true, id:h.id, nome:h.nome,
+        categoria:h.categoria_tipo||h.sottotitolo||'Homebrew',
+        danni:h.danni||'', costo:h.costo||'', peso:h.peso||''}))
+    ].sort((a,b) => a.nome.localeCompare(b.nome,'it'));
+    if (count) count.textContent = `${allEquip.length} voci`;
+    el.innerHTML = renderFavoritiSection('equipment') + allEquip.map(e => `
+      <div class="comp-row" onclick="${e._hb ? `Compendio.openHomebrew('${e.id}')` : `Compendio.openEquipment('${e.id}')`}">
         <div class="comp-row-main">
-          <span class="comp-row-name">${highlight(e.nome, f.q)}</span>
+          <span class="comp-row-name">${highlight(e.nome, f.q)}${e._hb ? ' <span style="font-size:0.6rem;color:var(--accent-secondary);">HB</span>' : ''}</span>
           <span class="comp-row-meta">${highlight(e.categoria || '', f.q)}</span>
         </div>
         <div class="comp-row-stats">
           ${e.danni ? `<span class="comp-stat-pill">${e.danni}</span>` : ''}
           ${e.costo ? `<span class="comp-stat-pill">${e.costo}</span>` : ''}
           ${e.peso  ? `<span class="comp-stat-pill">${e.peso}</span>`  : ''}
-          ${favBtn(e.id, e.nome, 'equipment')}
+          ${favBtn(e.id, e.nome, e._hb ? 'homebrew' : 'equipment')}
         </div>
       </div>`).join('');
   };
@@ -9809,6 +9863,61 @@ const clearImg = (key) => {
   if (fileEl) fileEl.value = '';
 };
 
+
+
+// ── Helper immagine posizionabile ──
+const renderImgPositionabile = (src, opts) => {
+  if (!src) return '';
+  const h = opts?.h || '200px';
+  const objPos = opts?.pos || '50% 50%';
+  const zoom = opts?.zoom || 1;
+  const dataId = opts?.dataId || '';
+  const saveFn = opts?.saveFn || '';
+  return `<div style="position:relative;width:100%;height:${h};overflow:hidden;border-radius:var(--radius-md);background:var(--bg-tertiary);margin-bottom:8px;cursor:grab;" id="img-pos-wrap-${dataId}">
+    <img src="${src}" style="width:100%;height:100%;object-fit:cover;object-position:${objPos};transform:scale(${zoom});transform-origin:${objPos};transition:object-position 0.2s,transform 0.2s;" id="img-pos-${dataId}" draggable="false">
+    <div style="position:absolute;bottom:4px;right:4px;display:flex;gap:3px;opacity:0.8;">
+      <button onclick="imgMove('${dataId}','up',${saveFn ? '\''+saveFn+'\'' : 'null'})" class="btn btn-ghost btn-icon-sm" style="width:22px;height:22px;font-size:0.7rem;background:var(--bg-card);" title="Sposta su">↑</button>
+      <button onclick="imgMove('${dataId}','down',${saveFn ? '\''+saveFn+'\'' : 'null'})" class="btn btn-ghost btn-icon-sm" style="width:22px;height:22px;font-size:0.7rem;background:var(--bg-card);" title="Sposta giù">↓</button>
+      <button onclick="imgMove('${dataId}','left',${saveFn ? '\''+saveFn+'\'' : 'null'})" class="btn btn-ghost btn-icon-sm" style="width:22px;height:22px;font-size:0.7rem;background:var(--bg-card);" title="Sposta sx">←</button>
+      <button onclick="imgMove('${dataId}','right',${saveFn ? '\''+saveFn+'\'' : 'null'})" class="btn btn-ghost btn-icon-sm" style="width:22px;height:22px;font-size:0.7rem;background:var(--bg-card);" title="Sposta dx">→</button>
+      <button onclick="imgZoom('${dataId}','in',${saveFn ? '\''+saveFn+'\'' : 'null'})" class="btn btn-ghost btn-icon-sm" style="width:22px;height:22px;font-size:0.7rem;background:var(--bg-card);" title="Zoom in">+</button>
+      <button onclick="imgZoom('${dataId}','out',${saveFn ? '\''+saveFn+'\'' : 'null'})" class="btn btn-ghost btn-icon-sm" style="width:22px;height:22px;font-size:0.7rem;background:var(--bg-card);" title="Zoom out">−</button>
+    </div>
+  </div>`;
+};
+
+// Stato posizione immagini in memoria
+const _imgPos = {};
+const _imgZoom = {};
+
+const imgMove = (dataId, dir, saveFn) => {
+  if (!_imgPos[dataId]) _imgPos[dataId] = [50, 50];
+  const step = 10;
+  if (dir === 'up')    _imgPos[dataId][1] = Math.max(0, _imgPos[dataId][1] - step);
+  if (dir === 'down')  _imgPos[dataId][1] = Math.min(100, _imgPos[dataId][1] + step);
+  if (dir === 'left')  _imgPos[dataId][0] = Math.max(0, _imgPos[dataId][0] - step);
+  if (dir === 'right') _imgPos[dataId][0] = Math.min(100, _imgPos[dataId][0] + step);
+  const img = document.getElementById('img-pos-' + dataId);
+  if (img) {
+    const pos = _imgPos[dataId][0] + '% ' + _imgPos[dataId][1] + '%';
+    const z = _imgZoom[dataId] || 1;
+    img.style.objectPosition = pos;
+    img.style.transform = 'scale(' + z + ')';
+    img.style.transformOrigin = pos;
+  }
+};
+
+const imgZoom = (dataId, dir, saveFn) => {
+  if (!_imgZoom[dataId]) _imgZoom[dataId] = 1;
+  if (dir === 'in')  _imgZoom[dataId] = Math.min(3, _imgZoom[dataId] + 0.2);
+  if (dir === 'out') _imgZoom[dataId] = Math.max(0.5, _imgZoom[dataId] - 0.2);
+  const img = document.getElementById('img-pos-' + dataId);
+  if (img) {
+    const pos = _imgPos[dataId] ? _imgPos[dataId][0] + '% ' + _imgPos[dataId][1] + '%' : '50% 50%';
+    img.style.transform = 'scale(' + _imgZoom[dataId] + ')';
+    img.style.transformOrigin = pos;
+  }
+};
 
 /* ── INIT ── */
 
