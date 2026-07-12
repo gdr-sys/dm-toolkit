@@ -7812,7 +7812,10 @@ const Schermo = (() => {
 
   const setCompendioRef = (blockId, sezioneId) => {
     const block = _blocks.find(b => b.id === blockId);
-    const regola = rules.find(r => r.id === sezioneId);
+    if (!block) return;
+    block.content = sezioneId;
+    const allRules = Compendio?.getData()?.rules || [];
+    const regola = allRules.find(r => r.id === sezioneId);
     if (regola) block.title = '📖 ' + regola.nome;
     save();
     updateBlockContent(block);
@@ -11781,7 +11784,6 @@ document.addEventListener('DOMContentLoaded', () => {
   );
   App.init();
   BackupSystem.autoBackup();
-  Storage.autoBackup(); // snapshot versionati #8
   // Carica cache mostri e compendio in background
   setTimeout(() => MonsterCache.load(), 500);
 
