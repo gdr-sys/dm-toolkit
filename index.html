@@ -6078,7 +6078,7 @@ const Compendio = (() => {
     const hasContent = favRows;
     if (!hasContent) return '';
     return `<div class="comp-cat-header" style="color:var(--accent-secondary);">${favs.length ? 'Preferiti' : ''}${favs.length && hbItems.length ? ' · ' : ''}${hbItems.length ? 'Homebrew' : ''}</div>` +
-      favRows + hbRows +
+      favRows +
       `<div style="height:1px;background:var(--border);margin:6px 0 8px;"></div>`;
   };
 
