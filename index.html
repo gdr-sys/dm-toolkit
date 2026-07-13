@@ -63,6 +63,62 @@
 #nc-page-content em { color: var(--text-secondary); }
 #nc-page-content:empty::before { content: attr(data-placeholder); color: var(--text-muted); pointer-events: none; white-space: pre-line; }
 #nc-page-content:focus { outline: none; }
+/* Tag #hashtag */
+#nc-page-content .nc-tag {
+  display: inline-block;
+  background: rgba(93,164,90,0.15);
+  color: var(--accent-secondary);
+  border-radius: var(--radius-sm);
+  padding: 0 4px;
+  font-size: 0.85em;
+  cursor: pointer;
+  font-weight: 600;
+  text-decoration: none;
+}
+#nc-page-content .nc-tag:hover { background: rgba(93,164,90,0.3); }
+/* Wikilink [[Nota]] */
+#nc-page-content .nc-wikilink {
+  display: inline-block;
+  background: rgba(91,164,245,0.12);
+  color: #5ba4f5;
+  border-radius: var(--radius-sm);
+  padding: 0 4px;
+  font-size: 0.85em;
+  cursor: pointer;
+  border-bottom: 1px solid rgba(91,164,245,0.4);
+  text-decoration: none;
+}
+#nc-page-content .nc-wikilink:hover { background: rgba(91,164,245,0.25); }
+#nc-page-content .nc-wikilink.nc-broken { color: var(--text-muted); border-bottom-style: dashed; }
+/* Pannello backlinks */
+#nc-backlinks {
+  padding: 8px 12px;
+  border-top: 1px solid var(--border);
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  background: var(--bg-secondary);
+}
+#nc-backlinks .nc-bl-item {
+  display: inline-block;
+  margin: 2px 4px 2px 0;
+  padding: 2px 8px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  color: #5ba4f5;
+}
+#nc-backlinks .nc-bl-item:hover { background: rgba(91,164,245,0.1); }
+/* Tag bar */
+#nc-tag-bar .nc-tb-tag {
+  padding: 2px 8px;
+  background: rgba(93,164,90,0.12);
+  color: var(--accent-secondary);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  font-weight: 600;
+}
+#nc-tag-bar .nc-tb-tag:hover { background: rgba(93,164,90,0.25); }
 /* Mobile: toolbar più grande */
 @media (max-width: 768px) {
   .nc-tb { min-width: 34px; padding: 5px 8px; font-size: 0.82rem; }
@@ -297,7 +353,12 @@
               <button class="nc-tb" onclick="ncFmtBlock('blockquote')" title="Citazione / evidenziazione">❝</button>
               <div style="width:1px;background:var(--border);margin:2px 3px;"></div>
               <button class="nc-tb" onclick="ncFmt('removeFormat')" title="Rimuovi formattazione" style="font-size:0.7rem;color:var(--text-muted);">✕</button>
+              <div style="width:1px;background:var(--border);margin:2px 3px;"></div>
+              <button class="nc-tb" onclick="ncInsertTag()" title="Inserisci tag #" style="color:var(--accent-secondary);">#tag</button>
+              <button class="nc-tb" onclick="ncInsertLink()" title="Inserisci link [[Nota]]" style="color:#5ba4f5;">[[link]]</button>
             </div>
+            <!-- Tag cloud attivi in questa nota -->
+            <div id="nc-tag-bar" style="display:none;padding:4px 10px;border-bottom:1px solid var(--border);background:var(--bg-primary);font-size:0.72rem;display:flex;flex-wrap:wrap;gap:4px;min-height:0;"></div>
             <!-- Editor contenteditable -->
             <div id="nc-page-content"
               contenteditable="true"
@@ -307,6 +368,7 @@
               oninput="NoteCampagna.savePage()"
               onkeydown="ncEditorKeydown(event)">
             </div>
+            <div id="nc-backlinks" style="display:none;padding:8px 12px;border-top:1px solid var(--border);font-size:0.75rem;color:var(--text-muted);background:var(--bg-secondary);flex-wrap:wrap;gap:4px;"></div>
           </div>
         </div>
       </div>
@@ -10108,6 +10170,110 @@ const ncEditorKeydown = (e) => {
   // Salva dopo ogni tasto (già gestito da oninput, ma per sicurezza)
 };
 
+
+// ── Note Campagna: Tag e Wikilink ──
+
+// Inserisce #tag al cursore
+const ncInsertTag = () => {
+  const tag = prompt('Nome tag (senza #):', '');
+  if (!tag?.trim()) return;
+  document.getElementById('nc-page-content')?.focus();
+  document.execCommand('insertHTML', false,
+    `<span class="nc-tag" onclick="ncClickTag(this)">#${tag.trim().toLowerCase().replace(/\s+/g,'_')}</span>&nbsp;`
+  );
+  NoteCampagna.savePage();
+  ncUpdateTagBar();
+};
+
+// Inserisce [[wikilink]] al cursore
+const ncInsertLink = () => {
+  const cats = NoteCampagna._getData ? NoteCampagna._getData() : [];
+  // Costruisce lista di tutte le pagine disponibili
+  const pages = [];
+  cats.forEach(c => (c.pagine||[]).forEach(p => pages.push({ cat: c.nome, titolo: p.titolo, id: p.id })));
+  if (!pages.length) { Toast.show('Nessuna nota disponibile', 'info'); return; }
+  const titoli = pages.map((p,i) => `${i+1}. [${p.cat}] ${p.titolo}`).join('\n');
+  const input = prompt(`Link a quale nota?\n${titoli}\n\nScrivi il titolo:`, '');
+  if (!input?.trim()) return;
+  const found = pages.find(p => p.titolo.toLowerCase() === input.trim().toLowerCase());
+  const titolo = found ? found.titolo : input.trim();
+  const cls = found ? 'nc-wikilink' : 'nc-wikilink nc-broken';
+  document.getElementById('nc-page-content')?.focus();
+  document.execCommand('insertHTML', false,
+    `<span class="${cls}" data-link="${titolo}" onclick="ncClickLink(this)">[[${titolo}]]</span>&nbsp;`
+  );
+  NoteCampagna.savePage();
+  ncUpdateBacklinks();
+};
+
+// Click su #tag → filtra note con quel tag
+const ncClickTag = (el) => {
+  const tag = el.textContent.slice(1); // rimuove #
+  Toast.show(`Tag: ${tag} — usa la ricerca per filtrare`, 'info', 2000);
+};
+
+// Click su [[wikilink]] → naviga alla nota
+const ncClickLink = (el) => {
+  const titolo = el.dataset.link;
+  const cats = NoteCampagna._getData ? NoteCampagna._getData() : [];
+  for (let ci = 0; ci < cats.length; ci++) {
+    const pi = (cats[ci].pagine||[]).findIndex(p => p.titolo === titolo);
+    if (pi >= 0) {
+      NoteCampagna.selectCat(ci);
+      NoteCampagna.selectPage(pi);
+      return;
+    }
+  }
+  Toast.show(`Nota "${titolo}" non trovata`, 'warning');
+};
+
+// Aggiorna la tag bar (mostra tag presenti nella nota corrente)
+const ncUpdateTagBar = () => {
+  const el = document.getElementById('nc-page-content');
+  const bar = document.getElementById('nc-tag-bar');
+  if (!el || !bar) return;
+  const tags = [...el.querySelectorAll('.nc-tag')].map(t => t.textContent);
+  const unique = [...new Set(tags)];
+  if (!unique.length) { bar.style.display = 'none'; return; }
+  bar.style.display = 'flex';
+  bar.innerHTML = '<span style="color:var(--text-muted);margin-right:4px;">Tags:</span>' +
+    unique.map(t => `<span class="nc-tb-tag" onclick="ncClickTag({textContent:'${t}'})">${t}</span>`).join('');
+};
+
+// Aggiorna il pannello backlinks (chi cita questa pagina corrente)
+const ncUpdateBacklinks = () => {
+  const panel = document.getElementById('nc-backlinks');
+  if (!panel) return;
+  const cats = NoteCampagna._getData ? NoteCampagna._getData() : [];
+  const currentPage = cats[NoteCampagna._catIdx]?.pagine?.[NoteCampagna._pageIdx];
+  if (!currentPage) { panel.style.display = 'none'; return; }
+  const titolo = currentPage.titolo;
+  const backlinks = [];
+  cats.forEach((c, ci) => {
+    (c.pagine||[]).forEach((p, pi) => {
+      if (p.id === currentPage.id) return; // skip se stessa
+      if ((p.contenuto||'').includes(`data-link="${titolo}"`)) {
+        backlinks.push({ cat: c.nome, titolo: p.titolo, ci, pi });
+      }
+    });
+  });
+  if (!backlinks.length) { panel.style.display = 'none'; return; }
+  panel.style.display = 'block';
+  panel.innerHTML = '<span style="margin-right:6px;">🔗 Citata da:</span>' +
+    backlinks.map(b =>
+      `<span class="nc-bl-item" onclick="NoteCampagna.selectCat(${b.ci});NoteCampagna.selectPage(${b.pi})">
+        <span style="color:var(--text-muted);font-size:0.68rem;">${b.cat} / </span>${b.titolo}
+      </span>`
+    ).join('');
+};
+
+// Ri-applica stili tag/wikilink dopo il caricamento di una nota
+// (il contenuto salvato ha già gli span, ma i click handler vanno riattaccati via CSS/onclick)
+const ncRefreshEditor = () => {
+  ncUpdateTagBar();
+  ncUpdateBacklinks();
+};
+
 /* ── INIT ── */
 
 // ══ MONSTER CACHE (per Combat Tracker) ══
@@ -12168,6 +12334,8 @@ const NoteCampagna = (() => {
     }
     titleEl.disabled = false; contentEl.disabled = false;
     titleEl.value = page.titolo || '';
+    // Aggiorna tag bar e backlinks dopo il render
+    setTimeout(() => ncRefreshEditor?.(), 50);
     // Supporta sia contenteditable che textarea
     if (contentEl.contentEditable === 'true') {
       // Se il contenuto salvato è testo puro (vecchio formato), convertilo in paragrafo
@@ -12253,6 +12421,7 @@ const NoteCampagna = (() => {
     // Supporta sia contenteditable (innerHTML) che textarea (value)
     page.contenuto = el ? (el.contentEditable === 'true' ? el.innerHTML : el.value) : '';
     _save(data);
+    ncUpdateTagBar?.();
     // Aggiorna solo il titolo nella lista
     const pageEls = document.querySelectorAll('#nc-pages > div');
     const dataEl = pageEls[_pageIdx+1];
@@ -12262,7 +12431,8 @@ const NoteCampagna = (() => {
     }
   };
 
-  return { render, selectCat, selectPage, addCategoria, renameCategoria, deleteCategoria, addPage, deletePage, savePage, _mobileBack };
+  return { render, selectCat, selectPage, addCategoria, renameCategoria, deleteCategoria, addPage, deletePage,
+    _getData: _get, get _catIdx() { return _catIdx; }, get _pageIdx() { return _pageIdx; }, savePage, _mobileBack };
 })();
 
 
