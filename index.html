@@ -32,6 +32,43 @@
 @media (max-width: 1024px) { .schermo-grid { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; } }
 @media (max-width: 768px)  { .schermo-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; } }
 @media (max-width: 480px)  { .schermo-grid { grid-template-columns: 1fr !important; } }</style>
+<style>
+/* Editor WYSIWYG note campagna */
+.nc-tb {
+  padding: 3px 7px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  cursor: pointer;
+  font-size: 0.78rem;
+  line-height: 1.4;
+  transition: background var(--transition-fast), border-color var(--transition-fast);
+  min-width: 28px;
+  text-align: center;
+  -webkit-tap-highlight-color: transparent;
+}
+.nc-tb:hover { background: var(--bg-tertiary); border-color: var(--border-strong); }
+.nc-tb:active { background: var(--accent-primary); border-color: var(--accent-primary); color: #fff; }
+/* Contenuto formattato */
+#nc-page-content h1 { font-family:var(--font-display); font-size:1.4rem; font-weight:700; color:var(--accent-primary); margin:0.6em 0 0.3em; border-bottom:1px solid var(--border); padding-bottom:4px; }
+#nc-page-content h2 { font-family:var(--font-display); font-size:1.1rem; font-weight:700; color:var(--text-primary); margin:0.5em 0 0.2em; }
+#nc-page-content h3 { font-family:var(--font-display); font-size:0.95rem; font-weight:600; color:var(--accent-secondary); margin:0.4em 0 0.2em; }
+#nc-page-content p { margin: 0.3em 0; }
+#nc-page-content ul { padding-left: 1.4em; margin: 0.3em 0; }
+#nc-page-content ol { padding-left: 1.4em; margin: 0.3em 0; }
+#nc-page-content li { margin: 0.15em 0; }
+#nc-page-content blockquote { border-left: 3px solid var(--accent-secondary); margin: 0.4em 0; padding: 4px 12px; background: rgba(var(--accent-secondary-rgb, 93,130,90), 0.08); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; color: var(--text-secondary); font-style: italic; }
+#nc-page-content strong { color: var(--text-primary); }
+#nc-page-content em { color: var(--text-secondary); }
+#nc-page-content:empty::before { content: attr(data-placeholder); color: var(--text-muted); pointer-events: none; white-space: pre-line; }
+#nc-page-content:focus { outline: none; }
+/* Mobile: toolbar più grande */
+@media (max-width: 768px) {
+  .nc-tb { min-width: 34px; padding: 5px 8px; font-size: 0.82rem; }
+  #nc-toolbar { gap: 3px; padding: 6px 8px; }
+}
+</style>
 </head>
 <body>
 
@@ -243,9 +280,33 @@
                 <svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>
               </button>
             </div>
-            <textarea id="nc-page-content" style="flex:1;border:none;resize:none;font-size:0.9rem;line-height:1.8;padding:var(--space-md);background:transparent;color:var(--text-primary);outline:none;width:100%;min-height:70vh;box-sizing:border-box;"
-              placeholder="Scrivi le tue note qui...&#10;&#10;Perfetto per lore, segreti, dialoghi, piani narrativi..."
-              oninput="NoteCampagna.savePage()"></textarea>
+            <!-- Toolbar formattazione -->
+            <div id="nc-toolbar" style="display:flex;flex-wrap:wrap;gap:2px;padding:4px 8px;border-bottom:1px solid var(--border);background:var(--bg-secondary);">
+              <button class="nc-tb" onclick="ncFmt('bold')" title="Grassetto (Ctrl+B)"><b>B</b></button>
+              <button class="nc-tb" onclick="ncFmt('italic')" title="Corsivo (Ctrl+I)"><i>I</i></button>
+              <button class="nc-tb" onclick="ncFmt('underline')" title="Sottolineato (Ctrl+U)"><u>S</u></button>
+              <button class="nc-tb" onclick="ncFmt('strikeThrough')" title="Barrato"><s>ab</s></button>
+              <div style="width:1px;background:var(--border);margin:2px 3px;"></div>
+              <button class="nc-tb" onclick="ncFmtBlock('h1')" title="Titolo 1" style="font-size:0.85rem;font-weight:700;">H1</button>
+              <button class="nc-tb" onclick="ncFmtBlock('h2')" title="Titolo 2" style="font-size:0.8rem;font-weight:700;">H2</button>
+              <button class="nc-tb" onclick="ncFmtBlock('h3')" title="Titolo 3" style="font-size:0.75rem;font-weight:700;">H3</button>
+              <button class="nc-tb" onclick="ncFmtBlock('p')" title="Testo normale" style="font-size:0.75rem;">¶</button>
+              <div style="width:1px;background:var(--border);margin:2px 3px;"></div>
+              <button class="nc-tb" onclick="ncFmt('insertUnorderedList')" title="Elenco puntato">• —</button>
+              <button class="nc-tb" onclick="ncFmt('insertOrderedList')" title="Elenco numerato">1.</button>
+              <button class="nc-tb" onclick="ncFmtBlock('blockquote')" title="Citazione / evidenziazione">❝</button>
+              <div style="width:1px;background:var(--border);margin:2px 3px;"></div>
+              <button class="nc-tb" onclick="ncFmt('removeFormat')" title="Rimuovi formattazione" style="font-size:0.7rem;color:var(--text-muted);">✕</button>
+            </div>
+            <!-- Editor contenteditable -->
+            <div id="nc-page-content"
+              contenteditable="true"
+              spellcheck="true"
+              style="flex:1;border:none;font-size:0.9rem;line-height:1.8;padding:var(--space-md);background:transparent;color:var(--text-primary);outline:none;width:100%;min-height:70vh;box-sizing:border-box;overflow-y:auto;"
+              data-placeholder="Scrivi le tue note qui...&#10;&#10;Perfetto per lore, segreti, dialoghi, piani narrativi..."
+              oninput="NoteCampagna.savePage()"
+              onkeydown="ncEditorKeydown(event)">
+            </div>
           </div>
         </div>
       </div>
@@ -10011,6 +10072,42 @@ const npcImgAdjust = (id,axis,delta) => { const s=_getImgState(id,'npc'); if(axi
 const locImgAdjust = (id,axis,delta) => { const s=_getImgState(id,'loc'); if(axis==='x')s.x=Math.max(0,Math.min(100,s.x+delta)); if(axis==='y')s.y=Math.max(0,Math.min(100,s.y+delta)); if(axis==='z')s.z=Math.max(50,Math.min(300,s.z+delta)); _applyImgState('loc',id,s); };
 const fazImgAdjust = (id,axis,delta) => { const s=_getImgState(id,'faz'); if(axis==='x')s.x=Math.max(0,Math.min(100,s.x+delta)); if(axis==='y')s.y=Math.max(0,Math.min(100,s.y+delta)); if(axis==='z')s.z=Math.max(50,Math.min(300,s.z+delta)); _applyImgState('faz',id,s); };
 
+
+// ── Editor WYSIWYG Note Campagna ──
+const ncFmt = (cmd) => {
+  document.getElementById('nc-page-content')?.focus();
+  document.execCommand(cmd, false, null);
+  NoteCampagna.savePage();
+};
+
+const ncFmtBlock = (tag) => {
+  const el = document.getElementById('nc-page-content');
+  if (!el) return;
+  el.focus();
+  // Per H1/H2/H3/P usa formatBlock
+  if (['h1','h2','h3','p'].includes(tag)) {
+    document.execCommand('formatBlock', false, '<' + tag + '>');
+  } else if (tag === 'blockquote') {
+    document.execCommand('formatBlock', false, '<blockquote>');
+  }
+  NoteCampagna.savePage();
+};
+
+const ncEditorKeydown = (e) => {
+  // Ctrl/Cmd + B/I/U per grassetto/corsivo/sottolineato
+  if (e.ctrlKey || e.metaKey) {
+    if (e.key === 'b') { e.preventDefault(); ncFmt('bold'); }
+    if (e.key === 'i') { e.preventDefault(); ncFmt('italic'); }
+    if (e.key === 'u') { e.preventDefault(); ncFmt('underline'); }
+  }
+  // Tab → indent (non cambia focus)
+  if (e.key === 'Tab') {
+    e.preventDefault();
+    document.execCommand('insertHTML', false, '&nbsp;&nbsp;&nbsp;&nbsp;');
+  }
+  // Salva dopo ogni tasto (già gestito da oninput, ma per sicurezza)
+};
+
 /* ── INIT ── */
 
 // ══ MONSTER CACHE (per Combat Tracker) ══
@@ -12071,7 +12168,14 @@ const NoteCampagna = (() => {
     }
     titleEl.disabled = false; contentEl.disabled = false;
     titleEl.value = page.titolo || '';
-    contentEl.value = page.contenuto || '';
+    // Supporta sia contenteditable che textarea
+    if (contentEl.contentEditable === 'true') {
+      // Se il contenuto salvato è testo puro (vecchio formato), convertilo in paragrafo
+      const saved = page.contenuto || '';
+      contentEl.innerHTML = saved.includes('<') ? saved : saved.split('\n').map(l => l ? `<p>${l}</p>` : '<p><br></p>').join('');
+    } else {
+      contentEl.value = page.contenuto || '';
+    }
   };
 
   const _mobileBack = () => {
@@ -12145,7 +12249,9 @@ const NoteCampagna = (() => {
     const page = data[_catIdx]?.pagine?.[_pageIdx];
     if (!page) return;
     page.titolo = document.getElementById('nc-page-title')?.value || '';
-    page.contenuto = document.getElementById('nc-page-content')?.value || '';
+    const el = document.getElementById('nc-page-content');
+    // Supporta sia contenteditable (innerHTML) che textarea (value)
+    page.contenuto = el ? (el.contentEditable === 'true' ? el.innerHTML : el.value) : '';
     _save(data);
     // Aggiorna solo il titolo nella lista
     const pageEls = document.querySelectorAll('#nc-pages > div');
