@@ -4218,7 +4218,14 @@ const NPC = (() => {
       const facName = camp?.factions?.find(f => f.id === npc.factionId)?.name || '';
       return `
         <div class="npc-card" onclick="NPC.openView('${npc.id}')">
-          ${npc.immagine ? `<div style="height:120px;width:100%;background:url('${npc.immagine}') ${npc.imgPosX||50}% ${npc.imgPosY||50}% / ${npc.imgZoom||100}% auto no-repeat;border-radius:var(--radius-md);margin-bottom:8px;"></div>` : ''}
+          ${npc.immagine ? `<div style="position:relative;height:140px;width:100%;border-radius:var(--radius-md);margin-bottom:8px;overflow:hidden;"><div id="npc-img-bg-${npc.id}" style="width:100%;height:100%;background:url('${npc.immagine}') ${npc.imgPosX||50}% ${npc.imgPosY||50}% / ${npc.imgZoom||100}% auto no-repeat;"></div><div style="position:absolute;bottom:4px;right:4px;display:flex;gap:2px;background:rgba(0,0,0,0.65);border-radius:4px;padding:2px 3px;z-index:10;">
+        <button onclick="event.stopPropagation();npcImgAdjust.bind(null,'${npc.id}')('x',-10)" style="width:24px;height:24px;background:none;border:none;color:#fff;cursor:pointer;font-size:0.85rem;line-height:1;" title="←">←</button>
+        <button onclick="event.stopPropagation();npcImgAdjust.bind(null,'${npc.id}')('x',10)" style="width:24px;height:24px;background:none;border:none;color:#fff;cursor:pointer;font-size:0.85rem;line-height:1;" title="→">→</button>
+        <button onclick="event.stopPropagation();npcImgAdjust.bind(null,'${npc.id}')('y',-10)" style="width:24px;height:24px;background:none;border:none;color:#fff;cursor:pointer;font-size:0.85rem;line-height:1;" title="↑">↑</button>
+        <button onclick="event.stopPropagation();npcImgAdjust.bind(null,'${npc.id}')('y',10)" style="width:24px;height:24px;background:none;border:none;color:#fff;cursor:pointer;font-size:0.85rem;line-height:1;" title="↓">↓</button>
+        <button onclick="event.stopPropagation();npcImgAdjust.bind(null,'${npc.id}')('z',-20)" style="width:24px;height:24px;background:none;border:none;color:#fff;cursor:pointer;font-size:1rem;line-height:1;" title="−">−</button>
+        <button onclick="event.stopPropagation();npcImgAdjust.bind(null,'${npc.id}')('z',20)" style="width:24px;height:24px;background:none;border:none;color:#fff;cursor:pointer;font-size:1rem;line-height:1;" title="+">+</button>
+      </div></div>` : ''}
           <div class="npc-card-header">
             <div class="npc-avatar">${npc.icon || '👤'}</div>
             <div style="flex:1;min-width:0;">
@@ -4426,7 +4433,14 @@ const Luoghi = (() => {
     const figli = getAll().filter(x => x.parentId === id);
 
     const content = `
-      ${l.immagine ? `<div style="height:200px;width:100%;background:url('${l.immagine}') ${l.imgPosX||50}% ${l.imgPosY||50}% / ${l.imgZoom||100}% auto no-repeat;border-radius:var(--radius-md);margin-bottom:8px;"></div>` : ''}
+      ${l.immagine ? `<div style="position:relative;height:200px;width:100%;border-radius:var(--radius-md);margin-bottom:8px;overflow:hidden;"><div id="loc-img-${l.id}" style="width:100%;height:100%;background:url('${l.immagine}') ${l.imgPosX||50}% ${l.imgPosY||50}% / ${l.imgZoom||100}% auto no-repeat;"></div><div style="position:absolute;bottom:4px;right:4px;display:flex;gap:2px;background:rgba(0,0,0,0.65);border-radius:4px;padding:2px 3px;z-index:10;">
+        <button onclick="event.stopPropagation();locImgAdjust.bind(null,'${l.id}')('x',-10)" style="width:24px;height:24px;background:none;border:none;color:#fff;cursor:pointer;font-size:0.85rem;line-height:1;" title="←">←</button>
+        <button onclick="event.stopPropagation();locImgAdjust.bind(null,'${l.id}')('x',10)" style="width:24px;height:24px;background:none;border:none;color:#fff;cursor:pointer;font-size:0.85rem;line-height:1;" title="→">→</button>
+        <button onclick="event.stopPropagation();locImgAdjust.bind(null,'${l.id}')('y',-10)" style="width:24px;height:24px;background:none;border:none;color:#fff;cursor:pointer;font-size:0.85rem;line-height:1;" title="↑">↑</button>
+        <button onclick="event.stopPropagation();locImgAdjust.bind(null,'${l.id}')('y',10)" style="width:24px;height:24px;background:none;border:none;color:#fff;cursor:pointer;font-size:0.85rem;line-height:1;" title="↓">↓</button>
+        <button onclick="event.stopPropagation();locImgAdjust.bind(null,'${l.id}')('z',-20)" style="width:24px;height:24px;background:none;border:none;color:#fff;cursor:pointer;font-size:1rem;line-height:1;" title="−">−</button>
+        <button onclick="event.stopPropagation();locImgAdjust.bind(null,'${l.id}')('z',20)" style="width:24px;height:24px;background:none;border:none;color:#fff;cursor:pointer;font-size:1rem;line-height:1;" title="+">+</button>
+      </div></div>` : ''}
       <div class="text-xs text-muted" style="font-family:var(--font-display);letter-spacing:0.05em;text-transform:uppercase;margin-bottom:var(--space-sm);">
         ${tipoIcon[l.tipo] || '📍'} ${l.tipo || ''} ${parent ? '· dentro ' + parent.nome : ''}
       </div>
@@ -4610,7 +4624,14 @@ const Fazioni = (() => {
     const col = relColor(pct);
 
     const content = `
-      ${f.immagine ? `<div style="height:160px;width:100%;background:url('${f.immagine}') ${f.imgPosX||50}% ${f.imgPosY||50}% / ${f.imgZoom||100}% auto no-repeat;border-radius:var(--radius-md);margin-bottom:8px;"></div>` : ''}
+      ${f.immagine ? `<div style="position:relative;height:160px;width:100%;border-radius:var(--radius-md);margin-bottom:8px;overflow:hidden;"><div id="faz-img-${f.id}" style="width:100%;height:100%;background:url('${f.immagine}') ${f.imgPosX||50}% ${f.imgPosY||50}% / ${f.imgZoom||100}% auto no-repeat;"></div><div style="position:absolute;bottom:4px;right:4px;display:flex;gap:2px;background:rgba(0,0,0,0.65);border-radius:4px;padding:2px 3px;z-index:10;">
+        <button onclick="event.stopPropagation();fazImgAdjust.bind(null,'${f.id}')('x',-10)" style="width:24px;height:24px;background:none;border:none;color:#fff;cursor:pointer;font-size:0.85rem;line-height:1;" title="←">←</button>
+        <button onclick="event.stopPropagation();fazImgAdjust.bind(null,'${f.id}')('x',10)" style="width:24px;height:24px;background:none;border:none;color:#fff;cursor:pointer;font-size:0.85rem;line-height:1;" title="→">→</button>
+        <button onclick="event.stopPropagation();fazImgAdjust.bind(null,'${f.id}')('y',-10)" style="width:24px;height:24px;background:none;border:none;color:#fff;cursor:pointer;font-size:0.85rem;line-height:1;" title="↑">↑</button>
+        <button onclick="event.stopPropagation();fazImgAdjust.bind(null,'${f.id}')('y',10)" style="width:24px;height:24px;background:none;border:none;color:#fff;cursor:pointer;font-size:0.85rem;line-height:1;" title="↓">↓</button>
+        <button onclick="event.stopPropagation();fazImgAdjust.bind(null,'${f.id}')('z',-20)" style="width:24px;height:24px;background:none;border:none;color:#fff;cursor:pointer;font-size:1rem;line-height:1;" title="−">−</button>
+        <button onclick="event.stopPropagation();fazImgAdjust.bind(null,'${f.id}')('z',20)" style="width:24px;height:24px;background:none;border:none;color:#fff;cursor:pointer;font-size:1rem;line-height:1;" title="+">+</button>
+      </div></div>` : ''}
       <div style="margin-bottom:var(--space-md);">
         <div class="relation-bar-labels"><span>Debole</span><span style="color:${col};font-weight:600;">${pct}% potere</span><span>Dominante</span></div>
         <div class="relation-bar-track"><div class="relation-bar-fill" style="width:${pct}%;background:${col};"></div></div>
@@ -5070,6 +5091,22 @@ const Sessione = (() => {
     }
     saveCombat(_combat);
     renderCombat();
+  };
+
+  const changeHPSchermo = (id, delta) => {
+    App.reloadActiveCampaign();
+    const camp = App.getActiveCampaign();
+    if (!camp?.activeCombat) return;
+    _combat = camp.activeCombat;
+    changeHP(id, delta);
+  };
+
+  const openCondizioneSchermo = (id) => {
+    App.reloadActiveCampaign();
+    const camp = App.getActiveCampaign();
+    if (!camp?.activeCombat) return;
+    _combat = camp.activeCombat;
+    openCondizioneModal(id);
   };
 
   const nextTurn = () => {
@@ -5662,7 +5699,7 @@ const Sessione = (() => {
   return {
     init,
     addPG, editPG, deletePG, submitPG, openPGModal, addPGtoCombat, toggleInspirazione,
-    newCombat, nextTurn, prevTurn, rollAllInitiative, updateInit,
+    newCombat, nextTurn, prevTurn, changeHPSchermo, openCondizioneSchermo, rollAllInitiative, updateInit,
     changeHP, setHP, quickDamage,
     openCondizioneModal, submitCondizioni, removeCondizione,
     toggleConcentrazione, openNote,
@@ -6114,10 +6151,6 @@ const Compendio = (() => {
     const count = document.getElementById('comp-count-monsters');
     if (count) count.textContent = `${list.length} mostri`;
 
-    if (list.length === 0) {
-      el.innerHTML = `<div class="empty-state"><div class="empty-state-icon">🐉</div><h3>Nessun mostro trovato</h3><p class="text-sm text-muted">Prova a modificare i filtri</p></div>`;
-      return;
-    }
 
     // Aggiungi homebrew mostri in lista unificata
     const hbMonsters = _getHomebrew().filter(h => h.categoria === 'monsters' &&
@@ -6142,6 +6175,11 @@ const Compendio = (() => {
       return a.nome.localeCompare(b.nome, 'it');
     });
 
+    if (combined.length === 0) {
+      el.innerHTML = `<div class="empty-state"><div class="empty-state-icon">🐉</div><h3>Nessun mostro trovato</h3><p class="text-muted">Prova a modificare i filtri</p></div>`;
+      if (count) count.textContent = '0 mostri';
+      return;
+    }
     if (count) count.textContent = `${combined.length} mostri`;
 
     el.innerHTML = renderFavoritiSection('monsters') + combined.map(m => {
@@ -7704,11 +7742,11 @@ const Schermo = (() => {
         <!-- Azioni -->
         <div style="display:flex;gap:4px;flex-shrink:0;">
           <button class="btn btn-ghost btn-sm" style="padding:2px 8px;font-size:0.72rem;"
-            onclick="Sessione.changeHP('${c.id}',-1);setTimeout(()=>Schermo._refreshCombat(),100)" title="Danno">💥 Danno</button>
+            onclick="Sessione.changeHPSchermo('${c.id}',-1);setTimeout(()=>Schermo._refreshCombat(),200)" title="Danno">💥 Danno</button>
           <button class="btn btn-ghost btn-sm" style="padding:2px 8px;font-size:0.72rem;"
-            onclick="Sessione.changeHP('${c.id}',1);setTimeout(()=>Schermo._refreshCombat(),100)" title="Cura">💚 Cura</button>
+            onclick="Sessione.changeHPSchermo('${c.id}',1);setTimeout(()=>Schermo._refreshCombat(),200)" title="Cura">💚 Cura</button>
           <button class="btn btn-ghost btn-sm" style="padding:2px 8px;font-size:0.72rem;"
-            onclick="Sessione.openCondizioneModal('${c.id}')" title="Condizioni">🔴 Cond.</button>
+            onclick="Sessione.openCondizioneSchermo('${c.id}')" title="Condizioni">🔴 Cond.</button>
         </div>
       </div>`;
     }).join('');
@@ -9946,6 +9984,32 @@ const imgZoom = (dataId, dir, saveFn) => {
     img.style.transformOrigin = pos;
   }
 };
+
+
+const _imgState = {};
+const _getImgState = (id, entity) => {
+  if (!_imgState[id]) {
+    const camp = App.getActiveCampaign();
+    let obj = null;
+    if (entity==='npc') obj=(camp?.npcs||[]).find(n=>n.id===id);
+    if (entity==='loc') obj=(camp?.locations||[]).find(l=>l.id===id);
+    if (entity==='faz') obj=(camp?.factions||[]).find(f=>f.id===id);
+    _imgState[id]={x:obj?.imgPosX??50,y:obj?.imgPosY??50,z:obj?.imgZoom??100};
+  }
+  return _imgState[id];
+};
+const _applyImgState = (entity, id, s) => {
+  const el = document.getElementById(entity+'-img-'+id);
+  if (el) { el.style.backgroundPosition=s.x+'% '+s.y+'%'; el.style.backgroundSize=s.z+'% auto'; }
+  const camp = App.getActiveCampaign();
+  if (!camp) return;
+  if (entity==='npc') { const npcs=(camp.npcs||[]).map(n=>n.id===id?{...n,imgPosX:s.x,imgPosY:s.y,imgZoom:s.z}:n); App.saveActiveCampaign({npcs}); }
+  else if (entity==='loc') { const locations=(camp.locations||[]).map(l=>l.id===id?{...l,imgPosX:s.x,imgPosY:s.y,imgZoom:s.z}:l); App.saveActiveCampaign({locations}); }
+  else if (entity==='faz') { const factions=(camp.factions||[]).map(f=>f.id===id?{...f,imgPosX:s.x,imgPosY:s.y,imgZoom:s.z}:f); App.saveActiveCampaign({factions}); }
+};
+const npcImgAdjust = (id,axis,delta) => { const s=_getImgState(id,'npc'); if(axis==='x')s.x=Math.max(0,Math.min(100,s.x+delta)); if(axis==='y')s.y=Math.max(0,Math.min(100,s.y+delta)); if(axis==='z')s.z=Math.max(50,Math.min(300,s.z+delta)); _applyImgState('npc',id,s); };
+const locImgAdjust = (id,axis,delta) => { const s=_getImgState(id,'loc'); if(axis==='x')s.x=Math.max(0,Math.min(100,s.x+delta)); if(axis==='y')s.y=Math.max(0,Math.min(100,s.y+delta)); if(axis==='z')s.z=Math.max(50,Math.min(300,s.z+delta)); _applyImgState('loc',id,s); };
+const fazImgAdjust = (id,axis,delta) => { const s=_getImgState(id,'faz'); if(axis==='x')s.x=Math.max(0,Math.min(100,s.x+delta)); if(axis==='y')s.y=Math.max(0,Math.min(100,s.y+delta)); if(axis==='z')s.z=Math.max(50,Math.min(300,s.z+delta)); _applyImgState('faz',id,s); };
 
 /* ── INIT ── */
 
