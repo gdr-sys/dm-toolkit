@@ -7,6 +7,9 @@
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/components.css">
   <link rel="stylesheet" href="css/layout.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.2/Sortable.min.js"></script>
 <style>
 /FIX SCHERMO DM — grid 5 colonne con span */
@@ -311,6 +314,10 @@
         <div>
           <h1 class="page-title" id="camp-page-title">Campagna</h1>
           <p class="page-subtitle">Dashboard della campagna attiva</p>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="btn btn-ghost btn-sm" onclick="ExportPDF.exportCampagna()" title="Esporta campagna come PDF">📄 Export PDF</button>
+          <button class="btn btn-ghost btn-sm" id="gdrive-btn" onclick="GDrive.toggleLogin()" style="display:none;">☁️ Drive</button>
         </div>
       </div>
 
@@ -1401,6 +1408,7 @@
           <button id="wiki-tab-lore" class="btn btn-primary btn-sm" onclick="WikiDM.switchSection('lore')">📚 Lore</button>
           <button id="wiki-tab-sessioni" class="btn btn-ghost btn-sm" onclick="WikiDM.switchSection('sessioni')">📋 Sessioni</button>
           <button id="wiki-tab-templates" class="btn btn-ghost btn-sm" onclick="WikiDM.switchSection('templates')">🗂️ Template</button>
+          <button id="wiki-tab-grafo" class="btn btn-ghost btn-sm" onclick="WikiDM.switchSection('grafo')">🕸 Grafo</button>
         </div>
         <div style="flex:1;min-width:160px;max-width:320px;position:relative;">
           <input id="wiki-search" type="text" class="form-input" placeholder="🔍 Cerca nel wiki..." style="width:100%;padding-left:8px;" oninput="WikiDM.search(this.value)">
@@ -1441,6 +1449,7 @@
             <button class="nc-tb" onclick="wikiF('insertOrderedList')">1.</button>
             <button class="nc-tb" onclick="wikiFB('blockquote')">❝</button>
             <div style="width:1px;background:var(--border);margin:2px 3px;"></div>
+            <button class="nc-tb" onclick="wikiInsertImage()" title="Inserisci immagine via URL" style="color:#f5a623;">🖼</button>
             <button class="nc-tb" onclick="wikiInsertTag()" style="color:var(--accent-secondary);">#tag</button>
             <button class="nc-tb" onclick="wikiInsertLink()" style="color:#5ba4f5;">[[link]]</button>
             <div style="width:1px;background:var(--border);margin:2px 3px;"></div>
@@ -1466,6 +1475,19 @@
           <div id="wiki-backlinks" style="display:none;padding:8px 16px;border-top:1px solid var(--border);font-size:0.75rem;color:var(--text-muted);background:var(--bg-secondary);flex-shrink:0;flex-wrap:wrap;gap:4px;"></div>
           <!-- Tag bar -->
           <div id="wiki-tag-bar" style="display:none;padding:4px 16px;border-top:1px solid var(--border);font-size:0.72rem;background:var(--bg-primary);flex-shrink:0;flex-wrap:wrap;gap:4px;"></div>
+        </div>
+
+        <!-- Grafo visivo nodi -->
+        <div id="wiki-grafo-panel" style="display:none;flex:1;flex-direction:column;min-width:0;position:relative;">
+          <div style="padding:8px 16px;font-size:0.72rem;color:var(--text-muted);border-bottom:1px solid var(--border);background:var(--bg-secondary);flex-shrink:0;display:flex;align-items:center;flex-wrap:wrap;gap:8px;">
+            <span>🕸 Clicca un nodo per aprirlo · Trascina per spostare · Scroll per zoom</span>
+            <label style="display:flex;align-items:center;gap:3px;cursor:pointer;"><input type="checkbox" id="grafo-show-wiki" checked onchange="WikiGrafo.render()"> Note</label>
+            <label style="display:flex;align-items:center;gap:3px;cursor:pointer;"><input type="checkbox" id="grafo-show-png" checked onchange="WikiGrafo.render()"> PNG</label>
+            <label style="display:flex;align-items:center;gap:3px;cursor:pointer;"><input type="checkbox" id="grafo-show-luoghi" checked onchange="WikiGrafo.render()"> Luoghi</label>
+            <label style="display:flex;align-items:center;gap:3px;cursor:pointer;"><input type="checkbox" id="grafo-show-fazioni" checked onchange="WikiGrafo.render()"> Fazioni</label>
+            <button class="btn btn-ghost btn-sm" onclick="WikiGrafo.render()" style="margin-left:auto;font-size:0.72rem;">↻ Aggiorna</button>
+          </div>
+          <svg id="wiki-grafo-svg" style="flex:1;width:100%;min-height:400px;background:var(--bg-primary);cursor:grab;"></svg>
         </div>
 
         <!-- Pannello risultati ricerca (overlay) -->
@@ -10655,6 +10677,31 @@ const WikiDM = (() => {
     _section = sec;
     _noteId = null;
     _mobileView = 'tree';
+
+    // Gestione pannello grafo
+    const grafoPanel = document.getElementById('wiki-grafo-panel');
+    const sidebar    = document.getElementById('wiki-sidebar');
+    const editorArea = document.getElementById('wiki-editor-area');
+
+    if (sec === 'grafo') {
+      if (grafoPanel) grafoPanel.style.display = 'flex';
+      if (sidebar)    sidebar.style.display    = 'none';
+      if (editorArea) editorArea.style.display = 'none';
+      ['lore','sessioni','templates'].forEach(s => {
+        const b = document.getElementById('wiki-tab-'+s);
+        if (b) b.className = 'btn btn-ghost btn-sm';
+      });
+      const gb = document.getElementById('wiki-tab-grafo');
+      if (gb) gb.className = 'btn btn-primary btn-sm';
+      setTimeout(() => { try { WikiGrafo.render(); } catch(e) {} }, 80);
+      return;
+    }
+
+    // Nasconde grafo se si torna alle sezioni normali
+    if (grafoPanel) grafoPanel.style.display = 'none';
+    if (sidebar)    sidebar.style.display    = '';
+    if (editorArea) editorArea.style.display = '';
+
     _render();
   };
 
@@ -11546,6 +11593,460 @@ const _timeAgo = (ts) => {
   if (h < 24) return h + 'h fa';
   return d + 'g fa';
 };
+
+
+
+// ══ WIKI GRAFO — d3-force ══
+const WikiGrafo = (() => {
+  let _sim = null;
+  const C = { wiki:'#5ba4f5', sessione:'#c97bea', png:'#69cc85', luogo:'#f5a623', fazione:'#ff6b6b' };
+  const I = { wiki:'📄', sessione:'⚔️', png:'👤', luogo:'🗺️', fazione:'⚔️' };
+
+  const _build = () => {
+    const camp = App.getActiveCampaign();
+    const wiki = camp?.wiki || {};
+    const nodes = [], links = [], map = {};
+    const showWiki = document.getElementById('grafo-show-wiki')?.checked !== false;
+    const showPng  = document.getElementById('grafo-show-png')?.checked !== false;
+    const showLoc  = document.getElementById('grafo-show-luoghi')?.checked !== false;
+    const showFaz  = document.getElementById('grafo-show-fazioni')?.checked !== false;
+
+    const add = (id, label, tipo, ref) => {
+      if (!map[id]) { const n={id,label,tipo,ref,deg:0}; nodes.push(n); map[id]=n; }
+      return map[id];
+    };
+    const link = (s,t) => { if(map[s]&&map[t]&&s!==t){ links.push({source:s,target:t}); map[s].deg++; map[t].deg++; } };
+
+    if (showWiki) ['lore','sessioni'].forEach(sec => (wiki[sec]||[]).forEach(n => add('w_'+n.id, n.titolo||'—', sec==='sessioni'?'sessione':'wiki', {sec,id:n.id})));
+    if (showPng)  (camp?.npcs||[]).forEach(n => add('p_'+n.id, n.name||n.nome||'', 'png', {id:n.id}));
+    if (showLoc)  (camp?.locations||[]).forEach(l => add('l_'+l.id, l.nome||'', 'luogo', {id:l.id}));
+    if (showFaz)  (camp?.factions||[]).forEach(f => add('f_'+f.id, f.nome||'', 'fazione', {id:f.id}));
+
+    ['lore','sessioni'].forEach(sec => (wiki[sec]||[]).forEach(n => {
+      const src = 'w_'+n.id;
+      [...(n.contenuto||'').matchAll(/data-link="([^"]+)"/g)].forEach(m => {
+        const key=m[1], tipo=key.startsWith('png:')?'png':key.startsWith('luogo:')?'luogo':key.startsWith('fazione:')?'fazione':'wiki';
+        const nome=tipo==='wiki'?key:key.slice({png:4,luogo:6,fazione:8}[tipo]);
+        if (tipo==='png') { const x=(camp?.npcs||[]).find(x=>(x.name||x.nome||'')===nome); if(x)link(src,'p_'+x.id); }
+        else if (tipo==='luogo') { const x=(camp?.locations||[]).find(x=>x.nome===nome); if(x)link(src,'l_'+x.id); }
+        else if (tipo==='fazione') { const x=(camp?.factions||[]).find(x=>x.nome===nome); if(x)link(src,'f_'+x.id); }
+        else ['lore','sessioni'].forEach(s=>{ const x=(wiki[s]||[]).find(x=>x.titolo===nome); if(x)link(src,'w_'+x.id); });
+      });
+    }));
+    if (showPng&&showFaz) (camp?.npcs||[]).forEach(n=>{ if(n.factionId)link('p_'+n.id,'f_'+n.factionId); });
+    return {nodes,links};
+  };
+
+  const _open = (d) => {
+    if (d.tipo==='wiki'||d.tipo==='sessione') { WikiDM.switchSection(d.tipo==='sessione'?'sessioni':'lore'); WikiDM.openNote(d.ref.id); }
+    else if (d.tipo==='png') { App.navigateTo('mondo'); setTimeout(()=>NPC.openView(d.ref.id),150); }
+    else if (d.tipo==='luogo') { App.navigateTo('mondo'); setTimeout(()=>Luoghi.openView(d.ref.id),150); }
+    else if (d.tipo==='fazione') { App.navigateTo('mondo'); setTimeout(()=>Fazioni.openView(d.ref.id),150); }
+  };
+
+  const render = () => {
+    const svg = document.getElementById('wiki-grafo-svg');
+    if (!svg) return;
+    const {nodes,links} = _build();
+    const W = svg.clientWidth||800, H = svg.clientHeight||500;
+    while (svg.firstChild) svg.removeChild(svg.firstChild);
+
+    if (!nodes.length) {
+      const t=document.createElementNS('http://www.w3.org/2000/svg','text');
+      t.setAttribute('x',W/2);t.setAttribute('y',H/2);t.setAttribute('text-anchor','middle');
+      t.setAttribute('fill','#555');t.setAttribute('font-size','14');
+      t.textContent='Nessun nodo — crea note con [[link]] per popolare il grafo';
+      svg.appendChild(t); return;
+    }
+
+    if (typeof d3==='undefined') {
+      // Fallback layout circolare
+      const r=Math.min(W,H)*0.35, cx=W/2, cy=H/2;
+      nodes.forEach((n,i)=>{ n.x=cx+r*Math.cos(i/nodes.length*2*Math.PI-Math.PI/2); n.y=cy+r*Math.sin(i/nodes.length*2*Math.PI-Math.PI/2); });
+      links.forEach(l=>{ const s=nodes.find(n=>n.id===l.source),t=nodes.find(n=>n.id===l.target); if(!s||!t)return;
+        const ln=document.createElementNS('http://www.w3.org/2000/svg','line');
+        ln.setAttribute('x1',s.x);ln.setAttribute('y1',s.y);ln.setAttribute('x2',t.x);ln.setAttribute('y2',t.y);
+        ln.setAttribute('stroke','#444');ln.setAttribute('stroke-width','1.5');svg.appendChild(ln); });
+      nodes.forEach(n=>{ const c=document.createElementNS('http://www.w3.org/2000/svg','circle');
+        c.setAttribute('cx',n.x);c.setAttribute('cy',n.y);c.setAttribute('r',18);c.setAttribute('fill',C[n.tipo]||'#888');
+        c.style.cursor='pointer';c.onclick=()=>_open(n);svg.appendChild(c); });
+      return;
+    }
+
+    if (_sim) _sim.stop();
+    const d3svg=d3.select(svg);
+    const g=d3svg.append('g');
+    d3svg.call(d3.zoom().scaleExtent([0.2,4]).on('zoom',e=>g.attr('transform',e.transform)));
+    const defs=d3svg.append('defs');
+    defs.append('marker').attr('id','arr').attr('viewBox','0 -5 10 10').attr('refX',22).attr('refY',0)
+      .attr('markerWidth',5).attr('markerHeight',5).attr('orient','auto')
+      .append('path').attr('d','M0,-5L10,0L0,5').attr('fill','#444');
+
+    const lnk=g.append('g').selectAll('line').data(links).enter().append('line')
+      .attr('stroke','#444').attr('stroke-width',1.5).attr('marker-end','url(#arr)').attr('opacity',0.5);
+
+    const nd=g.append('g').selectAll('g').data(nodes).enter().append('g').attr('cursor','pointer')
+      .call(d3.drag()
+        .on('start',(e,d)=>{if(!e.active)_sim.alphaTarget(0.3).restart();d.fx=d.x;d.fy=d.y;})
+        .on('drag', (e,d)=>{d.fx=e.x;d.fy=e.y;})
+        .on('end',  (e,d)=>{if(!e.active)_sim.alphaTarget(0);d.fx=null;d.fy=null;}))
+      .on('click',(e,d)=>_open(d));
+
+    nd.append('circle').attr('r',d=>Math.max(16,12+d.deg*3))
+      .attr('fill',d=>C[d.tipo]||'#888').attr('fill-opacity',0.85)
+      .attr('stroke','#1a1a1a').attr('stroke-width',2);
+    nd.append('text').attr('text-anchor','middle').attr('dy','0.35em').attr('font-size','12').text(d=>I[d.tipo]||'📄');
+    nd.append('text').attr('text-anchor','middle').attr('dy',d=>Math.max(16,12+d.deg*3)+13)
+      .attr('fill','#ccc').attr('font-size','10').text(d=>d.label.length>16?d.label.slice(0,14)+'…':d.label);
+
+    _sim=d3.forceSimulation(nodes)
+      .force('link',d3.forceLink(links).id(d=>d.id).distance(110).strength(0.8))
+      .force('charge',d3.forceManyBody().strength(-280))
+      .force('center',d3.forceCenter(W/2,H/2))
+      .force('collision',d3.forceCollide(35))
+      .on('tick',()=>{
+        lnk.attr('x1',d=>d.source.x).attr('y1',d=>d.source.y).attr('x2',d=>d.target.x).attr('y2',d=>d.target.y);
+        nd.attr('transform',d=>'translate('+d.x+','+d.y+')');
+      });
+  };
+  return { render };
+})();
+
+// ══ IMMAGINI NELLE NOTE WIKI ══
+const wikiInsertImage = () => {
+  const url = prompt('URL immagine (es. https://i.imgur.com/...):', '');
+  if (!url?.trim()) return;
+  const alt = prompt('Descrizione immagine (opzionale):', '') || 'immagine';
+  const el = document.getElementById('wiki-note-content');
+  if (!el) return;
+  el.focus();
+  document.execCommand('insertHTML', false,
+    '<figure style="margin:12px 0;text-align:center;">' +
+    '<img src="' + url.trim() + '" alt="' + alt + '" style="max-width:100%;border-radius:var(--radius-md);border:1px solid var(--border);" onerror="this.style.display=\'none\';this.nextSibling.style.display=\'block\'">' +
+    '<div style="display:none;padding:8px;background:var(--bg-tertiary);border-radius:var(--radius-md);color:var(--text-muted);font-size:0.78rem;">⚠️ Immagine non caricata: ' + url.trim() + '</div>' +
+    (alt !== 'immagine' ? '<figcaption style="font-size:0.72rem;color:var(--text-muted);margin-top:4px;">' + alt + '</figcaption>' : '') +
+    '</figure><p><br></p>'
+  );
+  WikiDM.saveNote();
+};
+
+
+
+// ══ EXPORT PDF CAMPAGNA ══
+const ExportPDF = (() => {
+
+  const exportCampagna = async () => {
+    const camp = App.getActiveCampaign();
+    if (!camp) { Toast.show('Nessuna campagna attiva', 'warning'); return; }
+
+    Toast.show('Generazione PDF in corso...', 'info', 3000);
+
+    // Usa jsPDF se disponibile
+    if (typeof window.jspdf === 'undefined' && typeof jsPDF === 'undefined') {
+      _exportHTML(camp);
+      return;
+    }
+
+    const { jsPDF } = window.jspdf || { jsPDF };
+    const doc = new jsPDF({ orientation:'portrait', unit:'mm', format:'a4' });
+    const pageW = 210, pageH = 297, margin = 15, contentW = pageW - margin*2;
+    let y = margin;
+
+    const addPage = () => { doc.addPage(); y = margin; };
+    const checkY = (needed = 8) => { if (y + needed > pageH - margin) addPage(); };
+
+    // Font e stili
+    const title = (text, size=16) => {
+      checkY(size/2 + 4);
+      doc.setFontSize(size);
+      doc.setFont('helvetica','bold');
+      doc.setTextColor(139,38,53);
+      doc.text(text, margin, y);
+      y += size/2 + 4;
+      doc.setTextColor(0,0,0);
+    };
+    const h2 = (text) => {
+      checkY(10);
+      doc.setFontSize(13);
+      doc.setFont('helvetica','bold');
+      doc.setTextColor(60,60,60);
+      doc.text(text, margin, y);
+      y += 7;
+      doc.setDrawColor(200,200,200);
+      doc.line(margin, y-2, pageW-margin, y-2);
+      y += 3;
+      doc.setTextColor(0,0,0);
+    };
+    const body = (text, indent=0) => {
+      if (!text) return;
+      doc.setFontSize(10);
+      doc.setFont('helvetica','normal');
+      doc.setTextColor(50,50,50);
+      const lines = doc.splitTextToSize(text, contentW - indent);
+      lines.forEach(line => { checkY(5); doc.text(line, margin+indent, y); y+=5; });
+      doc.setTextColor(0,0,0);
+    };
+    const label = (lbl, val, indent=4) => {
+      if (!val) return;
+      doc.setFontSize(9);
+      doc.setFont('helvetica','bold'); doc.text(lbl+':', margin+indent, y);
+      doc.setFont('helvetica','normal');
+      const x = margin + indent + doc.getTextWidth(lbl+': ');
+      const lines = doc.splitTextToSize(String(val), contentW - indent - doc.getTextWidth(lbl+': '));
+      doc.text(lines[0]||'', x, y); y += 5;
+      lines.slice(1).forEach(l => { checkY(5); doc.text(l, margin+indent+20, y); y+=5; });
+    };
+    const separator = () => { y += 4; doc.setDrawColor(230,230,230); doc.line(margin, y, pageW-margin, y); y += 6; };
+
+    // ── COPERTINA ──
+    doc.setFillColor(139,38,53);
+    doc.rect(0, 0, pageW, 60, 'F');
+    doc.setTextColor(255,255,255);
+    doc.setFontSize(28); doc.setFont('helvetica','bold');
+    doc.text(camp.name || 'Campagna', margin, 30);
+    doc.setFontSize(12); doc.setFont('helvetica','normal');
+    doc.text('DM Toolkit — Export campagna', margin, 42);
+    doc.setFontSize(10);
+    doc.text(new Date().toLocaleDateString('it-IT'), margin, 52);
+    doc.setTextColor(0,0,0);
+    y = 70;
+
+    // ── RIEPILOGO ──
+    if (camp.sessionRecap) {
+      h2('📋 Ultima sessione');
+      body(camp.sessionRecap);
+      separator();
+    }
+
+    // ── QUEST ──
+    const quests = camp.quests || [];
+    if (quests.length) {
+      h2('⚔️ Quest');
+      quests.forEach(q => {
+        checkY(12);
+        doc.setFontSize(11); doc.setFont('helvetica','bold');
+        const stato = {disponibile:'[ ]', in_corso:'[→]', completata:'[✓]', fallita:'[✗]'}[q.status]||'';
+        doc.text(stato + ' ' + (q.title||''), margin+2, y); y += 6;
+        if (q.notes) body(q.notes, 4);
+        if (q.reward) { doc.setFontSize(9); doc.setFont('helvetica','italic'); doc.text('Ricompensa: '+q.reward, margin+4, y); y+=5; }
+        y += 2;
+      });
+      separator();
+    }
+
+    // ── PNG ──
+    const npcs = camp.npcs || [];
+    if (npcs.length) {
+      h2('👤 PNG');
+      npcs.forEach(n => {
+        checkY(15);
+        doc.setFontSize(12); doc.setFont('helvetica','bold');
+        doc.text((n.name||''), margin+2, y); y+=6;
+        label('Razza/Classe', [n.race,n.job].filter(Boolean).join(' · '));
+        if (n.trait) label('Personalità', n.trait);
+        if (n.wants) label('Vuole', n.wants);
+        if (n.secret) { doc.setFontSize(9); doc.setFont('helvetica','italic'); doc.setTextColor(139,38,53); doc.text('🔒 '+n.secret, margin+4, y); y+=5; doc.setTextColor(0,0,0); }
+        y += 3;
+      });
+      separator();
+    }
+
+    // ── LUOGHI ──
+    const locs = camp.locations || [];
+    if (locs.length) {
+      h2('🗺️ Luoghi');
+      locs.forEach(l => {
+        checkY(12);
+        doc.setFontSize(12); doc.setFont('helvetica','bold');
+        doc.text((l.nome||''), margin+2, y); y+=6;
+        if (l.tipo) label('Tipo', l.tipo);
+        if (l.descrizione) body(l.descrizione, 4);
+        y += 3;
+      });
+      separator();
+    }
+
+    // ── FAZIONI ──
+    const faz = camp.factions || [];
+    if (faz.length) {
+      h2('⚔️ Fazioni');
+      faz.forEach(f => {
+        checkY(12);
+        doc.setFontSize(12); doc.setFont('helvetica','bold');
+        doc.text((f.nome||''), margin+2, y); y+=6;
+        if (f.descrizione) body(f.descrizione, 4);
+        y += 3;
+      });
+      separator();
+    }
+
+    // ── WIKI ──
+    const wiki = camp.wiki || {};
+    ['lore','sessioni'].forEach(sec => {
+      const notes = wiki[sec] || [];
+      if (!notes.length) return;
+      h2(sec==='lore' ? '📚 Lore' : '📋 Sessioni');
+      notes.forEach(n => {
+        checkY(12);
+        doc.setFontSize(12); doc.setFont('helvetica','bold');
+        doc.text((n.titolo||'Senza titolo'), margin+2, y); y+=6;
+        if (n.contenuto) {
+          const plain = n.contenuto.replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim();
+          body(plain.slice(0,500) + (plain.length>500?'...':''), 4);
+        }
+        y += 3;
+      });
+      separator();
+    });
+
+    // ── SALVA ──
+    const filename = (camp.name||'campagna').replace(/[^a-zA-Z0-9]/g,'_') + '_' + new Date().toISOString().slice(0,10) + '.pdf';
+    doc.save(filename);
+    Toast.show('PDF esportato: '+filename, 'success', 3000);
+  };
+
+  // Fallback: export HTML stampabile
+  const _exportHTML = (camp) => {
+    const win = window.open('', '_blank');
+    if (!win) { Toast.show('Popup bloccato — abilita i popup per il download', 'warning'); return; }
+    const npcs = (camp.npcs||[]).map(n => `<h3>${n.name||''}</h3><p>${n.trait||''} ${n.wants||''}</p>`).join('');
+    const quests = (camp.quests||[]).map(q => `<h3>${q.title||''}</h3><p>${q.notes||''}</p>`).join('');
+    win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${camp.name||'Campagna'}</title>
+      <style>body{font-family:Georgia,serif;max-width:800px;margin:40px auto;color:#222}h1{color:#8b2635}h2{border-bottom:2px solid #8b2635;padding-bottom:4px}@media print{body{margin:0}}</style></head>
+      <body><h1>${camp.name||'Campagna'}</h1>
+      <p><em>Export del ${new Date().toLocaleDateString('it-IT')}</em></p>
+      ${camp.sessionRecap?'<h2>Ultima sessione</h2><p>'+camp.sessionRecap+'</p>':''}
+      ${quests?'<h2>Quest</h2>'+quests:''}
+      ${npcs?'<h2>PNG</h2>'+npcs:''}
+      <script>window.print();<\/script>
+<!-- Modal setup Google Drive -->
+<div class="modal-overlay hidden" id="modal-gdrive-setup" style="display:none;" onclick="if(event.target===this)Modal.close('gdrive-setup')">
+  <div class="modal" style="max-width:480px;">
+    <div class="modal-header">
+      <h3 class="modal-title">☁️ Configura Google Drive Sync</h3>
+      <button class="btn btn-ghost btn-icon-sm" onclick="Modal.close('gdrive-setup')">✕</button>
+    </div>
+    <div class="modal-body" style="font-size:0.85rem;line-height:1.7;">
+      <p>Per sincronizzare la campagna su Google Drive è necessario un <strong>Client ID OAuth 2.0</strong> gratuito.</p>
+      <ol style="padding-left:1.4em;margin:10px 0;">
+        <li>Vai su <a href="https://console.cloud.google.com" target="_blank" style="color:#5ba4f5;">console.cloud.google.com</a></li>
+        <li>Crea un progetto → Abilita <strong>Google Drive API</strong></li>
+        <li>Credenziali → Crea OAuth 2.0 Client ID → tipo <strong>Web</strong></li>
+        <li>Aggiungi <code style="background:var(--bg-tertiary);padding:1px 5px;border-radius:3px;">https://gdr-sys.github.io</code> come origine autorizzata</li>
+        <li>Copia il Client ID e incollalo qui sotto</li>
+      </ol>
+      <input id="gdrive-client-id-input" type="text" class="form-input" placeholder="xxxxxx.apps.googleusercontent.com" style="margin-bottom:8px;">
+      <p style="font-size:0.75rem;color:var(--text-muted);">Il Client ID viene salvato in localStorage sul tuo dispositivo, non sui server.</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="Modal.close('gdrive-setup')">Annulla</button>
+      <button class="btn btn-primary" onclick="GDrive._saveClientId()">Salva e connetti</button>
+    </div>
+  </div>
+</div>
+
+</body></html>`);
+    win.document.close();
+  };
+
+  return { exportCampagna };
+})();
+
+// ══ GOOGLE DRIVE SYNC ══
+const GDrive = (() => {
+  const CLIENT_ID = ''; // Da configurare in Google Cloud Console
+  const SCOPES = 'https://www.googleapis.com/auth/drive.appdata';
+  const FILE_NAME = 'dm-toolkit-save.json';
+  let _fileId = null;
+  let _loggedIn = false;
+
+  const init = () => {
+    // Mostra pulsante Drive nella UI
+    const btn = document.getElementById('gdrive-btn');
+    if (btn) btn.style.display = '';
+    _updateBtn();
+  };
+
+  const _updateBtn = () => {
+    const btn = document.getElementById('gdrive-btn');
+    if (!btn) return;
+    btn.textContent = _loggedIn ? '☁️ Drive ✓' : '☁️ Drive';
+    btn.title = _loggedIn ? 'Connesso a Google Drive — clicca per scollegarti' : 'Connetti Google Drive per sincronizzare';
+    btn.style.color = _loggedIn ? 'var(--accent-secondary)' : '';
+  };
+
+  const toggleLogin = () => {
+    if (!CLIENT_ID) {
+      Modal.open('gdrive-setup');
+      return;
+    }
+    if (_loggedIn) {
+      if (confirm('Disconnettere Google Drive?')) { _loggedIn = false; _updateBtn(); }
+    } else {
+      _login();
+    }
+  };
+
+  const _login = async () => {
+    if (!window.gapi) {
+      Toast.show('Google API non disponibile — aggiungi il CLIENT_ID nelle impostazioni', 'warning', 4000);
+      return;
+    }
+    try {
+      await gapi.auth2.getAuthInstance().signIn();
+      _loggedIn = true;
+      _updateBtn();
+      Toast.show('Google Drive connesso ✓', 'success');
+      await sync();
+    } catch(e) {
+      Toast.show('Login Google fallito: ' + e.message, 'error');
+    }
+  };
+
+  const sync = async () => {
+    if (!_loggedIn) return;
+    try {
+      const camp = Storage.getAll();
+      await _save(JSON.stringify(camp));
+      Toast.show('Campagna sincronizzata su Drive ✓', 'success', 2000);
+    } catch(e) {
+      Toast.show('Sync Drive fallito: ' + e.message, 'error');
+    }
+  };
+
+  const _save = async (data) => {
+    if (_fileId) {
+      await gapi.client.request({ path:`/upload/drive/v3/files/${_fileId}`, method:'PATCH', params:{uploadType:'media'}, body:data });
+    } else {
+      const res = await gapi.client.drive.files.create({
+        resource: { name: FILE_NAME, parents: ['appDataFolder'] },
+        media: { mimeType: 'application/json', body: data },
+        fields: 'id',
+      });
+      _fileId = res.result.id;
+    }
+  };
+
+  const load = async () => {
+    if (!_loggedIn) return null;
+    try {
+      const list = await gapi.client.drive.files.list({ spaces:'appDataFolder', q:`name='${FILE_NAME}'`, fields:'files(id)' });
+      if (!list.result.files.length) return null;
+      _fileId = list.result.files[0].id;
+      const res = await gapi.client.drive.files.get({ fileId:_fileId, alt:'media' });
+      return res.result;
+    } catch(e) { return null; }
+  };
+
+  const _saveClientId = () => {
+    const id = document.getElementById('gdrive-client-id-input')?.value?.trim();
+    if (!id) { Toast.show('Inserisci il Client ID', 'warning'); return; }
+    localStorage.setItem('dm_gdrive_client_id', id);
+    Modal.close('gdrive-setup');
+    Toast.show('Client ID salvato — ricarica la pagina per connettere Drive', 'success', 4000);
+  };
+  return { init, toggleLogin, sync, load, _saveClientId };
+})();
 
 
 /* ── INIT ── */
@@ -14083,6 +14584,33 @@ document.addEventListener('DOMContentLoaded', initMobileNav);
       </div>
     </div>
     <div id="gs-results" style="max-height:60vh;overflow-y:auto;padding:8px 0;"></div>
+  </div>
+</div>
+
+
+<!-- Modal setup Google Drive -->
+<div class="modal-overlay hidden" id="modal-gdrive-setup" style="display:none;" onclick="if(event.target===this)Modal.close('gdrive-setup')">
+  <div class="modal" style="max-width:480px;">
+    <div class="modal-header">
+      <h3 class="modal-title">☁️ Configura Google Drive Sync</h3>
+      <button class="btn btn-ghost btn-icon-sm" onclick="Modal.close('gdrive-setup')">✕</button>
+    </div>
+    <div class="modal-body" style="font-size:0.85rem;line-height:1.7;">
+      <p>Per sincronizzare la campagna su Google Drive è necessario un <strong>Client ID OAuth 2.0</strong> gratuito.</p>
+      <ol style="padding-left:1.4em;margin:10px 0;">
+        <li>Vai su <a href="https://console.cloud.google.com" target="_blank" style="color:#5ba4f5;">console.cloud.google.com</a></li>
+        <li>Crea un progetto → Abilita <strong>Google Drive API</strong></li>
+        <li>Credenziali → Crea OAuth 2.0 Client ID → tipo <strong>Web</strong></li>
+        <li>Aggiungi <code style="background:var(--bg-tertiary);padding:1px 5px;border-radius:3px;">https://gdr-sys.github.io</code> come origine autorizzata</li>
+        <li>Copia il Client ID e incollalo qui sotto</li>
+      </ol>
+      <input id="gdrive-client-id-input" type="text" class="form-input" placeholder="xxxxxx.apps.googleusercontent.com" style="margin-bottom:8px;">
+      <p style="font-size:0.75rem;color:var(--text-muted);">Il Client ID viene salvato in localStorage sul tuo dispositivo, non sui server.</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="Modal.close('gdrive-setup')">Annulla</button>
+      <button class="btn btn-primary" onclick="GDrive._saveClientId()">Salva e connetti</button>
+    </div>
   </div>
 </div>
 
