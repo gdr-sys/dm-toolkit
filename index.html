@@ -10933,28 +10933,116 @@ const wikiInsertTag = () => {
 const wikiInsertLink = () => {
   const w = WikiDM._getData?.() || {};
   const camp = App.getActiveCampaign();
+
+  // Costruisce lista con tipo
   const pages = [];
-  ['lore','sessioni'].forEach(sec => (w[sec]||[]).forEach(n => pages.push({ titolo:n.titolo })));
-  (camp?.npcs||[]).forEach(n => pages.push({ titolo:n.name||n.nome }));
-  (camp?.locations||[]).forEach(l => pages.push({ titolo:l.nome }));
-  (camp?.factions||[]).forEach(f => pages.push({ titolo:f.nome }));
-  const input = prompt('Titolo della nota da collegare:\n' + pages.slice(0,20).map((p,i)=>`${i+1}. ${p.titolo}`).join('\n'),'');
+  ['lore','sessioni'].forEach(sec => (w[sec]||[]).forEach(n =>
+    pages.push({ tipo:'wiki', tipo_label:'📝 Wiki', titolo:n.titolo, key:n.titolo })
+  ));
+  (camp?.npcs||[]).forEach(n =>
+    pages.push({ tipo:'png', tipo_label:'👤 PNG', titolo:n.name||n.nome||'', id:n.id, key:'png:'+( n.name||n.nome||'') })
+  );
+  (camp?.locations||[]).forEach(l =>
+    pages.push({ tipo:'luogo', tipo_label:'🗺️ Luogo', titolo:l.nome||'', id:l.id, key:'luogo:'+(l.nome||'') })
+  );
+  (camp?.factions||[]).forEach(f =>
+    pages.push({ tipo:'fazione', tipo_label:'⚔️ Fazione', titolo:f.nome||'', id:f.id, key:'fazione:'+(f.nome||'') })
+  );
+
+  if (!pages.length) { Toast.show('Nessuna nota o entità disponibile','info'); return; }
+
+  const list = pages.slice(0,30).map((p,i) => `${i+1}. ${p.tipo_label} ${p.titolo}`).join('\n');
+  const input = prompt('Collega a (numero o titolo):\n' + list, '');
   if (!input?.trim()) return;
-  const found = pages.find(p => p.titolo?.toLowerCase() === input.trim().toLowerCase());
+
+  // Cerca per numero o per titolo
+  let found = null;
+  const num = parseInt(input.trim());
+  if (!isNaN(num) && num >= 1 && num <= pages.length) {
+    found = pages[num-1];
+  } else {
+    found = pages.find(p => p.titolo.toLowerCase() === input.trim().toLowerCase());
+  }
+
   const titolo = found ? found.titolo : input.trim();
+  const key = found ? found.key : titolo;
+  const cls = found ? 'nc-wikilink' : 'nc-wikilink nc-broken';
+  const label = found ? (
+    found.tipo === 'png' ? '👤 ' :
+    found.tipo === 'luogo' ? '🗺️ ' :
+    found.tipo === 'fazione' ? '⚔️ ' : ''
+  ) + titolo : titolo;
+
   document.getElementById('wiki-note-content')?.focus();
-  document.execCommand('insertHTML',false,
-    `<span class="${found?'nc-wikilink':'nc-wikilink nc-broken'}" data-link="${titolo}" onclick="wikiNavigateLink('${titolo.replace(/'/g,"\\'")}')">[[${titolo}]]</span>&nbsp;`);
+  const _safeKey = key.replace(/'/g, "\\'");
+  const _span = '<span class="' + cls + '" data-link="' + key + '" data-tipo="' + (found?.tipo||'wiki') + '" onclick="wikiNavigateLink(\'' + _safeKey + '\')">[[' + label + ']]</span>&nbsp;';
+  document.execCommand('insertHTML', false, _span);
   WikiDM.saveNote();
 };
 
-const wikiNavigateLink = (titolo) => {
+const wikiNavigateLink = (key) => {
+  // key può essere: 'Titolo wiki', 'png:Nome', 'luogo:Nome', 'fazione:Nome'
+  const tipo = key.startsWith('png:') ? 'png'
+             : key.startsWith('luogo:') ? 'luogo'
+             : key.startsWith('fazione:') ? 'fazione'
+             : 'wiki';
+  const titolo = tipo === 'wiki' ? key
+               : tipo === 'png'     ? key.slice(4)
+               : tipo === 'luogo'   ? key.slice(6)
+               : key.slice(8); // fazione:
+
+  if (tipo === 'png') {
+    const camp = App.getActiveCampaign();
+    const npc = (camp?.npcs||[]).find(n => (n.name||n.nome||'').toLowerCase() === titolo.toLowerCase());
+    if (npc) {
+      App.navigateTo('mondo');
+      setTimeout(() => {
+        try { NPC.init(); } catch(e) {}
+        setTimeout(() => NPC.openView(npc.id), 150);
+      }, 100);
+      return;
+    }
+    Toast.show('PNG "' + titolo + '" non trovato nel Mondo', 'warning', 2500);
+    return;
+  }
+
+  if (tipo === 'luogo') {
+    const camp = App.getActiveCampaign();
+    const loc = (camp?.locations||[]).find(l => (l.nome||'').toLowerCase() === titolo.toLowerCase());
+    if (loc) {
+      App.navigateTo('mondo');
+      setTimeout(() => {
+        try { Luoghi.init(); } catch(e) {}
+        setTimeout(() => Luoghi.openView(loc.id), 150);
+      }, 100);
+      return;
+    }
+    Toast.show('Luogo "' + titolo + '" non trovato nel Mondo', 'warning', 2500);
+    return;
+  }
+
+  if (tipo === 'fazione') {
+    const camp = App.getActiveCampaign();
+    const faz = (camp?.factions||[]).find(f => (f.nome||'').toLowerCase() === titolo.toLowerCase());
+    if (faz) {
+      App.navigateTo('mondo');
+      setTimeout(() => {
+        try { Fazioni.init(); } catch(e) {}
+        setTimeout(() => Fazioni.openView(faz.id), 150);
+      }, 100);
+      return;
+    }
+    Toast.show('Fazione "' + titolo + '" non trovata nel Mondo', 'warning', 2500);
+    return;
+  }
+
+  // Tipo wiki — cerca nelle note
   const w = WikiDM._getData?.() || {};
   for (const sec of ['lore','sessioni']) {
     const n = (w[sec]||[]).find(n => n.titolo === titolo);
     if (n) { WikiDM.switchSection(sec); WikiDM.openNote(n.id); return; }
   }
-  Toast.show(`Nota "${titolo}" non trovata`, 'info', 2500);
+  Toast.show('Nota "' + titolo + '" non trovata', 'info', 2500);
 };
 
 const wikiEditorKeydown = (e) => {
