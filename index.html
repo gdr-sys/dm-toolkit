@@ -7,7 +7,6 @@
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/components.css">
   <link rel="stylesheet" href="css/layout.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.2/Sortable.min.js"></script>
 <style>
 /FIX SCHERMO DM — grid 5 colonne con span */
@@ -64,6 +63,20 @@
 #nc-page-content em { color: var(--text-secondary); }
 #nc-page-content:empty::before { content: attr(data-placeholder); color: var(--text-muted); pointer-events: none; white-space: pre-line; }
 #nc-page-content:focus { outline: none; }
+/* Callout blocks */
+.wiki-callout { border-radius:var(--radius-md); padding:10px 14px; margin:8px 0; border-left:4px solid; }
+.wiki-callout-read-aloud { background:rgba(105,204,133,0.1); border-color:#69cc85; }
+.wiki-callout-secret      { background:rgba(201,123,234,0.1); border-color:#c97bea; }
+.wiki-callout-loot        { background:rgba(245,166,35,0.1);  border-color:#f5a623; }
+.wiki-callout-clue        { background:rgba(91,164,245,0.1);  border-color:#5ba4f5; }
+.wiki-callout-trap        { background:rgba(255,107,107,0.1); border-color:#ff6b6b; }
+.wiki-callout-improv      { background:rgba(93,164,90,0.1);   border-color:var(--accent-secondary); }
+.wiki-callout-label { font-size:0.65rem; font-family:var(--font-display); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:4px; display:block; opacity:0.8; }
+/* editor wiki stili */
+#wiki-note-content h1 { font-family:var(--font-display); font-size:1.4rem; font-weight:700; color:var(--accent-primary); margin:0.6em 0 0.3em; border-bottom:1px solid var(--border); padding-bottom:4px; }
+#wiki-note-content h2 { font-family:var(--font-display); font-size:1.1rem; font-weight:700; color:var(--text-primary); margin:0.5em 0 0.2em; }
+#wiki-note-content h3 { font-family:var(--font-display); font-size:0.95rem; font-weight:600; color:var(--accent-secondary); margin:0.4em 0 0.2em; }
+#wiki-note-content blockquote { border-left:3px solid var(--accent-secondary); margin:0.4em 0; padding:4px 12px; background:rgba(93,130,90,0.08); border-radius:0 var(--radius-sm) var(--radius-sm) 0; font-style:italic; }
 /* Tag #hashtag */
 #nc-page-content .nc-tag {
   display: inline-block;
@@ -233,10 +246,31 @@
     <header id="topbar">
       <!-- hamburger rimosso: navigazione diretta via mobile-nav -->
       <h1 class="topbar-title" id="topbar-title">Campagne</h1>
-      <div class="topbar-actions">
+      <div class="topbar-actions" style="display:flex;align-items:center;gap:8px;">
+        <button title="Scratchpad (note rapide)" onclick="Scratchpad.toggle()"
+          style="background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:1.1rem;padding:4px 8px;border-radius:var(--radius-sm);transition:background 0.15s;"
+          onmouseenter="this.style.background='var(--bg-tertiary)'" onmouseleave="this.style.background='none'">
+          ✏️
+        </button>
         <span class="text-xs text-muted" id="topbar-campaign-badge"></span>
       </div>
     </header>
+    <!-- Scratchpad panel -->
+    <div id="scratchpad-panel" style="display:none;position:fixed;bottom:70px;right:16px;width:320px;max-height:60vh;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-xl);box-shadow:var(--shadow-xl);z-index:450;display:none;flex-direction:column;">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid var(--border);flex-shrink:0;">
+        <span style="font-family:var(--font-display);font-size:0.82rem;font-weight:600;">✏️ Scratchpad</span>
+        <div style="display:flex;gap:4px;">
+          <button onclick="Scratchpad.clear()" title="Pulisci" style="background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:0.72rem;padding:2px 6px;">Pulisci</button>
+          <button onclick="Scratchpad.toggle()" style="background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:0.9rem;padding:2px;">✕</button>
+        </div>
+      </div>
+      <textarea id="scratchpad-text" placeholder="Note veloci... nomi inventati, decisioni party, dettagli improvvisati" 
+        style="flex:1;border:none;resize:none;padding:12px 14px;background:transparent;color:var(--text-primary);font-size:0.85rem;line-height:1.6;outline:none;min-height:200px;font-family:var(--font-body);"
+        oninput="Scratchpad.save()"></textarea>
+      <div style="padding:6px 14px;border-top:1px solid var(--border);font-size:0.65rem;color:var(--text-muted);flex-shrink:0;">
+        Salvato in locale · Ctrl+K per ricerca globale
+      </div>
+    </div>
 
     <!-- ════════════════════════
          PAGINA: HOME
@@ -289,6 +323,24 @@
         <div class="card-body">
           <textarea id="camp-session-recap" class="form-textarea" rows="4"
             placeholder="Scrivi qui i punti chiave dell'ultima sessione... Sarà la prima cosa che vedi aprendo questa campagna."></textarea>
+        </div>
+      </div>
+
+      <!-- Note recenti Wiki + Scratchpad rapido -->
+      <div class="grid-2" style="gap:var(--space-lg);margin-bottom:var(--space-lg);">
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">📝 Note recenti</h3>
+            <button class="btn btn-ghost btn-sm" onclick="App.navigateTo('wiki')">Apri Wiki →</button>
+          </div>
+          <div id="dash-recent-notes" style="padding:8px 0;"></div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <h3 class="card-title">⏱ Clocks attivi</h3>
+            <button class="btn btn-ghost btn-sm" onclick="App.navigateTo('sessione')">Gestisci →</button>
+          </div>
+          <div id="dash-clocks-preview" style="padding:8px;"></div>
         </div>
       </div>
 
@@ -520,6 +572,17 @@
             <div id="saved-sessions-list" class="comp-list"></div>
           </div>
 
+        </div>
+
+        <!-- Clocks / Progress Tracker -->
+        <div class="card" style="margin-top:var(--space-lg);">
+          <div class="card-header">
+            <h3 class="card-title">⏱ Clocks</h3>
+            <button class="btn btn-primary btn-sm" onclick="Clocks.add()">+ Clock</button>
+          </div>
+          <div id="clocks-list" style="padding:8px;display:flex;flex-wrap:wrap;gap:12px;min-height:50px;">
+            <div class="text-muted text-sm" style="padding:8px;">Nessun clock attivo. Usali per rituali, inseguimenti, pressione fazioni, allarmi...</div>
+          </div>
         </div>
 
         <!-- Note Sessione -->
@@ -1338,7 +1401,6 @@
           <button id="wiki-tab-lore" class="btn btn-primary btn-sm" onclick="WikiDM.switchSection('lore')">📚 Lore</button>
           <button id="wiki-tab-sessioni" class="btn btn-ghost btn-sm" onclick="WikiDM.switchSection('sessioni')">📋 Sessioni</button>
           <button id="wiki-tab-templates" class="btn btn-ghost btn-sm" onclick="WikiDM.switchSection('templates')">🗂️ Template</button>
-          <button id="wiki-tab-grafo" class="btn btn-ghost btn-sm" onclick="WikiDM.switchSection('grafo')">🕸 Grafo</button>
         </div>
         <div style="flex:1;min-width:160px;max-width:320px;position:relative;">
           <input id="wiki-search" type="text" class="form-input" placeholder="🔍 Cerca nel wiki..." style="width:100%;padding-left:8px;" oninput="WikiDM.search(this.value)">
@@ -1383,6 +1445,13 @@
             <button class="nc-tb" onclick="wikiInsertLink()" style="color:#5ba4f5;">[[link]]</button>
             <div style="width:1px;background:var(--border);margin:2px 3px;"></div>
             <button class="nc-tb" onclick="wikiF('removeFormat')" style="font-size:0.7rem;color:var(--text-muted);">✕</button>
+            <div style="width:1px;background:var(--border);margin:2px 3px;"></div>
+            <button class="nc-tb" onclick="wikiCallout('read-aloud')" title="Read Aloud — testo da leggere ai giocatori" style="color:#69cc85;font-size:0.68rem;">📢</button>
+            <button class="nc-tb" onclick="wikiCallout('secret')" title="Segreto DM" style="color:#c97bea;font-size:0.68rem;">🔒</button>
+            <button class="nc-tb" onclick="wikiCallout('loot')" title="Loot" style="color:#f5a623;font-size:0.68rem;">💰</button>
+            <button class="nc-tb" onclick="wikiCallout('clue')" title="Indizio" style="color:#5ba4f5;font-size:0.68rem;">🔍</button>
+            <button class="nc-tb" onclick="wikiCallout('trap')" title="Trappola" style="color:#ff6b6b;font-size:0.68rem;">⚠️</button>
+            <button class="nc-tb" onclick="wikiCallout('improv')" title="Improv — idea al volo" style="color:var(--accent-secondary);font-size:0.68rem;">💡</button>
           </div>
           <!-- Editor -->
           <div id="wiki-note-content"
@@ -1397,20 +1466,6 @@
           <div id="wiki-backlinks" style="display:none;padding:8px 16px;border-top:1px solid var(--border);font-size:0.75rem;color:var(--text-muted);background:var(--bg-secondary);flex-shrink:0;flex-wrap:wrap;gap:4px;"></div>
           <!-- Tag bar -->
           <div id="wiki-tag-bar" style="display:none;padding:4px 16px;border-top:1px solid var(--border);font-size:0.72rem;background:var(--bg-primary);flex-shrink:0;flex-wrap:wrap;gap:4px;"></div>
-        </div>
-
-        <!-- Grafo visivo nodi -->
-        <div id="wiki-grafo-panel" style="display:none;flex:1;flex-direction:column;min-width:0;position:relative;">
-          <div style="padding:8px 16px;font-size:0.72rem;color:var(--text-muted);border-bottom:1px solid var(--border);background:var(--bg-secondary);flex-shrink:0;">
-            🕸 Grafo delle connessioni — clicca un nodo per aprire · trascina per spostare
-            <span style="margin-left:12px;">
-              <label style="margin-right:8px;"><input type="checkbox" id="grafo-show-wiki" checked onchange="WikiGrafo.render()"> Note</label>
-              <label style="margin-right:8px;"><input type="checkbox" id="grafo-show-png" checked onchange="WikiGrafo.render()"> PNG</label>
-              <label style="margin-right:8px;"><input type="checkbox" id="grafo-show-luoghi" checked onchange="WikiGrafo.render()"> Luoghi</label>
-              <label><input type="checkbox" id="grafo-show-fazioni" checked onchange="WikiGrafo.render()"> Fazioni</label>
-            </span>
-          </div>
-          <svg id="wiki-grafo-svg" style="flex:1;width:100%;min-height:400px;background:var(--bg-primary);cursor:grab;"></svg>
         </div>
 
         <!-- Pannello risultati ricerca (overlay) -->
@@ -1891,26 +1946,6 @@
           <div class="form-group"><label class="form-label">Morale</label><select id="nm-morale" class="form-select"><option value="">—</option><option value="coraggioso">Coraggioso (combatte fino alla morte)</option><option value="determinato">Determinato (fugge sotto il 25% PF)</option><option value="cauto">Cauto (fugge sotto il 50% PF)</option><option value="codardo">Codardo (fugge al primo danno subito)</option><option value="fanatico">Fanatico (non si arrende mai)</option><option value="mercenario">Mercenario (si arrende se offri oro)</option></select></div>
         </div>
         <div class="form-group"><label class="form-label">Legami e relazioni</label><input type="text" id="nm-links" class="form-input" placeholder="es. Dipendente di: Locanda del Drago | Nemico di: Alaric"></div>
-        <!-- Relazioni strutturate con altri PNG -->
-        <div class="form-group" style="margin-top:8px;">
-          <label class="form-label">Relazioni con altri PNG</label>
-          <div id="nm-relazioni-list" style="margin-bottom:6px;display:flex;flex-wrap:wrap;gap:4px;min-height:20px;"></div>
-          <div style="display:flex;gap:6px;align-items:center;">
-            <select id="nm-rel-npc" class="form-select" style="flex:1;font-size:0.82rem;">
-              <option value="">Seleziona PNG...</option>
-            </select>
-            <select id="nm-rel-tipo" class="form-select" style="width:140px;font-size:0.82rem;">
-              <option value="alleato">🤝 Alleato</option>
-              <option value="nemico">⚔️ Nemico</option>
-              <option value="neutrale">🤷 Neutrale</option>
-              <option value="familiare">👨‍👩‍👧 Familiare</option>
-              <option value="superiore">👑 Superiore</option>
-              <option value="subordinato">⬇️ Subordinato</option>
-              <option value="amore">💕 Interesse romantico</option>
-            </select>
-            <button class="btn btn-ghost btn-sm" onclick="NPC.addRelazione()">+</button>
-          </div>
-        </div>
         <div style="margin-top:var(--space-md);">
           <label class="form-label">Relazione col Party — <span id="nm-rel-label" style="color:var(--accent-secondary);">Neutrale</span> (<span id="nm-rel-val">50</span>)</label>
           <div style="display:flex;align-items:center;gap:var(--space-sm);">
@@ -2002,19 +2037,6 @@
         </div>
         <div class="relation-bar-value" id="npc-view-rel-val">50 / 100</div>
       </div>
-
-      <!-- Relazioni con altri PNG -->
-      <div id="npc-relazioni-section" style="margin-bottom:8px;display:none;">
-        <div style="font-size:0.68rem;font-family:var(--font-display);text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin-bottom:6px;">🤝 Relazioni</div>
-        <div id="npc-relazioni-view" style="display:flex;flex-wrap:wrap;gap:4px;"></div>
-      </div>
-
-      <!-- Cronologia Wiki -->
-      <div style="margin-bottom:8px;">
-        <div style="font-size:0.68rem;font-family:var(--font-display);text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin-bottom:6px;">📖 Citazioni in Wiki</div>
-        <div id="npc-cronologia" style="max-height:120px;overflow-y:auto;"></div>
-      </div>
-
       <div class="npc-flip-container" id="npc-flip-container">
         <div class="npc-flip-inner" id="npc-flip-inner">
           <!-- FRONTE: Ruolo -->
@@ -3396,7 +3418,7 @@ const App = (() => {
         try { Luoghi.init(); } catch(e) {}
         try { Fazioni.init(); } catch(e) {}
         break;
-      case 'sessione':   try { Sessione.init(); setTimeout(() => NoteSessione.render(), 100); } catch(e) {} break;
+      case 'sessione':   try { Sessione.init(); setTimeout(() => NoteSessione.render(), 100); } catch(e) {} setTimeout(()=>{try{Clocks.render();}catch(e){}},200); break;
       case 'generatori':
         setTimeout(() => { GeneratoriDD.enable(); Generatori.applyVisibility(); EncounterBuilder.init(); RNGLoot.init(); }, 100);
         break;
@@ -4140,10 +4162,6 @@ const NPC = (() => {
 
     // Immagine
     if (window.setImgPreview) setImgPreview('npc', npc?.immagine || '');
-    // Inizializza relazioni temporanee e popola select
-    _tempRelazioni = [...(npc?.relazioni || [])];
-    npcRenderRelazioni(_tempRelazioni);
-    npcPopulateRelSelect();
     if (npc?.imgPosX != null) { const el = document.getElementById('npc-img-pos-x'); if(el) el.value = npc.imgPosX; }
     if (npc?.imgPosY != null) { const el = document.getElementById('npc-img-pos-y'); if(el) el.value = npc.imgPosY; }
     if (npc?.imgZoom != null) { const el = document.getElementById('npc-img-zoom'); if(el) el.value = npc.imgZoom; }
@@ -4206,7 +4224,6 @@ const NPC = (() => {
       combatNotes: document.getElementById('nm-combat-notes')?.value?.trim() || '',
       actions: getActions(),
       immagine: document.getElementById('npc-img-url')?.value?.trim() || '',
-      relazioni: _tempRelazioni.slice(),
       imgPosX: parseInt(document.getElementById('npc-img-pos-x')?.value || 50),
       imgPosY: parseInt(document.getElementById('npc-img-pos-y')?.value || 50),
       imgZoom: parseInt(document.getElementById('npc-img-zoom')?.value || 100),
@@ -10638,26 +10655,6 @@ const WikiDM = (() => {
     _section = sec;
     _noteId = null;
     _mobileView = 'tree';
-    // Mostra/nasconde il pannello grafo
-    const grafoPanel = document.getElementById('wiki-grafo-panel');
-    const sidebarEl  = document.getElementById('wiki-sidebar');
-    const editorArea = document.getElementById('wiki-editor-area');
-    if (sec === 'grafo') {
-      if (grafoPanel) grafoPanel.style.display = 'flex';
-      if (sidebarEl)  sidebarEl.style.display  = 'none';
-      if (editorArea) editorArea.style.display  = 'none';
-      // Aggiorna tab
-      ['lore','sessioni','templates'].forEach(s => {
-        const b = document.getElementById('wiki-tab-'+s);
-        if (b) b.className = 'btn btn-ghost btn-sm';
-      });
-      const gb = document.getElementById('wiki-tab-grafo');
-      if (gb) gb.className = 'btn btn-primary btn-sm';
-      setTimeout(() => WikiGrafo.render(), 50);
-      return;
-    }
-    // Nasconde grafo se si torna alle altre sezioni
-    if (grafoPanel) grafoPanel.style.display = 'none';
     _render();
   };
 
@@ -11337,346 +11334,217 @@ document.addEventListener('keydown', (e) => {
 
 
 
-// ══ WIKI GRAFO — Grafo visivo d3-force ══
-const WikiGrafo = (() => {
-  let _sim = null;
+// ══ SCRATCHPAD ══
+const Scratchpad = (() => {
+  const KEY = 'dm_scratchpad';
+  let _open = false;
 
-  // Colori per tipo nodo
-  const COLORS = {
-    wiki:    '#5ba4f5',   // blu — note wiki
-    sessione:'#c97bea',  // viola — sessioni
-    png:     '#69cc85',  // verde — PNG
-    luogo:   '#f5a623',  // arancio — luoghi
-    fazione: '#ff6b6b',  // rosso — fazioni
+  const toggle = () => {
+    const panel = document.getElementById('scratchpad-panel');
+    if (!panel) return;
+    _open = !_open;
+    panel.style.display = _open ? 'flex' : 'none';
+    if (_open) {
+      const ta = document.getElementById('scratchpad-text');
+      if (ta) { ta.value = localStorage.getItem(KEY) || ''; ta.focus(); }
+    }
   };
 
-  const ICONS = { wiki:'📄', sessione:'⚔️', png:'👤', luogo:'🗺️', fazione:'⚔️' };
+  const save = () => {
+    const val = document.getElementById('scratchpad-text')?.value || '';
+    localStorage.setItem(KEY, val);
+  };
 
-  // Costruisce nodi e link dal contenuto della campagna
-  const _buildGraph = () => {
+  const clear = () => {
+    if (!confirm('Pulire lo scratchpad?')) return;
+    localStorage.removeItem(KEY);
+    const ta = document.getElementById('scratchpad-text');
+    if (ta) ta.value = '';
+  };
+
+  return { toggle, save, clear };
+})();
+
+// ══ CALLOUT WIKI ══
+const wikiCallout = (tipo) => {
+  const labels = {
+    'read-aloud': '📢 READ ALOUD',
+    'secret':     '🔒 SEGRETO DM',
+    'loot':       '💰 LOOT',
+    'clue':       '🔍 INDIZIO',
+    'trap':       '⚠️ TRAPPOLA',
+    'improv':     '💡 IMPROV',
+  };
+  const el = document.getElementById('wiki-note-content');
+  if (!el) return;
+  el.focus();
+  document.execCommand('insertHTML', false,
+    '<div class="wiki-callout wiki-callout-' + tipo + '" contenteditable="true">' +
+    '<span class="wiki-callout-label">' + (labels[tipo]||tipo) + '</span>' +
+    '<p>...</p></div><p><br></p>'
+  );
+  WikiDM.saveNote();
+};
+
+// Stessa funzione per l'editor note campagna
+const ncCallout = (tipo) => {
+  const labels = {
+    'read-aloud': '📢 READ ALOUD', 'secret': '🔒 SEGRETO DM',
+    'loot': '💰 LOOT', 'clue': '🔍 INDIZIO',
+    'trap': '⚠️ TRAPPOLA', 'improv': '💡 IMPROV',
+  };
+  const el = document.getElementById('nc-page-content');
+  if (!el) return;
+  el.focus();
+  document.execCommand('insertHTML', false,
+    '<div class="wiki-callout wiki-callout-' + tipo + '">' +
+    '<span class="wiki-callout-label">' + (labels[tipo]||tipo) + '</span>' +
+    '<p>...</p></div><p><br></p>'
+  );
+  NoteCampagna.savePage();
+};
+
+// ══ CLOCKS / PROGRESS TRACKER ══
+const Clocks = (() => {
+  const _getClocks = () => {
     const camp = App.getActiveCampaign();
-    const wiki = camp?.wiki || {};
-    const nodes = [], links = [], nodeMap = {};
-
-    const showWiki    = document.getElementById('grafo-show-wiki')?.checked !== false;
-    const showPng     = document.getElementById('grafo-show-png')?.checked !== false;
-    const showLuoghi  = document.getElementById('grafo-show-luoghi')?.checked !== false;
-    const showFazioni = document.getElementById('grafo-show-fazioni')?.checked !== false;
-
-    const addNode = (id, label, tipo, ref) => {
-      if (!nodeMap[id]) {
-        const n = { id, label, tipo, ref, links: 0 };
-        nodes.push(n);
-        nodeMap[id] = n;
-      }
-      return nodeMap[id];
-    };
-
-    // Note wiki (lore + sessioni)
-    if (showWiki) {
-      ['lore','sessioni'].forEach(sec => {
-        (wiki[sec]||[]).forEach(n => {
-          addNode('wiki_'+n.id, n.titolo||'Senza titolo', sec==='sessioni'?'sessione':'wiki', { sec, id:n.id });
-        });
-      });
-    }
-
-    // PNG
-    if (showPng) {
-      (camp?.npcs||[]).forEach(n => {
-        addNode('png_'+n.id, n.name||n.nome||'', 'png', { id:n.id });
-      });
-    }
-
-    // Luoghi
-    if (showLuoghi) {
-      (camp?.locations||[]).forEach(l => {
-        addNode('loc_'+l.id, l.nome||'', 'luogo', { id:l.id });
-      });
-    }
-
-    // Fazioni
-    if (showFazioni) {
-      (camp?.factions||[]).forEach(f => {
-        addNode('faz_'+f.id, f.nome||'', 'fazione', { id:f.id });
-      });
-    }
-
-    // Estrai link dai wikilink nelle note
-    const addLink = (src, tgt) => {
-      if (nodeMap[src] && nodeMap[tgt] && src !== tgt) {
-        links.push({ source: src, target: tgt });
-        nodeMap[src].links++;
-        nodeMap[tgt].links++;
-      }
-    };
-
-    ['lore','sessioni'].forEach(sec => {
-      (wiki[sec]||[]).forEach(n => {
-        const srcId = 'wiki_' + n.id;
-        const content = n.contenuto || '';
-        // Estrai data-link="..."
-        const matches = [...content.matchAll(/data-link="([^"]+)"/g)];
-        matches.forEach(m => {
-          const key = m[1];
-          const tipo = key.startsWith('png:') ? 'png'
-                     : key.startsWith('luogo:') ? 'luogo'
-                     : key.startsWith('fazione:') ? 'fazione'
-                     : 'wiki';
-          const nome = tipo === 'wiki' ? key
-                     : tipo === 'png' ? key.slice(4)
-                     : tipo === 'luogo' ? key.slice(6)
-                     : key.slice(8);
-
-          if (tipo === 'png') {
-            const npc = (camp?.npcs||[]).find(x => (x.name||x.nome||'') === nome);
-            if (npc) addLink(srcId, 'png_'+npc.id);
-          } else if (tipo === 'luogo') {
-            const loc = (camp?.locations||[]).find(x => x.nome === nome);
-            if (loc) addLink(srcId, 'loc_'+loc.id);
-          } else if (tipo === 'fazione') {
-            const faz = (camp?.factions||[]).find(x => x.nome === nome);
-            if (faz) addLink(srcId, 'faz_'+faz.id);
-          } else {
-            // Link a un'altra nota wiki
-            ['lore','sessioni'].forEach(s => {
-              const target = (wiki[s]||[]).find(x => x.titolo === nome);
-              if (target) addLink(srcId, 'wiki_'+target.id);
-            });
-          }
-        });
-      });
-    });
-
-    // Link PNG → Fazione
-    if (showPng && showFazioni) {
-      (camp?.npcs||[]).forEach(n => {
-        if (n.factionId) {
-          const faz = (camp?.factions||[]).find(f => f.id === n.factionId);
-          if (faz) addLink('png_'+n.id, 'faz_'+faz.id);
-        }
-      });
-    }
-
-    return { nodes, links };
+    return camp?.clocks || [];
   };
+  const _saveClocks = (clocks) => App.saveActiveCampaign({ clocks });
 
   const render = () => {
-    const svg = document.getElementById('wiki-grafo-svg');
-    if (!svg) return;
-
-    const { nodes, links } = _buildGraph();
-
-    const W = svg.clientWidth || 800;
-    const H = svg.clientHeight || 500;
-
-    // Pulisce
-    while (svg.firstChild) svg.removeChild(svg.firstChild);
-
-    if (!nodes.length) {
-      const text = document.createElementNS('http://www.w3.org/2000/svg','text');
-      text.setAttribute('x', W/2); text.setAttribute('y', H/2);
-      text.setAttribute('text-anchor','middle'); text.setAttribute('fill','#666');
-      text.textContent = 'Nessun nodo — crea note con [[link]] per popolare il grafo';
-      svg.appendChild(text);
+    const el = document.getElementById('clocks-list');
+    if (!el) return;
+    const clocks = _getClocks();
+    if (!clocks.length) {
+      el.innerHTML = '<div class="text-muted text-sm" style="padding:8px;">Nessun clock attivo. Usali per rituali, inseguimenti, pressione fazioni, allarmi...</div>';
       return;
     }
-
-    // Usa d3 se disponibile, altrimenti layout semplice
-    if (typeof d3 === 'undefined') {
-      _renderSimple(svg, nodes, links, W, H);
-      return;
-    }
-
-    if (_sim) _sim.stop();
-
-    const d3svg = d3.select(svg);
-    const g = d3svg.append('g');
-
-    // Zoom & pan
-    d3svg.call(d3.zoom().scaleExtent([0.3,3]).on('zoom', e => g.attr('transform', e.transform)));
-
-    // Defs per frecce
-    const defs = d3svg.append('defs');
-    defs.append('marker').attr('id','arrowhead').attr('viewBox','0 -5 10 10')
-      .attr('refX',20).attr('refY',0).attr('markerWidth',6).attr('markerHeight',6)
-      .attr('orient','auto').append('path').attr('d','M0,-5L10,0L0,5').attr('fill','#555');
-
-    // Link
-    const link = g.append('g').selectAll('line').data(links).enter().append('line')
-      .attr('stroke','#444').attr('stroke-width',1.5).attr('marker-end','url(#arrowhead)').attr('opacity',0.6);
-
-    // Nodi
-    const node = g.append('g').selectAll('g').data(nodes).enter().append('g')
-      .attr('cursor','pointer')
-      .call(d3.drag()
-        .on('start', (e,d) => { if(!e.active) _sim.alphaTarget(0.3).restart(); d.fx=d.x; d.fy=d.y; })
-        .on('drag',  (e,d) => { d.fx=e.x; d.fy=e.y; })
-        .on('end',   (e,d) => { if(!e.active) _sim.alphaTarget(0); d.fx=null; d.fy=null; })
-      )
-      .on('click', (e,d) => _openNode(d));
-
-    // Cerchio dimensione proporzionale ai link
-    node.append('circle')
-      .attr('r', d => Math.max(18, 14 + d.links * 3))
-      .attr('fill', d => COLORS[d.tipo] || '#888')
-      .attr('fill-opacity', 0.85)
-      .attr('stroke', '#1a1a1a').attr('stroke-width', 2);
-
-    // Icona emoji
-    node.append('text').attr('text-anchor','middle').attr('dy','0.35em')
-      .attr('font-size','13px').text(d => ICONS[d.tipo] || '📄');
-
-    // Label
-    node.append('text').attr('text-anchor','middle').attr('dy', d => Math.max(18,14+d.links*3)+14)
-      .attr('fill','#ccc').attr('font-size','10px')
-      .text(d => d.label.length > 18 ? d.label.slice(0,16)+'…' : d.label);
-
-    // Simulazione
-    _sim = d3.forceSimulation(nodes)
-      .force('link', d3.forceLink(links).id(d=>d.id).distance(100).strength(0.8))
-      .force('charge', d3.forceManyBody().strength(-250))
-      .force('center', d3.forceCenter(W/2, H/2))
-      .force('collision', d3.forceCollide(35))
-      .on('tick', () => {
-        link.attr('x1',d=>d.source.x).attr('y1',d=>d.source.y)
-            .attr('x2',d=>d.target.x).attr('y2',d=>d.target.y);
-        node.attr('transform', d => 'translate('+d.x+','+d.y+')');
-      });
+    el.innerHTML = clocks.map((c, i) => {
+      const pct = Math.round((c.current / c.max) * 100);
+      const color = pct >= 100 ? 'var(--accent-danger)' : pct >= 66 ? '#f5a623' : 'var(--accent-secondary)';
+      const segs = Array.from({length: c.max}, (_, j) => {
+        const filled = j < c.current;
+        return '<div style="flex:1;height:100%;background:' + (filled ? color : 'var(--bg-tertiary)') + ';border-right:1px solid var(--bg-primary);transition:background 0.2s;"></div>';
+      }).join('');
+      return '<div style="background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-md);padding:10px 12px;min-width:180px;flex:1;max-width:240px;">' +
+        '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">' +
+          '<span style="font-family:var(--font-display);font-size:0.82rem;font-weight:600;">' + c.nome + '</span>' +
+          '<div style="display:flex;gap:2px;">' +
+            '<span style="font-size:0.68rem;color:var(--text-muted);">' + c.current + '/' + c.max + '</span>' +
+            '<button onclick="Clocks.tick('+i+')" style="background:none;border:none;cursor:pointer;color:var(--accent-secondary);font-size:0.8rem;padding:0 3px;" title="Avanza">+</button>' +
+            '<button onclick="Clocks.untick('+i+')" style="background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:0.8rem;padding:0 3px;" title="Indietro">−</button>' +
+            '<button onclick="Clocks.remove('+i+')" style="background:none;border:none;cursor:pointer;color:var(--accent-danger);font-size:0.8rem;padding:0 3px;" title="Rimuovi">✕</button>' +
+          '</div>' +
+        '</div>' +
+        '<div style="display:flex;height:14px;border-radius:4px;overflow:hidden;gap:1px;">' + segs + '</div>' +
+        (c.note ? '<div style="font-size:0.68rem;color:var(--text-muted);margin-top:4px;">' + c.note + '</div>' : '') +
+        (pct >= 100 ? '<div style="font-size:0.7rem;color:var(--accent-danger);margin-top:4px;font-weight:600;">⚡ COMPLETATO</div>' : '') +
+      '</div>';
+    }).join('');
   };
 
-  const _openNode = (d) => {
-    if (d.tipo === 'wiki' || d.tipo === 'sessione') {
-      const sec = d.tipo === 'sessione' ? 'sessioni' : 'lore';
-      WikiDM.switchSection(sec);
-      WikiDM.openNote(d.ref.id);
-    } else if (d.tipo === 'png') {
-      App.navigateTo('mondo');
-      setTimeout(() => NPC.openView(d.ref.id), 150);
-    } else if (d.tipo === 'luogo') {
-      App.navigateTo('mondo');
-      setTimeout(() => Luoghi.openView(d.ref.id), 150);
-    } else if (d.tipo === 'fazione') {
-      App.navigateTo('mondo');
-      setTimeout(() => Fazioni.openView(d.ref.id), 150);
-    }
+  const add = () => {
+    const nome = prompt('Nome del clock (es. "Rituale del Profano", "Inseguimento"):', '');
+    if (!nome?.trim()) return;
+    const maxStr = prompt('Quanti segmenti? (4, 6, 8, 10...)', '6');
+    const max = Math.max(2, Math.min(20, parseInt(maxStr) || 6));
+    const nota = prompt('Nota opzionale (lascia vuoto per saltare):', '') || '';
+    const clocks = _getClocks();
+    clocks.push({ nome: nome.trim(), max, current: 0, nota });
+    _saveClocks(clocks);
+    render();
   };
 
-  // Layout semplice senza d3 (fallback)
-  const _renderSimple = (svg, nodes, links, W, H) => {
-    const cx = W/2, cy = H/2, r = Math.min(W,H)*0.35;
-    nodes.forEach((n,i) => {
-      const angle = (i/nodes.length)*2*Math.PI - Math.PI/2;
-      n.x = cx + r*Math.cos(angle);
-      n.y = cy + r*Math.sin(angle);
-    });
-    // draw links
-    links.forEach(l => {
-      const s = nodes.find(n=>n.id===l.source), t = nodes.find(n=>n.id===l.target);
-      if (!s||!t) return;
-      const line = document.createElementNS('http://www.w3.org/2000/svg','line');
-      line.setAttribute('x1',s.x); line.setAttribute('y1',s.y);
-      line.setAttribute('x2',t.x); line.setAttribute('y2',t.y);
-      line.setAttribute('stroke','#444'); line.setAttribute('stroke-width','1.5');
-      svg.appendChild(line);
-    });
-    // draw nodes
-    nodes.forEach(n => {
-      const c = document.createElementNS('http://www.w3.org/2000/svg','circle');
-      c.setAttribute('cx',n.x); c.setAttribute('cy',n.y); c.setAttribute('r',18);
-      c.setAttribute('fill', COLORS[n.tipo]||'#888'); c.setAttribute('cursor','pointer');
-      c.onclick = () => _openNode(n);
-      svg.appendChild(c);
-      const t = document.createElementNS('http://www.w3.org/2000/svg','text');
-      t.setAttribute('x',n.x); t.setAttribute('y',n.y+32); t.setAttribute('text-anchor','middle');
-      t.setAttribute('fill','#ccc'); t.setAttribute('font-size','10');
-      t.textContent = n.label.slice(0,14);
-      svg.appendChild(t);
-    });
+  const tick = (i) => {
+    const clocks = _getClocks();
+    if (!clocks[i]) return;
+    clocks[i].current = Math.min(clocks[i].max, clocks[i].current + 1);
+    if (clocks[i].current >= clocks[i].max) Toast.show('⚡ Clock "' + clocks[i].nome + '" completato!', 'warning', 4000);
+    _saveClocks(clocks);
+    render();
   };
 
-  return { render };
+  const untick = (i) => {
+    const clocks = _getClocks();
+    if (!clocks[i]) return;
+    clocks[i].current = Math.max(0, clocks[i].current - 1);
+    _saveClocks(clocks);
+    render();
+  };
+
+  const remove = (i) => {
+    if (!confirm('Rimuovere questo clock?')) return;
+    const clocks = _getClocks();
+    clocks.splice(i, 1);
+    _saveClocks(clocks);
+    render();
+  };
+
+  return { add, tick, untick, remove, render };
 })();
 
 
 
-// ══ RELAZIONI PNG ══
-const _relTipoLabels = {
-  alleato:'🤝 Alleato', nemico:'⚔️ Nemico', neutrale:'🤷 Neutrale',
-  familiare:'👨‍👩‍👧 Familiare', superiore:'👑 Superiore', subordinato:'⬇️ Subordinato', amore:'💕 Amore'
-};
-
-// Popola il select PNG nel modal relazioni
-const npcPopulateRelSelect = () => {
-  const sel = document.getElementById('nm-rel-npc');
-  if (!sel) return;
-  const camp = App.getActiveCampaign();
-  const editingId = NPC._getEditingId?.();
-  sel.innerHTML = '<option value="">Seleziona PNG...</option>' +
-    (camp?.npcs||[]).filter(n => n.id !== editingId).map(n =>
-      '<option value="'+n.id+'">'+(n.name||n.nome||'')+'</option>'
-    ).join('');
-};
-
-// Render lista relazioni nel modal
-const npcRenderRelazioni = (relazioni) => {
-  const el = document.getElementById('nm-relazioni-list');
-  if (!el) return;
-  el.innerHTML = (relazioni||[]).map((r,i) => {
-    const camp = App.getActiveCampaign();
-    const npc = (camp?.npcs||[]).find(n => n.id === r.npcId);
-    const nome = npc ? (npc.name||npc.nome||'') : r.npcId;
-    return '<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;background:var(--bg-tertiary);border:1px solid var(--border);border-radius:var(--radius-full);font-size:0.72rem;">' +
-      (_relTipoLabels[r.tipo]||r.tipo) + ' <strong>' + nome + '</strong>' +
-      '<button onclick="npcRemoveRel('+i+')" style="background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:0.7rem;margin-left:2px;">✕</button>' +
-      '</span>';
-  }).join('');
-};
-
-// Stato temporaneo relazioni in editing
-let _tempRelazioni = [];
-
-const npcRemoveRel = (idx) => {
-  _tempRelazioni.splice(idx, 1);
-  npcRenderRelazioni(_tempRelazioni);
-};
-
-// ══ CRONOLOGIA PNG — auto-popolata dai wikilink ══
-const npcGetCronologia = (npcId) => {
+const _renderDashRecenti = () => {
   const camp = App.getActiveCampaign();
   const wiki = camp?.wiki || {};
-  const npc = (camp?.npcs||[]).find(n => n.id === npcId);
-  if (!npc) return [];
-  const nome = npc.name || npc.nome || '';
-  const eventi = [];
-  ['lore','sessioni'].forEach(sec => {
-    (wiki[sec]||[]).forEach(n => {
-      if ((n.contenuto||'').includes('data-link="png:'+nome+'"') ||
-          (n.contenuto||'').includes('data-link="'+nome+'"')) {
-        eventi.push({
-          sec, titolo: n.titolo||'Senza titolo', id: n.id,
-          data: new Date(n.aggiornatoAt||0).toLocaleDateString('it-IT')
-        });
-      }
-    });
-  });
-  return eventi;
+  const el = document.getElementById('dash-recent-notes');
+  const clocksEl = document.getElementById('dash-clocks-preview');
+
+  // Note recenti
+  if (el) {
+    const all = [...(wiki.lore||[]), ...(wiki.sessioni||[])]
+      .sort((a,b) => (b.aggiornatoAt||0) - (a.aggiornatoAt||0))
+      .slice(0, 5);
+    if (!all.length) {
+      el.innerHTML = '<div style="padding:8px 12px;color:var(--text-muted);font-size:0.82rem;">Nessuna nota wiki ancora.</div>';
+    } else {
+      el.innerHTML = all.map(n => {
+        const sec = (wiki.lore||[]).find(x=>x.id===n.id) ? 'lore' : 'sessioni';
+        const icon = sec === 'sessioni' ? '⚔️' : (n.pinned ? '📌' : '📄');
+        const ago = _timeAgo(n.aggiornatoAt);
+        return '<div style="display:flex;align-items:center;gap:8px;padding:6px 12px;cursor:pointer;border-bottom:1px solid var(--border);" onclick="App.navigateTo(\'wiki\');setTimeout(()=>{WikiDM.switchSection(\''+sec+'\');WikiDM.openNote(\''+n.id+'\');},200)">' +
+          '<span style="font-size:0.8rem;">' + icon + '</span>' +
+          '<span style="flex:1;font-size:0.82rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + (n.titolo||'Senza titolo') + '</span>' +
+          '<span style="font-size:0.68rem;color:var(--text-muted);flex-shrink:0;">' + ago + '</span>' +
+          '</div>';
+      }).join('');
+    }
+  }
+
+  // Clocks preview
+  if (clocksEl) {
+    const clocks = camp?.clocks || [];
+    if (!clocks.length) {
+      clocksEl.innerHTML = '<div style="color:var(--text-muted);font-size:0.82rem;">Nessun clock. Aggiungili in Sessione.</div>';
+    } else {
+      clocksEl.innerHTML = clocks.slice(0,3).map(c => {
+        const pct = Math.round((c.current/c.max)*100);
+        const color = pct>=100?'var(--accent-danger)':pct>=66?'#f5a623':'var(--accent-secondary)';
+        return '<div style="margin-bottom:8px;">' +
+          '<div style="display:flex;justify-content:space-between;font-size:0.8rem;margin-bottom:3px;">' +
+            '<span>' + c.nome + '</span><span style="color:'+color+';">' + c.current+'/'+c.max + '</span>' +
+          '</div>' +
+          '<div style="height:6px;background:var(--bg-tertiary);border-radius:3px;overflow:hidden;">' +
+            '<div style="height:100%;width:'+pct+'%;background:'+color+';border-radius:3px;transition:width 0.3s;"></div>' +
+          '</div>' +
+        '</div>';
+      }).join('');
+    }
+  }
 };
 
-// Mostra cronologia nella scheda NPC
-const npcRenderCronologia = (npcId) => {
-  const el = document.getElementById('npc-cronologia');
-  if (!el) return;
-  const eventi = npcGetCronologia(npcId);
-  if (!eventi.length) { el.innerHTML = '<div style="color:var(--text-muted);font-size:0.78rem;">Nessuna citazione nelle note wiki.</div>'; return; }
-  el.innerHTML = eventi.map(e => {
-    const icon = e.sec === 'sessioni' ? '⚔️' : '📚';
-    return '<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--border);cursor:pointer;" onclick="App.navigateTo(\'wiki\');setTimeout(()=>{WikiDM.switchSection(\''+e.sec+'\');WikiDM.openNote(\''+e.id+'\');},200)">' +
-      '<span style="font-size:0.8rem;">'+icon+'</span>' +
-      '<span style="font-size:0.82rem;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+e.titolo+'</span>' +
-      '<span style="font-size:0.68rem;color:var(--text-muted);">'+e.data+'</span>' +
-      '</div>';
-  }).join('');
+const _timeAgo = (ts) => {
+  if (!ts) return '';
+  const diff = Date.now() - ts;
+  const m = Math.floor(diff/60000);
+  const h = Math.floor(diff/3600000);
+  const d = Math.floor(diff/86400000);
+  if (m < 1) return 'ora';
+  if (m < 60) return m + 'm fa';
+  if (h < 24) return h + 'h fa';
+  return d + 'g fa';
 };
 
 
