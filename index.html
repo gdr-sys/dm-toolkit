@@ -80,6 +80,13 @@
 #wiki-note-content h2 { font-family:var(--font-display); font-size:1.1rem; font-weight:700; color:var(--text-primary); margin:0.5em 0 0.2em; }
 #wiki-note-content h3 { font-family:var(--font-display); font-size:0.95rem; font-weight:600; color:var(--accent-secondary); margin:0.4em 0 0.2em; }
 #wiki-note-content blockquote { border-left:3px solid var(--accent-secondary); margin:0.4em 0; padding:4px 12px; background:rgba(93,130,90,0.08); border-radius:0 var(--radius-sm) var(--radius-sm) 0; font-style:italic; }
+/* View mode */
+#wiki-note-content[contenteditable="false"] { cursor:default; }
+#wiki-note-content[contenteditable="false"] .nc-wikilink { cursor:pointer; text-decoration:underline dotted; }
+#wiki-note-content[contenteditable="false"] .nc-wikilink:hover { background:rgba(91,164,245,0.25); border-radius:3px; }
+#wiki-toolbar.view-mode { display:none !important; }
+#wiki-note-title[disabled] { opacity:1; background:transparent; border:none; cursor:default; pointer-events:none; }
+.wiki-view-badge { display:inline-flex; align-items:center; gap:4px; padding:2px 8px; background:var(--bg-tertiary); border:1px solid var(--border); border-radius:var(--radius-full); font-size:0.68rem; color:var(--text-muted); }
 /* Tag #hashtag */
 #nc-page-content .nc-tag {
   display: inline-block;
@@ -1431,7 +1438,10 @@
           <!-- Titolo nota -->
           <div style="padding:8px 16px;border-bottom:1px solid var(--border);flex-shrink:0;display:flex;align-items:center;gap:8px;">
             <input id="wiki-note-title" class="form-input" placeholder="Titolo nota..." style="flex:1;font-family:var(--font-display);font-size:1rem;font-weight:600;border:none;background:transparent;padding:0;" oninput="WikiDM.saveNote()">
+            <div style="display:flex;gap:4px;align-items:center;">
+            <button id="wiki-view-toggle" class="btn btn-ghost btn-sm" onclick="WikiDM.toggleViewMode()" title="Alterna modalità lettura/modifica" style="font-size:0.72rem;">👁 Vista</button>
             <div id="wiki-note-actions" style="display:flex;gap:4px;flex-shrink:0;"></div>
+          </div>
           </div>
           <!-- Toolbar formattazione (riusa quella delle note campagna) -->
           <div id="wiki-toolbar" style="display:flex;flex-wrap:wrap;gap:2px;padding:4px 8px;border-bottom:1px solid var(--border);background:var(--bg-secondary);flex-shrink:0;">
@@ -10819,13 +10829,12 @@ const WikiDM = (() => {
       return;
     }
 
-    titleEl.disabled = false;
-    contentEl.contentEditable = 'true';
     titleEl.value = nota.titolo || '';
     contentEl.innerHTML = nota.contenuto || '';
     _showTagBar(nota.tags || []);
     _showBacklinks(nota);
-    setTimeout(() => titleEl.focus(), 50);
+    // Applica modalità corrente (view default, edit se richiesto)
+    setTimeout(() => _applyViewMode(), 30);
   };
 
   // ── Nuova nota ──
@@ -11108,6 +11117,7 @@ const WikiDM = (() => {
     newNote, openNote, saveNote, deleteNote,
     newTemplate, deleteTemplate, saveTemplate,
     search, clearSearch, togglePin,
+    toggleViewMode: () => { _wikiViewMode = _wikiViewMode === 'view' ? 'edit' : 'view'; _applyViewMode(); },
     _createFromTpl, _clickNote, _clickTemplate, _openResult,
     get _section() { return _section; },
     get _noteId()  { return _noteId; },
@@ -11647,8 +11657,13 @@ const WikiGrafo = (() => {
   const render = () => {
     const svg = document.getElementById('wiki-grafo-svg');
     if (!svg) return;
+    // Se il pannello non è visibile, il clientWidth è 0 — aspetta un frame
+    if (!svg.clientWidth) {
+      setTimeout(() => render(), 100);
+      return;
+    }
     const {nodes,links} = _build();
-    const W = svg.clientWidth||800, H = svg.clientHeight||500;
+    const W = svg.clientWidth || 800, H = Math.max(svg.clientHeight, 400);
     while (svg.firstChild) svg.removeChild(svg.firstChild);
 
     if (!nodes.length) {
@@ -12047,6 +12062,31 @@ const GDrive = (() => {
   };
   return { init, toggleLogin, sync, load, _saveClientId };
 })();
+
+
+
+// ══ WIKI VIEW MODE ══
+// Stato: 'view' | 'edit'
+let _wikiViewMode = 'view'; // default: vista lettura
+
+const _applyViewMode = () => {
+  const content = document.getElementById('wiki-note-content');
+  const toolbar  = document.getElementById('wiki-toolbar');
+  const titleEl  = document.getElementById('wiki-note-title');
+  const btn      = document.getElementById('wiki-view-toggle');
+
+  if (_wikiViewMode === 'view') {
+    if (content) { content.contentEditable = 'false'; content.style.cursor = 'default'; }
+    if (toolbar)  toolbar.classList.add('view-mode');
+    if (titleEl)  titleEl.disabled = true;
+    if (btn) { btn.textContent = '✏️ Modifica'; btn.title = 'Passa in modalità modifica'; btn.style.color = 'var(--accent-secondary)'; }
+  } else {
+    if (content) { content.contentEditable = 'true'; content.style.cursor = ''; content.focus(); }
+    if (toolbar)  toolbar.classList.remove('view-mode');
+    if (titleEl)  titleEl.disabled = false;
+    if (btn) { btn.textContent = '👁 Vista'; btn.title = 'Passa in modalità lettura'; btn.style.color = ''; }
+  }
+};
 
 
 /* ── INIT ── */
