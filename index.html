@@ -185,7 +185,13 @@
         <span class="nav-label">Compendio</span>
       </button>
 
-      <button class="nav-item" data-page="schermo" onclick="App.navigateTo('schermo');closeMobileMenu()">
+      <button class="nav-item" data-page="wiki" data-requires-campaign="true" onclick="App.navigateTo('wiki');closeMobileMenu()">
+          <span class="nav-icon" aria-hidden="true">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+          </span>
+          <span class="nav-label">Wiki</span>
+        </button>
+        <button class="nav-item" data-page="schermo" onclick="App.navigateTo('schermo');closeMobileMenu()">
         <span class="nav-icon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></span>
         <span class="nav-label">Schermo DM</span>
       </button>
@@ -1302,6 +1308,87 @@
         </div>
         <div class="tab-content" id="comp-panel-rules">
           <div id="comp-list-rules" class="comp-list"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ════════════════════════
+         PAGINA: WIKI DM
+    ════════════════════════ -->
+    <section class="page" id="page-wiki" style="padding:0;display:none;flex-direction:column;height:calc(100vh - var(--header-height));">
+      <!-- Topbar Wiki -->
+      <div id="wiki-topbar" style="display:flex;align-items:center;gap:8px;padding:8px 16px;border-bottom:1px solid var(--border);background:var(--bg-card);flex-shrink:0;flex-wrap:wrap;">
+        <div style="display:flex;gap:4px;flex-shrink:0;">
+          <button id="wiki-tab-lore" class="btn btn-primary btn-sm" onclick="WikiDM.switchSection('lore')">📚 Lore</button>
+          <button id="wiki-tab-sessioni" class="btn btn-ghost btn-sm" onclick="WikiDM.switchSection('sessioni')">📋 Sessioni</button>
+          <button id="wiki-tab-templates" class="btn btn-ghost btn-sm" onclick="WikiDM.switchSection('templates')">🗂️ Template</button>
+        </div>
+        <div style="flex:1;min-width:160px;max-width:320px;position:relative;">
+          <input id="wiki-search" type="text" class="form-input" placeholder="🔍 Cerca nel wiki..." style="width:100%;padding-left:8px;" oninput="WikiDM.search(this.value)">
+        </div>
+        <div id="wiki-section-actions" style="display:flex;gap:4px;flex-shrink:0;"></div>
+      </div>
+
+      <!-- Corpo Wiki -->
+      <div style="display:flex;flex:1;overflow:hidden;min-height:0;">
+
+        <!-- Sidebar sinistra: albero note -->
+        <div id="wiki-sidebar" style="width:240px;flex-shrink:0;border-right:1px solid var(--border);overflow-y:auto;background:var(--bg-secondary);display:flex;flex-direction:column;">
+          <div id="wiki-tree" style="flex:1;overflow-y:auto;padding:8px 0;"></div>
+        </div>
+
+        <!-- Area centrale: editor + backlinks -->
+        <div id="wiki-editor-area" style="flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden;">
+          <!-- Breadcrumb -->
+          <div id="wiki-breadcrumb" style="padding:4px 16px;font-size:0.72rem;color:var(--text-muted);border-bottom:1px solid var(--border);background:var(--bg-secondary);flex-shrink:0;"></div>
+          <!-- Titolo nota -->
+          <div style="padding:8px 16px;border-bottom:1px solid var(--border);flex-shrink:0;display:flex;align-items:center;gap:8px;">
+            <input id="wiki-note-title" class="form-input" placeholder="Titolo nota..." style="flex:1;font-family:var(--font-display);font-size:1rem;font-weight:600;border:none;background:transparent;padding:0;" oninput="WikiDM.saveNote()">
+            <div id="wiki-note-actions" style="display:flex;gap:4px;flex-shrink:0;"></div>
+          </div>
+          <!-- Toolbar formattazione (riusa quella delle note campagna) -->
+          <div id="wiki-toolbar" style="display:flex;flex-wrap:wrap;gap:2px;padding:4px 8px;border-bottom:1px solid var(--border);background:var(--bg-secondary);flex-shrink:0;">
+            <button class="nc-tb" onclick="wikiF('bold')" title="Grassetto"><b>B</b></button>
+            <button class="nc-tb" onclick="wikiF('italic')" title="Corsivo"><i>I</i></button>
+            <button class="nc-tb" onclick="wikiF('underline')" title="Sottolineato"><u>S</u></button>
+            <button class="nc-tb" onclick="wikiF('strikeThrough')" title="Barrato"><s>ab</s></button>
+            <div style="width:1px;background:var(--border);margin:2px 3px;"></div>
+            <button class="nc-tb" onclick="wikiFB('h1')" style="font-weight:700;font-size:0.85rem;">H1</button>
+            <button class="nc-tb" onclick="wikiFB('h2')" style="font-weight:700;font-size:0.8rem;">H2</button>
+            <button class="nc-tb" onclick="wikiFB('h3')" style="font-weight:700;font-size:0.75rem;">H3</button>
+            <button class="nc-tb" onclick="wikiFB('p')" style="font-size:0.75rem;">¶</button>
+            <div style="width:1px;background:var(--border);margin:2px 3px;"></div>
+            <button class="nc-tb" onclick="wikiF('insertUnorderedList')">• —</button>
+            <button class="nc-tb" onclick="wikiF('insertOrderedList')">1.</button>
+            <button class="nc-tb" onclick="wikiFB('blockquote')">❝</button>
+            <div style="width:1px;background:var(--border);margin:2px 3px;"></div>
+            <button class="nc-tb" onclick="wikiInsertTag()" style="color:var(--accent-secondary);">#tag</button>
+            <button class="nc-tb" onclick="wikiInsertLink()" style="color:#5ba4f5;">[[link]]</button>
+            <div style="width:1px;background:var(--border);margin:2px 3px;"></div>
+            <button class="nc-tb" onclick="wikiF('removeFormat')" style="font-size:0.7rem;color:var(--text-muted);">✕</button>
+          </div>
+          <!-- Editor -->
+          <div id="wiki-note-content"
+            contenteditable="true"
+            spellcheck="true"
+            style="flex:1;padding:16px;overflow-y:auto;outline:none;font-size:0.9rem;line-height:1.8;color:var(--text-primary);"
+            data-placeholder="Inizia a scrivere... Usa [[link]] per collegare note, #tag per categorizzare."
+            oninput="WikiDM.saveNote()"
+            onkeydown="wikiEditorKeydown(event)">
+          </div>
+          <!-- Backlinks -->
+          <div id="wiki-backlinks" style="display:none;padding:8px 16px;border-top:1px solid var(--border);font-size:0.75rem;color:var(--text-muted);background:var(--bg-secondary);flex-shrink:0;flex-wrap:wrap;gap:4px;"></div>
+          <!-- Tag bar -->
+          <div id="wiki-tag-bar" style="display:none;padding:4px 16px;border-top:1px solid var(--border);font-size:0.72rem;background:var(--bg-primary);flex-shrink:0;flex-wrap:wrap;gap:4px;"></div>
+        </div>
+
+        <!-- Pannello risultati ricerca (overlay) -->
+        <div id="wiki-search-results" style="display:none;position:absolute;top:0;left:0;right:0;bottom:0;background:var(--bg-primary);z-index:10;overflow-y:auto;padding:16px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+            <h3 style="font-family:var(--font-display);font-size:1rem;">Risultati ricerca</h3>
+            <button class="btn btn-ghost btn-sm" onclick="WikiDM.clearSearch()">✕ Chiudi</button>
+          </div>
+          <div id="wiki-search-list"></div>
         </div>
       </div>
     </section>
@@ -3173,6 +3260,7 @@ const App = (() => {
     generatori: { label: 'Generatori', icon: '✨', navItem: true,  requiresCampaign: false },
     compendio:  { label: 'Compendio',  icon: '📚', navItem: true,  requiresCampaign: false },
     schermo:    { label: 'Schermo DM', icon: '🖥️', navItem: true,  requiresCampaign: false },
+    wiki:       { label: 'Wiki',        icon: '📝', navItem: true,  requiresCampaign: true  },
   };
 
   const navigateTo = (pageId) => {
@@ -3239,6 +3327,7 @@ const App = (() => {
         break;
       case 'compendio':  try { Compendio.init(); } catch(e) {} break;
       case 'schermo':    try { Schermo.init(); } catch(e) {} break;
+      case 'wiki':       setTimeout(() => WikiDM.init(), 50); break;
     }
   };
 
@@ -10274,6 +10363,624 @@ const ncRefreshEditor = () => {
   ncUpdateBacklinks();
 };
 
+
+// ══════════════════════════════════════════════════════════════
+// WIKI DM — Lore, Sessioni, Template con editor WYSIWYG
+// ══════════════════════════════════════════════════════════════
+const WikiDM = (() => {
+
+  // ── Stato ──
+  let _section = 'lore';      // 'lore' | 'sessioni' | 'templates'
+  let _noteId  = null;        // id nota corrente
+  let _searchQ = '';
+
+  // ── Storage key ──
+  const _getWiki = () => {
+    const camp = App.getActiveCampaign();
+    if (!camp) return { lore: [], sessioni: [], templates: _defaultTemplates() };
+    return camp.wiki || { lore: [], sessioni: [], templates: _defaultTemplates() };
+  };
+  const _saveWiki = (wiki) => App.saveActiveCampaign({ wiki });
+
+  // ── Template predefiniti ──
+  const _defaultTemplates = () => [
+    {
+      id: 'tpl_sessione', nome: 'Sessione', icona: '⚔️', predefinito: true,
+      contenuto: `<h1>Sessione {{N}} — {{Titolo}}</h1>
+<p><strong>Data:</strong> {{data}} &nbsp;|&nbsp; <strong>Round narrativo:</strong> {{round}}</p>
+
+<h2>🎯 Obiettivi Sessione</h2>
+<ul><li>...</li></ul>
+
+<h2>🗺️ Scene Preparate</h2>
+<p>...</p>
+
+<h2>👥 PNG Coinvolti</h2>
+<ul><li>...</li></ul>
+
+<h2>⚔️ Encounter</h2>
+<p>...</p>
+
+<h2>💰 Loot / Ricompense</h2>
+<p>...</p>
+
+<h2>🔒 Segreti (solo DM)</h2>
+<p>...</p>
+
+<h2>📝 Note Live (durante la sessione)</h2>
+<p>...</p>
+
+<h2>📖 Recap (dopo la sessione)</h2>
+<p>...</p>
+
+<h2>🔗 Thread aperti</h2>
+<ul><li>...</li></ul>`,
+    },
+    {
+      id: 'tpl_lore', nome: 'Articolo Lore', icona: '📚', predefinito: true,
+      contenuto: `<h1>{{Titolo}}</h1>
+<p><em>Categoria: {{categoria}} &nbsp;|&nbsp; #tag</em></p>
+
+<h2>Descrizione</h2>
+<p>...</p>
+
+<h2>Storia</h2>
+<p>...</p>
+
+<h2>Connessioni</h2>
+<ul><li>[[Collegamento]]</li></ul>
+
+<h2>Note DM</h2>
+<blockquote>Segreti e informazioni riservate al DM...</blockquote>`,
+    },
+    {
+      id: 'tpl_npc_wiki', nome: 'PNG (Wiki)', icona: '👤', predefinito: true,
+      contenuto: `<h1>{{Nome PNG}}</h1>
+<p><strong>Razza:</strong> ... &nbsp;|&nbsp; <strong>Professione:</strong> ... &nbsp;|&nbsp; <strong>Luogo:</strong> [[Luogo]]</p>
+<p>#png #{{fazione}}</p>
+
+<h2>Descrizione</h2>
+<p>...</p>
+
+<h2>Personalità</h2>
+<p><strong>Vuole:</strong> ...<br><strong>Teme:</strong> ...<br><strong>Segreto:</strong> ...</p>
+
+<h2>Relazioni</h2>
+<ul><li>[[Nome]] — ...</li></ul>
+
+<h2>Dialoghi tipici</h2>
+<blockquote>...</blockquote>
+
+<h2>Note DM</h2>
+<p>...</p>`,
+    },
+    {
+      id: 'tpl_luogo_wiki', nome: 'Luogo (Wiki)', icona: '🗺️', predefinito: true,
+      contenuto: `<h1>{{Nome Luogo}}</h1>
+<p><strong>Tipo:</strong> ... &nbsp;|&nbsp; <strong>Regione:</strong> [[Regione]] &nbsp;|&nbsp; #luogo</p>
+
+<h2>Descrizione</h2>
+<p>...</p>
+
+<h2>Atmosfera</h2>
+<p><strong>Aspetto:</strong> ...<br><strong>Suoni:</strong> ...<br><strong>Odori:</strong> ...</p>
+
+<h2>Abitanti / PNG</h2>
+<ul><li>[[PNG]]</li></ul>
+
+<h2>Punti di Interesse</h2>
+<ul><li>...</li></ul>
+
+<h2>Note DM</h2>
+<blockquote>...</blockquote>`,
+    },
+    {
+      id: 'tpl_libero', nome: 'Nota Libera', icona: '📄', predefinito: true,
+      contenuto: `<h1>{{Titolo}}</h1>
+<p>...</p>`,
+    },
+  ];
+
+  // ── Genera ID ──
+  const _uid = () => 'n_' + Date.now() + '_' + Math.random().toString(36).slice(2,6);
+
+  // ── Applica template (sostituisce {{placeholder}}) ──
+  const _applyTemplate = (tpl) => {
+    const now = new Date();
+    const wiki = _getWiki();
+    const nSessioni = (wiki.sessioni || []).length + 1;
+    return tpl.contenuto
+      .replace(/\{\{N\}\}/g, nSessioni)
+      .replace(/\{\{data\}\}/g, now.toLocaleDateString('it-IT'))
+      .replace(/\{\{round\}\}/g, nSessioni)
+      .replace(/\{\{Titolo\}\}/g, '')
+      .replace(/\{\{categoria\}\}/g, '')
+      .replace(/\{\{fazione\}\}/g, '')
+      .replace(/\{\{Nome PNG\}\}/g, '')
+      .replace(/\{\{Nome Luogo\}\}/g, '')
+      .replace(/\{\{Regione\}\}/g, '');
+  };
+
+  // ── Nuova nota ──
+  const newNote = (sectionOverride) => {
+    const sec = sectionOverride || _section;
+    if (sec === 'templates') { newTemplate(); return; }
+
+    // Sceglie template
+    const wiki = _getWiki();
+    const templates = wiki.templates || _defaultTemplates();
+    if (templates.length === 0) {
+      _createNote(sec, 'Nuova nota', '');
+      return;
+    }
+
+    // Modal selezione template
+    const tplList = templates.map((t,i) =>
+      `<div style="display:flex;align-items:center;gap:8px;padding:8px;border:1px solid var(--border);border-radius:var(--radius-md);cursor:pointer;margin-bottom:6px;background:var(--bg-secondary);"
+        onclick="WikiDM._selectTemplate('${t.id}','${sec}');Modal.close('wiki-tpl')"
+        onmouseover="this.style.background='var(--bg-tertiary)'" onmouseout="this.style.background='var(--bg-secondary)'">
+        <span style="font-size:1.2rem;">${t.icona}</span>
+        <div><div style="font-family:var(--font-display);font-size:0.88rem;">${t.nome}</div>
+        ${t.predefinito ? '<div style="font-size:0.68rem;color:var(--text-muted);">Predefinito</div>' : ''}</div>
+      </div>`
+    ).join('');
+
+    document.getElementById('wiki-tpl-list').innerHTML = tplList;
+    Modal.open('wiki-tpl');
+  };
+
+  const _selectTemplate = (tplId, sec) => {
+    const wiki = _getWiki();
+    const tpl = (wiki.templates || _defaultTemplates()).find(t => t.id === tplId);
+    if (!tpl) { _createNote(sec, 'Nuova nota', ''); return; }
+    const content = _applyTemplate(tpl);
+    _createNote(sec, 'Nuova nota', content);
+  };
+
+  const _createNote = (sec, titolo, contenuto) => {
+    const wiki = _getWiki();
+    const nota = { id: _uid(), titolo, contenuto, creatoAt: Date.now(), aggiornatoAt: Date.now(), tags: [] };
+    if (!wiki[sec]) wiki[sec] = [];
+    wiki[sec].unshift(nota);
+    _saveWiki(wiki);
+    _noteId = nota.id;
+    _section = sec;
+    renderTree();
+    renderEditor();
+    document.getElementById('wiki-note-title')?.focus();
+  };
+
+  // ── Elimina nota ──
+  const deleteNote = () => {
+    if (!_noteId) return;
+    if (!confirm('Eliminare questa nota?')) return;
+    const wiki = _getWiki();
+    wiki[_section] = (wiki[_section] || []).filter(n => n.id !== _noteId);
+    _saveWiki(wiki);
+    _noteId = (wiki[_section][0])?.id || null;
+    renderTree();
+    renderEditor();
+  };
+
+  // ── Salva nota corrente ──
+  const saveNote = () => {
+    if (!_noteId || _section === 'templates') return;
+    const wiki = _getWiki();
+    const nota = (wiki[_section] || []).find(n => n.id === _noteId);
+    if (!nota) return;
+    nota.titolo = document.getElementById('wiki-note-title')?.value || 'Senza titolo';
+    const el = document.getElementById('wiki-note-content');
+    nota.contenuto = el?.innerHTML || '';
+    nota.aggiornatoAt = Date.now();
+    // Estrai tag dal contenuto
+    nota.tags = [...new Set([...nota.contenuto.matchAll(/class="nc-tag"[^>]*>([^<]+)</g)].map(m => m[1]))];
+    _saveWiki(wiki);
+    // Aggiorna titolo nel tree
+    document.querySelectorAll(`[data-note-id="${_noteId}"] .wiki-note-name`).forEach(el => {
+      el.textContent = nota.titolo || 'Senza titolo';
+    });
+    _updateTagBar(nota.tags);
+    _updateBacklinks();
+  };
+
+  // ── Apri nota ──
+  const openNote = (id) => {
+    _noteId = id;
+    renderEditor();
+  };
+
+  // ── Switch sezione ──
+  const switchSection = (sec) => {
+    _section = sec;
+    _noteId = null;
+    ['lore','sessioni','templates'].forEach(s => {
+      const btn = document.getElementById(`wiki-tab-${s}`);
+      if (btn) {
+        btn.className = s === sec ? 'btn btn-primary btn-sm' : 'btn btn-ghost btn-sm';
+      }
+    });
+    renderTree();
+    renderEditor();
+    _renderSectionActions();
+  };
+
+  // ── Ricerca ──
+  const search = (q) => {
+    _searchQ = q.trim().toLowerCase();
+    if (!_searchQ) { clearSearch(); return; }
+    const wiki = _getWiki();
+    const results = [];
+    ['lore','sessioni'].forEach(sec => {
+      (wiki[sec] || []).forEach(n => {
+        const haystack = (n.titolo + ' ' + n.contenuto.replace(/<[^>]+>/g,'')).toLowerCase();
+        if (haystack.includes(_searchQ)) {
+          const excerpt = _makeExcerpt(n.contenuto.replace(/<[^>]+>/g,''), _searchQ);
+          results.push({ sec, n, excerpt });
+        }
+      });
+    });
+    const sr = document.getElementById('wiki-search-results');
+    const sl = document.getElementById('wiki-search-list');
+    if (sr) sr.style.display = 'block';
+    const labels = { lore:'📚 Lore', sessioni:'📋 Sessioni' };
+    if (sl) sl.innerHTML = results.length === 0
+      ? '<p class="text-muted text-sm">Nessun risultato.</p>'
+      : results.map(r =>
+          `<div style="padding:10px;border:1px solid var(--border);border-radius:var(--radius-md);margin-bottom:8px;cursor:pointer;background:var(--bg-secondary);"
+            onclick="WikiDM._openFromSearch('${r.sec}','${r.n.id}')">
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+              <span class="badge badge-muted" style="font-size:0.6rem;">${labels[r.sec]}</span>
+              <span style="font-family:var(--font-display);font-size:0.9rem;">${r.n.titolo || 'Senza titolo'}</span>
+            </div>
+            <div style="font-size:0.78rem;color:var(--text-muted);">${r.excerpt}</div>
+          </div>`
+        ).join('');
+  };
+
+  const _openFromSearch = (sec, id) => {
+    clearSearch();
+    document.getElementById('wiki-search')?.value && (document.getElementById('wiki-search').value = '');
+    _section = sec;
+    _noteId = id;
+    switchSection(sec);
+    renderEditor();
+  };
+
+  const clearSearch = () => {
+    const sr = document.getElementById('wiki-search-results');
+    if (sr) sr.style.display = 'none';
+  };
+
+  const _makeExcerpt = (text, q) => {
+    const idx = text.toLowerCase().indexOf(q);
+    if (idx < 0) return text.slice(0,100) + '...';
+    const start = Math.max(0, idx - 40);
+    const end = Math.min(text.length, idx + q.length + 60);
+    return (start > 0 ? '...' : '') + text.slice(start, end).replace(
+      new RegExp(q,'gi'), m => `<mark style="background:rgba(93,164,90,0.3);border-radius:2px;">${m}</mark>`
+    ) + (end < text.length ? '...' : '');
+  };
+
+  // ── Render Tree (sidebar) ──
+  const renderTree = () => {
+    const tree = document.getElementById('wiki-tree');
+    if (!tree) return;
+    if (_section === 'templates') { renderTemplatesTree(); return; }
+
+    const wiki = _getWiki();
+    const notes = wiki[_section] || [];
+    const label = { lore:'📚 Lore', sessioni:'📋 Sessioni' }[_section];
+
+    if (!notes.length) {
+      tree.innerHTML = `<div style="padding:16px;text-align:center;color:var(--text-muted);font-size:0.82rem;">
+        <div style="font-size:2rem;margin-bottom:8px;">📄</div>
+        <div>Nessuna nota</div>
+        <button class="btn btn-primary btn-sm" style="margin-top:8px;" onclick="WikiDM.newNote()">+ Nuova nota</button>
+      </div>`;
+      return;
+    }
+
+    tree.innerHTML = notes.map(n =>
+      `<div data-note-id="${n.id}" style="display:flex;align-items:center;gap:6px;padding:7px 12px;cursor:pointer;border-radius:0;transition:background 0.15s;${n.id === _noteId ? 'background:rgba(139,38,53,0.15);border-right:2px solid var(--accent-primary);' : ''}"
+        onclick="WikiDM.openNote('${n.id}')"
+        onmouseover="if('${n.id}'!=='${_noteId}')this.style.background='var(--bg-tertiary)'"
+        onmouseout="if('${n.id}'!=='${_noteId}')this.style.background=''">
+        <span style="font-size:0.7rem;flex-shrink:0;">${_noteIcon(n)}</span>
+        <span class="wiki-note-name" style="font-size:0.82rem;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text-primary);">${n.titolo || 'Senza titolo'}</span>
+        ${n.tags?.length ? `<span style="font-size:0.6rem;color:var(--accent-secondary);">●</span>` : ''}
+      </div>`
+    ).join('');
+  };
+
+  const _noteIcon = (n) => {
+    const t = (n.titolo || '').toLowerCase();
+    if (t.includes('sessione')) return '⚔️';
+    if (t.includes('png') || t.includes('npc')) return '👤';
+    if (t.includes('luogo')) return '🗺️';
+    return '📄';
+  };
+
+  // ── Render Editor ──
+  const renderEditor = () => {
+    const titleEl = document.getElementById('wiki-note-title');
+    const contentEl = document.getElementById('wiki-note-content');
+    const actionsEl = document.getElementById('wiki-note-actions');
+    const breadcrumb = document.getElementById('wiki-breadcrumb');
+
+    if (_section === 'templates') { renderTemplateEditor(); return; }
+
+    if (!titleEl || !contentEl) return;
+
+    const wiki = _getWiki();
+    const nota = _noteId ? (wiki[_section] || []).find(n => n.id === _noteId) : null;
+
+    // Breadcrumb
+    if (breadcrumb) {
+      const labels = { lore:'📚 Lore', sessioni:'📋 Sessioni' };
+      breadcrumb.innerHTML = nota
+        ? `<span onclick="WikiDM.switchSection('${_section}')" style="cursor:pointer;">${labels[_section]}</span> <span style="margin:0 4px;">›</span> <span>${nota.titolo || 'Senza titolo'}</span>`
+        : labels[_section] || '';
+    }
+
+    // Azioni nota
+    if (actionsEl) {
+      actionsEl.innerHTML = nota ? `
+        <button class="btn btn-ghost btn-icon-sm" onclick="WikiDM.deleteNote()" title="Elimina nota" style="color:var(--accent-danger);">🗑️</button>
+      ` : '';
+    }
+
+    if (!nota) {
+      titleEl.value = '';
+      titleEl.disabled = true;
+      contentEl.innerHTML = `<div style="text-align:center;padding:40px;color:var(--text-muted);">
+        <div style="font-size:3rem;margin-bottom:12px;">📄</div>
+        <div style="font-size:0.9rem;margin-bottom:16px;">Seleziona una nota o creane una nuova</div>
+        <button class="btn btn-primary btn-sm" onclick="WikiDM.newNote()">+ Nuova nota</button>
+      </div>`;
+      contentEl.contentEditable = 'false';
+      _updateTagBar([]);
+      _updateBacklinks();
+      return;
+    }
+
+    titleEl.disabled = false;
+    contentEl.contentEditable = 'true';
+    titleEl.value = nota.titolo || '';
+    contentEl.innerHTML = nota.contenuto || '';
+    _updateTagBar(nota.tags || []);
+    _updateBacklinks();
+  };
+
+  // ── Template section ──
+  const renderTemplatesTree = () => {
+    const tree = document.getElementById('wiki-tree');
+    if (!tree) return;
+    const wiki = _getWiki();
+    const templates = wiki.templates || _defaultTemplates();
+    tree.innerHTML = templates.map(t =>
+      `<div data-tpl-id="${t.id}" style="display:flex;align-items:center;gap:6px;padding:7px 12px;cursor:pointer;${t.id === _noteId ? 'background:rgba(139,38,53,0.15);border-right:2px solid var(--accent-primary);' : ''}"
+        onclick="WikiDM._openTemplate('${t.id}')"
+        onmouseover="if('${t.id}'!=='${_noteId}')this.style.background='var(--bg-tertiary)'"
+        onmouseout="if('${t.id}'!=='${_noteId}')this.style.background=''">
+        <span>${t.icona}</span>
+        <span style="font-size:0.82rem;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${t.nome}</span>
+        ${t.predefinito ? '<span style="font-size:0.6rem;color:var(--text-muted);">def</span>' : ''}
+      </div>`
+    ).join('') + `<div style="padding:8px 12px;border-top:1px solid var(--border);margin-top:8px;">
+      <button class="btn btn-ghost btn-sm w-full" onclick="WikiDM.newTemplate()" style="font-size:0.75rem;">+ Nuovo template</button>
+    </div>`;
+  };
+
+  const _openTemplate = (id) => {
+    _noteId = id;
+    renderTemplateEditor();
+  };
+
+  const renderTemplateEditor = () => {
+    const wiki = _getWiki();
+    const templates = wiki.templates || _defaultTemplates();
+    const tpl = templates.find(t => t.id === _noteId);
+    const titleEl = document.getElementById('wiki-note-title');
+    const contentEl = document.getElementById('wiki-note-content');
+    const actionsEl = document.getElementById('wiki-note-actions');
+    const breadcrumb = document.getElementById('wiki-breadcrumb');
+
+    if (breadcrumb) breadcrumb.textContent = '🗂️ Template';
+    if (actionsEl) {
+      actionsEl.innerHTML = tpl && !tpl.predefinito ? `
+        <button class="btn btn-ghost btn-icon-sm" onclick="WikiDM.deleteTemplate('${tpl.id}')" style="color:var(--accent-danger);">🗑️</button>
+      ` : '';
+    }
+
+    if (!tpl) {
+      if (titleEl) { titleEl.value = ''; titleEl.disabled = true; }
+      if (contentEl) {
+        contentEl.contentEditable = 'false';
+        contentEl.innerHTML = `<div style="text-align:center;padding:40px;color:var(--text-muted);">
+          <div style="font-size:2.5rem;margin-bottom:12px;">🗂️</div>
+          <div style="margin-bottom:16px;">Seleziona un template da modificare o creane uno nuovo</div>
+          <button class="btn btn-primary btn-sm" onclick="WikiDM.newTemplate()">+ Nuovo template</button>
+        </div>`;
+      }
+      return;
+    }
+
+    if (titleEl) { titleEl.disabled = false; titleEl.value = tpl.nome; }
+    if (contentEl) { contentEl.contentEditable = 'true'; contentEl.innerHTML = tpl.contenuto; }
+  };
+
+  const saveTemplate = () => {
+    if (!_noteId || _section !== 'templates') return;
+    const wiki = _getWiki();
+    if (!wiki.templates) wiki.templates = _defaultTemplates();
+    const tpl = wiki.templates.find(t => t.id === _noteId);
+    if (!tpl) return;
+    tpl.nome = document.getElementById('wiki-note-title')?.value || tpl.nome;
+    const el = document.getElementById('wiki-note-content');
+    tpl.contenuto = el?.innerHTML || '';
+    _saveWiki(wiki);
+    renderTemplatesTree();
+  };
+
+  const newTemplate = () => {
+    const nome = prompt('Nome del template:', 'Nuovo template');
+    if (!nome?.trim()) return;
+    const wiki = _getWiki();
+    if (!wiki.templates) wiki.templates = _defaultTemplates();
+    const tpl = { id: 'tpl_' + Date.now(), nome: nome.trim(), icona: '📄', predefinito: false, contenuto: `<h1>${nome.trim()}</h1>\n<p>...</p>` };
+    wiki.templates.push(tpl);
+    _saveWiki(wiki);
+    _noteId = tpl.id;
+    renderTemplatesTree();
+    renderTemplateEditor();
+  };
+
+  const deleteTemplate = (id) => {
+    const wiki = _getWiki();
+    if (!wiki.templates) return;
+    const tpl = wiki.templates.find(t => t.id === id);
+    if (tpl?.predefinito) { Toast.show('I template predefiniti non si possono eliminare', 'warning'); return; }
+    if (!confirm('Eliminare questo template?')) return;
+    wiki.templates = wiki.templates.filter(t => t.id !== id);
+    _saveWiki(wiki);
+    _noteId = null;
+    renderTemplatesTree();
+    renderTemplateEditor();
+  };
+
+  // ── Tag bar ──
+  const _updateTagBar = (tags) => {
+    const bar = document.getElementById('wiki-tag-bar');
+    if (!bar) return;
+    if (!tags?.length) { bar.style.display = 'none'; return; }
+    bar.style.display = 'flex';
+    bar.innerHTML = '<span style="color:var(--text-muted);margin-right:4px;">Tags:</span>' +
+      [...new Set(tags)].map(t => `<span class="nc-tb-tag" style="cursor:pointer;">${t}</span>`).join('');
+  };
+
+  // ── Backlinks ──
+  const _updateBacklinks = () => {
+    const panel = document.getElementById('wiki-backlinks');
+    if (!panel || !_noteId || _section === 'templates') { if (panel) panel.style.display = 'none'; return; }
+    const wiki = _getWiki();
+    const current = (wiki[_section] || []).find(n => n.id === _noteId);
+    if (!current) { panel.style.display = 'none'; return; }
+    const titolo = current.titolo;
+    const backlinks = [];
+    ['lore','sessioni'].forEach(sec => {
+      (wiki[sec] || []).forEach(n => {
+        if (n.id === _noteId) return;
+        if ((n.contenuto || '').includes(`data-link="${titolo}"`)) {
+          backlinks.push({ sec, n });
+        }
+      });
+    });
+    if (!backlinks.length) { panel.style.display = 'none'; return; }
+    const secLabels = { lore:'📚', sessioni:'📋' };
+    panel.style.display = 'flex';
+    panel.innerHTML = '<span style="margin-right:6px;flex-shrink:0;">🔗 Citata da:</span>' +
+      backlinks.map(b =>
+        `<span style="padding:2px 8px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;color:#5ba4f5;font-size:0.75rem;"
+          onclick="WikiDM._section='${b.sec}';WikiDM.openNote('${b.n.id}');WikiDM.renderTree();">
+          ${secLabels[b.sec]} ${b.n.titolo}
+        </span>`
+      ).join('');
+  };
+
+  // ── Azioni sezione (pulsante +) ──
+  const _renderSectionActions = () => {
+    const el = document.getElementById('wiki-section-actions');
+    if (!el) return;
+    el.innerHTML = `<button class="btn btn-primary btn-sm" onclick="WikiDM.newNote()" title="Nuova nota">+ Nota</button>`;
+  };
+
+  // ── Init ──
+  const init = () => {
+    // Assicura che wiki esista
+    const wiki = _getWiki();
+    if (!wiki.templates || wiki.templates.length === 0) {
+      wiki.templates = _defaultTemplates();
+      _saveWiki(wiki);
+    }
+    _section = 'lore';
+    _noteId = (wiki.lore || [])[0]?.id || null;
+    switchSection('lore');
+    _renderSectionActions();
+  };
+
+  return {
+    init, switchSection, newNote, openNote, saveNote, deleteNote,
+    search, clearSearch,
+    newTemplate, deleteTemplate, saveTemplate,
+    _selectTemplate, _openTemplate, _openFromSearch,
+    renderTree, renderEditor,
+    // Esponi per backlinks
+    get _section() { return _section; },
+    get _noteId() { return _noteId; },
+    _getData: _getWiki,
+  };
+})();
+
+// ── Editor Wiki: funzioni globali ──
+const wikiF  = (cmd) => { document.getElementById('wiki-note-content')?.focus(); document.execCommand(cmd, false, null); WikiDM.saveNote(); };
+const wikiFB = (tag) => { document.getElementById('wiki-note-content')?.focus(); document.execCommand('formatBlock', false, '<' + tag + '>'); WikiDM.saveNote(); };
+
+const wikiInsertTag = () => {
+  const tag = prompt('Nome tag (senza #):', '');
+  if (!tag?.trim()) return;
+  document.getElementById('wiki-note-content')?.focus();
+  document.execCommand('insertHTML', false,
+    `<span class="nc-tag" onclick="this.style.outline='1px solid var(--accent-secondary)'">#${tag.trim().toLowerCase().replace(/\s+/g,'_')}</span>&nbsp;`
+  );
+  WikiDM.saveNote();
+};
+
+const wikiInsertLink = () => {
+  const wiki = WikiDM._getData ? WikiDM._getData() : {};
+  const pages = [];
+  ['lore','sessioni'].forEach(sec => (wiki[sec]||[]).forEach(n => pages.push({ sec, titolo: n.titolo, id: n.id })));
+  const camp = App.getActiveCampaign();
+  (camp?.npcs||[]).forEach(n => pages.push({ sec:'npc', titolo: n.name, id: n.id }));
+  (camp?.locations||[]).forEach(l => pages.push({ sec:'loc', titolo: l.nome, id: l.id }));
+  (camp?.factions||[]).forEach(f => pages.push({ sec:'faz', titolo: f.nome, id: f.id }));
+
+  if (!pages.length) { Toast.show('Nessuna nota disponibile', 'info'); return; }
+  const input = prompt('Collega a:\n' + pages.slice(0,20).map((p,i) => `${i+1}. ${p.titolo}`).join('\n') + '\n\nScrivi il titolo:', '');
+  if (!input?.trim()) return;
+  const found = pages.find(p => p.titolo?.toLowerCase() === input.trim().toLowerCase());
+  const titolo = found ? found.titolo : input.trim();
+  const cls = found ? 'nc-wikilink' : 'nc-wikilink nc-broken';
+  document.getElementById('wiki-note-content')?.focus();
+  document.execCommand('insertHTML', false,
+    `<span class="${cls}" data-link="${titolo}" onclick="wikiNavigateLink('${titolo}')" style="cursor:pointer;">[[${titolo}]]</span>&nbsp;`
+  );
+  WikiDM.saveNote();
+};
+
+const wikiNavigateLink = (titolo) => {
+  const wiki = WikiDM._getData ? WikiDM._getData() : {};
+  for (const sec of ['lore','sessioni']) {
+    const n = (wiki[sec]||[]).find(n => n.titolo === titolo);
+    if (n) { WikiDM.switchSection(sec); WikiDM.openNote(n.id); return; }
+  }
+  // Cerca in PNG/Luoghi/Fazioni
+  const camp = App.getActiveCampaign();
+  if ((camp?.npcs||[]).find(n => n.name === titolo)) { App.navigateTo('mondo'); return; }
+  if ((camp?.locations||[]).find(l => l.nome === titolo)) { App.navigateTo('mondo'); return; }
+  Toast.show(`"${titolo}" non trovata — creala nella sezione Lore`, 'info', 3000);
+};
+
+const wikiEditorKeydown = (e) => {
+  if (e.ctrlKey || e.metaKey) {
+    if (e.key === 'b') { e.preventDefault(); wikiF('bold'); }
+    if (e.key === 'i') { e.preventDefault(); wikiF('italic'); }
+    if (e.key === 'u') { e.preventDefault(); wikiF('underline'); }
+    if (e.key === 's') { e.preventDefault(); WikiDM.saveNote(); Toast.show('Salvato', 'success', 1000); }
+  }
+  if (e.key === 'Tab') { e.preventDefault(); document.execCommand('insertHTML', false, '&nbsp;&nbsp;&nbsp;&nbsp;'); }
+};
+
+
 /* ── INIT ── */
 
 // ══ MONSTER CACHE (per Combat Tracker) ══
@@ -12705,6 +13412,10 @@ document.addEventListener('DOMContentLoaded', () => {
     <span class="mobile-nav-icon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span>
     <span class="mobile-nav-label">Generatori</span>
   </button>
+  <button class="mobile-nav-item" data-page="wiki" onclick="App.navigateTo('wiki');setMobileActive(this)" aria-label="Wiki">
+    <span class="mobile-nav-icon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></span>
+    <span class="mobile-nav-label">Wiki</span>
+  </button>
   <button class="mobile-nav-item" data-page="compendio" onclick="App.navigateTo('compendio');setMobileActive(this)">
     <span class="mobile-nav-icon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg></span>
     <span class="mobile-nav-label">Compendio</span>
@@ -12774,6 +13485,22 @@ window.addEventListener('resize', initMobileNav);
 window.addEventListener('load', initMobileNav);
 document.addEventListener('DOMContentLoaded', initMobileNav);
 </script>
+
+
+    <!-- Modal selezione template Wiki -->
+    <div id="modal-wiki-tpl" class="modal-overlay" style="display:none;" onclick="if(event.target===this)Modal.close('wiki-tpl')">
+      <div class="modal" style="max-width:380px;">
+        <div class="modal-header">
+          <h3 class="modal-title">📄 Scegli template</h3>
+          <button class="btn btn-ghost btn-icon-sm" onclick="Modal.close('wiki-tpl')">✕</button>
+        </div>
+        <div class="modal-body" id="wiki-tpl-list" style="max-height:60vh;overflow-y:auto;"></div>
+        <div class="modal-footer">
+          <button class="btn btn-ghost" onclick="WikiDM._selectTemplate('tpl_libero',WikiDM._section);Modal.close('wiki-tpl')">Nota libera</button>
+          <button class="btn btn-ghost" onclick="Modal.close('wiki-tpl')">Annulla</button>
+        </div>
+      </div>
+    </div>
 
 </body>
 </html>
