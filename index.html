@@ -2123,7 +2123,18 @@
     </div>
     <div class="modal-body">
       <input type="hidden" id="cond-combatant-id">
-      <div id="cond-list" style="columns:2;gap:var(--space-md);"></div>
+      <div id="cond-list" style="columns:2;gap:var(--space-md);margin-bottom:12px;"></div>
+      <!-- Effetti personalizzati con countdown -->
+      <div style="border-top:1px solid var(--border);padding-top:10px;">
+        <div style="font-size:0.72rem;color:var(--text-muted);margin-bottom:6px;font-family:var(--font-display);text-transform:uppercase;letter-spacing:0.05em;">⏱ Effetti con countdown</div>
+        <div id="cond-effects-list" style="margin-bottom:8px;display:flex;flex-wrap:wrap;gap:4px;"></div>
+        <div style="display:flex;gap:6px;align-items:center;">
+          <input id="cond-effect-name" type="text" class="form-input" placeholder="Nome effetto..." style="flex:1;font-size:0.82rem;">
+          <input id="cond-effect-rounds" type="number" min="1" max="99" value="3" class="form-input" style="width:60px;text-align:center;" title="Round">
+          <span style="font-size:0.72rem;color:var(--text-muted);">round</span>
+          <button class="btn btn-secondary btn-sm" onclick="Sessione.addEffect()">+</button>
+        </div>
+      </div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="Modal.close('cond-modal')">Annulla</button>
@@ -5248,7 +5259,12 @@ const Sessione = (() => {
     const hpPct = c.maxHp > 0 ? Math.max(0, Math.round((c.hp / c.maxHp) * 100)) : 100;
     const hpColor = hpPct > 66 ? 'var(--accent-success)' : hpPct > 33 ? 'var(--accent-warning)' : 'var(--accent-danger)';
     const isDead = c.hp <= 0;
-    const condizioniHTML = (c.condizioni || []).map(cond =>
+    const effectsHTML = (c.effects || []).map(ef =>
+        `<span style="display:inline-flex;align-items:center;gap:2px;padding:1px 6px;background:rgba(93,164,90,0.12);border:1px solid var(--accent-secondary);border-radius:var(--radius-full);font-size:0.62rem;color:var(--accent-secondary);" title="${ef.nome} — ${ef.round} round rimasti">
+          ⏱${ef.nome} <strong>${ef.round}r</strong>
+        </span>`
+      ).join('');
+      const condizioniHTML = (c.condizioni || []).map(cond =>
       `<span class="badge badge-primary" style="font-size:0.6rem;cursor:pointer;" onclick="Sessione.removeCondizione('${c.id}','${cond}')" title="Rimuovi">${cond} ✕</span>`
     ).join('');
 
@@ -5275,7 +5291,7 @@ const Sessione = (() => {
               ${c.concentrazione ? '<span class="badge badge-blue" style="font-size:0.6rem;">CONC.</span>' : ''}
             </div>
           </div>
-          ${condizioniHTML ? `<div style="display:flex;flex-wrap:wrap;gap:3px;margin-top:4px;">${condizioniHTML}</div>` : ''}
+          ${condizioniHTML ? `<div style="display:flex;flex-wrap:wrap;gap:3px;margin-top:4px;">${condizioniHTML}${effectsHTML}</div>` : ''}
         </div>
 
         <!-- HP -->
@@ -5342,6 +5358,8 @@ const Sessione = (() => {
 
   const nextTurn = () => {
     if (!_combat || !_sortedCombatants.length) return;
+    // Decrementa effetti quando tocca al primo combatante (inizio round)
+    if (_combat.turno === _sortedCombatants.length - 1) _tickEffects();
     _combat.turno = (_combat.turno + 1) % _sortedCombatants.length;
     if (_combat.turno === 0) {
       _combat.round++;
@@ -5465,6 +5483,42 @@ const Sessione = (() => {
     c.condizioni = (c.condizioni || []).filter(x => x !== cond);
     saveCombat(_combat);
     renderCombat();
+  };
+
+  const addEffect = () => {
+    const id = document.getElementById('cond-combatant-id')?.value;
+    const nome = document.getElementById('cond-effect-name')?.value?.trim();
+    const round = parseInt(document.getElementById('cond-effect-rounds')?.value) || 1;
+    if (!id || !nome) { Toast.show('Inserisci nome e round', 'warning'); return; }
+    const c = _combat?.combatants.find(x => x.id === id);
+    if (!c) return;
+    if (!c.effects) c.effects = [];
+    c.effects.push({ nome, round });
+    saveCombat(_combat);
+    // Aggiorna lista effetti nel modal senza chiuderlo
+    openCondizioneModal(id);
+  };
+
+  const _removeEffect = (id, idx) => {
+    const c = _combat?.combatants.find(x => x.id === id);
+    if (!c || !c.effects) return;
+    c.effects.splice(idx, 1);
+    saveCombat(_combat);
+    openCondizioneModal(id);
+  };
+
+  // Decrementa countdown effetti al passaggio del turno
+  const _tickEffects = () => {
+    if (!_combat?.combatants) return;
+    const expired = [];
+    _combat.combatants.forEach(c => {
+      if (!c.effects?.length) return;
+      c.effects = c.effects.map(ef => ({ ...ef, round: ef.round - 1 }));
+      const just_expired = c.effects.filter(ef => ef.round <= 0);
+      just_expired.forEach(ef => expired.push(c.nome + ': "' + ef.nome + '" scaduto'));
+      c.effects = c.effects.filter(ef => ef.round > 0);
+    });
+    if (expired.length) Toast.show('⏱ ' + expired.join(' · '), 'info', 4000);
   };
 
   const toggleConcentrazione = (id) => {
@@ -5930,7 +5984,7 @@ const Sessione = (() => {
   return {
     init,
     addPG, editPG, deletePG, submitPG, openPGModal, addPGtoCombat, toggleInspirazione,
-    newCombat, nextTurn, prevTurn, changeHPSchermo, openCondizioneSchermo, rollAllInitiative, updateInit,
+    newCombat, nextTurn, prevTurn, changeHPSchermo, openCondizioneSchermo, addEffect, _removeEffect, rollAllInitiative, updateInit,
     changeHP, setHP, quickDamage,
     openCondizioneModal, submitCondizioni, removeCondizione,
     toggleConcentrazione, openNote,
@@ -6111,26 +6165,31 @@ const Compendio = (() => {
       // Normalizza mostri — unifica diversi formati JSON
       _data.monsters.forEach(m => {
         // Normalizza grado_sfida
+        const _parseGS = (raw) => {
+          if (raw === '1/8' || raw === 0.125) return 0.125;
+          if (raw === '1/4' || raw === 0.25) return 0.25;
+          if (raw === '1/2' || raw === 0.5)  return 0.5;
+          const n = parseFloat(raw);
+          return isNaN(n) ? null : n;
+        };
+        const _gsRaw = (v) => {
+          if (v === 0.125) return '1/8';
+          if (v === 0.25)  return '1/4';
+          if (v === 0.5)   return '1/2';
+          return v != null ? String(v) : '?';
+        };
+
         if (!m.grado_sfida) {
           // Formato 5e2024: challenge_rating come numero diretto
           const cr = m.challenge_rating ?? m.cr ?? m.grado_sfida_val;
-          m.grado_sfida = { valore: cr != null ? parseFloat(cr) : null, raw: cr != null ? String(cr) : '?' };
-        } else if (m.grado_sfida.valore === null || m.grado_sfida.valore === undefined) {
-          // grado_sfida esiste ma valore è null
-          const raw = m.grado_sfida.raw || m.grado_sfida.testo;
-          if (raw === '1/8') m.grado_sfida.valore = 0.125;
-          else if (raw === '1/4') m.grado_sfida.valore = 0.25;
-          else if (raw === '1/2') m.grado_sfida.valore = 0.5;
-          else if (raw) m.grado_sfida.valore = parseFloat(raw) || null;
-        }
-        // Assicura che raw sia presente
-        if (m.grado_sfida && !m.grado_sfida.raw) {
-          const v = m.grado_sfida.valore;
-          if (v === 0.125) m.grado_sfida.raw = '1/8';
-          else if (v === 0.25) m.grado_sfida.raw = '1/4';
-          else if (v === 0.5) m.grado_sfida.raw = '1/2';
-          else if (v != null) m.grado_sfida.raw = String(v);
-          else m.grado_sfida.raw = '?';
+          const val = _parseGS(cr);
+          m.grado_sfida = { valore: val, raw: _gsRaw(val) };
+        } else {
+          // grado_sfida.valore può essere stringa ("10") o null
+          const rawSrc = m.grado_sfida.raw || m.grado_sfida.testo || m.grado_sfida.valore;
+          const val = _parseGS(rawSrc);
+          m.grado_sfida.valore = val;
+          m.grado_sfida.raw = _gsRaw(val);
         }
         // Normalizza punti_ferita
         if (!m.punti_ferita && m.hit_points != null) {
@@ -10551,18 +10610,29 @@ const WikiDM = (() => {
       return;
     }
 
-    tree.innerHTML = notes.map(n => {
+    // Ordina: pinned in cima, poi per data modifica
+    const sorted = [...notes].sort((a, b) => {
+      if (a.pinned && !b.pinned) return -1;
+      if (!a.pinned && b.pinned) return 1;
+      return (b.aggiornatoAt||0) - (a.aggiornatoAt||0);
+    });
+
+    tree.innerHTML = sorted.map(n => {
       const active = n.id === _noteId;
       return `<div data-note-id="${n.id}"
-        style="display:flex;align-items:center;gap:6px;padding:8px 12px;cursor:pointer;
+        style="display:flex;align-items:center;gap:6px;padding:7px 8px 7px 12px;cursor:pointer;
                border-right:${active ? '2px solid var(--accent-primary)' : '2px solid transparent'};
                background:${active ? 'rgba(139,38,53,0.15)' : 'transparent'};"
         onclick="WikiDM._clickNote('${n.id}')"
         onmouseenter="if(!${active})this.style.background='var(--bg-tertiary)'"
         onmouseleave="if(!${active})this.style.background='transparent'">
-        <span style="font-size:0.75rem;flex-shrink:0;">${_noteIcon(n.titolo)}</span>
-        <span style="font-size:0.82rem;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${n.titolo || 'Senza titolo'}</span>
-        ${(n.tags||[]).length ? '<span style="color:var(--accent-secondary);font-size:0.6rem;">●</span>' : ''}
+        <span style="font-size:0.75rem;flex-shrink:0;">${n.pinned ? '📌' : _noteIcon(n.titolo)}</span>
+        <span style="font-size:0.82rem;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;${n.pinned?'font-weight:600;':''}">${n.titolo || 'Senza titolo'}</span>
+        <div style="display:flex;gap:2px;flex-shrink:0;opacity:0.5;" onclick="event.stopPropagation();">
+          <button title="${n.pinned?'Rimuovi pin':'Fissa in cima'}"
+            style="width:18px;height:18px;background:none;border:none;cursor:pointer;font-size:0.65rem;padding:0;color:${n.pinned?'var(--accent-secondary)':'var(--text-muted)'};"
+            onclick="WikiDM.togglePin('${n.id}')">📌</button>
+        </div>
       </div>`;
     }).join('');
   };
@@ -10906,11 +10976,20 @@ const WikiDM = (() => {
     _render();
   };
 
+  const togglePin = (id) => {
+    const w = _getWiki();
+    const nota = (w[_section]||[]).find(n => n.id === id);
+    if (!nota) return;
+    nota.pinned = !nota.pinned;
+    _saveWiki(w);
+    renderTree();
+  };
+
   return {
     init, switchSection, renderTree, renderEditor,
     newNote, openNote, saveNote, deleteNote,
     newTemplate, deleteTemplate, saveTemplate,
-    search, clearSearch,
+    search, clearSearch, togglePin,
     _createFromTpl, _clickNote, _clickTemplate, _openResult,
     get _section() { return _section; },
     get _noteId()  { return _noteId; },
@@ -11054,6 +11133,134 @@ const wikiEditorKeydown = (e) => {
   }
   if (e.key==='Tab') { e.preventDefault(); document.execCommand('insertHTML',false,'&nbsp;&nbsp;&nbsp;&nbsp;'); }
 };
+
+
+// ══ RICERCA GLOBALE (Ctrl+K) ══
+const GlobalSearch = (() => {
+  let _idx = -1;
+  let _results = [];
+
+  const open = () => {
+    Modal.open('global-search');
+    setTimeout(() => {
+      const inp = document.getElementById('gs-input');
+      if (inp) { inp.value = ''; inp.focus(); }
+      document.getElementById('gs-results').innerHTML =
+        '<div style="padding:16px;text-align:center;color:var(--text-muted);font-size:0.85rem;">Inizia a digitare per cercare...</div>';
+    }, 50);
+  };
+
+  const search = (q) => {
+    const query = q.trim().toLowerCase();
+    if (!query || query.length < 2) {
+      document.getElementById('gs-results').innerHTML =
+        '<div style="padding:16px;text-align:center;color:var(--text-muted);font-size:0.85rem;">Inizia a digitare per cercare...</div>';
+      _results = [];
+      return;
+    }
+    _results = [];
+    const camp = App.getActiveCampaign();
+
+    // PNG
+    (camp?.npcs||[]).forEach(n => {
+      const name = n.name || n.nome || '';
+      if (name.toLowerCase().includes(query) || (n.job||'').toLowerCase().includes(query)) {
+        _results.push({ tipo:'👤 PNG', nome:name, sub:n.job||n.race||'', action:() => { Modal.close('global-search'); App.navigateTo('mondo'); setTimeout(()=>NPC.openView(n.id),150); } });
+      }
+    });
+
+    // Luoghi
+    (camp?.locations||[]).forEach(l => {
+      if ((l.nome||'').toLowerCase().includes(query) || (l.tipo||'').toLowerCase().includes(query)) {
+        _results.push({ tipo:'🗺️ Luogo', nome:l.nome||'', sub:l.tipo||'', action:() => { Modal.close('global-search'); App.navigateTo('mondo'); setTimeout(()=>Luoghi.openView(l.id),150); } });
+      }
+    });
+
+    // Fazioni
+    (camp?.factions||[]).forEach(f => {
+      if ((f.nome||'').toLowerCase().includes(query) || (f.tipo||'').toLowerCase().includes(query)) {
+        _results.push({ tipo:'⚔️ Fazione', nome:f.nome||'', sub:f.tipo||'', action:() => { Modal.close('global-search'); App.navigateTo('mondo'); setTimeout(()=>Fazioni.openView(f.id),150); } });
+      }
+    });
+
+    // Wiki note
+    const wiki = camp?.wiki || {};
+    ['lore','sessioni'].forEach(sec => {
+      (wiki[sec]||[]).forEach(n => {
+        const text = (n.titolo + ' ' + (n.contenuto||'').replace(/<[^>]+>/g,'')).toLowerCase();
+        if (text.includes(query)) {
+          const secLabel = sec === 'lore' ? '📚 Lore' : '📋 Sessione';
+          _results.push({ tipo:secLabel, nome:n.titolo||'Senza titolo', sub:'', action:() => { Modal.close('global-search'); App.navigateTo('wiki'); setTimeout(()=>{ WikiDM.switchSection(sec); WikiDM.openNote(n.id); },200); } });
+        }
+      });
+    });
+
+    // Compendio mostri (solo se caricati)
+    try {
+      const monsters = Compendio?.getData()?.monsters || [];
+      monsters.slice(0,500).forEach(m => {
+        if ((m.nome||'').toLowerCase().includes(query)) {
+          _results.push({ tipo:'🐉 Mostro', nome:m.nome, sub:'GS '+(m.grado_sfida?.raw||'?'), action:() => { Modal.close('global-search'); App.navigateTo('compendio'); setTimeout(()=>Compendio.openMonster(m.id),200); } });
+        }
+      });
+    } catch(e) {}
+
+    _idx = -1;
+    _renderResults(query);
+  };
+
+  const _renderResults = (query) => {
+    const el = document.getElementById('gs-results');
+    if (!el) return;
+    if (!_results.length) {
+      el.innerHTML = '<div style="padding:16px;text-align:center;color:var(--text-muted);">Nessun risultato per "' + query + '"</div>';
+      return;
+    }
+    el.innerHTML = _results.slice(0,20).map((r,i) =>
+      '<div data-gs-idx="'+i+'" style="display:flex;align-items:center;gap:10px;padding:9px 16px;cursor:pointer;border-bottom:1px solid var(--border);'+(_idx===i?'background:var(--bg-tertiary);':'')+'" onclick="GlobalSearch._pick('+i+')" onmouseenter="GlobalSearch._hover('+i+')" onmouseleave="this.style.background=\'\'">' +
+        '<span style="font-size:0.82rem;flex-shrink:0;min-width:80px;color:var(--text-muted);">' + r.tipo + '</span>' +
+        '<div style="flex:1;min-width:0;">' +
+          '<div style="font-size:0.88rem;color:var(--text-primary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + r.nome + '</div>' +
+          (r.sub ? '<div style="font-size:0.72rem;color:var(--text-muted);">' + r.sub + '</div>' : '') +
+        '</div>' +
+      '</div>'
+    ).join('') + (_results.length > 20 ? '<div style="padding:8px 16px;font-size:0.72rem;color:var(--text-muted);">e altri ' + (_results.length-20) + ' risultati — affina la ricerca</div>' : '');
+  };
+
+  const _hover = (i) => {
+    _idx = i;
+    document.querySelectorAll('[data-gs-idx]').forEach((el,j) => {
+      el.style.background = j===i ? 'var(--bg-tertiary)' : '';
+    });
+  };
+
+  const _pick = (i) => {
+    const r = _results[i];
+    if (r) r.action();
+  };
+
+  const keydown = (e) => {
+    if (e.key === 'Escape') { Modal.close('global-search'); return; }
+    if (e.key === 'ArrowDown') { e.preventDefault(); _idx = Math.min(_idx+1, Math.min(_results.length,20)-1); _renderResults(document.getElementById('gs-input')?.value||''); }
+    if (e.key === 'ArrowUp') { e.preventDefault(); _idx = Math.max(_idx-1, -1); _renderResults(document.getElementById('gs-input')?.value||''); }
+    if (e.key === 'Enter' && _idx >= 0) { e.preventDefault(); _pick(_idx); }
+  };
+
+  return { open, search, keydown, _pick, _hover };
+})();
+
+// ── Listener Ctrl+K globale ──
+document.addEventListener('keydown', (e) => {
+  if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+    e.preventDefault();
+    GlobalSearch.open();
+  }
+  if (e.key === 'Escape') {
+    const gs = document.getElementById('modal-global-search');
+    if (gs && gs.style.display !== 'none') Modal.close('global-search');
+  }
+});
+
 
 /* ── INIT ── */
 
@@ -13575,6 +13782,23 @@ document.addEventListener('DOMContentLoaded', initMobileNav);
         </div>
       </div>
     </div>
+
+
+<!-- Modal: Ricerca Globale Ctrl+K -->
+<div class="modal-overlay hidden" id="modal-global-search" style="display:none;" onclick="if(event.target===this)Modal.close('global-search')">
+  <div class="modal" style="max-width:560px;margin-top:80px;">
+    <div class="modal-header" style="padding:10px 16px;">
+      <div style="display:flex;align-items:center;gap:8px;flex:1;">
+        <span style="font-size:1rem;">🔍</span>
+        <input id="gs-input" type="text" placeholder="Cerca in tutto... (PNG, Luoghi, Fazioni, Note, Compendio)"
+          class="form-input" style="flex:1;border:none;background:transparent;font-size:0.95rem;padding:0;"
+          oninput="GlobalSearch.search(this.value)" onkeydown="GlobalSearch.keydown(event)" autocomplete="off">
+        <kbd style="font-size:0.65rem;color:var(--text-muted);background:var(--bg-tertiary);padding:2px 6px;border-radius:3px;">ESC</kbd>
+      </div>
+    </div>
+    <div id="gs-results" style="max-height:60vh;overflow-y:auto;padding:8px 0;"></div>
+  </div>
+</div>
 
 </body>
 </html>
