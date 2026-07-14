@@ -1465,6 +1465,19 @@
             <div style="width:1px;background:var(--border);margin:2px 3px;"></div>
             <button class="nc-tb" onclick="wikiF('removeFormat')" style="font-size:0.7rem;color:var(--text-muted);">✕</button>
             <div style="width:1px;background:var(--border);margin:2px 3px;"></div>
+            <!-- Colore testo -->
+            <div style="position:relative;display:inline-block;">
+              <button class="nc-tb" id="wiki-color-btn" onclick="wikiApplyColor()" title="Colore testo" style="min-width:28px;border-bottom:3px solid var(--wiki-cur-color,#f5a623);">A</button>
+              <input type="color" id="wiki-color-pick" value="#f5a623" oninput="document.documentElement.style.setProperty('--wiki-cur-color',this.value)" style="position:absolute;width:1px;height:1px;opacity:0;bottom:0;left:0;">
+              <button class="nc-tb" onclick="document.getElementById('wiki-color-pick').click()" title="Scegli colore" style="font-size:0.6rem;padding:0 2px;">▾</button>
+            </div>
+            <!-- Evidenziatore -->
+            <div style="position:relative;display:inline-block;">
+              <button class="nc-tb" id="wiki-hl-btn" onclick="wikiApplyHighlight()" title="Evidenzia" style="min-width:28px;border-bottom:3px solid var(--wiki-cur-hl,rgba(245,166,35,0.5));background:var(--wiki-cur-hl,rgba(245,166,35,0.3));">H</button>
+              <input type="color" id="wiki-hl-pick" value="#f5a623" oninput="document.documentElement.style.setProperty('--wiki-cur-hl',this.value+'80')" style="position:absolute;width:1px;height:1px;opacity:0;bottom:0;left:0;">
+              <button class="nc-tb" onclick="document.getElementById('wiki-hl-pick').click()" title="Scegli evidenziatore" style="font-size:0.6rem;padding:0 2px;">▾</button>
+            </div>
+            <div style="width:1px;background:var(--border);margin:2px 3px;"></div>
             <button class="nc-tb" onclick="wikiCallout('read-aloud')" title="Read Aloud — testo da leggere ai giocatori" style="color:#69cc85;font-size:0.68rem;">📢</button>
             <button class="nc-tb" onclick="wikiCallout('secret')" title="Segreto DM" style="color:#c97bea;font-size:0.68rem;">🔒</button>
             <button class="nc-tb" onclick="wikiCallout('loot')" title="Loot" style="color:#f5a623;font-size:0.68rem;">💰</button>
@@ -1967,8 +1980,20 @@
           <div class="form-group"><label class="form-label">Voce</label><input type="text" id="nm-voice" class="form-input" placeholder="es. Bassa e roca"></div>
           <div class="form-group"><label class="form-label">Tic / Gesto</label><input type="text" id="nm-tic" class="form-input" placeholder="es. Si tocca sempre l'orecchio"></div>
         </div>
-        <div class="form-group"><label class="form-label">Tratto caratteriale</label><textarea id="nm-trait" class="form-textarea" rows="2" placeholder="Come si comporta, cosa lo rende memorabile..."></textarea></div>
-        <div class="form-group"><label class="form-label">Segreto DM</label><textarea id="nm-secret" class="form-textarea" rows="2" placeholder="Cosa nasconde (solo il DM lo sa)..."></textarea></div>
+        <div class="form-group"><label class="form-label">Tratto caratteriale</label><div class="mini-fmt-toolbar" style="display:flex;gap:2px;margin-bottom:4px;flex-wrap:wrap;">
+  <button type="button" class="nc-tb" onclick="miniFmt('nm-trait','bold')" title="Grassetto"><b>B</b></button>
+  <button type="button" class="nc-tb" onclick="miniFmt('nm-trait','italic')" title="Corsivo"><i>I</i></button>
+  <button type="button" class="nc-tb" onclick="miniFmt('nm-trait','underline')" title="Sottolineato"><u>S</u></button>
+  <button type="button" class="nc-tb" onclick="miniFmt('nm-trait','link')" title="[[Link]]" style="color:#5ba4f5;font-size:0.68rem;">[[]]</button>
+  <button type="button" class="nc-tb" onclick="miniFmt('nm-trait','tag')" title="#tag" style="color:var(--accent-secondary);font-size:0.68rem;">#</button>
+</div><textarea id="nm-trait" class="form-textarea" rows="2" placeholder="Come si comporta, cosa lo rende memorabile..."></textarea></div>
+        <div class="form-group"><label class="form-label">Segreto DM</label><div class="mini-fmt-toolbar" style="display:flex;gap:2px;margin-bottom:4px;flex-wrap:wrap;">
+  <button type="button" class="nc-tb" onclick="miniFmt('nm-secret','bold')" title="Grassetto"><b>B</b></button>
+  <button type="button" class="nc-tb" onclick="miniFmt('nm-secret','italic')" title="Corsivo"><i>I</i></button>
+  <button type="button" class="nc-tb" onclick="miniFmt('nm-secret','underline')" title="Sottolineato"><u>S</u></button>
+  <button type="button" class="nc-tb" onclick="miniFmt('nm-secret','link')" title="[[Link]]" style="color:#5ba4f5;font-size:0.68rem;">[[]]</button>
+  <button type="button" class="nc-tb" onclick="miniFmt('nm-secret','tag')" title="#tag" style="color:var(--accent-secondary);font-size:0.68rem;">#</button>
+</div><textarea id="nm-secret" class="form-textarea" rows="2" placeholder="Cosa nasconde (solo il DM lo sa)..."></textarea></div>
         <div class="form-row">
           <div class="form-group"><label class="form-label">Cosa vuole dai PG</label><textarea id="nm-wants" class="form-textarea" rows="2" placeholder="Obiettivo o richiesta..."></textarea></div>
           <div class="form-group"><label class="form-label">Cosa offre ai PG</label><textarea id="nm-offers" class="form-textarea" rows="2" placeholder="Informazioni, servizi, oggetti..."></textarea></div>
@@ -2324,7 +2349,13 @@
       </div>
       <div class="form-group">
         <label class="form-label">Descrizione</label>
-        <textarea id="luogo-desc" class="form-textarea" rows="3" placeholder="Atmosfera, dettagli sensoriali, cosa si vede appena si entra..."></textarea>
+        <div class="mini-fmt-toolbar" style="display:flex;gap:2px;margin-bottom:4px;flex-wrap:wrap;">
+  <button type="button" class="nc-tb" onclick="miniFmt('luogo-desc','bold')" title="Grassetto"><b>B</b></button>
+  <button type="button" class="nc-tb" onclick="miniFmt('luogo-desc','italic')" title="Corsivo"><i>I</i></button>
+  <button type="button" class="nc-tb" onclick="miniFmt('luogo-desc','underline')" title="Sottolineato"><u>S</u></button>
+  <button type="button" class="nc-tb" onclick="miniFmt('luogo-desc','link')" title="[[Link]]" style="color:#5ba4f5;font-size:0.68rem;">[[]]</button>
+  <button type="button" class="nc-tb" onclick="miniFmt('luogo-desc','tag')" title="#tag" style="color:var(--accent-secondary);font-size:0.68rem;">#</button>
+</div><textarea id="luogo-desc" class="form-textarea" rows="3" placeholder="Atmosfera, dettagli sensoriali, cosa si vede appena si entra..."></textarea>
       </div>
       <div class="form-row">
         <div class="form-group">
@@ -2338,7 +2369,13 @@
       </div>
       <div class="form-group">
         <label class="form-label">Note DM</label>
-        <textarea id="luogo-note" class="form-textarea" rows="2" placeholder="Informazioni riservate al master..."></textarea>
+        <div class="mini-fmt-toolbar" style="display:flex;gap:2px;margin-bottom:4px;flex-wrap:wrap;">
+  <button type="button" class="nc-tb" onclick="miniFmt('luogo-note','bold')" title="Grassetto"><b>B</b></button>
+  <button type="button" class="nc-tb" onclick="miniFmt('luogo-note','italic')" title="Corsivo"><i>I</i></button>
+  <button type="button" class="nc-tb" onclick="miniFmt('luogo-note','underline')" title="Sottolineato"><u>S</u></button>
+  <button type="button" class="nc-tb" onclick="miniFmt('luogo-note','link')" title="[[Link]]" style="color:#5ba4f5;font-size:0.68rem;">[[]]</button>
+  <button type="button" class="nc-tb" onclick="miniFmt('luogo-note','tag')" title="#tag" style="color:var(--accent-secondary);font-size:0.68rem;">#</button>
+</div><textarea id="luogo-note" class="form-textarea" rows="2" placeholder="Informazioni riservate al master..."></textarea>
       </div>
     </div>
     <div class="modal-footer">
@@ -2404,7 +2441,13 @@
       </div>
       <div class="form-group">
         <label class="form-label">Note DM</label>
-        <textarea id="fazione-mondo-note" class="form-textarea" rows="2" placeholder="Piani segreti, leader, agenti..."></textarea>
+        <div class="mini-fmt-toolbar" style="display:flex;gap:2px;margin-bottom:4px;flex-wrap:wrap;">
+  <button type="button" class="nc-tb" onclick="miniFmt('fazione-mondo-note','bold')" title="Grassetto"><b>B</b></button>
+  <button type="button" class="nc-tb" onclick="miniFmt('fazione-mondo-note','italic')" title="Corsivo"><i>I</i></button>
+  <button type="button" class="nc-tb" onclick="miniFmt('fazione-mondo-note','underline')" title="Sottolineato"><u>S</u></button>
+  <button type="button" class="nc-tb" onclick="miniFmt('fazione-mondo-note','link')" title="[[Link]]" style="color:#5ba4f5;font-size:0.68rem;">[[]]</button>
+  <button type="button" class="nc-tb" onclick="miniFmt('fazione-mondo-note','tag')" title="#tag" style="color:var(--accent-secondary);font-size:0.68rem;">#</button>
+</div><textarea id="fazione-mondo-note" class="form-textarea" rows="2" placeholder="Piani segreti, leader, agenti..."></textarea>
       </div>
     </div>
     <div class="modal-footer">
@@ -10601,7 +10644,22 @@ const WikiDM = (() => {
 
   // ── Assicura template ──
   const _ensureTemplates = (w) => {
-    if (!w.templates || !w.templates.length) w.templates = _builtinTemplates();
+    const builtin = _builtinTemplates();
+    // Aggiunge extra templates se non presenti
+    try {
+      const extra = _extraTemplates();
+      extra.forEach(t => {
+        if (!builtin.find(b => b.id === t.id)) builtin.push(t);
+      });
+    } catch(e) {}
+    if (!w.templates || !w.templates.length) {
+      w.templates = builtin;
+    } else {
+      // Aggiunge nuovi builtin mancanti senza sovrascrivere personalizzati
+      builtin.forEach(bt => {
+        if (!w.templates.find(t => t.id === bt.id)) w.templates.unshift(bt);
+      });
+    }
     return w;
   };
 
@@ -12087,6 +12145,158 @@ const _applyViewMode = () => {
     if (btn) { btn.textContent = '👁 Vista'; btn.title = 'Passa in modalità lettura'; btn.style.color = ''; }
   }
 };
+
+
+
+// ══ COLORE TESTO + EVIDENZIATORE ══
+const _getWordAtCursor = () => {
+  const sel = window.getSelection();
+  if (!sel || sel.rangeCount === 0) return null;
+  if (!sel.isCollapsed) return null; // c'è già una selezione
+  // Espande la selezione alla parola corrente
+  const range = sel.getRangeAt(0).cloneRange();
+  range.expand('word');
+  return range;
+};
+
+const wikiApplyColor = () => {
+  const color = document.getElementById('wiki-color-pick')?.value || '#f5a623';
+  const sel = window.getSelection();
+  const el = document.getElementById('wiki-note-content');
+  if (!el) return;
+  el.focus();
+  // Se non c'è selezione, seleziona la parola al cursore
+  if (sel && sel.isCollapsed) {
+    const r = _getWordAtCursor();
+    if (r) { sel.removeAllRanges(); sel.addRange(r); }
+  }
+  document.execCommand('foreColor', false, color);
+  WikiDM.saveNote();
+};
+
+const wikiApplyHighlight = () => {
+  const color = document.getElementById('wiki-hl-pick')?.value || '#f5a623';
+  const sel = window.getSelection();
+  const el = document.getElementById('wiki-note-content');
+  if (!el) return;
+  el.focus();
+  if (sel && sel.isCollapsed) {
+    const r = _getWordAtCursor();
+    if (r) { sel.removeAllRanges(); sel.addRange(r); }
+  }
+  document.execCommand('hiliteColor', false, color + '60');
+  WikiDM.saveNote();
+};
+
+// ══ MINI TOOLBAR per PNG/Luoghi/Fazioni ══
+const miniFmt = (fieldId, cmd) => {
+  const el = document.getElementById(fieldId);
+  if (!el) return;
+  const start = el.selectionStart, end = el.selectionEnd;
+  const text = el.value;
+  const sel = text.slice(start, end);
+  const word = sel || _getWordInTextarea(el);
+
+  if (cmd === 'bold') {
+    const ins = '**' + (sel||word) + '**';
+    _insertInTextarea(el, ins, sel ? start : el._wordStart, sel ? end : el._wordEnd);
+  } else if (cmd === 'italic') {
+    const ins = '*' + (sel||word) + '*';
+    _insertInTextarea(el, ins, sel ? start : el._wordStart, sel ? end : el._wordEnd);
+  } else if (cmd === 'underline') {
+    const ins = '__' + (sel||word) + '__';
+    _insertInTextarea(el, ins, sel ? start : el._wordStart, sel ? end : el._wordEnd);
+  } else if (cmd === 'link') {
+    const camp = App.getActiveCampaign();
+    const pages = [];
+    const wiki = camp?.wiki || {};
+    ['lore','sessioni'].forEach(sec => (wiki[sec]||[]).forEach(n => pages.push(n.titolo||'')));
+    (camp?.npcs||[]).forEach(n => pages.push('png:'+(n.name||n.nome||'')));
+    (camp?.locations||[]).forEach(l => pages.push('luogo:'+(l.nome||'')));
+    (camp?.factions||[]).forEach(f => pages.push('fazione:'+(f.nome||'')));
+    const input = prompt('Collega a:\n'+pages.slice(0,20).join('\n'),'');
+    if (!input?.trim()) return;
+    const ins = '[[' + input.trim() + ']]';
+    _insertInTextarea(el, ins, start, end);
+  } else if (cmd === 'tag') {
+    const tag = prompt('Nome tag (senza #):', '');
+    if (!tag?.trim()) return;
+    const ins = '#' + tag.trim().toLowerCase().replace(/\s+/g,'_') + ' ';
+    _insertInTextarea(el, ins, start, end);
+  }
+};
+
+const _getWordInTextarea = (el) => {
+  const pos = el.selectionStart;
+  const text = el.value;
+  let start = pos, end = pos;
+  while (start > 0 && /\w/.test(text[start-1])) start--;
+  while (end < text.length && /\w/.test(text[end])) end++;
+  el._wordStart = start; el._wordEnd = end;
+  return text.slice(start, end);
+};
+
+const _insertInTextarea = (el, ins, start, end) => {
+  const text = el.value;
+  el.value = text.slice(0, start) + ins + text.slice(end);
+  el.selectionStart = el.selectionEnd = start + ins.length;
+  el.dispatchEvent(new Event('input'));
+  el.focus();
+};
+
+// ══ NUOVI TEMPLATE PREDEFINITI ══
+// Aggiunge template aggiuntivi ai builtin
+const _extraTemplates = () => [
+  {
+    id:'tpl_oggetto', nome:'💎 Oggetto Magico', icona:'💎', builtin:true,
+    contenuto:`<h1></h1>
+<p><strong>Tipo:</strong> &nbsp;|&nbsp; <strong>Rarità:</strong> &nbsp;|&nbsp; <strong>Richiede sintonia:</strong> No &nbsp;|&nbsp; #oggetto</p>
+<h2>Descrizione</h2><p></p>
+<h2>Proprietà magiche</h2><ul><li></li></ul>
+<h2>Storia dell'oggetto</h2><p></p>
+<h2>Note DM</h2><blockquote></blockquote>`
+  },
+  {
+    id:'tpl_dungeon', nome:'🏚️ Dungeon / Stanza', icona:'🏚️', builtin:true,
+    contenuto:`<h1></h1>
+<p><strong>Tipo:</strong> Dungeon / Stanza &nbsp;|&nbsp; <strong>Piano:</strong> &nbsp;|&nbsp; #dungeon</p>
+<h2>📢 READ ALOUD</h2>
+<div class="wiki-callout wiki-callout-read-aloud"><span class="wiki-callout-label">📢 READ ALOUD</span><p>Descrivi la stanza ai giocatori...</p></div>
+<h2>Dettagli DM</h2><p></p>
+<h2>⚠️ Pericoli / Trappole</h2>
+<div class="wiki-callout wiki-callout-trap"><span class="wiki-callout-label">⚠️ TRAPPOLA</span><p>...</p></div>
+<h2>💰 Loot</h2>
+<div class="wiki-callout wiki-callout-loot"><span class="wiki-callout-label">💰 LOOT</span><p>...</p></div>
+<h2>Uscite</h2><ul><li>Nord: [[]]</li><li>Sud: [[]]</li></ul>`
+  },
+  {
+    id:'tpl_evento', nome:'🔍 Evento / Segreto', icona:'🔍', builtin:true,
+    contenuto:`<h1></h1>
+<p><strong>Tipo:</strong> Evento / Segreto &nbsp;|&nbsp; <strong>Sessione:</strong> &nbsp;|&nbsp; #segreto</p>
+<h2>Cosa è successo</h2><p></p>
+<h2>🔒 Chi lo sa</h2>
+<div class="wiki-callout wiki-callout-secret"><span class="wiki-callout-label">🔒 SEGRETO DM</span><p>Solo il DM sa che...</p></div>
+<h2>🔍 Come può emergere</h2>
+<div class="wiki-callout wiki-callout-clue"><span class="wiki-callout-label">🔍 INDIZIO</span><p>I PG possono scoprirlo se...</p></div>
+<h2>Impatto sulla trama</h2><p></p>
+<h2>Collegato a</h2><ul><li>[[]]</li></ul>`
+  },
+  {
+    id:'tpl_negozio', nome:'🏪 Negozio', icona:'🏪', builtin:true,
+    contenuto:`<h1></h1>
+<p><strong>Tipo:</strong> &nbsp;|&nbsp; <strong>Luogo:</strong> [[]] &nbsp;|&nbsp; #negozio</p>
+<h2>Descrizione</h2><p></p>
+<h2>Gestore</h2><p>[[]] — </p>
+<h2>Inventario</h2>
+<div class="wiki-callout wiki-callout-loot"><span class="wiki-callout-label">💰 IN VENDITA</span>
+<ul><li></li></ul></div>
+<h2>Prezzi speciali / offerte</h2><p></p>
+<h2>Note DM</h2><blockquote></blockquote>`
+  },
+];
+
+// Patch _builtinTemplates per includere gli extra
+// Viene chiamata alla prima inizializzazione
 
 
 /* ── INIT ── */
