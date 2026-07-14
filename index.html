@@ -124,6 +124,10 @@
   .nc-tb { min-width: 34px; padding: 5px 8px; font-size: 0.82rem; }
   #nc-toolbar { gap: 3px; padding: 6px 8px; }
 }
+#page-wiki.active {
+  display: flex !important;
+  flex-direction: column;
+}
 </style>
 </head>
 <body>
@@ -1315,7 +1319,7 @@
     <!-- ════════════════════════
          PAGINA: WIKI DM
     ════════════════════════ -->
-    <section class="page" id="page-wiki" style="padding:0;display:none;flex-direction:column;height:calc(100vh - var(--header-height));">
+    <section class="page" id="page-wiki" style="padding:0;height:calc(100vh - var(--header-height));display:none;">
       <!-- Topbar Wiki -->
       <div id="wiki-topbar" style="display:flex;align-items:center;gap:8px;padding:8px 16px;border-bottom:1px solid var(--border);background:var(--bg-card);flex-shrink:0;flex-wrap:wrap;">
         <div style="display:flex;gap:4px;flex-shrink:0;">
@@ -1330,7 +1334,7 @@
       </div>
 
       <!-- Corpo Wiki -->
-      <div style="display:flex;flex:1;overflow:hidden;min-height:0;">
+      <div style="display:flex;flex:1;overflow:hidden;min-height:0;position:relative;">
 
         <!-- Sidebar sinistra: albero note -->
         <div id="wiki-sidebar" style="width:240px;flex-shrink:0;border-right:1px solid var(--border);overflow-y:auto;background:var(--bg-secondary);display:flex;flex-direction:column;">
@@ -3327,7 +3331,11 @@ const App = (() => {
         break;
       case 'compendio':  try { Compendio.init(); } catch(e) {} break;
       case 'schermo':    try { Schermo.init(); } catch(e) {} break;
-      case 'wiki':       setTimeout(() => WikiDM.init(), 50); break;
+      case 'wiki':
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+          try { WikiDM.init(); } catch(e) { Debug.warn('WikiDM: ' + e); }
+        }));
+        break;
     }
   };
 
@@ -10732,10 +10740,22 @@ const WikiDM = (() => {
     if (!nota) {
       titleEl.value = '';
       titleEl.disabled = true;
-      contentEl.innerHTML = `<div style="text-align:center;padding:40px;color:var(--text-muted);">
-        <div style="font-size:3rem;margin-bottom:12px;">📄</div>
-        <div style="font-size:0.9rem;margin-bottom:16px;">Seleziona una nota o creane una nuova</div>
-        <button class="btn btn-primary btn-sm" onclick="WikiDM.newNote()">+ Nuova nota</button>
+      const secLabel = { lore:'Lore', sessioni:'Sessioni' }[_section] || '';
+      const secHint = {
+        lore: 'Scrivi lore del mondo, storia, divinità, magia — tutto quello che costruisce l'ambientazione.',
+        sessioni: 'Una nota per sessione: prep, note live durante il gioco, recap finale.',
+        templates: ''
+      }[_section] || '';
+      contentEl.innerHTML = `<div style="max-width:480px;margin:40px auto;text-align:center;color:var(--text-muted);">
+        <div style="font-size:3.5rem;margin-bottom:16px;">${_section==='lore'?'📚':_section==='sessioni'?'📋':'🗂️'}</div>
+        <h2 style="font-family:var(--font-display);font-size:1.1rem;color:var(--text-primary);margin-bottom:8px;">${secLabel}</h2>
+        <p style="font-size:0.85rem;margin-bottom:24px;line-height:1.6;">${secHint}</p>
+        <button class="btn btn-primary" onclick="WikiDM.newNote()" style="margin-bottom:12px;">+ Crea prima nota</button>
+        <div style="font-size:0.75rem;margin-top:16px;color:var(--text-muted);">
+          Usa <span style="background:var(--bg-tertiary);padding:1px 5px;border-radius:3px;font-family:var(--font-mono);">[[link]]</span> per collegare note
+          &nbsp;·&nbsp;
+          <span style="background:var(--bg-tertiary);padding:1px 5px;border-radius:3px;font-family:var(--font-mono);">#tag</span> per categorizzare
+        </div>
       </div>`;
       contentEl.contentEditable = 'false';
       _updateTagBar([]);
