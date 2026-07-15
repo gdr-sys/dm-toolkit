@@ -11060,6 +11060,59 @@ const WikiDM = (() => {
     _noteId = nota.id;
     _mobileView = 'editor';
     _render();
+    // Se è un template PNG/Luogo/Fazione, crea entità nel Mondo
+    const mondoTipoMap = {
+      'tpl_npc':'npc', 'tpl_npc_wiki':'npc',
+      'tpl_loc':'luogo', 'tpl_luogo_wiki':'luogo',
+      'tpl_dungeon':'luogo',
+      'tpl_negozio':'luogo',
+    };
+    const mondoTipo = mondoTipoMap[tplId];
+    if (mondoTipo) {
+      setTimeout(() => _createInMondo(mondoTipo, nota), 300);
+    }
+  };
+
+  // Crea entità nel Mondo dalla nota wiki
+  const _createInMondo = (tipo, nota) => {
+    try {
+      const camp = App.getActiveCampaign();
+      if (!camp) return;
+      const uid = Date.now();
+      if (tipo === 'npc') {
+        const npcs = [...(camp.npcs||[])];
+        const npcData = {
+          id: 'npc_' + uid,
+          name: nota.titolo || 'Nuovo PNG',
+          race: '', job: '', icon: '👤',
+          trait: '', secret: '', wants: '', offers: '', links: '',
+          relation: 50, imgPosX: 50, imgPosY: 50, imgZoom: 100,
+          wikiId: nota.id,
+        };
+        npcs.push(npcData);
+        App.saveActiveCampaign({ npcs });
+        // Aggiorna la nota con il mondoId
+        const w = _getWiki();
+        const n = (w[_section]||[]).find(x => x.id === nota.id);
+        if (n) { n.mondoId = npcData.id; n.mondoTipo = 'npc'; _saveWiki(w); }
+        Toast.show('👤 PNG creato nel Mondo — aprilo per completare i dettagli', 'success', 3000);
+      } else if (tipo === 'luogo') {
+        const locations = [...(camp.locations||[])];
+        const locData = {
+          id: 'loc_' + uid,
+          nome: nota.titolo || 'Nuovo Luogo',
+          tipo: 'altro', desc: '', note: '', poi: '', loot: '',
+          imgPosX: 50, imgPosY: 50, imgZoom: 100,
+          wikiId: nota.id,
+        };
+        locations.push(locData);
+        App.saveActiveCampaign({ locations });
+        const w = _getWiki();
+        const n = (w[_section]||[]).find(x => x.id === nota.id);
+        if (n) { n.mondoId = locData.id; n.mondoTipo = 'luogo'; _saveWiki(w); }
+        Toast.show('🗺️ Luogo creato nel Mondo — aprilo per completare i dettagli', 'success', 3000);
+      }
+    } catch(e) { Debug.warn('_createInMondo:', e); }
   };
 
   const deleteNote = () => {
@@ -11086,10 +11139,30 @@ const WikiDM = (() => {
     nota.tags = [...new Set(
       [...nota.contenuto.matchAll(/class="nc-tag"[^>]*>([^<]+)</g)].map(m => m[1])
     )];
+    const _oldTitolo = (w[_section]||[]).find(n => n.id === _noteId)?.titolo || '';
     _saveWiki(w);
     // Se la nota è sincronizzata con il compendio, aggiorna automaticamente
     if (nota.inCompendio) {
       try { _syncWikiToCompendio(_noteId, true); } catch(e) {}
+    }
+    // Se collegata al Mondo e il titolo è cambiato, aggiorna nome entità + rinomina link
+    if (nota.mondoId && nota.mondoTipo && nota.titolo && nota.titolo !== _oldTitolo) {
+      try {
+        const camp = App.getActiveCampaign();
+        if (nota.mondoTipo === 'npc') {
+          const npcs = (camp?.npcs||[]).map(n => n.id===nota.mondoId ? {...n, name:nota.titolo} : n);
+          App.saveActiveCampaign({ npcs });
+          _safeRename('npc', _oldTitolo, nota.titolo);
+        } else if (nota.mondoTipo === 'luogo') {
+          const locations = (camp?.locations||[]).map(l => l.id===nota.mondoId ? {...l, nome:nota.titolo} : l);
+          App.saveActiveCampaign({ locations });
+          _safeRename('luogo', _oldTitolo, nota.titolo);
+        } else if (nota.mondoTipo === 'fazione') {
+          const factions = (camp?.factions||[]).map(f => f.id===nota.mondoId ? {...f, nome:nota.titolo} : f);
+          App.saveActiveCampaign({ factions });
+          _safeRename('fazione', _oldTitolo, nota.titolo);
+        }
+      } catch(e) { Debug.warn('Sync titolo→Mondo:', e); }
     }
     // Aggiorna nome nel tree senza re-render completo
     const el = document.querySelector(`[data-note-id="${_noteId}"] span:nth-child(2)`);
