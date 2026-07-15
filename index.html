@@ -498,6 +498,14 @@
             <input type="text" id="npc-search" class="form-input" placeholder="Cerca PNG..." aria-label="Cerca PNG" style="width:220px;" oninput="NPC.filter()">
             <button onclick="document.getElementById('npc-search').value='';NPC.filter();" style="position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:0.85rem;padding:2px 4px;line-height:1;border-radius:var(--radius-sm);" title="Cancella ricerca">✕</button>
           </div>
+            <select id="npc-filter-status" class="form-select" style="width:auto;" onchange="NPC.filter()">
+              <option value="">Tutti gli stati</option>
+              <option value="vivo">🟢 Vivo</option>
+              <option value="morto">💀 Morto</option>
+              <option value="scomparso">❓ Scomparso</option>
+              <option value="alleato">🤝 Alleato</option>
+              <option value="nemico">⚔️ Nemico</option>
+            </select>
             <select id="npc-filter-faction" class="form-select" style="width:auto;" onchange="NPC.filter()">
               <option value="">Tutte le fazioni</option>
             </select>
@@ -1455,6 +1463,7 @@
                 <span>📦 Compendio</span>
               </label>
             </div>
+            <button class="btn btn-ghost btn-sm" onclick="wikiDuplicaNote()" title="Duplica questa nota" style="font-size:0.72rem;">⎘</button>
             <button id="wiki-view-toggle" class="btn btn-ghost btn-sm" onclick="WikiDM.toggleViewMode()" title="Alterna modalità lettura/modifica" style="font-size:0.72rem;">👁 Vista</button>
             <div id="wiki-mondo-sync-btn" style="display:none;">
               <button class="btn btn-ghost btn-sm" onclick="wikiToMondo(WikiDM._noteId)" title="Aggiorna l'entità nel Mondo con i dati di questa nota" style="font-size:0.72rem;">🌍 → Mondo</button>
@@ -2125,6 +2134,20 @@
         </div>
         <div class="relation-bar-value" id="npc-view-rel-val">50 / 100</div>
       </div>
+
+      <!-- Link nota wiki collegata -->
+      <div id="npc-wiki-link" style="display:none;margin-bottom:8px;">
+        <button class="btn btn-ghost btn-sm" style="font-size:0.72rem;width:100%;text-align:left;">
+          📝 Apri nota Wiki collegata
+        </button>
+      </div>
+
+      <!-- Citazioni in Wiki -->
+      <div style="margin-bottom:8px;">
+        <div style="font-size:0.68rem;font-family:var(--font-display);text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin-bottom:5px;">📖 Citato in Wiki</div>
+        <div id="npc-cronologia" style="max-height:100px;overflow-y:auto;font-size:0.78rem;"></div>
+      </div>
+
       <div class="npc-flip-container" id="npc-flip-container">
         <div class="npc-flip-inner" id="npc-flip-inner">
           <!-- FRONTE: Ruolo -->
@@ -4366,6 +4389,9 @@ const NPC = (() => {
       morale: document.getElementById('nm-morale')?.value || '',
     };
 
+    // Salva il vecchio nome per rinomina sicura
+    const _oldNpcName = _editingId ? (npcs.find(n => n.id === _editingId)?.name || '') : '';
+
     if (_editingId) {
       const idx = npcs.findIndex(n => n.id === _editingId);
       if (idx !== -1) npcs[idx] = { ...npcs[idx], ...data };
@@ -4392,6 +4418,8 @@ const NPC = (() => {
     render();
     Toast.show(_editingId ? 'PNG aggiornato' : 'PNG aggiunto', 'success');
     Debug.log(`NPC salvato: ${name}`);
+    // Rinomina sicura: aggiorna [[link]] nelle note wiki
+    if (_oldNpcName && _oldNpcName !== name) _safeRename('npc', _oldNpcName, name);
     // Sincronizza automaticamente con la Wiki
     setTimeout(() => {
       try {
@@ -4423,6 +4451,7 @@ const NPC = (() => {
     const fill = document.getElementById('npc-view-rel-fill');
     const lbl  = document.getElementById('npc-view-rel-label');
     const val  = document.getElementById('npc-view-rel-val');
+    setTimeout(() => { try { npcRenderCronologia(id); } catch(e) {} }, 100);
     if (fill) { fill.style.width = rel + '%'; fill.style.background = relColor(rel); }
     if (lbl)  lbl.textContent = relLabel(rel);
     if (val)  val.textContent = rel + ' / 100';
@@ -4868,6 +4897,8 @@ const Luoghi = (() => {
       immagine:  document.getElementById('luogo-img-url')?.value?.trim() || '',
     };
 
+    const _oldLocNome = _editingId ? (locations.find(l => l.id === _editingId)?.nome || '') : '';
+
     if (_editingId) {
       const idx = locations.findIndex(l => l.id === _editingId);
       if (idx !== -1) locations[idx] = { ...locations[idx], ...data };
@@ -4880,6 +4911,7 @@ const Luoghi = (() => {
     render();
     Toast.show(_editingId ? 'Luogo aggiornato' : 'Luogo aggiunto', 'success');
     Debug.log(`Luogo salvato: ${nome}`);
+    if (_oldLocNome && _oldLocNome !== nome) _safeRename('luogo', _oldLocNome, nome);
     // Sincronizza con la Wiki
     setTimeout(() => {
       try {
@@ -11441,29 +11473,10 @@ const GlobalSearch = (() => {
     _results = [];
     const camp = App.getActiveCampaign();
 
-    // PNG
-    (camp?.npcs||[]).forEach(n => {
-      const name = n.name || n.nome || '';
-      if (name.toLowerCase().includes(query) || (n.job||'').toLowerCase().includes(query)) {
-        _results.push({ tipo:'👤 PNG', nome:name, sub:n.job||n.race||'', action:() => { Modal.close('global-search'); App.navigateTo('mondo'); setTimeout(()=>NPC.openView(n.id),150); } });
-      }
-    });
+    // PNG, Luoghi, Fazioni — cerca anche nei contenuti dei campi
+    try { _results.push(..._enrichedSearch(query, camp)); } catch(e) {}
 
-    // Luoghi
-    (camp?.locations||[]).forEach(l => {
-      if ((l.nome||'').toLowerCase().includes(query) || (l.tipo||'').toLowerCase().includes(query)) {
-        _results.push({ tipo:'🗺️ Luogo', nome:l.nome||'', sub:l.tipo||'', action:() => { Modal.close('global-search'); App.navigateTo('mondo'); setTimeout(()=>Luoghi.openView(l.id),150); } });
-      }
-    });
-
-    // Fazioni
-    (camp?.factions||[]).forEach(f => {
-      if ((f.nome||'').toLowerCase().includes(query) || (f.tipo||'').toLowerCase().includes(query)) {
-        _results.push({ tipo:'⚔️ Fazione', nome:f.nome||'', sub:f.tipo||'', action:() => { Modal.close('global-search'); App.navigateTo('mondo'); setTimeout(()=>Fazioni.openView(f.id),150); } });
-      }
-    });
-
-    // Wiki note
+        // Wiki note
     const wiki = camp?.wiki || {};
     ['lore','sessioni'].forEach(sec => {
       (wiki[sec]||[]).forEach(n => {
@@ -12655,7 +12668,7 @@ const _mondoToWiki = (tipo, entita) => {
       ' &nbsp;|&nbsp; <strong>Ruolo:</strong> ' + (entita.job||'') +
       (faz ? ' &nbsp;|&nbsp; <strong>Fazione:</strong> <span class="nc-wikilink" data-link="fazione:'+faz.nome+'" onclick="wikiNavigateLink(\'fazione:'+faz.nome+'\')">[[⚔️ '+faz.nome+']]</span>' : '') +
       '</p>' +
-      '<p>#npc #png</p>' +
+      '<p>#npc #png' + (entita.factionId ? '' : '') + (entita.race ? ' #'+entita.race.toLowerCase().replace(/\s+/g,'_') : '') + '</p>' +
       '<h2>Tratto caratteriale</h2>' +
       '<p>' + (entita.trait || '') + '</p>' +
       '<h2>Vuole / Offre</h2>' +
@@ -12669,7 +12682,7 @@ const _mondoToWiki = (tipo, entita) => {
   else if (tipo === 'luogo') {
     contenuto =
       '<h1>' + nome + '</h1>' +
-      '<p><strong>Tipo:</strong> ' + (entita.tipo||'') + ' &nbsp;|&nbsp; #luogo</p>' +
+      '<p><strong>Tipo:</strong> ' + (entita.tipo||'') + ' &nbsp;|&nbsp; #luogo' + (entita.tipo ? ' #'+entita.tipo : '') + '</p>' +
       '<h2>Descrizione</h2>' +
       '<p>' + (entita.desc || '') + '</p>' +
       (entita.poi ? '<h2>Punti di Interesse</h2><p>' + entita.poi + '</p>' : '') +
@@ -12680,7 +12693,7 @@ const _mondoToWiki = (tipo, entita) => {
   else if (tipo === 'fazione') {
     contenuto =
       '<h1>' + nome + '</h1>' +
-      '<p>#fazione</p>' +
+      '<p>#fazione' + (entita.tipo ? ' #'+entita.tipo.toLowerCase().replace(/\s+/g,'_') : '') + '</p>' +
       '<h2>Obiettivi</h2>' +
       '<p>' + (entita.obiettivi || '') + '</p>' +
       (entita.note ? '<h2>Note DM</h2><div class="wiki-callout wiki-callout-secret"><span class="wiki-callout-label">🔒 SEGRETO DM</span><p>' + entita.note + '</p></div>' : '');
@@ -12793,6 +12806,186 @@ const wikiToMondo = (notaId) => {
     App.saveActiveCampaign({ factions });
     Toast.show('Fazione aggiornata dal wiki ✓', 'success');
   }
+};
+
+
+
+// ══ RINOMINA SICURA — aggiorna [[link]] nelle note wiki ══
+const _safeRename = (tipo, oldName, newName) => {
+  if (!oldName || !newName || oldName === newName) return;
+  const camp = App.getActiveCampaign();
+  if (!camp?.wiki) return;
+
+  const prefix = tipo === 'npc' ? 'png' : tipo === 'luogo' ? 'luogo' : 'fazione';
+  const oldKey = prefix + ':' + oldName;
+  const newKey = prefix + ':' + newName;
+  const oldLabel = tipo === 'npc' ? '👤 ' : tipo === 'luogo' ? '🗺️ ' : '⚔️ ';
+
+  let count = 0;
+  const wiki = camp.wiki;
+  ['lore','sessioni'].forEach(sec => {
+    (wiki[sec]||[]).forEach(nota => {
+      if (!nota.contenuto) return;
+      let c = nota.contenuto;
+      c = c.split('data-link="'+oldKey+'"').join('data-link="'+newKey+'"');
+      c = c.split('[['+oldLabel+oldName+']]').join('[['+oldLabel+newName+']]');
+      c = c.split('[['+oldName+']]').join('[['+newName+']]');
+      if (c !== nota.contenuto) { nota.contenuto = c; nota.aggiornatoAt = Date.now(); count++; }
+    });
+  });
+  if (count > 0) {
+    App.saveActiveCampaign({ wiki });
+    Toast.show('🔗 ' + count + ' link aggiornati → "' + newName + '"', 'info', 2500);
+  }
+
+
+
+// ══ FIX 4: CRONOLOGIA NPC + LINK WIKI ══
+const npcGetCronologia = (npcId) => {
+  const camp = App.getActiveCampaign();
+  const wiki = camp?.wiki || {};
+  const npc = (camp?.npcs||[]).find(n => n.id === npcId);
+  if (!npc) return [];
+  const nome = npc.name || npc.nome || '';
+  const eventi = [];
+  ['lore','sessioni'].forEach(sec => {
+    (wiki[sec]||[]).forEach(n => {
+      if ((n.contenuto||'').includes('data-link="png:'+nome+'"') ||
+          (n.contenuto||'').includes('[[👤 '+nome+']]') ||
+          (n.contenuto||'').includes('[['+nome+']]')) {
+        eventi.push({ sec, titolo:n.titolo||'Senza titolo', id:n.id, ts:n.aggiornatoAt||0 });
+      }
+    });
+  });
+  return eventi.sort((a,b) => b.ts - a.ts);
+};
+
+const npcRenderCronologia = (npcId) => {
+  const el = document.getElementById('npc-cronologia');
+  const wikiBtn = document.getElementById('npc-wiki-link');
+  if (!el) return;
+  const camp = App.getActiveCampaign();
+  const wiki = camp?.wiki || {};
+  const wikiNota = (wiki.lore||[]).find(n => n.mondoId === npcId);
+  if (wikiBtn) {
+    if (wikiNota) {
+      wikiBtn.style.display = '';
+      const btn = wikiBtn.querySelector('button');
+      if (btn) btn.onclick = () => {
+        App.navigateTo('wiki');
+        setTimeout(() => { WikiDM.switchSection('lore'); WikiDM.openNote(wikiNota.id); }, 200);
+      };
+    } else {
+      wikiBtn.style.display = 'none';
+    }
+  }
+  const eventi = npcGetCronologia(npcId);
+  if (!eventi.length) {
+    el.innerHTML = '<div style="color:var(--text-muted);font-size:0.75rem;padding:4px 0;">Nessuna citazione nelle note wiki.</div>';
+    return;
+  }
+  el.innerHTML = '';
+  eventi.forEach(e => {
+    const div = document.createElement('div');
+    div.style.cssText = 'display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid var(--border);cursor:pointer;';
+    const icon = e.sec === 'sessioni' ? '⚔️' : '📚';
+    div.innerHTML = '<span>' + icon + '</span><span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + (e.titolo||'Senza titolo') + '</span>';
+    div.addEventListener('click', () => {
+      App.navigateTo('wiki');
+      setTimeout(() => { WikiDM.switchSection(e.sec); WikiDM.openNote(e.id); }, 200);
+    });
+    el.appendChild(div);
+  });
+};
+// ══ FIX 5: RICERCA GLOBALE — cerca anche dentro i campi ══
+// Patch GlobalSearch.search per cercare nel contenuto dei campi
+const _enrichedSearch = (q, camp) => {
+  const results = [];
+  const query = q.toLowerCase();
+
+  // PNG — cerca anche in trait, secret, wants, links
+  (camp?.npcs||[]).forEach(n => {
+    const haystack = [n.name||n.nome, n.job, n.race, n.trait, n.secret, n.wants, n.links].filter(Boolean).join(' ').toLowerCase();
+    if (haystack.includes(query)) {
+      let sub = n.job || n.race || '';
+      // Evidenzia da dove viene il match
+      if ((n.trait||'').toLowerCase().includes(query)) sub = 'Tratto: ' + n.trait.slice(0,40);
+      else if ((n.secret||'').toLowerCase().includes(query)) sub = '🔒 Segreto';
+      else if ((n.wants||'').toLowerCase().includes(query)) sub = 'Vuole: ' + n.wants.slice(0,40);
+      results.push({ tipo:'👤 PNG', nome:n.name||n.nome||'', sub,
+        action:() => { Modal.close('global-search'); App.navigateTo('mondo'); setTimeout(()=>NPC.openView(n.id),150); }
+      });
+    }
+  });
+
+  // Luoghi — cerca in descrizione, note, poi
+  (camp?.locations||[]).forEach(l => {
+    const haystack = [l.nome, l.tipo, l.desc, l.note, l.poi].filter(Boolean).join(' ').toLowerCase();
+    if (haystack.includes(query)) {
+      let sub = l.tipo || '';
+      if ((l.desc||'').toLowerCase().includes(query)) sub = l.desc.replace(/<[^>]+>/g,'').slice(0,40);
+      results.push({ tipo:'🗺️ Luogo', nome:l.nome||'', sub,
+        action:() => { Modal.close('global-search'); App.navigateTo('mondo'); setTimeout(()=>Luoghi.openView(l.id),150); }
+      });
+    }
+  });
+
+  // Fazioni
+  (camp?.factions||[]).forEach(f => {
+    const haystack = [f.nome, f.tipo, f.obiettivi, f.note].filter(Boolean).join(' ').toLowerCase();
+    if (haystack.includes(query)) {
+      let sub = f.tipo || '';
+      if ((f.obiettivi||'').toLowerCase().includes(query)) sub = f.obiettivi.replace(/<[^>]+>/g,'').slice(0,40);
+      results.push({ tipo:'⚔️ Fazione', nome:f.nome||'', sub,
+        action:() => { Modal.close('global-search'); App.navigateTo('mondo'); setTimeout(()=>Fazioni.openView(f.id),150); }
+      });
+    }
+  });
+
+  return results;
+};
+
+// ══ FIX 6: FILTRI NEL MONDO ══
+// Aggiunge filtri per stato PNG e tipo contenitore Luoghi
+const npcSetStatus = (id, status) => {
+  const camp = App.getActiveCampaign();
+  if (!camp) return;
+  const npcs = (camp.npcs||[]).map(n => n.id===id ? {...n, status} : n);
+  App.saveActiveCampaign({ npcs });
+  if (window.NPC) NPC.render();
+  Toast.show('Stato aggiornato: ' + status, 'success', 1200);
+};
+
+// ══ FIX 7: DUPLICA NOTA WIKI ══
+const wikiDuplicaNote = () => {
+  const noteId = WikiDM._noteId;
+  if (!noteId) return;
+  const camp = App.getActiveCampaign();
+  const wiki = camp?.wiki || {};
+  let nota = null, sec = '';
+  for (const s of ['lore','sessioni']) {
+    const found = (wiki[s]||[]).find(n => n.id === noteId);
+    if (found) { nota = found; sec = s; break; }
+  }
+  if (!nota) return;
+  const now = Date.now();
+  const uid = 'n' + now + Math.random().toString(36).slice(2,5);
+  const copia = {
+    ...nota,
+    id: uid,
+    titolo: 'Copia di ' + (nota.titolo || 'Senza titolo'),
+    creatoAt: now,
+    aggiornatoAt: now,
+    mondoId: null, // Non collegata al Mondo
+    inCompendio: false,
+  };
+  if (!wiki[sec]) wiki[sec] = [];
+  const idx = wiki[sec].findIndex(n => n.id === noteId);
+  wiki[sec].splice(idx + 1, 0, copia);
+  App.saveActiveCampaign({ wiki });
+  WikiDM.switchSection(sec);
+  WikiDM.openNote(uid);
+  Toast.show('📄 Nota duplicata', 'success', 1500);
 };
 
 
@@ -15188,6 +15381,8 @@ const BackupSystem = (() => {
   return { exportAll, openImport, autoBackup };
 })();
 
+
+};
 document.addEventListener('DOMContentLoaded', () => {
   Debug.init(
     document.getElementById('debug-body'),
