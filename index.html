@@ -1456,6 +1456,9 @@
               </label>
             </div>
             <button id="wiki-view-toggle" class="btn btn-ghost btn-sm" onclick="WikiDM.toggleViewMode()" title="Alterna modalità lettura/modifica" style="font-size:0.72rem;">👁 Vista</button>
+            <div id="wiki-mondo-sync-btn" style="display:none;">
+              <button class="btn btn-ghost btn-sm" onclick="wikiToMondo(WikiDM._noteId)" title="Aggiorna l'entità nel Mondo con i dati di questa nota" style="font-size:0.72rem;">🌍 → Mondo</button>
+            </div>
             <div id="wiki-note-actions" style="display:flex;gap:4px;flex-shrink:0;"></div>
           </div>
           </div>
@@ -4389,6 +4392,14 @@ const NPC = (() => {
     render();
     Toast.show(_editingId ? 'PNG aggiornato' : 'PNG aggiunto', 'success');
     Debug.log(`NPC salvato: ${name}`);
+    // Sincronizza automaticamente con la Wiki
+    setTimeout(() => {
+      try {
+        const camp2 = App.getActiveCampaign();
+        const savedNpc = (camp2?.npcs||[]).find(n => n.name === name);
+        if (savedNpc) _mondoToWiki('npc', savedNpc);
+      } catch(e) { Debug.warn('Wiki sync NPC:', e); }
+    }, 200);
   };
 
   // ── Apri scheda visualizzazione ──
@@ -4869,6 +4880,14 @@ const Luoghi = (() => {
     render();
     Toast.show(_editingId ? 'Luogo aggiornato' : 'Luogo aggiunto', 'success');
     Debug.log(`Luogo salvato: ${nome}`);
+    // Sincronizza con la Wiki
+    setTimeout(() => {
+      try {
+        const camp2 = App.getActiveCampaign();
+        const saved = (camp2?.locations||[]).find(l => l.nome === nome);
+        if (saved) _mondoToWiki('luogo', saved);
+      } catch(e) { Debug.warn('Wiki sync Luogo:', e); }
+    }, 200);
   };
 
   const openView = (id) => {
@@ -5060,6 +5079,14 @@ const Fazioni = (() => {
     if (window.App) App.renderFactionList();
     Toast.show(_editingId ? 'Fazione aggiornata' : 'Fazione aggiunta', 'success');
     Debug.log(`Fazione salvata: ${nome}`);
+    // Sincronizza con la Wiki
+    setTimeout(() => {
+      try {
+        const camp2 = App.getActiveCampaign();
+        const saved = (camp2?.factions||[]).find(f => f.nome === nome);
+        if (saved) _mondoToWiki('fazione', saved);
+      } catch(e) { Debug.warn('Wiki sync Fazione:', e); }
+    }, 200);
   };
 
   const openView = (id) => {
@@ -12576,11 +12603,11 @@ const _syncWikiToCompendio = (notaId, enable) => {
 
 // Aggiorna il toggle nell'header quando si apre una nota
 const _updateCompendioToggle = (nota) => {
-  const wrap = document.getElementById('wiki-compendio-sync');
+  const wrap  = document.getElementById('wiki-compendio-sync');
   const check = document.getElementById('wiki-sync-check');
+  const mondoBtn = document.getElementById('wiki-mondo-sync-btn');
   if (!wrap || !check) return;
 
-  // Mostra il toggle solo per note con tag #oggetto, #mostro, o template specifici
   const content = nota?.contenuto || '';
   const tags = [...content.matchAll(/class="nc-tag"[^>]*>#([^<]+)/g)].map(m => m[1]);
   const showFor = ['oggetto','oggetto_magico','mostro','npc','png','incantesimo','spell','equipaggiamento'];
@@ -12590,6 +12617,182 @@ const _updateCompendioToggle = (nota) => {
 
   wrap.style.display = shouldShow ? 'flex' : 'none';
   check.checked = nota?.inCompendio === true;
+
+  // Mostra btn "→ Mondo" se la nota è collegata a un'entità del Mondo
+  if (mondoBtn) {
+    mondoBtn.style.display = nota?.mondoId ? 'block' : 'none';
+  }
+};
+
+
+
+// ══ SINCRONIZZAZIONE BIDIREZIONALE MONDO ↔ WIKI ══
+
+// Crea o aggiorna una nota wiki partendo da un'entità del Mondo
+const _mondoToWiki = (tipo, entita) => {
+  const w = (() => {
+    const camp = App.getActiveCampaign();
+    return camp?.wiki || { lore: [], sessioni: [], templates: [] };
+  })();
+
+  // Cerca nota già esistente (per wikiId o per titolo)
+  const nome = entita.name || entita.nome || '';
+  const existing = (w.lore || []).find(n =>
+    n.mondoId === entita.id || n.titolo === nome
+  );
+
+  // Costruisce il contenuto HTML della nota
+  let contenuto = '';
+
+  if (tipo === 'npc') {
+    const faz = (() => {
+      const camp = App.getActiveCampaign();
+      return (camp?.factions||[]).find(f => f.id === entita.factionId);
+    })();
+    contenuto =
+      '<h1>' + nome + '</h1>' +
+      '<p><strong>Razza:</strong> ' + (entita.race||'') +
+      ' &nbsp;|&nbsp; <strong>Ruolo:</strong> ' + (entita.job||'') +
+      (faz ? ' &nbsp;|&nbsp; <strong>Fazione:</strong> <span class="nc-wikilink" data-link="fazione:'+faz.nome+'" onclick="wikiNavigateLink(\'fazione:'+faz.nome+'\')">[[⚔️ '+faz.nome+']]</span>' : '') +
+      '</p>' +
+      '<p>#npc #png</p>' +
+      '<h2>Tratto caratteriale</h2>' +
+      '<p>' + (entita.trait || '') + '</p>' +
+      '<h2>Vuole / Offre</h2>' +
+      '<p><strong>Vuole:</strong> ' + (entita.wants||'...') + '<br>' +
+      '<strong>Offre:</strong> ' + (entita.offers||'...') + '</p>' +
+      (entita.secret ? '<h2>🔒 Segreto DM</h2><div class="wiki-callout wiki-callout-secret"><span class="wiki-callout-label">🔒 SEGRETO DM</span><p>' + entita.secret + '</p></div>' : '') +
+      '<h2>Legami</h2>' +
+      '<p>' + (entita.links || '') + '</p>';
+  }
+
+  else if (tipo === 'luogo') {
+    contenuto =
+      '<h1>' + nome + '</h1>' +
+      '<p><strong>Tipo:</strong> ' + (entita.tipo||'') + ' &nbsp;|&nbsp; #luogo</p>' +
+      '<h2>Descrizione</h2>' +
+      '<p>' + (entita.desc || '') + '</p>' +
+      (entita.poi ? '<h2>Punti di Interesse</h2><p>' + entita.poi + '</p>' : '') +
+      (entita.loot ? '<h2>💰 Loot</h2><div class="wiki-callout wiki-callout-loot"><span class="wiki-callout-label">💰 LOOT</span><p>' + entita.loot + '</p></div>' : '') +
+      (entita.note ? '<h2>Note DM</h2><blockquote>' + entita.note + '</blockquote>' : '');
+  }
+
+  else if (tipo === 'fazione') {
+    contenuto =
+      '<h1>' + nome + '</h1>' +
+      '<p>#fazione</p>' +
+      '<h2>Obiettivi</h2>' +
+      '<p>' + (entita.obiettivi || '') + '</p>' +
+      (entita.note ? '<h2>Note DM</h2><div class="wiki-callout wiki-callout-secret"><span class="wiki-callout-label">🔒 SEGRETO DM</span><p>' + entita.note + '</p></div>' : '');
+  }
+
+  const now = Date.now();
+
+  if (existing) {
+    // Aggiorna nota esistente mantenendo eventuali aggiunte manuali
+    existing.titolo = nome;
+    existing.aggiornatoAt = now;
+    // Merge intelligente: aggiorna solo le sezioni che vengono dal Mondo
+    // Se l'utente ha aggiunto cose in wiki, le mantiene dopo le sezioni base
+    const userExtra = _extractUserAdditions(existing.contenuto);
+    existing.contenuto = contenuto + (userExtra ? '\n<hr>\n' + userExtra : '');
+    existing.mondoId = entita.id;
+    existing.mondoTipo = tipo;
+  } else {
+    // Crea nuova nota
+    const uid = 'n' + now + Math.random().toString(36).slice(2,5);
+    const nota = {
+      id: uid,
+      titolo: nome,
+      contenuto,
+      tags: [tipo === 'npc' ? 'npc' : tipo === 'luogo' ? 'luogo' : 'fazione'],
+      creatoAt: now,
+      aggiornatoAt: now,
+      mondoId: entita.id,
+      mondoTipo: tipo,
+    };
+    if (!w.lore) w.lore = [];
+    w.lore.unshift(nota);
+  }
+
+  App.saveActiveCampaign({ wiki: w });
+};
+
+// Estrae le aggiunte manuali dell'utente dopo l'ultima sezione base
+const _extractUserAdditions = (html) => {
+  if (!html) return '';
+  // Se c'è un <hr>, tutto dopo è contenuto utente
+  const hrIdx = html.lastIndexOf('<hr>');
+  if (hrIdx >= 0) return html.slice(hrIdx + 4).trim();
+  return '';
+};
+
+// Aggiorna entità del Mondo da nota wiki (wiki → Mondo)
+// Chiamato quando l'utente clicca "Aggiorna Mondo" dalla nota
+const wikiToMondo = (notaId) => {
+  const camp = App.getActiveCampaign();
+  if (!camp) return;
+  const wiki = camp.wiki || {};
+  const nota = (wiki.lore||[]).find(n => n.id === notaId);
+  if (!nota?.mondoId || !nota?.mondoTipo) {
+    Toast.show('Questa nota non è collegata a un\'entità del Mondo', 'info', 2500);
+    return;
+  }
+
+  const tipo = nota.mondoTipo;
+  const html = nota.contenuto || '';
+
+  const extractField = (label) => {
+    const re = new RegExp('<strong>' + label + ':<\\/strong>\\s*([^<\\n]+)', 'i');
+    const m = html.match(re);
+    return m ? m[1].replace(/<[^>]+>/g,'').trim() : null;
+  };
+  const extractSection = (heading) => {
+    const re = new RegExp('<h2[^>]*>[^<]*' + heading + '[^<]*<\\/h2>([\\s\\S]*?)(?=<h[12]|<hr|$)', 'i');
+    const m = html.match(re);
+    return m ? m[1].replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim() : null;
+  };
+
+  if (tipo === 'npc') {
+    const npcs = (camp.npcs||[]).map(n => {
+      if (n.id !== nota.mondoId) return n;
+      return {
+        ...n,
+        trait:  extractSection('Tratto') || n.trait,
+        wants:  extractField('Vuole') || n.wants,
+        offers: extractField('Offre') || n.offers,
+        secret: extractSection('Segreto') || n.secret,
+        links:  extractSection('Legami') || n.links,
+      };
+    });
+    App.saveActiveCampaign({ npcs });
+    Toast.show('PNG aggiornato dal wiki ✓', 'success');
+  }
+  else if (tipo === 'luogo') {
+    const locations = (camp.locations||[]).map(l => {
+      if (l.id !== nota.mondoId) return l;
+      return {
+        ...l,
+        desc: extractSection('Descrizione') || l.desc,
+        poi:  extractSection('Punti di Interesse') || l.poi,
+        note: extractSection('Note DM') || l.note,
+      };
+    });
+    App.saveActiveCampaign({ locations });
+    Toast.show('Luogo aggiornato dal wiki ✓', 'success');
+  }
+  else if (tipo === 'fazione') {
+    const factions = (camp.factions||[]).map(f => {
+      if (f.id !== nota.mondoId) return f;
+      return {
+        ...f,
+        obiettivi: extractSection('Obiettivi') || f.obiettivi,
+        note:      extractSection('Note DM') || f.note,
+      };
+    });
+    App.saveActiveCampaign({ factions });
+    Toast.show('Fazione aggiornata dal wiki ✓', 'success');
+  }
 };
 
 
