@@ -1448,7 +1448,13 @@
           <!-- Titolo nota -->
           <div style="padding:8px 16px;border-bottom:1px solid var(--border);flex-shrink:0;display:flex;align-items:center;gap:8px;">
             <input id="wiki-note-title" class="form-input" placeholder="Titolo nota..." style="flex:1;font-family:var(--font-display);font-size:1rem;font-weight:600;border:none;background:transparent;padding:0;" oninput="WikiDM.saveNote()">
-            <div style="display:flex;gap:4px;align-items:center;">
+            <div style="display:flex;gap:4px;align-items:center;flex-wrap:wrap;">
+            <div id="wiki-compendio-sync" style="display:none;align-items:center;gap:6px;padding:2px 8px;background:var(--bg-tertiary);border:1px solid var(--border);border-radius:var(--radius-full);font-size:0.72rem;">
+              <label style="display:flex;align-items:center;gap:4px;cursor:pointer;margin:0;">
+                <input type="checkbox" id="wiki-sync-check" onchange="WikiDM.toggleCompendioSync(this.checked)" style="cursor:pointer;">
+                <span>📦 Compendio</span>
+              </label>
+            </div>
             <button id="wiki-view-toggle" class="btn btn-ghost btn-sm" onclick="WikiDM.toggleViewMode()" title="Alterna modalità lettura/modifica" style="font-size:0.72rem;">👁 Vista</button>
             <div id="wiki-note-actions" style="display:flex;gap:4px;flex-shrink:0;"></div>
           </div>
@@ -10947,8 +10953,8 @@ const WikiDM = (() => {
     contentEl.innerHTML = nota.contenuto || '';
     _showTagBar(nota.tags || []);
     _showBacklinks(nota);
-    // Applica modalità corrente (view default, edit se richiesto)
-    setTimeout(() => _applyViewMode(), 30);
+    // Mostra toggle compendio se rilevante
+    setTimeout(() => { _applyViewMode(); try { _updateCompendioToggle(nota); } catch(e) {} }, 30);
   };
 
   // ── Nuova nota ──
@@ -11022,6 +11028,10 @@ const WikiDM = (() => {
       [...nota.contenuto.matchAll(/class="nc-tag"[^>]*>([^<]+)</g)].map(m => m[1])
     )];
     _saveWiki(w);
+    // Se la nota è sincronizzata con il compendio, aggiorna automaticamente
+    if (nota.inCompendio) {
+      try { _syncWikiToCompendio(_noteId, true); } catch(e) {}
+    }
     // Aggiorna nome nel tree senza re-render completo
     const el = document.querySelector(`[data-note-id="${_noteId}"] span:nth-child(2)`);
     if (el) el.textContent = nota.titolo || 'Senza titolo';
@@ -11232,6 +11242,7 @@ const WikiDM = (() => {
     newTemplate, deleteTemplate, saveTemplate,
     search, clearSearch, togglePin,
     toggleViewMode: () => { _wikiViewMode = _wikiViewMode === 'view' ? 'edit' : 'view'; _applyViewMode(); },
+    toggleCompendioSync: (enabled) => { if (_noteId) _syncWikiToCompendio(_noteId, enabled); },
     _createFromTpl, _clickNote, _clickTemplate, _openResult,
     get _section() { return _section; },
     get _noteId()  { return _noteId; },
@@ -12433,6 +12444,152 @@ const miniFmtHL = (fieldId) => {
   const sel = window.getSelection();
   if (sel && sel.isCollapsed) { const r = _getWordAtCursor(); if (r) { sel.removeAllRanges(); sel.addRange(r); } }
   document.execCommand('hiliteColor', false, color + '60');
+};
+
+
+
+// ══ WIKI → COMPENDIO SYNC ══
+// Categorie supportate dalla sincronizzazione wiki→compendio
+const WIKI_COMP_TEMPLATES = {
+  // id template → categoria homebrew
+  'tpl_oggetto':  'magic_items',
+  'tpl_npc':      'monsters',
+  'tpl_npc_wiki': 'monsters',
+  'tpl_sess':     null,
+  'tpl_lore':     null,
+  'tpl_loc':      null,
+  'tpl_luogo_wiki': null,
+  'tpl_dungeon':  null,
+  'tpl_evento':   null,
+  'tpl_negozio':  null,
+  'tpl_free':     null,
+};
+
+// Estrae dati strutturati da una nota wiki per creare un item homebrew
+const _extractFromWikiNote = (nota) => {
+  const html = nota.contenuto || '';
+  const text = html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+
+  // Estrae titolo (h1)
+  const h1 = html.match(/<h1[^>]*>(.*?)<\/h1>/i);
+  const nome = h1 ? h1[1].replace(/<[^>]+>/g,'').trim() : nota.titolo || '';
+
+  // Estrae tags per categoria
+  const tags = [...html.matchAll(/class="nc-tag"[^>]*>#([^<]+)/g)].map(m => m[1]);
+
+  // Determina categoria homebrew dai tag o dal template
+  let categoria = 'magic_items'; // default
+  if (tags.includes('oggetto') || tags.includes('oggetto_magico')) categoria = 'magic_items';
+  else if (tags.includes('mostro') || tags.includes('png') || tags.includes('npc')) categoria = 'monsters';
+  else if (tags.includes('incantesimo') || tags.includes('spell')) categoria = 'spells';
+  else if (tags.includes('equipaggiamento') || tags.includes('equipment')) categoria = 'equipment';
+
+  // Estrae campi specifici per tipo
+  const extractField = (label) => {
+    const re = new RegExp('<strong>' + label + ':<\/strong>\s*([^<\n]+)', 'i');
+    const m = html.match(re);
+    return m ? m[1].replace(/<[^>]+>/g,'').trim() : '';
+  };
+
+  const extractSection = (heading) => {
+    const re = new RegExp('<h2[^>]*>[^<]*' + heading + '[^<]*<\/h2>([\s\S]*?)(?=<h[12]|$)', 'i');
+    const m = html.match(re);
+    return m ? m[1].replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim() : '';
+  };
+
+  const base = {
+    id: 'wiki_' + nota.id,
+    wikiId: nota.id,          // collegamento alla nota sorgente
+    nome,
+    categoria,
+    descrizione: extractSection('Descrizione') || extractSection('Proprietà') || text.slice(0, 500),
+    note: 'Importato dalla Wiki il ' + new Date().toLocaleDateString('it-IT'),
+  };
+
+  if (categoria === 'magic_items') {
+    return {
+      ...base,
+      rarita: extractField('Rarità') || extractField('Rarity') || '',
+      tipo_base: extractField('Tipo') || '',
+      sintonia: extractField('Richiede sintonia').toLowerCase().includes('sì') ||
+                extractField('Sintonia').toLowerCase().includes('sì'),
+    };
+  } else if (categoria === 'monsters') {
+    return {
+      ...base,
+      gs: extractField('GS') || extractField('Grado Sfida') || '1',
+      tipo: extractField('Tipo') || extractField('Razza') || '',
+      dimensione: extractField('Dimensione') || 'Media',
+      pf: extractField('PF') || '10',
+      ca: extractField('CA') || '12',
+    };
+  }
+  return base;
+};
+
+// Sincronizza una nota wiki con il compendio homebrew
+const _syncWikiToCompendio = (notaId, enable) => {
+  const w = WikiDM._getData?.() || {};
+  const camp = App.getActiveCampaign();
+  if (!camp) return;
+
+  // Trova la nota
+  let nota = null;
+  for (const sec of ['lore','sessioni']) {
+    nota = (w[sec]||[]).find(n => n.id === notaId);
+    if (nota) break;
+  }
+  if (!nota) return;
+
+  const homebrew = (camp.homebrew || []).slice();
+
+  if (enable) {
+    // Estrai dati e aggiungi/aggiorna nel compendio
+    const item = _extractFromWikiNote(nota);
+    const existingIdx = homebrew.findIndex(h => h.wikiId === notaId);
+    if (existingIdx >= 0) {
+      homebrew[existingIdx] = { ...homebrew[existingIdx], ...item };
+      Toast.show('📦 Compendio aggiornato: ' + item.nome, 'success', 2000);
+    } else {
+      homebrew.push(item);
+      Toast.show('📦 Aggiunto al Compendio: ' + item.nome, 'success', 2000);
+    }
+    // Salva il flag nella nota
+    nota.inCompendio = true;
+  } else {
+    // Rimuovi dal compendio
+    const before = homebrew.length;
+    const filtered = homebrew.filter(h => h.wikiId !== notaId);
+    if (filtered.length < before) {
+      Toast.show('📦 Rimosso dal Compendio', 'info', 1500);
+    }
+    nota.inCompendio = false;
+    App.saveActiveCampaign({ homebrew: filtered });
+    // Salva nota aggiornata
+    WikiDM.saveNote();
+    return;
+  }
+
+  App.saveActiveCampaign({ homebrew });
+  WikiDM.saveNote();
+};
+
+// Aggiorna il toggle nell'header quando si apre una nota
+const _updateCompendioToggle = (nota) => {
+  const wrap = document.getElementById('wiki-compendio-sync');
+  const check = document.getElementById('wiki-sync-check');
+  if (!wrap || !check) return;
+
+  // Mostra il toggle solo per note con tag #oggetto, #mostro, o template specifici
+  const content = nota?.contenuto || '';
+  const tags = [...content.matchAll(/class="nc-tag"[^>]*>#([^<]+)/g)].map(m => m[1]);
+  const showFor = ['oggetto','oggetto_magico','mostro','npc','png','incantesimo','spell','equipaggiamento'];
+  const shouldShow = tags.some(t => showFor.includes(t)) ||
+    (nota?.titolo||'').toLowerCase().includes('oggetto') ||
+    content.includes('class="nc-wikilink"');
+
+  wrap.style.display = shouldShow ? 'flex' : 'none';
+  check.checked = nota?.inCompendio === true;
 };
 
 
