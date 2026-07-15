@@ -440,7 +440,17 @@
               <button class="nc-tb" onclick="ncFmt('insertOrderedList')" title="Elenco numerato">1.</button>
               <button class="nc-tb" onclick="ncFmtBlock('blockquote')" title="Citazione / evidenziazione">❝</button>
               <div style="width:1px;background:var(--border);margin:2px 3px;"></div>
-              <button class="nc-tb" onclick="ncFmt('removeFormat')" title="Rimuovi formattazione" style="font-size:0.7rem;color:var(--text-muted);">✕</button>
+              <button class="nc-tb" onclick="ncFmt('removeFormat')" title="Rimuovi formattazione" style="font-size:0.7rem;color:var(--text-muted);">✕</button><div style="width:1px;background:var(--border);margin:2px 3px;"></div>
+              <div style="position:relative;display:inline-flex;align-items:center;gap:1px;">
+                <button class="nc-tb" onclick="ncApplyColor()" title="Colore testo — applica alla selezione o alla parola corrente" style="min-width:24px;border-bottom:3px solid var(--wiki-cur-color,#f5a623);">A</button>
+                <input type="color" id="nc-color-pick" value="#f5a623" oninput="document.documentElement.style.setProperty('--wiki-cur-color',this.value)" style="position:absolute;width:1px;height:1px;opacity:0;bottom:0;left:0;">
+                <button class="nc-tb" onclick="document.getElementById('nc-color-pick').click()" title="Scegli colore" style="font-size:0.55rem;padding:0 2px;min-width:14px;">▾</button>
+              </div>
+              <div style="position:relative;display:inline-flex;align-items:center;gap:1px;">
+                <button class="nc-tb" onclick="ncApplyHighlight()" title="Evidenzia — applica alla selezione o alla parola corrente" style="min-width:24px;background:rgba(245,166,35,0.25);border-bottom:3px solid rgba(245,166,35,0.7);">H</button>
+                <input type="color" id="nc-hl-pick" value="#f5a623" oninput="document.documentElement.style.setProperty('--wiki-cur-hl',this.value)" style="position:absolute;width:1px;height:1px;opacity:0;bottom:0;left:0;">
+                <button class="nc-tb" onclick="document.getElementById('nc-hl-pick').click()" title="Scegli colore evidenziatore" style="font-size:0.55rem;padding:0 2px;min-width:14px;">▾</button>
+              </div>
               <div style="width:1px;background:var(--border);margin:2px 3px;"></div>
               <button class="nc-tb" onclick="ncInsertTag()" title="Inserisci tag #" style="color:var(--accent-secondary);">#tag</button>
               <button class="nc-tb" onclick="ncInsertLink()" title="Inserisci link [[Nota]]" style="color:#5ba4f5;">[[link]]</button>
@@ -1980,20 +1990,26 @@
           <div class="form-group"><label class="form-label">Voce</label><input type="text" id="nm-voice" class="form-input" placeholder="es. Bassa e roca"></div>
           <div class="form-group"><label class="form-label">Tic / Gesto</label><input type="text" id="nm-tic" class="form-input" placeholder="es. Si tocca sempre l'orecchio"></div>
         </div>
-        <div class="form-group"><label class="form-label">Tratto caratteriale</label><div class="mini-fmt-toolbar" style="display:flex;gap:2px;margin-bottom:4px;flex-wrap:wrap;">
+        <div class="form-group"><label class="form-label">Tratto caratteriale</label><div class="mini-fmt-toolbar" style="display:flex;gap:2px;margin-bottom:4px;flex-wrap:wrap;align-items:center;">
   <button type="button" class="nc-tb" onclick="miniFmt('nm-trait','bold')" title="Grassetto"><b>B</b></button>
   <button type="button" class="nc-tb" onclick="miniFmt('nm-trait','italic')" title="Corsivo"><i>I</i></button>
   <button type="button" class="nc-tb" onclick="miniFmt('nm-trait','underline')" title="Sottolineato"><u>S</u></button>
+  <div style="width:1px;background:var(--border);margin:0 2px;height:18px;"></div>
   <button type="button" class="nc-tb" onclick="miniFmt('nm-trait','link')" title="[[Link]]" style="color:#5ba4f5;font-size:0.68rem;">[[]]</button>
   <button type="button" class="nc-tb" onclick="miniFmt('nm-trait','tag')" title="#tag" style="color:var(--accent-secondary);font-size:0.68rem;">#</button>
-</div><textarea id="nm-trait" class="form-textarea" rows="2" placeholder="Come si comporta, cosa lo rende memorabile..."></textarea></div>
-        <div class="form-group"><label class="form-label">Segreto DM</label><div class="mini-fmt-toolbar" style="display:flex;gap:2px;margin-bottom:4px;flex-wrap:wrap;">
+  <button type="button" class="nc-tb" onclick="miniFmt('nm-trait','secret')" title="🔒 Segreto DM" style="color:#c97bea;font-size:0.65rem;">🔒</button>
+  <button type="button" class="nc-tb" onclick="miniFmt('nm-trait','clue')" title="🔍 Indizio" style="color:#5ba4f5;font-size:0.65rem;">🔍</button>
+</div><div id="nm-trait" contenteditable="true" data-placeholder="Come si comporta, cosa lo rende memorabile..." style="min-height:48px;padding:8px;background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-md);font-size:0.88rem;line-height:1.6;color:var(--text-primary);outline:none;overflow-y:auto;" oninput="void 0"></div></div>
+        <div class="form-group"><label class="form-label">Segreto DM</label><div class="mini-fmt-toolbar" style="display:flex;gap:2px;margin-bottom:4px;flex-wrap:wrap;align-items:center;">
   <button type="button" class="nc-tb" onclick="miniFmt('nm-secret','bold')" title="Grassetto"><b>B</b></button>
   <button type="button" class="nc-tb" onclick="miniFmt('nm-secret','italic')" title="Corsivo"><i>I</i></button>
   <button type="button" class="nc-tb" onclick="miniFmt('nm-secret','underline')" title="Sottolineato"><u>S</u></button>
+  <div style="width:1px;background:var(--border);margin:0 2px;height:18px;"></div>
   <button type="button" class="nc-tb" onclick="miniFmt('nm-secret','link')" title="[[Link]]" style="color:#5ba4f5;font-size:0.68rem;">[[]]</button>
   <button type="button" class="nc-tb" onclick="miniFmt('nm-secret','tag')" title="#tag" style="color:var(--accent-secondary);font-size:0.68rem;">#</button>
-</div><textarea id="nm-secret" class="form-textarea" rows="2" placeholder="Cosa nasconde (solo il DM lo sa)..."></textarea></div>
+  <button type="button" class="nc-tb" onclick="miniFmt('nm-secret','secret')" title="🔒 Segreto DM" style="color:#c97bea;font-size:0.65rem;">🔒</button>
+  <button type="button" class="nc-tb" onclick="miniFmt('nm-secret','clue')" title="🔍 Indizio" style="color:#5ba4f5;font-size:0.65rem;">🔍</button>
+</div><div id="nm-secret" contenteditable="true" data-placeholder="Cosa nasconde (solo il DM lo sa)..." style="min-height:48px;padding:8px;background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-md);font-size:0.88rem;line-height:1.6;color:var(--text-primary);outline:none;overflow-y:auto;" oninput="void 0"></div></div>
         <div class="form-row">
           <div class="form-group"><label class="form-label">Cosa vuole dai PG</label><textarea id="nm-wants" class="form-textarea" rows="2" placeholder="Obiettivo o richiesta..."></textarea></div>
           <div class="form-group"><label class="form-label">Cosa offre ai PG</label><textarea id="nm-offers" class="form-textarea" rows="2" placeholder="Informazioni, servizi, oggetti..."></textarea></div>
@@ -2349,13 +2365,16 @@
       </div>
       <div class="form-group">
         <label class="form-label">Descrizione</label>
-        <div class="mini-fmt-toolbar" style="display:flex;gap:2px;margin-bottom:4px;flex-wrap:wrap;">
+        <div class="mini-fmt-toolbar" style="display:flex;gap:2px;margin-bottom:4px;flex-wrap:wrap;align-items:center;">
   <button type="button" class="nc-tb" onclick="miniFmt('luogo-desc','bold')" title="Grassetto"><b>B</b></button>
   <button type="button" class="nc-tb" onclick="miniFmt('luogo-desc','italic')" title="Corsivo"><i>I</i></button>
   <button type="button" class="nc-tb" onclick="miniFmt('luogo-desc','underline')" title="Sottolineato"><u>S</u></button>
+  <div style="width:1px;background:var(--border);margin:0 2px;height:18px;"></div>
   <button type="button" class="nc-tb" onclick="miniFmt('luogo-desc','link')" title="[[Link]]" style="color:#5ba4f5;font-size:0.68rem;">[[]]</button>
   <button type="button" class="nc-tb" onclick="miniFmt('luogo-desc','tag')" title="#tag" style="color:var(--accent-secondary);font-size:0.68rem;">#</button>
-</div><textarea id="luogo-desc" class="form-textarea" rows="3" placeholder="Atmosfera, dettagli sensoriali, cosa si vede appena si entra..."></textarea>
+  <button type="button" class="nc-tb" onclick="miniFmt('luogo-desc','secret')" title="🔒 Segreto DM" style="color:#c97bea;font-size:0.65rem;">🔒</button>
+  <button type="button" class="nc-tb" onclick="miniFmt('luogo-desc','clue')" title="🔍 Indizio" style="color:#5ba4f5;font-size:0.65rem;">🔍</button>
+</div><div id="luogo-desc" contenteditable="true" data-placeholder="Atmosfera, dettagli sensoriali, cosa si vede appena si entra..." style="min-height:72px;padding:8px;background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-md);font-size:0.88rem;line-height:1.6;color:var(--text-primary);outline:none;overflow-y:auto;" oninput="void 0"></div>
       </div>
       <div class="form-row">
         <div class="form-group">
@@ -2369,13 +2388,16 @@
       </div>
       <div class="form-group">
         <label class="form-label">Note DM</label>
-        <div class="mini-fmt-toolbar" style="display:flex;gap:2px;margin-bottom:4px;flex-wrap:wrap;">
+        <div class="mini-fmt-toolbar" style="display:flex;gap:2px;margin-bottom:4px;flex-wrap:wrap;align-items:center;">
   <button type="button" class="nc-tb" onclick="miniFmt('luogo-note','bold')" title="Grassetto"><b>B</b></button>
   <button type="button" class="nc-tb" onclick="miniFmt('luogo-note','italic')" title="Corsivo"><i>I</i></button>
   <button type="button" class="nc-tb" onclick="miniFmt('luogo-note','underline')" title="Sottolineato"><u>S</u></button>
+  <div style="width:1px;background:var(--border);margin:0 2px;height:18px;"></div>
   <button type="button" class="nc-tb" onclick="miniFmt('luogo-note','link')" title="[[Link]]" style="color:#5ba4f5;font-size:0.68rem;">[[]]</button>
   <button type="button" class="nc-tb" onclick="miniFmt('luogo-note','tag')" title="#tag" style="color:var(--accent-secondary);font-size:0.68rem;">#</button>
-</div><textarea id="luogo-note" class="form-textarea" rows="2" placeholder="Informazioni riservate al master..."></textarea>
+  <button type="button" class="nc-tb" onclick="miniFmt('luogo-note','secret')" title="🔒 Segreto DM" style="color:#c97bea;font-size:0.65rem;">🔒</button>
+  <button type="button" class="nc-tb" onclick="miniFmt('luogo-note','clue')" title="🔍 Indizio" style="color:#5ba4f5;font-size:0.65rem;">🔍</button>
+</div><div id="luogo-note" contenteditable="true" data-placeholder="Informazioni riservate al master..." style="min-height:48px;padding:8px;background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-md);font-size:0.88rem;line-height:1.6;color:var(--text-primary);outline:none;overflow-y:auto;" oninput="void 0"></div>
       </div>
     </div>
     <div class="modal-footer">
@@ -2433,7 +2455,7 @@
       </div>
       <div class="form-group">
         <label class="form-label">Obiettivi e metodi</label>
-        <textarea id="fazione-mondo-obiettivi" class="form-textarea" rows="2" placeholder="Cosa vuole questa fazione e come lo persegue..."></textarea>
+        <div id="fazione-mondo-obiettivi" contenteditable="true" data-placeholder="Cosa vuole questa fazione e come lo persegue..." style="min-height:48px;padding:8px;background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-md);font-size:0.88rem;line-height:1.6;color:var(--text-primary);outline:none;overflow-y:auto;" oninput="void 0"></div>
       </div>
       <div class="form-group">
         <label class="form-label">Relazioni con altre fazioni</label>
@@ -2441,13 +2463,16 @@
       </div>
       <div class="form-group">
         <label class="form-label">Note DM</label>
-        <div class="mini-fmt-toolbar" style="display:flex;gap:2px;margin-bottom:4px;flex-wrap:wrap;">
+        <div class="mini-fmt-toolbar" style="display:flex;gap:2px;margin-bottom:4px;flex-wrap:wrap;align-items:center;">
   <button type="button" class="nc-tb" onclick="miniFmt('fazione-mondo-note','bold')" title="Grassetto"><b>B</b></button>
   <button type="button" class="nc-tb" onclick="miniFmt('fazione-mondo-note','italic')" title="Corsivo"><i>I</i></button>
   <button type="button" class="nc-tb" onclick="miniFmt('fazione-mondo-note','underline')" title="Sottolineato"><u>S</u></button>
+  <div style="width:1px;background:var(--border);margin:0 2px;height:18px;"></div>
   <button type="button" class="nc-tb" onclick="miniFmt('fazione-mondo-note','link')" title="[[Link]]" style="color:#5ba4f5;font-size:0.68rem;">[[]]</button>
   <button type="button" class="nc-tb" onclick="miniFmt('fazione-mondo-note','tag')" title="#tag" style="color:var(--accent-secondary);font-size:0.68rem;">#</button>
-</div><textarea id="fazione-mondo-note" class="form-textarea" rows="2" placeholder="Piani segreti, leader, agenti..."></textarea>
+  <button type="button" class="nc-tb" onclick="miniFmt('fazione-mondo-note','secret')" title="🔒 Segreto DM" style="color:#c97bea;font-size:0.65rem;">🔒</button>
+  <button type="button" class="nc-tb" onclick="miniFmt('fazione-mondo-note','clue')" title="🔍 Indizio" style="color:#5ba4f5;font-size:0.65rem;">🔍</button>
+</div><div id="fazione-mondo-note" contenteditable="true" data-placeholder="Piani segreti, leader, agenti..." style="min-height:48px;padding:8px;background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-md);font-size:0.88rem;line-height:1.6;color:var(--text-primary);outline:none;overflow-y:auto;" oninput="void 0"></div>
       </div>
     </div>
     <div class="modal-footer">
@@ -4273,8 +4298,8 @@ const NPC = (() => {
       icon:     document.getElementById('nm-icon')?.value?.trim()   || '👤',
       voice:    document.getElementById('nm-voice')?.value?.trim()  || '',
       tic:      document.getElementById('nm-tic')?.value?.trim()    || '',
-      trait:    document.getElementById('nm-trait')?.value?.trim()  || '',
-      secret:   document.getElementById('nm-secret')?.value?.trim() || '',
+      trait:    _fieldVal('nm-trait')?.trim()  || '',
+      secret:   _fieldVal('nm-secret')?.trim() || '',
       wants:    document.getElementById('nm-wants')?.value?.trim()  || '',
       offers:   document.getElementById('nm-offers')?.value?.trim() || '',
       links:    document.getElementById('nm-links')?.value?.trim()  || '',
@@ -4793,10 +4818,10 @@ const Luoghi = (() => {
       tipo:      document.getElementById('luogo-tipo')?.value || 'altro',
       icon:      document.getElementById('luogo-icon')?.value?.trim() || '',
       parentId:  document.getElementById('luogo-parent')?.value || '',
-      desc:      document.getElementById('luogo-desc')?.value?.trim() || '',
+      desc:      _fieldVal('luogo-desc')?.trim() || '',
       poi:       document.getElementById('luogo-poi')?.value?.trim() || '',
       loot:      document.getElementById('luogo-loot')?.value?.trim() || '',
-      note:      document.getElementById('luogo-note')?.value?.trim() || '',
+      note:      _fieldVal('luogo-note')?.trim() || '',
       immagine:  document.getElementById('luogo-img-url')?.value?.trim() || '',
     };
 
@@ -4983,9 +5008,9 @@ const Fazioni = (() => {
       icon:      document.getElementById('fazione-mondo-icon')?.value?.trim()      || '🏛️',
       power:     parseInt(document.getElementById('fazione-mondo-power')?.value)   || 50,
       influence: document.getElementById('fazione-mondo-influenza')?.value?.trim() || '',
-      obiettivi: document.getElementById('fazione-mondo-obiettivi')?.value?.trim() || '',
+      obiettivi: _fieldVal('fazione-mondo-obiettivi')?.trim() || '',
       relazioni: document.getElementById('fazione-mondo-relazioni')?.value?.trim() || '',
-      notes:     document.getElementById('fazione-mondo-note')?.value?.trim()      || '',
+      notes:     _fieldVal('fazione-mondo-note')?.trim()      || '',
       immagine:  document.getElementById('fazione-img-url')?.value?.trim()         || '',
     };
 
@@ -6309,22 +6334,24 @@ const Compendio = (() => {
       }
 
       // Normalizza mostri — unifica diversi formati JSON
+      // Sposta _parseGS e _gsRaw fuori dal forEach per efficienza
+      const _parseGS = (raw) => {
+        if (raw === '1/8' || raw === 0.125) return 0.125;
+        if (raw === '1/4' || raw === 0.25) return 0.25;
+        if (raw === '1/2' || raw === 0.5)  return 0.5;
+        const n = parseFloat(raw);
+        return isNaN(n) ? null : n;
+      };
+      const _gsRaw = (v) => {
+        if (v === 0.125) return '1/8';
+        if (v === 0.25)  return '1/4';
+        if (v === 0.5)   return '1/2';
+        return v != null ? String(v) : '?';
+      };
       _data.monsters.forEach(m => {
+        try {
         // Normalizza grado_sfida
-        const _parseGS = (raw) => {
-          if (raw === '1/8' || raw === 0.125) return 0.125;
-          if (raw === '1/4' || raw === 0.25) return 0.25;
-          if (raw === '1/2' || raw === 0.5)  return 0.5;
-          const n = parseFloat(raw);
-          return isNaN(n) ? null : n;
-        };
-        const _gsRaw = (v) => {
-          if (v === 0.125) return '1/8';
-          if (v === 0.25)  return '1/4';
-          if (v === 0.5)   return '1/2';
-          return v != null ? String(v) : '?';
-        };
-
+        
         if (!m.grado_sfida) {
           // Formato 5e2024: challenge_rating come numero diretto
           const cr = m.challenge_rating ?? m.cr ?? m.grado_sfida_val;
@@ -6346,6 +6373,9 @@ const Compendio = (() => {
           m.classe_armatura = typeof m.armor_class === 'object'
             ? (m.armor_class[0]?.value || m.armor_class) : m.armor_class;
         }
+        // Assicura nome
+        if (!m.nome && m.name) m.nome = m.name;
+        } catch(e) { Debug.warn('Normalizzazione mostro fallita:', e.message); }
       });
 
       // Normalizza rarità oggetti magici
@@ -12298,6 +12328,22 @@ const _extraTemplates = () => [
 // Patch _builtinTemplates per includere gli extra
 // Viene chiamata alla prima inizializzazione
 
+
+
+// Helper: legge valore da textarea o contenteditable
+const _fieldVal = (id) => {
+  const el = document.getElementById(id);
+  if (!el) return '';
+  if (el.tagName === 'TEXTAREA' || el.tagName === 'INPUT') return el.value;
+  // contenteditable: restituisce innerHTML (mantiene formattazione HTML)
+  return el.innerHTML || '';
+};
+const _setField = (id, val) => {
+  const el = document.getElementById(id);
+  if (!el) return;
+  if (el.tagName === 'TEXTAREA' || el.tagName === 'INPUT') el.value = val || '';
+  else el.innerHTML = val || '';
+};
 
 /* ── INIT ── */
 
