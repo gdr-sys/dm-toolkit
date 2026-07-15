@@ -1999,6 +1999,9 @@
   <button type="button" class="nc-tb" onclick="miniFmt('nm-trait','tag')" title="#tag" style="color:var(--accent-secondary);font-size:0.68rem;">#</button>
   <button type="button" class="nc-tb" onclick="miniFmt('nm-trait','secret')" title="🔒 Segreto DM" style="color:#c97bea;font-size:0.65rem;">🔒</button>
   <button type="button" class="nc-tb" onclick="miniFmt('nm-trait','clue')" title="🔍 Indizio" style="color:#5ba4f5;font-size:0.65rem;">🔍</button>
+  <div style="width:1px;background:var(--border);margin:0 2px;height:18px;"></div>
+  <button type="button" class="nc-tb" onclick="miniFmtColor('nm-trait')" title="Colore testo" style="border-bottom:3px solid #f5a623;">A</button>
+  <button type="button" class="nc-tb" onclick="miniFmtHL('nm-trait')" title="Evidenzia" style="background:rgba(245,166,35,0.25);border-bottom:3px solid rgba(245,166,35,0.7);">H</button>
 </div><div id="nm-trait" contenteditable="true" data-placeholder="Come si comporta, cosa lo rende memorabile..." style="min-height:48px;padding:8px;background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-md);font-size:0.88rem;line-height:1.6;color:var(--text-primary);outline:none;overflow-y:auto;" oninput="void 0"></div></div>
         <div class="form-group"><label class="form-label">Segreto DM</label><div class="mini-fmt-toolbar" style="display:flex;gap:2px;margin-bottom:4px;flex-wrap:wrap;align-items:center;">
   <button type="button" class="nc-tb" onclick="miniFmt('nm-secret','bold')" title="Grassetto"><b>B</b></button>
@@ -2009,6 +2012,9 @@
   <button type="button" class="nc-tb" onclick="miniFmt('nm-secret','tag')" title="#tag" style="color:var(--accent-secondary);font-size:0.68rem;">#</button>
   <button type="button" class="nc-tb" onclick="miniFmt('nm-secret','secret')" title="🔒 Segreto DM" style="color:#c97bea;font-size:0.65rem;">🔒</button>
   <button type="button" class="nc-tb" onclick="miniFmt('nm-secret','clue')" title="🔍 Indizio" style="color:#5ba4f5;font-size:0.65rem;">🔍</button>
+  <div style="width:1px;background:var(--border);margin:0 2px;height:18px;"></div>
+  <button type="button" class="nc-tb" onclick="miniFmtColor('nm-secret')" title="Colore testo" style="border-bottom:3px solid #f5a623;">A</button>
+  <button type="button" class="nc-tb" onclick="miniFmtHL('nm-secret')" title="Evidenzia" style="background:rgba(245,166,35,0.25);border-bottom:3px solid rgba(245,166,35,0.7);">H</button>
 </div><div id="nm-secret" contenteditable="true" data-placeholder="Cosa nasconde (solo il DM lo sa)..." style="min-height:48px;padding:8px;background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-md);font-size:0.88rem;line-height:1.6;color:var(--text-primary);outline:none;overflow-y:auto;" oninput="void 0"></div></div>
         <div class="form-row">
           <div class="form-group"><label class="form-label">Cosa vuole dai PG</label><textarea id="nm-wants" class="form-textarea" rows="2" placeholder="Obiettivo o richiesta..."></textarea></div>
@@ -2374,6 +2380,9 @@
   <button type="button" class="nc-tb" onclick="miniFmt('luogo-desc','tag')" title="#tag" style="color:var(--accent-secondary);font-size:0.68rem;">#</button>
   <button type="button" class="nc-tb" onclick="miniFmt('luogo-desc','secret')" title="🔒 Segreto DM" style="color:#c97bea;font-size:0.65rem;">🔒</button>
   <button type="button" class="nc-tb" onclick="miniFmt('luogo-desc','clue')" title="🔍 Indizio" style="color:#5ba4f5;font-size:0.65rem;">🔍</button>
+  <div style="width:1px;background:var(--border);margin:0 2px;height:18px;"></div>
+  <button type="button" class="nc-tb" onclick="miniFmtColor('luogo-desc')" title="Colore testo" style="border-bottom:3px solid #f5a623;">A</button>
+  <button type="button" class="nc-tb" onclick="miniFmtHL('luogo-desc')" title="Evidenzia" style="background:rgba(245,166,35,0.25);border-bottom:3px solid rgba(245,166,35,0.7);">H</button>
 </div><div id="luogo-desc" contenteditable="true" data-placeholder="Atmosfera, dettagli sensoriali, cosa si vede appena si entra..." style="min-height:72px;padding:8px;background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-md);font-size:0.88rem;line-height:1.6;color:var(--text-primary);outline:none;overflow-y:auto;" oninput="void 0"></div>
       </div>
       <div class="form-row">
@@ -2397,6 +2406,9 @@
   <button type="button" class="nc-tb" onclick="miniFmt('luogo-note','tag')" title="#tag" style="color:var(--accent-secondary);font-size:0.68rem;">#</button>
   <button type="button" class="nc-tb" onclick="miniFmt('luogo-note','secret')" title="🔒 Segreto DM" style="color:#c97bea;font-size:0.65rem;">🔒</button>
   <button type="button" class="nc-tb" onclick="miniFmt('luogo-note','clue')" title="🔍 Indizio" style="color:#5ba4f5;font-size:0.65rem;">🔍</button>
+  <div style="width:1px;background:var(--border);margin:0 2px;height:18px;"></div>
+  <button type="button" class="nc-tb" onclick="miniFmtColor('luogo-note')" title="Colore testo" style="border-bottom:3px solid #f5a623;">A</button>
+  <button type="button" class="nc-tb" onclick="miniFmtHL('luogo-note')" title="Evidenzia" style="background:rgba(245,166,35,0.25);border-bottom:3px solid rgba(245,166,35,0.7);">H</button>
 </div><div id="luogo-note" contenteditable="true" data-placeholder="Informazioni riservate al master..." style="min-height:48px;padding:8px;background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-md);font-size:0.88rem;line-height:1.6;color:var(--text-primary);outline:none;overflow-y:auto;" oninput="void 0"></div>
       </div>
     </div>
@@ -2455,6 +2467,17 @@
       </div>
       <div class="form-group">
         <label class="form-label">Obiettivi e metodi</label>
+        <div class="mini-fmt-toolbar" style="display:flex;gap:2px;margin-bottom:4px;flex-wrap:wrap;align-items:center;">
+  <button type="button" class="nc-tb" onclick="miniFmt('fazione-mondo-obiettivi','bold')" title="Grassetto"><b>B</b></button>
+  <button type="button" class="nc-tb" onclick="miniFmt('fazione-mondo-obiettivi','italic')" title="Corsivo"><i>I</i></button>
+  <button type="button" class="nc-tb" onclick="miniFmt('fazione-mondo-obiettivi','underline')" title="Sottolineato"><u>S</u></button>
+  <div style="width:1px;background:var(--border);margin:0 2px;height:18px;"></div>
+  <button type="button" class="nc-tb" onclick="miniFmt('fazione-mondo-obiettivi','link')" title="[[Link]]" style="color:#5ba4f5;font-size:0.68rem;">[[]]</button>
+  <button type="button" class="nc-tb" onclick="miniFmt('fazione-mondo-obiettivi','tag')" title="#tag" style="color:var(--accent-secondary);font-size:0.68rem;">#</button>
+  <button type="button" class="nc-tb" onclick="miniFmt('fazione-mondo-obiettivi','secret')" title="🔒 Segreto DM" style="color:#c97bea;font-size:0.65rem;">🔒</button>
+  <button type="button" class="nc-tb" onclick="miniFmtColor('fazione-mondo-obiettivi')" title="Colore testo" style="border-bottom:3px solid #f5a623;">A</button>
+  <button type="button" class="nc-tb" onclick="miniFmtHL('fazione-mondo-obiettivi')" title="Evidenzia" style="background:rgba(245,166,35,0.25);border-bottom:3px solid rgba(245,166,35,0.7);">H</button>
+</div>
         <div id="fazione-mondo-obiettivi" contenteditable="true" data-placeholder="Cosa vuole questa fazione e come lo persegue..." style="min-height:48px;padding:8px;background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-md);font-size:0.88rem;line-height:1.6;color:var(--text-primary);outline:none;overflow-y:auto;" oninput="void 0"></div>
       </div>
       <div class="form-group">
@@ -2472,6 +2495,9 @@
   <button type="button" class="nc-tb" onclick="miniFmt('fazione-mondo-note','tag')" title="#tag" style="color:var(--accent-secondary);font-size:0.68rem;">#</button>
   <button type="button" class="nc-tb" onclick="miniFmt('fazione-mondo-note','secret')" title="🔒 Segreto DM" style="color:#c97bea;font-size:0.65rem;">🔒</button>
   <button type="button" class="nc-tb" onclick="miniFmt('fazione-mondo-note','clue')" title="🔍 Indizio" style="color:#5ba4f5;font-size:0.65rem;">🔍</button>
+  <div style="width:1px;background:var(--border);margin:0 2px;height:18px;"></div>
+  <button type="button" class="nc-tb" onclick="miniFmtColor('fazione-mondo-note')" title="Colore testo" style="border-bottom:3px solid #f5a623;">A</button>
+  <button type="button" class="nc-tb" onclick="miniFmtHL('fazione-mondo-note')" title="Evidenzia" style="background:rgba(245,166,35,0.25);border-bottom:3px solid rgba(245,166,35,0.7);">H</button>
 </div><div id="fazione-mondo-note" contenteditable="true" data-placeholder="Piani segreti, leader, agenti..." style="min-height:48px;padding:8px;background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-md);font-size:0.88rem;line-height:1.6;color:var(--text-primary);outline:none;overflow-y:auto;" oninput="void 0"></div>
       </div>
     </div>
@@ -12222,40 +12248,83 @@ const wikiApplyHighlight = () => {
 const miniFmt = (fieldId, cmd) => {
   const el = document.getElementById(fieldId);
   if (!el) return;
-  const start = el.selectionStart, end = el.selectionEnd;
-  const text = el.value;
-  const sel = text.slice(start, end);
-  const word = sel || _getWordInTextarea(el);
+  const isEditable = el.contentEditable === 'true';
 
-  if (cmd === 'bold') {
-    const ins = '**' + (sel||word) + '**';
-    _insertInTextarea(el, ins, sel ? start : el._wordStart, sel ? end : el._wordEnd);
-  } else if (cmd === 'italic') {
-    const ins = '*' + (sel||word) + '*';
-    _insertInTextarea(el, ins, sel ? start : el._wordStart, sel ? end : el._wordEnd);
-  } else if (cmd === 'underline') {
-    const ins = '__' + (sel||word) + '__';
-    _insertInTextarea(el, ins, sel ? start : el._wordStart, sel ? end : el._wordEnd);
-  } else if (cmd === 'link') {
-    const camp = App.getActiveCampaign();
-    const pages = [];
-    const wiki = camp?.wiki || {};
-    ['lore','sessioni'].forEach(sec => (wiki[sec]||[]).forEach(n => pages.push(n.titolo||'')));
-    (camp?.npcs||[]).forEach(n => pages.push('png:'+(n.name||n.nome||'')));
-    (camp?.locations||[]).forEach(l => pages.push('luogo:'+(l.nome||'')));
-    (camp?.factions||[]).forEach(f => pages.push('fazione:'+(f.nome||'')));
-    const input = prompt('Collega a:\n'+pages.slice(0,20).join('\n'),'');
-    if (!input?.trim()) return;
-    const ins = '[[' + input.trim() + ']]';
-    _insertInTextarea(el, ins, start, end);
-  } else if (cmd === 'tag') {
-    const tag = prompt('Nome tag (senza #):', '');
+  if (isEditable) {
+    // contenteditable: usa execCommand
+    el.focus();
+
+    if (cmd === 'bold')      { document.execCommand('bold', false, null); }
+    else if (cmd === 'italic')    { document.execCommand('italic', false, null); }
+    else if (cmd === 'underline') { document.execCommand('underline', false, null); }
+    else if (cmd === 'link') {
+      const camp = App.getActiveCampaign();
+      const pages = [];
+      const wiki = camp?.wiki || {};
+      ['lore','sessioni'].forEach(sec => (wiki[sec]||[]).forEach(n => pages.push({label:'📄 '+n.titolo, key:n.titolo})));
+      (camp?.npcs||[]).forEach(n => pages.push({label:'👤 '+(n.name||n.nome||''), key:'png:'+(n.name||n.nome||'')}));
+      (camp?.locations||[]).forEach(l => pages.push({label:'🗺️ '+(l.nome||''), key:'luogo:'+(l.nome||'')}));
+      (camp?.factions||[]).forEach(f => pages.push({label:'⚔️ '+(f.nome||''), key:'fazione:'+(f.nome||'')}));
+      const list = pages.slice(0,25).map((p,i) => (i+1)+'. '+p.label).join('\n');
+      const input = prompt('Collega a (numero o titolo):\n'+list, '');
+      if (!input?.trim()) return;
+      const num = parseInt(input.trim());
+      const found = !isNaN(num) && num>=1 && num<=pages.length ? pages[num-1]
+                  : pages.find(p => p.label.toLowerCase().includes(input.trim().toLowerCase()));
+      const key = found ? found.key : input.trim();
+      const titolo = key.startsWith('png:') ? key.slice(4)
+                   : key.startsWith('luogo:') ? key.slice(6)
+                   : key.startsWith('fazione:') ? key.slice(8)
+                   : key;
+      const cls = found ? 'nc-wikilink' : 'nc-wikilink nc-broken';
+      const icon = !found ? '' : key.startsWith('png:') ? '👤 ' : key.startsWith('luogo:') ? '🗺️ ' : key.startsWith('fazione:') ? '⚔️ ' : '';
+      document.execCommand('insertHTML', false,
+        '<span class="'+cls+'" data-link="'+key+'" onclick="wikiNavigateLink(\''+key.replace(/'/g,"\\'")+'\')" style="cursor:pointer;">[['+icon+titolo+']]</span>&nbsp;'
+      );
+    }
+    else if (cmd === 'tag') {
+      const tag = prompt('Nome tag (senza #):', '');
+      if (!tag?.trim()) return;
+      document.execCommand('insertHTML', false,
+        '<span class="nc-tag">#'+tag.trim().toLowerCase().replace(/\s+/g,'_')+'</span>&nbsp;'
+      );
+    }
+    else if (cmd === 'secret') {
+      document.execCommand('insertHTML', false,
+        '<div class="wiki-callout wiki-callout-secret"><span class="wiki-callout-label">🔒 SEGRETO DM</span><p>...</p></div><p><br></p>'
+      );
+    }
+    else if (cmd === 'clue') {
+      document.execCommand('insertHTML', false,
+        '<div class="wiki-callout wiki-callout-clue"><span class="wiki-callout-label">🔍 INDIZIO</span><p>...</p></div><p><br></p>'
+      );
+    }
+    return;
+  }
+
+  // Fallback textarea (campi non ancora convertiti)
+  const start = el.selectionStart || 0, end = el.selectionEnd || 0;
+  const text = el.value || '';
+  const sel = text.slice(start, end);
+  let ins = '';
+  if (cmd === 'bold')       ins = '**'+(sel||'testo')+'**';
+  else if (cmd === 'italic') ins = '*'+(sel||'testo')+'*';
+  else if (cmd === 'underline') ins = '__'+(sel||'testo')+'__';
+  else if (cmd === 'tag') {
+    const tag = prompt('Nome tag:', '');
     if (!tag?.trim()) return;
-    const ins = '#' + tag.trim().toLowerCase().replace(/\s+/g,'_') + ' ';
-    _insertInTextarea(el, ins, start, end);
+    ins = '#'+tag.trim().toLowerCase().replace(/\s+/g,'_')+' ';
+  }
+  else if (cmd === 'link') { ins = '[[]]'; }
+  else if (cmd === 'secret') { ins = '[SEGRETO DM: ...]'; }
+  else if (cmd === 'clue')   { ins = '[INDIZIO: ...]'; }
+  if (ins) {
+    el.value = text.slice(0,start) + ins + text.slice(end);
+    el.selectionStart = el.selectionEnd = start + ins.length;
+    el.dispatchEvent(new Event('input'));
+    el.focus();
   }
 };
-
 const _getWordInTextarea = (el) => {
   const pos = el.selectionStart;
   const text = el.value;
@@ -12344,6 +12413,28 @@ const _setField = (id, val) => {
   if (el.tagName === 'TEXTAREA' || el.tagName === 'INPUT') el.value = val || '';
   else el.innerHTML = val || '';
 };
+
+
+const miniFmtColor = (fieldId) => {
+  const el = document.getElementById(fieldId);
+  if (!el || el.contentEditable !== 'true') return;
+  el.focus();
+  const color = document.getElementById('wiki-color-pick')?.value || '#f5a623';
+  const sel = window.getSelection();
+  if (sel && sel.isCollapsed) { const r = _getWordAtCursor(); if (r) { sel.removeAllRanges(); sel.addRange(r); } }
+  document.execCommand('foreColor', false, color);
+};
+
+const miniFmtHL = (fieldId) => {
+  const el = document.getElementById(fieldId);
+  if (!el || el.contentEditable !== 'true') return;
+  el.focus();
+  const color = document.getElementById('wiki-hl-pick')?.value || '#f5a623';
+  const sel = window.getSelection();
+  if (sel && sel.isCollapsed) { const r = _getWordAtCursor(); if (r) { sel.removeAllRanges(); sel.addRange(r); } }
+  document.execCommand('hiliteColor', false, color + '60');
+};
+
 
 /* ── INIT ── */
 
