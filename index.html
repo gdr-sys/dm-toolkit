@@ -7,6 +7,10 @@
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/components.css">
   <link rel="stylesheet" href="css/layout.css">
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -262,6 +266,14 @@
           onmouseenter="this.style.background='var(--bg-tertiary)'" onmouseleave="this.style.background='none'">
           ✏️
         </button>
+        <!-- Auth button -->
+        <button id="fb-auth-btn" onclick="FirebaseSync.toggleAuth()"
+          style="display:none;background:none;border:1px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;color:var(--text-muted);font-size:0.75rem;padding:4px 10px;display:flex;align-items:center;gap:6px;">
+          <span id="fb-auth-icon">🔑</span>
+          <span id="fb-auth-label">Accedi</span>
+        </button>
+        <!-- Presenza co-autori online -->
+        <div id="fb-presence" style="display:none;align-items:center;gap:4px;font-size:0.72rem;color:var(--text-muted);"></div>
         <span class="text-xs text-muted" id="topbar-campaign-badge"></span>
       </div>
     </header>
@@ -12176,24 +12188,231 @@ const ExportPDF = (() => {
 <div class="modal-overlay hidden" id="modal-gdrive-setup" style="display:none;" onclick="if(event.target===this)Modal.close('gdrive-setup')">
   <div class="modal" style="max-width:480px;">
     <div class="modal-header">
-      <h3 class="modal-title">☁️ Configura Google Drive Sync</h3>
+      <h3 class="modal-title">☁️ Configura Google Drive</h3>
       <button class="btn btn-ghost btn-icon-sm" onclick="Modal.close('gdrive-setup')">✕</button>
     </div>
     <div class="modal-body" style="font-size:0.85rem;line-height:1.7;">
-      <p>Per sincronizzare la campagna su Google Drive è necessario un <strong>Client ID OAuth 2.0</strong> gratuito.</p>
+      <p>Per sincronizzare e collaborare tramite Google Drive ti serve un <strong>Client ID OAuth 2.0</strong> gratuito.</p>
       <ol style="padding-left:1.4em;margin:10px 0;">
         <li>Vai su <a href="https://console.cloud.google.com" target="_blank" style="color:#5ba4f5;">console.cloud.google.com</a></li>
-        <li>Crea un progetto → Abilita <strong>Google Drive API</strong></li>
-        <li>Credenziali → Crea OAuth 2.0 Client ID → tipo <strong>Web</strong></li>
+        <li>Crea progetto → abilita <strong>Google Drive API</strong></li>
+        <li>Credenziali → OAuth 2.0 Client ID → tipo <strong>Web</strong></li>
         <li>Aggiungi <code style="background:var(--bg-tertiary);padding:1px 5px;border-radius:3px;">https://gdr-sys.github.io</code> come origine autorizzata</li>
-        <li>Copia il Client ID e incollalo qui sotto</li>
+        <li>Copia il Client ID qui sotto</li>
       </ol>
       <input id="gdrive-client-id-input" type="text" class="form-input" placeholder="xxxxxx.apps.googleusercontent.com" style="margin-bottom:8px;">
-      <p style="font-size:0.75rem;color:var(--text-muted);">Il Client ID viene salvato in localStorage sul tuo dispositivo, non sui server.</p>
+      <p style="font-size:0.75rem;color:var(--text-muted);">Il Client ID viene salvato solo sul tuo dispositivo.</p>
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="Modal.close('gdrive-setup')">Annulla</button>
       <button class="btn btn-primary" onclick="GDrive._saveClientId()">Salva e connetti</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal opzioni Google Drive (quando già connesso) -->
+<div class="modal-overlay hidden" id="modal-gdrive-options" style="display:none;" onclick="if(event.target===this)Modal.close('gdrive-options')">
+  <div class="modal" style="max-width:440px;">
+    <div class="modal-header">
+      <h3 class="modal-title">☁️ Google Drive</h3>
+      <button class="btn btn-ghost btn-icon-sm" onclick="Modal.close('gdrive-options')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="gdrive-user-info" style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--bg-secondary);border-radius:var(--radius-md);margin-bottom:16px;">
+        <div style="width:36px;height:36px;background:var(--accent-primary);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:1rem;">👤</div>
+        <div id="gdrive-user-name" style="font-size:0.88rem;"></div>
+      </div>
+
+      <!-- Salva su Drive -->
+      <div style="margin-bottom:12px;">
+        <button class="btn btn-primary w-full" onclick="GDriveUI.syncNow()">
+          ☁️ Salva campagna su Drive
+        </button>
+      </div>
+
+      <!-- Invita collaboratore -->
+      <div style="border-top:1px solid var(--border);padding-top:12px;margin-bottom:12px;">
+        <div style="font-family:var(--font-display);font-size:0.82rem;font-weight:600;margin-bottom:8px;">👥 Invita collaboratore</div>
+        <p style="font-size:0.78rem;color:var(--text-muted);margin-bottom:8px;">Genera un codice da condividere con il co-autore.</p>
+        <div style="display:flex;gap:8px;">
+          <input id="gdrive-invite-code" type="text" class="form-input" placeholder="Codice generato qui..." readonly style="flex:1;font-family:var(--font-mono);font-size:0.9rem;letter-spacing:0.1em;" onclick="this.select()">
+          <button class="btn btn-secondary" onclick="GDriveUI.generateInvite()">Genera</button>
+        </div>
+        <div id="gdrive-invite-hint" style="font-size:0.72rem;color:var(--text-muted);margin-top:6px;"></div>
+      </div>
+
+      <!-- Unisciti con codice -->
+      <div style="border-top:1px solid var(--border);padding-top:12px;margin-bottom:12px;">
+        <div style="font-family:var(--font-display);font-size:0.82rem;font-weight:600;margin-bottom:8px;">🔑 Unisciti a una campagna</div>
+        <p style="font-size:0.78rem;color:var(--text-muted);margin-bottom:8px;">Hai un codice invito? Inseriscilo per accedere alla campagna condivisa.</p>
+        <div style="display:flex;gap:8px;">
+          <input id="gdrive-join-code" type="text" class="form-input" placeholder="Inserisci codice..." style="flex:1;font-family:var(--font-mono);text-transform:uppercase;" maxlength="20">
+          <button class="btn btn-primary" onclick="GDriveUI.joinCampaign()">Accedi</button>
+        </div>
+      </div>
+
+      <!-- Disconnect -->
+      <div style="border-top:1px solid var(--border);padding-top:12px;">
+        <button class="btn btn-ghost btn-sm" onclick="GDrive.logout()" style="color:var(--accent-danger);">Disconnetti Google Drive</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Configura Firebase -->
+<div class="modal-overlay hidden" id="modal-firebase-setup" style="display:none;" onclick="if(event.target===this)Modal.close('firebase-setup')">
+  <div class="modal" style="max-width:520px;">
+    <div class="modal-header">
+      <h3 class="modal-title">🔥 Configura Firebase</h3>
+      <button class="btn btn-ghost btn-icon-sm" onclick="Modal.close('firebase-setup')">✕</button>
+    </div>
+    <div class="modal-body" style="font-size:0.85rem;line-height:1.7;">
+      <p>Firebase è <strong>gratuito</strong> e permette collaborazione in tempo reale. Setup in 5 minuti:</p>
+      <ol style="padding-left:1.4em;margin:10px 0 16px;">
+        <li>Vai su <a href="https://console.firebase.google.com" target="_blank" style="color:#f5a623;">console.firebase.google.com</a></li>
+        <li>Crea progetto → abilita <strong>Google Authentication</strong></li>
+        <li>Crea <strong>Realtime Database</strong> (modalità test)</li>
+        <li>Impostazioni progetto → Aggiungi app Web → copia la config</li>
+        <li>Aggiungi <code style="background:var(--bg-tertiary);padding:1px 5px;border-radius:3px;">gdr-sys.github.io</code> ai domini autorizzati</li>
+      </ol>
+      <div style="background:var(--bg-secondary);border-radius:var(--radius-md);padding:10px;margin-bottom:12px;">
+        <div style="font-size:0.72rem;color:var(--text-muted);margin-bottom:6px;">Incolla qui la tua Firebase config (oggetto JS):</div>
+        <textarea id="fb-config-input" rows="8" class="form-textarea" style="font-family:var(--font-mono);font-size:0.72rem;" placeholder='{
+  "apiKey": "...",
+  "authDomain": "...",
+  "databaseURL": "...",
+  "projectId": "...",
+  "storageBucket": "...",
+  "messagingSenderId": "...",
+  "appId": "..."
+}'></textarea>
+      </div>
+      <p style="font-size:0.72rem;color:var(--text-muted);">La config viene salvata nel tuo browser. Non contiene dati sensibili — è la configurazione pubblica dell'app.</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="Modal.close('firebase-setup')">Annulla</button>
+      <button class="btn btn-primary" onclick="FirebaseSync.saveConfig()">Salva e connetti</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Scegli come entrare -->
+<div class="modal-overlay hidden" id="modal-auth-choice" style="display:none;" onclick="if(event.target===this)Modal.close('auth-choice')">
+  <div class="modal" style="max-width:400px;">
+    <div class="modal-header">
+      <h3 class="modal-title">🎲 Benvenuto nel DM Toolkit</h3>
+      <button class="btn btn-ghost btn-icon-sm" onclick="Modal.close('auth-choice')">✕</button>
+    </div>
+    <div class="modal-body" style="display:flex;flex-direction:column;gap:10px;padding:20px;">
+
+      <!-- Opzione 1: Locale -->
+      <button class="btn btn-ghost" style="padding:14px;text-align:left;border:1px solid var(--border);border-radius:var(--radius-md);"
+        onclick="FirebaseSync.useLocal();Modal.close('auth-choice')">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <span style="font-size:1.4rem;">💾</span>
+          <div>
+            <div style="font-family:var(--font-display);font-size:0.9rem;font-weight:600;">Solo locale</div>
+            <div style="font-size:0.75rem;color:var(--text-muted);">Dati salvati nel browser. Nessun account richiesto.</div>
+          </div>
+        </div>
+      </button>
+
+      <!-- Opzione 2: Anonimo -->
+      <button class="btn btn-ghost" style="padding:14px;text-align:left;border:1px solid var(--border);border-radius:var(--radius-md);"
+        onclick="FirebaseSync.loginAnonymous();Modal.close('auth-choice')">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <span style="font-size:1.4rem;">👤</span>
+          <div>
+            <div style="font-family:var(--font-display);font-size:0.9rem;font-weight:600;">Anonimo</div>
+            <div style="font-size:0.75rem;color:var(--text-muted);">Dati sul cloud, nessun account. Puoi passare a Google in seguito.</div>
+          </div>
+        </div>
+      </button>
+
+      <!-- Opzione 3: Google -->
+      <button class="btn btn-ghost" style="padding:14px;text-align:left;border:1px solid var(--border);border-radius:var(--radius-md);"
+        onclick="FirebaseSync.loginGoogle();Modal.close('auth-choice')">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <span style="font-size:1.4rem;">🔑</span>
+          <div>
+            <div style="font-family:var(--font-display);font-size:0.9rem;font-weight:600;">Accedi con Google</div>
+            <div style="font-size:0.75rem;color:var(--text-muted);">Sync multi-dispositivo e collaborazione con co-autori.</div>
+          </div>
+        </div>
+      </button>
+
+      <div style="font-size:0.7rem;color:var(--text-muted);text-align:center;margin-top:4px;">
+        Puoi cambiare modalità in qualsiasi momento dalle impostazioni.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Invita collaboratore -->
+<div class="modal-overlay hidden" id="modal-collab" style="display:none;" onclick="if(event.target===this)Modal.close('collab')">
+  <div class="modal" style="max-width:440px;">
+    <div class="modal-header">
+      <h3 class="modal-title">👥 Collaborazione</h3>
+      <button class="btn btn-ghost btn-icon-sm" onclick="Modal.close('collab')">✕</button>
+    </div>
+    <div class="modal-body">
+      <!-- Info utente -->
+      <div id="collab-user-info" style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--bg-secondary);border-radius:var(--radius-md);margin-bottom:16px;">
+        <img id="collab-user-photo" src="" style="width:36px;height:36px;border-radius:50%;display:none;">
+        <div id="collab-user-placeholder" style="width:36px;height:36px;background:var(--accent-primary);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;">👤</div>
+        <div>
+          <div id="collab-user-name" style="font-size:0.88rem;font-weight:600;"></div>
+          <div id="collab-user-email" style="font-size:0.72rem;color:var(--text-muted);"></div>
+        </div>
+      </div>
+
+      <!-- Co-autori online -->
+      <div id="collab-online" style="margin-bottom:16px;display:none;">
+        <div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:6px;font-family:var(--font-display);text-transform:uppercase;letter-spacing:0.05em;">🟢 Online ora</div>
+        <div id="collab-online-list" style="display:flex;flex-wrap:wrap;gap:6px;"></div>
+      </div>
+
+      <!-- Invita -->
+      <div style="border-top:1px solid var(--border);padding-top:14px;margin-bottom:14px;">
+        <div style="font-family:var(--font-display);font-size:0.85rem;font-weight:600;margin-bottom:6px;">📨 Invita co-autore</div>
+        <p style="font-size:0.78rem;color:var(--text-muted);margin-bottom:8px;">Condividi il codice campagna — il co-autore lo inserisce per accedere.</p>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <code id="collab-camp-code" style="flex:1;background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-md);padding:8px 12px;font-size:0.9rem;letter-spacing:0.12em;text-align:center;cursor:pointer;" onclick="FirebaseSync.copyCode()" title="Clicca per copiare">—</code>
+          <button class="btn btn-ghost btn-sm" onclick="FirebaseSync.copyCode()">📋 Copia</button>
+        </div>
+        <div style="font-size:0.7rem;color:var(--text-muted);margin-top:4px;">Il codice è il nome della campagna su Firebase. Chiunque lo abbia può accedere.</div>
+      </div>
+
+      <!-- Unisciti -->
+      <div style="border-top:1px solid var(--border);padding-top:14px;margin-bottom:14px;">
+        <div style="font-family:var(--font-display);font-size:0.85rem;font-weight:600;margin-bottom:6px;">🔑 Unisciti a una campagna</div>
+        <div style="display:flex;gap:8px;">
+          <input id="collab-join-code" type="text" class="form-input" placeholder="Codice campagna..." style="flex:1;font-family:var(--font-mono);text-transform:uppercase;" oninput="this.value=this.value.toUpperCase()">
+          <button class="btn btn-primary btn-sm" onclick="FirebaseSync.joinCampaign()">Accedi</button>
+        </div>
+      </div>
+
+      <!-- Sync status -->
+      <div id="collab-sync-status" style="border-top:1px solid var(--border);padding-top:12px;font-size:0.75rem;color:var(--text-muted);display:flex;align-items:center;justify-content:space-between;">
+        <span id="collab-last-sync">Nessuna sync</span>
+        <button class="btn btn-ghost btn-sm" onclick="FirebaseSync.syncNow()">↻ Sincronizza</button>
+      </div>
+
+      <!-- Upgrade anonimo → Google -->
+      <div id="collab-upgrade-section" style="border-top:1px solid var(--border);padding-top:12px;margin-top:4px;display:none;">
+        <div style="font-size:0.78rem;color:var(--text-muted);margin-bottom:6px;">
+          Stai usando un account anonimo. Passa a Google per collaborare e sincronizzare su più dispositivi.
+        </div>
+        <button class="btn btn-secondary btn-sm" onclick="FirebaseSync.upgradeToGoogle()">
+          🔑 Collega account Google
+        </button>
+      </div>
+
+      <!-- Logout -->
+      <div style="margin-top:12px;display:flex;gap:8px;align-items:center;">
+        <button class="btn btn-ghost btn-sm" onclick="FirebaseSync.logout()" style="color:var(--accent-danger);font-size:0.75rem;">Esci</button>
+        <button class="btn btn-ghost btn-sm" onclick="FirebaseSync.switchMode()" style="font-size:0.75rem;">Cambia modalità</button>
+      </div>
     </div>
   </div>
 </div>
@@ -12207,100 +12426,183 @@ const ExportPDF = (() => {
 
 // ══ GOOGLE DRIVE SYNC ══
 const GDrive = (() => {
-  const CLIENT_ID = ''; // Da configurare in Google Cloud Console
-  const SCOPES = 'https://www.googleapis.com/auth/drive.appdata';
-  const FILE_NAME = 'dm-toolkit-save.json';
-  let _fileId = null;
-  let _loggedIn = false;
+  // ── Config ──
+  let CLIENT_ID = localStorage.getItem('dm_gdrive_client_id') || '';
+  const SCOPES = 'https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/drive.readonly';
+  const FILE_NAME = 'dm-toolkit-campagna.json';
 
+  let _loggedIn = false;
+  let _fileId = null;      // file della campagna attiva
+  let _userInfo = null;    // { name, email, picture }
+
+  // ── Init ──
   const init = () => {
-    // Mostra pulsante Drive nella UI
     const btn = document.getElementById('gdrive-btn');
     if (btn) btn.style.display = '';
+    // Riprende fileId salvato
+    _fileId = localStorage.getItem('dm_gdrive_fileid') || null;
+    const savedId = localStorage.getItem('dm_gdrive_client_id');
+    if (savedId) CLIENT_ID = savedId;
     _updateBtn();
   };
 
   const _updateBtn = () => {
     const btn = document.getElementById('gdrive-btn');
     if (!btn) return;
-    btn.textContent = _loggedIn ? '☁️ Drive ✓' : '☁️ Drive';
-    btn.title = _loggedIn ? 'Connesso a Google Drive — clicca per scollegarti' : 'Connetti Google Drive per sincronizzare';
-    btn.style.color = _loggedIn ? 'var(--accent-secondary)' : '';
+    if (_loggedIn && _userInfo) {
+      btn.textContent = '☁️ ' + (_userInfo.name?.split(' ')[0] || 'Drive');
+      btn.title = 'Connesso come ' + _userInfo.email + ' — clicca per opzioni';
+      btn.style.color = 'var(--accent-secondary)';
+    } else {
+      btn.textContent = '☁️ Drive';
+      btn.title = 'Connetti Google Drive';
+      btn.style.color = '';
+    }
   };
 
+  // ── Login / Logout ──
   const toggleLogin = () => {
-    if (!CLIENT_ID) {
-      Modal.open('gdrive-setup');
-      return;
-    }
-    if (_loggedIn) {
-      if (confirm('Disconnettere Google Drive?')) { _loggedIn = false; _updateBtn(); }
-    } else {
-      _login();
-    }
+    if (!CLIENT_ID) { Modal.open('gdrive-setup'); return; }
+    if (_loggedIn) { Modal.open('gdrive-options'); }
+    else { _login(); }
   };
 
   const _login = async () => {
     if (!window.gapi) {
-      Toast.show('Google API non disponibile — aggiungi il CLIENT_ID nelle impostazioni', 'warning', 4000);
+      Toast.show('Aggiungi prima il Client ID (clicca ☁️ Drive)', 'warning', 3000);
+      Modal.open('gdrive-setup');
       return;
     }
     try {
       await gapi.auth2.getAuthInstance().signIn();
       _loggedIn = true;
+      const profile = gapi.auth2.getAuthInstance().currentUser.get().getBasicProfile();
+      _userInfo = { name: profile.getName(), email: profile.getEmail(), picture: profile.getImageUrl() };
       _updateBtn();
-      Toast.show('Google Drive connesso ✓', 'success');
-      await sync();
+      Toast.show('✓ Connesso come ' + _userInfo.name, 'success', 2000);
     } catch(e) {
-      Toast.show('Login Google fallito: ' + e.message, 'error');
+      Toast.show('Login fallito: ' + (e.error || e.message), 'error');
     }
   };
 
-  const sync = async () => {
-    if (!_loggedIn) return;
+  const logout = () => {
+    if (window.gapi) gapi.auth2.getAuthInstance().signOut();
+    _loggedIn = false;
+    _userInfo = null;
+    _fileId = null;
+    localStorage.removeItem('dm_gdrive_fileid');
+    _updateBtn();
+    Toast.show('Disconnesso da Google Drive', 'info');
+    Modal.close('gdrive-options');
+  };
+
+  // ── Salva campagna su Drive ──
+  const save = async (campagna) => {
+    if (!_loggedIn) return false;
     try {
-      const camp = Storage.getAll();
-      await _save(JSON.stringify(camp));
-      Toast.show('Campagna sincronizzata su Drive ✓', 'success', 2000);
+      const body = JSON.stringify({ campagna, savedAt: Date.now(), version: 1 });
+      if (_fileId) {
+        await gapi.client.request({
+          path: '/upload/drive/v3/files/' + _fileId,
+          method: 'PATCH',
+          params: { uploadType: 'media' },
+          body,
+        });
+      } else {
+        const res = await gapi.client.drive.files.create({
+          resource: { name: FILE_NAME, mimeType: 'application/json' },
+          media: { mimeType: 'application/json', body },
+          fields: 'id, webViewLink',
+        });
+        _fileId = res.result.id;
+        localStorage.setItem('dm_gdrive_fileid', _fileId);
+      }
+      return true;
     } catch(e) {
-      Toast.show('Sync Drive fallito: ' + e.message, 'error');
+      Debug.warn('GDrive save error:', e);
+      return false;
     }
   };
 
-  const _save = async (data) => {
-    if (_fileId) {
-      await gapi.client.request({ path:`/upload/drive/v3/files/${_fileId}`, method:'PATCH', params:{uploadType:'media'}, body:data });
-    } else {
-      const res = await gapi.client.drive.files.create({
-        resource: { name: FILE_NAME, parents: ['appDataFolder'] },
-        media: { mimeType: 'application/json', body: data },
-        fields: 'id',
-      });
-      _fileId = res.result.id;
-    }
-  };
-
-  const load = async () => {
+  // ── Carica campagna da Drive ──
+  const load = async (fileId) => {
     if (!_loggedIn) return null;
     try {
-      const list = await gapi.client.drive.files.list({ spaces:'appDataFolder', q:`name='${FILE_NAME}'`, fields:'files(id)' });
-      if (!list.result.files.length) return null;
-      _fileId = list.result.files[0].id;
-      const res = await gapi.client.drive.files.get({ fileId:_fileId, alt:'media' });
+      const fid = fileId || _fileId;
+      if (!fid) return null;
+      const res = await gapi.client.drive.files.get({ fileId: fid, alt: 'media' });
       return res.result;
-    } catch(e) { return null; }
+    } catch(e) {
+      Debug.warn('GDrive load error:', e);
+      return null;
+    }
+  };
+
+  // ── Genera codice invito ──
+  const generateInvite = async () => {
+    if (!_loggedIn) { Toast.show('Connettiti prima a Google Drive', 'warning'); return null; }
+    if (!_fileId) { Toast.show('Salva prima la campagna su Drive', 'warning'); return null; }
+    try {
+      // Rende il file accessibile a chiunque abbia il link (viewer → poi editor)
+      await gapi.client.drive.permissions.create({
+        fileId: _fileId,
+        resource: { role: 'writer', type: 'anyone' },
+      });
+      // Il codice invito è il fileId codificato in base64
+      const code = btoa(_fileId).replace(/=/g,'').slice(0,16).toUpperCase();
+      // Salva codice→fileId nel localStorage per decodifica
+      const invites = JSON.parse(localStorage.getItem('dm_invites') || '{}');
+      invites[code] = _fileId;
+      localStorage.setItem('dm_invites', JSON.stringify(invites));
+      return { code, fileId: _fileId };
+    } catch(e) {
+      Debug.warn('GDrive invite error:', e);
+      return null;
+    }
+  };
+
+  // ── Accetta invito ──
+  const acceptInvite = async (code) => {
+    if (!_loggedIn) { await _login(); if (!_loggedIn) return false; }
+    // Il fileId è il codice stesso (semplificato) o mappato
+    let fileId = null;
+    // Prima prova nel localStorage locale
+    const invites = JSON.parse(localStorage.getItem('dm_invites') || '{}');
+    if (invites[code]) { fileId = invites[code]; }
+    else {
+      // Prova a decodificare (il DM potrebbe aver condiviso il fileId diretto)
+      try { fileId = atob(code + '=='.slice(0, (4 - code.length % 4) % 4)); } catch(e) {}
+    }
+    if (!fileId) {
+      // Usa il codice come fileId diretto
+      fileId = code;
+    }
+    try {
+      const data = await load(fileId);
+      if (!data?.campagna) { Toast.show('Codice non valido o campagna non trovata', 'error'); return false; }
+      _fileId = fileId;
+      localStorage.setItem('dm_gdrive_fileid', fileId);
+      return data.campagna;
+    } catch(e) {
+      Toast.show('Errore accesso: ' + (e.message||''), 'error');
+      return false;
+    }
   };
 
   const _saveClientId = () => {
     const id = document.getElementById('gdrive-client-id-input')?.value?.trim();
     if (!id) { Toast.show('Inserisci il Client ID', 'warning'); return; }
+    CLIENT_ID = id;
     localStorage.setItem('dm_gdrive_client_id', id);
     Modal.close('gdrive-setup');
-    Toast.show('Client ID salvato — ricarica la pagina per connettere Drive', 'success', 4000);
+    Toast.show('Client ID salvato — ricarica la pagina', 'success', 3000);
   };
-  return { init, toggleLogin, sync, load, _saveClientId };
-})();
 
+  const isLoggedIn = () => _loggedIn;
+  const getFileId = () => _fileId;
+
+  return { init, toggleLogin, logout, save, load, generateInvite, acceptInvite, isLoggedIn, getFileId, _saveClientId };
+})();
 
 
 // ══ WIKI VIEW MODE ══
@@ -13060,6 +13362,541 @@ const wikiDuplicaNote = () => {
   WikiDM.openNote(uid);
   Toast.show('📄 Nota duplicata', 'success', 1500);
 };
+
+
+
+// ══ GOOGLE DRIVE UI ══
+// Carica gapi al primo accesso
+const _loadGapi = (clientId) => new Promise((resolve, reject) => {
+  if (window.gapi?.auth2) { resolve(); return; }
+  const script = document.createElement('script');
+  script.src = 'https://apis.google.com/js/api.js';
+  script.onload = () => {
+    gapi.load('client:auth2', () => {
+      gapi.client.init({
+        clientId,
+        scope: 'https://www.googleapis.com/auth/drive.file',
+        discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest'],
+      }).then(resolve).catch(reject);
+    });
+  };
+  script.onerror = reject;
+  document.head.appendChild(script);
+});
+
+const GDriveUI = (() => {
+  const syncNow = async () => {
+    const camp = App.getActiveCampaign();
+    if (!camp) { Toast.show('Nessuna campagna attiva', 'warning'); return; }
+    Toast.show('Salvataggio su Drive...', 'info', 2000);
+    const ok = await GDrive.save(camp);
+    if (ok) {
+      Toast.show('✓ Campagna salvata su Drive', 'success', 2000);
+    } else {
+      Toast.show('Errore salvataggio Drive', 'error');
+    }
+  };
+
+  const generateInvite = async () => {
+    const inp = document.getElementById('gdrive-invite-code');
+    const hint = document.getElementById('gdrive-invite-hint');
+    if (inp) inp.value = 'Generazione...';
+    const result = await GDrive.generateInvite();
+    if (result) {
+      if (inp) inp.value = result.code;
+      if (hint) hint.textContent = '✓ Codice generato — condividilo con il co-autore. È valido finché la campagna è su Drive.';
+      // Copia negli appunti
+      try { await navigator.clipboard.writeText(result.code); if (hint) hint.textContent += ' (copiato!)'} catch(e) {}
+    } else {
+      if (inp) inp.value = '';
+      if (hint) hint.textContent = '✗ Errore — salva prima la campagna su Drive.';
+    }
+  };
+
+  const joinCampaign = async () => {
+    const code = document.getElementById('gdrive-join-code')?.value?.trim().toUpperCase();
+    if (!code) { Toast.show('Inserisci un codice', 'warning'); return; }
+    Toast.show('Accesso alla campagna...', 'info', 2000);
+    const campagna = await GDrive.acceptInvite(code);
+    if (campagna) {
+      // Importa la campagna
+      if (campagna.id) {
+        // Controlla se esiste già
+        const existing = Storage.getCampaigns().find(c => c.id === campagna.id);
+        if (existing) {
+          // Aggiorna
+          Storage.updateCampaign(campagna.id, campagna);
+          Toast.show('✓ Campagna sincronizzata: ' + campagna.name, 'success', 3000);
+        } else {
+          // Crea nuova
+          Storage.createCampaign(campagna);
+          Toast.show('✓ Campagna aggiunta: ' + campagna.name, 'success', 3000);
+        }
+        App.init();
+        Modal.close('gdrive-options');
+      }
+    }
+  };
+
+  // Aggiorna info utente nel modal
+  const updateUserInfo = (userInfo) => {
+    const el = document.getElementById('gdrive-user-name');
+    if (el && userInfo) {
+      el.innerHTML = '<strong>' + (userInfo.name||'') + '</strong><br><span style="font-size:0.72rem;color:var(--text-muted);">' + (userInfo.email||'') + '</span>';
+    }
+  };
+
+  // Init: carica gapi se clientId è già configurato
+  const init = async () => {
+    const clientId = localStorage.getItem('dm_gdrive_client_id');
+    if (!clientId) return;
+    try {
+      await _loadGapi(clientId);
+      GDrive.init();
+      // Auto-login silenzioso se già autorizzato
+      const authInstance = gapi.auth2.getAuthInstance();
+      if (authInstance.isSignedIn.get()) {
+        const profile = authInstance.currentUser.get().getBasicProfile();
+        GDrive._loggedIn = true;
+        GDrive._userInfo = { name: profile.getName(), email: profile.getEmail() };
+        GDrive._updateBtn();
+        updateUserInfo(GDrive._userInfo);
+      }
+    } catch(e) {
+      Debug.warn('GDrive init:', e);
+    }
+  };
+
+  return { syncNow, generateInvite, joinCampaign, updateUserInfo, init };
+})();
+
+
+
+// ══ FIREBASE SYNC — Auth + Realtime Database + Collaborazione ══
+const FirebaseSync = (() => {
+  let _app = null;
+  let _db  = null;
+  let _auth = null;
+  let _user = null;
+  let _campRef = null;      // riferimento Firebase alla campagna attiva
+  let _presenceRef = null;  // riferimento presenza utente
+  let _listening = false;
+  let _lastSyncAt = null;
+  let _syncTimeout = null;
+
+  // ── Config ──
+  const _getConfig = () => {
+    try { return JSON.parse(localStorage.getItem('dm_firebase_config') || 'null'); } catch(e) { return null; }
+  };
+  const _saveConfig = (cfg) => localStorage.setItem('dm_firebase_config', JSON.stringify(cfg));
+
+  // ── Init ──
+  const init = () => {
+    const cfg = _getConfig();
+    if (!cfg) return; // non configurato
+
+    try {
+      // Inizializza Firebase (evita doppio init)
+      if (!firebase.apps.length) {
+        _app = firebase.initializeApp(cfg);
+      } else {
+        _app = firebase.apps[0];
+      }
+      _db   = firebase.database();
+      _auth = firebase.auth();
+
+      // Mostra pulsante auth
+      const btn = document.getElementById('fb-auth-btn');
+      if (btn) btn.style.display = 'flex';
+
+      // Observer stato auth
+      _auth.onAuthStateChanged(user => {
+        _user = user;
+        _updateAuthBtn();
+        if (user) {
+          _onLogin(user);
+        } else {
+          _onLogout();
+        }
+      });
+    } catch(e) {
+      Debug.warn('Firebase init error:', e.message);
+    }
+  };
+
+  // ── Auth ──
+  // ── Modalità ──
+  // 'local' | 'anonymous' | 'google'
+  let _mode = localStorage.getItem('dm_auth_mode') || 'local';
+
+  const useLocal = () => {
+    _mode = 'local';
+    localStorage.setItem('dm_auth_mode', 'local');
+    if (_auth && _user?.isAnonymous) _auth.signOut();
+    _updateAuthBtn();
+    Toast.show('💾 Modalità locale attivata', 'info', 2000);
+  };
+
+  const loginAnonymous = async () => {
+    if (!_auth) { Modal.open('firebase-setup'); return; }
+    try {
+      await _auth.signInAnonymously();
+      _mode = 'anonymous';
+      localStorage.setItem('dm_auth_mode', 'anonymous');
+      Toast.show('👤 Accesso anonimo — dati salvati sul cloud', 'success', 2500);
+    } catch(e) {
+      Toast.show('Errore accesso anonimo: ' + (e.message||''), 'error');
+    }
+  };
+
+  const loginGoogle = async () => {
+    if (!_auth) { Modal.open('firebase-setup'); return; }
+    try {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      if (_user?.isAnonymous) {
+        // Upgrade: collega account anonimo a Google
+        await _user.linkWithPopup(provider);
+        Toast.show('✓ Account Google collegato — dati mantenuti', 'success');
+      } else {
+        await _auth.signInWithPopup(provider);
+      }
+      _mode = 'google';
+      localStorage.setItem('dm_auth_mode', 'google');
+    } catch(e) {
+      if (e.code === 'auth/credential-already-in-use') {
+        // Account Google già usato — fai login normale
+        const provider = new firebase.auth.GoogleAuthProvider();
+        await _auth.signInWithPopup(provider);
+      } else {
+        Toast.show('Login fallito: ' + (e.message||''), 'error');
+      }
+    }
+  };
+
+  // Alias per compatibilità
+  const _loginGoogle = loginGoogle;
+
+  const upgradeToGoogle = () => loginGoogle();
+
+  const switchMode = () => {
+    Modal.close('collab');
+    Modal.open('auth-choice');
+  };
+
+  const toggleAuth = () => {
+    const cfg = _getConfig();
+    if (!cfg) { Modal.open('firebase-setup'); return; }
+    if (_user) {
+      Modal.open('collab');
+      _updateCollabModal();
+    } else {
+      Modal.open('auth-choice');
+    }
+  };
+
+  const logout = () => {
+    _auth?.signOut();
+    Modal.close('collab');
+  };
+
+  const _onLogin = (user) => {
+    _updateAuthBtn();
+    if (user.isAnonymous) {
+      Toast.show('👤 Accesso anonimo attivo', 'info', 2000);
+    } else {
+      Toast.show('✓ Benvenuto ' + (user.displayName||user.email).split(' ')[0], 'success', 2000);
+    }
+    // Se c'è una campagna attiva, avvia la sync
+    const camp = App.getActiveCampaign();
+    if (camp) _startSync(camp.id);
+  };
+
+  const _onLogout = () => {
+    _stopSync();
+    _updateAuthBtn();
+    const presence = document.getElementById('fb-presence');
+    if (presence) presence.style.display = 'none';
+  };
+
+  const _updateAuthBtn = () => {
+    const btn   = document.getElementById('fb-auth-btn');
+    const icon  = document.getElementById('fb-auth-icon');
+    const label = document.getElementById('fb-auth-label');
+    if (!btn) return;
+    if (_user?.isAnonymous) {
+      if (icon) icon.textContent = '👤';
+      if (label) label.textContent = 'Anonimo';
+      btn.style.borderColor = 'var(--border-strong)';
+      btn.style.color = 'var(--text-muted)';
+    } else if (_user) {
+      if (icon) icon.textContent = '🔑';
+      if (label) label.textContent = (_user.displayName||_user.email||'').split(' ')[0];
+      btn.style.borderColor = 'var(--accent-secondary)';
+      btn.style.color = 'var(--accent-secondary)';
+    } else {
+      if (icon) icon.textContent = '☁️';
+      if (label) label.textContent = 'Accedi';
+      btn.style.borderColor = 'var(--border)';
+      btn.style.color = 'var(--text-muted)';
+    }
+  };
+
+  // ── Sync campagna ──
+  const _campKey = (campId) =>
+    'dm_toolkit_' + campId.replace(/[^a-zA-Z0-9]/g,'_');
+
+  const _startSync = (campId) => {
+    if (!_db || !_user) return;
+    _stopSync();
+    const key = _campKey(campId);
+    _campRef = _db.ref('campagne/' + key);
+    _presenceRef = _db.ref('campagne/' + key + '/presenza/' + _user.uid);
+
+    // Registra presenza
+    _presenceRef.set({
+      nome: _user.displayName || _user.email,
+      foto: _user.photoURL || null,
+      online: true,
+      at: firebase.database.ServerValue.TIMESTAMP,
+    });
+    // Rimuove presenza quando offline
+    _presenceRef.onDisconnect().remove();
+
+    // Ascolta presenza altri utenti
+    _db.ref('campagne/' + key + '/presenza').on('value', snap => {
+      const presence = snap.val() || {};
+      _renderPresence(presence);
+    });
+
+    // Ascolta modifiche alla campagna in tempo reale
+    _campRef.child('data').on('value', snap => {
+      const remote = snap.val();
+      if (!remote) return;
+      if (remote.updatedAt <= (_lastSyncAt || 0)) return; // già aggiornato
+      // Controlla se la modifica è nostra
+      if (remote.updatedBy === _user.uid) return;
+      // Merge con la versione locale
+      _mergeRemote(remote);
+    });
+
+    _listening = true;
+    _updateSyncStatus('In ascolto...');
+  };
+
+  const _stopSync = () => {
+    if (_campRef) { _campRef.off(); _campRef = null; }
+    if (_presenceRef) { _presenceRef.remove(); _presenceRef = null; }
+    _listening = false;
+  };
+
+  // ── Salva su Firebase ── (chiamato ad ogni save locale)
+  const push = (camp) => {
+    if (!_db || !_user || !_campRef) return;
+    // Debounce: aspetta 2 secondi prima di pushare
+    if (_syncTimeout) clearTimeout(_syncTimeout);
+    _syncTimeout = setTimeout(async () => {
+      try {
+        await _campRef.child('data').set({
+          ...camp,
+          updatedAt: firebase.database.ServerValue.TIMESTAMP,
+          updatedBy: _user.uid,
+          updatedByName: _user.displayName || _user.email,
+        });
+        _lastSyncAt = Date.now();
+        _updateSyncStatus('Sync: ' + new Date().toLocaleTimeString('it-IT'));
+      } catch(e) {
+        Debug.warn('Firebase push error:', e.message);
+      }
+    }, 2000);
+  };
+
+  // ── Sincronizza ora ──
+  const syncNow = () => {
+    const camp = App.getActiveCampaign();
+    if (!camp) return;
+    if (!_user) { Toast.show('Accedi prima', 'warning'); return; }
+    if (!_campRef) { _startSync(camp.id); }
+    push(camp);
+    Toast.show('☁️ Sync inviata', 'success', 1500);
+  };
+
+  // ── Merge dati remoti ──
+  const _mergeRemote = (remote) => {
+    const local = App.getActiveCampaign();
+    if (!local || local.id !== remote.id) return;
+
+    // Merge semplice: prende la versione più recente per ogni sezione
+    const merged = { ...local };
+
+    // Wiki: merge per nota (quella più recente vince)
+    if (remote.wiki) {
+      const localWiki = local.wiki || {};
+      ['lore','sessioni'].forEach(sec => {
+        const remNotes = remote.wiki[sec] || [];
+        const locNotes = localWiki[sec] || [];
+        const noteMap = {};
+        locNotes.forEach(n => noteMap[n.id] = n);
+        remNotes.forEach(n => {
+          if (!noteMap[n.id] || (n.aggiornatoAt||0) > (noteMap[n.id].aggiornatoAt||0)) {
+            noteMap[n.id] = n;
+          }
+        });
+        merged.wiki = merged.wiki || {};
+        merged.wiki[sec] = Object.values(noteMap).sort((a,b) => (b.aggiornatoAt||0)-(a.aggiornatoAt||0));
+      });
+    }
+
+    // PNG: merge per id
+    if (remote.npcs) {
+      const locMap = {};
+      (local.npcs||[]).forEach(n => locMap[n.id] = n);
+      (remote.npcs||[]).forEach(n => {
+        if (!locMap[n.id]) locMap[n.id] = n; // nuovo da remoto
+        // se stesso id, mantieni locale (l'utente potrebbe stare modificando)
+      });
+      merged.npcs = Object.values(locMap);
+    }
+
+    // Salva il merge localmente
+    App.saveActiveCampaign(merged);
+    _lastSyncAt = Date.now();
+
+    // Avviso discreto
+    const nome = remote.updatedByName || 'Co-autore';
+    Toast.show('📥 ' + nome + ' ha salvato modifiche', 'info', 2500);
+    _updateSyncStatus('Ricevuto da ' + nome + ' · ' + new Date().toLocaleTimeString('it-IT'));
+  };
+
+  // ── Presenza ──
+  const _renderPresence = (presence) => {
+    const bar = document.getElementById('fb-presence');
+    if (!bar) return;
+    const others = Object.entries(presence)
+      .filter(([uid]) => uid !== _user?.uid && uid !== 'data')
+      .map(([, v]) => v);
+    if (!others.length) { bar.style.display = 'none'; return; }
+    bar.style.display = 'flex';
+    bar.innerHTML = others.map(u =>
+      '<span style="display:inline-flex;align-items:center;gap:3px;" title="' + (u.nome||'Co-autore') + ' è online">' +
+      '<span style="width:7px;height:7px;background:#69cc85;border-radius:50%;"></span>' +
+      '<span style="font-size:0.72rem;">' + (u.nome||'Co-autore').split(' ')[0] + '</span>' +
+      '</span>'
+    ).join(' · ');
+  };
+
+  // ── Invito campagna ──
+  const getCampCode = () => {
+    const camp = App.getActiveCampaign();
+    if (!camp) return null;
+    return _campKey(camp.id).toUpperCase().slice(0,12);
+  };
+
+  const copyCode = () => {
+    const code = getCampCode();
+    if (!code) return;
+    navigator.clipboard?.writeText(code).then(() => Toast.show('Codice copiato!', 'success', 1500));
+  };
+
+  const joinCampaign = async () => {
+    const code = document.getElementById('collab-join-code')?.value?.trim().toUpperCase();
+    if (!code || !_db) { Toast.show('Inserisci un codice valido', 'warning'); return; }
+    if (!_user) { Toast.show('Accedi prima', 'warning'); return; }
+    try {
+      const snap = await _db.ref('campagne/' + code.toLowerCase() + '/data').get();
+      const remote = snap.val();
+      if (!remote) { Toast.show('Campagna non trovata — verifica il codice', 'error'); return; }
+      // Importa/aggiorna la campagna
+      const existing = Storage.getCampaigns?.()?.find(c => _campKey(c.id).toUpperCase().slice(0,12) === code);
+      if (existing) {
+        App.saveActiveCampaign(remote);
+        Toast.show('✓ Campagna aggiornata: ' + (remote.name||''), 'success');
+      } else {
+        // Crea nuova campagna locale
+        remote.id = remote.id || ('collab_' + Date.now());
+        Storage.updateCampaign?.(remote.id, remote) || Storage.createCampaign?.(remote);
+        Toast.show('✓ Campagna aggiunta: ' + (remote.name||''), 'success');
+        App.init?.();
+      }
+      Modal.close('collab');
+      _startSync(remote.id);
+    } catch(e) {
+      Toast.show('Errore accesso: ' + (e.message||''), 'error');
+    }
+  };
+
+  // ── Update UI collab modal ──
+  const _updateCollabModal = () => {
+    if (!_user) return;
+    const nameEl    = document.getElementById('collab-user-name');
+    const emailEl   = document.getElementById('collab-user-email');
+    const photoEl   = document.getElementById('collab-user-photo');
+    const placEl    = document.getElementById('collab-user-placeholder');
+    const codeEl    = document.getElementById('collab-camp-code');
+    const upgradeEl = document.getElementById('collab-upgrade-section');
+
+    if (_user.isAnonymous) {
+      if (nameEl)  nameEl.textContent  = 'Utente anonimo';
+      if (emailEl) emailEl.textContent = 'Nessun account collegato';
+      if (upgradeEl) upgradeEl.style.display = '';
+      // Nascondi sezione invito per anonimi
+      const codeSection = codeEl?.closest('div[style*="border-top"]');
+    } else {
+      if (nameEl)  nameEl.textContent  = _user.displayName || '';
+      if (emailEl) emailEl.textContent = _user.email || '';
+      if (upgradeEl) upgradeEl.style.display = 'none';
+      if (_user.photoURL && photoEl) {
+        photoEl.src = _user.photoURL;
+        photoEl.style.display = '';
+        if (placEl) placEl.style.display = 'none';
+      }
+    }
+    if (codeEl) {
+      const code = getCampCode();
+      codeEl.textContent = _user.isAnonymous ? '(accedi con Google per collaborare)' : (code || '(salva una campagna)');
+    }
+  };
+
+  const _updateSyncStatus = (msg) => {
+    const el = document.getElementById('collab-last-sync');
+    if (el) el.textContent = msg;
+  };
+
+  // ── Salva config ──
+  const saveConfig = () => {
+    const raw = document.getElementById('fb-config-input')?.value?.trim();
+    if (!raw) { Toast.show('Incolla la configurazione Firebase', 'warning'); return; }
+    try {
+      // Accetta sia oggetto JS che JSON
+      const cfg = new Function('return (' + raw + ')')();
+      if (!cfg.apiKey || !cfg.databaseURL) {
+        Toast.show('Config non valida — assicurati di includere apiKey e databaseURL', 'error');
+        return;
+      }
+      _saveConfig(cfg);
+      Modal.close('firebase-setup');
+      Toast.show('Config salvata — ricarica la pagina per attivare Firebase', 'success', 4000);
+    } catch(e) {
+      Toast.show('Errore nel formato config: ' + e.message, 'error');
+    }
+  };
+
+  // Notifica quando la campagna viene salvata localmente → push su Firebase
+  const onCampagnaSaved = (camp) => {
+    if (_user && _campRef) push(camp);
+  };
+
+  // Avvia sync quando si naviga alla campagna
+  const onCampagnaActivated = (campId) => {
+    if (_user && campId) _startSync(campId);
+  };
+
+  return {
+    init, toggleAuth, logout, saveConfig,
+    loginAnonymous, loginGoogle, useLocal, upgradeToGoogle, switchMode,
+    syncNow, push, onCampagnaSaved, onCampagnaActivated,
+    getCampCode, copyCode, joinCampaign,
+  };
+})();
 
 
 /* ── INIT ── */
@@ -15463,6 +16300,9 @@ document.addEventListener('DOMContentLoaded', () => {
   );
   App.init();
   BackupSystem.autoBackup();
+  // Inizializza Google Drive se configurato
+  setTimeout(() => { try { GDriveUI.init(); } catch(e) {} }, 1000);
+  setTimeout(() => { try { FirebaseSync.init(); } catch(e) {} }, 500);
   // Carica cache mostri e compendio in background
   setTimeout(() => MonsterCache.load(), 500);
 
@@ -15607,24 +16447,231 @@ document.addEventListener('DOMContentLoaded', initMobileNav);
 <div class="modal-overlay hidden" id="modal-gdrive-setup" style="display:none;" onclick="if(event.target===this)Modal.close('gdrive-setup')">
   <div class="modal" style="max-width:480px;">
     <div class="modal-header">
-      <h3 class="modal-title">☁️ Configura Google Drive Sync</h3>
+      <h3 class="modal-title">☁️ Configura Google Drive</h3>
       <button class="btn btn-ghost btn-icon-sm" onclick="Modal.close('gdrive-setup')">✕</button>
     </div>
     <div class="modal-body" style="font-size:0.85rem;line-height:1.7;">
-      <p>Per sincronizzare la campagna su Google Drive è necessario un <strong>Client ID OAuth 2.0</strong> gratuito.</p>
+      <p>Per sincronizzare e collaborare tramite Google Drive ti serve un <strong>Client ID OAuth 2.0</strong> gratuito.</p>
       <ol style="padding-left:1.4em;margin:10px 0;">
         <li>Vai su <a href="https://console.cloud.google.com" target="_blank" style="color:#5ba4f5;">console.cloud.google.com</a></li>
-        <li>Crea un progetto → Abilita <strong>Google Drive API</strong></li>
-        <li>Credenziali → Crea OAuth 2.0 Client ID → tipo <strong>Web</strong></li>
+        <li>Crea progetto → abilita <strong>Google Drive API</strong></li>
+        <li>Credenziali → OAuth 2.0 Client ID → tipo <strong>Web</strong></li>
         <li>Aggiungi <code style="background:var(--bg-tertiary);padding:1px 5px;border-radius:3px;">https://gdr-sys.github.io</code> come origine autorizzata</li>
-        <li>Copia il Client ID e incollalo qui sotto</li>
+        <li>Copia il Client ID qui sotto</li>
       </ol>
       <input id="gdrive-client-id-input" type="text" class="form-input" placeholder="xxxxxx.apps.googleusercontent.com" style="margin-bottom:8px;">
-      <p style="font-size:0.75rem;color:var(--text-muted);">Il Client ID viene salvato in localStorage sul tuo dispositivo, non sui server.</p>
+      <p style="font-size:0.75rem;color:var(--text-muted);">Il Client ID viene salvato solo sul tuo dispositivo.</p>
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="Modal.close('gdrive-setup')">Annulla</button>
       <button class="btn btn-primary" onclick="GDrive._saveClientId()">Salva e connetti</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal opzioni Google Drive (quando già connesso) -->
+<div class="modal-overlay hidden" id="modal-gdrive-options" style="display:none;" onclick="if(event.target===this)Modal.close('gdrive-options')">
+  <div class="modal" style="max-width:440px;">
+    <div class="modal-header">
+      <h3 class="modal-title">☁️ Google Drive</h3>
+      <button class="btn btn-ghost btn-icon-sm" onclick="Modal.close('gdrive-options')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="gdrive-user-info" style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--bg-secondary);border-radius:var(--radius-md);margin-bottom:16px;">
+        <div style="width:36px;height:36px;background:var(--accent-primary);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:1rem;">👤</div>
+        <div id="gdrive-user-name" style="font-size:0.88rem;"></div>
+      </div>
+
+      <!-- Salva su Drive -->
+      <div style="margin-bottom:12px;">
+        <button class="btn btn-primary w-full" onclick="GDriveUI.syncNow()">
+          ☁️ Salva campagna su Drive
+        </button>
+      </div>
+
+      <!-- Invita collaboratore -->
+      <div style="border-top:1px solid var(--border);padding-top:12px;margin-bottom:12px;">
+        <div style="font-family:var(--font-display);font-size:0.82rem;font-weight:600;margin-bottom:8px;">👥 Invita collaboratore</div>
+        <p style="font-size:0.78rem;color:var(--text-muted);margin-bottom:8px;">Genera un codice da condividere con il co-autore.</p>
+        <div style="display:flex;gap:8px;">
+          <input id="gdrive-invite-code" type="text" class="form-input" placeholder="Codice generato qui..." readonly style="flex:1;font-family:var(--font-mono);font-size:0.9rem;letter-spacing:0.1em;" onclick="this.select()">
+          <button class="btn btn-secondary" onclick="GDriveUI.generateInvite()">Genera</button>
+        </div>
+        <div id="gdrive-invite-hint" style="font-size:0.72rem;color:var(--text-muted);margin-top:6px;"></div>
+      </div>
+
+      <!-- Unisciti con codice -->
+      <div style="border-top:1px solid var(--border);padding-top:12px;margin-bottom:12px;">
+        <div style="font-family:var(--font-display);font-size:0.82rem;font-weight:600;margin-bottom:8px;">🔑 Unisciti a una campagna</div>
+        <p style="font-size:0.78rem;color:var(--text-muted);margin-bottom:8px;">Hai un codice invito? Inseriscilo per accedere alla campagna condivisa.</p>
+        <div style="display:flex;gap:8px;">
+          <input id="gdrive-join-code" type="text" class="form-input" placeholder="Inserisci codice..." style="flex:1;font-family:var(--font-mono);text-transform:uppercase;" maxlength="20">
+          <button class="btn btn-primary" onclick="GDriveUI.joinCampaign()">Accedi</button>
+        </div>
+      </div>
+
+      <!-- Disconnect -->
+      <div style="border-top:1px solid var(--border);padding-top:12px;">
+        <button class="btn btn-ghost btn-sm" onclick="GDrive.logout()" style="color:var(--accent-danger);">Disconnetti Google Drive</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Configura Firebase -->
+<div class="modal-overlay hidden" id="modal-firebase-setup" style="display:none;" onclick="if(event.target===this)Modal.close('firebase-setup')">
+  <div class="modal" style="max-width:520px;">
+    <div class="modal-header">
+      <h3 class="modal-title">🔥 Configura Firebase</h3>
+      <button class="btn btn-ghost btn-icon-sm" onclick="Modal.close('firebase-setup')">✕</button>
+    </div>
+    <div class="modal-body" style="font-size:0.85rem;line-height:1.7;">
+      <p>Firebase è <strong>gratuito</strong> e permette collaborazione in tempo reale. Setup in 5 minuti:</p>
+      <ol style="padding-left:1.4em;margin:10px 0 16px;">
+        <li>Vai su <a href="https://console.firebase.google.com" target="_blank" style="color:#f5a623;">console.firebase.google.com</a></li>
+        <li>Crea progetto → abilita <strong>Google Authentication</strong></li>
+        <li>Crea <strong>Realtime Database</strong> (modalità test)</li>
+        <li>Impostazioni progetto → Aggiungi app Web → copia la config</li>
+        <li>Aggiungi <code style="background:var(--bg-tertiary);padding:1px 5px;border-radius:3px;">gdr-sys.github.io</code> ai domini autorizzati</li>
+      </ol>
+      <div style="background:var(--bg-secondary);border-radius:var(--radius-md);padding:10px;margin-bottom:12px;">
+        <div style="font-size:0.72rem;color:var(--text-muted);margin-bottom:6px;">Incolla qui la tua Firebase config (oggetto JS):</div>
+        <textarea id="fb-config-input" rows="8" class="form-textarea" style="font-family:var(--font-mono);font-size:0.72rem;" placeholder='{
+  "apiKey": "...",
+  "authDomain": "...",
+  "databaseURL": "...",
+  "projectId": "...",
+  "storageBucket": "...",
+  "messagingSenderId": "...",
+  "appId": "..."
+}'></textarea>
+      </div>
+      <p style="font-size:0.72rem;color:var(--text-muted);">La config viene salvata nel tuo browser. Non contiene dati sensibili — è la configurazione pubblica dell'app.</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="Modal.close('firebase-setup')">Annulla</button>
+      <button class="btn btn-primary" onclick="FirebaseSync.saveConfig()">Salva e connetti</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Scegli come entrare -->
+<div class="modal-overlay hidden" id="modal-auth-choice" style="display:none;" onclick="if(event.target===this)Modal.close('auth-choice')">
+  <div class="modal" style="max-width:400px;">
+    <div class="modal-header">
+      <h3 class="modal-title">🎲 Benvenuto nel DM Toolkit</h3>
+      <button class="btn btn-ghost btn-icon-sm" onclick="Modal.close('auth-choice')">✕</button>
+    </div>
+    <div class="modal-body" style="display:flex;flex-direction:column;gap:10px;padding:20px;">
+
+      <!-- Opzione 1: Locale -->
+      <button class="btn btn-ghost" style="padding:14px;text-align:left;border:1px solid var(--border);border-radius:var(--radius-md);"
+        onclick="FirebaseSync.useLocal();Modal.close('auth-choice')">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <span style="font-size:1.4rem;">💾</span>
+          <div>
+            <div style="font-family:var(--font-display);font-size:0.9rem;font-weight:600;">Solo locale</div>
+            <div style="font-size:0.75rem;color:var(--text-muted);">Dati salvati nel browser. Nessun account richiesto.</div>
+          </div>
+        </div>
+      </button>
+
+      <!-- Opzione 2: Anonimo -->
+      <button class="btn btn-ghost" style="padding:14px;text-align:left;border:1px solid var(--border);border-radius:var(--radius-md);"
+        onclick="FirebaseSync.loginAnonymous();Modal.close('auth-choice')">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <span style="font-size:1.4rem;">👤</span>
+          <div>
+            <div style="font-family:var(--font-display);font-size:0.9rem;font-weight:600;">Anonimo</div>
+            <div style="font-size:0.75rem;color:var(--text-muted);">Dati sul cloud, nessun account. Puoi passare a Google in seguito.</div>
+          </div>
+        </div>
+      </button>
+
+      <!-- Opzione 3: Google -->
+      <button class="btn btn-ghost" style="padding:14px;text-align:left;border:1px solid var(--border);border-radius:var(--radius-md);"
+        onclick="FirebaseSync.loginGoogle();Modal.close('auth-choice')">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <span style="font-size:1.4rem;">🔑</span>
+          <div>
+            <div style="font-family:var(--font-display);font-size:0.9rem;font-weight:600;">Accedi con Google</div>
+            <div style="font-size:0.75rem;color:var(--text-muted);">Sync multi-dispositivo e collaborazione con co-autori.</div>
+          </div>
+        </div>
+      </button>
+
+      <div style="font-size:0.7rem;color:var(--text-muted);text-align:center;margin-top:4px;">
+        Puoi cambiare modalità in qualsiasi momento dalle impostazioni.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Invita collaboratore -->
+<div class="modal-overlay hidden" id="modal-collab" style="display:none;" onclick="if(event.target===this)Modal.close('collab')">
+  <div class="modal" style="max-width:440px;">
+    <div class="modal-header">
+      <h3 class="modal-title">👥 Collaborazione</h3>
+      <button class="btn btn-ghost btn-icon-sm" onclick="Modal.close('collab')">✕</button>
+    </div>
+    <div class="modal-body">
+      <!-- Info utente -->
+      <div id="collab-user-info" style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--bg-secondary);border-radius:var(--radius-md);margin-bottom:16px;">
+        <img id="collab-user-photo" src="" style="width:36px;height:36px;border-radius:50%;display:none;">
+        <div id="collab-user-placeholder" style="width:36px;height:36px;background:var(--accent-primary);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;">👤</div>
+        <div>
+          <div id="collab-user-name" style="font-size:0.88rem;font-weight:600;"></div>
+          <div id="collab-user-email" style="font-size:0.72rem;color:var(--text-muted);"></div>
+        </div>
+      </div>
+
+      <!-- Co-autori online -->
+      <div id="collab-online" style="margin-bottom:16px;display:none;">
+        <div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:6px;font-family:var(--font-display);text-transform:uppercase;letter-spacing:0.05em;">🟢 Online ora</div>
+        <div id="collab-online-list" style="display:flex;flex-wrap:wrap;gap:6px;"></div>
+      </div>
+
+      <!-- Invita -->
+      <div style="border-top:1px solid var(--border);padding-top:14px;margin-bottom:14px;">
+        <div style="font-family:var(--font-display);font-size:0.85rem;font-weight:600;margin-bottom:6px;">📨 Invita co-autore</div>
+        <p style="font-size:0.78rem;color:var(--text-muted);margin-bottom:8px;">Condividi il codice campagna — il co-autore lo inserisce per accedere.</p>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <code id="collab-camp-code" style="flex:1;background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-md);padding:8px 12px;font-size:0.9rem;letter-spacing:0.12em;text-align:center;cursor:pointer;" onclick="FirebaseSync.copyCode()" title="Clicca per copiare">—</code>
+          <button class="btn btn-ghost btn-sm" onclick="FirebaseSync.copyCode()">📋 Copia</button>
+        </div>
+        <div style="font-size:0.7rem;color:var(--text-muted);margin-top:4px;">Il codice è il nome della campagna su Firebase. Chiunque lo abbia può accedere.</div>
+      </div>
+
+      <!-- Unisciti -->
+      <div style="border-top:1px solid var(--border);padding-top:14px;margin-bottom:14px;">
+        <div style="font-family:var(--font-display);font-size:0.85rem;font-weight:600;margin-bottom:6px;">🔑 Unisciti a una campagna</div>
+        <div style="display:flex;gap:8px;">
+          <input id="collab-join-code" type="text" class="form-input" placeholder="Codice campagna..." style="flex:1;font-family:var(--font-mono);text-transform:uppercase;" oninput="this.value=this.value.toUpperCase()">
+          <button class="btn btn-primary btn-sm" onclick="FirebaseSync.joinCampaign()">Accedi</button>
+        </div>
+      </div>
+
+      <!-- Sync status -->
+      <div id="collab-sync-status" style="border-top:1px solid var(--border);padding-top:12px;font-size:0.75rem;color:var(--text-muted);display:flex;align-items:center;justify-content:space-between;">
+        <span id="collab-last-sync">Nessuna sync</span>
+        <button class="btn btn-ghost btn-sm" onclick="FirebaseSync.syncNow()">↻ Sincronizza</button>
+      </div>
+
+      <!-- Upgrade anonimo → Google -->
+      <div id="collab-upgrade-section" style="border-top:1px solid var(--border);padding-top:12px;margin-top:4px;display:none;">
+        <div style="font-size:0.78rem;color:var(--text-muted);margin-bottom:6px;">
+          Stai usando un account anonimo. Passa a Google per collaborare e sincronizzare su più dispositivi.
+        </div>
+        <button class="btn btn-secondary btn-sm" onclick="FirebaseSync.upgradeToGoogle()">
+          🔑 Collega account Google
+        </button>
+      </div>
+
+      <!-- Logout -->
+      <div style="margin-top:12px;display:flex;gap:8px;align-items:center;">
+        <button class="btn btn-ghost btn-sm" onclick="FirebaseSync.logout()" style="color:var(--accent-danger);font-size:0.75rem;">Esci</button>
+        <button class="btn btn-ghost btn-sm" onclick="FirebaseSync.switchMode()" style="font-size:0.75rem;">Cambia modalità</button>
+      </div>
     </div>
   </div>
 </div>
