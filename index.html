@@ -245,6 +245,7 @@
 
     <!-- Footer sidebar -->
     <div class="sidebar-footer">
+      <button class="btn btn-ghost btn-icon" onclick="Settings.open()" aria-label="Impostazioni" title="Impostazioni"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
       <button class="sidebar-toggle" onclick="App.toggleSidebar()" aria-label="Comprimi/espandi sidebar" data-tooltip="Comprimi sidebar">
         <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
       </button>
@@ -12585,6 +12586,153 @@ const ExportPDF = (() => {
   </div>
 </div>
 
+
+<!-- Modal: Impostazioni -->
+<div class="modal-overlay hidden" id="modal-settings" style="display:none;" onclick="if(event.target===this)Modal.close('settings')">
+  <div class="modal" style="max-width:520px;max-height:90vh;overflow-y:auto;">
+    <div class="modal-header" style="position:sticky;top:0;background:var(--bg-card);z-index:1;">
+      <h3 class="modal-title">Impostazioni</h3>
+      <button class="btn btn-ghost btn-icon-sm" onclick="Modal.close('settings')">✕</button>
+    </div>
+    <div class="modal-body" style="display:flex;flex-direction:column;gap:20px;padding:20px;">
+
+      <!-- Aspetto -->
+      <section>
+        <h4 style="font-family:var(--font-display);font-size:0.82rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin:0 0 12px;">Aspetto</h4>
+
+        <!-- Tema -->
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+          <div>
+            <div style="font-size:0.88rem;font-weight:600;">Tema</div>
+            <div style="font-size:0.72rem;color:var(--text-muted);">Scuro o chiaro</div>
+          </div>
+          <div style="display:flex;gap:6px;">
+            <button id="theme-btn-dark" onclick="Settings.setTheme('dark')"
+              class="btn btn-sm" style="font-size:0.78rem;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg> Scuro</button>
+            <button id="theme-btn-light" onclick="Settings.setTheme('light')"
+              class="btn btn-sm" style="font-size:0.78rem;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg> Chiaro</button>
+          </div>
+        </div>
+
+        <!-- Dimensione font -->
+        <div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+            <div>
+              <div style="font-size:0.88rem;font-weight:600;">Dimensione testo</div>
+              <div style="font-size:0.72rem;color:var(--text-muted);">Scala l'intera interfaccia</div>
+            </div>
+            <span id="font-size-label" style="font-size:0.82rem;color:var(--accent-secondary);font-weight:600;">100%</span>
+          </div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            <button onclick="Settings.setFontSize(85)"  class="btn btn-ghost btn-sm settings-font-btn" data-size="85"  style="font-size:0.72rem;">85%</button>
+            <button onclick="Settings.setFontSize(100)" class="btn btn-ghost btn-sm settings-font-btn" data-size="100" style="font-size:0.78rem;">100%</button>
+            <button onclick="Settings.setFontSize(110)" class="btn btn-ghost btn-sm settings-font-btn" data-size="110" style="font-size:0.82rem;">110%</button>
+            <button onclick="Settings.setFontSize(125)" class="btn btn-ghost btn-sm settings-font-btn" data-size="125" style="font-size:0.88rem;">125%</button>
+            <button onclick="Settings.setFontSize(150)" class="btn btn-ghost btn-sm settings-font-btn" data-size="150" style="font-size:0.95rem;">150%</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Account -->
+      <section style="border-top:1px solid var(--border);padding-top:16px;">
+        <h4 style="font-family:var(--font-display);font-size:0.82rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin:0 0 12px;">Account & Sync</h4>
+        <div id="settings-auth-info" style="background:var(--bg-secondary);border-radius:var(--radius-md);padding:12px;margin-bottom:10px;">
+          <div style="font-size:0.85rem;color:var(--text-muted);">Non connesso — modalità locale</div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="btn btn-primary btn-sm" onclick="Modal.close('settings');FirebaseSync.toggleAuth()">
+            Gestisci account
+          </button>
+          <button class="btn btn-ghost btn-sm" onclick="ExportMarkdown.exportAll()" title="Esporta tutta la wiki come Markdown compatibile Obsidian">
+            ↓ <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Export Wiki
+          </button>
+        </div>
+      </section>
+
+      <!-- Supporta il progetto -->
+      <section style="border-top:1px solid var(--border);padding-top:16px;">
+        <h4 style="font-family:var(--font-display);font-size:0.82rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin:0 0 12px;">Supporta il progetto</h4>
+        <a href="https://ko-fi.com/noemimarcolini" target="_blank" rel="noopener"
+          style="display:flex;align-items:center;gap:10px;padding:12px;background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-md);text-decoration:none;color:var(--text-primary);transition:border-color 0.15s;"
+          onmouseenter="this.style.borderColor='#FF5E5B'" onmouseleave="this.style.borderColor='var(--border)'">
+          <span style="color:#FF5E5B;flex-shrink:0;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg></span>
+          <div>
+            <div style="font-size:0.88rem;font-weight:600;">Ko-fi — noemimarcolini</div>
+            <div style="font-size:0.72rem;color:var(--text-muted);">Se questo toolkit ti è utile, offrimi un caffè!</div>
+          </div>
+        </a>
+      </section>
+
+      <!-- Altre app -->
+      <section style="border-top:1px solid var(--border);padding-top:16px;">
+        <h4 style="font-family:var(--font-display);font-size:0.82rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin:0 0 12px;">Altre app per il tuo gioco</h4>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+
+          <a href="https://gdr-toolbox.noemi-marcolini.workers.dev/" target="_blank" rel="noopener"
+            style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-md);text-decoration:none;color:var(--text-primary);"
+            onmouseenter="this.style.borderColor='var(--accent-primary)'" onmouseleave="this.style.borderColor='var(--border)'">
+            <span style="color:var(--accent-primary);flex-shrink:0;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></span>
+            <div>
+              <div style="font-size:0.85rem;font-weight:600;">GDR Toolbox</div>
+              <div style="font-size:0.72rem;color:var(--text-muted);">Tutte le webapp per il gioco di ruolo in un posto</div>
+            </div>
+            <span style="margin-left:auto;color:var(--text-muted);flex-shrink:0;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></span>
+          </a>
+
+          <a href="https://gdr-sys.github.io/Compendio-incantesimi-homebrew/" target="_blank" rel="noopener"
+            style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-md);text-decoration:none;color:var(--text-primary);"
+            onmouseenter="this.style.borderColor='var(--accent-primary)'" onmouseleave="this.style.borderColor='var(--border)'">
+            <span style="color:#c97bea;flex-shrink:0;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
+            <div>
+              <div style="font-size:0.85rem;font-weight:600;">Compendio Incantesimi Homebrew</div>
+              <div style="font-size:0.72rem;color:var(--text-muted);">Raccogli e consulta i tuoi incantesimi personalizzati</div>
+            </div>
+            <span style="margin-left:auto;color:var(--text-muted);flex-shrink:0;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></span>
+          </a>
+
+          <a href="https://gdr-sys.github.io/The-Hungry-Dragon/" target="_blank" rel="noopener"
+            style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-md);text-decoration:none;color:var(--text-primary);"
+            onmouseenter="this.style.borderColor='var(--accent-primary)'" onmouseleave="this.style.borderColor='var(--border)'">
+            <span style="color:var(--accent-danger);flex-shrink:0;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/><path d="M8 12s1.5-2 4-2 4 2 4 2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg></span>
+            <div>
+              <div style="font-size:0.85rem;font-weight:600;">The Hungry Dragon</div>
+              <div style="font-size:0.72rem;color:var(--text-muted);">Gestione taverna e negozio per il tuo party</div>
+            </div>
+            <span style="margin-left:auto;color:var(--text-muted);flex-shrink:0;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></span>
+          </a>
+
+          <a href="https://grimoire-forge.vercel.app/" target="_blank" rel="noopener"
+            style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-md);text-decoration:none;color:var(--text-primary);"
+            onmouseenter="this.style.borderColor='var(--accent-primary)'" onmouseleave="this.style.borderColor='var(--border)'">
+            <span style="color:#f5a623;flex-shrink:0;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
+            <div>
+              <div style="font-size:0.85rem;font-weight:600;">Grimoire Forge</div>
+              <div style="font-size:0.72rem;color:var(--text-muted);">Crea e gestisci il tuo grimorio personalizzato</div>
+            </div>
+            <span style="margin-left:auto;color:var(--text-muted);flex-shrink:0;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></span>
+          </a>
+
+        </div>
+      </section>
+
+      <!-- Info app -->
+      <section style="border-top:1px solid var(--border);padding-top:16px;">
+        <h4 style="font-family:var(--font-display);font-size:0.82rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin:0 0 8px;">Informazioni</h4>
+        <div style="font-size:0.78rem;color:var(--text-muted);line-height:1.7;">
+          <div>DM Toolkit — versione 2.0</div>
+          <div>Dati SRD D&D 5e — OGL/ORC — Wizards of the Coast</div>
+          <div style="margin-top:4px;">
+            <a href="https://github.com/gdr-sys/dm-toolkit" target="_blank" style="color:var(--accent-primary);text-decoration:none;display:inline-flex;align-items:center;gap:4px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg> GitHub</a>
+            &nbsp;·&nbsp;
+            <a href="https://ko-fi.com/noemimarcolini" target="_blank" style="color:var(--accent-primary);text-decoration:none;">Ko-fi</a>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </div>
+</div>
+
 </body></html>`);
     win.document.close();
   };
@@ -15024,6 +15172,99 @@ const ExportMarkdown = (() => {
 })();
 
 
+
+// ══ SETTINGS MODULE ══
+const Settings = (() => {
+
+  const _getSettings = () => {
+    try { return JSON.parse(localStorage.getItem('dm_settings') || '{}'); } catch(e) { return {}; }
+  };
+  const _save = (s) => localStorage.setItem('dm_settings', JSON.stringify(s));
+
+  // ── Font size ──
+  const setFontSize = (pct) => {
+    document.documentElement.style.fontSize = pct + '%';
+    const s = _getSettings();
+    s.fontSize = pct;
+    _save(s);
+    // Aggiorna UI
+    document.querySelectorAll('.settings-font-btn').forEach(btn => {
+      const size = parseInt(btn.dataset.size);
+      btn.className = size === pct ? 'btn btn-primary btn-sm settings-font-btn' : 'btn btn-ghost btn-sm settings-font-btn';
+    });
+    const lbl = document.getElementById('font-size-label');
+    if (lbl) lbl.textContent = pct + '%';
+  };
+
+  // ── Tema ──
+  const setTheme = (theme) => {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('dm_theme', theme);
+    const btnD = document.getElementById('theme-btn-dark');
+    const btnL = document.getElementById('theme-btn-light');
+    if (btnD) btnD.className = theme === 'dark'  ? 'btn btn-primary btn-sm' : 'btn btn-ghost btn-sm';
+    if (btnL) btnL.className = theme === 'light' ? 'btn btn-primary btn-sm' : 'btn btn-ghost btn-sm';
+    // Aggiorna anche il toggle nella sidebar
+    try { App.applyTheme(theme); } catch(e) {}
+  };
+
+  // ── Auth info nel modal ──
+  const updateAuthInfo = () => {
+    const el = document.getElementById('settings-auth-info');
+    if (!el) return;
+    try {
+      const user = firebase?.auth?.()?.currentUser;
+      if (user) {
+        if (user.isAnonymous) {
+          el.innerHTML = '<div style="font-size:0.85rem;"><strong>Anonimo</strong> — dati sul cloud senza account</div>';
+        } else {
+          el.innerHTML = '<div style="display:flex;align-items:center;gap:8px;">' +
+            (user.photoURL ? '<img src="'+user.photoURL+'" style="width:28px;height:28px;border-radius:50%;">' : '') +
+            '<div><div style="font-size:0.85rem;font-weight:600;">'+(user.displayName||user.email||'')+'</div>' +
+            '<div style="font-size:0.72rem;color:var(--text-muted);">'+(user.email||'')+'</div></div></div>';
+        }
+      } else {
+        el.innerHTML = '<div style="font-size:0.85rem;color:var(--text-muted);">Non connesso — solo locale</div>';
+      }
+    } catch(e) {
+      el.innerHTML = '<div style="font-size:0.85rem;color:var(--text-muted);">Solo locale</div>';
+    }
+  };
+
+  // ── Apri modal impostazioni ──
+  const open = () => {
+    const s = _getSettings();
+    // Ripristina font size
+    const currentSize = s.fontSize || 100;
+    document.querySelectorAll('.settings-font-btn').forEach(btn => {
+      const size = parseInt(btn.dataset.size);
+      btn.className = size === currentSize ? 'btn btn-primary btn-sm settings-font-btn' : 'btn btn-ghost btn-sm settings-font-btn';
+    });
+    const lbl = document.getElementById('font-size-label');
+    if (lbl) lbl.textContent = currentSize + '%';
+    // Tema
+    const theme = localStorage.getItem('dm_theme') || 'dark';
+    const btnD = document.getElementById('theme-btn-dark');
+    const btnL = document.getElementById('theme-btn-light');
+    if (btnD) btnD.className = theme === 'dark'  ? 'btn btn-primary btn-sm' : 'btn btn-ghost btn-sm';
+    if (btnL) btnL.className = theme === 'light' ? 'btn btn-primary btn-sm' : 'btn btn-ghost btn-sm';
+    // Auth
+    updateAuthInfo();
+    Modal.open('settings');
+  };
+
+  // ── Init — applica impostazioni salvate ──
+  const init = () => {
+    const s = _getSettings();
+    if (s.fontSize && s.fontSize !== 100) {
+      document.documentElement.style.fontSize = s.fontSize + '%';
+    }
+  };
+
+  return { setFontSize, setTheme, updateAuthInfo, open, init };
+})();
+
+
 /* ── INIT ── */
 
 // ══ MONSTER CACHE (per Combat Tracker) ══
@@ -17425,6 +17666,7 @@ document.addEventListener('DOMContentLoaded', () => {
   );
   App.init();
   BackupSystem.autoBackup();
+  Settings.init();
   // Inizializza Google Drive se configurato
   setTimeout(() => { try { GDriveUI.init(); } catch(e) {} }, 1000);
   setTimeout(() => { try { FirebaseSync.init(); } catch(e) {} }, 500);
@@ -17886,6 +18128,153 @@ document.addEventListener('DOMContentLoaded', initMobileNav);
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="Modal.close('session-log')">Annulla</button>
       <button class="btn btn-primary" onclick="SessioniLog.save()">Salva Sessione</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- Modal: Impostazioni -->
+<div class="modal-overlay hidden" id="modal-settings" style="display:none;" onclick="if(event.target===this)Modal.close('settings')">
+  <div class="modal" style="max-width:520px;max-height:90vh;overflow-y:auto;">
+    <div class="modal-header" style="position:sticky;top:0;background:var(--bg-card);z-index:1;">
+      <h3 class="modal-title">Impostazioni</h3>
+      <button class="btn btn-ghost btn-icon-sm" onclick="Modal.close('settings')">✕</button>
+    </div>
+    <div class="modal-body" style="display:flex;flex-direction:column;gap:20px;padding:20px;">
+
+      <!-- Aspetto -->
+      <section>
+        <h4 style="font-family:var(--font-display);font-size:0.82rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin:0 0 12px;">Aspetto</h4>
+
+        <!-- Tema -->
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+          <div>
+            <div style="font-size:0.88rem;font-weight:600;">Tema</div>
+            <div style="font-size:0.72rem;color:var(--text-muted);">Scuro o chiaro</div>
+          </div>
+          <div style="display:flex;gap:6px;">
+            <button id="theme-btn-dark" onclick="Settings.setTheme('dark')"
+              class="btn btn-sm" style="font-size:0.78rem;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg> Scuro</button>
+            <button id="theme-btn-light" onclick="Settings.setTheme('light')"
+              class="btn btn-sm" style="font-size:0.78rem;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg> Chiaro</button>
+          </div>
+        </div>
+
+        <!-- Dimensione font -->
+        <div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+            <div>
+              <div style="font-size:0.88rem;font-weight:600;">Dimensione testo</div>
+              <div style="font-size:0.72rem;color:var(--text-muted);">Scala l'intera interfaccia</div>
+            </div>
+            <span id="font-size-label" style="font-size:0.82rem;color:var(--accent-secondary);font-weight:600;">100%</span>
+          </div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            <button onclick="Settings.setFontSize(85)"  class="btn btn-ghost btn-sm settings-font-btn" data-size="85"  style="font-size:0.72rem;">85%</button>
+            <button onclick="Settings.setFontSize(100)" class="btn btn-ghost btn-sm settings-font-btn" data-size="100" style="font-size:0.78rem;">100%</button>
+            <button onclick="Settings.setFontSize(110)" class="btn btn-ghost btn-sm settings-font-btn" data-size="110" style="font-size:0.82rem;">110%</button>
+            <button onclick="Settings.setFontSize(125)" class="btn btn-ghost btn-sm settings-font-btn" data-size="125" style="font-size:0.88rem;">125%</button>
+            <button onclick="Settings.setFontSize(150)" class="btn btn-ghost btn-sm settings-font-btn" data-size="150" style="font-size:0.95rem;">150%</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Account -->
+      <section style="border-top:1px solid var(--border);padding-top:16px;">
+        <h4 style="font-family:var(--font-display);font-size:0.82rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin:0 0 12px;">Account & Sync</h4>
+        <div id="settings-auth-info" style="background:var(--bg-secondary);border-radius:var(--radius-md);padding:12px;margin-bottom:10px;">
+          <div style="font-size:0.85rem;color:var(--text-muted);">Non connesso — modalità locale</div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="btn btn-primary btn-sm" onclick="Modal.close('settings');FirebaseSync.toggleAuth()">
+            Gestisci account
+          </button>
+          <button class="btn btn-ghost btn-sm" onclick="ExportMarkdown.exportAll()" title="Esporta tutta la wiki come Markdown compatibile Obsidian">
+            ↓ <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Export Wiki
+          </button>
+        </div>
+      </section>
+
+      <!-- Supporta il progetto -->
+      <section style="border-top:1px solid var(--border);padding-top:16px;">
+        <h4 style="font-family:var(--font-display);font-size:0.82rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin:0 0 12px;">Supporta il progetto</h4>
+        <a href="https://ko-fi.com/noemimarcolini" target="_blank" rel="noopener"
+          style="display:flex;align-items:center;gap:10px;padding:12px;background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-md);text-decoration:none;color:var(--text-primary);transition:border-color 0.15s;"
+          onmouseenter="this.style.borderColor='#FF5E5B'" onmouseleave="this.style.borderColor='var(--border)'">
+          <span style="color:#FF5E5B;flex-shrink:0;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg></span>
+          <div>
+            <div style="font-size:0.88rem;font-weight:600;">Ko-fi — noemimarcolini</div>
+            <div style="font-size:0.72rem;color:var(--text-muted);">Se questo toolkit ti è utile, offrimi un caffè!</div>
+          </div>
+        </a>
+      </section>
+
+      <!-- Altre app -->
+      <section style="border-top:1px solid var(--border);padding-top:16px;">
+        <h4 style="font-family:var(--font-display);font-size:0.82rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin:0 0 12px;">Altre app per il tuo gioco</h4>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+
+          <a href="https://gdr-toolbox.noemi-marcolini.workers.dev/" target="_blank" rel="noopener"
+            style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-md);text-decoration:none;color:var(--text-primary);"
+            onmouseenter="this.style.borderColor='var(--accent-primary)'" onmouseleave="this.style.borderColor='var(--border)'">
+            <span style="color:var(--accent-primary);flex-shrink:0;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></span>
+            <div>
+              <div style="font-size:0.85rem;font-weight:600;">GDR Toolbox</div>
+              <div style="font-size:0.72rem;color:var(--text-muted);">Tutte le webapp per il gioco di ruolo in un posto</div>
+            </div>
+            <span style="margin-left:auto;color:var(--text-muted);flex-shrink:0;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></span>
+          </a>
+
+          <a href="https://gdr-sys.github.io/Compendio-incantesimi-homebrew/" target="_blank" rel="noopener"
+            style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-md);text-decoration:none;color:var(--text-primary);"
+            onmouseenter="this.style.borderColor='var(--accent-primary)'" onmouseleave="this.style.borderColor='var(--border)'">
+            <span style="color:#c97bea;flex-shrink:0;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
+            <div>
+              <div style="font-size:0.85rem;font-weight:600;">Compendio Incantesimi Homebrew</div>
+              <div style="font-size:0.72rem;color:var(--text-muted);">Raccogli e consulta i tuoi incantesimi personalizzati</div>
+            </div>
+            <span style="margin-left:auto;color:var(--text-muted);flex-shrink:0;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></span>
+          </a>
+
+          <a href="https://gdr-sys.github.io/The-Hungry-Dragon/" target="_blank" rel="noopener"
+            style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-md);text-decoration:none;color:var(--text-primary);"
+            onmouseenter="this.style.borderColor='var(--accent-primary)'" onmouseleave="this.style.borderColor='var(--border)'">
+            <span style="color:var(--accent-danger);flex-shrink:0;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/><path d="M8 12s1.5-2 4-2 4 2 4 2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg></span>
+            <div>
+              <div style="font-size:0.85rem;font-weight:600;">The Hungry Dragon</div>
+              <div style="font-size:0.72rem;color:var(--text-muted);">Gestione taverna e negozio per il tuo party</div>
+            </div>
+            <span style="margin-left:auto;color:var(--text-muted);flex-shrink:0;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></span>
+          </a>
+
+          <a href="https://grimoire-forge.vercel.app/" target="_blank" rel="noopener"
+            style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-md);text-decoration:none;color:var(--text-primary);"
+            onmouseenter="this.style.borderColor='var(--accent-primary)'" onmouseleave="this.style.borderColor='var(--border)'">
+            <span style="color:#f5a623;flex-shrink:0;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
+            <div>
+              <div style="font-size:0.85rem;font-weight:600;">Grimoire Forge</div>
+              <div style="font-size:0.72rem;color:var(--text-muted);">Crea e gestisci il tuo grimorio personalizzato</div>
+            </div>
+            <span style="margin-left:auto;color:var(--text-muted);flex-shrink:0;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></span>
+          </a>
+
+        </div>
+      </section>
+
+      <!-- Info app -->
+      <section style="border-top:1px solid var(--border);padding-top:16px;">
+        <h4 style="font-family:var(--font-display);font-size:0.82rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin:0 0 8px;">Informazioni</h4>
+        <div style="font-size:0.78rem;color:var(--text-muted);line-height:1.7;">
+          <div>DM Toolkit — versione 2.0</div>
+          <div>Dati SRD D&D 5e — OGL/ORC — Wizards of the Coast</div>
+          <div style="margin-top:4px;">
+            <a href="https://github.com/gdr-sys/dm-toolkit" target="_blank" style="color:var(--accent-primary);text-decoration:none;display:inline-flex;align-items:center;gap:4px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg> GitHub</a>
+            &nbsp;·&nbsp;
+            <a href="https://ko-fi.com/noemimarcolini" target="_blank" style="color:var(--accent-primary);text-decoration:none;">Ko-fi</a>
+          </div>
+        </div>
+      </section>
+
     </div>
   </div>
 </div>
