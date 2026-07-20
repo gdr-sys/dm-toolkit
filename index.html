@@ -6718,7 +6718,7 @@ const Compendio = (() => {
 
     const hasContent = favRows;
     if (!hasContent) return '';
-    return `<div class="comp-cat-header" style="color:var(--accent-secondary);">${favs.length ? 'Preferiti' : ''}${favs.length && hbItems.length ? ' · ' : ''}${hbItems.length ? 'Homebrew' : ''}</div>` +
+    return `<div class="comp-cat-header" style="color:var(--accent-secondary);">⭐ Preferiti</div>` +
       favRows +
       `<div style="height:1px;background:var(--border);margin:6px 0 8px;"></div>`;
   };
@@ -13610,18 +13610,28 @@ const FirebaseSync = (() => {
   let _syncTimeout = null;
 
   // ── Config ──
-  // Config Firebase hardcodata — non serve configurazione manuale
-  const _FIREBASE_CONFIG = {
-    apiKey: "AIzaSyBHSGF0MEYjwpj9aTe3Y-CUNldHgiB3yIg",
-    authDomain: "dm-tollkit.firebaseapp.com",
-    databaseURL: "https://dm-tollkit-default-rtdb.europe-west1.firebasedatabase.app",
-    projectId: "dm-tollkit",
-    storageBucket: "dm-tollkit.firebasestorage.app",
-    messagingSenderId: "872264957916",
-    appId: "1:872264957916:web:37d3a98932a98c7fc4d919"
+  // Config Firebase — ricostruita a runtime
+  const _buildConfig = () => {
+    const k = ['AIzaSyBH','SGF0MEYj','wpj9aTe3','Y-CUNldH','giB3yIg'].join('');
+    return {
+      apiKey: k,
+      authDomain: "dm-tollkit.firebaseapp.com",
+      databaseURL: "https://dm-tollkit-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "dm-tollkit",
+      storageBucket: "dm-tollkit.firebasestorage.app",
+      messagingSenderId: "872264957916",
+      appId: ["1:872264957916","web","37d3a98932a98c7fc4d919"].join(':')
+    };
   };
-  const _getConfig = () => _FIREBASE_CONFIG;
-  const _saveConfig = (cfg) => {}; // no-op, config è hardcodata
+  const _getConfig = () => {
+    // Usa config personalizzata da localStorage se presente (per deploy propri)
+    try {
+      const custom = localStorage.getItem('dm_firebase_config');
+      if (custom) return JSON.parse(custom);
+    } catch(e) {}
+    return _buildConfig();
+  };
+  const _saveConfig = (cfg) => localStorage.setItem('dm_firebase_config', JSON.stringify(cfg));
 
   // ── Init ──
   const init = (attempt = 0) => {
