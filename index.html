@@ -640,15 +640,23 @@
 
         <!-- Scene Planner -->
         <div class="card" style="margin-top:var(--space-lg);">
-          <div class="card-header">
-            <h3 class="card-title">Scene Planner</h3>
-            <div style="display:flex;gap:6px;">
+          <div class="card-header" style="flex-wrap:wrap;gap:6px;">
+            <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0;">
+              <h3 class="card-title" style="margin:0;">Scene Planner</h3>
+              <span id="scene-sess-badge" style="display:none;font-size:0.68rem;color:var(--accent-secondary);background:rgba(93,164,90,0.1);padding:2px 8px;border-radius:var(--radius-full);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></span>
+            </div>
+            <div style="display:flex;gap:4px;align-items:center;">
+              <button class="btn btn-ghost btn-sm" onclick="SessioniLog.showTab('storico')" style="font-size:0.72rem;color:var(--text-muted);">Storico →</button>
               <button class="btn btn-ghost btn-sm" onclick="ScenePlanner.addBeat()" style="font-size:0.8rem;">+ Beat</button>
               <button class="btn btn-ghost btn-sm" onclick="ScenePlanner.clear()" style="font-size:0.72rem;color:var(--text-muted);">Pulisci</button>
             </div>
           </div>
           <div id="scene-planner-empty" style="padding:12px;color:var(--text-muted);font-size:0.82rem;display:none;">
-            Nessun beat. Aggiungi momenti chiave della sessione — apertura, rivelazione, combattimento, cliffhanger...
+            <div>Nessun beat.</div>
+            <div style="font-size:0.78rem;margin-top:4px;">
+              <strong>Crea prima una sessione</strong> con "+ Nuova Sessione" e impostala come "In corso" — i beat si salveranno in quella sessione.
+              <br>Oppure aggiungi beat liberi senza sessione.
+            </div>
           </div>
           <div id="scene-planner-list" style="padding:8px;display:flex;flex-direction:column;gap:6px;"></div>
         </div>
@@ -14300,16 +14308,50 @@ const ScenePlanner = (() => {
     { value:'libero',      label:'Libero',        color:'#888' },
   ];
 
-  const _getBeats = () => {
+  // Trova la sessione attualmente in corso
+  const _getActiveSession = () => {
     const camp = App.getActiveCampaign();
-    return camp?.sceneBeats || [];
+    return (camp?.sessioni_log||[]).find(s => s.stato === 'in_corso') || null;
   };
-  const _saveBeats = (beats) => App.saveActiveCampaign({ sceneBeats: beats });
+
+  const _getBeats = () => {
+    const sess = _getActiveSession();
+    if (sess) return sess.beats || [];
+    // Fallback: beats globali se nessuna sessione in corso
+    return App.getActiveCampaign()?.sceneBeats || [];
+  };
+
+  const _saveBeats = (beats) => {
+    const sess = _getActiveSession();
+    if (sess) {
+      const camp = App.getActiveCampaign();
+      const sessioni = (camp?.sessioni_log||[]).map(s =>
+        s.id === sess.id ? { ...s, beats } : s
+      );
+      App.saveActiveCampaign({ sessioni_log: sessioni });
+    } else {
+      // Salva globalmente se nessuna sessione in corso
+      App.saveActiveCampaign({ sceneBeats: beats });
+    }
+  };
 
   const render = () => {
     const list = document.getElementById('scene-planner-list');
     const empty = document.getElementById('scene-planner-empty');
     if (!list) return;
+
+    // Mostra quale sessione è in corso
+    const activeSess = _getActiveSession();
+    const badge = document.getElementById('scene-sess-badge');
+    if (badge) {
+      if (activeSess) {
+        badge.style.display = '';
+        badge.textContent = 'Sessione ' + activeSess.numero + (activeSess.titolo ? ' — ' + activeSess.titolo : '') + ' · in corso';
+      } else {
+        badge.style.display = 'none';
+      }
+    }
+
     const beats = _getBeats();
     if (!beats.length) {
       list.innerHTML = '';
@@ -14650,7 +14692,9 @@ const SessioniLog = (() => {
     );
     _saveSessioni(sessioni);
     renderList();
-    Toast.show('Sessione impostata come in corso', 'success', 1500);
+    Toast.show('Sessione impostata come in corso — i beat si salvano qui', 'success', 2000);
+    // Aggiorna lo scene planner se visibile
+    setTimeout(() => { try { ScenePlanner.render(); } catch(e) {} }, 100);
   };
 
   // ── NPC nel modal ──
