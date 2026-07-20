@@ -376,22 +376,48 @@
       <!-- Grid: Quest + Timeline + Fazioni -->
       <div class="grid-2" style="gap:var(--space-lg);">
 
-        <!-- QUEST TRACKER -->
-        <div class="card">
+        <!-- QUEST TRACKER KANBAN -->
+        <div class="card" style="overflow:visible;">
           <div class="card-header">
             <h3 class="card-title">Quest Tracker</h3>
-            <button class="btn btn-primary btn-sm" onclick="App.addQuest()">+ Aggiungi</button>
+            <div style="display:flex;gap:6px;align-items:center;">
+              <button id="quest-view-kanban" class="btn btn-primary btn-sm" onclick="QuestKanban.setView('kanban')" style="font-size:0.72rem;">Kanban</button>
+              <button id="quest-view-list" class="btn btn-ghost btn-sm" onclick="QuestKanban.setView('list')" style="font-size:0.72rem;">Lista</button>
+              <button class="btn btn-primary btn-sm" onclick="App.addQuest()">+ Aggiungi</button>
+            </div>
           </div>
-          <div class="tabs" style="margin-bottom:var(--space-md);">
-            <button class="tab-btn active" onclick="switchQuestTab(this,'disponibile')">Disponibili</button>
-            <button class="tab-btn" onclick="switchQuestTab(this,'in_corso')">In Corso</button>
-            <button class="tab-btn" onclick="switchQuestTab(this,'completata')">Completate</button>
-            <button class="tab-btn" onclick="switchQuestTab(this,'fallita')">Fallite</button>
+          <!-- Vista Kanban -->
+          <div id="quest-kanban-view" style="display:flex;gap:8px;overflow-x:auto;padding:8px;min-height:120px;">
+            <div style="flex:0 0 200px;">
+              <div style="font-size:0.68rem;font-family:var(--font-display);text-transform:uppercase;letter-spacing:0.06em;color:#5ba4f5;margin-bottom:6px;padding:0 4px;">Disponibili</div>
+              <div id="kanban-col-disponibile" class="kanban-col" data-status="disponibile" style="min-height:80px;display:flex;flex-direction:column;gap:4px;"></div>
+            </div>
+            <div style="flex:0 0 200px;">
+              <div style="font-size:0.68rem;font-family:var(--font-display);text-transform:uppercase;letter-spacing:0.06em;color:#f5a623;margin-bottom:6px;padding:0 4px;">In Corso</div>
+              <div id="kanban-col-in_corso" class="kanban-col" data-status="in_corso" style="min-height:80px;display:flex;flex-direction:column;gap:4px;"></div>
+            </div>
+            <div style="flex:0 0 200px;">
+              <div style="font-size:0.68rem;font-family:var(--font-display);text-transform:uppercase;letter-spacing:0.06em;color:#69cc85;margin-bottom:6px;padding:0 4px;">Completate</div>
+              <div id="kanban-col-completata" class="kanban-col" data-status="completata" style="min-height:80px;display:flex;flex-direction:column;gap:4px;"></div>
+            </div>
+            <div style="flex:0 0 200px;">
+              <div style="font-size:0.68rem;font-family:var(--font-display);text-transform:uppercase;letter-spacing:0.06em;color:#ff6b6b;margin-bottom:6px;padding:0 4px;">Fallite</div>
+              <div id="kanban-col-fallita" class="kanban-col" data-status="fallita" style="min-height:80px;display:flex;flex-direction:column;gap:4px;"></div>
+            </div>
           </div>
-          <div id="quest-list-disponibile" class="tab-content active"></div>
-          <div id="quest-list-in_corso" class="tab-content"></div>
-          <div id="quest-list-completata" class="tab-content"></div>
-          <div id="quest-list-fallita" class="tab-content"></div>
+          <!-- Vista Lista (fallback) -->
+          <div id="quest-list-view" style="display:none;">
+            <div class="tabs" style="margin-bottom:var(--space-md);padding:0 8px;">
+              <button class="tab-btn active" onclick="switchQuestTab(this,'disponibile')">Disponibili</button>
+              <button class="tab-btn" onclick="switchQuestTab(this,'in_corso')">In Corso</button>
+              <button class="tab-btn" onclick="switchQuestTab(this,'completata')">Completate</button>
+              <button class="tab-btn" onclick="switchQuestTab(this,'fallita')">Fallite</button>
+            </div>
+            <div id="quest-list-disponibile" class="tab-content active"></div>
+            <div id="quest-list-in_corso" class="tab-content"></div>
+            <div id="quest-list-completata" class="tab-content"></div>
+            <div id="quest-list-fallita" class="tab-content"></div>
+          </div>
         </div>
 
         <!-- Colonna destra: Timeline + Fazioni -->
@@ -1519,6 +1545,7 @@
               </label>
             </div>
             <button class="btn btn-ghost btn-sm" onclick="wikiDuplicaNote()" title="Duplica questa nota" style="font-size:0.72rem;">⎘</button>
+            <button class="btn btn-ghost btn-sm" onclick="ExportMarkdown.exportNote(WikiDM.getCurrentNote?.())" title="Esporta nota come Markdown" style="font-size:0.72rem;">↓ MD</button>
             <button id="wiki-view-toggle" class="btn btn-ghost btn-sm" onclick="WikiDM.toggleViewMode()" title="Alterna modalità lettura/modifica" style="font-size:0.72rem;">👁 Vista</button>
             <div id="wiki-mondo-sync-btn" style="display:none;">
               <button class="btn btn-ghost btn-sm" onclick="wikiToMondo(WikiDM._noteId)" title="Aggiorna l'entità nel Mondo con i dati di questa nota" style="font-size:0.72rem;">🌍 → Mondo</button>
@@ -2023,6 +2050,7 @@
       <div id="npc-modal-ruolo">
         <div class="form-row-3">
           <div class="form-group"><label class="form-label">Nome *</label><input type="text" id="nm-name" class="form-input" placeholder="es. Keth"></div>
+          <div class="form-group"><label class="form-label">Alias / Soprannomi</label><input type="text" id="nm-alias" class="form-input" placeholder="es. Il Sussurratore, Vex il Ladro" title="Nomi alternativi separati da virgola — cercabili con Ctrl+K"></div>
           <div class="form-group"><label class="form-label">Razza</label><input type="text" id="nm-race" class="form-input" placeholder="es. Nano"></div>
           <div class="form-group"><label class="form-label">Professione / Ruolo</label><input type="text" id="nm-job" class="form-input" placeholder="es. Fabbro"></div>
         </div>
@@ -3624,7 +3652,7 @@ const App = (() => {
     // Hook pagina specifica
     switch (pageId) {
       case 'home':       renderHomePage(); break;
-      case 'campagna':   renderCampaignPage(); setTimeout(() => NoteCampagna.render(), 100); break;
+      case 'campagna':   renderCampaignPage(); setTimeout(() => { NoteCampagna.render(); try{QuestKanban.render();}catch(e){} }, 100); break;
       case 'mondo':
         App.reloadActiveCampaign();
         try { NPC.init(); } catch(e) { Debug.warn('NPC non pronto: ' + e); }
@@ -4375,6 +4403,8 @@ const NPC = (() => {
 
     // Immagine
     if (window.setImgPreview) setImgPreview('npc', npc?.immagine || '');
+    const aliasEl = document.getElementById('nm-alias');
+    if (aliasEl) aliasEl.value = npc?.alias || '';
     if (npc?.imgPosX != null) { const el = document.getElementById('npc-img-pos-x'); if(el) el.value = npc.imgPosX; }
     if (npc?.imgPosY != null) { const el = document.getElementById('npc-img-pos-y'); if(el) el.value = npc.imgPosY; }
     if (npc?.imgZoom != null) { const el = document.getElementById('npc-img-zoom'); if(el) el.value = npc.imgZoom; }
@@ -4406,6 +4436,7 @@ const NPC = (() => {
 
     const data = {
       name,
+      alias:    document.getElementById('nm-alias')?.value?.trim()  || '',
       race:     document.getElementById('nm-race')?.value?.trim()   || '',
       job:      document.getElementById('nm-job')?.value?.trim()    || '',
       icon:     document.getElementById('nm-icon')?.value?.trim()   || '👤',
@@ -11172,13 +11203,17 @@ const WikiDM = (() => {
 
   const deleteNote = () => {
     if (!_noteId) return;
-    if (!confirm('Eliminare questa nota?')) return;
     const w = _getWiki();
+    const nota = (w[_section]||[]).find(n => n.id === _noteId);
+    if (!confirm('Eliminare "' + (nota?.titolo||'questa nota') + '"? Sarà nel cestino per 30 giorni.')) return;
+    // Sposta nel cestino
+    try { WikiTrash.addToTrash(nota, _section); } catch(e) {}
     w[_section] = (w[_section]||[]).filter(n => n.id !== _noteId);
     _saveWiki(w);
     _noteId = w[_section]?.[0]?.id || null;
     _mobileView = 'tree';
     _render();
+    Toast.show('Nota spostata nel cestino', 'info', 1500);
   };
 
   // ── Salva ──
@@ -11429,6 +11464,7 @@ const WikiDM = (() => {
     newTemplate, deleteTemplate, saveTemplate,
     search, clearSearch, togglePin,
     toggleViewMode: () => { _wikiViewMode = _wikiViewMode === 'view' ? 'edit' : 'view'; _applyViewMode(); },
+    getCurrentNote: () => { const w = _getWiki(); return (w[_section]||[]).find(n => n.id === _noteId) || null; },
     toggleCompendioSync: (enabled) => { if (_noteId) _syncWikiToCompendio(_noteId, enabled); },
     _createFromTpl, _clickNote, _clickTemplate, _openResult,
     get _section() { return _section; },
@@ -13413,7 +13449,7 @@ const _enrichedSearch = (q, camp) => {
 
   // PNG — cerca anche in trait, secret, wants, links
   (camp?.npcs||[]).forEach(n => {
-    const haystack = [n.name||n.nome, n.job, n.race, n.trait, n.secret, n.wants, n.links].filter(Boolean).join(' ').toLowerCase();
+    const haystack = [n.name||n.nome, n.alias, n.job, n.race, n.trait, n.secret, n.wants, n.links].filter(Boolean).join(' ').toLowerCase();
     if (haystack.includes(query)) {
       let sub = n.job || n.race || '';
       // Evidenzia da dove viene il match
@@ -14798,6 +14834,193 @@ const SessioniLog = (() => {
     setInCorso, addNpc, _removeNpc,
     createWikiNote, openWiki,
   };
+})();
+
+
+
+// ══ ALIAS PNG — estende ricerca globale ══
+// Patch _enrichedSearch per includere alias
+const _enrichedSearchOrig = _enrichedSearch;
+
+// Override tramite monkey-patch sicuro nel GlobalSearch
+// (già fatto in _enrichedSearch — aggiunge alias al haystack)
+
+// ══ KANBAN QUEST ══
+const QuestKanban = (() => {
+  let _view = 'kanban';
+
+  const setView = (v) => {
+    _view = v;
+    const kanban = document.getElementById('quest-kanban-view');
+    const list   = document.getElementById('quest-list-view');
+    const btnK   = document.getElementById('quest-view-kanban');
+    const btnL   = document.getElementById('quest-view-list');
+    if (kanban) kanban.style.display = v === 'kanban' ? 'flex' : 'none';
+    if (list)   list.style.display   = v === 'list' ? '' : 'none';
+    if (btnK) { btnK.className = v === 'kanban' ? 'btn btn-primary btn-sm' : 'btn btn-ghost btn-sm'; btnK.style.fontSize='0.72rem'; }
+    if (btnL) { btnL.className = v === 'list'   ? 'btn btn-primary btn-sm' : 'btn btn-ghost btn-sm'; btnL.style.fontSize='0.72rem'; }
+    if (v === 'kanban') render();
+  };
+
+  const COLORS = { disponibile:'#5ba4f5', in_corso:'#f5a623', completata:'#69cc85', fallita:'#ff6b6b' };
+
+  const render = () => {
+    const camp = App.getActiveCampaign();
+    const quests = camp?.quests || [];
+    ['disponibile','in_corso','completata','fallita'].forEach(status => {
+      const col = document.getElementById('kanban-col-' + status);
+      if (!col) return;
+      const items = quests.filter(q => q.status === status);
+      col.innerHTML = items.length ? items.map(q =>
+        '<div draggable="true" data-qid="'+q.id+'" '+
+        'ondragstart="QuestKanban._dragStart(event,\''+q.id+'\')" '+
+        'style="background:var(--bg-card);border:1px solid var(--border);border-left:3px solid '+COLORS[status]+';'+
+        'border-radius:var(--radius-md);padding:8px 10px;cursor:grab;font-size:0.82rem;" '+
+        'onclick="App.openQuest(\''+q.id+'\')">' +
+          '<div style="font-weight:600;margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + (q.title||'') + '</div>' +
+          (q.notes ? '<div style="font-size:0.72rem;color:var(--text-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + q.notes.slice(0,50) + '</div>' : '') +
+        '</div>'
+      ).join('') :
+      '<div style="font-size:0.72rem;color:var(--text-muted);padding:8px;text-align:center;border:1px dashed var(--border);border-radius:var(--radius-md);">—</div>';
+
+      // Drag & drop
+      col.ondragover = (e) => { e.preventDefault(); col.style.background = 'rgba(91,164,245,0.08)'; };
+      col.ondragleave = () => { col.style.background = ''; };
+      col.ondrop = (e) => {
+        e.preventDefault();
+        col.style.background = '';
+        const qid = e.dataTransfer.getData('qid');
+        _drop(qid, status);
+      };
+    });
+  };
+
+  const _dragStart = (e, id) => e.dataTransfer.setData('qid', id);
+
+  const _drop = (qid, newStatus) => {
+    const camp = App.getActiveCampaign();
+    if (!camp) return;
+    const quests = (camp.quests||[]).map(q => q.id === qid ? { ...q, status: newStatus } : q);
+    App.saveActiveCampaign({ quests });
+    render();
+  };
+
+  return { setView, render, _dragStart };
+})();
+
+// ══ CESTINO NOTE WIKI ══
+const WikiTrash = (() => {
+  const KEY = 'dm_wiki_trash';
+
+  const _getTrash = () => {
+    try { return JSON.parse(localStorage.getItem(KEY) || '[]'); } catch(e) { return []; }
+  };
+  const _saveTrash = (t) => {
+    // Mantieni solo le 50 note più recenti nel cestino
+    const sorted = t.sort((a,b) => (b.deletedAt||0)-(a.deletedAt||0)).slice(0,50);
+    localStorage.setItem(KEY, JSON.stringify(sorted));
+  };
+
+  const addToTrash = (nota, sec) => {
+    const trash = _getTrash();
+    trash.push({ ...nota, deletedAt: Date.now(), _sec: sec });
+    _saveTrash(trash);
+  };
+
+  const restore = (id) => {
+    const trash = _getTrash();
+    const nota = trash.find(n => n.id === id);
+    if (!nota) return;
+    const { deletedAt, _sec, ...clean } = nota;
+    const sec = _sec || 'lore';
+    // Ripristina nella wiki
+    const camp = App.getActiveCampaign();
+    const wiki = camp?.wiki || {};
+    if (!wiki[sec]) wiki[sec] = [];
+    wiki[sec].unshift({ ...clean, titolo: (clean.titolo||'') + ' (ripristinata)' });
+    App.saveActiveCampaign({ wiki });
+    // Rimuovi dal cestino
+    _saveTrash(trash.filter(n => n.id !== id));
+    Toast.show('Nota ripristinata in ' + sec, 'success');
+    WikiDM.switchSection(sec);
+  };
+
+  const getAll = () => _getTrash();
+
+  const empty = () => {
+    if (!confirm('Svuotare definitivamente il cestino? Le note non saranno recuperabili.')) return;
+    localStorage.removeItem(KEY);
+    Toast.show('Cestino svuotato', 'info');
+  };
+
+  return { addToTrash, restore, getAll, empty };
+})();
+
+// ══ EXPORT MARKDOWN ══
+const ExportMarkdown = (() => {
+  const _htmlToMd = (html) => {
+    if (!html) return '';
+    return html
+      .replace(/<h1[^>]*>(.*?)<\/h1>/gi, '# $1\n')
+      .replace(/<h2[^>]*>(.*?)<\/h2>/gi, '## $1\n')
+      .replace(/<h3[^>]*>(.*?)<\/h3>/gi, '### $1\n')
+      .replace(/<strong[^>]*>(.*?)<\/strong>/gi, '**$1**')
+      .replace(/<b[^>]*>(.*?)<\/b>/gi, '**$1**')
+      .replace(/<em[^>]*>(.*?)<\/em>/gi, '*$1*')
+      .replace(/<i[^>]*>(.*?)<\/i>/gi, '*$1*')
+      .replace(/<u[^>]*>(.*?)<\/u>/gi, '$1')
+      .replace(/<li[^>]*>(.*?)<\/li>/gi, '- $1\n')
+      .replace(/<ul[^>]*>|<\/ul>/gi, '')
+      .replace(/<ol[^>]*>|<\/ol>/gi, '')
+      .replace(/<blockquote[^>]*>(.*?)<\/blockquote>/gi, '> $1\n')
+      .replace(/<br\s*\/?>/gi, '\n')
+      .replace(/<p[^>]*>(.*?)<\/p>/gi, '$1\n\n')
+      .replace(/<hr\s*\/?>/gi, '\n---\n')
+      .replace(/<span class="nc-wikilink"[^>]*data-link="([^"]+)"[^>]*>\[\[([^\]]+)\]\]<\/span>/gi, '[[$2]]')
+      .replace(/<span class="nc-tag"[^>]*>#([^<]+)<\/span>/gi, '#$1')
+      .replace(/<div class="wiki-callout[^"]*"[^>]*>.*?<span class="wiki-callout-label"[^>]*>([^<]+)<\/span>([\s\S]*?)<\/div>/gi,
+        (_, label, content) => '\n> **' + label + '**\n' + content.replace(/<[^>]+>/g,'').trim().split('\n').map(l => '> ' + l).join('\n') + '\n')
+      .replace(/<[^>]+>/g, '')
+      .replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&nbsp;/g,' ')
+      .replace(/\n{3,}/g, '\n\n')
+      .trim();
+  };
+
+  const exportNote = (nota) => {
+    if (!nota) return;
+    const md = '# ' + (nota.titolo||'Senza titolo') + '\n\n' +
+      (nota.tags?.length ? nota.tags.map(t=>'#'+t).join(' ') + '\n\n' : '') +
+      _htmlToMd(nota.contenuto||'');
+    const blob = new Blob([md], { type: 'text/markdown' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = (nota.titolo||'nota').replace(/[^a-zA-Z0-9\s]/g,'').trim().replace(/\s+/g,'-') + '.md';
+    a.click();
+    Toast.show('Nota esportata come Markdown', 'success', 1500);
+  };
+
+  const exportAll = () => {
+    const camp = App.getActiveCampaign();
+    const wiki = camp?.wiki || {};
+    const lines = [];
+    ['lore','sessioni'].forEach(sec => {
+      (wiki[sec]||[]).forEach(n => {
+        lines.push('# ' + (n.titolo||'Senza titolo'));
+        if (n.tags?.length) lines.push(n.tags.map(t=>'#'+t).join(' '));
+        lines.push('');
+        lines.push(_htmlToMd(n.contenuto||''));
+        lines.push('\n---\n');
+      });
+    });
+    const blob = new Blob([lines.join('\n')], { type: 'text/markdown' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = (camp?.name||'campagna').replace(/[^a-zA-Z0-9]/g,'-') + '-wiki.md';
+    a.click();
+    Toast.show('Wiki esportata come Markdown (compatibile Obsidian)', 'success', 2000);
+  };
+
+  return { exportNote, exportAll };
 })();
 
 
