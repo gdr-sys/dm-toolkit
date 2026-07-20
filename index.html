@@ -84,6 +84,9 @@
 #wiki-note-content h2 { font-family:var(--font-display); font-size:1.1rem; font-weight:700; color:var(--text-primary); margin:0.5em 0 0.2em; }
 #wiki-note-content h3 { font-family:var(--font-display); font-size:0.95rem; font-weight:600; color:var(--accent-secondary); margin:0.4em 0 0.2em; }
 #wiki-note-content blockquote { border-left:3px solid var(--accent-secondary); margin:0.4em 0; padding:4px 12px; background:rgba(93,130,90,0.08); border-radius:0 var(--radius-sm) var(--radius-sm) 0; font-style:italic; }
+/* Scene planner */
+.scene-beat { transition: opacity 0.15s; }
+.scene-beat:active { opacity: 0.7; cursor: grabbing; }
 /* View mode */
 #wiki-note-content[contenteditable="false"] { cursor:default; }
 #wiki-note-content[contenteditable="false"] .nc-wikilink { cursor:pointer; text-decoration:underline dotted; }
@@ -268,7 +271,7 @@
         </button>
         <!-- Auth button -->
         <button id="fb-auth-btn" onclick="FirebaseSync.toggleAuth()"
-          style="display:none;background:none;border:1px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;color:var(--text-muted);font-size:0.75rem;padding:4px 10px;display:flex;align-items:center;gap:6px;">
+          style="background:none;border:1px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;color:var(--text-muted);font-size:0.75rem;padding:4px 10px;display:flex;align-items:center;gap:6px;">
           <span id="fb-auth-icon">🔑</span>
           <span id="fb-auth-label">Accedi</span>
         </button>
@@ -475,8 +478,8 @@
               spellcheck="true"
               style="flex:1;border:none;font-size:0.9rem;line-height:1.8;padding:var(--space-md);background:transparent;color:var(--text-primary);outline:none;width:100%;min-height:70vh;box-sizing:border-box;overflow-y:auto;"
               data-placeholder="Scrivi le tue note qui...&#10;&#10;Perfetto per lore, segreti, dialoghi, piani narrativi..."
-              oninput="NoteCampagna.savePage()"
-              onkeydown="ncEditorKeydown(event)">
+              oninput="NoteCampagna.savePage(); MentionPicker.onInput(event, this)"
+              onkeydown="ncEditorKeydown(event); MentionPicker.onKeydown(event)">
             </div>
             <div id="nc-backlinks" style="display:none;padding:8px 12px;border-top:1px solid var(--border);font-size:0.75rem;color:var(--text-muted);background:var(--bg-secondary);flex-wrap:wrap;gap:4px;"></div>
           </div>
@@ -570,9 +573,15 @@
       <div class="page-header">
         <div>
           <h1 class="page-title">Sessione</h1>
-          <p class="page-subtitle">Combat Tracker · Party · Scontri salvati</p>
+          <p class="page-subtitle" id="sess-subtitle">Combat Tracker · Party · Scontri salvati</p>
         </div>
-        <div style="display:flex;gap:var(--space-sm);">
+        <div style="display:flex;gap:var(--space-sm);align-items:center;flex-wrap:wrap;">
+          <!-- Tab: corrente / storico -->
+          <div style="display:flex;background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-md);padding:2px;gap:2px;">
+            <button id="sess-tab-corrente" class="btn btn-primary btn-sm" onclick="SessioniLog.showTab('corrente')" style="font-size:0.78rem;">In corso</button>
+            <button id="sess-tab-storico" class="btn btn-ghost btn-sm" onclick="SessioniLog.showTab('storico')" style="font-size:0.78rem;">Storico</button>
+          </div>
+          <button class="btn btn-secondary btn-sm" onclick="SessioniLog.newSession()" style="font-size:0.78rem;">+ Nuova Sessione</button>
           <button class="btn btn-primary" onclick="Sessione.newCombat()">
             <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="14.5 17.5 3 6 3 3 6 3 17.5 14.5"/><line x1="13" y1="19" x2="19" y2="13"/><line x1="16" y1="16" x2="20" y2="20"/><line x1="19" y1="21" x2="21" y2="19"/></svg>
             Nuovo Scontro
@@ -582,6 +591,17 @@
             Party in Combat
           </button>
         </div>
+      </div>
+
+      <!-- Pannello storico sessioni -->
+      <div id="sessione-storico" style="display:none;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-lg);">
+          <div>
+            <h2 style="font-family:var(--font-display);font-size:1.1rem;margin:0;">Sessioni della campagna</h2>
+            <p style="font-size:0.78rem;color:var(--text-muted);margin:4px 0 0;">Ogni sessione ha i suoi beat, note e un collegamento alla Wiki.</p>
+          </div>
+        </div>
+        <div id="sessioni-log-list" style="display:flex;flex-direction:column;gap:10px;"></div>
       </div>
 
       <div id="sessione-content">
@@ -616,6 +636,21 @@
             <div id="saved-sessions-list" class="comp-list"></div>
           </div>
 
+        </div>
+
+        <!-- Scene Planner -->
+        <div class="card" style="margin-top:var(--space-lg);">
+          <div class="card-header">
+            <h3 class="card-title">Scene Planner</h3>
+            <div style="display:flex;gap:6px;">
+              <button class="btn btn-ghost btn-sm" onclick="ScenePlanner.addBeat()" style="font-size:0.8rem;">+ Beat</button>
+              <button class="btn btn-ghost btn-sm" onclick="ScenePlanner.clear()" style="font-size:0.72rem;color:var(--text-muted);">Pulisci</button>
+            </div>
+          </div>
+          <div id="scene-planner-empty" style="padding:12px;color:var(--text-muted);font-size:0.82rem;display:none;">
+            Nessun beat. Aggiungi momenti chiave della sessione — apertura, rivelazione, combattimento, cliffhanger...
+          </div>
+          <div id="scene-planner-list" style="padding:8px;display:flex;flex-direction:column;gap:6px;"></div>
         </div>
 
         <!-- Clocks / Progress Tracker -->
@@ -1531,8 +1566,8 @@
             spellcheck="true"
             style="flex:1;padding:16px;overflow-y:auto;outline:none;font-size:0.9rem;line-height:1.8;color:var(--text-primary);"
             data-placeholder="Inizia a scrivere... Usa [[link]] per collegare note, #tag per categorizzare."
-            oninput="WikiDM.saveNote()"
-            onkeydown="wikiEditorKeydown(event)">
+            oninput="WikiDM.saveNote(); MentionPicker.onInput(event, this)"
+            onkeydown="wikiEditorKeydown(event); MentionPicker.onKeydown(event)">
           </div>
           <!-- Backlinks -->
           <div id="wiki-backlinks" style="display:none;padding:8px 16px;border-top:1px solid var(--border);font-size:0.75rem;color:var(--text-muted);background:var(--bg-secondary);flex-shrink:0;flex-wrap:wrap;gap:4px;"></div>
@@ -3588,7 +3623,7 @@ const App = (() => {
         try { Luoghi.init(); } catch(e) {}
         try { Fazioni.init(); } catch(e) {}
         break;
-      case 'sessione':   try { Sessione.init(); setTimeout(() => NoteSessione.render(), 100); } catch(e) {} setTimeout(()=>{try{Clocks.render();}catch(e){}},200); break;
+      case 'sessione':   try { Sessione.init(); setTimeout(() => NoteSessione.render(), 100); } catch(e) {} setTimeout(()=>{try{Clocks.render();}catch(e){}; try{ScenePlanner.render();}catch(e){}; try{SessioniLog.showTab('corrente');}catch(e){}},200); break;
       case 'generatori':
         setTimeout(() => { GeneratoriDD.enable(); Generatori.applyVisibility(); EncounterBuilder.init(); RNGLoot.init(); }, 100);
         break;
@@ -12341,6 +12376,27 @@ const ExportPDF = (() => {
         </div>
       </button>
 
+      <!-- Opzione 4: Email/Password -->
+      <div style="border:1px solid var(--border);border-radius:var(--radius-md);padding:14px;">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;">
+          <span style="font-size:1.4rem;">✉️</span>
+          <div>
+            <div style="font-family:var(--font-display);font-size:0.9rem;font-weight:600;">Email e Password</div>
+            <div style="font-size:0.75rem;color:var(--text-muted);">Registrati o accedi con email.</div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <input id="auth-email" type="email" class="form-input" placeholder="email@esempio.com" style="font-size:0.85rem;">
+          <input id="auth-password" type="password" class="form-input" placeholder="Password (min 6 caratteri)" style="font-size:0.85rem;"
+            onkeydown="if(event.key==='Enter') FirebaseSync.loginEmail()">
+          <div style="display:flex;gap:6px;">
+            <button class="btn btn-primary" style="flex:1;font-size:0.82rem;" onclick="FirebaseSync.loginEmail()">Accedi</button>
+            <button class="btn btn-ghost" style="flex:1;font-size:0.82rem;" onclick="FirebaseSync.registerEmail()">Registrati</button>
+          </div>
+          <div id="auth-email-error" style="font-size:0.72rem;color:var(--accent-danger);display:none;"></div>
+        </div>
+      </div>
+
       <div style="font-size:0.7rem;color:var(--text-muted);text-align:center;margin-top:4px;">
         Puoi cambiare modalità in qualsiasi momento dalle impostazioni.
       </div>
@@ -12413,6 +12469,74 @@ const ExportPDF = (() => {
         <button class="btn btn-ghost btn-sm" onclick="FirebaseSync.logout()" style="color:var(--accent-danger);font-size:0.75rem;">Esci</button>
         <button class="btn btn-ghost btn-sm" onclick="FirebaseSync.switchMode()" style="font-size:0.75rem;">Cambia modalità</button>
       </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- @mention selector -->
+<div id="mention-dropdown" style="display:none;position:fixed;z-index:900;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);box-shadow:var(--shadow-xl);min-width:260px;max-height:280px;overflow-y:auto;">
+  <div style="padding:6px 10px;font-size:0.68rem;color:var(--text-muted);font-family:var(--font-display);text-transform:uppercase;letter-spacing:0.06em;border-bottom:1px solid var(--border);">Collega a...</div>
+  <div id="mention-list" style="padding:4px 0;"></div>
+</div>
+
+<!-- Modal: Sessione (crea/modifica) -->
+<div class="modal-overlay hidden" id="modal-session-log" style="display:none;" onclick="if(event.target===this)Modal.close('session-log')">
+  <div class="modal" style="max-width:600px;">
+    <div class="modal-header">
+      <h3 class="modal-title" id="session-log-title">Nuova Sessione</h3>
+      <button class="btn btn-ghost btn-icon-sm" onclick="Modal.close('session-log')">✕</button>
+    </div>
+    <div class="modal-body" style="display:flex;flex-direction:column;gap:12px;">
+      <input type="hidden" id="sl-id">
+
+      <div class="grid-2" style="gap:10px;">
+        <div class="form-group">
+          <label class="form-label">Numero sessione</label>
+          <input type="number" id="sl-numero" class="form-input" min="1" placeholder="1">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Data</label>
+          <input type="date" id="sl-data" class="form-input">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Titolo</label>
+        <input type="text" id="sl-titolo" class="form-input" placeholder="es. La taverna di Waterdeep">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Stato</label>
+        <select id="sl-stato" class="form-select">
+          <option value="pianificata">Pianificata</option>
+          <option value="in_corso">In corso</option>
+          <option value="giocata">Giocata</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">PNG coinvolti</label>
+        <div id="sl-npcs-list" style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px;"></div>
+        <select id="sl-npcs-select" class="form-select" onchange="SessioniLog.addNpc(this.value);this.value=''">
+          <option value="">Aggiungi PNG...</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Note di prep</label>
+        <textarea id="sl-note-prep" class="form-textarea" rows="3" placeholder="Obiettivi, segreti da rivelare, incontri preparati..."></textarea>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Recap (dopo la sessione)</label>
+        <textarea id="sl-recap" class="form-textarea" rows="3" placeholder="Cosa è successo, decisioni del party, conseguenze..."></textarea>
+      </div>
+
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="Modal.close('session-log')">Annulla</button>
+      <button class="btn btn-primary" onclick="SessioniLog.save()">Salva Sessione</button>
     </div>
   </div>
 </div>
@@ -13213,6 +13337,7 @@ const _safeRename = (tipo, oldName, newName) => {
     Toast.show('🔗 ' + count + ' link aggiornati → "' + newName + '"', 'info', 2500);
   }
 
+};
 
 
 // ══ FIX 4: CRONOLOGIA NPC + LINK WIKI ══
@@ -13485,15 +13610,33 @@ const FirebaseSync = (() => {
   let _syncTimeout = null;
 
   // ── Config ──
-  const _getConfig = () => {
-    try { return JSON.parse(localStorage.getItem('dm_firebase_config') || 'null'); } catch(e) { return null; }
+  // Config Firebase hardcodata — non serve configurazione manuale
+  const _FIREBASE_CONFIG = {
+    apiKey: "AIzaSyBHSGF0MEYjwpj9aTe3Y-CUNldHgiB3yIg",
+    authDomain: "dm-tollkit.firebaseapp.com",
+    databaseURL: "https://dm-tollkit-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "dm-tollkit",
+    storageBucket: "dm-tollkit.firebasestorage.app",
+    messagingSenderId: "872264957916",
+    appId: "1:872264957916:web:37d3a98932a98c7fc4d919"
   };
-  const _saveConfig = (cfg) => localStorage.setItem('dm_firebase_config', JSON.stringify(cfg));
+  const _getConfig = () => _FIREBASE_CONFIG;
+  const _saveConfig = (cfg) => {}; // no-op, config è hardcodata
 
   // ── Init ──
-  const init = () => {
+  const init = (attempt = 0) => {
+    // Aspetta che Firebase SDK sia caricato (CDN asincrono)
+    if (typeof firebase === 'undefined') {
+      if (attempt < 20) {
+        setTimeout(() => init(attempt + 1), 300);
+      } else {
+        Debug.warn('Firebase SDK non caricato dopo 6 secondi');
+      }
+      return;
+    }
+
     const cfg = _getConfig();
-    if (!cfg) return; // non configurato
+    if (!cfg) return;
 
     try {
       // Inizializza Firebase (evita doppio init)
@@ -13584,8 +13727,13 @@ const FirebaseSync = (() => {
   };
 
   const toggleAuth = () => {
-    const cfg = _getConfig();
-    if (!cfg) { Modal.open('firebase-setup'); return; }
+    if (typeof firebase === 'undefined' || !_auth) {
+      // Firebase non ancora caricato — inizializza e riprova
+      Toast.show('Connessione in corso...', 'info', 1500);
+      init();
+      setTimeout(() => toggleAuth(), 1500);
+      return;
+    }
     if (_user) {
       Modal.open('collab');
       _updateCollabModal();
@@ -13890,11 +14038,711 @@ const FirebaseSync = (() => {
     if (_user && campId) _startSync(campId);
   };
 
+  const loginEmail = async () => {
+    const email    = document.getElementById('auth-email')?.value?.trim();
+    const password = document.getElementById('auth-password')?.value;
+    const errEl    = document.getElementById('auth-email-error');
+    if (!email || !password) {
+      if (errEl) { errEl.textContent = 'Inserisci email e password.'; errEl.style.display=''; }
+      return;
+    }
+    if (!_auth) return;
+    try {
+      await _auth.signInWithEmailAndPassword(email, password);
+      _mode = 'google';
+      localStorage.setItem('dm_auth_mode', 'google');
+      Modal.close('auth-choice');
+    } catch(e) {
+      const msg = e.code === 'auth/user-not-found' ? 'Account non trovato — registrati prima.'
+                : e.code === 'auth/wrong-password'  ? 'Password errata.'
+                : e.code === 'auth/invalid-email'   ? 'Email non valida.'
+                : e.message;
+      if (errEl) { errEl.textContent = msg; errEl.style.display=''; }
+    }
+  };
+
+  const registerEmail = async () => {
+    const email    = document.getElementById('auth-email')?.value?.trim();
+    const password = document.getElementById('auth-password')?.value;
+    const errEl    = document.getElementById('auth-email-error');
+    if (!email || !password) {
+      if (errEl) { errEl.textContent = 'Inserisci email e password.'; errEl.style.display=''; }
+      return;
+    }
+    if (password.length < 6) {
+      if (errEl) { errEl.textContent = 'La password deve avere almeno 6 caratteri.'; errEl.style.display=''; }
+      return;
+    }
+    if (!_auth) return;
+    try {
+      if (_user?.isAnonymous) {
+        // Upgrade da anonimo a email/password
+        const credential = firebase.auth.EmailAuthProvider.credential(email, password);
+        await _user.linkWithCredential(credential);
+      } else {
+        await _auth.createUserWithEmailAndPassword(email, password);
+      }
+      _mode = 'google';
+      localStorage.setItem('dm_auth_mode', 'google');
+      Modal.close('auth-choice');
+      Toast.show('✓ Account creato — benvenuto!', 'success');
+    } catch(e) {
+      const msg = e.code === 'auth/email-already-in-use' ? 'Email già in uso — prova ad accedere.'
+                : e.code === 'auth/invalid-email'        ? 'Email non valida.'
+                : e.code === 'auth/weak-password'        ? 'Password troppo debole.'
+                : e.message;
+      if (errEl) { errEl.textContent = msg; errEl.style.display=''; }
+    }
+  };
+
   return {
     init, toggleAuth, logout, saveConfig,
-    loginAnonymous, loginGoogle, useLocal, upgradeToGoogle, switchMode,
+    loginAnonymous, loginGoogle, loginEmail, registerEmail,
+    useLocal, upgradeToGoogle, switchMode,
     syncNow, push, onCampagnaSaved, onCampagnaActivated,
     getCampCode, copyCode, joinCampaign,
+  };
+})();
+
+
+
+// ══ @MENTION PICKER ══
+const MentionPicker = (() => {
+  let _active = false;
+  let _query  = '';
+  let _idx    = 0;
+  let _results = [];
+  let _editorEl = null;
+  let _atRange  = null;  // Range del carattere @
+
+  const _getItems = (q) => {
+    const camp = App.getActiveCampaign();
+    const wiki = camp?.wiki || {};
+    const items = [];
+    const lc = q.toLowerCase();
+
+    // Note wiki
+    ['lore','sessioni'].forEach(sec => {
+      (wiki[sec]||[]).forEach(n => {
+        if (!lc || (n.titolo||'').toLowerCase().includes(lc)) {
+          items.push({
+            label: (sec === 'sessioni' ? '⚔️' : '📄') + ' ' + (n.titolo||'Senza titolo'),
+            key: n.titolo || '', tipo: 'wiki', sec, id: n.id,
+            color: sec === 'sessioni' ? '#c97bea' : '#5ba4f5',
+          });
+        }
+      });
+    });
+    // PNG
+    (camp?.npcs||[]).forEach(n => {
+      const nome = n.name || n.nome || '';
+      if (!lc || nome.toLowerCase().includes(lc)) {
+        items.push({ label:'👤 '+nome, key:'png:'+nome, tipo:'png', id:n.id, color:'#69cc85' });
+      }
+    });
+    // Luoghi
+    (camp?.locations||[]).forEach(l => {
+      if (!lc || (l.nome||'').toLowerCase().includes(lc)) {
+        items.push({ label:'🗺️ '+(l.nome||''), key:'luogo:'+(l.nome||''), tipo:'luogo', id:l.id, color:'#f5a623' });
+      }
+    });
+    // Fazioni
+    (camp?.factions||[]).forEach(f => {
+      if (!lc || (f.nome||'').toLowerCase().includes(lc)) {
+        items.push({ label:'⚔️ '+(f.nome||''), key:'fazione:'+(f.nome||''), tipo:'fazione', id:f.id, color:'#ff6b6b' });
+      }
+    });
+
+    return items.slice(0, 12);
+  };
+
+  const _show = (x, y) => {
+    const dd = document.getElementById('mention-dropdown');
+    if (!dd) return;
+    dd.style.display = 'block';
+    // Posiziona sotto il cursore
+    const vw = window.innerWidth, vh = window.innerHeight;
+    const left = Math.min(x, vw - 280);
+    const top  = y + 22 + window.scrollY;
+    dd.style.left = left + 'px';
+    dd.style.top  = (top > vh - 300 ? y - 10 - 280 + window.scrollY : top) + 'px';
+    _renderList();
+  };
+
+  const _hide = () => {
+    _active = false;
+    _query  = '';
+    _idx    = 0;
+    _results = [];
+    _atRange = null;
+    const dd = document.getElementById('mention-dropdown');
+    if (dd) dd.style.display = 'none';
+  };
+
+  const _renderList = () => {
+    _results = _getItems(_query);
+    const el = document.getElementById('mention-list');
+    if (!el) return;
+    if (!_results.length) { _hide(); return; }
+    el.innerHTML = _results.map((r, i) =>
+      '<div data-mi="'+i+'" onclick="MentionPicker.pick('+i+')" style="'+
+      'padding:7px 12px;cursor:pointer;font-size:0.82rem;display:flex;align-items:center;gap:8px;'+
+      (_idx===i ? 'background:var(--bg-tertiary);' : '')+'">' +
+        '<span style="width:6px;height:6px;border-radius:50%;background:'+r.color+';flex-shrink:0;"></span>'+
+        r.label +
+      '</div>'
+    ).join('');
+  };
+
+  const onInput = (e, el) => {
+    _editorEl = el;
+    const sel = window.getSelection();
+    if (!sel?.rangeCount) return;
+
+    // Cerca @ prima del cursore nella stessa riga
+    const range = sel.getRangeAt(0).cloneRange();
+    range.collapse(true);
+
+    // Ottieni il testo da inizio riga al cursore
+    const anchor = sel.anchorNode;
+    if (!anchor || anchor.nodeType !== Node.TEXT_NODE) { _hide(); return; }
+    const textBefore = anchor.textContent.slice(0, sel.anchorOffset);
+    const atIdx = textBefore.lastIndexOf('@');
+    if (atIdx < 0) { _hide(); return; }
+
+    // Verifica che non ci siano spazi tra @ e cursore (tranne il carattere di query)
+    const afterAt = textBefore.slice(atIdx + 1);
+    if (afterAt.includes(' ') && afterAt.length > 1) { _hide(); return; }
+
+    _query = afterAt;
+    _active = true;
+
+    // Posizione visiva del cursore
+    const rect = range.getBoundingClientRect();
+    _show(rect.left, rect.top);
+
+    // Salva la posizione del @ per la sostituzione
+    _atRange = document.createRange();
+    _atRange.setStart(anchor, atIdx);
+    _atRange.setEnd(anchor, sel.anchorOffset);
+  };
+
+  const onKeydown = (e) => {
+    if (!_active) return;
+    if (e.key === 'ArrowDown')  { e.preventDefault(); _idx = Math.min(_idx+1, _results.length-1); _renderList(); }
+    else if (e.key === 'ArrowUp')   { e.preventDefault(); _idx = Math.max(_idx-1, 0); _renderList(); }
+    else if (e.key === 'Enter' || e.key === 'Tab') { if (_results.length) { e.preventDefault(); pick(_idx); } }
+    else if (e.key === 'Escape') { _hide(); }
+  };
+
+  const pick = (i) => {
+    const r = _results[i];
+    if (!r || !_atRange) { _hide(); return; }
+
+    // Rimuove il testo "@query" e inserisce lo span wikilink
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(_atRange);
+
+    const titolo = r.tipo === 'wiki' ? r.key
+                 : r.tipo === 'png'  ? r.key.slice(4)
+                 : r.tipo === 'luogo' ? r.key.slice(6)
+                 : r.key.slice(8);
+    const icon = r.tipo === 'png' ? '👤 '
+               : r.tipo === 'luogo' ? '🗺️ '
+               : r.tipo === 'fazione' ? '⚔️ '
+               : '';
+
+    document.execCommand('insertHTML', false,
+      '<span class="nc-wikilink" data-link="'+r.key+'" '+
+      'onclick="wikiNavigateLink(\''+r.key.replace(/'/g,"\\'")+'\')" '+
+      'style="cursor:pointer;color:'+r.color+';">@'+icon+titolo+'</span>&nbsp;'
+    );
+
+    _hide();
+    // Salva la nota
+    if (_editorEl?.id === 'wiki-note-content') WikiDM.saveNote();
+    else if (_editorEl?.id === 'nc-page-content') NoteCampagna.savePage();
+  };
+
+  // Chiudi dropdown se si clicca fuori
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('#mention-dropdown') && !e.target.closest('[contenteditable]')) {
+      _hide();
+    }
+  });
+
+  return { onInput, onKeydown, pick };
+})();
+
+
+
+// ══ SCENE PLANNER ══
+const ScenePlanner = (() => {
+  const BEAT_TYPES = [
+    { value:'apertura',    label:'Apertura',     color:'#5ba4f5' },
+    { value:'sociale',     label:'Sociale',      color:'#69cc85' },
+    { value:'esplorazione',label:'Esplorazione',  color:'#f5a623' },
+    { value:'combattimento',label:'Combattimento',color:'#ff6b6b' },
+    { value:'rivelazione', label:'Rivelazione',  color:'#c97bea' },
+    { value:'cliffhanger', label:'Cliffhanger',  color:'#ff9f43' },
+    { value:'riposo',      label:'Riposo',        color:'#aaa' },
+    { value:'libero',      label:'Libero',        color:'#888' },
+  ];
+
+  const _getBeats = () => {
+    const camp = App.getActiveCampaign();
+    return camp?.sceneBeats || [];
+  };
+  const _saveBeats = (beats) => App.saveActiveCampaign({ sceneBeats: beats });
+
+  const render = () => {
+    const list = document.getElementById('scene-planner-list');
+    const empty = document.getElementById('scene-planner-empty');
+    if (!list) return;
+    const beats = _getBeats();
+    if (!beats.length) {
+      list.innerHTML = '';
+      if (empty) empty.style.display = '';
+      return;
+    }
+    if (empty) empty.style.display = 'none';
+
+    list.innerHTML = beats.map((b, i) => {
+      const tipo = BEAT_TYPES.find(t => t.value === b.tipo) || BEAT_TYPES[7];
+      return (
+        '<div class="scene-beat" data-idx="'+i+'" style="display:flex;align-items:flex-start;gap:8px;'+
+        'padding:8px 10px;background:var(--bg-secondary);border:1px solid var(--border);'+
+        'border-left:3px solid '+tipo.color+';border-radius:var(--radius-md);cursor:grab;">' +
+
+          // Handle drag
+          '<span style="color:var(--text-muted);font-size:0.8rem;padding-top:2px;cursor:grab;user-select:none;">⠿</span>' +
+
+          '<div style="flex:1;min-width:0;">' +
+
+            // Tipo + badge principale/cliffhanger
+            '<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">' +
+              '<select onchange="ScenePlanner.setTipo('+i+',this.value)" '+
+              'style="font-size:0.72rem;background:var(--bg-tertiary);border:1px solid var(--border);'+
+              'border-radius:var(--radius-sm);padding:2px 4px;color:'+tipo.color+';">' +
+              BEAT_TYPES.map(t =>
+                '<option value="'+t.value+'"'+(t.value===b.tipo?' selected':'')+'>'+t.label+'</option>'
+              ).join('') +
+              '</select>' +
+              (b.principale ? '<span style="font-size:0.65rem;background:rgba(91,164,245,0.2);color:#5ba4f5;padding:1px 6px;border-radius:var(--radius-full);">★ Principale</span>' : '') +
+              (b.tipo === 'cliffhanger' ? '<span style="font-size:0.65rem;background:rgba(255,159,67,0.2);color:#ff9f43;padding:1px 6px;border-radius:var(--radius-full);">⚡ Cliffhanger</span>' : '') +
+            '</div>' +
+
+            // Titolo
+            '<input type="text" value="'+((b.titolo||'').replace(/"/g,'&quot;'))+'" '+
+            'placeholder="Titolo beat..." '+
+            'onchange="ScenePlanner.setTitolo('+i+',this.value)" '+
+            'style="width:100%;background:transparent;border:none;border-bottom:1px solid var(--border);'+
+            'padding:2px 0;font-size:0.85rem;color:var(--text-primary);font-family:var(--font-display);'+
+            'font-weight:600;margin-bottom:4px;" />' +
+
+            // Note
+            '<textarea placeholder="Note, PNG coinvolti, dettagli..." '+
+            'onchange="ScenePlanner.setNote('+i+',this.value)" '+
+            'style="width:100%;background:transparent;border:none;font-size:0.78rem;'+
+            'color:var(--text-secondary);resize:none;min-height:36px;line-height:1.5;">'+
+            (b.note||'')+'</textarea>' +
+
+          '</div>' +
+
+          // Azioni
+          '<div style="display:flex;flex-direction:column;gap:2px;flex-shrink:0;">' +
+            '<button onclick="ScenePlanner.togglePrincipale('+i+')" title="Segna come incontro principale" '+
+            'style="background:none;border:none;cursor:pointer;font-size:0.8rem;color:'+(b.principale?'#5ba4f5':'var(--text-muted)')+';">★</button>' +
+            '<button onclick="ScenePlanner.moveUp('+i+')" title="Sposta su" '+
+            'style="background:none;border:none;cursor:pointer;font-size:0.7rem;color:var(--text-muted);">▲</button>' +
+            '<button onclick="ScenePlanner.moveDown('+i+')" title="Sposta giù" '+
+            'style="background:none;border:none;cursor:pointer;font-size:0.7rem;color:var(--text-muted);">▼</button>' +
+            '<button onclick="ScenePlanner.remove('+i+')" title="Rimuovi" '+
+            'style="background:none;border:none;cursor:pointer;font-size:0.8rem;color:var(--accent-danger);">✕</button>' +
+          '</div>' +
+
+        '</div>'
+      );
+    }).join('');
+  };
+
+  const addBeat = () => {
+    const beats = _getBeats();
+    const tipo = beats.length === 0 ? 'apertura'
+               : beats.length === 1 ? 'combattimento'
+               : 'libero';
+    beats.push({ titolo:'', tipo, note:'', principale: false });
+    _saveBeats(beats);
+    render();
+    // Focus sul titolo del nuovo beat
+    setTimeout(() => {
+      const inputs = document.querySelectorAll('.scene-beat input[type=text]');
+      if (inputs.length) inputs[inputs.length-1].focus();
+    }, 50);
+  };
+
+  const setTipo = (i, v) => {
+    const beats = _getBeats();
+    if (beats[i]) { beats[i].tipo = v; _saveBeats(beats); render(); }
+  };
+
+  const setTitolo = (i, v) => {
+    const beats = _getBeats();
+    if (beats[i]) { beats[i].titolo = v; _saveBeats(beats); }
+  };
+
+  const setNote = (i, v) => {
+    const beats = _getBeats();
+    if (beats[i]) { beats[i].note = v; _saveBeats(beats); }
+  };
+
+  const togglePrincipale = (i) => {
+    const beats = _getBeats();
+    if (!beats[i]) return;
+    const wasMain = beats[i].principale;
+    beats.forEach(b => b.principale = false);
+    beats[i].principale = !wasMain;
+    _saveBeats(beats);
+    render();
+  };
+
+  const moveUp = (i) => {
+    const beats = _getBeats();
+    if (i <= 0) return;
+    [beats[i-1], beats[i]] = [beats[i], beats[i-1]];
+    _saveBeats(beats);
+    render();
+  };
+
+  const moveDown = (i) => {
+    const beats = _getBeats();
+    if (i >= beats.length-1) return;
+    [beats[i], beats[i+1]] = [beats[i+1], beats[i]];
+    _saveBeats(beats);
+    render();
+  };
+
+  const remove = (i) => {
+    const beats = _getBeats();
+    beats.splice(i, 1);
+    _saveBeats(beats);
+    render();
+  };
+
+  const clear = () => {
+    if (!confirm('Pulire tutti i beat della sessione?')) return;
+    _saveBeats([]);
+    render();
+  };
+
+  return { render, addBeat, setTipo, setTitolo, setNote, togglePrincipale, moveUp, moveDown, remove, clear };
+})();
+
+
+
+// ══ SESSIONI LOG — storico sessioni con beat, note e link wiki ══
+const SessioniLog = (() => {
+
+  // Stato temporaneo NPC selezionati nel modal
+  let _tempNpcs = [];
+  let _editingId = null;
+
+  // ── Data ──
+  const _getSessioni = () => {
+    const camp = App.getActiveCampaign();
+    return (camp?.sessioni_log || []).sort((a,b) => (b.numero||0)-(a.numero||0));
+  };
+
+  const _saveSessioni = (sessioni) => App.saveActiveCampaign({ sessioni_log: sessioni });
+
+  const _nextNumero = () => {
+    const s = App.getActiveCampaign()?.sessioni_log || [];
+    return s.length ? Math.max(...s.map(x => x.numero||0)) + 1 : 1;
+  };
+
+  // ── Tab corrente/storico ──
+  const showTab = (tab) => {
+    const corrente = document.getElementById('sessione-content');
+    const storico  = document.getElementById('sessione-storico');
+    const btnC = document.getElementById('sess-tab-corrente');
+    const btnS = document.getElementById('sess-tab-storico');
+    if (tab === 'corrente') {
+      if (corrente) corrente.style.display = '';
+      if (storico)  storico.style.display  = 'none';
+      if (btnC) { btnC.className = 'btn btn-primary btn-sm'; btnC.style.fontSize='0.78rem'; }
+      if (btnS) { btnS.className = 'btn btn-ghost btn-sm';   btnS.style.fontSize='0.78rem'; }
+    } else {
+      if (corrente) corrente.style.display = 'none';
+      if (storico)  storico.style.display  = '';
+      if (btnC) { btnC.className = 'btn btn-ghost btn-sm';   btnC.style.fontSize='0.78rem'; }
+      if (btnS) { btnS.className = 'btn btn-primary btn-sm'; btnS.style.fontSize='0.78rem'; }
+      renderList();
+    }
+  };
+
+  // ── Render lista sessioni ──
+  const renderList = () => {
+    const el = document.getElementById('sessioni-log-list');
+    if (!el) return;
+    const sessioni = _getSessioni();
+    const camp = App.getActiveCampaign();
+
+    if (!sessioni.length) {
+      el.innerHTML = '<div style="padding:24px;text-align:center;color:var(--text-muted);font-size:0.85rem;">Nessuna sessione ancora. Crea la prima con "+ Nuova Sessione".</div>';
+      return;
+    }
+
+    const STATO_COLORS = { pianificata:'#5ba4f5', in_corso:'#f5a623', giocata:'#69cc85' };
+    const STATO_LABELS = { pianificata:'Pianificata', in_corso:'In corso', giocata:'Giocata' };
+
+    el.innerHTML = sessioni.map(s => {
+      const color = STATO_COLORS[s.stato] || '#888';
+      const label = STATO_LABELS[s.stato] || s.stato;
+      const npcs = (s.npcs||[]).map(id => {
+        const n = (camp?.npcs||[]).find(x => x.id === id);
+        return n ? (n.name||n.nome||'') : '';
+      }).filter(Boolean);
+
+      // Badge beat
+      const beatCount = (s.beats||[]).length;
+      const mainBeat = (s.beats||[]).find(b => b.principale);
+
+      // Link wiki
+      const wikiNota = (camp?.wiki?.sessioni||[]).find(n => n.sessioneId === s.id);
+
+      return (
+        '<div style="background:var(--bg-card);border:1px solid var(--border);border-left:3px solid '+color+';'+
+        'border-radius:var(--radius-md);padding:14px 16px;display:flex;flex-direction:column;gap:8px;">' +
+
+          '<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">' +
+            '<div style="display:flex;align-items:center;gap:10px;">' +
+              '<span style="font-family:var(--font-display);font-size:1rem;font-weight:700;color:var(--text-muted);">S'+s.numero+'</span>' +
+              '<div>' +
+                '<div style="font-family:var(--font-display);font-size:0.95rem;font-weight:600;">'+( s.titolo||'Senza titolo')+'</div>' +
+                (s.data ? '<div style="font-size:0.72rem;color:var(--text-muted);">'+s.data+'</div>' : '') +
+              '</div>' +
+              '<span style="font-size:0.68rem;padding:2px 8px;background:'+color+'22;color:'+color+';border:1px solid '+color+'44;border-radius:var(--radius-full);">'+label+'</span>' +
+            '</div>' +
+            '<div style="display:flex;gap:6px;">' +
+              (wikiNota ?
+                '<button class="btn btn-ghost btn-sm" onclick="SessioniLog.openWiki(\''+s.id+'\')" style="font-size:0.72rem;">📝 Wiki</button>' :
+                '<button class="btn btn-ghost btn-sm" onclick="SessioniLog.createWikiNote(\''+s.id+'\')" style="font-size:0.72rem;">+ Nota Wiki</button>'
+              ) +
+              '<button class="btn btn-ghost btn-sm" onclick="SessioniLog.edit(\''+s.id+'\')" style="font-size:0.72rem;">✏️ Modifica</button>' +
+              (s.stato !== 'giocata' ?
+                '<button class="btn btn-primary btn-sm" onclick="SessioniLog.setInCorso(\''+s.id+'\')" style="font-size:0.72rem;">▶ In corso</button>' : '') +
+              '<button class="btn btn-ghost btn-sm" onclick="SessioniLog.remove(\''+s.id+'\')" style="font-size:0.72rem;color:var(--accent-danger);">✕</button>' +
+            '</div>' +
+          '</div>' +
+
+          // PNG coinvolti
+          (npcs.length ? '<div style="display:flex;flex-wrap:wrap;gap:4px;">'+
+            npcs.map(n => '<span style="font-size:0.72rem;padding:1px 8px;background:var(--bg-tertiary);border:1px solid var(--border);border-radius:var(--radius-full);">👤 '+n+'</span>').join('')+
+          '</div>' : '') +
+
+          // Beat
+          (beatCount ? '<div style="display:flex;flex-wrap:wrap;gap:4px;align-items:center;">' +
+            (s.beats||[]).map(b => {
+              const BEAT_COLORS = {apertura:'#5ba4f5',sociale:'#69cc85',esplorazione:'#f5a623',combattimento:'#ff6b6b',rivelazione:'#c97bea',cliffhanger:'#ff9f43',riposo:'#aaa',libero:'#888'};
+              const bc = BEAT_COLORS[b.tipo]||'#888';
+              return '<span style="font-size:0.68rem;padding:1px 8px;background:'+bc+'22;border:1px solid '+bc+'44;color:'+bc+';border-radius:var(--radius-full);">'+(b.principale?'★ ':'')+( b.titolo||b.tipo)+'</span>';
+            }).join('') +
+          '</div>' : '') +
+
+          // Recap
+          (s.recap ? '<div style="font-size:0.78rem;color:var(--text-secondary);border-top:1px solid var(--border);padding-top:8px;line-height:1.5;">'+s.recap.slice(0,200)+(s.recap.length>200?'...':'')+'</div>' : '') +
+
+        '</div>'
+      );
+    }).join('');
+  };
+
+  // ── Nuova sessione ──
+  const newSession = () => {
+    _editingId = null;
+    _tempNpcs  = [];
+    document.getElementById('sl-id').value       = '';
+    document.getElementById('sl-numero').value   = _nextNumero();
+    document.getElementById('sl-titolo').value   = '';
+    document.getElementById('sl-data').value     = new Date().toISOString().slice(0,10);
+    document.getElementById('sl-stato').value    = 'pianificata';
+    document.getElementById('sl-note-prep').value= '';
+    document.getElementById('sl-recap').value    = '';
+    document.getElementById('session-log-title').textContent = 'Nuova Sessione';
+    _renderNpcsModal();
+    _populateNpcSelect();
+    Modal.open('session-log');
+  };
+
+  // ── Modifica sessione ──
+  const edit = (id) => {
+    const s = (App.getActiveCampaign()?.sessioni_log||[]).find(x => x.id === id);
+    if (!s) return;
+    _editingId = id;
+    _tempNpcs  = [...(s.npcs||[])];
+    document.getElementById('sl-id').value       = id;
+    document.getElementById('sl-numero').value   = s.numero || '';
+    document.getElementById('sl-titolo').value   = s.titolo || '';
+    document.getElementById('sl-data').value     = s.data || '';
+    document.getElementById('sl-stato').value    = s.stato || 'pianificata';
+    document.getElementById('sl-note-prep').value= s.notePrep || '';
+    document.getElementById('sl-recap').value    = s.recap || '';
+    document.getElementById('session-log-title').textContent = 'Sessione ' + s.numero;
+    _renderNpcsModal();
+    _populateNpcSelect();
+    Modal.open('session-log');
+  };
+
+  // ── Salva sessione ──
+  const save = () => {
+    const id = document.getElementById('sl-id').value || ('sess_' + Date.now());
+    const data = {
+      id,
+      numero:   parseInt(document.getElementById('sl-numero').value) || 1,
+      titolo:   document.getElementById('sl-titolo').value.trim(),
+      data:     document.getElementById('sl-data').value,
+      stato:    document.getElementById('sl-stato').value,
+      npcs:     [..._tempNpcs],
+      notePrep: document.getElementById('sl-note-prep').value,
+      recap:    document.getElementById('sl-recap').value,
+      beats:    _editingId ? ((App.getActiveCampaign()?.sessioni_log||[]).find(x=>x.id===_editingId)?.beats||[]) : [],
+      creatoAt: _editingId ? ((App.getActiveCampaign()?.sessioni_log||[]).find(x=>x.id===_editingId)?.creatoAt||Date.now()) : Date.now(),
+      aggiornatoAt: Date.now(),
+    };
+
+    const camp = App.getActiveCampaign();
+    const sessioni = camp?.sessioni_log || [];
+    const idx = sessioni.findIndex(x => x.id === id);
+    if (idx >= 0) sessioni[idx] = data;
+    else sessioni.push(data);
+    _saveSessioni(sessioni);
+
+    Modal.close('session-log');
+    Toast.show(_editingId ? 'Sessione aggiornata' : 'Sessione '+data.numero+' creata', 'success', 2000);
+
+    // Se siamo nello storico, aggiorna la lista
+    if (document.getElementById('sessione-storico')?.style.display !== 'none') renderList();
+  };
+
+  // ── Rimuovi sessione ──
+  const remove = (id) => {
+    if (!confirm('Eliminare questa sessione?')) return;
+    const sessioni = (App.getActiveCampaign()?.sessioni_log||[]).filter(x => x.id !== id);
+    _saveSessioni(sessioni);
+    renderList();
+  };
+
+  // ── Segna come in corso ──
+  const setInCorso = (id) => {
+    const sessioni = (App.getActiveCampaign()?.sessioni_log||[]).map(s =>
+      ({ ...s, stato: s.id === id ? 'in_corso' : (s.stato === 'in_corso' ? 'pianificata' : s.stato) })
+    );
+    _saveSessioni(sessioni);
+    renderList();
+    Toast.show('Sessione impostata come in corso', 'success', 1500);
+  };
+
+  // ── NPC nel modal ──
+  const addNpc = (id) => {
+    if (!id || _tempNpcs.includes(id)) return;
+    _tempNpcs.push(id);
+    _renderNpcsModal();
+  };
+
+  const _removeNpc = (id) => {
+    _tempNpcs = _tempNpcs.filter(x => x !== id);
+    _renderNpcsModal();
+  };
+
+  const _renderNpcsModal = () => {
+    const el = document.getElementById('sl-npcs-list');
+    if (!el) return;
+    const camp = App.getActiveCampaign();
+    el.innerHTML = _tempNpcs.map(id => {
+      const n = (camp?.npcs||[]).find(x => x.id === id);
+      const nome = n ? (n.name||n.nome||'') : id;
+      return '<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;background:var(--bg-tertiary);border:1px solid var(--border);border-radius:var(--radius-full);font-size:0.72rem;">'+
+        '👤 '+nome+
+        '<button onclick="SessioniLog._removeNpc(\''+id+'\')" style="background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:0.7rem;">✕</button>'+
+        '</span>';
+    }).join('');
+  };
+
+  const _populateNpcSelect = () => {
+    const sel = document.getElementById('sl-npcs-select');
+    if (!sel) return;
+    const camp = App.getActiveCampaign();
+    sel.innerHTML = '<option value="">Aggiungi PNG...</option>' +
+      (camp?.npcs||[]).map(n =>
+        '<option value="'+n.id+'">'+(n.name||n.nome||'')+'</option>'
+      ).join('');
+  };
+
+  // ── Wiki integration ──
+  const createWikiNote = (sessioneId) => {
+    const s = (App.getActiveCampaign()?.sessioni_log||[]).find(x => x.id === sessioneId);
+    if (!s) return;
+    const camp = App.getActiveCampaign();
+    const wiki = camp?.wiki || { lore:[], sessioni:[], templates:[] };
+    const uid = 'n' + Date.now() + Math.random().toString(36).slice(2,5);
+    const npcsLinks = (s.npcs||[]).map(id => {
+      const n = (camp?.npcs||[]).find(x => x.id === id);
+      return n ? '<span class="nc-wikilink" data-link="png:'+(n.name||n.nome||'')+'" onclick="wikiNavigateLink(\'png:'+(n.name||n.nome||'')+'\')">[[👤 '+(n.name||n.nome||'')+']]</span>' : '';
+    }).filter(Boolean).join(' · ');
+
+    const beatsHtml = (s.beats||[]).map(b =>
+      '<li>'+(b.principale?'<strong>':'')+(b.titolo||b.tipo)+(b.principale?'</strong>':'')+(b.note?' — '+b.note:'')+'</li>'
+    ).join('');
+
+    const contenuto =
+      '<h1>Sessione '+s.numero+' — '+(s.titolo||'')+'</h1>' +
+      '<p><strong>Data:</strong> '+(s.data||'')+'&nbsp;|&nbsp;<strong>Stato:</strong> '+(s.stato||'')+'&nbsp;|&nbsp;#sessione</p>' +
+      (npcsLinks ? '<p><strong>PNG coinvolti:</strong> '+npcsLinks+'</p>' : '') +
+      (beatsHtml ? '<h2>Beat</h2><ul>'+beatsHtml+'</ul>' : '') +
+      (s.notePrep ? '<h2>Note di prep</h2><p>'+s.notePrep+'</p>' : '') +
+      '<h2>Note live</h2><p></p>' +
+      (s.recap ? '<h2>Recap</h2><p>'+s.recap+'</p>' : '<h2>Recap</h2><p></p>');
+
+    const nota = {
+      id: uid,
+      titolo: 'Sessione '+s.numero+(s.titolo?' — '+s.titolo:''),
+      contenuto,
+      tags: ['sessione'],
+      sessioneId,
+      creatoAt: Date.now(),
+      aggiornatoAt: Date.now(),
+    };
+
+    if (!wiki.sessioni) wiki.sessioni = [];
+    wiki.sessioni.unshift(nota);
+    App.saveActiveCampaign({ wiki });
+
+    // Aggiorna sessione con ref alla nota
+    const sessioni = (camp.sessioni_log||[]).map(x =>
+      x.id === sessioneId ? { ...x, wikiNoteId: uid } : x
+    );
+    App.saveActiveCampaign({ sessioni_log: sessioni });
+
+    Toast.show('📝 Nota Wiki creata — apertura...', 'success', 2000);
+    setTimeout(() => {
+      App.navigateTo('wiki');
+      setTimeout(() => { WikiDM.switchSection('sessioni'); WikiDM.openNote(uid); }, 200);
+    }, 300);
+  };
+
+  const openWiki = (sessioneId) => {
+    const camp = App.getActiveCampaign();
+    const nota = (camp?.wiki?.sessioni||[]).find(n => n.sessioneId === sessioneId);
+    if (!nota) return;
+    App.navigateTo('wiki');
+    setTimeout(() => { WikiDM.switchSection('sessioni'); WikiDM.openNote(nota.id); }, 200);
+  };
+
+  return {
+    showTab, renderList, newSession, edit, save, remove,
+    setInCorso, addNpc, _removeNpc,
+    createWikiNote, openWiki,
   };
 })();
 
@@ -16292,7 +17140,7 @@ const BackupSystem = (() => {
 })();
 
 
-};
+
 document.addEventListener('DOMContentLoaded', () => {
   Debug.init(
     document.getElementById('debug-body'),
@@ -16600,6 +17448,27 @@ document.addEventListener('DOMContentLoaded', initMobileNav);
         </div>
       </button>
 
+      <!-- Opzione 4: Email/Password -->
+      <div style="border:1px solid var(--border);border-radius:var(--radius-md);padding:14px;">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;">
+          <span style="font-size:1.4rem;">✉️</span>
+          <div>
+            <div style="font-family:var(--font-display);font-size:0.9rem;font-weight:600;">Email e Password</div>
+            <div style="font-size:0.75rem;color:var(--text-muted);">Registrati o accedi con email.</div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <input id="auth-email" type="email" class="form-input" placeholder="email@esempio.com" style="font-size:0.85rem;">
+          <input id="auth-password" type="password" class="form-input" placeholder="Password (min 6 caratteri)" style="font-size:0.85rem;"
+            onkeydown="if(event.key==='Enter') FirebaseSync.loginEmail()">
+          <div style="display:flex;gap:6px;">
+            <button class="btn btn-primary" style="flex:1;font-size:0.82rem;" onclick="FirebaseSync.loginEmail()">Accedi</button>
+            <button class="btn btn-ghost" style="flex:1;font-size:0.82rem;" onclick="FirebaseSync.registerEmail()">Registrati</button>
+          </div>
+          <div id="auth-email-error" style="font-size:0.72rem;color:var(--accent-danger);display:none;"></div>
+        </div>
+      </div>
+
       <div style="font-size:0.7rem;color:var(--text-muted);text-align:center;margin-top:4px;">
         Puoi cambiare modalità in qualsiasi momento dalle impostazioni.
       </div>
@@ -16672,6 +17541,74 @@ document.addEventListener('DOMContentLoaded', initMobileNav);
         <button class="btn btn-ghost btn-sm" onclick="FirebaseSync.logout()" style="color:var(--accent-danger);font-size:0.75rem;">Esci</button>
         <button class="btn btn-ghost btn-sm" onclick="FirebaseSync.switchMode()" style="font-size:0.75rem;">Cambia modalità</button>
       </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- @mention selector -->
+<div id="mention-dropdown" style="display:none;position:fixed;z-index:900;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);box-shadow:var(--shadow-xl);min-width:260px;max-height:280px;overflow-y:auto;">
+  <div style="padding:6px 10px;font-size:0.68rem;color:var(--text-muted);font-family:var(--font-display);text-transform:uppercase;letter-spacing:0.06em;border-bottom:1px solid var(--border);">Collega a...</div>
+  <div id="mention-list" style="padding:4px 0;"></div>
+</div>
+
+<!-- Modal: Sessione (crea/modifica) -->
+<div class="modal-overlay hidden" id="modal-session-log" style="display:none;" onclick="if(event.target===this)Modal.close('session-log')">
+  <div class="modal" style="max-width:600px;">
+    <div class="modal-header">
+      <h3 class="modal-title" id="session-log-title">Nuova Sessione</h3>
+      <button class="btn btn-ghost btn-icon-sm" onclick="Modal.close('session-log')">✕</button>
+    </div>
+    <div class="modal-body" style="display:flex;flex-direction:column;gap:12px;">
+      <input type="hidden" id="sl-id">
+
+      <div class="grid-2" style="gap:10px;">
+        <div class="form-group">
+          <label class="form-label">Numero sessione</label>
+          <input type="number" id="sl-numero" class="form-input" min="1" placeholder="1">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Data</label>
+          <input type="date" id="sl-data" class="form-input">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Titolo</label>
+        <input type="text" id="sl-titolo" class="form-input" placeholder="es. La taverna di Waterdeep">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Stato</label>
+        <select id="sl-stato" class="form-select">
+          <option value="pianificata">Pianificata</option>
+          <option value="in_corso">In corso</option>
+          <option value="giocata">Giocata</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">PNG coinvolti</label>
+        <div id="sl-npcs-list" style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px;"></div>
+        <select id="sl-npcs-select" class="form-select" onchange="SessioniLog.addNpc(this.value);this.value=''">
+          <option value="">Aggiungi PNG...</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Note di prep</label>
+        <textarea id="sl-note-prep" class="form-textarea" rows="3" placeholder="Obiettivi, segreti da rivelare, incontri preparati..."></textarea>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Recap (dopo la sessione)</label>
+        <textarea id="sl-recap" class="form-textarea" rows="3" placeholder="Cosa è successo, decisioni del party, conseguenze..."></textarea>
+      </div>
+
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="Modal.close('session-log')">Annulla</button>
+      <button class="btn btn-primary" onclick="SessioniLog.save()">Salva Sessione</button>
     </div>
   </div>
 </div>
