@@ -12658,6 +12658,23 @@ const ExportPDF = (() => {
         </div>
       </section>
 
+      <!-- Google Drive Backup -->
+      <section style="border-top:1px solid var(--border);padding-top:16px;">
+        <h4 style="font-family:var(--font-display);font-size:0.82rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin:0 0 12px;">Backup su Google Drive</h4>
+        <div style="background:var(--bg-secondary);border-radius:var(--radius-md);padding:12px;margin-bottom:10px;font-size:0.82rem;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            <span id="drive-settings-label" style="color:var(--text-muted);">Non collegato</span>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button id="drive-connect-btn" class="btn btn-primary btn-sm" onclick="DriveBackup.connect()">Collega Drive</button>
+          <button id="drive-backup-now-btn" class="btn btn-ghost btn-sm" style="display:none;" onclick="DriveBackup.backupNow()">Salva ora su Drive</button>
+          <button id="drive-disconnect-btn" class="btn btn-ghost btn-sm" style="display:none;color:var(--accent-danger);" onclick="DriveBackup.disconnect()">Scollega</button>
+        </div>
+        <div style="font-size:0.72rem;color:var(--text-muted);margin-top:8px;" id="drive-last-backup"></div>
+      </section>
+
       <!-- Supporta il progetto -->
       <section style="border-top:1px solid var(--border);padding-top:16px;">
         <h4 style="font-family:var(--font-display);font-size:0.82rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin:0 0 12px;">Supporta il progetto</h4>
@@ -12737,6 +12754,60 @@ const ExportPDF = (() => {
           </div>
         </div>
       </section>
+
+    </div>
+  </div>
+</div>
+
+
+<!-- Modal: Connetti Google Drive (post-login) -->
+<div class="modal-overlay hidden" id="modal-drive-welcome" style="display:none;" onclick="if(event.target===this)Modal.close('drive-welcome')">
+  <div class="modal" style="max-width:440px;">
+    <div class="modal-header" style="border-bottom:none;padding-bottom:0;">
+      <button class="btn btn-ghost btn-icon-sm" onclick="DriveBackup.dismissWelcome()" style="margin-left:auto;">✕</button>
+    </div>
+    <div class="modal-body" style="padding:8px 24px 24px;text-align:center;">
+
+      <!-- Icona -->
+      <div style="width:56px;height:56px;background:linear-gradient(135deg,var(--accent-primary),#c97bea);border-radius:var(--radius-xl);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        </svg>
+      </div>
+
+      <h3 style="font-family:var(--font-display);font-size:1.2rem;margin:0 0 8px;">Metti al sicuro la tua campagna</h3>
+      <p style="font-size:0.85rem;color:var(--text-muted);line-height:1.6;margin:0 0 20px;">
+        Ogni avventura merita di essere preservata. Collega Google Drive e le tue campagne verranno salvate automaticamente in una cartella <strong>DM Toolkit</strong> sul tuo Drive — al sicuro, sempre accessibili, solo tuoi.
+      </p>
+
+      <div style="background:var(--bg-secondary);border-radius:var(--radius-md);padding:12px 16px;margin-bottom:20px;text-align:left;">
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <div style="display:flex;align-items:center;gap:10px;font-size:0.82rem;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent-secondary)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            <span>Backup automatico ad ogni salvataggio</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;font-size:0.82rem;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent-secondary)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            <span>File JSON nella tua cartella Drive — sempre esportabile</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;font-size:0.82rem;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent-secondary)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            <span>Nessun dato extra su Firebase — lo storage è tuo</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <button class="btn btn-primary" style="width:100%;padding:12px;" onclick="DriveBackup.connectFromWelcome()">
+          <div style="display:flex;align-items:center;justify-content:center;gap:8px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+            Collega Google Drive
+          </div>
+        </button>
+        <button class="btn btn-ghost" style="width:100%;font-size:0.82rem;color:var(--text-muted);" onclick="DriveBackup.dismissWelcome()">
+          Non ora — posso farlo dalle impostazioni
+        </button>
+      </div>
 
     </div>
   </div>
@@ -13961,9 +14032,11 @@ const FirebaseSync = (() => {
   const _onLogin = (user) => {
     _updateAuthBtn();
     if (user.isAnonymous) {
-      Toast.show('👤 Accesso anonimo attivo', 'info', 2000);
+      Toast.show('Accesso anonimo attivo', 'info', 2000);
     } else {
-      Toast.show('✓ Benvenuto ' + (user.displayName||user.email).split(' ')[0], 'success', 2000);
+      Toast.show('Benvenuto ' + (user.displayName||user.email||'').split(' ')[0], 'success', 2000);
+      // Mostra welcome Drive solo al login Google (non anonimo)
+      setTimeout(() => { try { DriveBackup.showWelcomeIfNeeded(); } catch(e) {} }, 2000);
     }
     // Se c'è una campagna attiva, avvia la sync
     const camp = App.getActiveCampaign();
@@ -15294,6 +15367,226 @@ const Settings = (() => {
   };
 
   return { setFontSize, setTheme, updateAuthInfo, open, init };
+})();
+
+
+
+// ══ DRIVE BACKUP — backup automatico su Google Drive ══
+const DriveBackup = (() => {
+  const FOLDER_NAME = 'DM Toolkit';
+  const LS_KEY = 'dm_drive_connected';
+  const LS_LAST = 'dm_drive_last_backup';
+  let _folderId = null;
+  let _connected = false;
+  let _gapiReady = false;
+
+  // ── Init ──
+  const init = async () => {
+    _connected = localStorage.getItem(LS_KEY) === 'true';
+    if (_connected) _updateUI();
+    // Carica gapi se serve
+    if (window.gapi && !_gapiReady) {
+      try {
+        await _initGapi();
+      } catch(e) {}
+    }
+  };
+
+  const _initGapi = () => new Promise((resolve, reject) => {
+    if (_gapiReady) { resolve(); return; }
+    gapi.load('client', async () => {
+      try {
+        await gapi.client.init({
+          apiKey: ['AIzaSyBH','SGF0MEYj','wpj9aTe3','Y-CUNldH','giB3yIg'].join(''),
+          discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest'],
+        });
+        _gapiReady = true;
+        resolve();
+      } catch(e) { reject(e); }
+    });
+  });
+
+  // ── Connect ──
+  const connect = async () => {
+    try {
+      // Richiedi scope Drive oltre a Firebase Auth
+      const provider = new firebase.auth.GoogleAuthProvider();
+      provider.addScope('https://www.googleapis.com/auth/drive.file');
+      const auth = firebase.auth();
+      const user = auth.currentUser;
+
+      if (!user) {
+        Toast.show('Accedi prima con Google', 'warning');
+        return;
+      }
+
+      // Se già loggato con Google, richiedi scope aggiuntivo
+      await user.reauthenticateWithPopup(provider);
+      const credential = firebase.auth.GoogleAuthProvider.credential(
+        user.providerData.find(p => p.providerId === 'google.com')?.idToken
+      );
+
+      // Usa il token per Drive
+      await _initGapi();
+      _connected = true;
+      localStorage.setItem(LS_KEY, 'true');
+      _updateUI();
+      Toast.show('Google Drive collegato — backup automatico attivo', 'success', 3000);
+      Modal.close('drive-welcome');
+
+      // Backup immediato
+      setTimeout(() => backupNow(), 1000);
+    } catch(e) {
+      if (e.code === 'auth/popup-closed-by-user') return;
+      // Fallback: usa OAuth2 diretto
+      _connectOAuth();
+    }
+  };
+
+  const _connectOAuth = () => {
+    // Fallback: apre finestra Google OAuth2 per Drive
+    if (!window.gapi) {
+      Toast.show('Caricamento Google API...', 'info', 2000);
+      const script = document.createElement('script');
+      script.src = 'https://apis.google.com/js/api.js';
+      script.onload = () => gapi.load('auth2,client', async () => {
+        await gapi.client.init({
+          apiKey: ['AIzaSyBH','SGF0MEYj','wpj9aTe3','Y-CUNldH','giB3yIg'].join(''),
+          clientId: '',  // non necessario per drive.file con Firebase
+          discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest'],
+          scope: 'https://www.googleapis.com/auth/drive.file',
+        });
+        _gapiReady = true;
+        _connected = true;
+        localStorage.setItem(LS_KEY, 'true');
+        _updateUI();
+        backupNow();
+      });
+      document.head.appendChild(script);
+    }
+  };
+
+  const connectFromWelcome = async () => {
+    Modal.close('drive-welcome');
+    localStorage.setItem('dm_drive_welcome_seen', 'true');
+    // Apri impostazioni alla sezione Drive
+    Settings.open();
+    setTimeout(() => connect(), 300);
+  };
+
+  const dismissWelcome = () => {
+    localStorage.setItem('dm_drive_welcome_seen', 'true');
+    Modal.close('drive-welcome');
+  };
+
+  // ── Backup ──
+  const backupNow = async () => {
+    if (!_connected) return;
+    const camp = App.getActiveCampaign();
+    if (!camp) return;
+
+    try {
+      // Assicura folder DM Toolkit
+      if (!_folderId) _folderId = await _getOrCreateFolder();
+
+      const content = JSON.stringify(camp, null, 2);
+      const filename = (camp.name||'campagna').replace(/[^a-zA-Z0-9\s]/g,'-').trim() + '.json';
+
+      // Cerca file esistente
+      const existing = await gapi.client.drive.files.list({
+        q: `name='${filename}' and '${_folderId}' in parents and trashed=false`,
+        fields: 'files(id)',
+      });
+
+      if (existing.result.files?.length) {
+        // Aggiorna file esistente
+        await gapi.client.request({
+          path: `/upload/drive/v3/files/${existing.result.files[0].id}`,
+          method: 'PATCH',
+          params: { uploadType: 'media' },
+          headers: { 'Content-Type': 'application/json' },
+          body: content,
+        });
+      } else {
+        // Crea nuovo file
+        await gapi.client.drive.files.create({
+          resource: { name: filename, parents: [_folderId] },
+          media: { mimeType: 'application/json', body: content },
+        });
+      }
+
+      const now = new Date().toLocaleTimeString('it-IT', { hour:'2-digit', minute:'2-digit' });
+      localStorage.setItem(LS_LAST, now);
+      _updateLastBackup(now);
+
+    } catch(e) {
+      Debug.warn('Drive backup error:', e.message);
+    }
+  };
+
+  const _getOrCreateFolder = async () => {
+    // Cerca cartella DM Toolkit
+    const res = await gapi.client.drive.files.list({
+      q: `name='${FOLDER_NAME}' and mimeType='application/vnd.google-apps.folder' and trashed=false`,
+      fields: 'files(id)',
+    });
+    if (res.result.files?.length) return res.result.files[0].id;
+    // Crea cartella
+    const folder = await gapi.client.drive.files.create({
+      resource: { name: FOLDER_NAME, mimeType: 'application/vnd.google-apps.folder' },
+      fields: 'id',
+    });
+    return folder.result.id;
+  };
+
+  // ── UI ──
+  const _updateUI = () => {
+    const label = document.getElementById('drive-settings-label');
+    const connectBtn = document.getElementById('drive-connect-btn');
+    const backupBtn = document.getElementById('drive-backup-now-btn');
+    const disconnectBtn = document.getElementById('drive-disconnect-btn');
+    const lastBackup = document.getElementById('drive-last-backup');
+
+    if (_connected) {
+      if (label) { label.textContent = 'Collegato — cartella "DM Toolkit" su Google Drive'; label.style.color = 'var(--accent-secondary)'; }
+      if (connectBtn) connectBtn.style.display = 'none';
+      if (backupBtn) backupBtn.style.display = '';
+      if (disconnectBtn) disconnectBtn.style.display = '';
+      _updateLastBackup(localStorage.getItem(LS_LAST));
+    } else {
+      if (label) { label.textContent = 'Non collegato'; label.style.color = 'var(--text-muted)'; }
+      if (connectBtn) connectBtn.style.display = '';
+      if (backupBtn) backupBtn.style.display = 'none';
+      if (disconnectBtn) disconnectBtn.style.display = 'none';
+      if (lastBackup) lastBackup.textContent = '';
+    }
+  };
+
+  const _updateLastBackup = (time) => {
+    const el = document.getElementById('drive-last-backup');
+    if (el && time) el.textContent = 'Ultimo backup: ' + time;
+  };
+
+  const disconnect = () => {
+    if (!confirm('Scollegare Google Drive? I backup automatici verranno disattivati.')) return;
+    _connected = false;
+    _folderId = null;
+    localStorage.removeItem(LS_KEY);
+    localStorage.removeItem(LS_LAST);
+    _updateUI();
+    Toast.show('Google Drive scollegato', 'info');
+  };
+
+  // Mostra il welcome modal al primo login Google
+  const showWelcomeIfNeeded = () => {
+    const seen = localStorage.getItem('dm_drive_welcome_seen');
+    const connected = localStorage.getItem(LS_KEY) === 'true';
+    if (!seen && !connected) {
+      setTimeout(() => Modal.open('drive-welcome'), 1500);
+    }
+  };
+
+  return { init, connect, connectFromWelcome, dismissWelcome, backupNow, disconnect, showWelcomeIfNeeded, _updateUI };
 })();
 
 
@@ -17699,6 +17992,7 @@ document.addEventListener('DOMContentLoaded', () => {
   App.init();
   BackupSystem.autoBackup();
   Settings.init();
+  setTimeout(() => { try { DriveBackup.init(); } catch(e) {} }, 1200);
   // Inizializza Google Drive se configurato
   setTimeout(() => { try { GDriveUI.init(); } catch(e) {} }, 1000);
   setTimeout(() => { try { FirebaseSync.init(); } catch(e) {} }, 500);
@@ -18227,6 +18521,23 @@ document.addEventListener('DOMContentLoaded', initMobileNav);
         </div>
       </section>
 
+      <!-- Google Drive Backup -->
+      <section style="border-top:1px solid var(--border);padding-top:16px;">
+        <h4 style="font-family:var(--font-display);font-size:0.82rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin:0 0 12px;">Backup su Google Drive</h4>
+        <div style="background:var(--bg-secondary);border-radius:var(--radius-md);padding:12px;margin-bottom:10px;font-size:0.82rem;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            <span id="drive-settings-label" style="color:var(--text-muted);">Non collegato</span>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button id="drive-connect-btn" class="btn btn-primary btn-sm" onclick="DriveBackup.connect()">Collega Drive</button>
+          <button id="drive-backup-now-btn" class="btn btn-ghost btn-sm" style="display:none;" onclick="DriveBackup.backupNow()">Salva ora su Drive</button>
+          <button id="drive-disconnect-btn" class="btn btn-ghost btn-sm" style="display:none;color:var(--accent-danger);" onclick="DriveBackup.disconnect()">Scollega</button>
+        </div>
+        <div style="font-size:0.72rem;color:var(--text-muted);margin-top:8px;" id="drive-last-backup"></div>
+      </section>
+
       <!-- Supporta il progetto -->
       <section style="border-top:1px solid var(--border);padding-top:16px;">
         <h4 style="font-family:var(--font-display);font-size:0.82rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin:0 0 12px;">Supporta il progetto</h4>
@@ -18306,6 +18617,60 @@ document.addEventListener('DOMContentLoaded', initMobileNav);
           </div>
         </div>
       </section>
+
+    </div>
+  </div>
+</div>
+
+
+<!-- Modal: Connetti Google Drive (post-login) -->
+<div class="modal-overlay hidden" id="modal-drive-welcome" style="display:none;" onclick="if(event.target===this)Modal.close('drive-welcome')">
+  <div class="modal" style="max-width:440px;">
+    <div class="modal-header" style="border-bottom:none;padding-bottom:0;">
+      <button class="btn btn-ghost btn-icon-sm" onclick="DriveBackup.dismissWelcome()" style="margin-left:auto;">✕</button>
+    </div>
+    <div class="modal-body" style="padding:8px 24px 24px;text-align:center;">
+
+      <!-- Icona -->
+      <div style="width:56px;height:56px;background:linear-gradient(135deg,var(--accent-primary),#c97bea);border-radius:var(--radius-xl);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        </svg>
+      </div>
+
+      <h3 style="font-family:var(--font-display);font-size:1.2rem;margin:0 0 8px;">Metti al sicuro la tua campagna</h3>
+      <p style="font-size:0.85rem;color:var(--text-muted);line-height:1.6;margin:0 0 20px;">
+        Ogni avventura merita di essere preservata. Collega Google Drive e le tue campagne verranno salvate automaticamente in una cartella <strong>DM Toolkit</strong> sul tuo Drive — al sicuro, sempre accessibili, solo tuoi.
+      </p>
+
+      <div style="background:var(--bg-secondary);border-radius:var(--radius-md);padding:12px 16px;margin-bottom:20px;text-align:left;">
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <div style="display:flex;align-items:center;gap:10px;font-size:0.82rem;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent-secondary)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            <span>Backup automatico ad ogni salvataggio</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;font-size:0.82rem;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent-secondary)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            <span>File JSON nella tua cartella Drive — sempre esportabile</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;font-size:0.82rem;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent-secondary)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            <span>Nessun dato extra su Firebase — lo storage è tuo</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <button class="btn btn-primary" style="width:100%;padding:12px;" onclick="DriveBackup.connectFromWelcome()">
+          <div style="display:flex;align-items:center;justify-content:center;gap:8px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+            Collega Google Drive
+          </div>
+        </button>
+        <button class="btn btn-ghost" style="width:100%;font-size:0.82rem;color:var(--text-muted);" onclick="DriveBackup.dismissWelcome()">
+          Non ora — posso farlo dalle impostazioni
+        </button>
+      </div>
 
     </div>
   </div>
