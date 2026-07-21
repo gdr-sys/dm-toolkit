@@ -2,19 +2,28 @@
 <html lang="it" data-theme="dark">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>DM Toolkit — 5e</title>
+  <meta name="description" content="Campaign management tool for D&D 5e Dungeon Masters">
+  <meta name="theme-color" content="#8B2635">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="DM Toolkit">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/components.css">
   <link rel="stylesheet" href="css/layout.css">
   <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.2/Sortable.min.js"></script>
+  <!-- Firebase SDK — caricamento silenzioso se offline -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js" crossorigin="anonymous" onerror="console.warn('[DM] Firebase app non caricato')"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js" crossorigin="anonymous" onerror="console.warn('[DM] Firebase auth non caricato')"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js" crossorigin="anonymous" onerror="console.warn('[DM] Firebase DB non caricato')"></script>
+  <!-- Librerie CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js" crossorigin="anonymous" onerror="console.warn('[DM] d3 non caricato')"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" crossorigin="anonymous" onerror="console.warn('[DM] jsPDF non caricato')"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" crossorigin="anonymous" onerror="console.warn('[DM] html2canvas non caricato')"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.2/Sortable.min.js" crossorigin="anonymous" onerror="console.warn('[DM] Sortable non caricato')"></script>
 <style>
 /FIX SCHERMO DM — grid 5 colonne con span */
 #page-schermo { overflow-x: hidden !important; }
@@ -2739,6 +2748,15 @@
      SCRIPTS
 ════════════════════════════════════════════════════════ -->
 <!-- Generatori inline (sarà spostato in generatori.js) -->
+<script>
+  // Sopprime "Script error" da script cross-origin (errori non informativi)
+  window.addEventListener('error', function(e) {
+    if (e && (e.message === 'Script error.' || e.message === 'Script error')) {
+      e.stopImmediatePropagation();
+      return true;
+    }
+  }, true);
+</script>
 <script>
 
 // ════════════════════ debug.js ════════════════════
@@ -12813,6 +12831,9 @@ const ExportPDF = (() => {
   </div>
 </div>
 
+
+
+
 </body></html>`);
     win.document.close();
   };
@@ -17998,6 +18019,10 @@ document.addEventListener('DOMContentLoaded', () => {
   setTimeout(() => { try { FirebaseSync.init(); } catch(e) {} }, 500);
   // Carica cache mostri e compendio in background
   setTimeout(() => MonsterCache.load(), 500);
+  // PWA Service Worker
+  if ('serviceWorker' in navigator && window.self === window.top) {
+    navigator.serviceWorker.register('sw.js', { scope: '/dm-toolkit/' }).catch(function(){});
+  }
 
 });
 </script>
@@ -18675,6 +18700,18 @@ document.addEventListener('DOMContentLoaded', initMobileNav);
     </div>
   </div>
 </div>
+
+
+<script>
+  // Sopprime "Script error" da script cross-origin (non informativi)
+  window.addEventListener('error', (e) => {
+    if (e.message === 'Script error.' || e.message === 'Script error') {
+      e.stopImmediatePropagation();
+      return true;
+    }
+  }, true);
+</script>
+
 
 </body>
 </html>
