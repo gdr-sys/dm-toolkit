@@ -212,33 +212,18 @@
     <div class="nav-section">
       <div class="nav-section-label">Navigazione</div>
 
+
       <button class="nav-item active" data-page="home" onclick="App.navigateTo('home')">
         <span class="nav-icon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span>
         <span class="nav-label">Home</span>
       </button>
+
 
       <button class="nav-item" data-page="campagna" data-requires-campaign="true" onclick="App.navigateTo('campagna');closeMobileMenu()">
         <span class="nav-icon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg></span>
         <span class="nav-label">Dashboard</span>
       </button>
 
-
-      <button class="nav-item" data-page="sessione" data-requires-campaign="true" onclick="App.navigateTo('sessione');closeMobileMenu()">
-        <span class="nav-icon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="14.5 17.5 3 6 3 3 6 3 17.5 14.5"/><line x1="13" y1="19" x2="19" y2="13"/><line x1="16" y1="16" x2="20" y2="20"/><line x1="19" y1="21" x2="21" y2="19"/><polyline points="14.5 6.5 18 3 21 3 21 6 17.5 9.5"/><line x1="5" y1="14" x2="9" y2="18"/><line x1="7" y1="11" x2="11" y2="15"/></svg></span>
-        <span class="nav-label">Sessione</span>
-      </button>
-
-      <div class="nav-section-label" style="margin-top:8px;">Strumenti</div>
-
-      <button class="nav-item" data-page="generatori" onclick="App.navigateTo('generatori');closeMobileMenu()">
-        <span class="nav-icon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span>
-        <span class="nav-label">Generatori</span>
-      </button>
-
-      <button class="nav-item" data-page="compendio" onclick="App.navigateTo('compendio');closeMobileMenu()">
-        <span class="nav-icon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg></span>
-        <span class="nav-label">Compendio</span>
-      </button>
 
       <!-- Wiki con sottovoci -->
       <div class="nav-group-wiki" id="nav-wiki-group">
@@ -290,6 +275,26 @@
           </button>
         </div>
       </div>
+        <button class="nav-item" data-page="schermo" onclick="App.navigateTo('schermo');closeMobileMenu()">
+
+      <button class="nav-item" data-page="sessione" data-requires-campaign="true" onclick="App.navigateTo('sessione');closeMobileMenu()">
+        <span class="nav-icon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="14.5 17.5 3 6 3 3 6 3 17.5 14.5"/><line x1="13" y1="19" x2="19" y2="13"/><line x1="16" y1="16" x2="20" y2="20"/><line x1="19" y1="21" x2="21" y2="19"/><polyline points="14.5 6.5 18 3 21 3 21 6 17.5 9.5"/><line x1="5" y1="14" x2="9" y2="18"/><line x1="7" y1="11" x2="11" y2="15"/></svg></span>
+        <span class="nav-label">Sessione</span>
+      </button>
+
+
+      <div class="nav-section-label" style="margin-top:8px;">Strumenti</div>
+
+      <button class="nav-item" data-page="generatori" onclick="App.navigateTo('generatori');closeMobileMenu()">
+        <span class="nav-icon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span>
+        <span class="nav-label">Generatori</span>
+      </button>
+
+      <button class="nav-item" data-page="compendio" onclick="App.navigateTo('compendio');closeMobileMenu()">
+        <span class="nav-icon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg></span>
+        <span class="nav-label">Compendio</span>
+      </button>
+
         <button class="nav-item" data-page="schermo" onclick="App.navigateTo('schermo');closeMobileMenu()">
         <span class="nav-icon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></span>
         <span class="nav-label">Schermo DM</span>
@@ -1692,7 +1697,7 @@
     <!-- ══ WIKI SECTIONS — PNG / LUOGHI / FAZIONI / LORE / SESSIONI ══ -->
 
     <!-- PNG Wiki -->
-    <section class="page" id="page-wiki-png" style="display:none;padding:0;height:calc(100vh - var(--header-height));">
+    <section class="page" id="page-wiki-png" style="padding:0;height:calc(100vh - var(--header-height));">
       <div id="wiki-png-list" style="height:100%;overflow-y:auto;padding:20px;">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px;">
           <div><h2 style="font-family:var(--font-display);font-size:1.2rem;margin:0;">PNG</h2>
@@ -1708,7 +1713,7 @@
     </section>
 
     <!-- Luoghi Wiki -->
-    <section class="page" id="page-wiki-luoghi" style="display:none;padding:0;height:calc(100vh - var(--header-height));">
+    <section class="page" id="page-wiki-luoghi" style="padding:0;height:calc(100vh - var(--header-height));">
       <div id="wiki-luoghi-list" style="height:100%;overflow-y:auto;padding:20px;">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px;">
           <div><h2 style="font-family:var(--font-display);font-size:1.2rem;margin:0;">Luoghi</h2>
@@ -1724,7 +1729,7 @@
     </section>
 
     <!-- Fazioni Wiki -->
-    <section class="page" id="page-wiki-fazioni" style="display:none;padding:0;height:calc(100vh - var(--header-height));">
+    <section class="page" id="page-wiki-fazioni" style="padding:0;height:calc(100vh - var(--header-height));">
       <div id="wiki-fazioni-list" style="height:100%;overflow-y:auto;padding:20px;">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px;">
           <div><h2 style="font-family:var(--font-display);font-size:1.2rem;margin:0;">Fazioni</h2>
@@ -1740,7 +1745,7 @@
     </section>
 
     <!-- Lore Wiki -->
-    <section class="page" id="page-wiki-lore" style="display:none;padding:0;height:calc(100vh - var(--header-height));">
+    <section class="page" id="page-wiki-lore" style="padding:0;height:calc(100vh - var(--header-height));">
       <div id="wiki-lore-list" style="height:100%;overflow-y:auto;padding:20px;">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px;">
           <div><h2 style="font-family:var(--font-display);font-size:1.2rem;margin:0;">Lore</h2>
@@ -1759,7 +1764,7 @@
     </section>
 
     <!-- Sessioni Wiki -->
-    <section class="page" id="page-wiki-sessioni" style="display:none;padding:0;height:calc(100vh - var(--header-height));">
+    <section class="page" id="page-wiki-sessioni" style="padding:0;height:calc(100vh - var(--header-height));">
       <div id="wiki-sessioni-list" style="height:100%;overflow-y:auto;padding:20px;">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px;">
           <div><h2 style="font-family:var(--font-display);font-size:1.2rem;margin:0;">Sessioni</h2>
@@ -3749,14 +3754,19 @@ const App = (() => {
 
   // ── Navigazione ──
   const pages = {
-    home:       { label: 'Campagne',   icon: '🏠', navItem: true,  requiresCampaign: false },
-    campagna:   { label: 'Campagna',   icon: '📖', navItem: true,  requiresCampaign: true  },
+    home:       { label: 'Home',   icon: '🏠', navItem: true,  requiresCampaign: false },
+    campagna:   { label: 'Dashboard',   icon: '📖', navItem: true,  requiresCampaign: true  },
     mondo:      { label: 'Mondo',      icon: '🗺️', navItem: true,  requiresCampaign: true  },
     sessione:   { label: 'Sessione',   icon: '⚔️', navItem: true,  requiresCampaign: true  },
     generatori: { label: 'Generatori', icon: '✨', navItem: true,  requiresCampaign: false },
     compendio:  { label: 'Compendio',  icon: '📚', navItem: true,  requiresCampaign: false },
     schermo:    { label: 'Schermo DM', icon: '🖥️', navItem: true,  requiresCampaign: false },
     wiki:       { label: 'Wiki',        icon: '📝', navItem: true,  requiresCampaign: true  },
+    'wiki-png':      { label: 'PNG',      icon: '📝', navItem: false, requiresCampaign: true },
+    'wiki-luoghi':   { label: 'Luoghi',   icon: '📝', navItem: false, requiresCampaign: true },
+    'wiki-fazioni':  { label: 'Fazioni',  icon: '📝', navItem: false, requiresCampaign: true },
+    'wiki-lore':     { label: 'Lore',     icon: '📝', navItem: false, requiresCampaign: true },
+    'wiki-sessioni': { label: 'Sessioni', icon: '📝', navItem: false, requiresCampaign: true },
   };
 
   const navigateTo = (pageId) => {
@@ -3828,6 +3838,14 @@ const App = (() => {
         requestAnimationFrame(() => requestAnimationFrame(() => {
           try { WikiDM.init(); } catch(e) { Debug.warn('WikiDM: ' + e); }
         }));
+        break;
+    case 'wiki-png':
+    case 'wiki-luoghi':
+    case 'wiki-fazioni':
+    case 'wiki-lore':
+    case 'wiki-sessioni':
+        // gestito da WikiSections.goto()
+        setTimeout(() => { try { WikiSections.renderCounters(); } catch(e) {} }, 100);
         break;
     }
   };
@@ -16032,19 +16050,11 @@ const WikiSections = (() => {
   const goto = (type) => {
     _currentType = type;
     _currentItem = null;
-    // Nasconde tutte le pagine wiki-* e page-wiki
-    ['png','luoghi','fazioni','lore','sessioni'].forEach(t => {
-      const el = document.getElementById('page-wiki-' + t);
-      if (el) el.style.display = 'none';
-    });
-    const mainWiki = document.getElementById('page-wiki');
-    if (mainWiki) mainWiki.style.display = 'none';
 
-    // Mostra la pagina corrente
-    const page = document.getElementById('page-wiki-' + type);
-    if (page) page.style.display = '';
+    // Usa App.navigateTo per gestire show/hide pagine in modo coerente
+    App.navigateTo('wiki-' + type);
 
-    // Aggiorna nav active
+    // Aggiorna nav subitem active
     document.querySelectorAll('.nav-subitem').forEach(b => {
       b.classList.toggle('active', b.dataset.wikiSection === type);
     });
@@ -16057,9 +16067,6 @@ const WikiSections = (() => {
       if (sub) sub.style.display = 'flex';
       if (chev) chev.style.transform = 'rotate(180deg)';
     }
-
-    // Aggiorna App.currentPage
-    if (window.App?.setCurrentPage) App.setCurrentPage('wiki-' + type);
 
     renderList(type);
   };
