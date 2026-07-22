@@ -93,6 +93,10 @@
 #wiki-note-content h2 { font-family:var(--font-display); font-size:1.1rem; font-weight:700; color:var(--text-primary); margin:0.5em 0 0.2em; }
 #wiki-note-content h3 { font-family:var(--font-display); font-size:0.95rem; font-weight:600; color:var(--accent-secondary); margin:0.4em 0 0.2em; }
 #wiki-note-content blockquote { border-left:3px solid var(--accent-secondary); margin:0.4em 0; padding:4px 12px; background:rgba(93,130,90,0.08); border-radius:0 var(--radius-sm) var(--radius-sm) 0; font-style:italic; }
+/* Wiki subnav */
+.nav-subitem { font-size:0.78rem !important; padding:5px 8px !important; }
+.nav-subitem.active { background:var(--bg-secondary); color:var(--accent-primary) !important; }
+.nav-subitem:hover { background:var(--bg-secondary); }
 /* Scene planner */
 .scene-beat { transition: opacity 0.15s; }
 .scene-beat:active { opacity: 0.7; cursor: grabbing; }
@@ -210,18 +214,14 @@
 
       <button class="nav-item active" data-page="home" onclick="App.navigateTo('home')">
         <span class="nav-icon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span>
-        <span class="nav-label">Campagne</span>
+        <span class="nav-label">Home</span>
       </button>
 
       <button class="nav-item" data-page="campagna" data-requires-campaign="true" onclick="App.navigateTo('campagna');closeMobileMenu()">
         <span class="nav-icon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg></span>
-        <span class="nav-label">Campagna</span>
+        <span class="nav-label">Dashboard</span>
       </button>
 
-      <button class="nav-item" data-page="mondo" data-requires-campaign="true" onclick="App.navigateTo('mondo');closeMobileMenu()">
-        <span class="nav-icon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg></span>
-        <span class="nav-label">Mondo</span>
-      </button>
 
       <button class="nav-item" data-page="sessione" data-requires-campaign="true" onclick="App.navigateTo('sessione');closeMobileMenu()">
         <span class="nav-icon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="14.5 17.5 3 6 3 3 6 3 17.5 14.5"/><line x1="13" y1="19" x2="19" y2="13"/><line x1="16" y1="16" x2="20" y2="20"/><line x1="19" y1="21" x2="21" y2="19"/><polyline points="14.5 6.5 18 3 21 3 21 6 17.5 9.5"/><line x1="5" y1="14" x2="9" y2="18"/><line x1="7" y1="11" x2="11" y2="15"/></svg></span>
@@ -240,12 +240,56 @@
         <span class="nav-label">Compendio</span>
       </button>
 
-      <button class="nav-item" data-page="wiki" data-requires-campaign="true" onclick="App.navigateTo('wiki');closeMobileMenu()">
-          <span class="nav-icon" aria-hidden="true">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+      <!-- Wiki con sottovoci -->
+      <div class="nav-group-wiki" id="nav-wiki-group">
+        <button class="nav-item" data-page="wiki" data-requires-campaign="true"
+          onclick="WikiSections.toggleExpand();closeMobileMenu()"
+          style="justify-content:space-between;">
+          <span style="display:flex;align-items:center;gap:8px;">
+            <span class="nav-icon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
+            <span class="nav-label">Wiki</span>
           </span>
-          <span class="nav-label">Wiki</span>
+          <span id="wiki-nav-chevron" style="font-size:0.6rem;color:var(--text-muted);transition:transform 0.2s;">▼</span>
         </button>
+        <!-- Sottovoci Wiki -->
+        <div id="wiki-subnav" style="padding-left:16px;border-left:2px solid var(--border);margin-left:12px;display:none;flex-direction:column;gap:1px;">
+          <button class="nav-item nav-subitem" data-wiki-section="png"
+            onclick="WikiSections.goto('png');closeMobileMenu()"
+            style="padding:5px 8px;font-size:0.78rem;">
+            <span style="color:var(--text-muted);"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
+            <span class="nav-label">PNG</span>
+            <span id="wiki-cnt-png" style="margin-left:auto;font-size:0.6rem;background:var(--bg-tertiary);padding:1px 5px;border-radius:var(--radius-full);color:var(--text-muted);">0</span>
+          </button>
+          <button class="nav-item nav-subitem" data-wiki-section="luoghi"
+            onclick="WikiSections.goto('luoghi');closeMobileMenu()"
+            style="padding:5px 8px;font-size:0.78rem;">
+            <span style="color:var(--text-muted);"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg></span>
+            <span class="nav-label">Luoghi</span>
+            <span id="wiki-cnt-luoghi" style="margin-left:auto;font-size:0.6rem;background:var(--bg-tertiary);padding:1px 5px;border-radius:var(--radius-full);color:var(--text-muted);">0</span>
+          </button>
+          <button class="nav-item nav-subitem" data-wiki-section="fazioni"
+            onclick="WikiSections.goto('fazioni');closeMobileMenu()"
+            style="padding:5px 8px;font-size:0.78rem;">
+            <span style="color:var(--text-muted);"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>
+            <span class="nav-label">Fazioni</span>
+            <span id="wiki-cnt-fazioni" style="margin-left:auto;font-size:0.6rem;background:var(--bg-tertiary);padding:1px 5px;border-radius:var(--radius-full);color:var(--text-muted);">0</span>
+          </button>
+          <button class="nav-item nav-subitem" data-wiki-section="lore"
+            onclick="WikiSections.goto('lore');closeMobileMenu()"
+            style="padding:5px 8px;font-size:0.78rem;">
+            <span style="color:var(--text-muted);"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></span>
+            <span class="nav-label">Lore</span>
+            <span id="wiki-cnt-lore" style="margin-left:auto;font-size:0.6rem;background:var(--bg-tertiary);padding:1px 5px;border-radius:var(--radius-full);color:var(--text-muted);">0</span>
+          </button>
+          <button class="nav-item nav-subitem" data-wiki-section="sessioni"
+            onclick="WikiSections.goto('sessioni');closeMobileMenu()"
+            style="padding:5px 8px;font-size:0.78rem;">
+            <span style="color:var(--text-muted);"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="14.5 17.5 3 6 3 3 6 3 17.5 14.5"/><line x1="13" y1="19" x2="19" y2="13"/><line x1="16" y1="16" x2="20" y2="20"/><line x1="19" y1="21" x2="21" y2="19"/></svg></span>
+            <span class="nav-label">Sessioni</span>
+            <span id="wiki-cnt-sessioni" style="margin-left:auto;font-size:0.6rem;background:var(--bg-tertiary);padding:1px 5px;border-radius:var(--radius-full);color:var(--text-muted);">0</span>
+          </button>
+        </div>
+      </div>
         <button class="nav-item" data-page="schermo" onclick="App.navigateTo('schermo');closeMobileMenu()">
         <span class="nav-icon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></span>
         <span class="nav-label">Schermo DM</span>
@@ -272,7 +316,7 @@
     <!-- Topbar -->
     <header id="topbar">
       <!-- hamburger rimosso: navigazione diretta via mobile-nav -->
-      <h1 class="topbar-title" id="topbar-title">Campagne</h1>
+      <h1 class="topbar-title" id="topbar-title">Home</h1>
       <div class="topbar-actions" style="display:flex;align-items:center;gap:8px;">
         <button title="Scratchpad (note rapide)" onclick="Scratchpad.toggle()"
           style="background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:1.1rem;padding:4px 8px;border-radius:var(--radius-sm);transition:background 0.15s;"
@@ -344,7 +388,7 @@
     <section class="page" id="page-campagna">
       <div class="page-header">
         <div>
-          <h1 class="page-title" id="camp-page-title">Campagna</h1>
+          <h1 class="page-title" id="camp-<h1 class="page-title">Dashboard</h1>/h1>
           <p class="page-subtitle">Dashboard della campagna attiva</p>
         </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap;">
@@ -1642,6 +1686,92 @@
           <div id="wiki-search-list"></div>
         </div>
       </div>
+    </section>
+
+
+    <!-- ══ WIKI SECTIONS — PNG / LUOGHI / FAZIONI / LORE / SESSIONI ══ -->
+
+    <!-- PNG Wiki -->
+    <section class="page" id="page-wiki-png" style="display:none;padding:0;height:calc(100vh - var(--header-height));">
+      <div id="wiki-png-list" style="height:100%;overflow-y:auto;padding:20px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px;">
+          <div><h2 style="font-family:var(--font-display);font-size:1.2rem;margin:0;">PNG</h2>
+          <p style="font-size:0.75rem;color:var(--text-muted);margin:2px 0 0;">Personaggi non giocanti della campagna</p></div>
+          <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+            <input id="wiki-png-search" type="text" class="form-input" placeholder="Cerca PNG..." style="width:180px;font-size:0.82rem;" oninput="WikiSections.filter('png',this.value)">
+            <button class="btn btn-primary btn-sm" onclick="WikiSections.newCard('png')">+ Nuovo PNG</button>
+          </div>
+        </div>
+        <div id="wiki-png-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;"></div>
+      </div>
+      <div id="wiki-png-detail" style="display:none;height:100%;overflow-y:auto;padding:20px;"></div>
+    </section>
+
+    <!-- Luoghi Wiki -->
+    <section class="page" id="page-wiki-luoghi" style="display:none;padding:0;height:calc(100vh - var(--header-height));">
+      <div id="wiki-luoghi-list" style="height:100%;overflow-y:auto;padding:20px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px;">
+          <div><h2 style="font-family:var(--font-display);font-size:1.2rem;margin:0;">Luoghi</h2>
+          <p style="font-size:0.75rem;color:var(--text-muted);margin:2px 0 0;">Locazioni, dungeon, città e regioni</p></div>
+          <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+            <input id="wiki-luoghi-search" type="text" class="form-input" placeholder="Cerca luoghi..." style="width:180px;font-size:0.82rem;" oninput="WikiSections.filter('luoghi',this.value)">
+            <button class="btn btn-primary btn-sm" onclick="WikiSections.newCard('luoghi')">+ Nuovo Luogo</button>
+          </div>
+        </div>
+        <div id="wiki-luoghi-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;"></div>
+      </div>
+      <div id="wiki-luoghi-detail" style="display:none;height:100%;overflow-y:auto;padding:20px;"></div>
+    </section>
+
+    <!-- Fazioni Wiki -->
+    <section class="page" id="page-wiki-fazioni" style="display:none;padding:0;height:calc(100vh - var(--header-height));">
+      <div id="wiki-fazioni-list" style="height:100%;overflow-y:auto;padding:20px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px;">
+          <div><h2 style="font-family:var(--font-display);font-size:1.2rem;margin:0;">Fazioni</h2>
+          <p style="font-size:0.75rem;color:var(--text-muted);margin:2px 0 0;">Organizzazioni, gilde e fazioni della campagna</p></div>
+          <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+            <input id="wiki-fazioni-search" type="text" class="form-input" placeholder="Cerca fazioni..." style="width:180px;font-size:0.82rem;" oninput="WikiSections.filter('fazioni',this.value)">
+            <button class="btn btn-primary btn-sm" onclick="WikiSections.newCard('fazioni')">+ Nuova Fazione</button>
+          </div>
+        </div>
+        <div id="wiki-fazioni-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;"></div>
+      </div>
+      <div id="wiki-fazioni-detail" style="display:none;height:100%;overflow-y:auto;padding:20px;"></div>
+    </section>
+
+    <!-- Lore Wiki -->
+    <section class="page" id="page-wiki-lore" style="display:none;padding:0;height:calc(100vh - var(--header-height));">
+      <div id="wiki-lore-list" style="height:100%;overflow-y:auto;padding:20px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px;">
+          <div><h2 style="font-family:var(--font-display);font-size:1.2rem;margin:0;">Lore</h2>
+          <p style="font-size:0.75rem;color:var(--text-muted);margin:2px 0 0;">Note libere, lore, segreti e storia del mondo</p></div>
+          <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+            <input id="wiki-lore-search" type="text" class="form-input" placeholder="Cerca lore..." style="width:180px;font-size:0.82rem;" oninput="WikiSections.filter('lore',this.value)">
+            <select id="wiki-lore-filter-tag" class="form-select" style="width:140px;font-size:0.78rem;" onchange="WikiSections.filterTag('lore',this.value)">
+              <option value="">Tutti i tag</option>
+            </select>
+            <button class="btn btn-primary btn-sm" onclick="WikiSections.newCard('lore')">+ Nuova Nota</button>
+          </div>
+        </div>
+        <div id="wiki-lore-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;"></div>
+      </div>
+      <div id="wiki-lore-detail" style="display:none;height:100%;overflow-y:auto;padding:20px;"></div>
+    </section>
+
+    <!-- Sessioni Wiki -->
+    <section class="page" id="page-wiki-sessioni" style="display:none;padding:0;height:calc(100vh - var(--header-height));">
+      <div id="wiki-sessioni-list" style="height:100%;overflow-y:auto;padding:20px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px;">
+          <div><h2 style="font-family:var(--font-display);font-size:1.2rem;margin:0;">Sessioni</h2>
+          <p style="font-size:0.75rem;color:var(--text-muted);margin:2px 0 0;">Note sessioni, recap e ganci narrativi</p></div>
+          <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+            <input id="wiki-sessioni-search" type="text" class="form-input" placeholder="Cerca sessioni..." style="width:180px;font-size:0.82rem;" oninput="WikiSections.filter('sessioni',this.value)">
+            <button class="btn btn-primary btn-sm" onclick="WikiSections.newCard('sessioni')">+ Nuova Nota Sessione</button>
+          </div>
+        </div>
+        <div id="wiki-sessioni-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;"></div>
+      </div>
+      <div id="wiki-sessioni-detail" style="display:none;height:100%;overflow-y:auto;padding:20px;"></div>
     </section>
 
     <!-- ════════════════════════
@@ -3681,7 +3811,8 @@ const App = (() => {
     switch (pageId) {
       case 'home':       renderHomePage(); break;
       case 'campagna':   renderCampaignPage(); setTimeout(() => { NoteCampagna.render(); try{QuestKanban.render();}catch(e){} }, 100); break;
-      case 'mondo':
+      case 'mondo': WikiSections.goto('png'); return; // reindirizza alla Wiki PNG
+      case 'mondo_legacy':
         App.reloadActiveCampaign();
         try { NPC.init(); } catch(e) { Debug.warn('NPC non pronto: ' + e); }
         try { Luoghi.init(); } catch(e) {}
@@ -15611,6 +15742,649 @@ const DriveBackup = (() => {
 })();
 
 
+
+// ══ WIKI SECTIONS — PNG / Luoghi / Fazioni / Lore / Sessioni ══
+// Pattern lista→dettaglio con campi strutturati + editor libero
+const WikiSections = (() => {
+
+  // ── Configurazione tipi ──
+  const TYPES = {
+    png: {
+      label: 'PNG',
+      color: '#69cc85',
+      fields: [
+        { key: 'ruolo',       label: 'Ruolo',           type: 'short' },
+        { key: 'razza',       label: 'Razza / Specie',  type: 'short' },
+        { key: 'stato',       label: 'Stato',           type: 'select', options: ['Vivo','Morto','Scomparso','Alleato','Nemico','Sconosciuto'] },
+        { key: 'sede',        label: 'Sede / Luogo',    type: 'mention' },
+        { key: 'fazione',     label: 'Fazione',         type: 'mention' },
+        { key: 'vuole',       label: 'Vuole',           type: 'short' },
+        { key: 'teme',        label: 'Teme',            type: 'short' },
+        { key: 'apparenza',   label: 'Apparenza',       type: 'long' },
+        { key: 'personalita', label: 'Personalità',     type: 'long' },
+        { key: 'relazioni',   label: 'Relazioni',       type: 'mentions' },
+        { key: 'segreto',     label: 'Segreto DM',      type: 'secret' },
+      ],
+      getData: (camp) => {
+        // Usa i PNG del Mondo come fonte primaria
+        return (camp?.npcs || []).map(n => ({
+          id: n.id,
+          nome: n.name || n.nome || '',
+          immagine: n.immagine || '',
+          ruolo: n.job || n.ruolo || '',
+          razza: n.race || n.razza || '',
+          stato: n.stato || 'Vivo',
+          sede: n.location || n.sede || '',
+          fazione: n.fazione || '',
+          vuole: n.wants || n.vuole || '',
+          teme: n.fears || n.teme || '',
+          apparenza: n.apparenza || n.description || '',
+          personalita: n.personality || n.personalita || '',
+          relazioni: n.relazioni || n.links || '',
+          segreto: n.secret || n.segreto || '',
+          note: n.noteLibere || '',
+          tags: n.tags || [],
+          _source: 'mondo',
+        }));
+      },
+      saveItem: (camp, item) => {
+        // Aggiorna il PNG nel Mondo
+        const npcs = camp.npcs || [];
+        const idx = npcs.findIndex(n => n.id === item.id);
+        const npcData = {
+          ...(idx >= 0 ? npcs[idx] : {}),
+          id: item.id,
+          name: item.nome,
+          immagine: item.immagine || '',
+          job: item.ruolo,
+          race: item.razza,
+          stato: item.stato,
+          location: item.sede,
+          fazione: item.fazione,
+          wants: item.vuole,
+          fears: item.teme,
+          apparenza: item.apparenza,
+          personality: item.personalita,
+          relazioni: item.relazioni,
+          secret: item.segreto,
+          noteLibere: item.note,
+          tags: item.tags || [],
+          aggiornatoAt: Date.now(),
+        };
+        if (idx >= 0) npcs[idx] = npcData;
+        else npcs.push(npcData);
+        App.saveActiveCampaign({ npcs });
+        // Sync wiki ↔ mondo
+        try { _mondoToWiki('npc', npcData, camp); } catch(e) {}
+      },
+      newItem: () => ({
+        id: 'npc_' + Date.now() + '_' + Math.random().toString(36).slice(2,5),
+        nome: '',
+        ruolo: '', razza: '', stato: 'Vivo', sede: '', fazione: '',
+        vuole: '', teme: '', apparenza: '', personalita: '',
+        relazioni: '', segreto: '', note: '', tags: [],
+      }),
+    },
+
+    luoghi: {
+      label: 'Luoghi',
+      color: '#f5a623',
+      fields: [
+        { key: 'tipo',        label: 'Tipo',            type: 'select', options: ['Città','Villaggio','Dungeon','Taverna','Castello','Tempio','Foresta','Regione','Paese','Altro'] },
+        { key: 'regione',     label: 'Regione / Zona',  type: 'mention' },
+        { key: 'atmosfera',   label: 'Atmosfera',       type: 'long' },
+        { key: 'abitanti',    label: 'PNG Presenti',    type: 'mentions' },
+        { key: 'pericoli',    label: 'Pericoli / Trappole', type: 'long' },
+        { key: 'segreto',     label: 'Segreto DM',      type: 'secret' },
+      ],
+      getData: (camp) => (camp?.locations || []).map(l => ({
+        id: l.id, nome: l.nome || l.name || '',
+        immagine: l.immagine || '',
+        tipo: l.tipo || '', regione: l.regione || '',
+        atmosfera: l.atmosfera || l.description || '',
+        abitanti: l.npcs || l.abitanti || '',
+        pericoli: l.pericoli || '',
+        segreto: l.secret || l.segreto || '',
+        note: l.noteLibere || '',
+        tags: l.tags || [], _source: 'mondo',
+      })),
+      saveItem: (camp, item) => {
+        const locs = camp.locations || [];
+        const idx = locs.findIndex(l => l.id === item.id);
+        const d = { ...(idx >= 0 ? locs[idx] : {}), id: item.id, nome: item.nome, name: item.nome,
+          immagine: item.immagine, tipo: item.tipo, regione: item.regione,
+          atmosfera: item.atmosfera, description: item.atmosfera,
+          npcs: item.abitanti, abitanti: item.abitanti,
+          pericoli: item.pericoli, secret: item.segreto, segreto: item.segreto,
+          noteLibere: item.note, tags: item.tags, aggiornatoAt: Date.now() };
+        if (idx >= 0) locs[idx] = d; else locs.push(d);
+        App.saveActiveCampaign({ locations: locs });
+        try { _mondoToWiki('location', d, camp); } catch(e) {}
+      },
+      newItem: () => ({ id: 'loc_' + Date.now() + '_' + Math.random().toString(36).slice(2,5),
+        nome: '', tipo: 'Città', regione: '', atmosfera: '', abitanti: '', pericoli: '', segreto: '', note: '', tags: [] }),
+    },
+
+    fazioni: {
+      label: 'Fazioni',
+      color: '#c97bea',
+      fields: [
+        { key: 'tipo',       label: 'Tipo',             type: 'select', options: ['Gilda','Ordine','Governo','Criminale','Militare','Mercantile','Religiosa','Altro'] },
+        { key: 'attitudine', label: 'Attitudine Party', type: 'select', options: ['Alleata','Amichevole','Neutrale','Sospettosa','Ostile','Sconosciuta'] },
+        { key: 'leader',     label: 'Leader',           type: 'mention' },
+        { key: 'sede',       label: 'Sede',             type: 'mention' },
+        { key: 'obiettivo',  label: 'Obiettivo',        type: 'long' },
+        { key: 'risorse',    label: 'Risorse / Potere', type: 'short' },
+        { key: 'nemici',     label: 'Rivali / Nemici',  type: 'mentions' },
+        { key: 'segreto',    label: 'Segreto DM',       type: 'secret' },
+      ],
+      getData: (camp) => (camp?.factions || []).map(f => ({
+        id: f.id, nome: f.nome || f.name || '',
+        immagine: f.immagine || '',
+        tipo: f.tipo || '', attitudine: f.attitudine || 'Neutrale',
+        leader: f.leader || '', sede: f.sede || '',
+        obiettivo: f.obiettivo || f.description || '',
+        risorse: f.risorse || '',
+        nemici: f.nemici || '',
+        segreto: f.secret || f.segreto || '',
+        note: f.noteLibere || '', tags: f.tags || [], _source: 'mondo',
+      })),
+      saveItem: (camp, item) => {
+        const facs = camp.factions || [];
+        const idx = facs.findIndex(f => f.id === item.id);
+        const d = { ...(idx >= 0 ? facs[idx] : {}), id: item.id, nome: item.nome, name: item.nome,
+          immagine: item.immagine, tipo: item.tipo, attitudine: item.attitudine,
+          leader: item.leader, sede: item.sede, obiettivo: item.obiettivo,
+          description: item.obiettivo, risorse: item.risorse, nemici: item.nemici,
+          secret: item.segreto, segreto: item.segreto,
+          noteLibere: item.note, tags: item.tags, aggiornatoAt: Date.now() };
+        if (idx >= 0) facs[idx] = d; else facs.push(d);
+        App.saveActiveCampaign({ factions: facs });
+        try { _mondoToWiki('faction', d, camp); } catch(e) {}
+      },
+      newItem: () => ({ id: 'fac_' + Date.now() + '_' + Math.random().toString(36).slice(2,5),
+        nome: '', tipo: 'Gilda', attitudine: 'Neutrale', leader: '', sede: '', obiettivo: '', risorse: '', nemici: '', segreto: '', note: '', tags: [] }),
+    },
+
+    lore: {
+      label: 'Lore',
+      color: '#5ba4f5',
+      fields: [
+        { key: 'categoria',  label: 'Categoria',        type: 'select', options: ['Generale','Storia','Religione','Magia','Politica','Leggenda','Oggetto','Segreto DM','Altro'] },
+        { key: 'fonti',      label: 'Fonti / Riferimenti', type: 'short' },
+        { key: 'collegati',  label: 'Entità Collegate', type: 'mentions' },
+      ],
+      getData: (camp) => {
+        const wiki = camp?.wiki || {};
+        return (wiki.lore || []).map(n => ({
+          id: n.id, nome: n.titolo || '',
+          categoria: n.categoria || 'Generale',
+          fonti: n.fonti || '',
+          collegati: n.collegati || '',
+          contenuto: n.contenuto || '',
+          note: '',
+          tags: n.tags || [], _source: 'wiki',
+        }));
+      },
+      saveItem: (camp, item) => {
+        const wiki = camp?.wiki || { lore: [], sessioni: [] };
+        if (!wiki.lore) wiki.lore = [];
+        const idx = wiki.lore.findIndex(n => n.id === item.id);
+        const d = { id: item.id, titolo: item.nome, categoria: item.categoria,
+          fonti: item.fonti, collegati: item.collegati,
+          contenuto: item.contenuto || '', tags: item.tags || [],
+          aggiornatoAt: Date.now() };
+        if (idx >= 0) wiki.lore[idx] = d; else wiki.lore.unshift(d);
+        App.saveActiveCampaign({ wiki });
+      },
+      newItem: () => ({ id: 'n' + Date.now() + Math.random().toString(36).slice(2,5),
+        nome: '', categoria: 'Generale', fonti: '', collegati: '', contenuto: '', tags: [] }),
+    },
+
+    sessioni: {
+      label: 'Sessioni',
+      color: '#ff9f43',
+      fields: [
+        { key: 'numero',    label: 'Numero Sessione',  type: 'short' },
+        { key: 'data',      label: 'Data',             type: 'short' },
+        { key: 'stato',     label: 'Stato',            type: 'select', options: ['Pianificata','In corso','Giocata'] },
+        { key: 'png',       label: 'PNG Coinvolti',    type: 'mentions' },
+        { key: 'obiettivi', label: 'Obiettivi',        type: 'long' },
+        { key: 'recap',     label: 'Recap',            type: 'long' },
+        { key: 'ganci',     label: 'Ganci prossima',   type: 'long' },
+        { key: 'segreto',   label: 'Segreto DM',       type: 'secret' },
+      ],
+      getData: (camp) => {
+        const wiki = camp?.wiki || {};
+        const sessLog = camp?.sessioni_log || [];
+        // Unisce sessioni log e note wiki sessioni
+        const fromLog = sessLog.map(s => ({
+          id: s.id, nome: 'S' + s.numero + (s.titolo ? ' — ' + s.titolo : ''),
+          numero: String(s.numero || ''), data: s.data || '',
+          stato: s.stato === 'in_corso' ? 'In corso' : s.stato === 'giocata' ? 'Giocata' : 'Pianificata',
+          png: (s.npcs || []).join(', '),
+          obiettivi: s.notePrep || '',
+          recap: s.recap || '',
+          ganci: s.ganci || '',
+          segreto: s.segreto || '',
+          contenuto: '',
+          tags: ['sessione'], _source: 'sessioni_log', _origId: s.id,
+        }));
+        // Aggiunge note wiki sessioni non già presenti
+        const fromWiki = (wiki.sessioni || [])
+          .filter(n => !fromLog.find(s => s._origId === n.sessioneId))
+          .map(n => ({
+            id: n.id, nome: n.titolo || '',
+            numero: '', data: '', stato: 'Giocata',
+            png: '', obiettivi: '', recap: '', ganci: '', segreto: '',
+            contenuto: n.contenuto || '',
+            tags: n.tags || [], _source: 'wiki',
+          }));
+        return [...fromLog, ...fromWiki];
+      },
+      saveItem: (camp, item) => {
+        if (item._source === 'sessioni_log') {
+          const sessioni = (camp.sessioni_log || []).map(s =>
+            s.id === item._origId ? {
+              ...s, titolo: item.nome.replace(/^S\d+\s*—\s*/, ''),
+              data: item.data, stato: item.stato === 'In corso' ? 'in_corso' : item.stato === 'Giocata' ? 'giocata' : 'pianificata',
+              notePrep: item.obiettivi, recap: item.recap,
+              ganci: item.ganci, segreto: item.segreto,
+            } : s
+          );
+          App.saveActiveCampaign({ sessioni_log: sessioni });
+        } else {
+          const wiki = camp?.wiki || { lore: [], sessioni: [] };
+          if (!wiki.sessioni) wiki.sessioni = [];
+          const idx = wiki.sessioni.findIndex(n => n.id === item.id);
+          const d = { id: item.id, titolo: item.nome, contenuto: item.contenuto || '',
+            tags: item.tags || [], aggiornatoAt: Date.now() };
+          if (idx >= 0) wiki.sessioni[idx] = d; else wiki.sessioni.unshift(d);
+          App.saveActiveCampaign({ wiki });
+        }
+      },
+      newItem: () => ({
+        id: 'ws_' + Date.now() + '_' + Math.random().toString(36).slice(2,5),
+        nome: '', numero: '', data: new Date().toISOString().slice(0,10),
+        stato: 'Pianificata', png: '', obiettivi: '', recap: '', ganci: '', segreto: '',
+        contenuto: '', tags: ['sessione'], _source: 'wiki',
+      }),
+    },
+  };
+
+  // ── Stato ──
+  let _currentType = null;
+  let _currentItem = null;
+  let _autosaveTimer = null;
+  let _expanded = false;
+
+  // ── Toggle espansione sottovoci ──
+  const toggleExpand = () => {
+    _expanded = !_expanded;
+    const sub = document.getElementById('wiki-subnav');
+    const chev = document.getElementById('wiki-nav-chevron');
+    if (sub) sub.style.display = _expanded ? 'flex' : 'none';
+    if (chev) chev.style.transform = _expanded ? 'rotate(180deg)' : '';
+    if (_expanded && !_currentType) goto('png');
+  };
+
+  // ── Naviga a una sezione ──
+  const goto = (type) => {
+    _currentType = type;
+    _currentItem = null;
+    // Nasconde tutte le pagine wiki-* e page-wiki
+    ['png','luoghi','fazioni','lore','sessioni'].forEach(t => {
+      const el = document.getElementById('page-wiki-' + t);
+      if (el) el.style.display = 'none';
+    });
+    const mainWiki = document.getElementById('page-wiki');
+    if (mainWiki) mainWiki.style.display = 'none';
+
+    // Mostra la pagina corrente
+    const page = document.getElementById('page-wiki-' + type);
+    if (page) page.style.display = '';
+
+    // Aggiorna nav active
+    document.querySelectorAll('.nav-subitem').forEach(b => {
+      b.classList.toggle('active', b.dataset.wikiSection === type);
+    });
+
+    // Espande la sezione se non già espansa
+    if (!_expanded) {
+      _expanded = true;
+      const sub = document.getElementById('wiki-subnav');
+      const chev = document.getElementById('wiki-nav-chevron');
+      if (sub) sub.style.display = 'flex';
+      if (chev) chev.style.transform = 'rotate(180deg)';
+    }
+
+    // Aggiorna App.currentPage
+    if (window.App?.setCurrentPage) App.setCurrentPage('wiki-' + type);
+
+    renderList(type);
+  };
+
+  // ── Render lista card ──
+  const renderList = (type) => {
+    const cfg = TYPES[type];
+    const camp = App.getActiveCampaign();
+    const items = cfg.getData(camp);
+    const grid = document.getElementById('wiki-' + type + '-grid');
+    if (!grid) return;
+
+    // Aggiorna contatore sidebar
+    const cnt = document.getElementById('wiki-cnt-' + type);
+    if (cnt) cnt.textContent = items.length;
+
+    if (!items.length) {
+      grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-muted);">' +
+        '<div style="font-size:2rem;margin-bottom:8px;opacity:0.3;">+</div>' +
+        '<div style="margin-bottom:12px;">Nessun ' + cfg.label.toLowerCase() + ' ancora.</div>' +
+        '<button class="btn btn-primary" onclick="WikiSections.newCard(\'' + type + '\')">Crea il primo</button>' +
+        '</div>';
+      return;
+    }
+
+    const STATUS_COLORS = {
+      Vivo: '#69cc85', Morto: '#ff6b6b', Scomparso: '#aaa',
+      Alleato: '#5ba4f5', Nemico: '#ff6b6b',
+      Pianificata: '#5ba4f5', 'In corso': '#f5a623', Giocata: '#69cc85',
+      Alleata: '#69cc85', Amichevole: '#5ba4f5', Neutrale: '#aaa',
+      Sospettosa: '#f5a623', Ostile: '#ff6b6b',
+    };
+
+    grid.innerHTML = items.map(item => {
+      const statusColor = STATUS_COLORS[item.stato || item.attitudine] || cfg.color;
+      const sub = item.ruolo || item.tipo || item.categoria || item.stato || item.numero || '';
+      const tags = (item.tags || []).slice(0, 3).map(t =>
+        '<span style="font-size:0.62rem;padding:1px 6px;background:' + cfg.color + '22;color:' + cfg.color + ';border-radius:var(--radius-full);">' + t + '</span>'
+      ).join('');
+
+      return '<div onclick="WikiSections.openCard(\'' + type + '\',\'' + item.id + '\')" ' +
+        'data-search="' + (item.nome + ' ' + sub + ' ' + (item.tags||[]).join(' ')).toLowerCase() + '" ' +
+        'style="background:var(--bg-card);border:1px solid var(--border);border-top:3px solid ' + cfg.color + ';' +
+        'border-radius:var(--radius-md);padding:12px;cursor:pointer;transition:border-color 0.15s,transform 0.1s;" ' +
+        'onmouseenter="this.style.borderColor=\'' + cfg.color + '\';this.style.transform=\'translateY(-1px)\'" ' +
+        'onmouseleave="this.style.borderColor=\'var(--border)\';this.style.borderTopColor=\'' + cfg.color + '\';this.style.transform=\'\'">' +
+        (item.immagine ? '<img src="' + item.immagine + '" style="width:100%;height:60px;object-fit:cover;border-radius:var(--radius-sm);margin-bottom:8px;" onerror="this.style.display=\'none\'">' : '') +
+        '<div style="font-family:var(--font-display);font-weight:600;font-size:0.88rem;margin-bottom:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' +
+        (item.nome || '<em style="color:var(--text-muted)">Senza nome</em>') + '</div>' +
+        (sub ? '<div style="font-size:0.72rem;color:var(--text-muted);margin-bottom:6px;">' + sub + '</div>' : '') +
+        (tags ? '<div style="display:flex;flex-wrap:wrap;gap:3px;">' + tags + '</div>' : '') +
+        '</div>';
+    }).join('');
+  };
+
+  // ── Apri scheda dettaglio ──
+  const openCard = (type, id) => {
+    const cfg = TYPES[type];
+    const camp = App.getActiveCampaign();
+    const items = cfg.getData(camp);
+    const item = items.find(x => x.id === id);
+    if (!item) return;
+    _currentItem = { ...item };
+
+    const listEl   = document.getElementById('wiki-' + type + '-list');
+    const detailEl = document.getElementById('wiki-' + type + '-detail');
+    if (listEl) listEl.style.display = 'none';
+    if (detailEl) { detailEl.style.display = ''; detailEl.innerHTML = _renderDetail(type, item); }
+
+    // Attiva autosave sull'editor note libere
+    const editor = document.getElementById('ws-editor-free');
+    if (editor) {
+      editor.addEventListener('input', () => {
+        _currentItem.note = editor.innerHTML;
+        _scheduleAutosave(type);
+      });
+      // MentionPicker
+      editor.addEventListener('input', (e) => MentionPicker.onInput(e, editor));
+      editor.addEventListener('keydown', (e) => MentionPicker.onKeydown(e));
+    }
+  };
+
+  // ── Render scheda dettaglio ──
+  const _renderDetail = (type, item) => {
+    const cfg = TYPES[type];
+    const STATUS_COLORS = {
+      Vivo: '#69cc85', Morto: '#ff6b6b', Scomparso: '#aaa',
+      Alleato: '#5ba4f5', Nemico: '#ff6b6b',
+      Pianificata: '#5ba4f5', 'In corso': '#f5a623', Giocata: '#69cc85',
+    };
+    const statusColor = STATUS_COLORS[item.stato] || cfg.color;
+
+    let fieldsHtml = cfg.fields.map(f => {
+      const val = item[f.key] || '';
+      let input = '';
+
+      if (f.type === 'select') {
+        input = '<select id="wsf-' + f.key + '" class="form-select" style="font-size:0.82rem;" onchange="WikiSections._fieldChange(\'' + type + '\',\'' + f.key + '\',this.value)">' +
+          f.options.map(o => '<option value="' + o + '"' + (val === o ? ' selected' : '') + '>' + o + '</option>').join('') +
+          '</select>';
+      } else if (f.type === 'long') {
+        input = '<textarea id="wsf-' + f.key + '" class="form-textarea" rows="3" ' +
+          'style="font-size:0.82rem;line-height:1.6;" ' +
+          'oninput="WikiSections._fieldChange(\'' + type + '\',\'' + f.key + '\',this.value)">' +
+          _escHtml(val) + '</textarea>';
+      } else if (f.type === 'secret') {
+        input = '<textarea id="wsf-' + f.key + '" rows="2" ' +
+          'style="width:100%;background:rgba(255,107,107,0.08);border:1px solid rgba(255,107,107,0.3);border-radius:var(--radius-md);padding:8px;font-size:0.82rem;color:var(--text-primary);resize:vertical;" ' +
+          'oninput="WikiSections._fieldChange(\'' + type + '\',\'' + f.key + '\',this.value)">' +
+          _escHtml(val) + '</textarea>';
+      } else if (f.type === 'mention' || f.type === 'mentions') {
+        input = '<input id="wsf-' + f.key + '" type="text" class="form-input" ' +
+          'style="font-size:0.82rem;" value="' + _escHtml(val) + '" ' +
+          'placeholder="Scrivi @nome per collegare..." ' +
+          'oninput="WikiSections._fieldChange(\'' + type + '\',\'' + f.key + '\',this.value)">';
+      } else {
+        input = '<input id="wsf-' + f.key + '" type="text" class="form-input" ' +
+          'style="font-size:0.82rem;" value="' + _escHtml(val) + '" ' +
+          'oninput="WikiSections._fieldChange(\'' + type + '\',\'' + f.key + '\',this.value)">';
+      }
+
+      const isSecret = f.type === 'secret';
+      return '<div class="form-group" style="margin-bottom:12px;">' +
+        '<label class="form-label" style="font-size:0.68rem;' + (isSecret ? 'color:#ff6b6b;' : '') + '">' +
+        (isSecret ? '🔒 ' : '') + f.label + '</label>' +
+        input +
+        '</div>';
+    }).join('');
+
+    // Tags
+    const tagsStr = (item.tags || []).join(', ');
+
+    return '<div style="max-width:760px;margin:0 auto;">' +
+
+      // Header con ← Torna
+      '<div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap;">' +
+        '<button onclick="WikiSections.closeDetail(\'' + type + '\')" ' +
+          'style="background:none;border:none;cursor:pointer;color:var(--accent-primary);font-size:0.85rem;display:flex;align-items:center;gap:4px;">' +
+          '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg> Torna</button>' +
+        '<div style="flex:1;min-width:0;">' +
+          '<input id="wsf-nome" type="text" value="' + _escHtml(item.nome) + '" placeholder="Nome..." ' +
+            'style="font-family:var(--font-display);font-size:1.2rem;font-weight:700;background:transparent;border:none;border-bottom:2px solid ' + cfg.color + ';width:100%;padding:2px 0;color:var(--text-primary);" ' +
+            'oninput="WikiSections._fieldChange(\'' + type + '\',\'nome\',this.value)">' +
+        '</div>' +
+        '<div style="display:flex;gap:6px;">' +
+          '<button onclick="WikiSections.deleteCard(\'' + type + '\',\'' + item.id + '\')" ' +
+            'style="background:none;border:1px solid var(--accent-danger);border-radius:var(--radius-md);cursor:pointer;color:var(--accent-danger);font-size:0.72rem;padding:4px 10px;">Elimina</button>' +
+        '</div>' +
+      '</div>' +
+
+      // Immagine (se PNG o Luoghi)
+      (type === 'png' || type === 'luoghi' || type === 'fazioni' ? '<div class="form-group" style="margin-bottom:16px;">' +
+        '<label class="form-label">Immagine URL</label>' +
+        '<input id="wsf-immagine" type="text" class="form-input" style="font-size:0.82rem;" ' +
+          'value="' + _escHtml(item.immagine || '') + '" placeholder="https://..." ' +
+          'oninput="WikiSections._fieldChange(\'' + type + '\',\'immagine\',this.value)">' +
+        (item.immagine ? '<img src="' + item.immagine + '" style="margin-top:6px;max-height:120px;border-radius:var(--radius-md);object-fit:cover;" onerror="this.style.display=\'none\'">' : '') +
+      '</div>' : '') +
+
+      // Campi strutturati
+      '<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);padding:16px;margin-bottom:16px;">' +
+        '<div style="font-size:0.68rem;font-family:var(--font-display);text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin-bottom:12px;">Informazioni</div>' +
+        fieldsHtml +
+      '</div>' +
+
+      // Tags
+      '<div class="form-group" style="margin-bottom:16px;">' +
+        '<label class="form-label">Tag <span style="color:var(--text-muted);font-weight:400;">(separati da virgola)</span></label>' +
+        '<input id="wsf-tags" type="text" class="form-input" style="font-size:0.82rem;" ' +
+          'value="' + _escHtml(tagsStr) + '" placeholder="#png, #importante..." ' +
+          'oninput="WikiSections._fieldChange(\'' + type + '\',\'tags\',this.value.split(\',\').map(t=>t.trim()).filter(Boolean))">' +
+      '</div>' +
+
+      // Editor libero note
+      '<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);overflow:hidden;margin-bottom:16px;">' +
+        '<div style="padding:8px 12px;border-bottom:1px solid var(--border);font-size:0.68rem;font-family:var(--font-display);text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);display:flex;align-items:center;justify-content:space-between;">' +
+          '<span>Note libere</span>' +
+          '<span style="font-size:0.65rem;color:var(--text-muted);font-family:var(--font-body);text-transform:none;letter-spacing:0;">Usa @nome per collegare · #tag · [[link]]</span>' +
+        '</div>' +
+        // Toolbar formattazione compatta
+        '<div style="display:flex;flex-wrap:wrap;gap:2px;padding:4px 8px;border-bottom:1px solid var(--border);background:var(--bg-secondary);">' +
+          '<button class="nc-tb" onclick="document.execCommand(\'bold\')" title="Grassetto"><b>B</b></button>' +
+          '<button class="nc-tb" onclick="document.execCommand(\'italic\')" title="Corsivo"><i>I</i></button>' +
+          '<button class="nc-tb" onclick="document.execCommand(\'underline\')" title="Sottolineato"><u>S</u></button>' +
+          '<div style="width:1px;background:var(--border);margin:2px 3px;"></div>' +
+          '<button class="nc-tb" onclick="document.execCommand(\'insertUnorderedList\')">•</button>' +
+          '<button class="nc-tb" onclick="document.execCommand(\'insertOrderedList\')">1.</button>' +
+          '<div style="width:1px;background:var(--border);margin:2px 3px;"></div>' +
+          '<button class="nc-tb" onclick="wikiCallout(\'secret\')" style="color:#c97bea;font-size:0.68rem;" title="Segreto DM">Segr.</button>' +
+          '<button class="nc-tb" onclick="wikiCallout(\'read-aloud\')" style="color:#5ba4f5;font-size:0.68rem;" title="Read Aloud">Lettura</button>' +
+        '</div>' +
+        '<div id="ws-editor-free" contenteditable="true" spellcheck="true" ' +
+          'style="min-height:120px;padding:12px 16px;font-size:0.88rem;line-height:1.8;outline:none;color:var(--text-primary);" ' +
+          'data-placeholder="Note aggiuntive, descrizioni, dettagli...">' +
+          (item.note || '') +
+        '</div>' +
+      '</div>' +
+
+      // Autosave status
+      '<div id="ws-autosave-status" style="font-size:0.68rem;color:var(--text-muted);text-align:right;margin-bottom:8px;"></div>' +
+
+    '</div>';
+  };
+
+  const _escHtml = (s) => String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+
+  // ── Field change con autosave ──
+  const _fieldChange = (type, key, value) => {
+    if (!_currentItem) return;
+    _currentItem[key] = value;
+    _scheduleAutosave(type);
+  };
+
+  const _scheduleAutosave = (type) => {
+    clearTimeout(_autosaveTimer);
+    const status = document.getElementById('ws-autosave-status');
+    if (status) status.textContent = 'Salvataggio...';
+    _autosaveTimer = setTimeout(() => {
+      _save(type);
+      if (status) status.textContent = 'Salvato ' + new Date().toLocaleTimeString('it-IT', {hour:'2-digit',minute:'2-digit'});
+    }, 1500);
+  };
+
+  const _save = (type) => {
+    if (!_currentItem) return;
+    const camp = App.getActiveCampaign();
+    // Leggi anche il contenuto dell'editor libero
+    const editor = document.getElementById('ws-editor-free');
+    if (editor) _currentItem.note = editor.innerHTML;
+    TYPES[type].saveItem(camp, _currentItem);
+    // Aggiorna contatore sidebar
+    renderCounters();
+  };
+
+  // ── Chiudi dettaglio ──
+  const closeDetail = (type) => {
+    // Salva prima di chiudere
+    if (_currentItem) _save(type);
+    _currentItem = null;
+    const listEl   = document.getElementById('wiki-' + type + '-list');
+    const detailEl = document.getElementById('wiki-' + type + '-detail');
+    if (listEl) listEl.style.display = '';
+    if (detailEl) detailEl.style.display = 'none';
+    renderList(type);
+  };
+
+  // ── Nuova card ──
+  const newCard = (type) => {
+    const cfg = TYPES[type];
+    const newItem = cfg.newItem();
+    // Salva subito come bozza
+    const camp = App.getActiveCampaign();
+    cfg.saveItem(camp, newItem);
+    openCard(type, newItem.id);
+    // Focus sul nome
+    setTimeout(() => document.getElementById('wsf-nome')?.focus(), 100);
+  };
+
+  // ── Elimina card ──
+  const deleteCard = (type, id) => {
+    if (!confirm('Eliminare questa voce? Verrà spostata nel cestino.')) return;
+    const camp = App.getActiveCampaign();
+    const cfg = TYPES[type];
+    // Aggiunge al cestino wiki
+    const items = cfg.getData(camp);
+    const item = items.find(x => x.id === id);
+    if (item) try { WikiTrash.addToTrash({ id, titolo: item.nome }, type); } catch(e) {}
+
+    // Rimuove dalla fonte
+    if (type === 'png') {
+      App.saveActiveCampaign({ npcs: (camp.npcs || []).filter(n => n.id !== id) });
+    } else if (type === 'luoghi') {
+      App.saveActiveCampaign({ locations: (camp.locations || []).filter(l => l.id !== id) });
+    } else if (type === 'fazioni') {
+      App.saveActiveCampaign({ factions: (camp.factions || []).filter(f => f.id !== id) });
+    } else if (type === 'lore' || type === 'sessioni') {
+      const wiki = camp?.wiki || {};
+      const sec = type === 'lore' ? 'lore' : 'sessioni';
+      if (wiki[sec]) wiki[sec] = wiki[sec].filter(n => n.id !== id);
+      App.saveActiveCampaign({ wiki });
+    }
+    closeDetail(type);
+    Toast.show('Voce eliminata', 'info', 1500);
+  };
+
+  // ── Filtro ricerca ──
+  const filter = (type, q) => {
+    const lc = q.toLowerCase();
+    document.querySelectorAll('#wiki-' + type + '-grid > div').forEach(card => {
+      card.style.display = (card.dataset.search || '').includes(lc) ? '' : 'none';
+    });
+  };
+
+  const filterTag = (type, tag) => {
+    const camp = App.getActiveCampaign();
+    const cfg = TYPES[type];
+    const items = cfg.getData(camp);
+    const grid = document.getElementById('wiki-' + type + '-grid');
+    if (!grid) return;
+    if (!tag) { renderList(type); return; }
+    grid.querySelectorAll('[data-search]').forEach((card, i) => {
+      const item = items[i];
+      card.style.display = (item?.tags || []).includes(tag) ? '' : 'none';
+    });
+  };
+
+  // ── Aggiorna contatori sidebar ──
+  const renderCounters = () => {
+    const camp = App.getActiveCampaign();
+    if (!camp) return;
+    Object.keys(TYPES).forEach(type => {
+      const cnt = document.getElementById('wiki-cnt-' + type);
+      if (cnt) cnt.textContent = TYPES[type].getData(camp).length;
+    });
+  };
+
+  // ── Init ──
+  const init = () => {
+    renderCounters();
+  };
+
+  return { toggleExpand, goto, renderList, openCard, closeDetail, newCard, deleteCard, filter, filterTag, renderCounters, init, _fieldChange };
+})();
+
+
 /* ── INIT ── */
 
 // ══ MONSTER CACHE (per Combat Tracker) ══
@@ -18013,6 +18787,7 @@ document.addEventListener('DOMContentLoaded', () => {
   App.init();
   BackupSystem.autoBackup();
   Settings.init();
+  try { WikiSections.init(); } catch(e) {}
   setTimeout(() => { try { DriveBackup.init(); } catch(e) {} }, 1200);
   // Inizializza Google Drive se configurato
   setTimeout(() => { try { GDriveUI.init(); } catch(e) {} }, 1000);
@@ -18035,11 +18810,11 @@ document.addEventListener('DOMContentLoaded', () => {
 <nav id="mobile-nav" style="display:none;" aria-label="Navigazione principale">
   <button class="mobile-nav-item active" data-page="home" onclick="App.navigateTo('home');setMobileActive(this)">
     <span class="mobile-nav-icon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span>
-    <span class="mobile-nav-label">Campagne</span>
+    <span class="mobile-nav-label">Home</span>
   </button>
   <button class="mobile-nav-item" data-page="campagna" onclick="App.navigateTo('campagna');setMobileActive(this)">
     <span class="mobile-nav-icon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg></span>
-    <span class="mobile-nav-label">Campagna</span>
+    <span class="mobile-nav-label">Home</span>
   </button>
   <button class="mobile-nav-item" data-page="mondo" onclick="App.navigateTo('mondo');setMobileActive(this)">
     <span class="mobile-nav-icon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg></span>
