@@ -15795,270 +15795,238 @@ const WikiSections = (() => {
   // ── Configurazione tipi ──
   const TYPES = {
     png: {
-      label: 'PNG',
-      color: '#69cc85',
+      label: 'PNG', color: '#69cc85',
       fields: [
-        { key: 'ruolo',       label: 'Ruolo',           type: 'short' },
-        { key: 'razza',       label: 'Razza / Specie',  type: 'short' },
-        { key: 'stato',       label: 'Stato',           type: 'select', options: ['Vivo','Morto','Scomparso','Alleato','Nemico','Sconosciuto'] },
-        { key: 'sede',        label: 'Sede / Luogo',    type: 'mention' },
-        { key: 'fazione',     label: 'Fazione',         type: 'mention' },
-        { key: 'vuole',       label: 'Vuole',           type: 'short' },
-        { key: 'teme',        label: 'Teme',            type: 'short' },
-        { key: 'apparenza',   label: 'Apparenza',       type: 'long' },
-        { key: 'personalita', label: 'Personalità',     type: 'long' },
-        { key: 'relazioni',   label: 'Relazioni',       type: 'mentions' },
-        { key: 'segreto',     label: 'Segreto DM',      type: 'secret' },
+        { key: 'ruolo',       label: 'Ruolo / Professione',  type: 'short',   hint: 'es. Mercante, Guardia, Mago' },
+        { key: 'razza',       label: 'Razza / Specie',       type: 'short',   hint: 'es. Umano, Elfo, Nano' },
+        { key: 'stato',       label: 'Stato',                type: 'select',  options: ['Vivo','Morto','Scomparso','Alleato','Nemico','Sconosciuto'] },
+        { key: 'allineamento',label: 'Allineamento',         type: 'select',  options: ['','Legale Buono','Neutrale Buono','Caotico Buono','Legale Neutrale','Neutrale','Caotico Neutrale','Legale Malvagio','Neutrale Malvagio','Caotico Malvagio'] },
+        { key: 'sede',        label: 'Luogo / Sede',         type: 'mention', hint: '@NomeLuogo' },
+        { key: 'fazione',     label: 'Fazione / Gruppo',     type: 'mention', hint: '@NomeFazione' },
+        { key: 'apparenza',   label: 'Aspetto fisico',       type: 'long',    hint: 'Come appare questo personaggio?' },
+        { key: 'personalita',  label: 'Personalita e tratti',  type: 'long',    hint: 'Tic, abitudini, voce...' },
+        { key: 'vuole',       label: 'Vuole / Obiettivo',    type: 'long',    hint: 'Cosa desidera questo personaggio?' },
+        { key: 'teme',        label: 'Teme / Debolezza',     type: 'long',    hint: 'Cosa lo spaventa o lo limita?' },
+        { key: 'relazioni',   label: 'Relazioni',            type: 'mentions',hint: '@PNG amico, @Fazione rivale...' },
+        { key: 'gancio',      label: 'Gancio per il party',  type: 'long',    hint: 'Come potrebbe coinvolgere i giocatori?' },
+        { key: 'segreto',     label: 'Segreto DM',           type: 'secret',  hint: 'Informazioni riservate al DM' },
       ],
-      getData: (camp) => {
-        // Usa i PNG del Mondo come fonte primaria
-        return (camp?.npcs || []).map(n => ({
-          id: n.id,
-          nome: n.name || n.nome || '',
-          immagine: n.immagine || '',
-          ruolo: n.job || n.ruolo || '',
-          razza: n.race || n.razza || '',
-          stato: n.stato || 'Vivo',
-          sede: n.location || n.sede || '',
-          fazione: n.fazione || '',
-          vuole: n.wants || n.vuole || '',
-          teme: n.fears || n.teme || '',
-          apparenza: n.apparenza || n.description || '',
-          personalita: n.personality || n.personalita || '',
-          relazioni: n.relazioni || n.links || '',
-          segreto: n.secret || n.segreto || '',
-          note: n.noteLibere || '',
-          tags: n.tags || [],
-          _source: 'mondo',
-        }));
-      },
+      getData: (camp) => (camp?.npcs || []).map(n => ({
+        id: n.id, nome: n.name || n.nome || '',
+        immagine: n.immagine || '',
+        ruolo: n.job || n.ruolo || '', razza: n.race || n.razza || '',
+        stato: n.stato || 'Vivo', allineamento: n.alignment || n.allineamento || '',
+        sede: n.location || n.sede || '', fazione: n.fazione || '',
+        apparenza: n.apparenza || n.description || '',
+        personalita: n.personality || n.personalita || '',
+        vuole: n.wants || n.vuole || '', teme: n.fears || n.teme || '',
+        relazioni: n.relazioni || n.links || '',
+        gancio: n.gancio || '',
+        segreto: n.secret || n.segreto || '',
+        note: n.noteLibere || '', tags: n.tags || [], _source: 'mondo',
+      })),
       saveItem: (camp, item) => {
-        // Aggiorna il PNG nel Mondo
         const npcs = camp.npcs || [];
         const idx = npcs.findIndex(n => n.id === item.id);
-        const npcData = {
-          ...(idx >= 0 ? npcs[idx] : {}),
-          id: item.id,
-          name: item.nome,
-          immagine: item.immagine || '',
-          job: item.ruolo,
-          race: item.razza,
-          stato: item.stato,
-          location: item.sede,
-          fazione: item.fazione,
-          wants: item.vuole,
-          fears: item.teme,
-          apparenza: item.apparenza,
-          personality: item.personalita,
-          relazioni: item.relazioni,
-          secret: item.segreto,
-          noteLibere: item.note,
-          tags: item.tags || [],
-          aggiornatoAt: Date.now(),
-        };
-        if (idx >= 0) npcs[idx] = npcData;
-        else npcs.push(npcData);
+        const d = { ...(idx>=0?npcs[idx]:{}), id:item.id, name:item.nome, nome:item.nome,
+          immagine:item.immagine||'', job:item.ruolo, ruolo:item.ruolo, race:item.razza, razza:item.razza,
+          stato:item.stato, alignment:item.allineamento, allineamento:item.allineamento,
+          location:item.sede, sede:item.sede, fazione:item.fazione,
+          apparenza:item.apparenza, description:item.apparenza,
+          personality:item.personalita, personalita:item.personalita,
+          wants:item.vuole, vuole:item.vuole, fears:item.teme, teme:item.teme,
+          relazioni:item.relazioni, links:item.relazioni,
+          gancio:item.gancio, secret:item.segreto, segreto:item.segreto,
+          noteLibere:item.note, tags:item.tags||[], aggiornatoAt:Date.now() };
+        if (idx>=0) npcs[idx]=d; else npcs.push(d);
         App.saveActiveCampaign({ npcs });
-        // Sync wiki ↔ mondo
-        try { _mondoToWiki('npc', npcData, camp); } catch(e) {}
+        try { _mondoToWiki('npc', d, camp); } catch(e) {}
       },
-      newItem: () => ({
-        id: 'npc_' + Date.now() + '_' + Math.random().toString(36).slice(2,5),
-        nome: '',
-        ruolo: '', razza: '', stato: 'Vivo', sede: '', fazione: '',
-        vuole: '', teme: '', apparenza: '', personalita: '',
-        relazioni: '', segreto: '', note: '', tags: [],
-      }),
+      newItem: () => ({ id:'npc_'+Date.now()+'_'+Math.random().toString(36).slice(2,5),
+        nome:'', ruolo:'', razza:'', stato:'Vivo', allineamento:'', sede:'', fazione:'',
+        apparenza:'', personalita:'', vuole:'', teme:'', relazioni:'', gancio:'', segreto:'', note:'', tags:[] }),
     },
 
     luoghi: {
-      label: 'Luoghi',
-      color: '#f5a623',
+      label: 'Luoghi', color: '#f5a623',
       fields: [
-        { key: 'tipo',        label: 'Tipo',            type: 'select', options: ['Città','Villaggio','Dungeon','Taverna','Castello','Tempio','Foresta','Regione','Paese','Altro'] },
-        { key: 'regione',     label: 'Regione / Zona',  type: 'mention' },
-        { key: 'atmosfera',   label: 'Atmosfera',       type: 'long' },
-        { key: 'abitanti',    label: 'PNG Presenti',    type: 'mentions' },
-        { key: 'pericoli',    label: 'Pericoli / Trappole', type: 'long' },
-        { key: 'segreto',     label: 'Segreto DM',      type: 'secret' },
+        { key: 'tipo',        label: 'Tipo di luogo',        type: 'select',  options: ['Città','Villaggio','Dungeon','Taverna','Castello','Tempio','Foresta','Regione','Paese','Porto','Torre','Altro'] },
+        { key: 'regione',     label: 'Regione / Zona',       type: 'mention', hint: '@LuogoPadre' },
+        { key: 'clima',       label: 'Clima / Ambiente',     type: 'short',   hint: 'es. Freddo e umido, desertico...' },
+        { key: 'atmosfera',   label: 'Descrizione',          type: 'long',    hint: 'Cosa si vede, sente, percepisce entrando?' },
+        { key: 'abitanti',    label: 'PNG Notabili',         type: 'mentions',hint: '@PNG che abitano o frequentano questo luogo' },
+        { key: 'punti',       label: 'Punti di interesse',   type: 'long',    hint: 'Locazioni importanti, negozi, stanze...' },
+        { key: 'storia',      label: 'Storia / Lore',        type: 'long',    hint: 'Cosa e successo qui?' },
+        { key: 'pericoli',    label: 'Pericoli / Trappole',  type: 'long',    hint: 'Mostri, trappole, fazioni ostili...' },
+        { key: 'segreto',     label: 'Segreto DM',           type: 'secret',  hint: 'Informazioni riservate al DM' },
       ],
       getData: (camp) => (camp?.locations || []).map(l => ({
-        id: l.id, nome: l.nome || l.name || '',
-        immagine: l.immagine || '',
-        tipo: l.tipo || '', regione: l.regione || '',
-        atmosfera: l.atmosfera || l.description || '',
-        abitanti: l.npcs || l.abitanti || '',
-        pericoli: l.pericoli || '',
-        segreto: l.secret || l.segreto || '',
-        note: l.noteLibere || '',
-        tags: l.tags || [], _source: 'mondo',
+        id:l.id, nome:l.nome||l.name||'', immagine:l.immagine||'',
+        tipo:l.tipo||'', regione:l.regione||'', clima:l.clima||'',
+        atmosfera:l.atmosfera||l.description||'', abitanti:l.npcs||l.abitanti||'',
+        punti:l.punti||'', storia:l.storia||'', pericoli:l.pericoli||'',
+        segreto:l.secret||l.segreto||'', note:l.noteLibere||'', tags:l.tags||[], _source:'mondo',
       })),
       saveItem: (camp, item) => {
         const locs = camp.locations || [];
         const idx = locs.findIndex(l => l.id === item.id);
-        const d = { ...(idx >= 0 ? locs[idx] : {}), id: item.id, nome: item.nome, name: item.nome,
-          immagine: item.immagine, tipo: item.tipo, regione: item.regione,
-          atmosfera: item.atmosfera, description: item.atmosfera,
-          npcs: item.abitanti, abitanti: item.abitanti,
-          pericoli: item.pericoli, secret: item.segreto, segreto: item.segreto,
-          noteLibere: item.note, tags: item.tags, aggiornatoAt: Date.now() };
-        if (idx >= 0) locs[idx] = d; else locs.push(d);
+        const d = { ...(idx>=0?locs[idx]:{}), id:item.id, nome:item.nome, name:item.nome,
+          immagine:item.immagine, tipo:item.tipo, regione:item.regione, clima:item.clima,
+          atmosfera:item.atmosfera, description:item.atmosfera,
+          npcs:item.abitanti, abitanti:item.abitanti,
+          punti:item.punti, storia:item.storia, pericoli:item.pericoli,
+          secret:item.segreto, segreto:item.segreto, noteLibere:item.note,
+          tags:item.tags, aggiornatoAt:Date.now() };
+        if (idx>=0) locs[idx]=d; else locs.push(d);
         App.saveActiveCampaign({ locations: locs });
         try { _mondoToWiki('location', d, camp); } catch(e) {}
       },
-      newItem: () => ({ id: 'loc_' + Date.now() + '_' + Math.random().toString(36).slice(2,5),
-        nome: '', tipo: 'Città', regione: '', atmosfera: '', abitanti: '', pericoli: '', segreto: '', note: '', tags: [] }),
+      newItem: () => ({ id:'loc_'+Date.now()+'_'+Math.random().toString(36).slice(2,5),
+        nome:'', tipo:'Città', regione:'', clima:'', atmosfera:'', abitanti:'',
+        punti:'', storia:'', pericoli:'', segreto:'', note:'', tags:[] }),
     },
 
     fazioni: {
-      label: 'Fazioni',
-      color: '#c97bea',
+      label: 'Fazioni', color: '#c97bea',
       fields: [
-        { key: 'tipo',       label: 'Tipo',             type: 'select', options: ['Gilda','Ordine','Governo','Criminale','Militare','Mercantile','Religiosa','Altro'] },
-        { key: 'attitudine', label: 'Attitudine Party', type: 'select', options: ['Alleata','Amichevole','Neutrale','Sospettosa','Ostile','Sconosciuta'] },
-        { key: 'leader',     label: 'Leader',           type: 'mention' },
-        { key: 'sede',       label: 'Sede',             type: 'mention' },
-        { key: 'obiettivo',  label: 'Obiettivo',        type: 'long' },
-        { key: 'risorse',    label: 'Risorse / Potere', type: 'short' },
-        { key: 'nemici',     label: 'Rivali / Nemici',  type: 'mentions' },
-        { key: 'segreto',    label: 'Segreto DM',       type: 'secret' },
+        { key: 'tipo',        label: 'Tipo',                 type: 'select',  options: ['Gilda','Ordine','Governo','Criminale','Militare','Mercantile','Religiosa','Arcana','Altro'] },
+        { key: 'attitudine',  label: 'Attitudine verso party',type: 'select', options: ['Alleata','Amichevole','Neutrale','Sospettosa','Ostile','Sconosciuta'] },
+        { key: 'simbolo', label: 'Simbolo / Motto', type: 'short', hint: 'es. Un drago rampante' },
+        { key: 'leader',      label: 'Leader',               type: 'mention', hint: '@NomePNG' },
+        { key: 'sede',        label: 'Sede / Base',          type: 'mention', hint: '@NomeLuogo' },
+        { key: 'obiettivo',   label: 'Obiettivo pubblico',   type: 'long',    hint: 'Cosa dicono di voler fare?' },
+        { key: 'vero_obiettivo', label: 'Vero obiettivo',   type: 'long',    hint: 'Cosa vogliono davvero?' },
+        { key: 'risorse',     label: 'Risorse / Influenza',  type: 'long',    hint: 'Soldi, truppe, magia, contatti...' },
+        { key: 'nemici',      label: 'Rivali / Nemici',      type: 'mentions',hint: '@Fazione rivale, @PNG nemico...' },
+        { key: 'segreto',     label: 'Segreto DM',           type: 'secret',  hint: 'Informazioni riservate al DM' },
       ],
       getData: (camp) => (camp?.factions || []).map(f => ({
-        id: f.id, nome: f.nome || f.name || '',
-        immagine: f.immagine || '',
-        tipo: f.tipo || '', attitudine: f.attitudine || 'Neutrale',
-        leader: f.leader || '', sede: f.sede || '',
-        obiettivo: f.obiettivo || f.description || '',
-        risorse: f.risorse || '',
-        nemici: f.nemici || '',
-        segreto: f.secret || f.segreto || '',
-        note: f.noteLibere || '', tags: f.tags || [], _source: 'mondo',
+        id:f.id, nome:f.nome||f.name||'', immagine:f.immagine||'',
+        tipo:f.tipo||'', attitudine:f.attitudine||'Neutrale', simbolo:f.simbolo||'',
+        leader:f.leader||'', sede:f.sede||'',
+        obiettivo:f.obiettivo||f.description||'', vero_obiettivo:f.vero_obiettivo||'',
+        risorse:f.risorse||'', nemici:f.nemici||'',
+        segreto:f.secret||f.segreto||'', note:f.noteLibere||'', tags:f.tags||[], _source:'mondo',
       })),
       saveItem: (camp, item) => {
         const facs = camp.factions || [];
         const idx = facs.findIndex(f => f.id === item.id);
-        const d = { ...(idx >= 0 ? facs[idx] : {}), id: item.id, nome: item.nome, name: item.nome,
-          immagine: item.immagine, tipo: item.tipo, attitudine: item.attitudine,
-          leader: item.leader, sede: item.sede, obiettivo: item.obiettivo,
-          description: item.obiettivo, risorse: item.risorse, nemici: item.nemici,
-          secret: item.segreto, segreto: item.segreto,
-          noteLibere: item.note, tags: item.tags, aggiornatoAt: Date.now() };
-        if (idx >= 0) facs[idx] = d; else facs.push(d);
+        const d = { ...(idx>=0?facs[idx]:{}), id:item.id, nome:item.nome, name:item.nome,
+          immagine:item.immagine, tipo:item.tipo, attitudine:item.attitudine, simbolo:item.simbolo,
+          leader:item.leader, sede:item.sede, obiettivo:item.obiettivo, description:item.obiettivo,
+          vero_obiettivo:item.vero_obiettivo, risorse:item.risorse, nemici:item.nemici,
+          secret:item.segreto, segreto:item.segreto, noteLibere:item.note,
+          tags:item.tags, aggiornatoAt:Date.now() };
+        if (idx>=0) facs[idx]=d; else facs.push(d);
         App.saveActiveCampaign({ factions: facs });
         try { _mondoToWiki('faction', d, camp); } catch(e) {}
       },
-      newItem: () => ({ id: 'fac_' + Date.now() + '_' + Math.random().toString(36).slice(2,5),
-        nome: '', tipo: 'Gilda', attitudine: 'Neutrale', leader: '', sede: '', obiettivo: '', risorse: '', nemici: '', segreto: '', note: '', tags: [] }),
+      newItem: () => ({ id:'fac_'+Date.now()+'_'+Math.random().toString(36).slice(2,5),
+        nome:'', tipo:'Gilda', attitudine:'Neutrale', simbolo:'', leader:'', sede:'',
+        obiettivo:'', vero_obiettivo:'', risorse:'', nemici:'', segreto:'', note:'', tags:[] }),
     },
 
     lore: {
-      label: 'Lore',
-      color: '#5ba4f5',
+      label: 'Lore', color: '#5ba4f5',
       fields: [
-        { key: 'categoria',  label: 'Categoria',        type: 'select', options: ['Generale','Storia','Religione','Magia','Politica','Leggenda','Oggetto','Segreto DM','Altro'] },
-        { key: 'fonti',      label: 'Fonti / Riferimenti', type: 'short' },
-        { key: 'collegati',  label: 'Entità Collegate', type: 'mentions' },
+        { key: 'categoria',  label: 'Categoria',             type: 'select',  options: ['Generale','Storia','Religione','Magia','Politica','Leggenda','Oggetto Magico','Profezia','Segreto DM','Altro'] },
+        { key: 'periodo',   label: 'Periodo / Era',          type: 'short',   hint: 'es. 500 anni fa' },
+        { key: 'collegati', label: 'Entita collegate',      type: 'mentions',hint: '@PNG, @Luogo, @Fazione' },
+        { key: 'rilevanza',  label: 'Rilevanza per il party',type: 'select',  options: ['Alta','Media','Bassa','Segreto DM'] },
+        { key: 'fonti',      label: 'Fonti / Chi sa?',       type: 'long',    hint: 'Chi conosce questa informazione?' },
       ],
       getData: (camp) => {
         const wiki = camp?.wiki || {};
         return (wiki.lore || []).map(n => ({
-          id: n.id, nome: n.titolo || '',
-          categoria: n.categoria || 'Generale',
-          fonti: n.fonti || '',
-          collegati: n.collegati || '',
-          contenuto: n.contenuto || '',
-          note: '',
-          tags: n.tags || [], _source: 'wiki',
+          id:n.id, nome:n.titolo||'',
+          categoria:n.categoria||'Generale', periodo:n.periodo||'',
+          collegati:n.collegati||'', rilevanza:n.rilevanza||'Media', fonti:n.fonti||'',
+          contenuto:n.contenuto||'', note:'', tags:n.tags||[], _source:'wiki',
         }));
       },
       saveItem: (camp, item) => {
-        const wiki = camp?.wiki || { lore: [], sessioni: [] };
+        const wiki = camp?.wiki || { lore:[], sessioni:[] };
         if (!wiki.lore) wiki.lore = [];
         const idx = wiki.lore.findIndex(n => n.id === item.id);
-        const d = { id: item.id, titolo: item.nome, categoria: item.categoria,
-          fonti: item.fonti, collegati: item.collegati,
-          contenuto: item.contenuto || '', tags: item.tags || [],
-          aggiornatoAt: Date.now() };
-        if (idx >= 0) wiki.lore[idx] = d; else wiki.lore.unshift(d);
+        const d = { id:item.id, titolo:item.nome, categoria:item.categoria, periodo:item.periodo,
+          collegati:item.collegati, rilevanza:item.rilevanza, fonti:item.fonti,
+          contenuto:item.contenuto||'', tags:item.tags||[], aggiornatoAt:Date.now() };
+        if (idx>=0) wiki.lore[idx]=d; else wiki.lore.unshift(d);
         App.saveActiveCampaign({ wiki });
       },
-      newItem: () => ({ id: 'n' + Date.now() + Math.random().toString(36).slice(2,5),
-        nome: '', categoria: 'Generale', fonti: '', collegati: '', contenuto: '', tags: [] }),
+      newItem: () => ({ id:'n'+Date.now()+Math.random().toString(36).slice(2,5),
+        nome:'', categoria:'Generale', periodo:'', collegati:'', rilevanza:'Media', fonti:'', contenuto:'', tags:[] }),
     },
 
     sessioni: {
-      label: 'Sessioni',
-      color: '#ff9f43',
+      label: 'Sessioni', color: '#ff9f43',
       fields: [
-        { key: 'numero',    label: 'Numero Sessione',  type: 'short' },
-        { key: 'data',      label: 'Data',             type: 'short' },
-        { key: 'stato',     label: 'Stato',            type: 'select', options: ['Pianificata','In corso','Giocata'] },
-        { key: 'png',       label: 'PNG Coinvolti',    type: 'mentions' },
-        { key: 'obiettivi', label: 'Obiettivi',        type: 'long' },
-        { key: 'recap',     label: 'Recap',            type: 'long' },
-        { key: 'ganci',     label: 'Ganci prossima',   type: 'long' },
-        { key: 'segreto',   label: 'Segreto DM',       type: 'secret' },
+        { key: 'numero',     label: 'Numero',               type: 'short' },
+        { key: 'data',       label: 'Data reale',           type: 'short' },
+        { key: 'stato',      label: 'Stato',                type: 'select', options: ['Pianificata','In corso','Giocata'] },
+        { key: 'png',        label: 'PNG coinvolti',        type: 'mentions', hint: '@NomePNG...' },
+        { key: 'luoghi_vis', label: 'Luoghi visitati',      type: 'mentions', hint: '@NomeLuogo...' },
+        { key: 'obiettivi',  label: 'Obiettivi / Prep DM',  type: 'long',    hint: 'Cosa vuoi che succeda? Hook, rivelazioni...' },
+        { key: 'successo',  label: 'Come e andata',         type: 'long',    hint: 'Cosa ha fatto il party?' },
+        { key: 'recap',      label: 'Recap (post sessione)',type: 'long',    hint: 'Riassunto per i giocatori' },
+        { key: 'ganci',      label: 'Ganci prossima',       type: 'long',    hint: 'Fili aperti, cliffhanger...' },
+        { key: 'xp',         label: 'XP / Ricompense',      type: 'short',   hint: 'es. 300 XP, Spada +1' },
+        { key: 'segreto',    label: 'Note DM (private)',     type: 'secret',  hint: 'Solo per il DM' },
       ],
       getData: (camp) => {
         const wiki = camp?.wiki || {};
         const sessLog = camp?.sessioni_log || [];
-        // Unisce sessioni log e note wiki sessioni
         const fromLog = sessLog.map(s => ({
-          id: s.id, nome: 'S' + s.numero + (s.titolo ? ' — ' + s.titolo : ''),
-          numero: String(s.numero || ''), data: s.data || '',
-          stato: s.stato === 'in_corso' ? 'In corso' : s.stato === 'giocata' ? 'Giocata' : 'Pianificata',
-          png: (s.npcs || []).map(id => {
-            const n = (camp?.npcs || []).find(x => x.id === id);
-            return n ? (n.name || n.nome || id) : id;
+          id: s.id, nome: 'Sessione ' + s.numero + (s.titolo ? ' — ' + s.titolo : ''),
+          numero: String(s.numero||''), data: s.data||'',
+          stato: s.stato==='in_corso' ? 'In corso' : s.stato==='giocata' ? 'Giocata' : 'Pianificata',
+          png: (s.npcs||[]).map(id => {
+            const n = (camp?.npcs||[]).find(x => x.id===id);
+            return n ? (n.name||n.nome||id) : id;
           }).join(', '),
-          obiettivi: s.notePrep || '',
-          recap: s.recap || '',
-          ganci: s.ganci || '',
-          segreto: s.segreto || '',
-          contenuto: '',
-          tags: ['sessione'], _source: 'sessioni_log', _origId: s.id,
+          luoghi_vis: s.luoghi_visitati||'',
+          obiettivi: s.notePrep||'', successo: s.successo||'',
+          recap: s.recap||'', ganci: s.ganci||'',
+          xp: s.xp||'', segreto: s.segreto||'',
+          contenuto: '', tags:['sessione'], _source:'sessioni_log', _origId:s.id,
         }));
-        // Aggiunge note wiki sessioni non già presenti
-        const fromWiki = (wiki.sessioni || [])
-          .filter(n => !fromLog.find(s => s._origId === n.sessioneId))
+        const fromWiki = (wiki.sessioni||[])
+          .filter(n => !fromLog.find(s => s._origId===n.sessioneId))
           .map(n => ({
-            id: n.id, nome: n.titolo || '',
-            numero: '', data: '', stato: 'Giocata',
-            png: '', obiettivi: '', recap: '', ganci: '', segreto: '',
-            contenuto: n.contenuto || '',
-            tags: n.tags || [], _source: 'wiki',
+            id:n.id, nome:n.titolo||'',
+            numero:'', data:'', stato:'Giocata',
+            png:'', luoghi_vis:'', obiettivi:'', successo:'', recap:'', ganci:'', xp:'', segreto:'',
+            contenuto:n.contenuto||'', tags:n.tags||[], _source:'wiki',
           }));
         return [...fromLog, ...fromWiki];
       },
       saveItem: (camp, item) => {
-        if (item._source === 'sessioni_log') {
-          const sessioni = (camp.sessioni_log || []).map(s =>
-            s.id === item._origId ? {
-              ...s, titolo: item.nome.replace(/^S\d+\s*—\s*/, ''),
-              data: item.data, stato: item.stato === 'In corso' ? 'in_corso' : item.stato === 'Giocata' ? 'giocata' : 'pianificata',
-              notePrep: item.obiettivi, recap: item.recap,
-              ganci: item.ganci, segreto: item.segreto,
+        if (item._source==='sessioni_log') {
+          const sessioni = (camp.sessioni_log||[]).map(s =>
+            s.id===item._origId ? { ...s,
+              titolo: item.nome.replace(/^Sessione \d+\s*[—-]\s*/, '').replace(/^Sessione \d+$/, ''),
+              data:item.data, stato:item.stato==='In corso'?'in_corso':item.stato==='Giocata'?'giocata':'pianificata',
+              notePrep:item.obiettivi, successo:item.successo, recap:item.recap,
+              ganci:item.ganci, xp:item.xp, segreto:item.segreto,
             } : s
           );
           App.saveActiveCampaign({ sessioni_log: sessioni });
         } else {
-          const wiki = camp?.wiki || { lore: [], sessioni: [] };
+          const wiki = camp?.wiki || { lore:[], sessioni:[] };
           if (!wiki.sessioni) wiki.sessioni = [];
-          const idx = wiki.sessioni.findIndex(n => n.id === item.id);
-          const d = { id: item.id, titolo: item.nome, contenuto: item.contenuto || '',
-            tags: item.tags || [], aggiornatoAt: Date.now() };
-          if (idx >= 0) wiki.sessioni[idx] = d; else wiki.sessioni.unshift(d);
+          const idx = wiki.sessioni.findIndex(n => n.id===item.id);
+          const d = { id:item.id, titolo:item.nome, contenuto:item.contenuto||'',
+            tags:item.tags||[], aggiornatoAt:Date.now() };
+          if (idx>=0) wiki.sessioni[idx]=d; else wiki.sessioni.unshift(d);
           App.saveActiveCampaign({ wiki });
         }
       },
-      newItem: () => ({
-        id: 'ws_' + Date.now() + '_' + Math.random().toString(36).slice(2,5),
-        nome: '', numero: '', data: new Date().toISOString().slice(0,10),
-        stato: 'Pianificata', png: '', obiettivi: '', recap: '', ganci: '', segreto: '',
-        contenuto: '', tags: ['sessione'], _source: 'wiki',
-      }),
+      newItem: () => ({ id:'ws_'+Date.now()+'_'+Math.random().toString(36).slice(2,5),
+        nome:'', numero:'', data:new Date().toISOString().slice(0,10),
+        stato:'Pianificata', png:'', luoghi_vis:'', obiettivi:'', successo:'', recap:'', ganci:'', xp:'', segreto:'',
+        contenuto:'', tags:['sessione'], _source:'wiki' }),
     },
-  };
+  }
 
   // ── Stato ──
   let _currentType = null;
@@ -16243,8 +16211,10 @@ const WikiSections = (() => {
       }
       const isSecret = f.type === 'secret';
       return '<div class="form-group" style="margin-bottom:12px;">' +
-        '<label class="form-label" style="font-size:0.68rem;' + (isSecret ? 'color:#ff6b6b;' : '') + '">' + (isSecret ? '🔒 ' : '') + f.label + '</label>' +
-        input + '</div>';
+        '<label class="form-label" style="font-size:0.68rem;' + (isSecret ? 'color:#ff6b6b;' : '') + '">' +
+        (isSecret ? '🔒 ' : '') + f.label +
+        (f.hint ? '<span style="font-weight:400;color:var(--text-muted);font-size:0.65rem;margin-left:6px;">' + f.hint + '</span>' : '') +
+        '</label>' + input + '</div>';
     };
 
     const tagsStr = (item.tags || []).join(', ');
@@ -16320,9 +16290,9 @@ const WikiSections = (() => {
         (isEdit ?
           '<div id="ws-editor-free" contenteditable="true" spellcheck="true" ' +
           'style="min-height:120px;padding:12px 16px;font-size:0.88rem;line-height:1.8;outline:none;color:var(--text-primary);" ' +
-          'data-placeholder="Note aggiuntive...">' + (item.note || '') + '</div>' :
+          'data-placeholder="Note aggiuntive... Usa [[Nome]] per collegare entità">' + (item.note || '') + '</div>' :
           (item.note ?
-            '<div style="padding:12px 16px;font-size:0.88rem;line-height:1.8;color:var(--text-primary);">' + item.note + '</div>' :
+            '<div style="padding:12px 16px;font-size:0.88rem;line-height:1.8;color:var(--text-primary);">' + WikiSections._parseLinks(item.note) + '</div>' :
             '<div style="padding:12px 16px;font-size:0.82rem;color:var(--text-muted);font-style:italic;">Nessuna nota. Clicca Modifica per aggiungerne.</div>')
         ) +
       '</div>' +
@@ -16334,6 +16304,22 @@ const WikiSections = (() => {
   };
 
   const _escHtml = (s) => String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+
+  // Converte [[Nome]] e @Nome in link cliccabili
+  const _parseLinks = (text) => {
+    if (!text) return '';
+    text = text.replace(/\[\[([^\]]+)\]\]/g, function(_, name) {
+      var clean = name.trim();
+      var safe = clean.replace(/&/g, '&amp;').replace(/"/g, '&quot;');
+      return '<span class="ws-link" data-name="' + safe + '" onclick="WikiSections._jumpToEntity(this.dataset.name)" style="cursor:pointer;color:var(--accent-primary);text-decoration:underline dotted;padding:0 2px;" title="Vai a ' + safe + '">' + clean + '</span>';
+    });
+    text = text.replace(/@([\wA-Za-z][\w\s]{1,30}?)(?=[\s,;.!?]|$)/gm, function(_, name) {
+      var clean = name.trim();
+      var safe = clean.replace(/&/g, '&amp;').replace(/"/g, '&quot;');
+      return '<span class="ws-link" data-name="' + safe + '" onclick="WikiSections._jumpToEntity(this.dataset.name)" style="cursor:pointer;color:var(--accent-secondary);font-weight:600;" title="Vai a ' + safe + '">@' + clean + '</span>';
+    });
+    return text;
+  };
 
   // ── Field change con autosave ──
   const _fieldChange = (type, key, value) => {
@@ -16501,7 +16487,7 @@ const WikiSections = (() => {
     Toast.show('Entità non trovata: ' + name, 'warning', 2000);
   };
 
-  return { toggleExpand, goto, renderList, openCard, editCard, closeDetail, newCard, deleteCard, filter, filterTag, renderCounters, init, _fieldChange, _jumpToEntity, _saveAndView };
+  return { toggleExpand, goto, renderList, openCard, editCard, closeDetail, newCard, deleteCard, filter, filterTag, renderCounters, init, _fieldChange, _jumpToEntity, _saveAndView, _parseLinks };
 })();
 
 
