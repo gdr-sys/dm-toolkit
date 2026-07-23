@@ -16007,7 +16007,10 @@ const WikiSections = (() => {
           id: s.id, nome: 'S' + s.numero + (s.titolo ? ' — ' + s.titolo : ''),
           numero: String(s.numero || ''), data: s.data || '',
           stato: s.stato === 'in_corso' ? 'In corso' : s.stato === 'giocata' ? 'Giocata' : 'Pianificata',
-          png: (s.npcs || []).join(', '),
+          png: (s.npcs || []).map(id => {
+            const n = (camp?.npcs || []).find(x => x.id === id);
+            return n ? (n.name || n.nome || id) : id;
+          }).join(', '),
           obiettivi: s.notePrep || '',
           recap: s.recap || '',
           ganci: s.ganci || '',
@@ -16161,7 +16164,7 @@ const WikiSections = (() => {
     const listEl   = document.getElementById('wiki-' + type + '-list');
     const detailEl = document.getElementById('wiki-' + type + '-detail');
     if (listEl) listEl.style.display = 'none';
-    if (detailEl) { detailEl.style.display = ''; detailEl.innerHTML = _renderDetail(type, item); }
+    if (detailEl) { detailEl.style.display = ''; detailEl.innerHTML = _renderDetail(type, item, 'view'); }
 
     // Attiva autosave sull'editor note libere
     const editor = document.getElementById('ws-editor-free');
@@ -16177,123 +16180,155 @@ const WikiSections = (() => {
   };
 
   // ── Render scheda dettaglio ──
-  const _renderDetail = (type, item) => {
+  const _renderDetail = (type, item, mode = 'view') => {
     const cfg = TYPES[type];
     const STATUS_COLORS = {
       Vivo: '#69cc85', Morto: '#ff6b6b', Scomparso: '#aaa',
       Alleato: '#5ba4f5', Nemico: '#ff6b6b',
       Pianificata: '#5ba4f5', 'In corso': '#f5a623', Giocata: '#69cc85',
+      Alleata: '#69cc85', Amichevole: '#5ba4f5', Neutrale: '#aaa',
+      Sospettosa: '#f5a623', Ostile: '#ff6b6b',
     };
-    const statusColor = STATUS_COLORS[item.stato] || cfg.color;
+    const statusColor = STATUS_COLORS[item.stato || item.attitudine] || cfg.color;
+    const isEdit = mode === 'edit';
 
-    let fieldsHtml = cfg.fields.map(f => {
+    // ── Helper: renderizza un campo in vista lettura ──
+    const _viewField = (f, val) => {
+      if (!val && val !== 0) return '';
+      const isSecret = f.type === 'secret';
+      let content = '';
+      if (f.type === 'mention' || f.type === 'mentions') {
+        // Chip cliccabili per ogni @entità
+        content = String(val).split(',').map(v => v.trim()).filter(Boolean).map(v => {
+          const clean = v.replace(/^@/, '');
+          return '<span onclick="WikiSections._jumpToEntity(\'' + clean.replace(/'/g,"\\'") + '\')" ' +
+            'style="display:inline-flex;align-items:center;gap:4px;padding:2px 10px;background:' + cfg.color + '22;' +
+            'color:' + cfg.color + ';border:1px solid ' + cfg.color + '44;border-radius:var(--radius-full);' +
+            'font-size:0.78rem;cursor:pointer;margin:2px;" ' +
+            'onmouseenter="this.style.background=\'' + cfg.color + '44\'" ' +
+            'onmouseleave="this.style.background=\'' + cfg.color + '22\'">' +
+            '@' + clean + '</span>';
+        }).join('');
+      } else if (f.type === 'long' || f.type === 'secret') {
+        content = '<div style="font-size:0.85rem;line-height:1.7;white-space:pre-wrap;">' + _escHtml(String(val)) + '</div>';
+      } else if (f.type === 'select') {
+        const sc = STATUS_COLORS[val] || cfg.color;
+        content = '<span style="padding:2px 10px;background:' + sc + '22;color:' + sc + ';border:1px solid ' + sc + '44;border-radius:var(--radius-full);font-size:0.78rem;">' + _escHtml(String(val)) + '</span>';
+      } else {
+        content = '<span style="font-size:0.88rem;">' + _escHtml(String(val)) + '</span>';
+      }
+      if (!content) return '';
+      return '<div style="margin-bottom:14px;">' +
+        '<div style="font-size:0.65rem;font-family:var(--font-display);text-transform:uppercase;letter-spacing:0.08em;color:' + (isSecret ? '#ff6b6b' : 'var(--text-muted)') + ';margin-bottom:4px;">' +
+        (isSecret ? '🔒 ' : '') + f.label + '</div>' +
+        (isSecret ?
+          '<div style="background:rgba(255,107,107,0.08);border-left:3px solid #ff6b6b;padding:8px 12px;border-radius:0 var(--radius-md) var(--radius-md) 0;">' + content + '</div>' :
+          content) +
+        '</div>';
+    };
+
+    // ── Helper: renderizza un campo in modalità edit ──
+    const _editField = (f) => {
       const val = item[f.key] || '';
       let input = '';
-
       if (f.type === 'select') {
         input = '<select id="wsf-' + f.key + '" class="form-select" style="font-size:0.82rem;" onchange="WikiSections._fieldChange(\'' + type + '\',\'' + f.key + '\',this.value)">' +
-          f.options.map(o => '<option value="' + o + '"' + (val === o ? ' selected' : '') + '>' + o + '</option>').join('') +
-          '</select>';
+          f.options.map(o => '<option value="' + o + '"' + (val === o ? ' selected' : '') + '>' + o + '</option>').join('') + '</select>';
       } else if (f.type === 'long') {
-        input = '<textarea id="wsf-' + f.key + '" class="form-textarea" rows="3" ' +
-          'style="font-size:0.82rem;line-height:1.6;" ' +
-          'oninput="WikiSections._fieldChange(\'' + type + '\',\'' + f.key + '\',this.value)">' +
-          _escHtml(val) + '</textarea>';
+        input = '<textarea id="wsf-' + f.key + '" class="form-textarea" rows="3" style="font-size:0.82rem;line-height:1.6;" oninput="WikiSections._fieldChange(\'' + type + '\',\'' + f.key + '\',this.value)">' + _escHtml(val) + '</textarea>';
       } else if (f.type === 'secret') {
-        input = '<textarea id="wsf-' + f.key + '" rows="2" ' +
-          'style="width:100%;background:rgba(255,107,107,0.08);border:1px solid rgba(255,107,107,0.3);border-radius:var(--radius-md);padding:8px;font-size:0.82rem;color:var(--text-primary);resize:vertical;" ' +
-          'oninput="WikiSections._fieldChange(\'' + type + '\',\'' + f.key + '\',this.value)">' +
-          _escHtml(val) + '</textarea>';
-      } else if (f.type === 'mention' || f.type === 'mentions') {
-        input = '<input id="wsf-' + f.key + '" type="text" class="form-input" ' +
-          'style="font-size:0.82rem;" value="' + _escHtml(val) + '" ' +
-          'placeholder="Scrivi @nome per collegare..." ' +
-          'oninput="WikiSections._fieldChange(\'' + type + '\',\'' + f.key + '\',this.value)">';
+        input = '<textarea id="wsf-' + f.key + '" rows="2" style="width:100%;background:rgba(255,107,107,0.08);border:1px solid rgba(255,107,107,0.3);border-radius:var(--radius-md);padding:8px;font-size:0.82rem;color:var(--text-primary);resize:vertical;" oninput="WikiSections._fieldChange(\'' + type + '\',\'' + f.key + '\',this.value)">' + _escHtml(val) + '</textarea>';
       } else {
-        input = '<input id="wsf-' + f.key + '" type="text" class="form-input" ' +
-          'style="font-size:0.82rem;" value="' + _escHtml(val) + '" ' +
-          'oninput="WikiSections._fieldChange(\'' + type + '\',\'' + f.key + '\',this.value)">';
+        input = '<input id="wsf-' + f.key + '" type="text" class="form-input" style="font-size:0.82rem;" value="' + _escHtml(val) + '" placeholder="' + (f.type === 'mention' || f.type === 'mentions' ? 'Scrivi @nome...' : '') + '" oninput="WikiSections._fieldChange(\'' + type + '\',\'' + f.key + '\',this.value)">';
       }
-
       const isSecret = f.type === 'secret';
       return '<div class="form-group" style="margin-bottom:12px;">' +
-        '<label class="form-label" style="font-size:0.68rem;' + (isSecret ? 'color:#ff6b6b;' : '') + '">' +
-        (isSecret ? '🔒 ' : '') + f.label + '</label>' +
-        input +
-        '</div>';
-    }).join('');
+        '<label class="form-label" style="font-size:0.68rem;' + (isSecret ? 'color:#ff6b6b;' : '') + '">' + (isSecret ? '🔒 ' : '') + f.label + '</label>' +
+        input + '</div>';
+    };
 
-    // Tags
     const tagsStr = (item.tags || []).join(', ');
 
     return '<div style="max-width:760px;margin:0 auto;">' +
 
-      // Header con ← Torna
+      // ── Header ──
       '<div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap;">' +
         '<button onclick="WikiSections.closeDetail(\'' + type + '\')" ' +
           'style="background:none;border:none;cursor:pointer;color:var(--accent-primary);font-size:0.85rem;display:flex;align-items:center;gap:4px;">' +
           '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg> Torna</button>' +
         '<div style="flex:1;min-width:0;">' +
-          '<input id="wsf-nome" type="text" value="' + _escHtml(item.nome) + '" placeholder="Nome..." ' +
+          (isEdit ?
+            '<input id="wsf-nome" type="text" value="' + _escHtml(item.nome) + '" placeholder="Nome..." ' +
             'style="font-family:var(--font-display);font-size:1.2rem;font-weight:700;background:transparent;border:none;border-bottom:2px solid ' + cfg.color + ';width:100%;padding:2px 0;color:var(--text-primary);" ' +
-            'oninput="WikiSections._fieldChange(\'' + type + '\',\'nome\',this.value)">' +
+            'oninput="WikiSections._fieldChange(\'' + type + '\',\'nome\',this.value)">' :
+            '<h2 style="font-family:var(--font-display);font-size:1.2rem;font-weight:700;margin:0;color:var(--text-primary);">' + _escHtml(item.nome || 'Senza nome') + '</h2>'
+          ) +
         '</div>' +
         '<div style="display:flex;gap:6px;">' +
-          '<button onclick="WikiSections.deleteCard(\'' + type + '\',\'' + item.id + '\')" ' +
-            'style="background:none;border:1px solid var(--accent-danger);border-radius:var(--radius-md);cursor:pointer;color:var(--accent-danger);font-size:0.72rem;padding:4px 10px;">Elimina</button>' +
+          (isEdit ?
+            '<button onclick="WikiSections._saveAndView(\'' + type + '\')" ' +
+              'class="btn btn-primary btn-sm">Salva</button>' :
+            '<button onclick="WikiSections.editCard(\'' + type + '\',\'' + item.id + '\')" ' +
+              'class="btn btn-ghost btn-sm" style="display:flex;align-items:center;gap:4px;">' +
+              '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>' +
+              'Modifica</button>'
+          ) +
+          (isEdit ?
+            '<button onclick="WikiSections.deleteCard(\'' + type + '\',\'' + item.id + '\')" ' +
+              'style="background:none;border:1px solid var(--accent-danger);border-radius:var(--radius-md);cursor:pointer;color:var(--accent-danger);font-size:0.72rem;padding:4px 10px;">Elimina</button>' : ''
+          ) +
         '</div>' +
       '</div>' +
 
-      // Immagine (se PNG o Luoghi)
-      (type === 'png' || type === 'luoghi' || type === 'fazioni' ? '<div class="form-group" style="margin-bottom:16px;">' +
+      // ── Immagine ──
+      (item.immagine && !isEdit ?
+        '<img src="' + item.immagine + '" style="width:100%;max-height:200px;object-fit:cover;border-radius:var(--radius-md);margin-bottom:16px;" onerror="this.style.display=\'none\'">' : '') +
+      (isEdit && (type === 'png' || type === 'luoghi' || type === 'fazioni') ?
+        '<div class="form-group" style="margin-bottom:16px;">' +
         '<label class="form-label">Immagine URL</label>' +
-        '<input id="wsf-immagine" type="text" class="form-input" style="font-size:0.82rem;" ' +
-          'value="' + _escHtml(item.immagine || '') + '" placeholder="https://..." ' +
-          'oninput="WikiSections._fieldChange(\'' + type + '\',\'immagine\',this.value)">' +
-        (item.immagine ? '<img src="' + item.immagine + '" style="margin-top:6px;max-height:120px;border-radius:var(--radius-md);object-fit:cover;" onerror="this.style.display=\'none\'">' : '') +
-      '</div>' : '') +
+        '<input id="wsf-immagine" type="text" class="form-input" style="font-size:0.82rem;" value="' + _escHtml(item.immagine || '') + '" placeholder="https://..." oninput="WikiSections._fieldChange(\'' + type + '\',\'immagine\',this.value)">' +
+        '</div>' : '') +
 
-      // Campi strutturati
+      // ── Campi principali ──
       '<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);padding:16px;margin-bottom:16px;">' +
         '<div style="font-size:0.68rem;font-family:var(--font-display);text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin-bottom:12px;">Informazioni</div>' +
-        fieldsHtml +
+        cfg.fields.map(f => isEdit ? _editField(f) : _viewField(f, item[f.key])).join('') +
       '</div>' +
 
-      // Tags
-      '<div class="form-group" style="margin-bottom:16px;">' +
-        '<label class="form-label">Tag <span style="color:var(--text-muted);font-weight:400;">(separati da virgola)</span></label>' +
-        '<input id="wsf-tags" type="text" class="form-input" style="font-size:0.82rem;" ' +
-          'value="' + _escHtml(tagsStr) + '" placeholder="#png, #importante..." ' +
-          'oninput="WikiSections._fieldChange(\'' + type + '\',\'tags\',this.value.split(\',\').map(t=>t.trim()).filter(Boolean))">' +
+      // ── Tag ──
+      '<div style="margin-bottom:16px;">' +
+        (isEdit ?
+          '<div class="form-group"><label class="form-label">Tag</label>' +
+          '<input id="wsf-tags" type="text" class="form-input" style="font-size:0.82rem;" value="' + _escHtml(tagsStr) + '" placeholder="#png, #importante..." ' +
+          'oninput="WikiSections._fieldChange(\'' + type + '\',\'tags\',this.value.split(\',\').map(t=>t.trim()).filter(Boolean))"></div>' :
+          (item.tags?.length ?
+            '<div style="display:flex;flex-wrap:wrap;gap:4px;">' +
+            item.tags.map(t => '<span style="font-size:0.72rem;padding:2px 8px;background:' + cfg.color + '22;color:' + cfg.color + ';border-radius:var(--radius-full);">#' + t + '</span>').join('') +
+            '</div>' : '')
+        ) +
       '</div>' +
 
-      // Editor libero note
+      // ── Note libere ──
       '<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);overflow:hidden;margin-bottom:16px;">' +
-        '<div style="padding:8px 12px;border-bottom:1px solid var(--border);font-size:0.68rem;font-family:var(--font-display);text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);display:flex;align-items:center;justify-content:space-between;">' +
-          '<span>Note libere</span>' +
-          '<span style="font-size:0.65rem;color:var(--text-muted);font-family:var(--font-body);text-transform:none;letter-spacing:0;">Usa @nome per collegare · #tag · [[link]]</span>' +
-        '</div>' +
-        // Toolbar formattazione compatta
-        '<div style="display:flex;flex-wrap:wrap;gap:2px;padding:4px 8px;border-bottom:1px solid var(--border);background:var(--bg-secondary);">' +
-          '<button class="nc-tb" onclick="document.execCommand(\'bold\')" title="Grassetto"><b>B</b></button>' +
-          '<button class="nc-tb" onclick="document.execCommand(\'italic\')" title="Corsivo"><i>I</i></button>' +
-          '<button class="nc-tb" onclick="document.execCommand(\'underline\')" title="Sottolineato"><u>S</u></button>' +
-          '<div style="width:1px;background:var(--border);margin:2px 3px;"></div>' +
+        '<div style="padding:8px 12px;border-bottom:1px solid var(--border);font-size:0.68rem;font-family:var(--font-display);text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);">Note libere</div>' +
+        (isEdit ?
+          '<div style="display:flex;flex-wrap:wrap;gap:2px;padding:4px 8px;border-bottom:1px solid var(--border);background:var(--bg-secondary);">' +
+          '<button class="nc-tb" onclick="document.execCommand(\'bold\')"><b>B</b></button>' +
+          '<button class="nc-tb" onclick="document.execCommand(\'italic\')"><i>I</i></button>' +
           '<button class="nc-tb" onclick="document.execCommand(\'insertUnorderedList\')">•</button>' +
-          '<button class="nc-tb" onclick="document.execCommand(\'insertOrderedList\')">1.</button>' +
-          '<div style="width:1px;background:var(--border);margin:2px 3px;"></div>' +
-          '<button class="nc-tb" onclick="wikiCallout(\'secret\')" style="color:#c97bea;font-size:0.68rem;" title="Segreto DM">Segr.</button>' +
-          '<button class="nc-tb" onclick="wikiCallout(\'read-aloud\')" style="color:#5ba4f5;font-size:0.68rem;" title="Read Aloud">Lettura</button>' +
-        '</div>' +
-        '<div id="ws-editor-free" contenteditable="true" spellcheck="true" ' +
+          '</div>' : '') +
+        (isEdit ?
+          '<div id="ws-editor-free" contenteditable="true" spellcheck="true" ' +
           'style="min-height:120px;padding:12px 16px;font-size:0.88rem;line-height:1.8;outline:none;color:var(--text-primary);" ' +
-          'data-placeholder="Note aggiuntive, descrizioni, dettagli...">' +
-          (item.note || '') +
-        '</div>' +
+          'data-placeholder="Note aggiuntive...">' + (item.note || '') + '</div>' :
+          (item.note ?
+            '<div style="padding:12px 16px;font-size:0.88rem;line-height:1.8;color:var(--text-primary);">' + item.note + '</div>' :
+            '<div style="padding:12px 16px;font-size:0.82rem;color:var(--text-muted);font-style:italic;">Nessuna nota. Clicca Modifica per aggiungerne.</div>')
+        ) +
       '</div>' +
 
-      // Autosave status
-      '<div id="ws-autosave-status" style="font-size:0.68rem;color:var(--text-muted);text-align:right;margin-bottom:8px;"></div>' +
+      // ── Autosave status (solo in edit) ──
+      (isEdit ? '<div id="ws-autosave-status" style="font-size:0.68rem;color:var(--text-muted);text-align:right;margin-bottom:8px;"></div>' : '') +
 
     '</div>';
   };
@@ -16347,7 +16382,14 @@ const WikiSections = (() => {
     // Salva subito come bozza
     const camp = App.getActiveCampaign();
     cfg.saveItem(camp, newItem);
-    openCard(type, newItem.id);
+    // Apre subito in modalità edit per le nuove card
+    const detailEl2 = document.getElementById('wiki-' + type + '-detail');
+    const listEl2   = document.getElementById('wiki-' + type + '-list');
+    _currentItem = { ...newItem };
+    if (listEl2) listEl2.style.display = 'none';
+    if (detailEl2) { detailEl2.style.display = ''; detailEl2.innerHTML = _renderDetail(type, newItem, 'edit'); }
+    const editor2 = document.getElementById('ws-editor-free');
+    if (editor2) editor2.addEventListener('input', () => { _currentItem.note = editor2.innerHTML; _scheduleAutosave(type); });
     // Focus sul nome
     setTimeout(() => document.getElementById('wsf-nome')?.focus(), 100);
   };
@@ -16415,7 +16457,51 @@ const WikiSections = (() => {
     renderCounters();
   };
 
-  return { toggleExpand, goto, renderList, openCard, closeDetail, newCard, deleteCard, filter, filterTag, renderCounters, init, _fieldChange };
+  // ── Modalità edit da lista (click Modifica) ──
+  const editCard = (type, id) => {
+    const cfg = TYPES[type];
+    const camp = App.getActiveCampaign();
+    const items = cfg.getData(camp);
+    const item = items.find(x => x.id === id);
+    if (!item) return;
+    _currentItem = { ...item };
+    const detailEl = document.getElementById('wiki-' + type + '-detail');
+    if (detailEl) detailEl.innerHTML = _renderDetail(type, item, 'edit');
+    // Attiva autosave
+    const editor = document.getElementById('ws-editor-free');
+    if (editor) editor.addEventListener('input', () => { _currentItem.note = editor.innerHTML; _scheduleAutosave(type); });
+  };
+
+  // ── Salva e torna a vista lettura ──
+  const _saveAndView = (type) => {
+    if (_currentItem) _save(type);
+    const camp = App.getActiveCampaign();
+    const cfg = TYPES[type];
+    const items = cfg.getData(camp);
+    const item = items.find(x => x.id === _currentItem?.id);
+    const detailEl = document.getElementById('wiki-' + type + '-detail');
+    if (detailEl && item) detailEl.innerHTML = _renderDetail(type, item, 'view');
+    const status = document.getElementById('ws-autosave-status');
+    // non esiste più in view mode
+  };
+
+  // ── Naviga a un'entità collegata (@mention) ──
+  const _jumpToEntity = (name) => {
+    const camp = App.getActiveCampaign();
+    const lc = name.toLowerCase();
+    // Cerca in PNG
+    const npc = (camp?.npcs||[]).find(n => (n.name||n.nome||'').toLowerCase().includes(lc));
+    if (npc) { goto('png'); setTimeout(() => openCard('png', npc.id), 100); return; }
+    // Cerca in Luoghi
+    const loc = (camp?.locations||[]).find(l => (l.nome||l.name||'').toLowerCase().includes(lc));
+    if (loc) { goto('luoghi'); setTimeout(() => openCard('luoghi', loc.id), 100); return; }
+    // Cerca in Fazioni
+    const fac = (camp?.factions||[]).find(f => (f.nome||f.name||'').toLowerCase().includes(lc));
+    if (fac) { goto('fazioni'); setTimeout(() => openCard('fazioni', fac.id), 100); return; }
+    Toast.show('Entità non trovata: ' + name, 'warning', 2000);
+  };
+
+  return { toggleExpand, goto, renderList, openCard, editCard, closeDetail, newCard, deleteCard, filter, filterTag, renderCounters, init, _fieldChange, _jumpToEntity, _saveAndView };
 })();
 
 
