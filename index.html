@@ -11666,8 +11666,60 @@ const WikiDM = (() => {
 })();
 
 // ── Editor Wiki: comandi globali ──
-const wikiF  = (cmd) => { document.getElementById('wiki-note-content')?.focus(); document.execCommand(cmd,false,null); WikiDM.saveNote(); };
-const wikiFB = (tag) => { document.getElementById('wiki-note-content')?.focus(); document.execCommand('formatBlock',false,'<'+tag+'>'); WikiDM.saveNote(); };
+// ── Editor attivo — trova il contenteditable con il focus
+const _getActiveEditor = () => {
+  const active = document.activeElement;
+  if (active && active.contentEditable === 'true') return active;
+  // Fallback: wiki-note-content o ws-editor-free
+  return document.getElementById('wiki-note-content') ||
+         document.getElementById('ws-editor-free') ||
+         document.getElementById('nc-page-content');
+};
+
+const _saveActiveEditor = () => {
+  const el = _getActiveEditor();
+  if (!el) return;
+  if (el.id === 'wiki-note-content') WikiDM.saveNote();
+  else if (el.id === 'nc-page-content') NoteCampagna.savePage?.();
+  else if (el.id === 'ws-editor-free' && window.WikiSections?._currentType) {
+    WikiSections._manualSave?.();
+  }
+};
+
+const wikiF  = (cmd) => {
+  const el = _getActiveEditor();
+  if (!el) return;
+  el.focus();
+  document.execCommand(cmd, false, null);
+  _saveActiveEditor();
+};
+
+// wikiFB: applica tag block SOLO alla riga/paragrafo selezionato
+const wikiFB = (tag) => {
+  const el = _getActiveEditor();
+  if (!el) return;
+  el.focus();
+  const sel = window.getSelection();
+  if (!sel?.rangeCount) return;
+  const range = sel.getRangeAt(0);
+
+  // Se c'è testo selezionato, avvolge solo quello
+  if (!sel.isCollapsed) {
+    const frag = range.extractContents();
+    const wrapper = document.createElement(tag);
+    wrapper.appendChild(frag);
+    range.insertNode(wrapper);
+    // Riposiziona il cursore
+    sel.removeAllRanges();
+    const newRange = document.createRange();
+    newRange.selectNodeContents(wrapper);
+    sel.addRange(newRange);
+  } else {
+    // Nessuna selezione: applica al blocco corrente (comportamento standard)
+    document.execCommand('formatBlock', false, '<' + tag + '>');
+  }
+  _saveActiveEditor();
+};
 
 const wikiInsertTag = () => {
   const tag = prompt('Nome tag (senza #):','');
@@ -13321,13 +13373,13 @@ const wikiApplyColor = () => {
     if (r) { sel.removeAllRanges(); sel.addRange(r); }
   }
   document.execCommand('foreColor', false, color);
-  WikiDM.saveNote();
+  _saveActiveEditor();
 };
 
 const wikiApplyHighlight = () => {
   const color = document.getElementById('wiki-hl-pick')?.value || '#f5a623';
   const sel = window.getSelection();
-  const el = document.getElementById('wiki-note-content');
+  const el = _getActiveEditor();
   if (!el) return;
   el.focus();
   if (sel && sel.isCollapsed) {
@@ -16297,6 +16349,7 @@ const WikiSections = (() => {
     const items = cfg.getData(camp);
     const item = items.find(x => x.id === id);
     if (!item) return;
+    _currentType = type;
     _currentItem = { ...item };
 
     const listEl   = document.getElementById('wiki-' + type + '-list');
@@ -16453,9 +16506,18 @@ const WikiSections = (() => {
         '<div style="padding:8px 12px;border-bottom:1px solid var(--border);font-size:0.68rem;font-family:var(--font-display);text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);">Note libere</div>' +
         (isEdit ?
           '<div style="display:flex;flex-wrap:wrap;gap:2px;padding:4px 8px;border-bottom:1px solid var(--border);background:var(--bg-secondary);">' +
-          '<button class="nc-tb" onclick="document.execCommand(\'bold\')"><b>B</b></button>' +
-          '<button class="nc-tb" onclick="document.execCommand(\'italic\')"><i>I</i></button>' +
-          '<button class="nc-tb" onclick="document.execCommand(\'insertUnorderedList\')">•</button>' +
+          '<button class="nc-tb" onclick="wikiF(\'bold\')"><b>B</b></button>' +
+          '<button class="nc-tb" onclick="wikiF(\'italic\')"><i>I</i></button>' +
+          '<button class="nc-tb" onclick="wikiF(\'underline\')"><u>S</u></button>' +
+          '<button class="nc-tb" onclick="wikiF(\'strikeThrough\')"><s>ab</s></button>' +
+          '<div style="width:1px;background:var(--border);margin:2px 3px;"></div>' +
+          '<button class="nc-tb" onclick="wikiFB(\'h2\')">H2</button>' +
+          '<button class="nc-tb" onclick="wikiFB(\'h3\')">H3</button>' +
+          '<button class="nc-tb" onclick="wikiF(\'insertUnorderedList\')">•</button>' +
+          '<button class="nc-tb" onclick="wikiF(\'insertOrderedList\')">±1.</button>' +
+          '<div style="width:1px;background:var(--border);margin:2px 3px;"></div>' +
+          '<input type="color" id="ws-color-pick" value="#c97bea" style="width:22px;height:22px;border:none;border-radius:3px;cursor:pointer;padding:1px;" title="Colore testo" oninput="wikiApplyColorWS(this.value)">' +
+          '<input type="color" id="ws-hl-pick" value="#f5a623" style="width:22px;height:22px;border:none;border-radius:3px;cursor:pointer;padding:1px;" title="Evidenziatore" oninput="wikiApplyHighlightWS(this.value)">' +
           '</div>' : '') +
         (isEdit ?
           '<div id="ws-editor-free" contenteditable="true" spellcheck="true" ' +
@@ -16546,6 +16608,7 @@ const WikiSections = (() => {
     // Apre subito in modalità edit per le nuove card
     const detailEl2 = document.getElementById('wiki-' + type + '-detail');
     const listEl2   = document.getElementById('wiki-' + type + '-list');
+    _currentType = type;
     _currentItem = { ...newItem };
     if (listEl2) listEl2.style.display = 'none';
     if (detailEl2) { detailEl2.style.display = ''; detailEl2.innerHTML = _renderDetail(type, newItem, 'edit'); }
@@ -16625,12 +16688,23 @@ const WikiSections = (() => {
     const items = cfg.getData(camp);
     const item = items.find(x => x.id === id);
     if (!item) return;
+    _currentType = type;
     _currentItem = { ...item };
     const detailEl = document.getElementById('wiki-' + type + '-detail');
     if (detailEl) detailEl.innerHTML = _renderDetail(type, item, 'edit');
-    // Attiva autosave
-    const editor = document.getElementById('ws-editor-free');
-    if (editor) editor.addEventListener('input', () => { _currentItem.note = editor.innerHTML; _scheduleAutosave(type); });
+    // Attiva autosave — usa delegate per evitare problemi con innerHTML ricreato
+    setTimeout(() => {
+      const editor = document.getElementById('ws-editor-free');
+      if (editor) {
+        editor.addEventListener('input', () => { _currentItem.note = editor.innerHTML; _scheduleAutosave(type); });
+        editor.addEventListener('blur', () => { if(_currentItem) _save(type); });
+      }
+      // Salva su blur anche per i campi strutturati
+      const detailEl2 = document.getElementById('wiki-' + type + '-detail');
+      if (detailEl2) detailEl2.querySelectorAll('input,textarea,select').forEach(el => {
+        el.addEventListener('blur', () => { if(_currentItem) _save(type); });
+      });
+    }, 50);
   };
 
   // ── Salva e torna a vista lettura ──
@@ -16662,7 +16736,8 @@ const WikiSections = (() => {
     Toast.show('Entità non trovata: ' + name, 'warning', 2000);
   };
 
-  return { toggleExpand, goto, renderList, openCard, editCard, closeDetail, newCard, deleteCard, filter, filterTag, renderCounters, init, _fieldChange, _jumpToEntity, _saveAndView, _parseLinks };
+  const _manualSave = () => { if (_currentType && _currentItem) _save(_currentType); };
+  return { toggleExpand, goto, renderList, openCard, editCard, closeDetail, newCard, deleteCard, filter, filterTag, renderCounters, init, _fieldChange, _jumpToEntity, _saveAndView, _parseLinks, _manualSave, get _currentType() { return _currentType; } };
 })();
 
 
@@ -16776,6 +16851,23 @@ const ImageViewer = (() => {
   return { open, zoom, reset, close };
 })();
 
+
+
+const wikiApplyColorWS = (color) => {
+  const el = document.getElementById('ws-editor-free');
+  if (!el) return;
+  el.focus();
+  document.execCommand('foreColor', false, color);
+  WikiSections._manualSave?.();
+};
+
+const wikiApplyHighlightWS = (color) => {
+  const el = document.getElementById('ws-editor-free');
+  if (!el) return;
+  el.focus();
+  document.execCommand('backColor', false, color);
+  WikiSections._manualSave?.();
+};
 
 /* ── INIT ── */
 
