@@ -12603,55 +12603,57 @@ const ExportPDF = (() => {
 
 <!-- Modal: Scegli come entrare -->
 <div class="modal-overlay hidden" id="modal-auth-choice" style="display:none;" onclick="if(event.target===this)Modal.close('auth-choice')">
-  <div class="modal" style="max-width:480px;">
+  <div class="modal" style="max-width:460px;">
     <div class="modal-header">
-      <h3 class="modal-title"> Benvenuto nel DM Toolkit</h3>
-      <button class="btn btn-ghost btn-icon-sm" onclick="Modal.close('auth-choice')"></button>
+      <h3 class="modal-title">Benvenuto nel DM Toolkit</h3>
+      <button class="btn btn-ghost btn-icon-sm" onclick="Modal.close('auth-choice')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
     </div>
-    <div class="modal-body" style="display:flex;flex-direction:column;gap:10px;padding:20px;">
+    <div class="modal-body" style="display:flex;flex-direction:column;gap:8px;padding:16px 20px 20px;">
 
-      <!-- Opzione 1: Locale -->
-      <button class="btn btn-ghost" style="padding:14px;text-align:left;border:1px solid var(--border);border-radius:var(--radius-md);"
+      <!-- Locale -->
+      <button class="btn btn-ghost" style="padding:12px 14px;text-align:left;border:1px solid var(--border);border-radius:var(--radius-md);width:100%;box-sizing:border-box;"
         onclick="FirebaseSync.useLocal();Modal.close('auth-choice')">
         <div style="display:flex;align-items:center;gap:12px;">
-          <span style="font-size:1.4rem;"></span>
-          <div>
-            <div style="font-family:var(--font-display);font-size:0.9rem;font-weight:600;">Solo locale</div>
-            <div style="font-size:0.75rem;color:var(--text-muted);">Dati salvati nel browser. Nessun account richiesto.</div>
+          <span style="color:var(--text-muted);flex-shrink:0;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></span>
+          <div style="min-width:0;text-align:left;">
+            <div style="font-family:var(--font-display);font-size:0.88rem;font-weight:600;">Solo locale</div>
+            <div style="font-size:0.75rem;color:var(--text-muted);white-space:normal;">Dati nel browser. Nessun account richiesto.</div>
           </div>
         </div>
       </button>
 
-      <!-- Opzione 2: Anonimo -->
-      <button class="btn btn-ghost" style="padding:14px;text-align:left;border:1px solid var(--border);border-radius:var(--radius-md);"
+      <!-- Anonimo -->
+      <button class="btn btn-ghost" style="padding:12px 14px;text-align:left;border:1px solid var(--border);border-radius:var(--radius-md);width:100%;box-sizing:border-box;"
         onclick="FirebaseSync.loginAnonymous();Modal.close('auth-choice')">
         <div style="display:flex;align-items:center;gap:12px;">
-          <span style="font-size:1.4rem;"></span>
-          <div>
-            <div style="font-family:var(--font-display);font-size:0.9rem;font-weight:600;">Anonimo</div>
-            <div style="font-size:0.75rem;color:var(--text-muted);">Dati sul cloud, nessun account. Puoi passare a Google in seguito.</div>
+          <span style="color:var(--text-muted);flex-shrink:0;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
+          <div style="min-width:0;text-align:left;">
+            <div style="font-family:var(--font-display);font-size:0.88rem;font-weight:600;">Anonimo</div>
+            <div style="font-size:0.75rem;color:var(--text-muted);white-space:normal;">Cloud senza account. Aggiornabile a Google in seguito.</div>
           </div>
         </div>
       </button>
 
-      <!-- Opzione 3: Google -->
-      <button class="btn btn-ghost" style="padding:14px;text-align:left;border:1px solid var(--border);border-radius:var(--radius-md);"
-        onclick="FirebaseSync.loginGoogle();Modal.close('auth-choice')">
+      <!-- Google -->
+      <button class="btn btn-ghost" style="padding:12px 14px;text-align:left;border:1px solid var(--border);border-radius:var(--radius-md);width:100%;box-sizing:border-box;"
+        onclick="FirebaseSync.loginGoogle()">
         <div style="display:flex;align-items:center;gap:12px;">
-          <span style="font-size:1.4rem;"></span>
-          <div>
-            <div style="font-family:var(--font-display);font-size:0.9rem;font-weight:600;">Accedi con Google</div>
-            <div style="font-size:0.75rem;color:var(--text-muted);">Sync multi-dispositivo e collaborazione con co-autori.</div>
+          <span style="color:var(--accent-secondary);flex-shrink:0;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg></span>
+          <div style="min-width:0;text-align:left;">
+            <div style="font-family:var(--font-display);font-size:0.88rem;font-weight:600;">Accedi con Google</div>
+            <div style="font-size:0.75rem;color:var(--text-muted);white-space:normal;">Sync multi-dispositivo e collaborazione con co-autori.</div>
           </div>
         </div>
       </button>
 
-      <!-- Opzione 4: Email/Password -->
+      <!-- Email/Password -->
       <div style="border:1px solid var(--border);border-radius:var(--radius-md);padding:14px;">
         <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;">
-          <span style="font-size:1.4rem;"></span>
+          <span style="color:var(--text-muted);flex-shrink:0;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></span>
           <div>
-            <div style="font-family:var(--font-display);font-size:0.9rem;font-weight:600;">Email e Password</div>
+            <div style="font-family:var(--font-display);font-size:0.88rem;font-weight:600;">Email e Password</div>
             <div style="font-size:0.75rem;color:var(--text-muted);">Registrati o accedi con email.</div>
           </div>
         </div>
@@ -12667,11 +12669,13 @@ const ExportPDF = (() => {
         </div>
       </div>
 
-      <div style="font-size:0.7rem;color:var(--text-muted);text-align:center;margin-top:4px;">
+      <div style="font-size:0.72rem;color:var(--text-muted);text-align:center;padding-top:4px;">
         Puoi cambiare modalità in qualsiasi momento dalle impostazioni.
       </div>
+
     </div>
   </div>
+</div></div>
 </div>
 
 <!-- Modal: Invita collaboratore -->
@@ -13062,6 +13066,24 @@ const ExportPDF = (() => {
 
 
 
+
+
+<!-- Image Viewer Overlay -->
+<div id="img-viewer-overlay" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.92);cursor:zoom-out;align-items:center;justify-content:center;"
+  onclick="ImageViewer.close()">
+  <div style="position:relative;max-width:90vw;max-height:90vh;user-select:none;" onclick="event.stopPropagation()">
+    <img id="img-viewer-img" src="" alt=""
+      style="max-width:90vw;max-height:85vh;object-fit:contain;border-radius:var(--radius-md);cursor:grab;transition:transform 0.1s;"
+      draggable="false">
+    <div style="position:absolute;bottom:-36px;left:50%;transform:translateX(-50%);display:flex;gap:8px;align-items:center;">
+      <button onclick="ImageViewer.zoom(-0.25)" style="background:rgba(255,255,255,0.15);border:none;border-radius:50%;width:32px;height:32px;color:#fff;cursor:pointer;font-size:1.1rem;display:flex;align-items:center;justify-content:center;">−</button>
+      <span id="img-viewer-zoom" style="color:#fff;font-size:0.78rem;min-width:40px;text-align:center;">100%</span>
+      <button onclick="ImageViewer.zoom(0.25)" style="background:rgba(255,255,255,0.15);border:none;border-radius:50%;width:32px;height:32px;color:#fff;cursor:pointer;font-size:1.1rem;display:flex;align-items:center;justify-content:center;">+</button>
+      <button onclick="ImageViewer.reset()" style="background:rgba(255,255,255,0.15);border:none;border-radius:var(--radius-sm);height:32px;padding:0 10px;color:#fff;cursor:pointer;font-size:0.75rem;">Reset</button>
+      <button onclick="ImageViewer.close()" style="background:rgba(255,255,255,0.15);border:none;border-radius:50%;width:32px;height:32px;color:#fff;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;">✕</button>
+    </div>
+  </div>
+</div>
 
 </body></html>`);
     win.document.close();
@@ -16400,7 +16422,7 @@ const WikiSections = (() => {
 
       // ── Immagine ──
       (item.immagine && !isEdit ?
-        '<img src="' + item.immagine + '" style="width:100%;height:220px;object-fit:cover;object-position:top center;border-radius:var(--radius-md);margin-bottom:16px;" onerror="this.style.display=\'none\'">' : '') +
+        '<img src="' + item.immagine + '" style="width:100%;height:220px;object-fit:cover;object-position:top center;border-radius:var(--radius-md);margin-bottom:16px;cursor:zoom-in;" onclick="ImageViewer.open(this.src)" title="Clicca per ingrandire" onerror="this.style.display=\'none\'">' : '') +
       (isEdit && (type === 'png' || type === 'luoghi' || type === 'fazioni') ?
         '<div class="form-group" style="margin-bottom:16px;">' +
         '<label class="form-label">Immagine URL</label>' +
@@ -16438,7 +16460,7 @@ const WikiSections = (() => {
         (isEdit ?
           '<div id="ws-editor-free" contenteditable="true" spellcheck="true" ' +
           'style="min-height:120px;padding:12px 16px;font-size:0.88rem;line-height:1.8;outline:none;color:var(--text-primary);" ' +
-          'data-placeholder="Note aggiuntive... Usa [[Nome]] per collegare entità">' + (item.note || '') + '</div>' :
+          'data-placeholder="Note libere... [[Nome]] per collegare · @Nome per menzione · #tag">' + (item.note || '') + '</div>' :
           (item.note ?
             '<div style="padding:12px 16px;font-size:0.88rem;line-height:1.8;color:var(--text-primary);">' + WikiSections._parseLinks(item.note) + '</div>' :
             '<div style="padding:12px 16px;font-size:0.82rem;color:var(--text-muted);font-style:italic;">Nessuna nota. Clicca Modifica per aggiungerne.</div>')
@@ -16465,6 +16487,11 @@ const WikiSections = (() => {
       var clean = name.trim();
       var safe = clean.replace(/&/g, '&amp;').replace(/"/g, '&quot;');
       return '<span class="ws-link" data-name="' + safe + '" onclick="WikiSections._jumpToEntity(this.dataset.name)" style="cursor:pointer;color:var(--accent-secondary);font-weight:600;" title="Vai a ' + safe + '">@' + clean + '</span>';
+    });
+    // #tag chip
+    text = text.replace(/#([\w\u00C0-\u00FF]+)/g, function(_, tag) {
+      var safe = tag.replace(/"/g, "");
+      return '<span class="nc-tag" data-tag="' + safe + '" style="display:inline-block;padding:1px 7px;background:var(--accent-primary);opacity:0.8;color:#fff;border-radius:var(--radius-full);font-size:0.78rem;cursor:pointer;" title="#' + safe + '">#' + safe + '</span>';
     });
     return text;
   };
@@ -16636,6 +16663,117 @@ const WikiSections = (() => {
   };
 
   return { toggleExpand, goto, renderList, openCard, editCard, closeDetail, newCard, deleteCard, filter, filterTag, renderCounters, init, _fieldChange, _jumpToEntity, _saveAndView, _parseLinks };
+})();
+
+
+
+// ══ IMAGE VIEWER — zoom/pan su tutte le immagini ══
+const ImageViewer = (() => {
+  let _scale = 1;
+  let _x = 0, _y = 0;
+  let _dragging = false;
+  let _lastX = 0, _lastY = 0;
+
+  const open = (src) => {
+    const overlay = document.getElementById('img-viewer-overlay');
+    const img     = document.getElementById('img-viewer-img');
+    if (!overlay || !img) return;
+    img.src = src;
+    _scale = 1; _x = 0; _y = 0;
+    _applyTransform(img);
+    overlay.style.display = 'flex';
+    document.getElementById('img-viewer-zoom').textContent = '100%';
+
+    // Drag per spostare
+    img.onmousedown = (e) => {
+      _dragging = true; _lastX = e.clientX; _lastY = e.clientY;
+      img.style.cursor = 'grabbing';
+      e.preventDefault();
+    };
+    window.onmousemove = (e) => {
+      if (!_dragging) return;
+      _x += e.clientX - _lastX;
+      _y += e.clientY - _lastY;
+      _lastX = e.clientX; _lastY = e.clientY;
+      _applyTransform(img);
+    };
+    window.onmouseup = () => { _dragging = false; img.style.cursor = 'grab'; };
+
+    // Touch per mobile
+    let _lastTouchDist = 0;
+    img.ontouchstart = (e) => {
+      if (e.touches.length === 2) {
+        _lastTouchDist = Math.hypot(
+          e.touches[0].clientX - e.touches[1].clientX,
+          e.touches[0].clientY - e.touches[1].clientY
+        );
+      } else {
+        _dragging = true;
+        _lastX = e.touches[0].clientX;
+        _lastY = e.touches[0].clientY;
+      }
+      e.preventDefault();
+    };
+    img.ontouchmove = (e) => {
+      if (e.touches.length === 2) {
+        const dist = Math.hypot(
+          e.touches[0].clientX - e.touches[1].clientX,
+          e.touches[0].clientY - e.touches[1].clientY
+        );
+        _scale = Math.max(0.25, Math.min(5, _scale * (dist / _lastTouchDist)));
+        _lastTouchDist = dist;
+        _applyTransform(img);
+      } else if (_dragging) {
+        _x += e.touches[0].clientX - _lastX;
+        _y += e.touches[0].clientY - _lastY;
+        _lastX = e.touches[0].clientX;
+        _lastY = e.touches[0].clientY;
+        _applyTransform(img);
+      }
+      e.preventDefault();
+    };
+    img.ontouchend = () => { _dragging = false; };
+
+    // Scroll per zoom
+    overlay.onwheel = (e) => {
+      e.preventDefault();
+      _scale = Math.max(0.25, Math.min(5, _scale + (e.deltaY < 0 ? 0.15 : -0.15)));
+      _applyTransform(img);
+    };
+  };
+
+  const _applyTransform = (img) => {
+    img.style.transform = `translate(${_x}px, ${_y}px) scale(${_scale})`;
+    const pct = Math.round(_scale * 100);
+    const lbl = document.getElementById('img-viewer-zoom');
+    if (lbl) lbl.textContent = pct + '%';
+  };
+
+  const zoom = (delta) => {
+    const img = document.getElementById('img-viewer-img');
+    _scale = Math.max(0.25, Math.min(5, _scale + delta));
+    _applyTransform(img);
+  };
+
+  const reset = () => {
+    const img = document.getElementById('img-viewer-img');
+    _scale = 1; _x = 0; _y = 0;
+    _applyTransform(img);
+  };
+
+  const close = () => {
+    const overlay = document.getElementById('img-viewer-overlay');
+    if (overlay) overlay.style.display = 'none';
+    window.onmousemove = null;
+    window.onmouseup = null;
+  };
+
+  // ESC per chiudere
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') close();
+  });
+
+  return { open, zoom, reset, close };
 })();
 
 
@@ -19764,6 +19902,24 @@ document.addEventListener('DOMContentLoaded', initMobileNav);
   }, true);
 </script>
 
+
+
+<!-- Image Viewer Overlay -->
+<div id="img-viewer-overlay" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.92);cursor:zoom-out;align-items:center;justify-content:center;"
+  onclick="ImageViewer.close()">
+  <div style="position:relative;max-width:90vw;max-height:90vh;user-select:none;" onclick="event.stopPropagation()">
+    <img id="img-viewer-img" src="" alt=""
+      style="max-width:90vw;max-height:85vh;object-fit:contain;border-radius:var(--radius-md);cursor:grab;transition:transform 0.1s;"
+      draggable="false">
+    <div style="position:absolute;bottom:-36px;left:50%;transform:translateX(-50%);display:flex;gap:8px;align-items:center;">
+      <button onclick="ImageViewer.zoom(-0.25)" style="background:rgba(255,255,255,0.15);border:none;border-radius:50%;width:32px;height:32px;color:#fff;cursor:pointer;font-size:1.1rem;display:flex;align-items:center;justify-content:center;">−</button>
+      <span id="img-viewer-zoom" style="color:#fff;font-size:0.78rem;min-width:40px;text-align:center;">100%</span>
+      <button onclick="ImageViewer.zoom(0.25)" style="background:rgba(255,255,255,0.15);border:none;border-radius:50%;width:32px;height:32px;color:#fff;cursor:pointer;font-size:1.1rem;display:flex;align-items:center;justify-content:center;">+</button>
+      <button onclick="ImageViewer.reset()" style="background:rgba(255,255,255,0.15);border:none;border-radius:var(--radius-sm);height:32px;padding:0 10px;color:#fff;cursor:pointer;font-size:0.75rem;">Reset</button>
+      <button onclick="ImageViewer.close()" style="background:rgba(255,255,255,0.15);border:none;border-radius:50%;width:32px;height:32px;color:#fff;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;">✕</button>
+    </div>
+  </div>
+</div>
 
 </body>
 </html>
