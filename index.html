@@ -295,6 +295,11 @@
 
       <div class="nav-section-label" style="margin-top:8px;">Strumenti</div>
 
+      <button class="nav-item" data-page="trame" data-requires-campaign="true" onclick="App.navigateTo('trame');closeMobileMenu()">
+        <span class="nav-icon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg></span>
+        <span class="nav-label">Trame</span>
+      </button>
+
       <button class="nav-item" data-page="generatori" onclick="App.navigateTo('generatori');closeMobileMenu()">
         <span class="nav-icon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span>
         <span class="nav-label">Generatori</span>
@@ -3807,6 +3812,7 @@ const App = (() => {
     'wiki-fazioni':  { label: 'Fazioni',  icon: '📝', navItem: false, requiresCampaign: true },
     'wiki-lore':     { label: 'Lore',     icon: '📝', navItem: false, requiresCampaign: true },
     'wiki-sessioni': { label: 'Sessioni', icon: '📝', navItem: false, requiresCampaign: true },
+    trame:          { label: 'Trame',    icon: '🎭', navItem: true,  requiresCampaign: true  },
   };
 
   const navigateTo = (pageId) => {
@@ -3886,6 +3892,9 @@ const App = (() => {
     case 'wiki-sessioni':
         // gestito da WikiSections.goto()
         setTimeout(() => { try { WikiSections.renderCounters(); } catch(e) {} }, 100);
+        break;
+    case 'trame':
+        setTimeout(() => { try { Trame.render(); } catch(e) {} }, 100);
         break;
     }
   };
@@ -14931,7 +14940,54 @@ const MentionPicker = (() => {
     }
   });
 
-  return { onInput, onKeydown, pick };
+    // Aggancia a un input text normale con @
+  const attachToInput = (inputEl) => {
+    if (!inputEl || inputEl._mpAttached) return;
+    inputEl._mpAttached = true;
+    inputEl.addEventListener('input', () => {
+      const val = inputEl.value;
+      const cursor = inputEl.selectionStart || val.length;
+      const before = val.slice(0, cursor);
+      const atIdx  = before.lastIndexOf('@');
+      if (atIdx < 0) { _hide(); return; }
+      const query = before.slice(atIdx + 1);
+      if (/\s/.test(query) && query.length > 15) { _hide(); return; }
+      _query   = query;
+      _results = _getItems(query);
+      if (!_results.length) { _hide(); return; }
+      const rect = inputEl.getBoundingClientRect();
+      _show(rect.left, rect.bottom + window.scrollY);
+      _render((item) => {
+        const name = item.key.replace(/^(png|luogo|fazione|wiki):/, '');
+        const before2 = val.slice(0, atIdx);
+        const after2  = val.slice(cursor);
+        inputEl.value = before2 + '@' + name + (after2.startsWith(' ') ? after2 : ' ' + after2);
+        inputEl.dispatchEvent(new Event('input', { bubbles: true }));
+        _hide();
+      });
+    });
+    inputEl.addEventListener('keydown', (e) => {
+      if (!_active) return;
+      if (e.key === 'ArrowDown') { _idx = Math.min(_idx+1, _results.length-1); _render(); e.preventDefault(); }
+      else if (e.key === 'ArrowUp') { _idx = Math.max(_idx-1, 0); _render(); e.preventDefault(); }
+      else if (e.key === 'Enter' || e.key === 'Tab') {
+        if (_results[_idx]) {
+          const item = _results[_idx];
+          const name = item.key.replace(/^(png|luogo|fazione|wiki):/, '');
+          const val  = inputEl.value;
+          const cursor = inputEl.selectionStart || val.length;
+          const atIdx = val.slice(0, cursor).lastIndexOf('@');
+          inputEl.value = val.slice(0, atIdx) + '@' + name + ' ' + val.slice(cursor);
+          inputEl.dispatchEvent(new Event('input', { bubbles: true }));
+          _hide();
+        }
+        e.preventDefault();
+      } else if (e.key === 'Escape') _hide();
+    });
+    inputEl.addEventListener('blur', () => setTimeout(_hide, 150));
+  };
+
+  return { onInput, onKeydown, pick, attachToInput };
 })();
 
 
@@ -16457,8 +16513,11 @@ const WikiSections = (() => {
     // ── Helper: renderizza un campo in vista lettura ──
     const _viewField = (f, val) => {
       if (f.type === 'separator') {
-        return '<div style="grid-column:1/-1;padding:10px 0 2px;border-top:1px solid var(--border);margin-top:4px;">' +
-          '<div style="font-size:0.72rem;font-family:var(--font-display);text-transform:uppercase;letter-spacing:0.1em;color:var(--accent-secondary);font-weight:600;">' + f.label + '</div>' +
+        const isPrep = f.label.toLowerCase().includes('prep');
+        const isPost = f.label.toLowerCase().includes('post');
+        const color = isPrep ? '#f5a623' : isPost ? '#69cc85' : 'var(--accent-secondary)';
+        return '<div style="grid-column:1/-1;margin:14px 0 6px;padding:8px 14px;background:' + color + '18;border-left:4px solid ' + color + ';border-radius:0 var(--radius-md) var(--radius-md) 0;">' +
+          '<div style="font-size:0.8rem;font-family:var(--font-display);font-weight:700;color:' + color + ';letter-spacing:0.05em;">' + f.label.replace(/^[—–]/,'').replace(/[—–]$/,'').trim() + '</div>' +
           '</div>';
       }
       if (!val && val !== 0) return '';
@@ -16497,8 +16556,11 @@ const WikiSections = (() => {
     // ── Helper: renderizza un campo in modalità edit ──
     const _editField = (f) => {
       if (f.type === 'separator') {
-        return '<div style="grid-column:1/-1;padding:12px 0 4px;border-top:1px solid var(--border);margin-top:8px;">' +
-          '<div style="font-size:0.72rem;font-family:var(--font-display);text-transform:uppercase;letter-spacing:0.1em;color:var(--accent-secondary);font-weight:600;">' + f.label + '</div>' +
+        const isPrep = f.label.toLowerCase().includes('prep');
+        const isPost = f.label.toLowerCase().includes('post');
+        const color = isPrep ? '#f5a623' : isPost ? '#69cc85' : 'var(--accent-secondary)';
+        return '<div style="grid-column:1/-1;margin:16px 0 8px;padding:10px 14px;background:' + color + '18;border-left:4px solid ' + color + ';border-radius:0 var(--radius-md) var(--radius-md) 0;">' +
+          '<div style="font-size:0.8rem;font-family:var(--font-display);font-weight:700;color:' + color + ';letter-spacing:0.05em;">' + f.label.replace(/^[—–]/,'').replace(/[—–]$/,'').trim() + '</div>' +
           '</div>';
       }
       const val = item[f.key] || '';
@@ -16806,12 +16868,25 @@ const WikiSections = (() => {
       if (editor) {
         editor.addEventListener('input', () => { _currentItem.note = editor.innerHTML; _scheduleAutosave(type); });
         editor.addEventListener('blur', () => { if(_currentItem) _save(type); });
+        editor.addEventListener('input', (e) => MentionPicker.onInput(e, editor));
+        editor.addEventListener('keydown', (e) => MentionPicker.onKeydown(e));
       }
-      // Salva su blur anche per i campi strutturati
+      // Salva su blur + autocomplete @ per campi mentions
       const detailEl2 = document.getElementById('wiki-' + type + '-detail');
-      if (detailEl2) detailEl2.querySelectorAll('input,textarea,select').forEach(el => {
-        el.addEventListener('blur', () => { if(_currentItem) _save(type); });
-      });
+      if (detailEl2) {
+        detailEl2.querySelectorAll('input,textarea,select').forEach(el => {
+          el.addEventListener('blur', () => { if(_currentItem) _save(type); });
+        });
+        const cfg = TYPES[type];
+        if (cfg?.fields) {
+          cfg.fields.forEach(f => {
+            if (f.type === 'mention' || f.type === 'mentions') {
+              const inp = detailEl2.querySelector('#wsf-' + f.key);
+              if (inp) MentionPicker.attachToInput(inp);
+            }
+          });
+        }
+      }
     }, 50);
   };
 
@@ -17073,7 +17148,7 @@ const SessCtx = (() => {
 
     container.innerHTML = npcs.map(n =>
       '<button onclick="WikiSections.goto(\'png\'); setTimeout(()=>WikiSections.openCard(\'png\',\''+n.id+'\'),150)" ' +
-      'style="display:flex;align-items:center;gap:6px;padding:5px 10px;background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-md);cursor:pointer;font-size:0.78rem;">' +
+      'style="display:flex;align-items:center;gap:6px;padding:5px 10px;background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-md);cursor:pointer;font-size:0.78rem;color:var(--text-primary);">' +
       (n.immagine ? '<img src="'+n.immagine+'" style="width:20px;height:20px;border-radius:50%;object-fit:cover;" onerror="this.style.display=\'none\'">' : '') +
       '<span>' + (n.name || n.nome || '?') + '</span>' +
       (n.ruolo ? '<span style="color:var(--text-muted);font-size:0.7rem;">— ' + n.ruolo + '</span>' : '') +
@@ -17102,7 +17177,7 @@ const SessCtx = (() => {
     container.innerHTML = luoghiNames.map(nome => {
       const loc = locs.find(l => (l.nome || l.name) === nome);
       return '<button onclick="WikiSections.goto(\'luoghi\'); setTimeout(()=>{ const l=(App.getActiveCampaign()?.locations||[]).find(x=>(x.nome||x.name)===\''+nome+'\'); if(l) WikiSections.openCard(\'luoghi\',l.id); },150)" ' +
-        'style="display:flex;align-items:center;gap:6px;padding:5px 10px;background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-md);cursor:pointer;font-size:0.78rem;">' +
+        'style="display:flex;align-items:center;gap:6px;padding:5px 10px;background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-md);cursor:pointer;font-size:0.78rem;color:var(--text-primary);">' +
         '<span>' + nome + '</span>' +
         (loc?.tipo ? '<span style="color:var(--text-muted);font-size:0.7rem;">— ' + loc.tipo + '</span>' : '') +
         '</button>';
@@ -17167,6 +17242,151 @@ const SessCtx = (() => {
   });
 
   return { showTab, refresh, openWikiSessione };
+})();
+
+
+// ══ TRAME — Scheletro narrativo della campagna ══
+const Trame = (() => {
+
+  const COLORS = ['#c9a84c','#69cc85','#5ba4f5','#c97bea','#ff9f43','#ff6b6b','#56d4dd'];
+  const TIPI   = ['Trama A (principale)','Trama B','Trama C','Arco personaggio','Sottotrama','Mistero','Altro'];
+
+  const _getData = () => {
+    const camp = App.getActiveCampaign();
+    if (!camp.trame) camp.trame = [];
+    return camp.trame;
+  };
+
+  const _save = (trame) => {
+    App.saveActiveCampaign({ trame });
+  };
+
+  const newArco = () => {
+    const trame = _getData();
+    const colori_usati = trame.map(t => t.colore);
+    const colore = COLORS.find(c => !colori_usati.includes(c)) || COLORS[trame.length % COLORS.length];
+    trame.push({
+      id: 'tr_' + Date.now(),
+      titolo: 'Nuova trama',
+      tipo: trame.length === 0 ? 'Trama A (principale)' : 'Trama B',
+      colore,
+      descrizione: '',
+      stato: 'In corso',
+      png_chiave: '',
+      location_chiave: '',
+      fazioni: '',
+      obiettivo: '',
+      twist: '',
+      sessioni_collegate: [],
+      note: '',
+    });
+    _save(trame);
+    render();
+  };
+
+  const deleteArco = (id) => {
+    if (!confirm('Eliminare questa trama?')) return;
+    const trame = _getData().filter(t => t.id !== id);
+    _save(trame);
+    render();
+  };
+
+  const updateArco = (id, key, value) => {
+    const trame = _getData();
+    const t = trame.find(x => x.id === id);
+    if (!t) return;
+    t[key] = value;
+    _save(trame);
+  };
+
+  const render = () => {
+    const container = document.getElementById('trame-container');
+    if (!container) return;
+    const trame = _getData();
+    const camp  = App.getActiveCampaign();
+
+    if (!trame.length) {
+      container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-muted);">' +
+        '<div style="font-size:2rem;margin-bottom:12px;opacity:0.3;">🎭</div>' +
+        '<div style="font-size:0.9rem;margin-bottom:16px;">Nessuna trama ancora.<br>Inizia definendo la trama principale della campagna.</div>' +
+        '<button class="btn btn-primary" onclick="Trame.newArco()">+ Crea la prima trama</button>' +
+        '</div>';
+      return;
+    }
+
+    const STATUS_COLORS = { 'In corso':'#69cc85', 'Completata':'#5ba4f5', 'In pausa':'#f5a623', 'Abbandonata':'#7a7068' };
+
+    container.innerHTML = trame.map((t, idx) => {
+      // Sessioni collegate automaticamente
+      const sessLog = camp?.sessioni_log || [];
+      const sessColleg = sessLog.filter(s =>
+        (s.png_previsti||'').includes(t.png_chiave?.split(',')[0]?.trim()?.replace('@','')) ||
+        (s.notePrep||'').includes(t.titolo) ||
+        (t.sessioni_collegate||[]).includes(s.id)
+      ).slice(0, 5);
+
+      return '<div style="background:var(--bg-card);border:1px solid var(--border);border-left:5px solid ' + t.colore + ';border-radius:var(--radius-md);overflow:hidden;">' +
+
+        // Header trama
+        '<div style="display:flex;align-items:center;gap:12px;padding:14px 16px;background:' + t.colore + '12;flex-wrap:wrap;">' +
+          '<div style="width:12px;height:12px;border-radius:50%;background:' + t.colore + ';flex-shrink:0;"></div>' +
+          '<div style="flex:1;min-width:0;">' +
+            '<input value="' + _esc(t.titolo) + '" ' +
+              'style="font-family:var(--font-display);font-size:1rem;font-weight:700;background:transparent;border:none;border-bottom:2px solid ' + t.colore + ';width:100%;padding:2px 0;color:var(--text-primary);" ' +
+
+          '</div>' +
+          '<select style="font-size:0.75rem;background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-sm);padding:3px 6px;color:var(--text-primary);" ' +
+
+            TIPI.map(tip => '<option value="' + tip + '"' + (t.tipo===tip?' selected':'') + '>' + tip + '</option>').join('') +
+          '</select>' +
+          '<select style="font-size:0.75rem;background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-sm);padding:3px 6px;color:' + (STATUS_COLORS[t.stato]||'var(--text-muted)') + ';" ' +
+
+            Object.keys(STATUS_COLORS).map(s => '<option value="' + s + '"' + (t.stato===s?' selected':'') + '>' + s + '</option>').join('') +
+          '</select>' +
+          '<input type="color" value="' + t.colore + '" style="width:28px;height:28px;border:none;border-radius:4px;cursor:pointer;padding:1px;" ' +
+
+
+        '</div>' +
+
+        // Corpo trama — griglia campi
+        '<div style="padding:16px;display:grid;grid-template-columns:1fr 1fr;gap:12px;">' +
+
+          _field(t, 'obiettivo',      'Obiettivo / Premessa',     'Cosa vuole il DM ottenere con questa trama?', 'long') +
+          _field(t, 'png_chiave',     'PNG chiave',               '@PNG centrali in questa trama', 'short') +
+          _field(t, 'fazioni',        'Fazioni coinvolte',        '@Fazione', 'short') +
+          _field(t, 'location_chiave','Location principale',      '@Luogo', 'short') +
+          _field(t, 'twist',          'Colpo di scena / Twist',   'Il grande reveal o svolta prevista', 'long') +
+          _field(t, 'descrizione',    'Note e dettagli',          'Sviluppo, backstory, connessioni...', 'long') +
+
+        '</div>' +
+
+        // Sessioni collegate
+        (sessColleg.length ? '<div style="padding:0 16px 14px;">' +
+          '<div style="font-size:0.68rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;">Sessioni collegate</div>' +
+          '<div style="display:flex;flex-wrap:wrap;gap:4px;">' +
+            sessColleg.map(s => '<span onclick="WikiSections.goto(\'sessioni\');setTimeout(()=>WikiSections.openCard(\'sessioni\',\''+s.id+'\'),150)" ' +
+              'style="padding:2px 8px;background:' + t.colore + '22;color:' + t.colore + ';border-radius:var(--radius-full);font-size:0.75rem;cursor:pointer;">S' + s.numero + (s.titolo?' — '+s.titolo:'') + '</span>'
+            ).join('') +
+          '</div></div>' : '') +
+
+      '</div>';
+    }).join('');
+  };
+
+  const _field = (t, key, label, hint, type) => {
+    const val = t[key] || '';
+    const isLong = type === 'long';
+    const input = isLong
+      ? '<textarea class="trama-field" data-id="' + t.id + '" data-key="' + key + '" rows="2" style="width:100%;background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-sm);padding:6px 8px;font-size:0.8rem;color:var(--text-primary);resize:vertical;font-family:inherit;box-sizing:border-box;" placeholder="' + hint + '">' + _esc(val) + '</textarea>'
+      : '<input type="text" class="trama-field" data-id="' + t.id + '" data-key="' + key + '" style="width:100%;background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-sm);padding:6px 8px;font-size:0.8rem;color:var(--text-primary);box-sizing:border-box;" placeholder="' + hint + '" value="' + _esc(val) + '">';
+    return '<div style="' + (isLong ? 'grid-column:1/-1;' : '') + '">' +
+      '<div style="font-size:0.65rem;font-family:var(--font-display);text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin-bottom:4px;">' + label + '</div>' +
+      input + '</div>';
+  };
+
+  const _esc = (s) => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+
+  return { newArco, deleteArco, updateArco, render };
 })();
 
 /* ── INIT ── */
