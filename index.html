@@ -769,18 +769,46 @@
           </div>
         </div>
 
-        <!-- Note Sessione -->
+        <!-- Pannello Contesto Sessione -->
         <div class="card" style="margin-top:var(--space-lg);">
-          <div class="card-header">
-            <h3 class="card-title">Note Sessione</h3>
-            <div style="display:flex;gap:6px;">
-              <button class="btn btn-secondary btn-sm" onclick="NoteSessione.addVoce()">+ Nota</button>
-              <button class="btn btn-ghost btn-icon-sm" onclick="NoteSessione.clear()" aria-label="Cancella tutte le note" title="Cancella tutte le note">
-                <svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>
-              </button>
+          <div class="card-header" style="flex-wrap:wrap;gap:6px;">
+            <h3 class="card-title">Contesto Sessione</h3>
+            <div style="display:flex;gap:2px;background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-md);padding:2px;">
+              <button id="sess-ctx-tab-note" class="btn btn-primary btn-sm" onclick="SessCtx.showTab('note')" style="font-size:0.72rem;">📝 Note</button>
+              <button id="sess-ctx-tab-png" class="btn btn-ghost btn-sm" onclick="SessCtx.showTab('png')" style="font-size:0.72rem;">👤 PNG</button>
+              <button id="sess-ctx-tab-luoghi" class="btn btn-ghost btn-sm" onclick="SessCtx.showTab('luoghi')" style="font-size:0.72rem;">🗺️ Luoghi</button>
+              <button id="sess-ctx-tab-info" class="btn btn-ghost btn-sm" onclick="SessCtx.showTab('info')" style="font-size:0.72rem;">📋 Info</button>
             </div>
+            <button class="btn btn-ghost btn-sm" onclick="SessCtx.refresh()" title="Aggiorna" style="font-size:0.8rem;">↻</button>
           </div>
-          <div id="note-sessione-list" style="min-height:60px;"></div>
+
+          <!-- Tab Note -->
+          <div id="sess-ctx-note" style="padding:8px;">
+            <div style="display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap;">
+              <button class="btn btn-secondary btn-sm" onclick="NoteSessione.addVoce()">+ Nota rapida</button>
+              <button class="btn btn-ghost btn-sm" onclick="SessCtx.openWikiSessione()" style="font-size:0.72rem;">📖 Wiki sessione →</button>
+            </div>
+            <div id="note-sessione-list" style="min-height:40px;"></div>
+          </div>
+
+          <!-- Tab PNG -->
+          <div id="sess-ctx-png" style="display:none;padding:8px;">
+            <p style="font-size:0.72rem;color:var(--text-muted);margin-bottom:8px;">PNG della sessione attiva. Clicca per aprire la scheda wiki.</p>
+            <div id="sess-ctx-png-list" style="display:flex;flex-wrap:wrap;gap:6px;min-height:32px;"></div>
+            <button class="btn btn-ghost btn-sm" onclick="WikiSections.goto('png')" style="margin-top:8px;font-size:0.72rem;">Tutti i PNG →</button>
+          </div>
+
+          <!-- Tab Luoghi -->
+          <div id="sess-ctx-luoghi" style="display:none;padding:8px;">
+            <p style="font-size:0.72rem;color:var(--text-muted);margin-bottom:8px;">Luoghi visitati. Clicca per aprire la scheda wiki.</p>
+            <div id="sess-ctx-luoghi-list" style="display:flex;flex-wrap:wrap;gap:6px;min-height:32px;"></div>
+            <button class="btn btn-ghost btn-sm" onclick="WikiSections.goto('luoghi')" style="margin-top:8px;font-size:0.72rem;">Tutti i luoghi →</button>
+          </div>
+
+          <!-- Tab Info sessione -->
+          <div id="sess-ctx-info" style="display:none;padding:8px;">
+            <div id="sess-ctx-info-content" style="font-size:0.85rem;line-height:1.7;"></div>
+          </div>
         </div>
       </div>
     </section>
@@ -16183,33 +16211,62 @@ const WikiSections = (() => {
     sessioni: {
       label: 'Sessioni', color: '#ff9f43',
       fields: [
-        { key: 'numero',     label: 'Numero',               type: 'short' },
-        { key: 'data',       label: 'Data reale',           type: 'short' },
-        { key: 'stato',      label: 'Stato',                type: 'select', options: ['Pianificata','In corso','Giocata'] },
-        { key: 'png',        label: 'PNG coinvolti',        type: 'mentions', hint: '@NomePNG...' },
-        { key: 'luoghi_vis', label: 'Luoghi visitati',      type: 'mentions', hint: '@NomeLuogo...' },
-        { key: 'obiettivi',  label: 'Obiettivi / Prep DM',  type: 'long',    hint: 'Cosa vuoi che succeda? Hook, rivelazioni...' },
-        { key: 'successo',  label: 'Come e andata',         type: 'long',    hint: 'Cosa ha fatto il party?' },
-        { key: 'recap',      label: 'Recap (post sessione)',type: 'long',    hint: 'Riassunto per i giocatori' },
-        { key: 'ganci',      label: 'Ganci prossima',       type: 'long',    hint: 'Fili aperti, cliffhanger...' },
-        { key: 'xp',         label: 'XP / Ricompense',      type: 'short',   hint: 'es. 300 XP, Spada +1' },
-        { key: 'segreto',    label: 'Note DM (private)',     type: 'secret',  hint: 'Solo per il DM' },
+        // ── Dati base ──
+        { key: 'numero',        label: 'Numero',             type: 'short' },
+        { key: 'data',          label: 'Data',               type: 'short' },
+        { key: 'titolo',        label: 'Titolo sessione',    type: 'short',   hint: 'es. La caduta di Velmoor' },
+        { key: 'stato',         label: 'Stato',              type: 'select',  options: ['Pianificata','In corso','Giocata'] },
+
+        // ── PREPARAZIONE ──
+        { key: '_sep_prep',     label: '— Preparazione —',   type: 'separator' },
+        { key: 'meteo',         label: 'Meteo / Atmosfera',  type: 'short',   hint: 'es. Notte di tempesta, alba nebbiosa' },
+        { key: 'png_previsti',  label: 'PNG previsti',       type: 'mentions', hint: '@PNG che potrebbero apparire' },
+        { key: 'luoghi_previsti',label: 'Luoghi previsti',   type: 'mentions', hint: '@Luoghi dove si svolgerà' },
+        { key: 'fazioni',       label: 'Fazioni coinvolte',  type: 'mentions', hint: '@Fazione che ha un ruolo' },
+        { key: 'obiettivi',     label: 'Obiettivi DM',       type: 'long',    hint: 'Cosa vuoi che succeda? Rivelazioni, hook...' },
+        { key: 'beat_prep',     label: 'Scene / Beat pianificati', type: 'long', hint: 'Sequenza di scene previste' },
+        { key: 'ganci_entrata', label: 'Ganci in entrata',   type: 'long',    hint: 'Fili aperti dalla sessione precedente' },
+        { key: 'segreto',       label: 'Note DM private',    type: 'secret',  hint: 'Twist, segreti, info riservate' },
+
+        // ── POST SESSIONE ──
+        { key: '_sep_post',     label: '— Post Sessione —',  type: 'separator' },
+        { key: 'png',           label: 'PNG apparsi',        type: 'mentions', hint: '@PNG effettivamente apparsi' },
+        { key: 'png_nuovi',     label: 'PNG introdotti (1a volta)', type: 'mentions', hint: '@PNG visti per la prima volta' },
+        { key: 'luoghi_vis',    label: 'Luoghi visitati',    type: 'mentions', hint: '@Luoghi effettivamente visitati' },
+        { key: 'successo',      label: 'Come è andata',      type: 'long',    hint: 'Cosa ha fatto davvero il party?' },
+        { key: 'decisioni',     label: 'Decisioni chiave',   type: 'long',    hint: 'Scelte importanti dei giocatori' },
+        { key: 'lore_rivelata', label: 'Lore rivelata',      type: 'long',    hint: 'Segreti svelati, storia raccontata' },
+        { key: 'recap',         label: 'Recap per i giocatori', type: 'long', hint: 'Riassunto da leggere/mandare ai giocatori' },
+        { key: 'ganci',         label: 'Ganci prossima sessione', type: 'long', hint: 'Fili aperti, cliffhanger' },
+        { key: 'xp',            label: 'XP / Ricompense',   type: 'short',   hint: 'es. 300 XP, Spada +1' },
       ],
       getData: (camp) => {
         const wiki = camp?.wiki || {};
         const sessLog = camp?.sessioni_log || [];
         const fromLog = sessLog.map(s => ({
           id: s.id, nome: 'Sessione ' + s.numero + (s.titolo ? ' — ' + s.titolo : ''),
-          numero: String(s.numero||''), data: s.data||'',
+          numero: String(s.numero||''), data: s.data||'', titolo: s.titolo||'',
           stato: s.stato==='in_corso' ? 'In corso' : s.stato==='giocata' ? 'Giocata' : 'Pianificata',
+          meteo: s.meteo||'',
+          // Prep
+          png_previsti: s.png_previsti||'',
+          luoghi_previsti: s.luoghi_previsti||'',
+          fazioni: Array.isArray(s.fazioni) ? s.fazioni.join(', ') : (s.fazioni||''),
+          obiettivi: s.notePrep||s.obiettivi||'',
+          beat_prep: s.beat_prep||(s.beats||[]).map(b=>b.titolo||b.tipo||'').filter(Boolean).join(', ')||'',
+          ganci_entrata: s.ganci_entrata||'',
+          segreto: s.segreto||'',
+          // Post
           png: (s.npcs||[]).map(id => {
             const n = (camp?.npcs||[]).find(x => x.id===id);
             return n ? (n.name||n.nome||id) : id;
           }).join(', '),
-          luoghi_vis: s.luoghi_visitati||'',
-          obiettivi: s.notePrep||'', successo: s.successo||'',
+          png_nuovi: s.png_nuovi||'',
+          luoghi_vis: s.luoghi_visitati||s.luoghi_vis||'',
+          successo: s.successo||'',
+          decisioni: s.decisioni||'', lore_rivelata: s.lore_rivelata||'',
           recap: s.recap||'', ganci: s.ganci||'',
-          xp: s.xp||'', segreto: s.segreto||'',
+          xp: s.xp||'',
           contenuto: '', tags:['sessione'], _source:'sessioni_log', _origId:s.id,
         }));
         const fromWiki = (wiki.sessioni||[])
@@ -16226,10 +16283,17 @@ const WikiSections = (() => {
         if (item._source==='sessioni_log') {
           const sessioni = (camp.sessioni_log||[]).map(s =>
             s.id===item._origId ? { ...s,
-              titolo: item.nome.replace(/^Sessione \d+\s*[—-]\s*/, '').replace(/^Sessione \d+$/, ''),
-              data:item.data, stato:item.stato==='In corso'?'in_corso':item.stato==='Giocata'?'giocata':'pianificata',
-              notePrep:item.obiettivi, successo:item.successo, recap:item.recap,
-              ganci:item.ganci, xp:item.xp, segreto:item.segreto,
+              titolo: item.titolo || item.nome.replace(/^Sessione \d+\s*[\u2014-]\s*/, '').replace(/^Sessione \d+$/, ''),
+              data:item.data||'', meteo:item.meteo||'',
+              stato:item.stato==='In corso'?'in_corso':item.stato==='Giocata'?'giocata':'pianificata',
+              // Prep
+              png_previsti:item.png_previsti||'', luoghi_previsti:item.luoghi_previsti||'',
+              fazioni:item.fazioni||'', notePrep:item.obiettivi||'', obiettivi:item.obiettivi||'',
+              beat_prep:item.beat_prep||'', ganci_entrata:item.ganci_entrata||'', segreto:item.segreto||'',
+              // Post
+              png_nuovi:item.png_nuovi||'', luoghi_visitati:item.luoghi_vis||'',
+              successo:item.successo||'', decisioni:item.decisioni||'', lore_rivelata:item.lore_rivelata||'',
+              recap:item.recap||'', ganci:item.ganci||'', xp:item.xp||'',
             } : s
           );
           App.saveActiveCampaign({ sessioni_log: sessioni });
@@ -16244,12 +16308,19 @@ const WikiSections = (() => {
         }
       },
       newItem: () => ({ id:'ws_'+Date.now()+'_'+Math.random().toString(36).slice(2,5),
-        nome:'', numero:'', data:new Date().toISOString().slice(0,10),
-        stato:'Pianificata', png:'', luoghi_vis:'', obiettivi:'', successo:'', recap:'', ganci:'', xp:'', segreto:'',
-        contenuto:'', tags:['sessione'], _source:'wiki' }),
+        nome:'', numero:'', data:new Date().toISOString().slice(0,10), titolo:'',
+        stato:'Pianificata', meteo:'', png_previsti:'', luoghi_previsti:'', fazioni:'',
+        obiettivi:'', beat_prep:'', ganci_entrata:'', segreto:'',
+        png:'', png_nuovi:'', luoghi_vis:'', successo:'', decisioni:'', lore_rivelata:'',
+        recap:'', ganci:'', xp:'', contenuto:'', tags:['sessione'], _source:'wiki' }),
+      newItem: () => ({ id:'ws_'+Date.now()+'_'+Math.random().toString(36).slice(2,5),
+        nome:'', numero:'', data:new Date().toISOString().slice(0,10), titolo:'',
+        stato:'Pianificata', meteo:'', png_previsti:'', luoghi_previsti:'', fazioni:'',
+        obiettivi:'', beat_prep:'', ganci_entrata:'', segreto:'',
+        png:'', png_nuovi:'', luoghi_vis:'', successo:'', decisioni:'', lore_rivelata:'',
+        recap:'', ganci:'', xp:'', contenuto:'', tags:['sessione'], _source:'wiki' }),
     },
-  }
-
+  };
   // ── Stato ──
   let _currentType = null;
   let _currentItem = null;
@@ -16385,6 +16456,11 @@ const WikiSections = (() => {
 
     // ── Helper: renderizza un campo in vista lettura ──
     const _viewField = (f, val) => {
+      if (f.type === 'separator') {
+        return '<div style="grid-column:1/-1;padding:10px 0 2px;border-top:1px solid var(--border);margin-top:4px;">' +
+          '<div style="font-size:0.72rem;font-family:var(--font-display);text-transform:uppercase;letter-spacing:0.1em;color:var(--accent-secondary);font-weight:600;">' + f.label + '</div>' +
+          '</div>';
+      }
       if (!val && val !== 0) return '';
       const isSecret = f.type === 'secret';
       let content = '';
@@ -16420,6 +16496,11 @@ const WikiSections = (() => {
 
     // ── Helper: renderizza un campo in modalità edit ──
     const _editField = (f) => {
+      if (f.type === 'separator') {
+        return '<div style="grid-column:1/-1;padding:12px 0 4px;border-top:1px solid var(--border);margin-top:8px;">' +
+          '<div style="font-size:0.72rem;font-family:var(--font-display);text-transform:uppercase;letter-spacing:0.1em;color:var(--accent-secondary);font-weight:600;">' + f.label + '</div>' +
+          '</div>';
+      }
       const val = item[f.key] || '';
       let input = '';
       if (f.type === 'select') {
@@ -16475,7 +16556,17 @@ const WikiSections = (() => {
 
       // ── Immagine ──
       (item.immagine && !isEdit ?
-        '<img src="' + item.immagine + '" style="width:100%;height:220px;object-fit:cover;object-position:top center;border-radius:var(--radius-md);margin-bottom:16px;cursor:zoom-in;" onclick="ImageViewer.open(this.src)" title="Clicca per ingrandire" onerror="this.style.display=\'none\'">' : '') +
+        '<div style="position:relative;width:100%;height:180px;border-radius:var(--radius-md);overflow:hidden;margin-bottom:16px;background:var(--bg-secondary);">' +
+          '<img src="' + item.immagine + '" id="ws-inline-img" ' +
+          'style="position:absolute;cursor:move;max-width:none;max-height:none;width:auto;height:auto;min-height:100%;min-width:100%;object-fit:cover;top:0;left:0;user-select:none;" ' +
+          'draggable="false" ' +
+          'onmousedown="InlineImgDrag.start(event,this)" ' +
+          'onclick="InlineImgDrag.click(event,this)" ' +
+          'onerror="this.parentElement.style.display=\'none\'" ' +
+          'title="Trascina per riposizionare · Clicca per ingrandire">' +
+          '<button onclick="ImageViewer.open(document.getElementById(\'ws-inline-img\').src)" ' +
+          'style="position:absolute;top:6px;right:6px;background:rgba(0,0,0,0.5);border:none;border-radius:var(--radius-sm);color:#fff;cursor:pointer;padding:3px 7px;font-size:0.7rem;z-index:2;">⤢ Ingrandisci</button>' +
+          '</div>' : '') +
       (isEdit && (type === 'png' || type === 'luoghi' || type === 'fazioni') ?
         '<div class="form-group" style="margin-bottom:16px;">' +
         '<label class="form-label">Immagine URL</label>' +
@@ -16500,6 +16591,23 @@ const WikiSections = (() => {
             '</div>' : '')
         ) +
       '</div>' +
+
+      // ── Cronologia sessioni per PNG ──
+      (type === 'png' ? (() => {
+        const camp = App.getActiveCampaign();
+        const sessLog = camp?.sessioni_log || [];
+        const apparso = sessLog.filter(s => (s.npcs||[]).includes(item.id));
+        if (!apparso.length) return '';
+        return '<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);padding:12px 16px;margin-bottom:16px;">' +
+          '<div style="font-size:0.68rem;font-family:var(--font-display);text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin-bottom:10px;">Apparso in</div>' +
+          apparso.map(s => '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">' +
+            '<span style="font-size:0.7rem;padding:1px 7px;background:' + (s.stato==='giocata'?'#69cc8522':'#5ba4f522') + ';color:' + (s.stato==='giocata'?'#69cc85':'#5ba4f5') + ';border-radius:var(--radius-full);">' + (s.stato==='giocata'?'Giocata':'Pianificata') + '</span>' +
+            '<span style="font-size:0.82rem;cursor:pointer;color:var(--accent-primary);" onclick="WikiSections.goto(\'sessioni\');setTimeout(()=>WikiSections.openCard(\'sessioni\',\''+s.id+'\'),150)">S' + s.numero + (s.titolo?' — '+s.titolo:'') + '</span>' +
+            (s.data?'<span style="font-size:0.72rem;color:var(--text-muted);">'+s.data+'</span>':'') +
+            '</div>'
+          ).join('') +
+          '</div>';
+      })() : '') +
 
       // ── Note libere ──
       '<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);overflow:hidden;margin-bottom:16px;">' +
@@ -16868,6 +16976,198 @@ const wikiApplyHighlightWS = (color) => {
   document.execCommand('backColor', false, color);
   WikiSections._manualSave?.();
 };
+
+
+// ══ INLINE IMAGE DRAG — riposiziona immagine nella card ══
+const InlineImgDrag = (() => {
+  let _dragging = false;
+  let _startX = 0, _startY = 0;
+  let _imgLeft = 0, _imgTop = 0;
+  let _moved = false;
+
+  const start = (e, img) => {
+    if (e.button !== 0) return;
+    _dragging = true;
+    _moved = false;
+    _startX = e.clientX;
+    _startY = e.clientY;
+    // Leggi posizione corrente
+    _imgLeft = parseInt(img.style.left) || 0;
+    _imgTop  = parseInt(img.style.top)  || 0;
+    img.style.cursor = 'grabbing';
+    img.style.transition = 'none';
+
+    const onMove = (ev) => {
+      if (!_dragging) return;
+      const dx = ev.clientX - _startX;
+      const dy = ev.clientY - _startY;
+      if (Math.abs(dx) > 3 || Math.abs(dy) > 3) _moved = true;
+      img.style.left = (_imgLeft + dx) + 'px';
+      img.style.top  = (_imgTop  + dy) + 'px';
+    };
+    const onUp = () => {
+      _dragging = false;
+      img.style.cursor = 'move';
+      document.removeEventListener('mousemove', onMove);
+      document.removeEventListener('mouseup', onUp);
+    };
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onUp);
+    e.preventDefault();
+  };
+
+  const click = (e, img) => {
+    // Se si è mosso, non aprire il viewer
+    if (_moved) { _moved = false; return; }
+    ImageViewer.open(img.src);
+  };
+
+  return { start, click };
+})();
+
+
+// ══ SESS CTX — Pannello contesto wiki nella Sessione Live ══
+const SessCtx = (() => {
+  let _activeTab = 'note';
+
+  const showTab = (tab) => {
+    _activeTab = tab;
+    ['note','png','luoghi','info'].forEach(t => {
+      const el = document.getElementById('sess-ctx-' + t);
+      const btn = document.getElementById('sess-ctx-tab-' + t);
+      if (el)  el.style.display  = t === tab ? '' : 'none';
+      if (btn) btn.className = t === tab ? 'btn btn-primary btn-sm' : 'btn btn-ghost btn-sm';
+    });
+    if (tab === 'png')    _renderPNG();
+    if (tab === 'luoghi') _renderLuoghi();
+    if (tab === 'info')   _renderInfo();
+  };
+
+  const _getActiveSessione = () => {
+    const camp = App.getActiveCampaign();
+    if (!camp) return null;
+    // Cerca la sessione "In corso"
+    return (camp.sessioni_log || []).find(s => s.stato === 'in_corso') ||
+           (camp.sessioni_log || []).slice(-1)[0] || null;
+  };
+
+  const _renderPNG = () => {
+    const camp = App.getActiveCampaign();
+    const sess = _getActiveSessione();
+    const container = document.getElementById('sess-ctx-png-list');
+    if (!container) return;
+
+    let npcIds = sess?.npcs || [];
+    const npcNames = (sess?.npcs_nomi || []);
+
+    // Risolvi ID in nomi
+    const npcs = (camp?.npcs || []).filter(n => npcIds.includes(n.id));
+    // Aggiungi anche quelli citati per nome nella wiki sessione
+    const wikiSess = (camp?.wiki?.sessioni || []).find(s => s.sessioneId === sess?.id);
+    const extraNames = wikiSess ? (wikiSess.png || '').split(',').map(s => s.trim()).filter(Boolean) : [];
+
+    if (!npcs.length && !extraNames.length) {
+      container.innerHTML = '<div style="color:var(--text-muted);font-size:0.8rem;">Nessun PNG nella sessione attiva.<br>Aggiungili dalla scheda sessione in Wiki.</div>';
+      return;
+    }
+
+    container.innerHTML = npcs.map(n =>
+      '<button onclick="WikiSections.goto(\'png\'); setTimeout(()=>WikiSections.openCard(\'png\',\''+n.id+'\'),150)" ' +
+      'style="display:flex;align-items:center;gap:6px;padding:5px 10px;background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-md);cursor:pointer;font-size:0.78rem;">' +
+      (n.immagine ? '<img src="'+n.immagine+'" style="width:20px;height:20px;border-radius:50%;object-fit:cover;" onerror="this.style.display=\'none\'">' : '') +
+      '<span>' + (n.name || n.nome || '?') + '</span>' +
+      (n.ruolo ? '<span style="color:var(--text-muted);font-size:0.7rem;">— ' + n.ruolo + '</span>' : '') +
+      '</button>'
+    ).join('') +
+    extraNames.map(nm =>
+      '<span style="padding:4px 10px;background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-md);font-size:0.78rem;">@' + nm + '</span>'
+    ).join('');
+  };
+
+  const _renderLuoghi = () => {
+    const camp = App.getActiveCampaign();
+    const sess = _getActiveSessione();
+    const container = document.getElementById('sess-ctx-luoghi-list');
+    if (!container) return;
+
+    const luoghiStr = sess?.luoghi_visitati || '';
+    const luoghiNames = luoghiStr.split(',').map(s=>s.trim()).filter(Boolean);
+    const locs = (camp?.locations || []).filter(l => luoghiNames.includes(l.nome || l.name));
+
+    if (!luoghiNames.length) {
+      container.innerHTML = '<div style="color:var(--text-muted);font-size:0.8rem;">Nessun luogo nella sessione attiva.</div>';
+      return;
+    }
+
+    container.innerHTML = luoghiNames.map(nome => {
+      const loc = locs.find(l => (l.nome || l.name) === nome);
+      return '<button onclick="WikiSections.goto(\'luoghi\'); setTimeout(()=>{ const l=(App.getActiveCampaign()?.locations||[]).find(x=>(x.nome||x.name)===\''+nome+'\'); if(l) WikiSections.openCard(\'luoghi\',l.id); },150)" ' +
+        'style="display:flex;align-items:center;gap:6px;padding:5px 10px;background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-md);cursor:pointer;font-size:0.78rem;">' +
+        '<span>' + nome + '</span>' +
+        (loc?.tipo ? '<span style="color:var(--text-muted);font-size:0.7rem;">— ' + loc.tipo + '</span>' : '') +
+        '</button>';
+    }).join('');
+  };
+
+  const _renderInfo = () => {
+    const camp = App.getActiveCampaign();
+    const sess = _getActiveSessione();
+    const container = document.getElementById('sess-ctx-info-content');
+    if (!container) return;
+
+    if (!sess) {
+      container.innerHTML = '<div style="color:var(--text-muted);font-size:0.8rem;">Nessuna sessione attiva.<br>Crea una sessione con "+ Nuova Sessione".</div>';
+      return;
+    }
+
+    const rows = [
+      ['Sessione', sess.numero ? 'S' + sess.numero : '—'],
+      ['Titolo', sess.titolo || '—'],
+      ['Data', sess.data || '—'],
+      ['Stato', sess.stato || '—'],
+      ['Meteo', sess.meteo || '—'],
+      ['Obiettivi', sess.notePrep || '—'],
+      ['Ganci', sess.ganci || '—'],
+      ['XP', sess.xp || '—'],
+    ];
+
+    container.innerHTML = rows
+      .filter(([,v]) => v !== '—')
+      .map(([k,v]) =>
+        '<div style="display:flex;gap:8px;margin-bottom:8px;align-items:flex-start;">' +
+        '<span style="font-size:0.68rem;font-family:var(--font-display);text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted);min-width:70px;padding-top:2px;">' + k + '</span>' +
+        '<span style="font-size:0.82rem;flex:1;">' + v + '</span>' +
+        '</div>'
+      ).join('') +
+      '<button onclick="SessCtx.openWikiSessione()" class="btn btn-ghost btn-sm" style="margin-top:8px;font-size:0.72rem;">📖 Scheda completa in Wiki →</button>';
+  };
+
+  const openWikiSessione = () => {
+    const sess = _getActiveSessione();
+    if (!sess) { Toast.show('Nessuna sessione attiva', 'warning'); return; }
+    WikiSections.goto('sessioni');
+    setTimeout(() => {
+      WikiSections.openCard('sessioni', sess.id);
+    }, 200);
+  };
+
+  const refresh = () => {
+    if (_activeTab === 'png')    _renderPNG();
+    else if (_activeTab === 'luoghi') _renderLuoghi();
+    else if (_activeTab === 'info')   _renderInfo();
+    Toast.show('Aggiornato', 'success', 1000);
+  };
+
+  // Auto-refresh quando si naviga alla Sessione Live
+  document.addEventListener('DOMContentLoaded', () => {
+    const origNav = App.navigateTo;
+    if (typeof origNav === 'function') {
+      // Hook nella navigazione per aggiornare quando si apre la sessione
+    }
+  });
+
+  return { showTab, refresh, openWikiSessione };
+})();
 
 /* ── INIT ── */
 
