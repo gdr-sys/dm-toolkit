@@ -291,7 +291,7 @@
 
       <button class="nav-item" data-page="sessione" data-requires-campaign="true" onclick="App.navigateTo('sessione');closeMobileMenu()">
         <span class="nav-icon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="14.5 17.5 3 6 3 3 6 3 17.5 14.5"/><line x1="13" y1="19" x2="19" y2="13"/><line x1="16" y1="16" x2="20" y2="20"/><line x1="19" y1="21" x2="21" y2="19"/><polyline points="14.5 6.5 18 3 21 3 21 6 17.5 9.5"/><line x1="5" y1="14" x2="9" y2="18"/><line x1="7" y1="11" x2="11" y2="15"/></svg></span>
-        <span class="nav-label">Sessione</span>
+        <span class="nav-label">Sessione Live</span>
       </button>
 
 
@@ -403,9 +403,9 @@
          PAGINA: CAMPAGNA
     ════════════════════════ -->
     <section class="page" id="page-campagna">
-      <div class="page-header">
+      <div class="page-header" style="max-width:1400px;margin:0 auto;width:100%;">
         <div>
-          <h1 class="page-title" id="camp-<h1 class="page-title">Dashboard</h1>/h1>
+          <h1 class="page-title" id="campagna-title">Dashboard</h1>
           <p class="page-subtitle">Dashboard della campagna attiva</p>
         </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap;">
@@ -414,6 +414,7 @@
         </div>
       </div>
 
+      <div style="max-width:1400px;margin:0 auto;width:100%;">
       <!-- Riepilogo ultima sessione -->
       <div class="card card-accent" style="margin-bottom:var(--space-lg);">
         <div class="card-header">
@@ -430,14 +431,14 @@
       <div class="grid-2" style="gap:var(--space-lg);margin-bottom:var(--space-lg);">
         <div class="card">
           <div class="card-header">
-            <h3 class="card-title">📝 Note recenti</h3>
+            <h3 class="card-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Note recenti</h3>
             <button class="btn btn-ghost btn-sm" onclick="App.navigateTo('wiki')">Apri Wiki →</button>
           </div>
           <div id="dash-recent-notes" style="padding:8px 0;"></div>
         </div>
         <div class="card">
           <div class="card-header">
-            <h3 class="card-title">⏱ Clocks attivi</h3>
+            <h3 class="card-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Clocks attivi</h3>
             <button class="btn btn-ghost btn-sm" onclick="App.navigateTo('sessione')">Gestisci →</button>
           </div>
           <div id="dash-clocks-preview" style="padding:8px;"></div>
@@ -583,6 +584,7 @@
         </div>
       </div>
 
+      </div>
     </section>
 
     <!-- ════════════════════════
@@ -1362,7 +1364,7 @@
       <div class="page-header">
         <div>
           <h1 class="page-title">Compendio</h1>
-          <p class="page-subtitle">D&D 5e 2024 — Mostri, Oggetti Magici, Equipaggiamento, Regole</p>
+          <p class="page-subtitle">D&D 5.5e (2024) — Mostri, Oggetti Magici, Equipaggiamento, Regole</p>
         </div>
       </div>
 
@@ -1388,11 +1390,11 @@
             <button class="tab-btn"        id="comp-tab-cerca"       onclick="Compendio.switchTab('cerca')">Cerca tutto</button>
           </div>
           <div style="display:flex;align-items:center;gap:var(--space-sm);">
-            <span class="badge badge-muted" id="comp-sistema-badge">5e 2024</span>
+            <span class="badge badge-muted" id="comp-sistema-badge">5.5e (2024)</span>
             <select id="comp-sistema-select" class="form-select" style="width:auto;font-size:0.75rem;"
               onchange="Compendio.changeSistema(this.value)">
-              <option value="5e2024">D&D 5e 2024</option>
-              <option value="5e2014">D&D 5e 2014</option>
+              <option value="5e2024">D&D 5.5e (2024)</option>
+              <option value="5e2014">D&D 5e (2014)</option>
             </select>
             <span class="text-xs text-muted" id="comp-count-monsters"></span>
             <span class="text-xs text-muted" id="comp-count-magic" style="display:none;"></span>
@@ -1970,7 +1972,7 @@
         <div class="form-group">
           <label class="form-label">Sistema</label>
           <select id="nc-system" class="form-select">
-            <option value="5e2024">D&D 5e (2024)</option>
+            <option value="5e2024">D&D 5.5e (2024)</option>
             <option value="5e2014">D&D 5e (2014)</option>
             <option value="custom">Personalizzato</option>
           </select>
@@ -2031,7 +2033,7 @@
         <div class="form-group">
           <label class="form-label">Sistema</label>
           <select id="ec-system" class="form-select">
-            <option value="5e2024">D&D 5e (2024)</option>
+            <option value="5e2024">D&D 5.5e (2024)</option>
             <option value="5e2014">D&D 5e (2014)</option>
             <option value="custom">Personalizzato</option>
           </select>
@@ -6661,7 +6663,7 @@ const Compendio = (() => {
 
     // Aggiorna il badge sistema nell'UI
     const badge = document.getElementById('comp-sistema-badge');
-    if (badge) badge.textContent = _sistema === '5e2014' ? '5e 2014' : '5e 2024';
+    if (badge) badge.textContent = _sistema === '5e2014' ? '5e (2014)' : '5.5e (2024)';
     // Aggiorna anche il select nel UI
     const sel = document.getElementById('comp-sistema-select');
     if (sel) sel.value = _sistema;
@@ -12459,6 +12461,28 @@ const ExportPDF = (() => {
     bottom: calc(70px + env(safe-area-inset-bottom, 0px)) !important;
   }
 }
+
+/* ── DENSITÀ UI — protezioni minime ── */
+/* In modalità compatta i form-input non scendono sotto 120px */
+.form-input, .form-select, .form-textarea {
+  min-width: 80px;
+}
+/* I card-title non vanno a capo in modo strano */
+.card-title {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* Le label non si sovrappongono */
+.form-label {
+  min-height: 16px;
+  display: block;
+}
+/* I badge/chip hanno min-width */
+[style*="border-radius:var(--radius-full)"] {
+  white-space: nowrap;
+}
+
 </style>
 </head>
       <body><h1>${camp.name||'Campagna'}</h1>
@@ -12581,7 +12605,7 @@ const ExportPDF = (() => {
 
 <!-- Modal: Scegli come entrare -->
 <div class="modal-overlay hidden" id="modal-auth-choice" style="display:none;" onclick="if(event.target===this)Modal.close('auth-choice')">
-  <div class="modal" style="max-width:400px;">
+  <div class="modal" style="max-width:480px;">
     <div class="modal-header">
       <h3 class="modal-title"> Benvenuto nel DM Toolkit</h3>
       <button class="btn btn-ghost btn-icon-sm" onclick="Modal.close('auth-choice')"></button>
@@ -12803,26 +12827,40 @@ const ExportPDF = (() => {
       <section>
         <h4 style="font-family:var(--font-display);font-size:0.82rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin:0 0 12px;">Aspetto</h4>
 
-        <!-- Tema -->
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-          <div>
-            <div style="font-size:0.88rem;font-weight:600;">Tema</div>
-            <div style="font-size:0.72rem;color:var(--text-muted);">Scuro o chiaro</div>
+        <!-- Tema e sfondo -->
+        <div style="margin-bottom:16px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+            <div>
+              <div style="font-size:0.88rem;font-weight:600;">Tema</div>
+              <div style="font-size:0.72rem;color:var(--text-muted);">Scuro o chiaro</div>
+            </div>
+            <div style="display:flex;gap:6px;">
+              <button id="theme-btn-dark" onclick="Settings.setTheme('dark')"
+                class="btn btn-sm" style="font-size:0.78rem;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg> Scuro</button>
+              <button id="theme-btn-light" onclick="Settings.setTheme('light')"
+                class="btn btn-sm" style="font-size:0.78rem;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg> Chiaro</button>
+            </div>
           </div>
-          <div style="display:flex;gap:6px;">
-            <button id="theme-btn-dark" onclick="Settings.setTheme('dark')"
-              class="btn btn-sm" style="font-size:0.78rem;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg> Scuro</button>
-            <button id="theme-btn-light" onclick="Settings.setTheme('light')"
-              class="btn btn-sm" style="font-size:0.78rem;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg> Chiaro</button>
+          <!-- Colore sfondo -->
+          <div>
+            <div style="font-size:0.78rem;font-weight:600;margin-bottom:6px;">Colore di sfondo</div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;">
+              <button onclick="Settings.setBg('default')" id="bg-btn-default" class="btn btn-sm settings-bg-btn" data-bg="default" style="font-size:0.72rem;">Default</button>
+              <button onclick="Settings.setBg('gray-900')" id="bg-btn-gray-900" class="btn btn-ghost btn-sm settings-bg-btn" data-bg="gray-900" style="font-size:0.72rem;background:#111;">Grigio scuro</button>
+              <button onclick="Settings.setBg('gray-800')" id="bg-btn-gray-800" class="btn btn-ghost btn-sm settings-bg-btn" data-bg="gray-800" style="font-size:0.72rem;background:#1f2937;">Grigio medio</button>
+              <button onclick="Settings.setBg('gray-700')" id="bg-btn-gray-700" class="btn btn-ghost btn-sm settings-bg-btn" data-bg="gray-700" style="font-size:0.72rem;background:#374151;">Grigio chiaro</button>
+              <button onclick="Settings.setBg('slate')" id="bg-btn-slate" class="btn btn-ghost btn-sm settings-bg-btn" data-bg="slate" style="font-size:0.72rem;background:#1e293b;">Ardesia</button>
+              <button onclick="Settings.setBg('parchment')" id="bg-btn-parchment" class="btn btn-ghost btn-sm settings-bg-btn" data-bg="parchment" style="font-size:0.72rem;background:#f5f0e8;color:#333;">Pergamena</button>
+            </div>
           </div>
         </div>
 
         <!-- Dimensione font -->
-        <div>
+        <div style="margin-bottom:14px;">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
             <div>
               <div style="font-size:0.88rem;font-weight:600;">Dimensione testo</div>
-              <div style="font-size:0.72rem;color:var(--text-muted);">Scala l'intera interfaccia</div>
+              <div style="font-size:0.72rem;color:var(--text-muted);">Scala il testo dell'interfaccia</div>
             </div>
             <span id="font-size-label" style="font-size:0.82rem;color:var(--accent-secondary);font-weight:600;">100%</span>
           </div>
@@ -12832,6 +12870,23 @@ const ExportPDF = (() => {
             <button onclick="Settings.setFontSize(110)" class="btn btn-ghost btn-sm settings-font-btn" data-size="110" style="font-size:0.82rem;">110%</button>
             <button onclick="Settings.setFontSize(125)" class="btn btn-ghost btn-sm settings-font-btn" data-size="125" style="font-size:0.88rem;">125%</button>
             <button onclick="Settings.setFontSize(150)" class="btn btn-ghost btn-sm settings-font-btn" data-size="150" style="font-size:0.95rem;">150%</button>
+          </div>
+        </div>
+
+        <!-- Densità / Zoom UI -->
+        <div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+            <div>
+              <div style="font-size:0.88rem;font-weight:600;">Densità interfaccia</div>
+              <div style="font-size:0.72rem;color:var(--text-muted);">Spazio tra elementi, larghezza contenuto</div>
+            </div>
+            <span id="ui-density-label" style="font-size:0.82rem;color:var(--accent-secondary);font-weight:600;">Normale</span>
+          </div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            <button onclick="Settings.setDensity('compact')"  class="btn btn-ghost btn-sm settings-density-btn" data-density="compact"  style="font-size:0.72rem;">Compatto</button>
+            <button onclick="Settings.setDensity('normal')"   class="btn btn-ghost btn-sm settings-density-btn" data-density="normal"   style="font-size:0.78rem;">Normale</button>
+            <button onclick="Settings.setDensity('spacious')" class="btn btn-ghost btn-sm settings-density-btn" data-density="spacious" style="font-size:0.82rem;">Spazioso</button>
+            <button onclick="Settings.setDensity('wide')"     class="btn btn-ghost btn-sm settings-density-btn" data-density="wide"     style="font-size:0.82rem;">Wide</button>
           </div>
         </div>
       </section>
@@ -15483,6 +15538,41 @@ const Settings = (() => {
   };
   const _save = (s) => localStorage.setItem('dm_settings', JSON.stringify(s));
 
+  // ── Densità UI ──
+  const DENSITY_PRESETS = {
+    compact:  { xs:'2px',  sm:'6px',  md:'12px', lg:'18px', xl:'24px', '2xl':'36px', '3xl':'48px', maxW:'1200px', sidebar:'220px' },
+    normal:   { xs:'4px',  sm:'8px',  md:'16px', lg:'24px', xl:'32px', '2xl':'48px', '3xl':'64px', maxW:'1600px', sidebar:'240px' },
+    spacious: { xs:'6px',  sm:'12px', md:'20px', lg:'32px', xl:'44px', '2xl':'60px', '3xl':'80px', maxW:'1800px', sidebar:'260px' },
+    wide:     { xs:'4px',  sm:'8px',  md:'16px', lg:'24px', xl:'32px', '2xl':'48px', '3xl':'64px', maxW:'100%',   sidebar:'240px' },
+  };
+  const DENSITY_LABELS = { compact:'Compatto', normal:'Normale', spacious:'Spazioso', wide:'Wide' };
+
+  const setDensity = (key) => {
+    const preset = DENSITY_PRESETS[key] || DENSITY_PRESETS.normal;
+    const root = document.documentElement;
+    root.style.setProperty('--space-xs',  preset.xs);
+    root.style.setProperty('--space-sm',  preset.sm);
+    root.style.setProperty('--space-md',  preset.md);
+    root.style.setProperty('--space-lg',  preset.lg);
+    root.style.setProperty('--space-xl',  preset.xl);
+    root.style.setProperty('--space-2xl', preset['2xl']);
+    root.style.setProperty('--space-3xl', preset['3xl']);
+    root.style.setProperty('--sidebar-width', preset.sidebar);
+    // Max width contenuto principale
+    document.querySelectorAll('.page').forEach(el => {
+      el.style.maxWidth = preset.maxW;
+    });
+    const s = _getSettings();
+    s.density = key;
+    _save(s);
+    // Aggiorna UI
+    document.querySelectorAll('.settings-density-btn').forEach(btn => {
+      btn.className = btn.dataset.density === key ? 'btn btn-primary btn-sm settings-density-btn' : 'btn btn-ghost btn-sm settings-density-btn';
+    });
+    const lbl = document.getElementById('ui-density-label');
+    if (lbl) lbl.textContent = DENSITY_LABELS[key] || key;
+  };
+
   // ── Font size ──
   const setFontSize = (pct) => {
     document.documentElement.style.fontSize = pct + '%';
@@ -15552,6 +15642,21 @@ const Settings = (() => {
     if (btnL) btnL.className = theme === 'light' ? 'btn btn-primary btn-sm' : 'btn btn-ghost btn-sm';
     // Auth
     updateAuthInfo();
+    // Sfondo
+    _initBgUI();
+    // Densità UI
+    const currentDensity = _getSettings().density || 'normal';
+    document.querySelectorAll('.settings-density-btn').forEach(btn => {
+      btn.className = btn.dataset.density === currentDensity ? 'btn btn-primary btn-sm settings-density-btn' : 'btn btn-ghost btn-sm settings-density-btn';
+    });
+    const densLbl = document.getElementById('ui-density-label');
+    if (densLbl) densLbl.textContent = DENSITY_LABELS[currentDensity] || 'Normale';
+    // Densità
+    const _s2 = _getSettings();
+    const _cd = _s2.density||'normal';
+    document.querySelectorAll('.settings-density-btn').forEach(b=>{ b.className=b.dataset.density===_cd?'btn btn-primary btn-sm settings-density-btn':'btn btn-ghost btn-sm settings-density-btn'; });
+    const _dl = document.getElementById('ui-density-label');
+    if(_dl) _dl.textContent = DENSITY_LABELS[_cd]||'Normale';
     Modal.open('settings');
   };
 
@@ -15561,9 +15666,54 @@ const Settings = (() => {
     if (s.fontSize && s.fontSize !== 100) {
       document.documentElement.style.fontSize = s.fontSize + '%';
     }
+    if (s.density && s.density !== 'normal') {
+      setDensity(s.density);
+    }
+    if (s.bgColor && s.bgColor !== 'default') {
+      const colors = {'gray-900':'#111111','gray-800':'#1f2937','gray-700':'#374151','slate':'#1e293b','parchment':'#f5f0e8'};
+      const c = colors[s.bgColor];
+      if (c) { document.documentElement.style.setProperty('--bg-page', c); document.body.style.background = c; }
+    }
   };
 
-  return { setFontSize, setTheme, updateAuthInfo, open, init };
+  // ── Colore sfondo ──
+  const BG_COLORS = {
+    'default':  '',
+    'gray-900': '#111111',
+    'gray-800': '#1f2937',
+    'gray-700': '#374151',
+    'slate':    '#1e293b',
+    'parchment':'#f5f0e8',
+  };
+
+  const setBg = (key) => {
+    const color = BG_COLORS[key] || '';
+    if (color) {
+      document.documentElement.style.setProperty('--bg-page', color);
+      document.body.style.background = color;
+    } else {
+      document.documentElement.style.removeProperty('--bg-page');
+      document.body.style.background = '';
+    }
+    const s = _getSettings();
+    s.bgColor = key;
+    _save(s);
+    // Aggiorna UI pulsanti
+    document.querySelectorAll('.settings-bg-btn').forEach(btn => {
+      btn.className = btn.dataset.bg === key ? 'btn btn-primary btn-sm settings-bg-btn' : 'btn btn-ghost btn-sm settings-bg-btn';
+    });
+  };
+
+  // Aggiorna open() per includere setBg
+  const _initBgUI = () => {
+    const s = _getSettings();
+    const currentBg = s.bgColor || 'default';
+    document.querySelectorAll('.settings-bg-btn').forEach(btn => {
+      btn.className = btn.dataset.bg === currentBg ? 'btn btn-primary btn-sm settings-bg-btn' : 'btn btn-ghost btn-sm settings-bg-btn';
+    });
+  };
+
+  return { setFontSize, setTheme, setBg, setDensity, updateAuthInfo, open, init, _initBgUI };
 })();
 
 
@@ -15855,7 +16005,7 @@ const WikiSections = (() => {
         { key: 'clima',       label: 'Clima / Ambiente',     type: 'short',   hint: 'es. Freddo e umido, desertico...' },
         { key: 'atmosfera',   label: 'Descrizione',          type: 'long',    hint: 'Cosa si vede, sente, percepisce entrando?' },
         { key: 'abitanti',    label: 'PNG Notabili',         type: 'mentions',hint: '@PNG che abitano o frequentano questo luogo' },
-        { key: 'punti',       label: 'Punti di interesse',   type: 'long',    hint: 'Locazioni importanti, negozi, stanze...' },
+        { key: 'punti',       label: 'Punti di interesse',   type: 'mentions',hint: '@Luogo, Stanza, Negozio...' },
         { key: 'storia',      label: 'Storia / Lore',        type: 'long',    hint: 'Cosa e successo qui?' },
         { key: 'pericoli',    label: 'Pericoli / Trappole',  type: 'long',    hint: 'Mostri, trappole, fazioni ostili...' },
         { key: 'segreto',     label: 'Segreto DM',           type: 'secret',  hint: 'Informazioni riservate al DM' },
@@ -16252,7 +16402,7 @@ const WikiSections = (() => {
 
       // ── Immagine ──
       (item.immagine && !isEdit ?
-        '<img src="' + item.immagine + '" style="width:100%;max-height:200px;object-fit:cover;border-radius:var(--radius-md);margin-bottom:16px;" onerror="this.style.display=\'none\'">' : '') +
+        '<img src="' + item.immagine + '" style="width:100%;height:220px;object-fit:cover;object-position:top center;border-radius:var(--radius-md);margin-bottom:16px;" onerror="this.style.display=\'none\'">' : '') +
       (isEdit && (type === 'png' || type === 'luoghi' || type === 'fazioni') ?
         '<div class="form-group" style="margin-bottom:16px;">' +
         '<label class="form-label">Immagine URL</label>' +
@@ -19148,7 +19298,7 @@ document.addEventListener('DOMContentLoaded', initMobileNav);
 
 <!-- Modal: Scegli come entrare -->
 <div class="modal-overlay hidden" id="modal-auth-choice" style="display:none;" onclick="if(event.target===this)Modal.close('auth-choice')">
-  <div class="modal" style="max-width:400px;">
+  <div class="modal" style="max-width:480px;">
     <div class="modal-header">
       <h3 class="modal-title">🎲 Benvenuto nel DM Toolkit</h3>
       <button class="btn btn-ghost btn-icon-sm" onclick="Modal.close('auth-choice')">✕</button>
@@ -19370,26 +19520,40 @@ document.addEventListener('DOMContentLoaded', initMobileNav);
       <section>
         <h4 style="font-family:var(--font-display);font-size:0.82rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin:0 0 12px;">Aspetto</h4>
 
-        <!-- Tema -->
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-          <div>
-            <div style="font-size:0.88rem;font-weight:600;">Tema</div>
-            <div style="font-size:0.72rem;color:var(--text-muted);">Scuro o chiaro</div>
+        <!-- Tema e sfondo -->
+        <div style="margin-bottom:16px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+            <div>
+              <div style="font-size:0.88rem;font-weight:600;">Tema</div>
+              <div style="font-size:0.72rem;color:var(--text-muted);">Scuro o chiaro</div>
+            </div>
+            <div style="display:flex;gap:6px;">
+              <button id="theme-btn-dark" onclick="Settings.setTheme('dark')"
+                class="btn btn-sm" style="font-size:0.78rem;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg> Scuro</button>
+              <button id="theme-btn-light" onclick="Settings.setTheme('light')"
+                class="btn btn-sm" style="font-size:0.78rem;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg> Chiaro</button>
+            </div>
           </div>
-          <div style="display:flex;gap:6px;">
-            <button id="theme-btn-dark" onclick="Settings.setTheme('dark')"
-              class="btn btn-sm" style="font-size:0.78rem;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg> Scuro</button>
-            <button id="theme-btn-light" onclick="Settings.setTheme('light')"
-              class="btn btn-sm" style="font-size:0.78rem;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg> Chiaro</button>
+          <!-- Colore sfondo -->
+          <div>
+            <div style="font-size:0.78rem;font-weight:600;margin-bottom:6px;">Colore di sfondo</div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;">
+              <button onclick="Settings.setBg('default')" id="bg-btn-default" class="btn btn-sm settings-bg-btn" data-bg="default" style="font-size:0.72rem;">Default</button>
+              <button onclick="Settings.setBg('gray-900')" id="bg-btn-gray-900" class="btn btn-ghost btn-sm settings-bg-btn" data-bg="gray-900" style="font-size:0.72rem;background:#111;">Grigio scuro</button>
+              <button onclick="Settings.setBg('gray-800')" id="bg-btn-gray-800" class="btn btn-ghost btn-sm settings-bg-btn" data-bg="gray-800" style="font-size:0.72rem;background:#1f2937;">Grigio medio</button>
+              <button onclick="Settings.setBg('gray-700')" id="bg-btn-gray-700" class="btn btn-ghost btn-sm settings-bg-btn" data-bg="gray-700" style="font-size:0.72rem;background:#374151;">Grigio chiaro</button>
+              <button onclick="Settings.setBg('slate')" id="bg-btn-slate" class="btn btn-ghost btn-sm settings-bg-btn" data-bg="slate" style="font-size:0.72rem;background:#1e293b;">Ardesia</button>
+              <button onclick="Settings.setBg('parchment')" id="bg-btn-parchment" class="btn btn-ghost btn-sm settings-bg-btn" data-bg="parchment" style="font-size:0.72rem;background:#f5f0e8;color:#333;">Pergamena</button>
+            </div>
           </div>
         </div>
 
         <!-- Dimensione font -->
-        <div>
+        <div style="margin-bottom:14px;">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
             <div>
               <div style="font-size:0.88rem;font-weight:600;">Dimensione testo</div>
-              <div style="font-size:0.72rem;color:var(--text-muted);">Scala l'intera interfaccia</div>
+              <div style="font-size:0.72rem;color:var(--text-muted);">Scala il testo dell'interfaccia</div>
             </div>
             <span id="font-size-label" style="font-size:0.82rem;color:var(--accent-secondary);font-weight:600;">100%</span>
           </div>
@@ -19399,6 +19563,23 @@ document.addEventListener('DOMContentLoaded', initMobileNav);
             <button onclick="Settings.setFontSize(110)" class="btn btn-ghost btn-sm settings-font-btn" data-size="110" style="font-size:0.82rem;">110%</button>
             <button onclick="Settings.setFontSize(125)" class="btn btn-ghost btn-sm settings-font-btn" data-size="125" style="font-size:0.88rem;">125%</button>
             <button onclick="Settings.setFontSize(150)" class="btn btn-ghost btn-sm settings-font-btn" data-size="150" style="font-size:0.95rem;">150%</button>
+          </div>
+        </div>
+
+        <!-- Densità / Zoom UI -->
+        <div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+            <div>
+              <div style="font-size:0.88rem;font-weight:600;">Densità interfaccia</div>
+              <div style="font-size:0.72rem;color:var(--text-muted);">Spazio tra elementi, larghezza contenuto</div>
+            </div>
+            <span id="ui-density-label" style="font-size:0.82rem;color:var(--accent-secondary);font-weight:600;">Normale</span>
+          </div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            <button onclick="Settings.setDensity('compact')"  class="btn btn-ghost btn-sm settings-density-btn" data-density="compact"  style="font-size:0.72rem;">Compatto</button>
+            <button onclick="Settings.setDensity('normal')"   class="btn btn-ghost btn-sm settings-density-btn" data-density="normal"   style="font-size:0.78rem;">Normale</button>
+            <button onclick="Settings.setDensity('spacious')" class="btn btn-ghost btn-sm settings-density-btn" data-density="spacious" style="font-size:0.82rem;">Spazioso</button>
+            <button onclick="Settings.setDensity('wide')"     class="btn btn-ghost btn-sm settings-density-btn" data-density="wide"     style="font-size:0.82rem;">Wide</button>
           </div>
         </div>
       </section>
