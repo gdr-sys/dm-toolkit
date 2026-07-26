@@ -285,6 +285,13 @@
             <span class="nav-label">Sessioni</span>
             <span id="wiki-cnt-sessioni" style="margin-left:auto;font-size:0.6rem;background:var(--bg-tertiary);padding:1px 5px;border-radius:var(--radius-full);color:var(--text-muted);">0</span>
           </button>
+          <button class="nav-item nav-subitem" data-wiki-section="quest"
+            onclick="WikiSections.goto('quest');closeMobileMenu()"
+            style="padding:5px 8px;font-size:0.78rem;">
+            <span style="color:var(--text-muted);">⚔️</span>
+            <span class="nav-label">Quest</span>
+            <span id="wiki-cnt-quest" style="margin-left:auto;font-size:0.6rem;background:var(--bg-tertiary);padding:1px 5px;border-radius:var(--radius-full);color:var(--text-muted);">0</span>
+          </button>
           <button class="nav-item nav-subitem" data-wiki-section="trame"
             onclick="WikiSections.gotoTrame();closeMobileMenu()"
             style="padding:5px 8px;font-size:0.78rem;">
@@ -408,186 +415,91 @@
          PAGINA: CAMPAGNA
     ════════════════════════ -->
     <section class="page" id="page-campagna">
-      <div class="page-header" style="max-width:1400px;margin:0 auto;width:100%;">
-        <div>
-          <h1 class="page-title" id="campagna-title">Dashboard</h1>
-          <p class="page-subtitle">Dashboard della campagna attiva</p>
-        </div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;">
-          <button class="btn btn-ghost btn-sm" onclick="ExportPDF.exportCampagna()" title="Esporta campagna come PDF">📄 Export PDF</button>
-          <button class="btn btn-ghost btn-sm" id="gdrive-btn" onclick="GDrive.toggleLogin()" style="display:none;">☁️ Drive</button>
-        </div>
-      </div>
+      <div style="max-width:1400px;margin:0 auto;padding:20px;">
 
-      <div style="max-width:1400px;margin:0 auto;width:100%;">
-      <!-- Riepilogo ultima sessione -->
-      <div class="card card-accent" style="margin-bottom:var(--space-lg);">
-        <div class="card-header">
-          <h3 class="card-title">Riepilogo Ultima Sessione</h3>
-          <button class="btn btn-primary btn-sm" onclick="App.saveRecap()">Salva</button>
+        <!-- Header campagna -->
+        <div class="page-header" style="margin-bottom:20px;">
+          <div>
+            <h1 class="page-title" id="campagna-title">Dashboard</h1>
+            <p class="page-subtitle" id="dash-ultima-sess-sub">Panoramica della campagna attiva</p>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn btn-ghost btn-sm" onclick="ExportPDF.exportCampagna()" title="Esporta campagna">📄</button>
+            <button class="btn btn-ghost btn-sm" id="gdrive-btn" onclick="GDrive.toggleLogin()" style="display:none;">☁️</button>
+          </div>
         </div>
-        <div class="card-body">
-          <textarea id="camp-session-recap" class="form-textarea" rows="4"
-            placeholder="Scrivi qui i punti chiave dell'ultima sessione... Sarà la prima cosa che vedi aprendo questa campagna."></textarea>
-        </div>
-      </div>
 
-      <!-- Note recenti Wiki + Scratchpad rapido -->
-      <div class="grid-2" style="gap:var(--space-lg);margin-bottom:var(--space-lg);">
+        <!-- Riga 1: Ultima sessione + Ganci + Trame attive -->
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:14px;">
+
+          <!-- Ultima sessione -->
+          <div class="card" style="cursor:pointer;" onclick="WikiSections.goto('sessioni')">
+            <div class="card-header">
+              <h3 class="card-title">📜 Ultima Sessione</h3>
+              <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();WikiSections.goto('sessioni')" style="font-size:0.72rem;">Tutte →</button>
+            </div>
+            <div id="dash-ultima-sessione" style="padding:4px 0;"></div>
+          </div>
+
+          <!-- Ganci prossima -->
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">🎣 Ganci prossima</h3>
+            </div>
+            <div id="dash-ganci" style="font-size:0.85rem;line-height:1.7;color:var(--text-secondary);max-height:120px;overflow-y:auto;"></div>
+          </div>
+
+          <!-- Clocks attivi -->
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">⏱ Clocks attivi</h3>
+              <button class="btn btn-ghost btn-sm" onclick="App.navigateTo('sessione')" style="font-size:0.72rem;">Gestisci →</button>
+            </div>
+            <div id="dash-clocks-preview" style="padding:8px;"></div>
+          </div>
+
+        </div>
+
+        <!-- Riga 2: Quest attive + PNG recenti + Trame -->
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:14px;">
+
+          <!-- Quest attive -->
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">⚔️ Quest attive</h3>
+              <button class="btn btn-ghost btn-sm" onclick="WikiSections.goto('quest')" style="font-size:0.72rem;">Tutte →</button>
+            </div>
+            <div id="dash-quest-attive" style="padding:4px 0;max-height:180px;overflow-y:auto;"></div>
+          </div>
+
+          <!-- PNG recenti (apparsi di recente) -->
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">👤 PNG recenti</h3>
+              <button class="btn btn-ghost btn-sm" onclick="WikiSections.goto('png')" style="font-size:0.72rem;">Tutti →</button>
+            </div>
+            <div id="dash-png-recenti" style="padding:4px 0;max-height:180px;overflow-y:auto;"></div>
+          </div>
+
+          <!-- Trame attive -->
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">🎭 Trame attive</h3>
+              <button class="btn btn-ghost btn-sm" onclick="WikiSections.gotoTrame()" style="font-size:0.72rem;">Gestisci →</button>
+            </div>
+            <div id="dash-trame" style="padding:4px 0;max-height:180px;overflow-y:auto;"></div>
+          </div>
+
+        </div>
+
+        <!-- Riga 3: Note recenti Wiki -->
         <div class="card">
           <div class="card-header">
-            <h3 class="card-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> Note recenti</h3>
+            <h3 class="card-title">📖 Note recenti Wiki</h3>
             <button class="btn btn-ghost btn-sm" onclick="App.navigateTo('wiki')">Apri Wiki →</button>
           </div>
           <div id="dash-recent-notes" style="padding:8px 0;"></div>
         </div>
-        <div class="card">
-          <div class="card-header">
-            <h3 class="card-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Clocks attivi</h3>
-            <button class="btn btn-ghost btn-sm" onclick="App.navigateTo('sessione')">Gestisci →</button>
-          </div>
-          <div id="dash-clocks-preview" style="padding:8px;"></div>
-        </div>
-      </div>
-
-      <!-- Grid: Quest + Timeline + Fazioni -->
-      <div class="grid-2" style="gap:var(--space-lg);">
-
-        <!-- QUEST TRACKER KANBAN -->
-        <div class="card" style="overflow:visible;">
-          <div class="card-header">
-            <h3 class="card-title">Quest Tracker</h3>
-            <div style="display:flex;gap:6px;align-items:center;">
-              <button id="quest-view-kanban" class="btn btn-primary btn-sm" onclick="QuestKanban.setView('kanban')" style="font-size:0.72rem;">Kanban</button>
-              <button id="quest-view-list" class="btn btn-ghost btn-sm" onclick="QuestKanban.setView('list')" style="font-size:0.72rem;">Lista</button>
-              <button class="btn btn-primary btn-sm" onclick="App.addQuest()">+ Aggiungi</button>
-            </div>
-          </div>
-          <!-- Vista Kanban -->
-          <div id="quest-kanban-view" style="display:flex;gap:8px;overflow-x:auto;padding:8px;min-height:120px;">
-            <div style="flex:0 0 200px;">
-              <div style="font-size:0.68rem;font-family:var(--font-display);text-transform:uppercase;letter-spacing:0.06em;color:#5ba4f5;margin-bottom:6px;padding:0 4px;">Disponibili</div>
-              <div id="kanban-col-disponibile" class="kanban-col" data-status="disponibile" style="min-height:80px;display:flex;flex-direction:column;gap:4px;"></div>
-            </div>
-            <div style="flex:0 0 200px;">
-              <div style="font-size:0.68rem;font-family:var(--font-display);text-transform:uppercase;letter-spacing:0.06em;color:#f5a623;margin-bottom:6px;padding:0 4px;">In Corso</div>
-              <div id="kanban-col-in_corso" class="kanban-col" data-status="in_corso" style="min-height:80px;display:flex;flex-direction:column;gap:4px;"></div>
-            </div>
-            <div style="flex:0 0 200px;">
-              <div style="font-size:0.68rem;font-family:var(--font-display);text-transform:uppercase;letter-spacing:0.06em;color:#69cc85;margin-bottom:6px;padding:0 4px;">Completate</div>
-              <div id="kanban-col-completata" class="kanban-col" data-status="completata" style="min-height:80px;display:flex;flex-direction:column;gap:4px;"></div>
-            </div>
-            <div style="flex:0 0 200px;">
-              <div style="font-size:0.68rem;font-family:var(--font-display);text-transform:uppercase;letter-spacing:0.06em;color:#ff6b6b;margin-bottom:6px;padding:0 4px;">Fallite</div>
-              <div id="kanban-col-fallita" class="kanban-col" data-status="fallita" style="min-height:80px;display:flex;flex-direction:column;gap:4px;"></div>
-            </div>
-          </div>
-          <!-- Vista Lista (fallback) -->
-          <div id="quest-list-view" style="display:none;">
-            <div class="tabs" style="margin-bottom:var(--space-md);padding:0 8px;">
-              <button class="tab-btn active" onclick="switchQuestTab(this,'disponibile')">Disponibili</button>
-              <button class="tab-btn" onclick="switchQuestTab(this,'in_corso')">In Corso</button>
-              <button class="tab-btn" onclick="switchQuestTab(this,'completata')">Completate</button>
-              <button class="tab-btn" onclick="switchQuestTab(this,'fallita')">Fallite</button>
-            </div>
-            <div id="quest-list-disponibile" class="tab-content active"></div>
-            <div id="quest-list-in_corso" class="tab-content"></div>
-            <div id="quest-list-completata" class="tab-content"></div>
-            <div id="quest-list-fallita" class="tab-content"></div>
-          </div>
-        </div>
-
-        <!-- Colonna destra: Timeline + Fazioni -->
-        <div style="display:flex;flex-direction:column;gap:var(--space-lg);">
-
-          <!-- TIMELINE -->
-          <div class="card">
-            <div class="card-header">
-              <h3 class="card-title">Cronologia Eventi</h3>
-              <button class="btn btn-primary btn-sm" onclick="App.addTimelineEvent()">+ Evento</button>
-            </div>
-            <div id="timeline-list" style="max-height:240px;overflow-y:auto;"></div>
-          </div>
-
-          <!-- FAZIONI -->
-          <div class="card">
-            <div class="card-header">
-              <h3 class="card-title">Fazioni</h3>
-              <button class="btn btn-primary btn-sm" onclick="App.addFaction()">+ Aggiungi</button>
-            </div>
-            <div id="faction-list" style="max-height:280px;overflow-y:auto;"></div>
-          </div>
-
-        </div>
-      </div>
-
-      <!-- NOTE CAMPAGNA stile OneNote -->
-      <div class="card" style="margin-top:var(--space-lg);padding:0;overflow:hidden;display:flex;flex-direction:column;">
-        <div class="card-header" style="padding:var(--space-sm) var(--space-md);">
-          <h3 class="card-title">Note Campagna</h3>
-          <button class="btn btn-primary btn-sm" onclick="NoteCampagna.addCategoria()">+ Categoria</button>
-        </div>
-        <div id="nc-container" style="display:flex;overflow:hidden;min-height:480px;max-height:70vh;">
-          <!-- Pannello categorie -->
-          <div id="nc-sidebar" style="width:180px;flex-shrink:0;border-right:1px solid var(--border);overflow-y:auto;background:var(--bg-secondary);">
-          </div>
-          <!-- Pannello pagine -->
-          <div id="nc-pages" style="width:200px;flex-shrink:0;border-right:1px solid var(--border);overflow-y:auto;background:var(--bg-card);">
-          </div>
-          <!-- Editor -->
-          <div id="nc-editor-wrap" style="flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden;">
-            <div id="nc-editor-header" style="padding:6px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:6px;flex-shrink:0;">
-              <input id="nc-page-title" class="form-input" style="flex:1;font-family:var(--font-display);font-size:0.9rem;" placeholder="Titolo pagina..." oninput="NoteCampagna.savePage()">
-              <button class="btn btn-ghost btn-icon-sm" onclick="NoteCampagna.deletePage()" aria-label="Elimina pagina" title="Elimina pagina">
-                <svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>
-              </button>
-            </div>
-            <!-- Toolbar formattazione -->
-            <div id="nc-toolbar" style="display:flex;flex-wrap:wrap;gap:2px;padding:4px 8px;border-bottom:1px solid var(--border);background:var(--bg-secondary);">
-              <button class="nc-tb" onclick="ncFmt('bold')" title="Grassetto (Ctrl+B)"><b>B</b></button>
-              <button class="nc-tb" onclick="ncFmt('italic')" title="Corsivo (Ctrl+I)"><i>I</i></button>
-              <button class="nc-tb" onclick="ncFmt('underline')" title="Sottolineato (Ctrl+U)"><u>S</u></button>
-              <button class="nc-tb" onclick="ncFmt('strikeThrough')" title="Barrato"><s>ab</s></button>
-              <div style="width:1px;background:var(--border);margin:2px 3px;"></div>
-              <button class="nc-tb" onclick="ncFmtBlock('h1')" title="Titolo 1" style="font-size:0.85rem;font-weight:700;">H1</button>
-              <button class="nc-tb" onclick="ncFmtBlock('h2')" title="Titolo 2" style="font-size:0.8rem;font-weight:700;">H2</button>
-              <button class="nc-tb" onclick="ncFmtBlock('h3')" title="Titolo 3" style="font-size:0.75rem;font-weight:700;">H3</button>
-              <button class="nc-tb" onclick="ncFmtBlock('p')" title="Testo normale" style="font-size:0.75rem;">¶</button>
-              <div style="width:1px;background:var(--border);margin:2px 3px;"></div>
-              <button class="nc-tb" onclick="ncFmt('insertUnorderedList')" title="Elenco puntato">• —</button>
-              <button class="nc-tb" onclick="ncFmt('insertOrderedList')" title="Elenco numerato">1.</button>
-              <button class="nc-tb" onclick="ncFmtBlock('blockquote')" title="Citazione / evidenziazione">❝</button>
-              <div style="width:1px;background:var(--border);margin:2px 3px;"></div>
-              <button class="nc-tb" onclick="ncFmt('removeFormat')" title="Rimuovi formattazione" style="font-size:0.7rem;color:var(--text-muted);">✕</button><div style="width:1px;background:var(--border);margin:2px 3px;"></div>
-              <div style="position:relative;display:inline-flex;align-items:center;gap:1px;">
-                <button class="nc-tb" onclick="ncApplyColor()" title="Colore testo — applica alla selezione o alla parola corrente" style="min-width:24px;border-bottom:3px solid var(--wiki-cur-color,#f5a623);">A</button>
-                <input type="color" id="nc-color-pick" value="#f5a623" oninput="document.documentElement.style.setProperty('--wiki-cur-color',this.value)" style="position:absolute;width:1px;height:1px;opacity:0;bottom:0;left:0;">
-                <button class="nc-tb" onclick="document.getElementById('nc-color-pick').click()" title="Scegli colore" style="font-size:0.55rem;padding:0 2px;min-width:14px;">▾</button>
-              </div>
-              <div style="position:relative;display:inline-flex;align-items:center;gap:1px;">
-                <button class="nc-tb" onclick="ncApplyHighlight()" title="Evidenzia — applica alla selezione o alla parola corrente" style="min-width:24px;background:rgba(245,166,35,0.25);border-bottom:3px solid rgba(245,166,35,0.7);">H</button>
-                <input type="color" id="nc-hl-pick" value="#f5a623" oninput="document.documentElement.style.setProperty('--wiki-cur-hl',this.value)" style="position:absolute;width:1px;height:1px;opacity:0;bottom:0;left:0;">
-                <button class="nc-tb" onclick="document.getElementById('nc-hl-pick').click()" title="Scegli colore evidenziatore" style="font-size:0.55rem;padding:0 2px;min-width:14px;">▾</button>
-              </div>
-              <div style="width:1px;background:var(--border);margin:2px 3px;"></div>
-              <button class="nc-tb" onclick="ncInsertTag()" title="Inserisci tag #" style="color:var(--accent-secondary);">#tag</button>
-              <button class="nc-tb" onclick="ncInsertLink()" title="Inserisci link [[Nota]]" style="color:#5ba4f5;">[[link]]</button>
-            </div>
-            <!-- Tag cloud attivi in questa nota -->
-            <div id="nc-tag-bar" style="display:none;padding:4px 10px;border-bottom:1px solid var(--border);background:var(--bg-primary);font-size:0.72rem;display:flex;flex-wrap:wrap;gap:4px;min-height:0;"></div>
-            <!-- Editor contenteditable -->
-            <div id="nc-page-content"
-              contenteditable="true"
-              spellcheck="true"
-              style="flex:1;border:none;font-size:0.9rem;line-height:1.8;padding:var(--space-md);background:transparent;color:var(--text-primary);outline:none;width:100%;min-height:70vh;box-sizing:border-box;overflow-y:auto;"
-              data-placeholder="Scrivi le tue note qui...&#10;&#10;Perfetto per lore, segreti, dialoghi, piani narrativi..."
-              oninput="NoteCampagna.savePage(); MentionPicker.onInput(event, this)"
-              onkeydown="ncEditorKeydown(event); MentionPicker.onKeydown(event)">
-            </div>
-            <div id="nc-backlinks" style="display:none;padding:8px 12px;border-top:1px solid var(--border);font-size:0.75rem;color:var(--text-muted);background:var(--bg-secondary);flex-wrap:wrap;gap:4px;"></div>
-          </div>
-        </div>
-      </div>
 
       </div>
     </section>
@@ -1742,6 +1654,30 @@
 
 
     <!-- ══ WIKI SECTIONS — PNG / LUOGHI / FAZIONI / LORE / SESSIONI ══ -->
+
+    <!-- Quest Wiki -->
+    <section class="page" id="page-wiki-quest" style="padding:0;height:calc(100vh - var(--header-height));">
+      <div id="wiki-quest-list" style="height:100%;overflow-y:auto;padding:20px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px;">
+          <div><h2 style="font-family:var(--font-display);font-size:1.2rem;margin:0;">Quest</h2>
+          <p style="font-size:0.75rem;color:var(--text-muted);margin:2px 0 0;">Missioni, obiettivi e ganci narrativi</p></div>
+          <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+            <input id="wiki-quest-search" type="text" class="form-input" placeholder="Cerca quest..." style="width:180px;font-size:0.82rem;" oninput="WikiSections.filter('quest',this.value)">
+            <select id="wiki-quest-filter-stato" class="form-select" style="width:130px;font-size:0.78rem;" onchange="WikiSections.filterTag('quest',this.value)">
+              <option value="">Tutti gli stati</option>
+              <option value="Attiva">Attive</option>
+              <option value="Completata">Completate</option>
+              <option value="Fallita">Fallite</option>
+              <option value="In sospeso">In sospeso</option>
+            </select>
+            <button class="btn btn-primary btn-sm" onclick="WikiSections.newCard('quest')">+ Nuova Quest</button>
+          </div>
+        </div>
+        <div id="wiki-quest-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;"></div>
+      </div>
+      <div id="wiki-quest-detail" style="display:none;height:100%;overflow-y:auto;padding:20px;"></div>
+    </section>
+
 
     <!-- PNG Wiki -->
     <section class="page" id="page-wiki-png" style="padding:0;height:calc(100vh - var(--header-height));">
@@ -3828,6 +3764,7 @@ const App = (() => {
     'wiki-lore':     { label: 'Lore',     icon: '📝', navItem: false, requiresCampaign: true },
     'wiki-sessioni': { label: 'Sessioni', icon: '📝', navItem: false, requiresCampaign: true },
     trame:          { label: 'Trame',    icon: '🎭', navItem: true,  requiresCampaign: true  },
+    'wiki-quest':   { label: 'Quest',    icon: '⚔️', navItem: false, requiresCampaign: true  },
   };
 
   const navigateTo = (pageId) => {
@@ -3881,7 +3818,7 @@ const App = (() => {
     // Hook pagina specifica
     switch (pageId) {
       case 'home':       renderHomePage(); break;
-      case 'campagna':   renderCampaignPage(); setTimeout(() => { NoteCampagna.render(); try{QuestKanban.render();}catch(e){} }, 100); break;
+      case 'campagna':   renderCampaignPage(); setTimeout(() => { try { renderDashboard(); } catch(e){} try{QuestKanban.render();}catch(e){} }, 100); break;
       case 'mondo': WikiSections.goto('png'); return; // reindirizza alla Wiki PNG
       case 'mondo_legacy':
         App.reloadActiveCampaign();
@@ -16279,6 +16216,56 @@ const WikiSections = (() => {
         nome:'', categoria:'Generale', periodo:'', collegati:'', rilevanza:'Media', fonti:'', contenuto:'', tags:[] }),
     },
 
+    quest: {
+      label: 'Quest', color: '#e84393',
+      fields: [
+        { key: 'tipo',        label: 'Tipo',                    type: 'select',  options: ['Principale','Secondaria','Personale','Side quest','Altro'] },
+        { key: 'stato',       label: 'Stato',                   type: 'select',  options: ['Attiva','In sospeso','Completata','Fallita','Nascosta'] },
+        { key: 'priorita',    label: 'Priorita',                type: 'select',  options: ['Alta','Media','Bassa'] },
+        { key: 'committente', label: 'Committente',             type: 'mention', hint: '@PNG che ha dato la quest' },
+        { key: 'png',         label: 'PNG coinvolti',           type: 'mentions', hint: '@PNG importanti' },
+        { key: 'luoghi',      label: 'Luoghi',                  type: 'mentions', hint: '@Luogo dove si svolge' },
+        { key: 'fazioni',     label: 'Fazioni coinvolte',       type: 'mentions', hint: '@Fazione' },
+        { key: 'obiettivo',   label: 'Obiettivo',               type: 'long',    hint: 'Cosa deve fare il party?' },
+        { key: 'ricompensa',  label: 'Ricompensa',              type: 'short',   hint: 'es. 500 MO, Spada +1' },
+        { key: 'ostacoli',    label: 'Ostacoli / Complicazioni',type: 'long',    hint: 'Cosa rende difficile questa quest?' },
+        { key: 'sviluppi',    label: 'Sviluppi possibili',      type: 'long',    hint: 'Come potrebbe evolversi?' },
+        { key: 'segreto',     label: 'Segreto DM',              type: 'secret',  hint: 'Twist nascosti, info riservate' },
+      ],
+      getData: (camp) => (camp?.quests || []).map(q => ({
+        id: q.id, nome: q.titolo || q.name || '',
+        tipo: q.tipo || 'Secondaria', stato: q.stato || 'Attiva', priorita: q.priorita || 'Media',
+        committente: q.committente || '', png: q.npcs || q.png || '',
+        luoghi: q.luoghi || '', fazioni: q.fazioni || '',
+        obiettivo: q.obiettivo || q.description || '',
+        ricompensa: q.ricompensa || '', ostacoli: q.ostacoli || '',
+        sviluppi: q.sviluppi || '', segreto: q.segreto || q.secret || '',
+        note: q.noteLibere || '', tags: q.tags || [], _source: 'quests',
+      })),
+      saveItem: (camp, item) => {
+        if (!camp.quests) camp.quests = [];
+        const idx = camp.quests.findIndex(q => q.id === item.id);
+        const d = { ...(idx>=0 ? camp.quests[idx] : {}),
+          id: item.id, titolo: item.nome, name: item.nome,
+          tipo: item.tipo, stato: item.stato, priorita: item.priorita,
+          committente: item.committente, npcs: item.png, png: item.png,
+          luoghi: item.luoghi, fazioni: item.fazioni,
+          obiettivo: item.obiettivo, description: item.obiettivo,
+          ricompensa: item.ricompensa, ostacoli: item.ostacoli,
+          sviluppi: item.sviluppi, segreto: item.segreto, secret: item.segreto,
+          noteLibere: item.note, tags: item.tags || [], aggiornatoAt: Date.now(),
+        };
+        if (idx>=0) camp.quests[idx]=d; else camp.quests.push(d);
+        App.saveActiveCampaign({ quests: camp.quests });
+      },
+      newItem: () => ({
+        id: 'q_' + Date.now() + '_' + Math.random().toString(36).slice(2,5),
+        nome: '', tipo: 'Secondaria', stato: 'Attiva', priorita: 'Media',
+        committente: '', png: '', luoghi: '', fazioni: '', obiettivo: '',
+        ricompensa: '', ostacoli: '', sviluppi: '', segreto: '', note: '', tags: [],
+      }),
+    },
+
     sessioni: {
       label: 'Sessioni', color: '#ff9f43',
       fields: [
@@ -16857,7 +16844,7 @@ const WikiSections = (() => {
     if (!camp) return;
     Object.keys(TYPES).forEach(type => {
       const cnt = document.getElementById('wiki-cnt-' + type);
-      if (cnt) cnt.textContent = TYPES[type].getData(camp).length;
+      if (cnt) try { cnt.textContent = TYPES[type].getData(camp).length; } catch(e) {}
     });
   };
 
@@ -17298,7 +17285,7 @@ const Trame = (() => {
     trame.push({
       id: 'tr_' + Date.now(),
       titolo: 'Nuova trama',
-      tipo: trame.length === 0 ? 'Trama A (principale)' : 'Trama B',
+      tipo: TIPI[Math.min(trame.length, TIPI.length-1)],
       colore,
       descrizione: '',
       stato: 'In corso',
@@ -17418,6 +17405,84 @@ const Trame = (() => {
 
   return { newArco, deleteArco, updateArco, render };
 })();
+
+
+// ══ DASHBOARD — popola le card della panoramica ══
+const renderDashboard = () => {
+  const camp = App.getActiveCampaign();
+  if (!camp) return;
+  const sessLog = camp.sessioni_log || [];
+  const ultima = sessLog.slice().sort(function(a,b){ return (b.numero||0)-(a.numero||0); })[0];
+
+  var dashUlt = document.getElementById('dash-ultima-sessione');
+  if (dashUlt) {
+    if (ultima) {
+      var sc2 = ultima.stato==='giocata'?'#69cc85':ultima.stato==='in_corso'?'#f5a623':'#5ba4f5';
+      var sl = ultima.stato==='giocata'?'Giocata':ultima.stato==='in_corso'?'In corso':'Pianificata';
+      dashUlt.innerHTML =
+        '<div style="margin-bottom:8px;"><span style="padding:2px 8px;background:'+sc2+'22;color:'+sc2+';border-radius:var(--radius-full);font-size:0.72rem;">'+sl+'</span>' +
+        '<span style="font-family:var(--font-display);font-size:0.95rem;font-weight:600;margin-left:8px;">S'+(ultima.numero||'?')+(ultima.titolo?' — '+ultima.titolo:'')+'</span></div>' +
+        (ultima.data?'<div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:6px;">'+ultima.data+'</div>':'') +
+        (ultima.recap?'<div style="font-size:0.82rem;line-height:1.6;color:var(--text-secondary);overflow:hidden;">'+ultima.recap+'</div>':'') +
+        '<button class="btn btn-ghost btn-sm dash-sess-open" data-id="'+ultima.id+'" style="margin-top:8px;font-size:0.72rem;">Apri scheda</button>';
+      var sub = document.getElementById('dash-ultima-sess-sub');
+      if (sub) sub.textContent = 'S'+(ultima.numero||'?')+(ultima.titolo?' — '+ultima.titolo:'')+(ultima.data?' · '+ultima.data:'');
+    } else {
+      dashUlt.innerHTML = '<div style="color:var(--text-muted);font-size:0.82rem;">Nessuna sessione ancora.</div>';
+    }
+  }
+
+  var dashGanci = document.getElementById('dash-ganci');
+  if (dashGanci) dashGanci.innerHTML = (ultima&&ultima.ganci)
+    ? '<div style="font-size:0.85rem;line-height:1.7;">'+ultima.ganci+'</div>'
+    : '<div style="color:var(--text-muted);font-size:0.82rem;">Nessun gancio.</div>';
+
+  var dashQuest = document.getElementById('dash-quest-attive');
+  if (dashQuest) {
+    var qA = (camp.quests||[]).filter(function(q){ return q.stato==='Attiva'||q.stato==='In sospeso'; });
+    var SQ = { Attiva:'#e84393', 'In sospeso':'#f5a623', Completata:'#69cc85', Fallita:'#7a7068' };
+    dashQuest.innerHTML = qA.length ? qA.map(function(q) {
+      return '<div class="dash-q-item" data-id="'+q.id+'" style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);cursor:pointer;">' +
+        '<span style="width:6px;height:6px;border-radius:50%;background:'+(SQ[q.stato]||'#aaa')+';flex-shrink:0;"></span>' +
+        '<span style="font-size:0.83rem;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+(q.titolo||q.name||'Quest')+'</span>' +
+        '<span style="font-size:0.68rem;color:var(--text-muted);">'+(q.tipo||'')+'</span></div>';
+    }).join('') : '<div style="color:var(--text-muted);font-size:0.82rem;padding:8px 0;">Nessuna quest attiva.</div>';
+  }
+
+  var dashPng = document.getElementById('dash-png-recenti');
+  if (dashPng) {
+    var nIds = new Map();
+    sessLog.slice().sort(function(a,b){return (b.numero||0)-(a.numero||0);}).slice(0,5).forEach(function(s){
+      (s.npcs||[]).forEach(function(id){ if(!nIds.has(id)) nIds.set(id, s.numero||0); });
+    });
+    var rNpcs = Array.from(nIds.entries()).slice(0,6).map(function(e){
+      var n=(camp.npcs||[]).find(function(x){return x.id===e[0];});
+      return n?Object.assign({},n,{sessNum:e[1]}):null;
+    }).filter(Boolean);
+    dashPng.innerHTML = rNpcs.length ? rNpcs.map(function(n) {
+      var img = n.immagine?'<img src="'+n.immagine+'" style="width:24px;height:24px;border-radius:50%;object-fit:cover;">':'';
+      return '<div class="dash-n-item" data-id="'+n.id+'" style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--border);cursor:pointer;">' +
+        img+'<div style="flex:1;min-width:0;"><div style="font-size:0.82rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+(n.name||n.nome||'?')+'</div>' +
+        '<div style="font-size:0.68rem;color:var(--text-muted);">'+(n.ruolo||n.job||'')+(n.sessNum?' S'+n.sessNum:'')+'</div></div></div>';
+    }).join('') : '<div style="color:var(--text-muted);font-size:0.82rem;">Nessun PNG nelle sessioni recenti.</div>';
+  }
+
+  var dashTrame = document.getElementById('dash-trame');
+  if (dashTrame) {
+    var tA = (camp.trame||[]).filter(function(t){return t.stato==='In corso';});
+    dashTrame.innerHTML = tA.length ? tA.map(function(t) {
+      return '<div class="dash-t-item" style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);cursor:pointer;">' +
+        '<div style="width:10px;height:10px;border-radius:50%;background:'+(t.colore||'#aaa')+';flex-shrink:0;"></div>' +
+        '<div style="flex:1;min-width:0;"><div style="font-size:0.82rem;font-weight:600;">'+(t.titolo||'Trama')+'</div>' +
+        '<div style="font-size:0.68rem;color:var(--text-muted);">'+(t.tipo||'')+'</div></div></div>';
+    }).join('') : '<div style="color:var(--text-muted);font-size:0.82rem;">Nessuna trama in corso.</div>';
+    document.querySelectorAll('.dash-t-item').forEach(function(el){el.addEventListener('click',function(){WikiSections.gotoTrame();});});
+  }
+
+  document.querySelectorAll('.dash-q-item').forEach(function(el){el.addEventListener('click',function(){_openWikiCard('quest',this.dataset.id);});});
+  document.querySelectorAll('.dash-n-item').forEach(function(el){el.addEventListener('click',function(){_openWikiCard('png',this.dataset.id);});});
+  document.querySelectorAll('.dash-sess-open').forEach(function(el){el.addEventListener('click',function(){_openSessFromDash(this.dataset.id);});});
+};
 
 /* ── INIT ── */
 
