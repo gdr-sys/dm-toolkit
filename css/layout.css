@@ -6,7 +6,7 @@
 #app { display: flex; min-height: 100vh; }
 
 /* ── SIDEBAR ── */
-#sidebar { position:fixed; left:0; top:0; bottom:0; width:var(--nav-width); background:var(--nav-bg); display:flex; flex-direction:column; z-index:200; transition:width var(--transition-normal); overflow:hidden; }
+#sidebar { --sidebar-width-current: var(--sidebar-width, 240px); position:fixed; left:0; top:0; bottom:0; width:var(--nav-width); background:var(--nav-bg); display:flex; flex-direction:column; z-index:200; transition:width var(--transition-normal); overflow:hidden; }
 #sidebar.collapsed { width:var(--nav-collapsed); }
 .sidebar-logo { display:flex; align-items:center; gap:var(--space-sm); padding:var(--space-md); border-bottom:1px solid rgba(255,255,255,0.08); min-height:var(--header-height); text-decoration:none; }
 .logo-icon { width:32px; height:32px; flex-shrink:0; background:var(--accent-primary); border-radius:var(--radius-md); display:flex; align-items:center; justify-content:center; color:#fff; }
@@ -472,6 +472,8 @@
   .modal-overlay {
     align-items: flex-end;
     padding-bottom: max(16px, var(--safe-bottom));
+    padding-left: 0;
+    padding-right: 0;
   }
 
   .modal {
@@ -481,6 +483,21 @@
     border-top-right-radius: var(--radius-xl);
     max-height: calc(92vh - var(--safe-top));
     width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+    box-sizing: border-box;
+  }
+
+  .modal .modal-body {
+    padding-left: 14px;
+    padding-right: 14px;
+    box-sizing: border-box;
+    overflow-x: hidden;
+  }
+
+  /* Button auth — assicura che non escano dal bordo */
+  .modal .btn {
+    box-sizing: border-box;
     max-width: 100%;
   }
 
@@ -504,3 +521,4 @@
 #main-content {
   padding-bottom: max(80px, calc(60px + var(--safe-bottom)));
 }
+by
