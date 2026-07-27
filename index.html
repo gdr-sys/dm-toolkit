@@ -14348,12 +14348,86 @@ const FirebaseSync = (() => {
       Toast.show('Accesso anonimo attivo', 'info', 2000);
     } else {
       Toast.show('Benvenuto ' + (user.displayName||user.email||'').split(' ')[0], 'success', 2000);
-      // Mostra welcome Drive solo al login Google (non anonimo)
       setTimeout(() => { try { DriveBackup.showWelcomeIfNeeded(); } catch(e) {} }, 2000);
+      // Carica le campagne dell'utente da Firebase
+      _loadUserCampaigns(user);
     }
     // Se c'è una campagna attiva, avvia la sync
+    // Se non c'è, prova a ricaricare dall'ultima sessione nota
     const camp = App.getActiveCampaign();
-    if (camp) _startSync(camp.id);
+    if (camp) {
+      _startSync(camp.id);
+    } else if (!user.isAnonymous) {
+      // Prova a ripristinare l'ultima campagna nota
+      const lastCampId = localStorage.getItem('dm_last_camp_id');
+      const lastShareCode = localStorage.getItem('dm_last_share_code');
+      if (lastShareCode && _db) {
+        // Scarica la campagna usando lo shareCode
+        _db.ref('campagne/' + lastShareCode + '/data').once('value').then(snap => {
+          const remote = snap.val();
+          if (remote && remote.id) {
+            Storage.saveCampaign(remote);
+            App.setActiveCampaign(remote);
+            _startSync(remote.id);
+            Toast.show('Campagna ripristinata dal cloud', 'success', 3000);
+            setTimeout(() => { try { App.renderHomePage(); } catch(e) {} }, 300);
+          }
+        }).catch(e => Debug.warn('Ripristino campagna fallito:', e.message));
+      }
+    }
+  };
+
+  // ── Carica campagne utente da Firebase ──
+  const _loadUserCampaigns = async (user) => {
+    if (!_db || !user || user.isAnonymous) return;
+    try {
+      // Cerca tutte le campagne dove l'utente è owner o collaboratore
+      const uid = user.uid;
+      const snap = await _db.ref('utenti/' + uid + '/campagne').once('value');
+      const campList = snap.val();
+      if (!campList) return;
+
+      const shareKeys = Object.keys(campList);
+      if (!shareKeys.length) return;
+
+      let loaded = 0;
+      for (const key of shareKeys) {
+        try {
+          const campSnap = await _db.ref('campagne/' + key + '/data').once('value');
+          const remoteData = campSnap.val();
+          if (!remoteData || !remoteData.id) continue;
+
+          // Controlla se la campagna esiste già in locale
+          const localCamp = Storage.getCampaign(remoteData.id);
+          if (!localCamp || (remoteData.updatedAt > (localCamp.updatedAt || 0))) {
+            // Salva/aggiorna la campagna in locale
+            Storage.saveCampaign(remoteData);
+            loaded++;
+          }
+        } catch(e) {
+          Debug.warn('Errore caricamento campagna ' + key, e.message);
+        }
+      }
+
+      if (loaded > 0) {
+        Toast.show(loaded + ' campagna/e caricata/e dal cloud', 'success', 3000);
+        // Aggiorna la home se siamo sulla home
+        setTimeout(() => { try { App.renderHomePage(); } catch(e) {} }, 500);
+      }
+    } catch(e) {
+      Debug.warn('Errore caricamento campagne utente:', e.message);
+    }
+  };
+
+  // ── Registra la campagna nell'indice utente su Firebase ──
+  const _registerCampaignForUser = (camp, key) => {
+    if (!_db || !_user || _user.isAnonymous) return;
+    const uid = _user.uid;
+    _db.ref('utenti/' + uid + '/campagne/' + key).set({
+      nome: camp.name || '',
+      id: camp.id,
+      aggiornatoAt: firebase.database.ServerValue.TIMESTAMP,
+    }).catch(e => Debug.warn('Errore registrazione campagna:', e.message));
   };
 
   const _onLogout = () => {
@@ -14411,6 +14485,13 @@ const FirebaseSync = (() => {
       online: true,
       at: firebase.database.ServerValue.TIMESTAMP,
     });
+    // Registra la campagna nell'indice utente (per caricamento su nuovi dispositivi)
+    if (camp) {
+      _registerCampaignForUser(camp, key);
+      // Salva lo shareCode in localStorage per ripristino futuro
+      localStorage.setItem('dm_last_camp_id', camp.id);
+      localStorage.setItem('dm_last_share_code', key);
+    }
     // Rimuove presenza quando offline
     _presenceRef.onDisconnect().remove();
 
@@ -14444,6 +14525,13 @@ const FirebaseSync = (() => {
   // ── Salva su Firebase ── (chiamato ad ogni save locale)
   const push = (camp) => {
     if (!_db || !_user || !_campRef) return;
+    // Aggiorna l'indice utente ad ogni push
+    if (!_user.isAnonymous) {
+      const key = camp?.shareCode || _campKey(camp?.id || '');
+      _registerCampaignForUser(camp, key);
+      localStorage.setItem('dm_last_camp_id', camp?.id || '');
+      localStorage.setItem('dm_last_share_code', key);
+    }
     // Debounce: aspetta 2 secondi prima di pushare
     if (_syncTimeout) clearTimeout(_syncTimeout);
     _syncTimeout = setTimeout(async () => {
@@ -14475,6 +14563,14 @@ const FirebaseSync = (() => {
   // ── Merge dati remoti ──
   const _mergeRemote = (remote) => {
     const local = App.getActiveCampaign();
+    // Se non c'è campagna locale ma arriva una remota, salvala come nuova
+    if (!local && remote && remote.id) {
+      Storage.saveCampaign(remote);
+      App.setActiveCampaign(remote);
+      Toast.show('Campagna caricata dal cloud', 'success', 2000);
+      setTimeout(() => { try { App.renderHomePage(); } catch(e) {} }, 300);
+      return;
+    }
     if (!local || local.id !== remote.id) return;
 
     // Merge semplice: prende la versione più recente per ogni sezione
