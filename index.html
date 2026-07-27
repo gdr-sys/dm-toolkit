@@ -14349,8 +14349,8 @@ const FirebaseSync = (() => {
     } else {
       Toast.show('Benvenuto ' + (user.displayName||user.email||'').split(' ')[0], 'success', 2000);
       setTimeout(() => { try { DriveBackup.showWelcomeIfNeeded(); } catch(e) {} }, 2000);
-      // Carica le campagne dell'utente da Firebase
-      _loadUserCampaigns(user);
+      // Registra le campagne locali su Firebase E scarica quelle remote
+      _syncAllCampaigns(user);
     }
     // Se c'è una campagna attiva, avvia la sync
     // Se non c'è, prova a ricaricare dall'ultima sessione nota
@@ -14377,48 +14377,6 @@ const FirebaseSync = (() => {
     }
   };
 
-  // ── Carica campagne utente da Firebase ──
-  const _loadUserCampaigns = async (user) => {
-    if (!_db || !user || user.isAnonymous) return;
-    try {
-      // Cerca tutte le campagne dove l'utente è owner o collaboratore
-      const uid = user.uid;
-      const snap = await _db.ref('utenti/' + uid + '/campagne').once('value');
-      const campList = snap.val();
-      if (!campList) return;
-
-      const shareKeys = Object.keys(campList);
-      if (!shareKeys.length) return;
-
-      let loaded = 0;
-      for (const key of shareKeys) {
-        try {
-          const campSnap = await _db.ref('campagne/' + key + '/data').once('value');
-          const remoteData = campSnap.val();
-          if (!remoteData || !remoteData.id) continue;
-
-          // Controlla se la campagna esiste già in locale
-          const localCamp = Storage.getCampaign(remoteData.id);
-          if (!localCamp || (remoteData.updatedAt > (localCamp.updatedAt || 0))) {
-            // Salva/aggiorna la campagna in locale
-            Storage.saveCampaign(remoteData);
-            loaded++;
-          }
-        } catch(e) {
-          Debug.warn('Errore caricamento campagna ' + key, e.message);
-        }
-      }
-
-      if (loaded > 0) {
-        Toast.show(loaded + ' campagna/e caricata/e dal cloud', 'success', 3000);
-        // Aggiorna la home se siamo sulla home
-        setTimeout(() => { try { App.renderHomePage(); } catch(e) {} }, 500);
-      }
-    } catch(e) {
-      Debug.warn('Errore caricamento campagne utente:', e.message);
-    }
-  };
-
   // ── Registra la campagna nell'indice utente su Firebase ──
   const _registerCampaignForUser = (camp, key) => {
     if (!_db || !_user || _user.isAnonymous) return;
@@ -14428,6 +14386,84 @@ const FirebaseSync = (() => {
       id: camp.id,
       aggiornatoAt: firebase.database.ServerValue.TIMESTAMP,
     }).catch(e => Debug.warn('Errore registrazione campagna:', e.message));
+  };
+
+  // ── Sincronizza TUTTE le campagne: registra locali + scarica remote ──
+  const _syncAllCampaigns = async (user) => {
+    if (!_db || !user || user.isAnonymous) return;
+    const uid = user.uid;
+
+    try {
+      // STEP 1: Registra tutte le campagne locali nell'indice Firebase
+      const localCamps = Storage.getCampaigns() || [];
+      for (const camp of localCamps) {
+        const key = camp.shareCode || _campKey(camp.id);
+        // Pusha la campagna su Firebase se non c'è già
+        try {
+          const existing = await _db.ref('campagne/' + key + '/data').once('value');
+          if (!existing.val()) {
+            // Prima volta — pusha la campagna
+            await _db.ref('campagne/' + key + '/data').set({
+              ...camp,
+              updatedAt: Date.now(),
+              updatedBy: uid,
+              updatedByName: user.displayName || user.email,
+              ownerId: uid,
+            });
+          }
+          // Registra nell'indice utente
+          await _db.ref('utenti/' + uid + '/campagne/' + key).set({
+            nome: camp.name || '',
+            id: camp.id,
+            aggiornatoAt: firebase.database.ServerValue.TIMESTAMP,
+          });
+          // Salva shareCode
+          localStorage.setItem('dm_last_camp_id', camp.id);
+          localStorage.setItem('dm_last_share_code', key);
+        } catch(e) {
+          Debug.warn('Push campagna locale:', e.message);
+        }
+      }
+
+      // STEP 2: Scarica campagne remote non presenti in locale
+      const snap = await _db.ref('utenti/' + uid + '/campagne').once('value');
+      const remoteIndex = snap.val() || {};
+      const remoteKeys = Object.keys(remoteIndex);
+
+      let downloaded = 0;
+      for (const key of remoteKeys) {
+        try {
+          const campSnap = await _db.ref('campagne/' + key + '/data').once('value');
+          const remote = campSnap.val();
+          if (!remote || !remote.id) continue;
+
+          const local = Storage.getCampaign(remote.id);
+          const remoteTs = remote.updatedAt || 0;
+          const localTs  = local?.updatedAt || 0;
+
+          if (!local) {
+            // Non esiste in locale — scaricala
+            Storage.saveCampaign(remote);
+            downloaded++;
+          } else if (remoteTs > localTs) {
+            // La versione remota è più recente — aggiorna
+            Storage.saveCampaign(remote);
+            downloaded++;
+          }
+        } catch(e) {
+          Debug.warn('Download campagna remota:', e.message);
+        }
+      }
+
+      if (downloaded > 0) {
+        Toast.show(downloaded + ' campagna' + (downloaded > 1 ? 'e' : '') + ' caricata dal cloud', 'success', 3000);
+        setTimeout(() => { try { App.renderHomePage(); } catch(e) {} }, 400);
+      } else if (localCamps.length > 0) {
+        Toast.show('Campagne sincronizzate con il cloud', 'success', 2000);
+      }
+    } catch(e) {
+      Debug.warn('Errore syncAllCampaigns:', e.message);
+    }
   };
 
   const _onLogout = () => {
