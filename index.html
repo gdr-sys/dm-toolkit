@@ -12644,63 +12644,57 @@ const ExportPDF = (() => {
 
 <!-- Modal: Scegli come entrare -->
 <div class="modal-overlay hidden" id="modal-auth-choice" style="display:none;" onclick="if(event.target===this)Modal.close('auth-choice')">
-  <div class="modal" style="max-width:460px;">
+  <div class="modal" style="max-width:460px;width:100%;box-sizing:border-box;">
     <div class="modal-header">
       <h3 class="modal-title">Benvenuto nel DM Toolkit</h3>
       <button class="btn btn-ghost btn-icon-sm" onclick="Modal.close('auth-choice')">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
     </div>
-    <div class="modal-body" style="display:flex;flex-direction:column;gap:8px;padding:16px 20px 20px;">
+    <div class="modal-body" style="display:flex;flex-direction:column;gap:8px;padding:16px;box-sizing:border-box;overflow:hidden;">
 
-      <!-- Locale -->
-      <button class="btn btn-ghost" style="padding:12px 14px;text-align:left;border:1px solid var(--border);border-radius:var(--radius-md);width:100%;box-sizing:border-box;"
-        onclick="FirebaseSync.useLocal();Modal.close('auth-choice')">
-        <div style="display:flex;align-items:center;gap:12px;">
-          <span style="color:var(--text-muted);flex-shrink:0;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></span>
-          <div style="min-width:0;text-align:left;">
-            <div style="font-family:var(--font-display);font-size:0.88rem;font-weight:600;">Solo locale</div>
-            <div style="font-size:0.75rem;color:var(--text-muted);white-space:normal;">Dati nel browser. Nessun account richiesto.</div>
-          </div>
+      <!-- Solo locale -->
+      <button onclick="FirebaseSync.useLocal();Modal.close('auth-choice')"
+        style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:transparent;border:1px solid var(--border);border-radius:var(--radius-md);width:100%;box-sizing:border-box;cursor:pointer;text-align:left;">
+        <span style="color:var(--text-muted);flex-shrink:0;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></span>
+        <div style="min-width:0;overflow:hidden;">
+          <div style="font-family:var(--font-display);font-size:0.88rem;font-weight:600;color:var(--text-primary);">Solo locale</div>
+          <div style="font-size:0.75rem;color:var(--text-muted);">Dati nel browser. Nessun account richiesto.</div>
         </div>
       </button>
 
       <!-- Anonimo -->
-      <button class="btn btn-ghost" style="padding:12px 14px;text-align:left;border:1px solid var(--border);border-radius:var(--radius-md);width:100%;box-sizing:border-box;"
-        onclick="FirebaseSync.loginAnonymous();Modal.close('auth-choice')">
-        <div style="display:flex;align-items:center;gap:12px;">
-          <span style="color:var(--text-muted);flex-shrink:0;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
-          <div style="min-width:0;text-align:left;">
-            <div style="font-family:var(--font-display);font-size:0.88rem;font-weight:600;">Anonimo</div>
-            <div style="font-size:0.75rem;color:var(--text-muted);white-space:normal;">Cloud senza account. Aggiornabile a Google in seguito.</div>
-          </div>
+      <button onclick="FirebaseSync.loginAnonymous();Modal.close('auth-choice')"
+        style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:transparent;border:1px solid var(--border);border-radius:var(--radius-md);width:100%;box-sizing:border-box;cursor:pointer;text-align:left;">
+        <span style="color:var(--text-muted);flex-shrink:0;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
+        <div style="min-width:0;overflow:hidden;">
+          <div style="font-family:var(--font-display);font-size:0.88rem;font-weight:600;color:var(--text-primary);">Anonimo</div>
+          <div style="font-size:0.75rem;color:var(--text-muted);">Cloud senza account. Aggiornabile a Google in seguito.</div>
         </div>
       </button>
 
       <!-- Google -->
-      <button class="btn btn-ghost" style="padding:12px 14px;text-align:left;border:1px solid var(--border);border-radius:var(--radius-md);width:100%;box-sizing:border-box;"
-        onclick="FirebaseSync.loginGoogle()">
-        <div style="display:flex;align-items:center;gap:12px;">
-          <span style="color:var(--accent-secondary);flex-shrink:0;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg></span>
-          <div style="min-width:0;text-align:left;">
-            <div style="font-family:var(--font-display);font-size:0.88rem;font-weight:600;">Accedi con Google</div>
-            <div style="font-size:0.75rem;color:var(--text-muted);white-space:normal;">Sync multi-dispositivo e collaborazione con co-autori.</div>
-          </div>
+      <button onclick="FirebaseSync.loginGoogle()"
+        style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:transparent;border:1px solid var(--border);border-radius:var(--radius-md);width:100%;box-sizing:border-box;cursor:pointer;text-align:left;">
+        <span style="color:var(--accent-secondary);flex-shrink:0;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
+        <div style="min-width:0;overflow:hidden;">
+          <div style="font-family:var(--font-display);font-size:0.88rem;font-weight:600;color:var(--text-primary);">Accedi con Google</div>
+          <div style="font-size:0.75rem;color:var(--text-muted);">Sync multi-dispositivo e collaborazione.</div>
         </div>
       </button>
 
       <!-- Email/Password -->
-      <div style="border:1px solid var(--border);border-radius:var(--radius-md);padding:14px;">
+      <div style="border:1px solid var(--border);border-radius:var(--radius-md);padding:14px;box-sizing:border-box;">
         <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;">
-          <span style="color:var(--text-muted);flex-shrink:0;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></span>
+          <span style="color:var(--text-muted);flex-shrink:0;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></span>
           <div>
-            <div style="font-family:var(--font-display);font-size:0.88rem;font-weight:600;">Email e Password</div>
+            <div style="font-family:var(--font-display);font-size:0.88rem;font-weight:600;color:var(--text-primary);">Email e Password</div>
             <div style="font-size:0.75rem;color:var(--text-muted);">Registrati o accedi con email.</div>
           </div>
         </div>
         <div style="display:flex;flex-direction:column;gap:6px;">
-          <input id="auth-email" type="email" class="form-input" placeholder="email@esempio.com" style="font-size:0.85rem;">
-          <input id="auth-password" type="password" class="form-input" placeholder="Password (min 6 caratteri)" style="font-size:0.85rem;"
+          <input id="auth-email" type="email" class="form-input" placeholder="email@esempio.com" style="font-size:0.85rem;width:100%;box-sizing:border-box;">
+          <input id="auth-password" type="password" class="form-input" placeholder="Password (min 6 caratteri)" style="font-size:0.85rem;width:100%;box-sizing:border-box;"
             onkeydown="if(event.key==='Enter') FirebaseSync.loginEmail()">
           <div style="display:flex;gap:6px;">
             <button class="btn btn-primary" style="flex:1;font-size:0.82rem;" onclick="FirebaseSync.loginEmail()">Accedi</button>
@@ -12710,9 +12704,9 @@ const ExportPDF = (() => {
         </div>
       </div>
 
-      <div style="font-size:0.72rem;color:var(--text-muted);text-align:center;padding-top:4px;">
-        Puoi cambiare modalità in qualsiasi momento dalle impostazioni.
-      </div>
+      <p style="font-size:0.72rem;color:var(--text-muted);text-align:center;margin:4px 0 0;">
+        Puoi cambiare modalita in qualsiasi momento dalle impostazioni.
+      </p>
 
     </div>
   </div>
@@ -17614,6 +17608,69 @@ const renderDashboard = () => {
   document.querySelectorAll('.dash-q-item').forEach(function(el){el.addEventListener('click',function(){_openWikiCard('quest',this.dataset.id);});});
   document.querySelectorAll('.dash-n-item').forEach(function(el){el.addEventListener('click',function(){_openWikiCard('png',this.dataset.id);});});
   document.querySelectorAll('.dash-sess-open').forEach(function(el){el.addEventListener('click',function(){_openSessFromDash(this.dataset.id);});});
+
+  // Clocks attivi
+  var dashClocks = document.getElementById('dash-clocks-preview');
+  if (dashClocks) {
+    var clocks = camp.clocks || [];
+    var activeClocks = clocks.filter(function(c){ return c.attivo !== false; });
+    if (activeClocks.length) {
+      dashClocks.innerHTML = activeClocks.map(function(c) {
+        var pct = Math.round(((c.progresso||0) / (c.totale||8)) * 100);
+        var filled = c.progresso || 0;
+        var total  = c.totale || 8;
+        var segs   = '';
+        for (var s = 0; s < total; s++) {
+          segs += '<div style="flex:1;height:8px;border-radius:2px;background:' + (s < filled ? (c.colore||'var(--accent-primary)') : 'var(--bg-tertiary)') + ';margin:0 1px;"></div>';
+        }
+        return '<div style="margin-bottom:10px;">' +
+          '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">' +
+            '<span style="font-size:0.8rem;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:70%;">' + (c.nome||'Clock') + '</span>' +
+            '<span style="font-size:0.72rem;color:var(--text-muted);">' + filled + '/' + total + '</span>' +
+          '</div>' +
+          '<div style="display:flex;gap:1px;">' + segs + '</div>' +
+        '</div>';
+      }).join('');
+    } else {
+      dashClocks.innerHTML = '<div style="color:var(--text-muted);font-size:0.82rem;">Nessun clock attivo.</div>';
+    }
+  }
+
+  // Note recenti wiki
+  var dashNotes = document.getElementById('dash-recent-notes');
+  if (dashNotes) {
+    var wiki = camp.wiki || {};
+    var allNotes = [];
+    (wiki.lore||[]).forEach(function(n){ allNotes.push({tipo:'Lore', titolo:n.titolo||'', ts:n.aggiornatoAt||0, color:'#5ba4f5', id:n.id}); });
+    (wiki.sessioni||[]).forEach(function(n){ allNotes.push({tipo:'Sessione', titolo:n.titolo||'', ts:n.aggiornatoAt||0, color:'#ff9f43', id:n.id}); });
+    (camp.quests||[]).forEach(function(q){ allNotes.push({tipo:'Quest', titolo:q.titolo||q.name||'', ts:q.aggiornatoAt||0, color:'#e84393', id:q.id}); });
+    allNotes.sort(function(a,b){ return (b.ts||0)-(a.ts||0); });
+    var recent = allNotes.slice(0,6);
+    if (recent.length) {
+      dashNotes.innerHTML = '<div style="display:flex;flex-wrap:wrap;gap:8px;">' +
+        recent.map(function(n) {
+          return '<div class="dash-note-item" data-tipo="' + n.tipo.toLowerCase() + '" data-id="' + n.id + '" ' +
+            'style="display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--bg-secondary);border:1px solid var(--border);border-left:3px solid ' + n.color + ';border-radius:var(--radius-md);cursor:pointer;min-width:140px;flex:1;">' +
+            '<div style="min-width:0;">' +
+              '<div style="font-size:0.68rem;color:' + n.color + ';text-transform:uppercase;letter-spacing:0.05em;margin-bottom:2px;">' + n.tipo + '</div>' +
+              '<div style="font-size:0.82rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + (n.titolo||'Senza titolo') + '</div>' +
+            '</div>' +
+          '</div>';
+        }).join('') +
+      '</div>';
+      document.querySelectorAll('.dash-note-item').forEach(function(el) {
+        el.addEventListener('click', function() {
+          var tipo = this.dataset.tipo;
+          var id   = this.dataset.id;
+          if (tipo === 'quest') _openWikiCard('quest', id);
+          else if (tipo === 'sessione') _openWikiCard('sessioni', id);
+          else _openWikiCard('lore', id);
+        });
+      });
+    } else {
+      dashNotes.innerHTML = '<div style="color:var(--text-muted);font-size:0.82rem;">Nessuna nota wiki ancora.</div>';
+    }
+  }
 };
 
 /* ── INIT ── */
