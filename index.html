@@ -16207,7 +16207,8 @@ const WikiSections = (() => {
         relazioni: n.relazioni || n.links || '',
         gancio: n.gancio || '',
         segreto: n.secret || n.segreto || '',
-        note: n.noteLibere || '', tags: n.tags || [], _source: 'mondo',
+        note: n.noteLibere || '', tags: n.tags || [],
+        campi_custom: n.campi_custom || [], _source: 'mondo',
       })),
       saveItem: (camp, item) => {
         const npcs = camp.npcs || [];
@@ -16221,7 +16222,8 @@ const WikiSections = (() => {
           wants:item.vuole, vuole:item.vuole, fears:item.teme, teme:item.teme,
           relazioni:item.relazioni, links:item.relazioni,
           gancio:item.gancio, secret:item.segreto, segreto:item.segreto,
-          noteLibere:item.note, tags:item.tags||[], aggiornatoAt:Date.now() };
+          noteLibere:item.note, tags:item.tags||[],
+          campi_custom:item.campi_custom||[], aggiornatoAt:Date.now() };
         if (idx>=0) npcs[idx]=d; else npcs.push(d);
         App.saveActiveCampaign({ npcs });
         try { _mondoToWiki('npc', d, camp); } catch(e) {}
@@ -16249,7 +16251,8 @@ const WikiSections = (() => {
         tipo:l.tipo||'', regione:l.regione||'', clima:l.clima||'',
         atmosfera:l.atmosfera||l.description||'', abitanti:l.npcs||l.abitanti||'',
         punti:l.punti||'', storia:l.storia||'', pericoli:l.pericoli||'',
-        segreto:l.secret||l.segreto||'', note:l.noteLibere||'', tags:l.tags||[], _source:'mondo',
+        segreto:l.secret||l.segreto||'', note:l.noteLibere||'', tags:l.tags||[],
+        campi_custom:l.campi_custom||[], _source:'mondo',
       })),
       saveItem: (camp, item) => {
         const locs = camp.locations || [];
@@ -16290,7 +16293,8 @@ const WikiSections = (() => {
         leader:f.leader||'', sede:f.sede||'',
         obiettivo:f.obiettivo||f.description||'', vero_obiettivo:f.vero_obiettivo||'',
         risorse:f.risorse||'', nemici:f.nemici||'',
-        segreto:f.secret||f.segreto||'', note:f.noteLibere||'', tags:f.tags||[], _source:'mondo',
+        segreto:f.secret||f.segreto||'', note:f.noteLibere||'', tags:f.tags||[],
+        campi_custom:f.campi_custom||[], _source:'mondo',
       })),
       saveItem: (camp, item) => {
         const facs = camp.factions || [];
@@ -16769,6 +16773,47 @@ const WikiSections = (() => {
         cfg.fields.map(f => isEdit ? _editField(f) : _viewField(f, item[f.key])).join('') +
       '</div>' +
 
+      // ── Campi custom ──
+      (() => {
+        const custom = _currentItem?.campi_custom || item.campi_custom || [];
+        if (!isEdit && !custom.length) return '';
+        let html = '<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);padding:16px;margin-bottom:16px;">';
+        html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">';
+        html += '<div style="font-size:0.68rem;font-family:var(--font-display);text-transform:uppercase;letter-spacing:0.08em;color:var(--accent-secondary);">Campi personalizzati</div>';
+        if (isEdit) html += '<button onclick="WikiSections._addCustomField(\'' + type + '\')" style="font-size:0.72rem;padding:3px 8px;background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;color:var(--text-primary);">+ Campo</button>';
+        html += '</div>';
+        if (custom.length) {
+          html += custom.map(function(f, fi) {
+            if (isEdit) {
+              return '<div style="display:flex;gap:6px;align-items:center;margin-bottom:8px;" data-fi="' + fi + '">' +
+                '<input class="form-input ws-custom-key" data-fi="' + fi + '" value="' + _escHtml(f.chiave||'') + '" placeholder="Nome campo" style="width:35%;font-size:0.78rem;">' +
+                '<select class="form-select ws-custom-tipo" data-fi="' + fi + '" style="width:25%;font-size:0.78rem;">' +
+                  ['testo','numero','si_no','data','link'].map(function(t){ return '<option value="' + t + '"' + (f.tipo===t?' selected':'') + '>' + {testo:'Testo',numero:'Numero',si_no:'Sì/No',data:'Data',link:'@Link'}[t] + '</option>'; }).join('') +
+                '</select>' +
+                (f.tipo === 'si_no'
+                  ? '<select class="form-select ws-custom-val" data-fi="' + fi + '" style="flex:1;font-size:0.78rem;"><option value="si"' + (f.valore==='si'?' selected':'') + '>Sì</option><option value="no"' + (f.valore==='no'?' selected':'') + '>No</option></select>'
+                  : '<input class="form-input ws-custom-val" data-fi="' + fi + '" value="' + _escHtml(f.valore||'') + '" placeholder="Valore" style="flex:1;font-size:0.78rem;">'
+                ) +
+                '<button onclick="WikiSections._removeCustomField(\'' + type + '\',' + fi + ')" style="background:none;border:none;cursor:pointer;color:var(--accent-danger);font-size:0.9rem;padding:0 4px;">✕</button>' +
+              '</div>';
+            } else {
+              if (!f.valore && f.valore !== 0) return '';
+              var valDisplay = f.tipo === 'si_no' ? (f.valore === 'si' ? '● Sì' : '○ No')
+                : f.tipo === 'link' ? '<span style="color:var(--accent-primary);cursor:pointer;" onclick="WikiSections._jumpToEntity(\'' + (f.valore||'').replace(/^@/,'') + '\')">@' + _escHtml((f.valore||'').replace(/^@/,'')) + '</span>'
+                : _escHtml(String(f.valore));
+              return '<div style="display:flex;gap:8px;align-items:baseline;padding:4px 0;border-bottom:1px solid var(--border);">' +
+                '<span style="font-size:0.72rem;color:var(--text-muted);min-width:120px;flex-shrink:0;">' + _escHtml(f.chiave||'') + '</span>' +
+                '<span style="font-size:0.85rem;">' + valDisplay + '</span>' +
+              '</div>';
+            }
+          }).join('');
+        } else if (isEdit) {
+          html += '<div style="font-size:0.78rem;color:var(--text-muted);font-style:italic;">Nessun campo personalizzato. Clicca + Campo per aggiungerne uno.</div>';
+        }
+        html += '</div>';
+        return html;
+      })() +
+
       // ── Tag ──
       '<div style="margin-bottom:16px;">' +
         (isEdit ?
@@ -16886,8 +16931,11 @@ const WikiSections = (() => {
 
   // ── Chiudi dettaglio ──
   const closeDetail = (type) => {
-    // Salva prima di chiudere
-    if (_currentItem) _save(type);
+    // Salva prima di chiudere (inclusi campi custom)
+    if (_currentItem) {
+      try { WikiSections._saveCustomFields(type); } catch(e) {}
+      _save(type);
+    }
     _currentItem = null;
     const listEl   = document.getElementById('wiki-' + type + '-list');
     const detailEl = document.getElementById('wiki-' + type + '-detail');
@@ -17020,7 +17068,11 @@ const WikiSections = (() => {
 
   // ── Salva e torna a vista lettura ──
   const _saveAndView = (type) => {
-    if (_currentItem) _save(type);
+    if (_currentItem) {
+      // Salva i valori dei campi custom dai DOM prima di fare il save
+      try { WikiSections._saveCustomFields(type); } catch(e) {}
+      _save(type);
+    }
     const camp = App.getActiveCampaign();
     const cfg = TYPES[type];
     const items = cfg.getData(camp);
@@ -17063,7 +17115,25 @@ const WikiSections = (() => {
       if (chev) chev.style.transform = 'rotate(180deg)';
     }
   };
-  return { toggleExpand, goto, gotoTrame, renderList, openCard, editCard, closeDetail, newCard, deleteCard, filter, filterTag, renderCounters, init, _fieldChange, _jumpToEntity, _saveAndView, _parseLinks, _manualSave, get _currentType() { return _currentType; } };
+  // ── Metodi esposti per campi custom ──
+  const _renderDetailPub = (type, item, mode) => _renderDetail(type, item, mode);
+  const _scheduleAutosavePub = (type) => _scheduleAutosave(type);
+  const _getCfg = (type) => TYPES[type];
+  const _currentItemRef = { get value() { return _currentItem; } };
+
+  // Aggancia _saveCustomFields al _save esistente
+  const _saveWithCustom = (type) => {
+    _saveCustomFields(type);
+    _save(type);
+  };
+
+  return { toggleExpand, goto, gotoTrame, renderList, openCard, editCard, closeDetail,
+    newCard, deleteCard, filter, filterTag, renderCounters, init,
+    _fieldChange, _jumpToEntity, _saveAndView, _parseLinks, _manualSave,
+    _renderDetailPub, _scheduleAutosavePub, _getCfg, _saveWithCustom,
+    get _currentType() { return _currentType; },
+    get _currentItem()  { return _currentItem; },
+  };
 })();
 
 
@@ -17670,6 +17740,76 @@ const renderDashboard = () => {
     } else {
       dashNotes.innerHTML = '<div style="color:var(--text-muted);font-size:0.82rem;">Nessuna nota wiki ancora.</div>';
     }
+  }
+};
+
+
+// ── Campi custom — gestione ──
+// Aggiunge un nuovo campo custom all'entità corrente
+WikiSections._addCustomField = function(type) {
+  if (!WikiSections._currentItem) return;
+  var item = WikiSections._currentItem;
+  if (!item.campi_custom) item.campi_custom = [];
+  item.campi_custom.push({ chiave: '', tipo: 'testo', valore: '' });
+  // Salva e re-render in edit mode
+  var detailEl = document.getElementById('wiki-' + type + '-detail');
+  if (detailEl) {
+    var cfg = WikiSections._getCfg(type);
+    if (cfg) detailEl.innerHTML = WikiSections._renderDetailPub(type, item, 'edit');
+    WikiSections._reattachEditListeners(type);
+  }
+};
+
+// Rimuove un campo custom
+WikiSections._removeCustomField = function(type, fi) {
+  if (!WikiSections._currentItem) return;
+  var item = WikiSections._currentItem;
+  if (!item.campi_custom) return;
+  item.campi_custom.splice(fi, 1);
+  var detailEl = document.getElementById('wiki-' + type + '-detail');
+  if (detailEl) {
+    detailEl.innerHTML = WikiSections._renderDetailPub(type, item, 'edit');
+    WikiSections._reattachEditListeners(type);
+  }
+};
+
+// Salva i valori dei campi custom dai DOM inputs
+WikiSections._saveCustomFields = function(type) {
+  if (!WikiSections._currentItem) return;
+  var item = WikiSections._currentItem;
+  var keys = document.querySelectorAll('.ws-custom-key');
+  var tipos = document.querySelectorAll('.ws-custom-tipo');
+  var vals = document.querySelectorAll('.ws-custom-val');
+  if (!keys.length) return;
+  var custom = [];
+  for (var i = 0; i < keys.length; i++) {
+    var chiave = keys[i].value.trim();
+    var tipo   = tipos[i] ? tipos[i].value : 'testo';
+    var valore = vals[i] ? vals[i].value : '';
+    if (chiave) custom.push({ chiave: chiave, tipo: tipo, valore: valore });
+  }
+  item.campi_custom = custom;
+};
+
+// Riattacca i listener dopo re-render
+WikiSections._reattachEditListeners = function(type) {
+  var editor = document.getElementById('ws-editor-free');
+  if (editor && WikiSections._currentItem) {
+    editor.addEventListener('input', function() {
+      WikiSections._currentItem.note = editor.innerHTML;
+      WikiSections._scheduleAutosavePub(type);
+    });
+  }
+  // Autocomplete @ nei campi mentions
+  var cfg = WikiSections._getCfg(type);
+  var detailEl = document.getElementById('wiki-' + type + '-detail');
+  if (cfg && cfg.fields && detailEl) {
+    cfg.fields.forEach(function(f) {
+      if (f.type === 'mention' || f.type === 'mentions') {
+        var inp = detailEl.querySelector('#wsf-' + f.key);
+        if (inp) MentionPicker.attachToInput(inp);
+      }
+    });
   }
 };
 
