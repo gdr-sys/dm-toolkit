@@ -521,4 +521,7 @@
 #main-content {
   padding-bottom: max(80px, calc(60px + var(--safe-bottom)));
 }
-by
+
+
+/* Usa tutto lo spazio disponibile */
+.page { width: 100%; box-sizing: border-box; }
