@@ -292,6 +292,20 @@
             <span class="nav-label">Quest</span>
             <span id="wiki-cnt-quest" style="margin-left:auto;font-size:0.6rem;background:var(--bg-tertiary);padding:1px 5px;border-radius:var(--radius-full);color:var(--text-muted);">0</span>
           </button>
+          <button class="nav-item nav-subitem" data-wiki-section="pg"
+            onclick="WikiSections.goto('pg');closeMobileMenu()"
+            style="padding:5px 8px;font-size:0.78rem;">
+            <span style="color:var(--text-muted);"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a5 5 0 0 1 5 5v2a5 5 0 0 1-10 0V7a5 5 0 0 1 5-5z"/><path d="M20 21a8 8 0 1 0-16 0"/><line x1="12" y1="11" x2="12" y2="21"/></svg></span>
+            <span class="nav-label">PG</span>
+            <span id="wiki-cnt-pg" style="margin-left:auto;font-size:0.6rem;background:var(--bg-tertiary);padding:1px 5px;border-radius:var(--radius-full);color:var(--text-muted);">0</span>
+          </button>
+          <button class="nav-item nav-subitem" data-wiki-section="incontri"
+            onclick="WikiSections.goto('incontri');closeMobileMenu()"
+            style="padding:5px 8px;font-size:0.78rem;">
+            <span style="color:var(--text-muted);"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg></span>
+            <span class="nav-label">Incontri</span>
+            <span id="wiki-cnt-incontri" style="margin-left:auto;font-size:0.6rem;background:var(--bg-tertiary);padding:1px 5px;border-radius:var(--radius-full);color:var(--text-muted);">0</span>
+          </button>
           <button class="nav-item nav-subitem" data-wiki-section="trame"
             onclick="WikiSections.gotoTrame();closeMobileMenu()"
             style="padding:5px 8px;font-size:0.78rem;">
@@ -1654,6 +1668,44 @@
 
 
     <!-- ══ WIKI SECTIONS — PNG / LUOGHI / FAZIONI / LORE / SESSIONI ══ -->
+    <!-- PG Wiki -->
+    <section class="page" id="page-wiki-pg" style="padding:0;height:calc(100vh - var(--header-height));">
+      <div id="wiki-pg-list" style="height:100%;overflow-y:auto;padding:20px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px;">
+          <div><h2 style="font-family:var(--font-display);font-size:1.2rem;margin:0;">PG</h2>
+          <p style="font-size:0.75rem;color:var(--text-muted);margin:2px 0 0;">Personaggi del party</p></div>
+          <div style="display:flex;gap:6px;align-items:center;">
+            <input id="wiki-pg-search" type="text" class="form-input" placeholder="Cerca PG..." style="width:180px;font-size:0.82rem;" oninput="WikiSections.filter('pg',this.value)">
+            <button class="btn btn-primary btn-sm" onclick="WikiSections.newCard('pg')">+ Nuovo PG</button>
+          </div>
+        </div>
+        <div id="wiki-pg-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;"></div>
+      </div>
+      <div id="wiki-pg-detail" style="display:none;height:100%;overflow-y:auto;padding:20px;"></div>
+    </section>
+
+    <!-- Incontri Wiki -->
+    <section class="page" id="page-wiki-incontri" style="padding:0;height:calc(100vh - var(--header-height));">
+      <div id="wiki-incontri-list" style="height:100%;overflow-y:auto;padding:20px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px;">
+          <div><h2 style="font-family:var(--font-display);font-size:1.2rem;margin:0;">Incontri</h2>
+          <p style="font-size:0.75rem;color:var(--text-muted);margin:2px 0 0;">Incontri preparati per la campagna</p></div>
+          <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+            <input id="wiki-incontri-search" type="text" class="form-input" placeholder="Cerca incontri..." style="width:180px;font-size:0.82rem;" oninput="WikiSections.filter('incontri',this.value)">
+            <select id="wiki-incontri-filter" class="form-select" style="width:130px;font-size:0.78rem;" onchange="WikiSections.filterTag('incontri',this.value)">
+              <option value="">Tutti i tipi</option>
+              <option value="Combattimento">Combattimento</option>
+              <option value="Esplorazione">Esplorazione</option>
+              <option value="Sociale">Sociale</option>
+            </select>
+            <button class="btn btn-primary btn-sm" onclick="WikiSections.newCard('incontri')">+ Nuovo Incontro</button>
+          </div>
+        </div>
+        <div id="wiki-incontri-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;"></div>
+      </div>
+      <div id="wiki-incontri-detail" style="display:none;height:100%;overflow-y:auto;padding:20px;"></div>
+    </section>
+
 
     <!-- Quest Wiki -->
     <section class="page" id="page-wiki-quest" style="padding:0;height:calc(100vh - var(--header-height));">
@@ -1703,10 +1755,12 @@
           <p style="font-size:0.75rem;color:var(--text-muted);margin:2px 0 0;">Locazioni, dungeon, città e regioni</p></div>
           <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
             <input id="wiki-luoghi-search" type="text" class="form-input" placeholder="Cerca luoghi..." style="width:180px;font-size:0.82rem;" oninput="WikiSections.filter('luoghi',this.value)">
+            <button class="btn btn-ghost btn-sm" onclick="WikiSections.toggleLuoghiView()" id="luoghi-view-btn" style="font-size:0.75rem;">🌳 Albero</button>
             <button class="btn btn-primary btn-sm" onclick="WikiSections.newCard('luoghi')">+ Nuovo Luogo</button>
           </div>
         </div>
         <div id="wiki-luoghi-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;"></div>
+        <div id="wiki-luoghi-tree" style="display:none;"></div>
       </div>
       <div id="wiki-luoghi-detail" style="display:none;height:100%;overflow-y:auto;padding:20px;"></div>
     </section>
@@ -3765,6 +3819,8 @@ const App = (() => {
     'wiki-sessioni': { label: 'Sessioni', icon: '📝', navItem: false, requiresCampaign: true },
     trame:          { label: 'Trame',    icon: '🎭', navItem: true,  requiresCampaign: true  },
     'wiki-quest':   { label: 'Quest',    icon: '⚔️', navItem: false, requiresCampaign: true  },
+    'wiki-pg':      { label: 'PG',       icon: '🧙', navItem: false, requiresCampaign: true  },
+    'wiki-incontri':{ label: 'Incontri', icon: '⚔️',  navItem: false, requiresCampaign: true  },
   };
 
   const navigateTo = (pageId) => {
@@ -14136,6 +14192,15 @@ const GDriveUI = (() => {
           Storage.createCampaign(campagna);
           Toast.show('✓ Campagna aggiunta: ' + campagna.name, 'success', 3000);
         }
+        // Avvia sync Firebase per rendere la campagna disponibile su tutti i dispositivi
+        try {
+          const user = FirebaseSync.getUser?.();
+          if (user && !user.isAnonymous) {
+            setTimeout(() => {
+              FirebaseSync._syncAllCampaignsNow?.(user);
+            }, 500);
+          }
+        } catch(e) {}
         App.init();
         Modal.close('gdrive-options');
       }
@@ -16346,6 +16411,98 @@ const WikiSections = (() => {
         nome:'', categoria:'Generale', periodo:'', collegati:'', rilevanza:'Media', fonti:'', contenuto:'', tags:[] }),
     },
 
+    pg: {
+      label: 'PG', color: '#56d4dd',
+      fields: [
+        { key: 'classe',      label: 'Classe / Sottoclasse',  type: 'short',   hint: 'es. Guerriero / Campione' },
+        { key: 'razza',       label: 'Razza / Specie',        type: 'short',   hint: 'es. Umano, Elfo, Nano' },
+        { key: 'livello',     label: 'Livello',               type: 'short',   hint: 'es. 5' },
+        { key: 'giocatore',   label: 'Nome giocatore',        type: 'short',   hint: 'Chi gioca questo PG?' },
+        { key: 'hp_max',      label: 'HP massimi',            type: 'short',   hint: 'es. 45' },
+        { key: 'ca',          label: 'Classe Armatura',       type: 'short',   hint: 'es. 16' },
+        { key: 'iniziativa',  label: 'Bonus iniziativa',      type: 'short',   hint: 'es. +3' },
+        { key: 'perc_pass',   label: 'Percezione passiva',    type: 'short',   hint: 'es. 14' },
+        { key: 'velocita',    label: 'Velocita',              type: 'short',   hint: 'es. 9m' },
+        { key: 'background',  label: 'Background',            type: 'short',   hint: 'es. Soldato, Nobile' },
+        { key: 'motivazione', label: 'Motivazione / Goal',    type: 'long',    hint: 'Cosa vuole questo PG?' },
+        { key: 'legami',      label: 'Legami con altri PG',   type: 'mentions', hint: '@AltroPG' },
+        { key: 'note_dm',     label: 'Note DM',               type: 'secret',  hint: 'Info riservate al DM' },
+      ],
+      getData: (camp) => (camp?.pg || []).map(p => ({
+        id:p.id, nome:p.nome||p.name||'', immagine:p.immagine||'',
+        classe:p.classe||'', razza:p.razza||'', livello:p.livello||'',
+        giocatore:p.giocatore||'', hp_max:p.hp_max||'', ca:p.ca||'',
+        iniziativa:p.iniziativa||'', perc_pass:p.perc_pass||'',
+        velocita:p.velocita||'', background:p.background||'',
+        motivazione:p.motivazione||'', legami:p.legami||'',
+        note_dm:p.note_dm||'', note:p.noteLibere||'',
+        tags:p.tags||[], campi_custom:p.campi_custom||[], _source:'pg',
+      })),
+      saveItem: (camp, item) => {
+        if (!camp.pg) camp.pg = [];
+        const idx = camp.pg.findIndex(p => p.id === item.id);
+        const d = { ...(idx>=0?camp.pg[idx]:{}), id:item.id, nome:item.nome, name:item.nome,
+          immagine:item.immagine||'', classe:item.classe, razza:item.razza,
+          livello:item.livello, giocatore:item.giocatore, hp_max:item.hp_max,
+          ca:item.ca, iniziativa:item.iniziativa, perc_pass:item.perc_pass,
+          velocita:item.velocita, background:item.background,
+          motivazione:item.motivazione, legami:item.legami, note_dm:item.note_dm,
+          noteLibere:item.note, tags:item.tags||[],
+          campi_custom:item.campi_custom||[], aggiornatoAt:Date.now() };
+        if (idx>=0) camp.pg[idx]=d; else camp.pg.push(d);
+        App.saveActiveCampaign({ pg: camp.pg });
+      },
+      newItem: () => ({ id:'pg_'+Date.now()+'_'+Math.random().toString(36).slice(2,5),
+        nome:'', classe:'', razza:'', livello:'', giocatore:'',
+        hp_max:'', ca:'', iniziativa:'', perc_pass:'', velocita:'',
+        background:'', motivazione:'', legami:'', note_dm:'',
+        note:'', tags:[], campi_custom:[] }),
+    },
+
+    incontri: {
+      label: 'Incontri', color: '#ff6b6b',
+      fields: [
+        { key: 'tipo',       label: 'Tipo',                type: 'select', options: ['Combattimento','Esplorazione','Sociale','Trappola','Misto','Altro'] },
+        { key: 'difficolta', label: 'Difficolta',          type: 'select', options: ['Facile','Medio','Difficile','Mortale','Boss'] },
+        { key: 'stato',      label: 'Stato',               type: 'select', options: ['Bozza','Pronto','Usato'] },
+        { key: 'ambientazione', label: 'Ambientazione',   type: 'mention', hint: '@Luogo' },
+        { key: 'sessione',   label: 'Sessione prevista',  type: 'mention', hint: '@Sessione' },
+        { key: 'nemici',     label: 'Nemici / Mostri',    type: 'long',   hint: 'es. 3x Goblin CR1/4, 1x Bugbear CR1' },
+        { key: 'xp_totale',  label: 'XP totali',          type: 'short',  hint: 'es. 450 XP' },
+        { key: 'loot',       label: 'Loot possibile',     type: 'long',   hint: 'Oggetti, monete, ricompense...' },
+        { key: 'tattiche',   label: 'Tattiche nemici',    type: 'long',   hint: 'Come si comportano i nemici?' },
+        { key: 'condizioni', label: 'Condizioni speciali',type: 'long',   hint: 'Terreno, effetti, varianti...' },
+        { key: 'note_dm',    label: 'Note DM',             type: 'secret', hint: 'Twist, info riservate' },
+      ],
+      getData: (camp) => (camp?.incontri || []).map(e => ({
+        id:e.id, nome:e.nome||e.name||'',
+        tipo:e.tipo||'Combattimento', difficolta:e.difficolta||'Medio',
+        stato:e.stato||'Bozza', ambientazione:e.ambientazione||'',
+        sessione:e.sessione||'', nemici:e.nemici||'',
+        xp_totale:e.xp_totale||'', loot:e.loot||'',
+        tattiche:e.tattiche||'', condizioni:e.condizioni||'',
+        note_dm:e.note_dm||'', note:e.noteLibere||'',
+        tags:e.tags||[], campi_custom:e.campi_custom||[], _source:'incontri',
+      })),
+      saveItem: (camp, item) => {
+        if (!camp.incontri) camp.incontri = [];
+        const idx = camp.incontri.findIndex(e => e.id === item.id);
+        const d = { ...(idx>=0?camp.incontri[idx]:{}), id:item.id, nome:item.nome, name:item.nome,
+          tipo:item.tipo, difficolta:item.difficolta, stato:item.stato,
+          ambientazione:item.ambientazione, sessione:item.sessione,
+          nemici:item.nemici, xp_totale:item.xp_totale, loot:item.loot,
+          tattiche:item.tattiche, condizioni:item.condizioni,
+          note_dm:item.note_dm, noteLibere:item.note,
+          tags:item.tags||[], campi_custom:item.campi_custom||[], aggiornatoAt:Date.now() };
+        if (idx>=0) camp.incontri[idx]=d; else camp.incontri.push(d);
+        App.saveActiveCampaign({ incontri: camp.incontri });
+      },
+      newItem: () => ({ id:'enc_'+Date.now()+'_'+Math.random().toString(36).slice(2,5),
+        nome:'', tipo:'Combattimento', difficolta:'Medio', stato:'Bozza',
+        ambientazione:'', sessione:'', nemici:'', xp_totale:'', loot:'',
+        tattiche:'', condizioni:'', note_dm:'', note:'', tags:[], campi_custom:[] }),
+    },
+
     quest: {
       label: 'Quest', color: '#e84393',
       fields: [
@@ -17127,7 +17284,19 @@ const WikiSections = (() => {
     _save(type);
   };
 
-  return { toggleExpand, goto, gotoTrame, renderList, openCard, editCard, closeDetail,
+  const toggleLuoghiView = () => {
+    const grid = document.getElementById('wiki-luoghi-grid');
+    const tree = document.getElementById('wiki-luoghi-tree');
+    const btn  = document.getElementById('luoghi-view-btn');
+    if (!grid || !tree) return;
+    const showingTree = tree.style.display !== 'none';
+    grid.style.display = showingTree ? '' : 'none';
+    tree.style.display = showingTree ? 'none' : '';
+    if (btn) btn.textContent = showingTree ? '🌳 Albero' : '📋 Lista';
+    if (!showingTree) _renderLuoghiTree();
+  };
+
+  return { toggleExpand, goto, gotoTrame, toggleLuoghiView, renderList, openCard, editCard, closeDetail,
     newCard, deleteCard, filter, filterTag, renderCounters, init,
     _fieldChange, _jumpToEntity, _saveAndView, _parseLinks, _manualSave,
     _renderDetailPub, _scheduleAutosavePub, _getCfg, _saveWithCustom,
@@ -17811,6 +17980,78 @@ WikiSections._reattachEditListeners = function(type) {
       }
     });
   }
+};
+
+
+// ── Vista ad albero dei Luoghi ──
+const _renderLuoghiTree = () => {
+  const camp = App.getActiveCampaign();
+  if (!camp) return;
+  const luoghi = (camp.locations || []).map(l => ({
+    id: l.id, nome: l.nome || l.name || '',
+    tipo: l.tipo || '',
+    regione: l.regione || l.parent || '',
+    immagine: l.immagine || '',
+  }));
+
+  const tree = document.getElementById('wiki-luoghi-tree');
+  if (!tree) return;
+
+  // Raggruppa per regione
+  const byParent = {};
+  const roots = [];
+  luoghi.forEach(l => {
+    const parent = l.regione || '';
+    if (!byParent[parent]) byParent[parent] = [];
+    byParent[parent].push(l);
+  });
+
+  // Radici = luoghi senza regione o con regione non trovata
+  const allNomi = new Set(luoghi.map(l => l.nome));
+  luoghi.forEach(l => {
+    if (!l.regione || !allNomi.has(l.regione)) roots.push(l);
+  });
+
+  const renderNode = (l, depth) => {
+    const children = byParent[l.nome] || [];
+    const indent = depth * 20;
+    const tipoColors = {
+      Regione:'#f5a623', Continente:'#c97bea', Citta:'#69cc85',
+      Citta:'#69cc85', Dungeon:'#ff6b6b', Taverna:'#56d4dd',
+      Negozio:'#56d4dd', Fortezza:'#ff9f43', Villaggio:'#69cc85',
+    };
+    const color = tipoColors[l.tipo] || 'var(--accent-primary)';
+    let html2 = '<div style="padding:6px 8px 6px ' + (indent+8) + 'px;display:flex;align-items:center;gap:8px;' +
+      'border-left:' + (depth>0?'2px solid var(--border)':'none') + ';' +
+      'margin-left:' + (depth>0?'20px':'0') + ';' +
+      'cursor:pointer;border-radius:var(--radius-sm);" ' +
+      'class="luoghi-tree-node" data-id="' + l.id + '" ' +
+      'class="luoghi-tree-node" data-id="' + l.id + '" style="' +
+      'padding:6px 8px 6px ' + (indent+8) + 'px;display:flex;align-items:center;gap:8px;border-left:' + (depth>0?'2px solid var(--border)':'none') + ';margin-left:' + (depth>0?'20px':'0') + ';cursor:pointer;border-radius:var(--radius-sm);">' +
+      (children.length ? '<span style="font-size:0.7rem;color:var(--text-muted);width:12px;">▶</span>' : '<span style="width:12px;"></span>') +
+      (l.immagine ? '<img src="' + l.immagine + '" style="width:20px;height:20px;border-radius:50%;object-fit:cover;">' : '') +
+      '<span style="font-size:0.7rem;padding:1px 6px;background:' + color + '22;color:' + color + ';border-radius:var(--radius-full);">' + (l.tipo||'Luogo') + '</span>' +
+      '<span style="font-size:0.88rem;">' + l.nome + '</span>' +
+      '</div>';
+    children.forEach(function(child) { html2 += renderNode(child, depth+1); });
+    return html2;
+  };
+
+  let treeHtml = '<div style="padding:8px;">';
+  if (!roots.length) {
+    treeHtml += '<div style="color:var(--text-muted);font-size:0.85rem;padding:16px;">Nessun luogo. Aggiungili e usa il campo @Regione per creare la gerarchia.</div>';
+  } else {
+    roots.forEach(function(r) { treeHtml += renderNode(r, 0); });
+  }
+  treeHtml += '</div>';
+  tree.innerHTML = treeHtml;
+
+  // Click sui nodi
+  tree.querySelectorAll('.luoghi-tree-node').forEach(function(el) {
+    el.addEventListener('click', function() {
+      _openWikiCard('luoghi', this.dataset.id);
+    });
+  });
 };
 
 /* ── INIT ── */
