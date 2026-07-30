@@ -1820,7 +1820,7 @@
           <h1 class="page-title">Trame</h1>
           <p class="page-subtitle">Scheletro narrativo — linee A, B, C e archi dei personaggi</p>
         </div>
-        <button class="btn btn-primary" onclick="Trame.newArco()">+ Nuova Trama</button>
+        <button class="btn btn-primary" onclick="Trame.newTrama()">+ Nuova Trama</button>
       </div>
       <div id="trame-container" style="display:flex;flex-direction:column;gap:14px;"></div>
     </section>
@@ -3844,7 +3844,7 @@ const App = (() => {
         setTimeout(() => { try { WikiSections.renderCounters(); } catch(e) {} }, 100);
         break;
     case 'trame':
-        setTimeout(() => { try { Trame.render(); } catch(e) {} }, 100);
+        setTimeout(() => { try { Trame.renderList(); } catch(e) {} }, 100);
         break;
     }
   };
@@ -14530,7 +14530,11 @@ const MentionPicker = (() => {
     if (atIdx < 0) { _hide(); return; }
 
     const afterAt = textBefore.slice(atIdx + 1);
-    if (afterAt.includes(' ') && afterAt.length > 1) { _hide(); return; }
+    // Nasconde se: c'è uno spazio dopo la @, o la @ è troppo lontana (>30 char)
+    if (afterAt.includes(' ')) { _hide(); return; }
+    if (afterAt.length > 30) { _hide(); return; }
+    // Nasconde se la @ fa parte di un indirizzo email (char prima è alfanumerico)
+    if (atIdx > 0 && /[a-zA-Z0-9]/.test(textBefore[atIdx - 1])) { _hide(); return; }
 
     _query = afterAt;
     _active = true;
@@ -14596,7 +14600,9 @@ const MentionPicker = (() => {
       const atIdx  = before.lastIndexOf('@');
       if (atIdx < 0) { _hide(); return; }
       const query = before.slice(atIdx + 1);
-      if (/\s/.test(query) && query.length > 15) { _hide(); return; }
+      if (/\s/.test(query)) { _hide(); return; }
+      if (query.length > 30) { _hide(); return; }
+      if (atIdx > 0 && /[a-zA-Z0-9]/.test(before[atIdx - 1])) { _hide(); return; }
       _query   = query;
       _results = _getItems(query);
       if (!_results.length) { _hide(); return; }
@@ -17010,8 +17016,25 @@ const SessCtx = (() => {
 
 const Trame = (() => {
 
-  const COLORS = ['#c9a84c','#69cc85','#5ba4f5','#c97bea','#ff9f43','#ff6b6b','#56d4dd'];
-  const TIPI   = ['Trama A (principale)','Trama B','Trama C','Arco personaggio','Sottotrama','Mistero','Altro'];
+  const CATEGORIE = ['Trama A — Principale','Trama B','Trama C','Arco personaggio','Sottotrama','Mistero','Altro'];
+  const STATI     = ['In corso','Completata','In pausa','Abbandonata'];
+  const CAT_COLORS = {
+    'Trama A — Principale': '#c9a84c',
+    'Trama B':              '#5ba4f5',
+    'Trama C':              '#c97bea',
+    'Arco personaggio':     '#69cc85',
+    'Sottotrama':           '#ff9f43',
+    'Mistero':              '#ff6b6b',
+    'Altro':                '#56d4dd',
+  };
+  const STATO_COLORS = {
+    'In corso':    '#69cc85',
+    'Completata':  '#5ba4f5',
+    'In pausa':    '#f5a623',
+    'Abbandonata': '#7a7068',
+  };
+
+  let _currentId = null;
 
   const _getData = () => {
     const camp = App.getActiveCampaign();
@@ -17019,132 +17042,249 @@ const Trame = (() => {
     return camp.trame;
   };
 
-  const _save = (trame) => {
-    App.saveActiveCampaign({ trame });
-  };
+  const _save = (trame) => App.saveActiveCampaign({ trame });
 
-  const newArco = () => {
+  const _esc = (s) => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+
+  // ── Crea nuova trama ──
+  const newTrama = () => {
     const trame = _getData();
-    const colori_usati = trame.map(t => t.colore);
-    const colore = COLORS.find(c => !colori_usati.includes(c)) || COLORS[trame.length % COLORS.length];
-    trame.push({
-      id: 'tr_' + Date.now(),
+    // Categoria automatica: A se è la prima, poi B, C, ecc.
+    const cat = CATEGORIE[Math.min(trame.length, CATEGORIE.length - 1)];
+    const color = CAT_COLORS[cat] || '#c9a84c';
+    const nuova = {
+      id: 'tr_' + Date.now() + '_' + Math.random().toString(36).slice(2,5),
       titolo: 'Nuova trama',
-      tipo: TIPI[Math.min(trame.length, TIPI.length-1)],
-      colore,
-      descrizione: '',
+      categoria: cat,
+      colore: color,
       stato: 'In corso',
-      png_chiave: '',
-      location_chiave: '',
-      fazioni: '',
-      obiettivo: '',
-      twist: '',
-      sessioni_collegate: [],
+      corpo: '',
       note: '',
-    });
+    };
+    trame.push(nuova);
     _save(trame);
-    render();
+    renderList();
+    // Apri subito la nuova trama
+    setTimeout(() => openTrama(nuova.id), 50);
   };
 
-  const deleteArco = (id) => {
+  const deleteTrama = (id) => {
     if (!confirm('Eliminare questa trama?')) return;
     const trame = _getData().filter(t => t.id !== id);
     _save(trame);
-    render();
+    _currentId = null;
+    renderList();
+    const detail = document.getElementById('trame-detail');
+    if (detail) detail.style.display = 'none';
+    const list = document.getElementById('trame-list');
+    if (list) list.style.display = '';
   };
 
-  const updateArco = (id, key, value) => {
-    const trame = _getData();
-    const t = trame.find(x => x.id === id);
-    if (!t) return;
-    t[key] = value;
-    _save(trame);
-  };
-
-  const render = () => {
+  // ── Lista card ──
+  const renderList = () => {
     const container = document.getElementById('trame-container');
     if (!container) return;
     const trame = _getData();
-    const camp  = App.getActiveCampaign();
 
     if (!trame.length) {
-      container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-muted);">' +
-        '<div style="font-size:2rem;margin-bottom:12px;opacity:0.3;">🎭</div>' +
-        '<div style="font-size:0.9rem;margin-bottom:16px;">Nessuna trama ancora.<br>Inizia definendo la trama principale della campagna.</div>' +
-        '<button class="btn btn-primary" onclick="Trame.newArco()">+ Crea la prima trama</button>' +
+      container.innerHTML =
+        '<div style="text-align:center;padding:40px;color:var(--text-muted);">' +
+        '<div style="font-size:2rem;opacity:0.3;margin-bottom:12px;">📖</div>' +
+        '<div style="font-size:0.9rem;margin-bottom:16px;">Nessuna trama. Crea la prima per iniziare.</div>' +
+        '<button class="btn btn-primary" onclick="Trame.newTrama()">+ Crea prima trama</button>' +
         '</div>';
       return;
     }
 
-    const STATUS_COLORS = { 'In corso':'#69cc85', 'Completata':'#5ba4f5', 'In pausa':'#f5a623', 'Abbandonata':'#7a7068' };
+    // Raggruppa per categoria
+    const bycat = {};
+    CATEGORIE.forEach(c => { bycat[c] = []; });
+    trame.forEach(t => {
+      const cat = t.categoria || CATEGORIE[0];
+      if (!bycat[cat]) bycat[cat] = [];
+      bycat[cat].push(t);
+    });
 
-    container.innerHTML = trame.map((t, idx) => {
+    let html2 = '';
+    CATEGORIE.forEach(cat => {
+      const items = bycat[cat] || [];
+      if (!items.length) return;
+      const color = CAT_COLORS[cat] || 'var(--accent-primary)';
+      html2 += '<div style="margin-bottom:24px;">' +
+        '<div style="font-size:0.72rem;font-family:var(--font-display);text-transform:uppercase;' +
+        'letter-spacing:0.1em;color:' + color + ';font-weight:700;margin-bottom:10px;' +
+        'padding-bottom:4px;border-bottom:2px solid ' + color + '40;">' + cat + '</div>' +
+        '<div style="display:flex;flex-direction:column;gap:8px;">' +
+        items.map(function(t) {
+          const sc = STATO_COLORS[t.stato] || '#aaa';
+          return '<div class="trama-card-item" data-id="' + t.id + '" ' +
+            'style="display:flex;align-items:center;gap:12px;padding:12px 16px;' +
+            'background:var(--bg-card);border:1px solid var(--border);' +
+            'border-left:4px solid ' + (t.colore||color) + ';' +
+            'border-radius:var(--radius-md);cursor:pointer;">' +
+            '<div style="flex:1;min-width:0;">' +
+              '<div style="font-family:var(--font-display);font-size:0.95rem;font-weight:600;' +
+              'overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + _esc(t.titolo||'Senza titolo') + '</div>' +
+              (t.corpo ? '<div style="font-size:0.75rem;color:var(--text-muted);margin-top:2px;' +
+              'overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + _esc(t.corpo.replace(/<[^>]*>/g,'').slice(0,80)) + '</div>' : '') +
+            '</div>' +
+            '<span style="padding:2px 8px;background:' + sc + '22;color:' + sc + ';' +
+            'border-radius:var(--radius-full);font-size:0.7rem;white-space:nowrap;">' + (t.stato||'In corso') + '</span>' +
+            '<button class="trama-del-btn" data-id="' + t.id + '" ' +
+            'style="background:none;border:none;cursor:pointer;color:var(--text-muted);padding:4px;font-size:0.85rem;flex-shrink:0;">✕</button>' +
+          '</div>';
+        }).join('') +
+        '</div></div>';
+    });
 
-      const sessLog = camp?.sessioni_log || [];
-      const sessColleg = sessLog.filter(s =>
-        (s.png_previsti||'').includes(t.png_chiave?.split(',')[0]?.trim()?.replace('@','')) ||
-        (s.notePrep||'').includes(t.titolo) ||
-        (t.sessioni_collegate||[]).includes(s.id)
-      ).slice(0, 5);
+    container.innerHTML = html2;
 
-      return '<div style="background:var(--bg-card);border:1px solid var(--border);border-left:5px solid ' + t.colore + ';border-radius:var(--radius-md);overflow:hidden;">' +
+    // Event delegation
+    container.querySelectorAll('.trama-card-item').forEach(function(el) {
+      el.addEventListener('click', function(e) {
+        if (e.target.classList.contains('trama-del-btn') || e.target.closest('.trama-del-btn')) return;
+        Trame.openTrama(this.dataset.id);
+      });
+    });
+    container.querySelectorAll('.trama-del-btn').forEach(function(el) {
+      el.addEventListener('click', function(e) {
+        e.stopPropagation();
+        Trame.deleteTrama(this.dataset.id);
+      });
+    });
+  };
 
-        '<div style="display:flex;align-items:center;gap:12px;padding:14px 16px;background:' + t.colore + '12;flex-wrap:wrap;">' +
-          '<div style="width:12px;height:12px;border-radius:50%;background:' + t.colore + ';flex-shrink:0;"></div>' +
-          '<div style="flex:1;min-width:0;">' +
-            '<input value="' + _esc(t.titolo) + '" ' +
-              'style="font-family:var(--font-display);font-size:1rem;font-weight:700;background:transparent;border:none;border-bottom:2px solid ' + t.colore + ';width:100%;padding:2px 0;color:var(--text-primary);" ' +
+  // ── Apri pagina dettaglio trama ──
+  const openTrama = (id) => {
+    const trame = _getData();
+    const t = trame.find(function(x) { return x.id === id; });
+    if (!t) return;
+    _currentId = id;
 
+    const list   = document.getElementById('trame-list');
+    const detail = document.getElementById('trame-detail');
+    if (list)   list.style.display   = 'none';
+    if (detail) detail.style.display = '';
+
+    if (!detail) return;
+    const color = t.colore || CAT_COLORS[t.categoria] || 'var(--accent-primary)';
+
+    detail.innerHTML =
+      '<div style="max-width:800px;margin:0 auto;padding:0 0 40px;">' +
+
+        // Header
+        '<div style="display:flex;align-items:center;gap:10px;margin-bottom:24px;flex-wrap:wrap;">' +
+          '<button onclick="Trame.closeDetail()" style="background:none;border:none;cursor:pointer;' +
+          'color:var(--text-muted);padding:4px 8px;font-size:0.85rem;display:flex;align-items:center;gap:4px;">' +
+          '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg> Trame</button>' +
+          '<div style="width:1px;height:16px;background:var(--border);"></div>' +
+          '<input id="trama-titolo" value="' + _esc(t.titolo||'') + '" ' +
+          'style="font-family:var(--font-display);font-size:1.2rem;font-weight:700;background:transparent;' +
+          'border:none;border-bottom:2px solid ' + color + ';flex:1;min-width:200px;padding:2px 0;color:var(--text-primary);">' +
+          '<select id="trama-categoria" style="font-size:0.78rem;background:var(--bg-secondary);' +
+          'border:1px solid var(--border);border-radius:var(--radius-sm);padding:4px 8px;color:var(--text-primary);">' +
+          CATEGORIE.map(function(c) { return '<option value="' + c + '"' + (t.categoria===c?' selected':'') + '>' + c + '</option>'; }).join('') +
+          '</select>' +
+          '<select id="trama-stato" style="font-size:0.78rem;background:var(--bg-secondary);' +
+          'border:1px solid var(--border);border-radius:var(--radius-sm);padding:4px 8px;' +
+          'color:' + (STATO_COLORS[t.stato]||'var(--text-muted)') + ';">' +
+          STATI.map(function(s) { return '<option value="' + s + '"' + (t.stato===s?' selected':'') + '>' + s + '</option>'; }).join('') +
+          '</select>' +
+          '<input type="color" id="trama-colore" value="' + (t.colore||color) + '" ' +
+          'style="width:28px;height:28px;border:none;border-radius:4px;cursor:pointer;">' +
+        '</div>' +
+
+        // Corpo principale
+        '<div style="margin-bottom:20px;">' +
+          '<div style="font-size:0.68rem;font-family:var(--font-display);text-transform:uppercase;' +
+          'letter-spacing:0.08em;color:var(--text-muted);margin-bottom:8px;">Corpo principale</div>' +
+          '<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);overflow:hidden;">' +
+            '<div style="display:flex;flex-wrap:wrap;gap:2px;padding:4px 8px;border-bottom:1px solid var(--border);background:var(--bg-secondary);">' +
+            '<button class="nc-tb trama-tb" data-cmd="bold"><b>B</b></button>' +
+            '<button class="nc-tb trama-tb" data-cmd="italic"><i>I</i></button>' +
+            '<button class="nc-tb trama-tb" data-cmd="underline"><u>S</u></button>' +
+            '<button class="nc-tb trama-tb" data-cmd="strikeThrough"><s>ab</s></button>' +
+            '<div style="width:1px;background:var(--border);margin:2px 3px;"></div>' +
+            '<button class="nc-tb trama-tb" data-cmd="h2">H2</button>' +
+            '<button class="nc-tb trama-tb" data-cmd="h3">H3</button>' +
+            '<button class="nc-tb trama-tb" data-cmd="ul">•</button>' +
+            '<button class="nc-tb trama-tb" data-cmd="ol">1.</button>' +
+            '</div>' +
+            '<div id="trama-corpo" contenteditable="true" ' +
+            'style="min-height:200px;padding:14px;font-size:0.88rem;line-height:1.8;outline:none;" ' +
+            'data-placeholder="Corpo principale della trama — usa [[Link]], @Personaggio, #tag...">' + (t.corpo||'') + '</div>' +
           '</div>' +
-          '<select style="font-size:0.75rem;background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-sm);padding:3px 6px;color:var(--text-primary);" ' +
-
-            TIPI.map(tip => '<option value="' + tip + '"' + (t.tipo===tip?' selected':'') + '>' + tip + '</option>').join('') +
-          '</select>' +
-          '<select style="font-size:0.75rem;background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-sm);padding:3px 6px;color:' + (STATUS_COLORS[t.stato]||'var(--text-muted)') + ';" ' +
-
-            Object.keys(STATUS_COLORS).map(s => '<option value="' + s + '"' + (t.stato===s?' selected':'') + '>' + s + '</option>').join('') +
-          '</select>' +
-          '<input type="color" value="' + t.colore + '" style="width:28px;height:28px;border:none;border-radius:4px;cursor:pointer;padding:1px;" ' +
-
         '</div>' +
 
-        '<div style="padding:16px;display:grid;grid-template-columns:1fr 1fr;gap:12px;">' +
-
-          _field(t, 'obiettivo',      'Obiettivo / Premessa',     'Cosa vuole il DM ottenere con questa trama?', 'long') +
-          _field(t, 'png_chiave',     'PNG chiave',               '@PNG centrali in questa trama', 'short') +
-          _field(t, 'fazioni',        'Fazioni coinvolte',        '@Fazione', 'short') +
-          _field(t, 'location_chiave','Location principale',      '@Luogo', 'short') +
-          _field(t, 'twist',          'Colpo di scena / Twist',   'Il grande reveal o svolta prevista', 'long') +
-          _field(t, 'descrizione',    'Note e dettagli',          'Sviluppo, backstory, connessioni...', 'long') +
-
+        // Note
+        '<div style="margin-bottom:20px;">' +
+          '<div style="font-size:0.68rem;font-family:var(--font-display);text-transform:uppercase;' +
+          'letter-spacing:0.08em;color:var(--text-muted);margin-bottom:8px;">Note</div>' +
+          '<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);overflow:hidden;">' +
+            '<div id="trama-note" contenteditable="true" ' +
+            'style="min-height:100px;padding:14px;font-size:0.85rem;line-height:1.7;outline:none;" ' +
+            'data-placeholder="Note, idee, connessioni con altre trame...">' + (t.note||'') + '</div>' +
+          '</div>' +
         '</div>' +
 
-        (sessColleg.length ? '<div style="padding:0 16px 14px;">' +
-          '<div style="font-size:0.68rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;">Sessioni collegate</div>' +
-          '<div style="display:flex;flex-wrap:wrap;gap:4px;">' +
-            sessColleg.map(s => '<span onclick="WikiSections.goto(\'sessioni\');setTimeout(()=>WikiSections.openCard(\'sessioni\',\''+s.id+'\'),150)" ' +
-              'style="padding:2px 8px;background:' + t.colore + '22;color:' + t.colore + ';border-radius:var(--radius-full);font-size:0.75rem;cursor:pointer;">S' + s.numero + (s.titolo?' — '+s.titolo:'') + '</span>'
-            ).join('') +
-          '</div></div>' : '') +
-
+        // Salva
+        '<div style="display:flex;gap:8px;">' +
+          '<button class="btn btn-primary" onclick="Trame.saveCurrent()">Salva</button>' +
+          '<button class="btn btn-ghost" onclick="Trame.closeDetail()">← Torna alla lista</button>' +
+        '</div>' +
       '</div>';
-    }).join('');
+
+    // Autosave
+    const _autosave = () => setTimeout(() => Trame.saveCurrent(), 1500);
+    // Event delegation toolbar
+    document.querySelectorAll('.trama-tb').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var cmd = this.dataset.cmd;
+        if (cmd === 'h2' || cmd === 'h3') wikiFB(cmd);
+        else if (cmd === 'ul') wikiF('insertUnorderedList');
+        else if (cmd === 'ol') wikiF('insertOrderedList');
+        else wikiF(cmd);
+      });
+    });
+
+    document.getElementById('trama-titolo')?.addEventListener('input', _autosave);
+    document.getElementById('trama-categoria')?.addEventListener('change', _autosave);
+    document.getElementById('trama-stato')?.addEventListener('change', _autosave);
+    document.getElementById('trama-colore')?.addEventListener('change', _autosave);
+    document.getElementById('trama-corpo')?.addEventListener('input', _autosave);
+    document.getElementById('trama-note')?.addEventListener('input', _autosave);
   };
 
-  const _field = (t, key, label, hint, type) => {
-    const val = t[key] || '';
-    const isLong = type === 'long';
-    const input = isLong
-      ? '<textarea class="trama-field" data-id="' + t.id + '" data-key="' + key + '" rows="2" style="width:100%;background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-sm);padding:6px 8px;font-size:0.8rem;color:var(--text-primary);resize:vertical;font-family:inherit;box-sizing:border-box;" placeholder="' + hint + '">' + _esc(val) + '</textarea>'
-      : '<input type="text" class="trama-field" data-id="' + t.id + '" data-key="' + key + '" style="width:100%;background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-sm);padding:6px 8px;font-size:0.8rem;color:var(--text-primary);box-sizing:border-box;" placeholder="' + hint + '" value="' + _esc(val) + '">';
-    return '<div style="' + (isLong ? 'grid-column:1/-1;' : '') + '">' +
-      '<div style="font-size:0.65rem;font-family:var(--font-display);text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin-bottom:4px;">' + label + '</div>' +
-      input + '</div>';
+  // ── Salva trama corrente ──
+  const saveCurrent = () => {
+    if (!_currentId) return;
+    const trame = _getData();
+    const t = trame.find(function(x) { return x.id === _currentId; });
+    if (!t) return;
+    t.titolo    = document.getElementById('trama-titolo')?.value?.trim() || t.titolo;
+    t.categoria = document.getElementById('trama-categoria')?.value || t.categoria;
+    t.stato     = document.getElementById('trama-stato')?.value || t.stato;
+    t.colore    = document.getElementById('trama-colore')?.value || t.colore;
+    t.corpo     = document.getElementById('trama-corpo')?.innerHTML || t.corpo;
+    t.note      = document.getElementById('trama-note')?.innerHTML || t.note;
+    _save(trame);
   };
 
-  const _esc = (s) => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  // ── Torna alla lista ──
+  const closeDetail = () => {
+    if (_currentId) saveCurrent();
+    _currentId = null;
+    const list   = document.getElementById('trame-list');
+    const detail = document.getElementById('trame-detail');
+    if (list)   list.style.display   = '';
+    if (detail) detail.style.display = 'none';
+    renderList();
+  };
 
-  return { newArco, deleteArco, updateArco, render };
+  // ── Render entry point ──
+  const render = () => renderList();
+
+  return { newTrama, deleteTrama, openTrama, saveCurrent, closeDetail, render, renderList };
 })();
 
 const renderDashboard = () => {
