@@ -1813,7 +1813,7 @@
         <button class="btn btn-primary btn-sm" onclick="Storage.createSnapshot('Manuale');Toast.show('Snapshot salvato','success');renderSnapshotList();">
           + Salva snapshot ora
         </button>
-        <button class="btn btn-secondary btn-sm" onclick="BackupSystem.importFile && BackupSystem.importFile()">
+        <button class="btn btn-secondary btn-sm" onclick="BackupSystem.openImport()">
           📥 Importa backup
         </button>
         <button class="btn btn-ghost btn-sm" onclick="Storage.exportSnapshot()">
@@ -3851,6 +3851,7 @@ const openCampaign = (id) => {
   return {
     init,
     navigateTo,
+    applyTheme,
     toggleTheme,
     toggleSidebar,
     getActiveCampaign,
@@ -6910,7 +6911,7 @@ const Compendio = (() => {
   const deleteHomebrew = (id) => {
     const h = _getHomebrew().find(x => x.id === id);
     if (!h) return;
-    Modal.confirm('Elimina "' + h.nome + '"?', () => {
+    openConfirmModal('Elimina "' + h.nome + '"?', 'Questa azione non può essere annullata.', () => {
       _saveHomebrew(_getHomebrew().filter(x => x.id !== id));
       if (_activeTab === 'homebrew') render();
       Toast.show('Eliminato', 'info');
@@ -8098,7 +8099,7 @@ const Schermo = (() => {
     removeBlock, resizeBlock, moveBlock, editBlock, resetLayout,
     rollDie, generateMeteo, saveNote, advanceTime, refreshCombat,
     setCompendioRef, _refreshCombat, _refreshFavoriti, _swapBlocks,
-    _refreshNoteSessione, _avanzaTempo,
+    _refreshNoteSessione, _avanzaTempo, filterVelocita,
     startResize,
     _blocks: () => _blocks,
     _syncFromDOM: () => {
@@ -11282,7 +11283,7 @@ const GDrive = (() => {
   const acceptInvite = async (code) => null;
 
   return { init, toggleLogin, logout, saveToCloud, loadFromCloud, setClientId, onConnect,
-           showWelcomeIfNeeded, acceptInvite,
+           showWelcomeIfNeeded, acceptInvite, _updateBtn,
            get loggedIn() { return _loggedIn; },
            get token() { return _token; } };
 })();
@@ -11683,41 +11684,50 @@ const _mondoToWiki = (tipo, entita) => {
       const camp = App.getActiveCampaign();
       return (camp?.factions||[]).find(f => f.id === entita.factionId);
     })();
+    const razza = entita.race || entita.razza || '';
+    const ruolo = entita.job || entita.ruolo || '';
+    const personalita = entita.personality || entita.personalita || '';
+    const vuole = entita.wants || entita.vuole || '';
+    const segreto = entita.secret || entita.segreto || '';
+    const relazioni = entita.relazioni || entita.links || '';
     contenuto =
       '<h1>' + nome + '</h1>' +
-      '<p><strong>Razza:</strong> ' + (entita.race||'') +
-      ' &nbsp;|&nbsp; <strong>Ruolo:</strong> ' + (entita.job||'') +
+      '<p><strong>Razza:</strong> ' + razza +
+      ' &nbsp;|&nbsp; <strong>Ruolo:</strong> ' + ruolo +
       (faz ? ' &nbsp;|&nbsp; <strong>Fazione:</strong> <span class="nc-wikilink" data-link="fazione:'+faz.nome+'" onclick="wikiNavigateLink(\'fazione:'+faz.nome+'\')">[[⚔️ '+faz.nome+']]</span>' : '') +
       '</p>' +
-      '<p>#npc #png' + (entita.factionId ? '' : '') + (entita.race ? ' #'+entita.race.toLowerCase().replace(/\s+/g,'_') : '') + '</p>' +
+      '<p>#npc #png' + (entita.factionId ? '' : '') + (razza ? ' #'+razza.toLowerCase().replace(/\s+/g,'_') : '') + '</p>' +
       '<h2>Tratto caratteriale</h2>' +
-      '<p>' + (entita.trait || '') + '</p>' +
-      '<h2>Vuole / Offre</h2>' +
-      '<p><strong>Vuole:</strong> ' + (entita.wants||'...') + '<br>' +
-      '<strong>Offre:</strong> ' + (entita.offers||'...') + '</p>' +
-      (entita.secret ? '<h2>🔒 Segreto DM</h2><div class="wiki-callout wiki-callout-secret"><span class="wiki-callout-label">🔒 SEGRETO DM</span><p>' + entita.secret + '</p></div>' : '') +
+      '<p>' + personalita + '</p>' +
+      '<h2>Vuole</h2>' +
+      '<p>' + (vuole||'...') + '</p>' +
+      (segreto ? '<h2>🔒 Segreto DM</h2><div class="wiki-callout wiki-callout-secret"><span class="wiki-callout-label">🔒 SEGRETO DM</span><p>' + segreto + '</p></div>' : '') +
       '<h2>Legami</h2>' +
-      '<p>' + (entita.links || '') + '</p>';
+      '<p>' + relazioni + '</p>';
   }
 
   else if (tipo === 'luogo') {
+    const atmosfera = entita.atmosfera || entita.description || '';
+    const punti = entita.punti || '';
+    const noteLibere = entita.noteLibere || '';
     contenuto =
       '<h1>' + nome + '</h1>' +
       '<p><strong>Tipo:</strong> ' + (entita.tipo||'') + ' &nbsp;|&nbsp; #luogo' + (entita.tipo ? ' #'+entita.tipo : '') + '</p>' +
       '<h2>Descrizione</h2>' +
-      '<p>' + (entita.desc || '') + '</p>' +
-      (entita.poi ? '<h2>Punti di Interesse</h2><p>' + entita.poi + '</p>' : '') +
-      (entita.loot ? '<h2>💰 Loot</h2><div class="wiki-callout wiki-callout-loot"><span class="wiki-callout-label">💰 LOOT</span><p>' + entita.loot + '</p></div>' : '') +
-      (entita.note ? '<h2>Note DM</h2><blockquote>' + entita.note + '</blockquote>' : '');
+      '<p>' + atmosfera + '</p>' +
+      (punti ? '<h2>Punti di Interesse</h2><p>' + punti + '</p>' : '') +
+      (noteLibere ? '<h2>Note DM</h2><blockquote>' + noteLibere + '</blockquote>' : '');
   }
 
   else if (tipo === 'fazione') {
+    const obiettivo = entita.obiettivo || entita.description || '';
+    const noteLibere = entita.noteLibere || '';
     contenuto =
       '<h1>' + nome + '</h1>' +
       '<p>#fazione' + (entita.tipo ? ' #'+entita.tipo.toLowerCase().replace(/\s+/g,'_') : '') + '</p>' +
       '<h2>Obiettivi</h2>' +
-      '<p>' + (entita.obiettivi || '') + '</p>' +
-      (entita.note ? '<h2>Note DM</h2><div class="wiki-callout wiki-callout-secret"><span class="wiki-callout-label">🔒 SEGRETO DM</span><p>' + entita.note + '</p></div>' : '');
+      '<p>' + obiettivo + '</p>' +
+      (noteLibere ? '<h2>Note DM</h2><div class="wiki-callout wiki-callout-secret"><span class="wiki-callout-label">🔒 SEGRETO DM</span><p>' + noteLibere + '</p></div>' : '');
   }
 
   const now = Date.now();
@@ -11786,13 +11796,16 @@ const wikiToMondo = (notaId) => {
   if (tipo === 'npc') {
     const npcs = (camp.npcs||[]).map(n => {
       if (n.id !== nota.mondoId) return n;
+      const personalita = extractSection('Tratto') || n.personalita || n.personality || '';
+      const vuole = extractField('Vuole') || n.vuole || n.wants || '';
+      const segreto = extractSection('Segreto') || n.segreto || n.secret || '';
+      const relazioni = extractSection('Legami') || n.relazioni || n.links || '';
       return {
         ...n,
-        trait:  extractSection('Tratto') || n.trait,
-        wants:  extractField('Vuole') || n.wants,
-        offers: extractField('Offre') || n.offers,
-        secret: extractSection('Segreto') || n.secret,
-        links:  extractSection('Legami') || n.links,
+        personalita, personality: personalita,
+        vuole, wants: vuole,
+        segreto, secret: segreto,
+        relazioni, links: relazioni,
       };
     });
     App.saveActiveCampaign({ npcs });
@@ -11801,11 +11814,14 @@ const wikiToMondo = (notaId) => {
   else if (tipo === 'luogo') {
     const locations = (camp.locations||[]).map(l => {
       if (l.id !== nota.mondoId) return l;
+      const atmosfera = extractSection('Descrizione') || l.atmosfera || l.description || '';
+      const punti = extractSection('Punti di Interesse') || l.punti || '';
+      const noteLibere = extractSection('Note DM') || l.noteLibere || l.note || '';
       return {
         ...l,
-        desc: extractSection('Descrizione') || l.desc,
-        poi:  extractSection('Punti di Interesse') || l.poi,
-        note: extractSection('Note DM') || l.note,
+        atmosfera, description: atmosfera,
+        punti,
+        noteLibere,
       };
     });
     App.saveActiveCampaign({ locations });
@@ -11814,10 +11830,12 @@ const wikiToMondo = (notaId) => {
   else if (tipo === 'fazione') {
     const factions = (camp.factions||[]).map(f => {
       if (f.id !== nota.mondoId) return f;
+      const obiettivo = extractSection('Obiettivi') || f.obiettivo || f.description || '';
+      const noteLibere = extractSection('Note DM') || f.noteLibere || f.note || '';
       return {
         ...f,
-        obiettivi: extractSection('Obiettivi') || f.obiettivi,
-        note:      extractSection('Note DM') || f.note,
+        obiettivo, description: obiettivo,
+        noteLibere,
       };
     });
     App.saveActiveCampaign({ factions });
@@ -12022,12 +12040,8 @@ const GDriveUI = (() => {
     const camp = App.getActiveCampaign();
     if (!camp) { Toast.show('Nessuna campagna attiva', 'warning'); return; }
     Toast.show('Salvataggio su Drive...', 'info', 2000);
-    const ok = await GDrive.save(camp);
-    if (ok) {
-      Toast.show('✓ Campagna salvata su Drive', 'success', 2000);
-    } else {
-      Toast.show('Errore salvataggio Drive', 'error');
-    }
+    // GDrive.saveToCloud mostra gia' da sola il toast di successo/errore.
+    await GDrive.saveToCloud(camp);
   };
 
   const generateInvite = async () => {
@@ -15641,7 +15655,7 @@ const SessCtx = (() => {
     const npcs = (camp?.npcs || []).filter(n => npcIds.includes(n.id));
 
     const wikiSess = (camp?.wiki?.sessioni || []).find(s => s.sessioneId === sess?.id);
-    const extraNames = wikiSess ? (wikiSess.png || '').split(',').map(s => s.trim()).filter(Boolean) : [];
+    const extraNames = wikiSess ? (wikiSess.png || '').split(',').map(s => s.trim().replace(/^@/, '')).filter(Boolean) : [];
 
     if (!npcs.length && !extraNames.length) {
       container.innerHTML = '<div style="color:var(--text-muted);font-size:0.8rem;">Nessun PNG nella sessione attiva.<br>Aggiungili dalla scheda sessione in Wiki.</div>';
@@ -15668,7 +15682,7 @@ const SessCtx = (() => {
     if (!container) return;
 
     const luoghiStr = sess?.luoghi_visitati || '';
-    const luoghiNames = luoghiStr.split(',').map(s=>s.trim()).filter(Boolean);
+    const luoghiNames = luoghiStr.split(',').map(s=>s.trim().replace(/^@/, '')).filter(Boolean);
     const locs = (camp?.locations || []).filter(l => luoghiNames.includes(l.nome || l.name));
 
     if (!luoghiNames.length) {
@@ -18521,7 +18535,7 @@ const NoteSessione = (() => {
   };
 
   const clear = () => {
-    Modal.confirm('Cancella tutte le note sessione?', '', () => {
+    openConfirmModal('Cancella tutte le note sessione?', '', () => {
       _save([]);
       render();
     });
@@ -18791,7 +18805,7 @@ document.addEventListener('DOMContentLoaded', initMobileNav);
         </div>
         <div class="modal-body" id="wiki-tpl-list" style="max-height:60vh;overflow-y:auto;"></div>
         <div class="modal-footer">
-          <button class="btn btn-ghost" onclick="WikiDM._selectTemplate('tpl_libero',WikiDM._section);Modal.close('wiki-tpl')">Nota libera</button>
+          <button class="btn btn-ghost" onclick="WikiDM._createFromTpl('tpl_libero',WikiDM._section);Modal.close('wiki-tpl')">Nota libera</button>
           <button class="btn btn-ghost" onclick="Modal.close('wiki-tpl')">Annulla</button>
         </div>
       </div>
