@@ -39,11 +39,15 @@
   --shadow-lg:  0 8px 24px rgba(0,0,0,0.12);
   --shadow-xl:  0 16px 40px rgba(0,0,0,0.14);
 
-  /* Navbar */
-  --nav-bg:      #1a1714;
-  --nav-text:    #c8c0b5;
-  --nav-active:  #f5f2ee;
+  /* Navbar — chiara nel tema chiaro, coerente col resto dell'interfaccia */
+  --nav-bg:      #ede9e3;
+  --nav-text:    #4a4540;
+  --nav-active:  #1a1714;
   --nav-accent:  #8b2635;
+  --nav-overlay-weak:   rgba(0,0,0,0.05);
+  --nav-overlay-mid:    rgba(0,0,0,0.08);
+  --nav-overlay-strong: rgba(0,0,0,0.15);
+  --nav-label-color:    rgba(0,0,0,0.35);
 
   /* Tipografia */
   --font-display: 'Cinzel', serif;
@@ -96,6 +100,10 @@
   --nav-bg:      #0e0c0a;
   --nav-text:    #9a9088;
   --nav-active:  #f0ebe4;
+  --nav-overlay-weak:   rgba(255,255,255,0.04);
+  --nav-overlay-mid:    rgba(255,255,255,0.08);
+  --nav-overlay-strong: rgba(255,255,255,0.15);
+  --nav-label-color:    rgba(255,255,255,0.25);
 
   --shadow-sm:  0 1px 3px rgba(0,0,0,0.30);
   --shadow-md:  0 4px 12px rgba(0,0,0,0.35);

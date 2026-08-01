@@ -12082,6 +12082,34 @@ const wikiInsertImage = () => {
 
 const ExportPDF = (() => {
 
+  // jsPDF coi font di base (helvetica) non sa disegnare emoji/simboli fuori dal set
+  // WinAnsi: escono come caratteri corrotti (es. "Ø=Ý") e, peggio, il calcolo della
+  // larghezza usato per andare a capo si sballa, facendo uscire il testo dal foglio.
+  // Si ripulisce ogni stringa prima di scriverla nel PDF, mappando la punteggiatura
+  // "furba" (virgolette curve, trattini lunghi) a equivalenti ASCII e togliendo il resto.
+  const _pdfSafe = (text) => String(text == null ? '' : text)
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/[‘’]/g, "'")
+    .replace(/[“”]/g, '"')
+    .replace(/[–—]/g, '-')
+    .replace(/…/g, '...')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/[^\x00-\xFF]/g, '')
+    .replace(/[ \t]+/g, ' ')
+    .trim();
+
+  // Applicato ad ogni istanza di jsPDF creata: intercetta text()/splitTextToSize() cosi'
+  // TUTTE le chiamate (dirette o tramite gli helper title/h2/body/label qui sotto) passano
+  // automaticamente dalla sanificazione, senza dover ripetere _pdfSafe ad ogni call site.
+  const _makeSafe = (doc) => {
+    const origText = doc.text.bind(doc);
+    doc.text = (text, ...rest) => origText(Array.isArray(text) ? text.map(_pdfSafe) : _pdfSafe(text), ...rest);
+    const origSplit = doc.splitTextToSize.bind(doc);
+    doc.splitTextToSize = (text, ...rest) => origSplit(_pdfSafe(text), ...rest);
+    return doc;
+  };
+
   const exportCampagna = async () => {
     const camp = App.getActiveCampaign();
     if (!camp) { Toast.show('Nessuna campagna attiva', 'warning'); return; }
@@ -12094,7 +12122,7 @@ const ExportPDF = (() => {
     }
 
     const { jsPDF } = window.jspdf || { jsPDF };
-    const doc = new jsPDF({ orientation:'portrait', unit:'mm', format:'a4' });
+    const doc = _makeSafe(new jsPDF({ orientation:'portrait', unit:'mm', format:'a4' }));
     const pageW = 210, pageH = 297, margin = 15, contentW = pageW - margin*2;
     let y = margin;
 
@@ -12170,7 +12198,7 @@ const ExportPDF = (() => {
       separator();
     }
 
-    const STATO_QUEST_LABELS = { Attiva:'[→]', 'In sospeso':'[ ]', Completata:'[]', Fallita:'[]', Nascosta:'[ ]' };
+    const STATO_QUEST_LABELS = { Attiva:'[>]', 'In sospeso':'[ ]', Completata:'[X]', Fallita:'[!]', Nascosta:'[ ]' };
     const quests = camp.quests || [];
     if (quests.length) {
       h2('Quest');
@@ -12290,7 +12318,7 @@ const ExportPDF = (() => {
     }
 
     const { jsPDF } = window.jspdf || { jsPDF };
-    const doc = new jsPDF({ orientation:'portrait', unit:'mm', format:'a4' });
+    const doc = _makeSafe(new jsPDF({ orientation:'portrait', unit:'mm', format:'a4' }));
     const pageW = 210, pageH = 297, margin = 15, contentW = pageW - margin*2;
     let y = margin;
 
@@ -16336,16 +16364,17 @@ const WikiSections = (() => {
       '</div>' +
 
       (item.immagine && !isEdit ?
-        '<div style="position:relative;width:100%;height:180px;border-radius:var(--radius-md);overflow:hidden;margin-bottom:16px;background:var(--bg-secondary);">' +
+        '<div style="position:relative;width:100%;height:240px;border-radius:var(--radius-md);overflow:hidden;margin-bottom:16px;background:var(--bg-secondary);display:flex;align-items:center;justify-content:center;">' +
           '<img src="' + item.immagine + '" id="ws-inline-img" ' +
-          'style="position:absolute;cursor:move;max-width:none;max-height:none;width:auto;height:auto;min-height:100%;min-width:100%;object-fit:cover;top:0;left:0;user-select:none;" ' +
+          'style="max-width:100%;max-height:100%;object-fit:contain;cursor:zoom-in;user-select:none;" ' +
           'draggable="false" ' +
-          'onmousedown="InlineImgDrag.start(event,this)" ' +
-          'onclick="InlineImgDrag.click(event,this)" ' +
+          'onclick="ImageViewer.open(this.src)" ' +
           'onerror="this.parentElement.style.display=\'none\'" ' +
-          'title="Trascina per riposizionare · Clicca per ingrandire">' +
+          'title="Clicca per ingrandire">' +
           '<button onclick="ImageViewer.open(document.getElementById(\'ws-inline-img\').src)" ' +
-          'style="position:absolute;top:6px;right:6px;background:rgba(0,0,0,0.5);border:none;border-radius:var(--radius-sm);color:#fff;cursor:pointer;padding:3px 7px;font-size:0.7rem;z-index:2;">⤢ Ingrandisci</button>' +
+          'style="position:absolute;top:6px;right:6px;background:rgba(0,0,0,0.5);border:none;border-radius:var(--radius-sm);color:#fff;cursor:pointer;padding:3px 6px;z-index:2;display:flex;align-items:center;" title="Ingrandisci">' +
+          '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>' +
+          '</button>' +
           '</div>' : '') +
       (isEdit && (type === 'png' || type === 'luoghi' || type === 'fazioni' || type === 'pg') ?
         '<div class="form-group" style="margin-bottom:16px;">' +
@@ -16501,7 +16530,7 @@ const WikiSections = (() => {
   const _imgPreviewPlaceholder = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.35;"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>';
 
   const _imgPreviewHTML = (src) => src
-    ? '<img src="' + String(src).replace(/"/g,'&quot;') + '" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display=\'none\'">'
+    ? '<img src="' + String(src).replace(/"/g,'&quot;') + '" style="max-width:100%;max-height:100%;object-fit:contain;" onerror="this.style.display=\'none\'">'
     : _imgPreviewPlaceholder;
 
   // Aggiorna l'anteprima quando l'utente incolla/modifica l'URL a mano (il caricamento da
@@ -16887,52 +16916,6 @@ const wikiApplyHighlightWS = (color) => {
   WikiSections._manualSave?.();
 };
 
-const InlineImgDrag = (() => {
-  let _dragging = false;
-  let _startX = 0, _startY = 0;
-  let _imgLeft = 0, _imgTop = 0;
-  let _moved = false;
-
-  const start = (e, img) => {
-    if (e.button !== 0) return;
-    _dragging = true;
-    _moved = false;
-    _startX = e.clientX;
-    _startY = e.clientY;
-
-    _imgLeft = parseInt(img.style.left) || 0;
-    _imgTop  = parseInt(img.style.top)  || 0;
-    img.style.cursor = 'grabbing';
-    img.style.transition = 'none';
-
-    const onMove = (ev) => {
-      if (!_dragging) return;
-      const dx = ev.clientX - _startX;
-      const dy = ev.clientY - _startY;
-      if (Math.abs(dx) > 3 || Math.abs(dy) > 3) _moved = true;
-      img.style.left = (_imgLeft + dx) + 'px';
-      img.style.top  = (_imgTop  + dy) + 'px';
-    };
-    const onUp = () => {
-      _dragging = false;
-      img.style.cursor = 'move';
-      document.removeEventListener('mousemove', onMove);
-      document.removeEventListener('mouseup', onUp);
-    };
-    document.addEventListener('mousemove', onMove);
-    document.addEventListener('mouseup', onUp);
-    e.preventDefault();
-  };
-
-  const click = (e, img) => {
-
-    if (_moved) { _moved = false; return; }
-    ImageViewer.open(img.src);
-  };
-
-  return { start, click };
-})();
-
 const SessCtx = (() => {
   let _activeTab = 'note';
 
@@ -17123,8 +17106,15 @@ const Trame = (() => {
     trame.push(nuova);
     _save(trame);
     renderList();
-    // Apri subito la nuova trama
-    setTimeout(() => openTrama(nuova.id), 50);
+    // Apri subito la nuova trama, direttamente in modifica (e' vuota, non avrebbe senso
+    // mostrarne prima una vista di sola lettura) — come WikiSections.newCard per PNG/Luoghi.
+    setTimeout(() => {
+      const list   = document.getElementById('trame-list');
+      const detail = document.getElementById('trame-detail');
+      if (list)   list.style.display   = 'none';
+      if (detail) detail.style.display = '';
+      edit(nuova.id);
+    }, 50);
   };
 
   const deleteTrama = (id) => {
@@ -17214,6 +17204,8 @@ const Trame = (() => {
   };
 
   // ── Apri pagina dettaglio trama ──
+  // ── Apre una trama in sola lettura (stesso pattern di WikiSections: view di default,
+  //    "Modifica" per entrare in editing) — eccezione: newTrama() apre direttamente in edit ──
   const openTrama = (id) => {
     const trame = _getData();
     const t = trame.find(function(x) { return x.id === id; });
@@ -17225,11 +17217,58 @@ const Trame = (() => {
     if (list)   list.style.display   = 'none';
     if (detail) detail.style.display = '';
 
-    if (!detail) return;
-    const color = t.colore || CAT_COLORS[t.categoria] || 'var(--accent-primary)';
+    _showView(t);
+  };
 
-    detail.innerHTML =
-      '<div style="max-width:800px;margin:0 auto;padding:0 0 40px;">' +
+  const edit = (id) => {
+    const trame = _getData();
+    const t = trame.find(function(x) { return x.id === id; });
+    if (!t) return;
+    _currentId = id;
+    _showEdit(t);
+  };
+
+  const _renderView = (t) => {
+    const color = t.colore || CAT_COLORS[t.categoria] || 'var(--accent-primary)';
+    const statoColor = STATO_COLORS[t.stato] || 'var(--text-muted)';
+    return '<div style="max-width:800px;margin:0 auto;padding:0 0 40px;">' +
+
+      '<div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;flex-wrap:wrap;">' +
+        '<button onclick="Trame.closeDetail()" style="background:none;border:none;cursor:pointer;' +
+        'color:var(--text-muted);padding:4px 8px;font-size:0.85rem;display:flex;align-items:center;gap:4px;">' +
+        '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg> Trame</button>' +
+        '<div style="width:1px;height:16px;background:var(--border);"></div>' +
+        '<h2 style="font-family:var(--font-display);font-size:1.2rem;font-weight:700;margin:0;flex:1;min-width:200px;' +
+        'color:var(--text-primary);border-bottom:2px solid ' + color + ';padding-bottom:2px;">' + _esc(t.titolo||'Senza titolo') + '</h2>' +
+        (t.categoria ? '<span style="font-size:0.72rem;padding:3px 10px;background:' + color + '22;color:' + color + ';border:1px solid ' + color + '44;border-radius:var(--radius-full);">' + _esc(t.categoria) + '</span>' : '') +
+        (t.stato ? '<span style="font-size:0.72rem;padding:3px 10px;background:' + statoColor + '22;color:' + statoColor + ';border:1px solid ' + statoColor + '44;border-radius:var(--radius-full);">' + _esc(t.stato) + '</span>' : '') +
+      '</div>' +
+
+      (t.corpo ? '<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);padding:14px;margin-bottom:16px;font-size:0.88rem;line-height:1.8;">' + t.corpo + '</div>'
+               : '<div style="color:var(--text-muted);font-size:0.85rem;margin-bottom:16px;">Nessun contenuto ancora.</div>') +
+
+      (t.note ? '<div style="margin-bottom:20px;">' +
+        '<div style="font-size:0.68rem;font-family:var(--font-display);text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin-bottom:8px;">Note</div>' +
+        '<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);padding:14px;font-size:0.85rem;line-height:1.7;">' + t.note + '</div>' +
+        '</div>' : '') +
+
+      '<div style="display:flex;gap:8px;">' +
+        '<button class="btn btn-primary btn-sm" onclick="Trame.edit(\'' + t.id + '\')" style="display:flex;align-items:center;gap:4px;">' +
+          '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Modifica' +
+        '</button>' +
+        '<button class="btn btn-ghost btn-sm" style="color:var(--accent-danger);" onclick="Trame.deleteTrama(\'' + t.id + '\')">Elimina</button>' +
+      '</div>' +
+    '</div>';
+  };
+
+  const _showView = (t) => {
+    const detail = document.getElementById('trame-detail');
+    if (detail) detail.innerHTML = _renderView(t);
+  };
+
+  const _renderEdit = (t) => {
+    const color = t.colore || CAT_COLORS[t.categoria] || 'var(--accent-primary)';
+    return '<div style="max-width:800px;margin:0 auto;padding:0 0 40px;">' +
 
         // Header
         '<div style="display:flex;align-items:center;gap:10px;margin-bottom:24px;flex-wrap:wrap;">' +
@@ -17292,6 +17331,11 @@ const Trame = (() => {
           '<button class="btn btn-ghost" onclick="Trame.closeDetail()">← Torna alla lista</button>' +
         '</div>' +
       '</div>';
+  };
+
+  const _showEdit = (t) => {
+    const detail = document.getElementById('trame-detail');
+    if (detail) detail.innerHTML = _renderEdit(t);
 
     // Autosave
     const _autosave = () => setTimeout(() => Trame.saveCurrent(), 1500);
@@ -17328,9 +17372,13 @@ const Trame = (() => {
     t.note      = document.getElementById('trama-note')?.innerHTML || t.note;
     _save(trame);
     // Il salvataggio automatico (debounce a ogni input) usa la stessa funzione ma senza
-    // toast, altrimenti spammerebbe un avviso ad ogni carattere digitato: il feedback
-    // visibile è riservato al click esplicito sul pulsante "Salva".
-    if (explicit) Toast.show('Trama salvata', 'success', 1500);
+    // toast ne' cambio di vista, altrimenti interromperebbe la digitazione ad ogni carattere:
+    // il click esplicito su "Salva" e' l'unico che torna alla vista di sola lettura, come
+    // succede per PNG/Luoghi/Fazioni.
+    if (explicit) {
+      Toast.show('Trama salvata', 'success', 1500);
+      _showView(t);
+    }
   };
 
   // ── Torna alla lista ──
@@ -17347,7 +17395,7 @@ const Trame = (() => {
   // ── Render entry point ──
   const render = () => renderList();
 
-  return { newTrama, deleteTrama, openTrama, saveCurrent, closeDetail, render, renderList };
+  return { newTrama, deleteTrama, openTrama, edit, saveCurrent, closeDetail, render, renderList };
 })();
 
 const renderDashboard = () => {

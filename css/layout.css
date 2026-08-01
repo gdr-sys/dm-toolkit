@@ -2,33 +2,33 @@
 
 #sidebar { --sidebar-width-current: var(--sidebar-width, 240px); position:fixed; left:0; top:0; bottom:0; width:var(--nav-width); background:var(--nav-bg); display:flex; flex-direction:column; z-index:200; transition:width var(--transition-normal); overflow:hidden; }
 #sidebar.collapsed { width:var(--nav-collapsed); }
-.sidebar-logo { display:flex; align-items:center; gap:var(--space-sm); padding:var(--space-md); border-bottom:1px solid rgba(255,255,255,0.08); min-height:var(--header-height); text-decoration:none; }
+.sidebar-logo { display:flex; align-items:center; gap:var(--space-sm); padding:var(--space-md); border-bottom:1px solid var(--nav-overlay-mid); min-height:var(--header-height); text-decoration:none; }
 .logo-icon { width:32px; height:32px; flex-shrink:0; display:flex; align-items:center; justify-content:center; }
 .logo-text { font-family:var(--font-display); font-size:0.85rem; font-weight:700; color:var(--nav-active); letter-spacing:0.03em; white-space:nowrap; opacity:1; transition:opacity var(--transition-fast); }
 #sidebar.collapsed .logo-text { opacity:0; width:0; }
-.sidebar-campaign { padding:var(--space-sm) var(--space-md); background:rgba(255,255,255,0.04); border-bottom:1px solid rgba(255,255,255,0.06); min-height:48px; display:flex; align-items:center; gap:var(--space-sm); cursor:pointer; transition:background var(--transition-fast); }
-.sidebar-campaign:hover { background:rgba(255,255,255,0.08); }
+.sidebar-campaign { padding:var(--space-sm) var(--space-md); background:var(--nav-overlay-weak); border-bottom:1px solid var(--nav-overlay-weak); min-height:48px; display:flex; align-items:center; gap:var(--space-sm); cursor:pointer; transition:background var(--transition-fast); }
+.sidebar-campaign:hover { background:var(--nav-overlay-mid); }
 .campaign-dot { width:8px; height:8px; background:var(--accent-secondary); border-radius:50%; flex-shrink:0; animation:pulse 2s infinite; }
 .campaign-name { font-size:0.78rem; color:var(--nav-text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; flex:1; transition:opacity var(--transition-fast); }
 #sidebar.collapsed .campaign-name { opacity:0; width:0; }
 .nav-section { padding:var(--space-sm) 0; flex:1; overflow-y:auto; overflow-x:hidden; }
-.nav-section-label { font-family:var(--font-display); font-size:0.6rem; letter-spacing:0.12em; text-transform:uppercase; color:rgba(255,255,255,0.25); padding:var(--space-sm) var(--space-md) var(--space-xs); white-space:nowrap; overflow:hidden; transition:opacity var(--transition-fast); }
+.nav-section-label { font-family:var(--font-display); font-size:0.6rem; letter-spacing:0.12em; text-transform:uppercase; color:var(--nav-label-color); padding:var(--space-sm) var(--space-md) var(--space-xs); white-space:nowrap; overflow:hidden; transition:opacity var(--transition-fast); }
 #sidebar.collapsed .nav-section-label { opacity:0; }
 .nav-item { display:flex; align-items:center; gap:var(--space-md); padding:10px var(--space-md); color:var(--nav-text); text-decoration:none; cursor:pointer; transition:all var(--transition-fast); border:none; background:none; width:100%; text-align:left; border-radius:0; position:relative; white-space:nowrap; }
-.nav-item:hover, .nav-item:focus-visible { background:rgba(255,255,255,0.06); color:var(--nav-active); outline:none; }
+.nav-item:hover, .nav-item:focus-visible { background:var(--nav-overlay-weak); color:var(--nav-active); outline:none; }
 .nav-item.active { background:rgba(139,38,53,0.25); color:var(--nav-active); }
 .nav-item.active::before { content:''; position:absolute; left:0; top:0; bottom:0; width:3px; background:var(--accent-primary); border-radius:0 2px 2px 0; }
 .nav-icon { width:24px; height:24px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
 .nav-label { font-family:var(--font-display); font-size:0.78rem; font-weight:600; letter-spacing:0.03em; opacity:1; transition:opacity var(--transition-fast); }
 #sidebar.collapsed .nav-label { opacity:0; width:0; overflow:hidden; }
-.sidebar-footer { padding:var(--space-md); border-top:1px solid rgba(255,255,255,0.08); display:flex; gap:var(--space-sm); align-items:center; }
+.sidebar-footer { padding:var(--space-md); border-top:1px solid var(--nav-overlay-mid); display:flex; gap:var(--space-sm); align-items:center; }
 .sidebar-footer.collapsed-footer { flex-direction:column; gap:var(--space-xs); }
-.sidebar-toggle { width:36px; height:36px; background:rgba(255,255,255,0.08); border:none; border-radius:var(--radius-sm); color:var(--nav-text); cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all var(--transition-fast); flex-shrink:0; }
-.sidebar-toggle:hover { background:rgba(255,255,255,0.15); color:var(--nav-active); }
-/* Il pannello laterale resta scuro in entrambi i temi: i bottoni al suo interno devono
-   sempre usare i colori testo pensati per quello sfondo, non quelli del tema chiaro/scuro attivo */
+.sidebar-toggle { width:36px; height:36px; background:var(--nav-overlay-mid); border:none; border-radius:var(--radius-sm); color:var(--nav-text); cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all var(--transition-fast); flex-shrink:0; }
+.sidebar-toggle:hover { background:var(--nav-overlay-strong); color:var(--nav-active); }
+/* Il pannello laterale segue il tema chiaro/scuro attivo (vedi --nav-* in base.css): i bottoni
+   al suo interno usano sempre i colori --nav-text/--nav-active, mai quelli del tema di sfondo. */
 .sidebar-footer .btn-ghost { color:var(--nav-text); }
-.sidebar-footer .btn-ghost:hover:not(:disabled) { background:rgba(255,255,255,0.08); color:var(--nav-active); }
+.sidebar-footer .btn-ghost:hover:not(:disabled) { background:var(--nav-overlay-mid); color:var(--nav-active); }
 
 #main-content { margin-left:var(--nav-width); flex:1; min-height:100vh; display:flex; flex-direction:column; transition:margin-left var(--transition-normal); }
 #main-content.expanded { margin-left:var(--nav-collapsed); }
@@ -135,7 +135,7 @@
   #sidebar-overlay.active { display:block !important; }
   #main-content { margin-left:0 !important; padding-bottom:var(--mobile-nav-height); }
   #topbar { padding:env(safe-area-inset-top, 0px) var(--space-sm) 0; min-height:calc(var(--header-height) + env(safe-area-inset-top, 0px)); }
-  #mobile-nav { display:flex; position:fixed; bottom:0; left:0; right:0; height:var(--mobile-nav-height); background:var(--nav-bg); border-top:1px solid rgba(255,255,255,0.08); z-index:400; align-items:stretch; }
+  #mobile-nav { display:flex; position:fixed; bottom:0; left:0; right:0; height:var(--mobile-nav-height); background:var(--nav-bg); border-top:1px solid var(--nav-overlay-mid); z-index:400; align-items:stretch; }
   .mobile-nav-item { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; color:var(--nav-text); cursor:pointer; border:none; background:none; padding:4px 2px; transition:color var(--transition-fast); min-width:0; }
   .mobile-nav-item.active, .mobile-nav-item:hover { color:var(--nav-active); }
   .mobile-nav-icon { display:flex; align-items:center; justify-content:center; line-height:1; }
@@ -156,6 +156,12 @@
   .modal-overlay { align-items:center; padding:8px; padding-bottom:calc(var(--mobile-nav-height,56px) + 8px); }
   .npc-card { min-width:0; }
   .page-header { flex-direction:column; align-items:flex-start; }
+}
+
+/* La tab-bar sezioni Wiki in pagina serve solo su mobile (sidebar nel drawer, nascosta di
+   default): su desktop il sidebar ha gia' il sottomenu Wiki, la tab-bar sarebbe ridondante. */
+@media (min-width: 769px) {
+  #wiki-section-tabbar { display: none !important; }
 }
 
 @media (max-width: 480px) {
