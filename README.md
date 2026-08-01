@@ -86,7 +86,7 @@ Drag-and-drop grid layout with customizable blocks: party passive perceptions, q
 
 ### Utilities
 
-Always-accessible scratchpad in the topbar for in-session quick notes. PDF export of the full campaign (cover, NPCs, locations, factions, Wiki notes). JSON backup and restore per campaign or full data, with an optional automatic backup to the user's own Google Drive. 13 quick generators for improvisation at the table.
+Always-accessible scratchpad in the topbar for in-session quick notes. JSON backup and restore per campaign or full data, with an optional automatic backup to the user's own Google Drive. 13 quick generators for improvisation at the table.
 
 ---
 
@@ -126,8 +126,6 @@ Single HTML file. No framework, no bundler, no NPM dependencies.
 |---|---|---|
 | Firebase 10 compat | Auth + Realtime Database | CDN (optional) |
 | d3 v7 | Visual node graph | CDN |
-| jsPDF 2.5 | PDF export | CDN |
-| html2canvas 1.4 | Screenshots for PDF | CDN |
 | SortableJS 1.15 | Drag & drop DM Screen | CDN |
 
 ---

@@ -22,8 +22,6 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js" crossorigin="anonymous" onerror="console.warn('[DM] Firebase DB non caricato')"></script>
   <!-- Librerie CDN -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js" crossorigin="anonymous" onerror="console.warn('[DM] d3 non caricato')"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" crossorigin="anonymous" onerror="console.warn('[DM] jsPDF non caricato')"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" crossorigin="anonymous" onerror="console.warn('[DM] html2canvas non caricato')"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.2/Sortable.min.js" crossorigin="anonymous" onerror="console.warn('[DM] Sortable non caricato')"></script>
 <style>
 /* FIX SCHERMO DM — grid 5 colonne con span */
@@ -451,7 +449,6 @@
             <p class="page-subtitle" id="dash-ultima-sess-sub" style="margin:0;font-size:0.78rem;">Panoramica della campagna attiva</p>
           </div>
           <div style="display:flex;gap:6px;">
-            <button class="btn btn-ghost btn-sm" onclick="ExportPDF.exportCampagna()" title="Esporta"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></button>
             <button class="btn btn-ghost btn-sm" id="gdrive-btn" onclick="GDrive.toggleLogin()" style="display:none;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg></button>
           </div>
         </div>
@@ -3908,13 +3905,13 @@ const App = (() => {
     if (sun)  sun.style.display  = theme === 'dark' ? 'none'  : 'block';
     Storage.updateSettings({ theme });
 
-    // Uno sfondo personalizzato (Impostazioni > Aspetto) fissa i colori con uno stile
-    // inline sull'html, che vince sempre sulle variabili [data-theme]: col tema toggle
-    // non avrebbe alcun effetto visibile. Il cambio tema riporta quindi lo sfondo su
-    // "Default", cosi' chiaro/scuro funzionano sempre, qualunque sfondo fosse attivo.
+    // Uno sfondo personalizzato (Impostazioni > Aspetto) resta attivo attraverso il cambio
+    // tema, ma va ricalcolato: la sua luminosita' segue il tema chiaro/scuro appena scelto,
+    // il colore scelto resta solo la tonalita'. Cosi' il toggle ha sempre un effetto visibile
+    // invece di essere ignorato o di azzerare la scelta dell'utente.
     const bgColor = Storage.getSettings()?.bgColor;
     if (bgColor && bgColor !== 'default') {
-      try { Settings.setBg('default'); } catch(e) {}
+      try { Settings.reapplyBg(); } catch(e) {}
     }
 
     Debug.log(`Tema: ${theme}`);
@@ -12080,353 +12077,6 @@ const wikiInsertImage = () => {
   WikiDM.saveNote();
 };
 
-const ExportPDF = (() => {
-
-  // jsPDF coi font di base (helvetica) non sa disegnare emoji/simboli fuori dal set
-  // WinAnsi: escono come caratteri corrotti (es. "Ø=Ý") e, peggio, il calcolo della
-  // larghezza usato per andare a capo si sballa, facendo uscire il testo dal foglio.
-  // Si ripulisce ogni stringa prima di scriverla nel PDF, mappando la punteggiatura
-  // "furba" (virgolette curve, trattini lunghi) a equivalenti ASCII e togliendo il resto.
-  const _pdfSafe = (text) => String(text == null ? '' : text)
-    .replace(/<[^>]+>/g, ' ')
-    .replace(/[‘’]/g, "'")
-    .replace(/[“”]/g, '"')
-    .replace(/[–—]/g, '-')
-    .replace(/…/g, '...')
-    .replace(/&nbsp;/g, ' ')
-    .replace(/&amp;/g, '&')
-    .replace(/[^\x00-\xFF]/g, '')
-    .replace(/[ \t]+/g, ' ')
-    .trim();
-
-  // Applicato ad ogni istanza di jsPDF creata: intercetta text()/splitTextToSize() cosi'
-  // TUTTE le chiamate (dirette o tramite gli helper title/h2/body/label qui sotto) passano
-  // automaticamente dalla sanificazione, senza dover ripetere _pdfSafe ad ogni call site.
-  const _makeSafe = (doc) => {
-    const origText = doc.text.bind(doc);
-    doc.text = (text, ...rest) => origText(Array.isArray(text) ? text.map(_pdfSafe) : _pdfSafe(text), ...rest);
-    const origSplit = doc.splitTextToSize.bind(doc);
-    doc.splitTextToSize = (text, ...rest) => origSplit(_pdfSafe(text), ...rest);
-    return doc;
-  };
-
-  const exportCampagna = async () => {
-    const camp = App.getActiveCampaign();
-    if (!camp) { Toast.show('Nessuna campagna attiva', 'warning'); return; }
-
-    Toast.show('Generazione PDF in corso...', 'info', 3000);
-
-    if (typeof window.jspdf === 'undefined' && typeof jsPDF === 'undefined') {
-      _exportHTML(camp);
-      return;
-    }
-
-    const { jsPDF } = window.jspdf || { jsPDF };
-    const doc = _makeSafe(new jsPDF({ orientation:'portrait', unit:'mm', format:'a4' }));
-    const pageW = 210, pageH = 297, margin = 15, contentW = pageW - margin*2;
-    let y = margin;
-
-    const addPage = () => { doc.addPage(); y = margin; };
-    const checkY = (needed = 8) => { if (y + needed > pageH - margin) addPage(); };
-
-    const title = (text, size=16) => {
-      checkY(size/2 + 4);
-      doc.setFontSize(size);
-      doc.setFont('helvetica','bold');
-      doc.setTextColor(139,38,53);
-      doc.text(text, margin, y);
-      y += size/2 + 4;
-      doc.setTextColor(0,0,0);
-    };
-    const h2 = (text) => {
-      checkY(10);
-      doc.setFontSize(13);
-      doc.setFont('helvetica','bold');
-      doc.setTextColor(60,60,60);
-      doc.text(text, margin, y);
-      y += 7;
-      doc.setDrawColor(200,200,200);
-      doc.line(margin, y-2, pageW-margin, y-2);
-      y += 3;
-      doc.setTextColor(0,0,0);
-    };
-    const body = (text, indent=0) => {
-      if (!text) return;
-      doc.setFontSize(10);
-      doc.setFont('helvetica','normal');
-      doc.setTextColor(50,50,50);
-      const lines = doc.splitTextToSize(text, contentW - indent);
-      lines.forEach(line => { checkY(5); doc.text(line, margin+indent, y); y+=5; });
-      doc.setTextColor(0,0,0);
-    };
-    const label = (lbl, val, indent=4) => {
-      if (!val) return;
-      doc.setFontSize(9);
-      doc.setFont('helvetica','bold'); doc.text(lbl+':', margin+indent, y);
-      doc.setFont('helvetica','normal');
-      const x = margin + indent + doc.getTextWidth(lbl+': ');
-      const lines = doc.splitTextToSize(String(val), contentW - indent - doc.getTextWidth(lbl+': '));
-      doc.text(lines[0]||'', x, y); y += 5;
-      lines.slice(1).forEach(l => { checkY(5); doc.text(l, margin+indent+20, y); y+=5; });
-    };
-    const separator = () => { y += 4; doc.setDrawColor(230,230,230); doc.line(margin, y, pageW-margin, y); y += 6; };
-
-    doc.setFillColor(139,38,53);
-    doc.rect(0, 0, pageW, 60, 'F');
-    doc.setTextColor(255,255,255);
-    doc.setFontSize(28); doc.setFont('helvetica','bold');
-    doc.text(camp.name || 'Campagna', margin, 30);
-    doc.setFontSize(12); doc.setFont('helvetica','normal');
-    doc.text('DM Toolkit — Export campagna', margin, 42);
-    doc.setFontSize(10);
-    doc.text(new Date().toLocaleDateString('it-IT'), margin, 52);
-    doc.setTextColor(0,0,0);
-    y = 70;
-
-    const STATO_SESSIONE_LABELS = { pianificata:'Pianificata', in_corso:'In corso', giocata:'Giocata' };
-    const sessioni = [...(camp.sessioni_log || [])].sort((a,b) => (b.numero||0)-(a.numero||0));
-    if (sessioni.length) {
-      h2('Sessioni');
-      sessioni.forEach(s => {
-        checkY(12);
-        doc.setFontSize(11); doc.setFont('helvetica','bold');
-        doc.text('S'+(s.numero||'')+(s.titolo?' — '+s.titolo:'')+(s.data?' ('+s.data+')':''), margin+2, y); y += 6;
-        if (STATO_SESSIONE_LABELS[s.stato]) label('Stato', STATO_SESSIONE_LABELS[s.stato]);
-        if (s.recap) body(s.recap, 4);
-        y += 2;
-      });
-      separator();
-    }
-
-    const STATO_QUEST_LABELS = { Attiva:'[>]', 'In sospeso':'[ ]', Completata:'[X]', Fallita:'[!]', Nascosta:'[ ]' };
-    const quests = camp.quests || [];
-    if (quests.length) {
-      h2('Quest');
-      quests.forEach(q => {
-        checkY(12);
-        doc.setFontSize(11); doc.setFont('helvetica','bold');
-        const stato = STATO_QUEST_LABELS[q.stato] || '';
-        doc.text(stato + ' ' + (q.titolo||''), margin+2, y); y += 6;
-        if (q.obiettivo) body(q.obiettivo, 4);
-        if (q.ricompensa) { doc.setFontSize(9); doc.setFont('helvetica','italic'); doc.text('Ricompensa: '+q.ricompensa, margin+4, y); y+=5; }
-        y += 2;
-      });
-      separator();
-    }
-
-    const npcs = camp.npcs || [];
-    if (npcs.length) {
-      h2('PNG');
-      npcs.forEach(n => {
-        checkY(15);
-        doc.setFontSize(12); doc.setFont('helvetica','bold');
-        doc.text((n.name||n.nome||''), margin+2, y); y+=6;
-        label('Razza/Classe', [n.race||n.razza,n.job||n.ruolo].filter(Boolean).join(' · '));
-        if (n.personality||n.personalita) label('Personalità', n.personality||n.personalita);
-        if (n.wants||n.vuole) label('Vuole', n.wants||n.vuole);
-        const segreto = n.secret||n.segreto;
-        if (segreto) { doc.setFontSize(9); doc.setFont('helvetica','italic'); doc.setTextColor(139,38,53); doc.text('[Segreto DM] '+segreto, margin+4, y); y+=5; doc.setTextColor(0,0,0); }
-        y += 3;
-      });
-      separator();
-    }
-
-    const locs = camp.locations || [];
-    if (locs.length) {
-      h2('Luoghi');
-      locs.forEach(l => {
-        checkY(12);
-        doc.setFontSize(12); doc.setFont('helvetica','bold');
-        doc.text((l.nome||l.name||''), margin+2, y); y+=6;
-        if (l.tipo) label('Tipo', l.tipo);
-        const descLuogo = l.atmosfera||l.description;
-        if (descLuogo) body(descLuogo, 4);
-        y += 3;
-      });
-      separator();
-    }
-
-    const faz = camp.factions || [];
-    if (faz.length) {
-      h2('Fazioni');
-      faz.forEach(f => {
-        checkY(12);
-        doc.setFontSize(12); doc.setFont('helvetica','bold');
-        doc.text((f.nome||f.name||''), margin+2, y); y+=6;
-        const descFaz = f.obiettivo||f.description;
-        if (descFaz) body(descFaz, 4);
-        y += 3;
-      });
-      separator();
-    }
-
-    const wiki = camp.wiki || {};
-    ['lore','sessioni'].forEach(sec => {
-      const notes = wiki[sec] || [];
-      if (!notes.length) return;
-      h2(sec==='lore' ? 'Lore' : 'Sessioni');
-      notes.forEach(n => {
-        checkY(12);
-        doc.setFontSize(12); doc.setFont('helvetica','bold');
-        doc.text((n.titolo||'Senza titolo'), margin+2, y); y+=6;
-        if (n.contenuto) {
-          const plain = n.contenuto.replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim();
-          body(plain.slice(0,500) + (plain.length>500?'...':''), 4);
-        }
-        y += 3;
-      });
-      separator();
-    });
-
-    const filename = (camp.name||'campagna').replace(/[^a-zA-Z0-9]/g,'_') + '_' + new Date().toISOString().slice(0,10) + '.pdf';
-    doc.save(filename);
-    Toast.show('PDF esportato: '+filename, 'success', 3000);
-  };
-
-  const _exportHTML = (camp) => {
-    const win = window.open('', '_blank');
-    if (!win) { Toast.show('Popup bloccato — abilita i popup per il download', 'warning'); return; }
-    const sessioni = [...(camp.sessioni_log||[])].sort((a,b) => (b.numero||0)-(a.numero||0))
-      .map(s => `<h3>S${s.numero||''}${s.titolo?' — '+s.titolo:''}</h3><p>${s.recap||''}</p>`).join('');
-    const npcs = (camp.npcs||[]).map(n => `<h3>${n.name||n.nome||''}</h3><p>${n.personality||n.personalita||''} ${n.wants||n.vuole||''}</p>`).join('');
-    const quests = (camp.quests||[]).map(q => `<h3>${q.titolo||''}</h3><p>${q.obiettivo||''}</p>`).join('');
-    win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${camp.name||'Campagna'}</title>
-      <style>body{font-family:Georgia,serif;max-width:800px;margin:40px auto;color:#222}h1{color:#8b2635}h2{border-bottom:2px solid #8b2635;padding-bottom:4px}@media print{body{margin:0}}</style>
-</head>
-      <body><h1>${camp.name||'Campagna'}</h1>
-      <p><em>Export del ${new Date().toLocaleDateString('it-IT')}</em></p>
-      ${sessioni?'<h2>Sessioni</h2>'+sessioni:''}
-      ${quests?'<h2>Quest</h2>'+quests:''}
-      ${npcs?'<h2>PNG</h2>'+npcs:''}
-      <script>window.print();<\/script>
-</body></html>`);
-    win.document.close();
-  };
-
-  // ── Export PDF di una singola sessione (dal Session Log) ──
-  const exportSessione = async (id) => {
-    const camp = App.getActiveCampaign();
-    if (!camp) { Toast.show('Nessuna campagna attiva', 'warning'); return; }
-    const s = (camp.sessioni_log || []).find(x => x.id === id);
-    if (!s) { Toast.show('Sessione non trovata', 'warning'); return; }
-
-    Toast.show('Generazione PDF in corso...', 'info', 2000);
-
-    if (typeof window.jspdf === 'undefined' && typeof jsPDF === 'undefined') {
-      _exportSessioneHTML(camp, s);
-      return;
-    }
-
-    const { jsPDF } = window.jspdf || { jsPDF };
-    const doc = _makeSafe(new jsPDF({ orientation:'portrait', unit:'mm', format:'a4' }));
-    const pageW = 210, pageH = 297, margin = 15, contentW = pageW - margin*2;
-    let y = margin;
-
-    const addPage = () => { doc.addPage(); y = margin; };
-    const checkY = (needed = 8) => { if (y + needed > pageH - margin) addPage(); };
-    const h2 = (text) => {
-      checkY(10);
-      doc.setFontSize(13);
-      doc.setFont('helvetica','bold');
-      doc.setTextColor(60,60,60);
-      doc.text(text, margin, y);
-      y += 7;
-      doc.setDrawColor(200,200,200);
-      doc.line(margin, y-2, pageW-margin, y-2);
-      y += 3;
-      doc.setTextColor(0,0,0);
-    };
-    const body = (text, indent=0) => {
-      if (!text) return;
-      doc.setFontSize(10);
-      doc.setFont('helvetica','normal');
-      doc.setTextColor(50,50,50);
-      const plain = String(text).replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim();
-      const lines = doc.splitTextToSize(plain, contentW - indent);
-      lines.forEach(line => { checkY(5); doc.text(line, margin+indent, y); y+=5; });
-      doc.setTextColor(0,0,0);
-    };
-    const label = (lbl, val, indent=0) => {
-      if (!val) return;
-      checkY(6);
-      doc.setFontSize(9);
-      doc.setFont('helvetica','bold'); doc.text(lbl+':', margin+indent, y);
-      doc.setFont('helvetica','normal');
-      const x = margin + indent + doc.getTextWidth(lbl+': ');
-      const lines = doc.splitTextToSize(String(val), contentW - indent - doc.getTextWidth(lbl+': '));
-      doc.text(lines[0]||'', x, y); y += 5;
-      lines.slice(1).forEach(l => { checkY(5); doc.text(l, margin+indent+20, y); y+=5; });
-    };
-    const separator = () => { y += 4; doc.setDrawColor(230,230,230); doc.line(margin, y, pageW-margin, y); y += 6; };
-
-    const STATO_LABELS = { pianificata:'Pianificata', in_corso:'In corso', giocata:'Giocata' };
-
-    doc.setFillColor(139,38,53);
-    doc.rect(0, 0, pageW, 50, 'F');
-    doc.setTextColor(255,255,255);
-    doc.setFontSize(22); doc.setFont('helvetica','bold');
-    doc.text('Sessione '+(s.numero||'')+(s.titolo?' — '+s.titolo:''), margin, 26);
-    doc.setFontSize(11); doc.setFont('helvetica','normal');
-    doc.text((camp.name||'Campagna')+(s.data?' · '+s.data:''), margin, 38);
-    doc.setTextColor(0,0,0);
-    y = 60;
-
-    if (STATO_LABELS[s.stato]) label('Stato', STATO_LABELS[s.stato]);
-
-    const npcNames = (s.npcs||[]).map(nid => {
-      const n = (camp.npcs||[]).find(x => x.id === nid);
-      return n ? (n.name||n.nome||'') : '';
-    }).filter(Boolean);
-    if (npcNames.length) label('PNG coinvolti', npcNames.join(', '));
-    y += 3;
-
-    if (s.notePrep) { h2('Note di preparazione'); body(s.notePrep); separator(); }
-
-    if ((s.beats||[]).length) {
-      h2('Scene / Beat');
-      s.beats.forEach(b => {
-        checkY(10);
-        doc.setFontSize(10); doc.setFont('helvetica','bold');
-        doc.text((b.principale?'* ':'') + (b.titolo || b.tipo || ''), margin+2, y); y += 5;
-        if (b.note) body(b.note, 4);
-        y += 1;
-      });
-      separator();
-    }
-
-    if (s.recap) { h2('Recap'); body(s.recap); separator(); }
-
-    const filename = (camp.name||'campagna').replace(/[^a-zA-Z0-9]/g,'_') + '_sessione' + (s.numero||'') + '_' + new Date().toISOString().slice(0,10) + '.pdf';
-    doc.save(filename);
-    Toast.show('PDF esportato: '+filename, 'success', 3000);
-  };
-
-  const _exportSessioneHTML = (camp, s) => {
-    const win = window.open('', '_blank');
-    if (!win) { Toast.show('Popup bloccato — abilita i popup per il download', 'warning'); return; }
-    const STATO_LABELS = { pianificata:'Pianificata', in_corso:'In corso', giocata:'Giocata' };
-    const npcNames = (s.npcs||[]).map(nid => {
-      const n = (camp.npcs||[]).find(x => x.id === nid);
-      return n ? (n.name||n.nome||'') : '';
-    }).filter(Boolean);
-    const beats = (s.beats||[]).map(b => '<li>'+(b.principale?'<strong>':'')+(b.titolo||b.tipo||'')+(b.principale?'</strong>':'')+(b.note?' — '+b.note:'')+'</li>').join('');
-    win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Sessione ${s.numero||''} — ${camp.name||''}</title>
-      <style>body{font-family:Georgia,serif;max-width:800px;margin:40px auto;color:#222}h1{color:#8b2635}h2{border-bottom:2px solid #8b2635;padding-bottom:4px}@media print{body{margin:0}}</style>
-</head>
-      <body><h1>Sessione ${s.numero||''}${s.titolo?' — '+s.titolo:''}</h1>
-      <p><em>${camp.name||''}${s.data?' · '+s.data:''}${STATO_LABELS[s.stato]?' · '+STATO_LABELS[s.stato]:''}</em></p>
-      ${npcNames.length?'<p><strong>PNG coinvolti:</strong> '+npcNames.join(', ')+'</p>':''}
-      ${s.notePrep?'<h2>Note di preparazione</h2><p>'+s.notePrep+'</p>':''}
-      ${beats?'<h2>Scene / Beat</h2><ul>'+beats+'</ul>':''}
-      ${s.recap?'<h2>Recap</h2><p>'+s.recap+'</p>':''}
-      <script>window.print();<\/script>
-</body></html>`);
-    win.document.close();
-  };
-
-  return { exportCampagna, exportSessione };
-})();
-
 const GDrive = (() => {
 
   // Client ID OAuth condiviso dell'app (pubblico, autorizzato solo per gdr-sys.github.io) —
@@ -14722,9 +14372,6 @@ const SessioniLog = (() => {
                 '<button class="btn btn-ghost btn-sm" onclick="SessioniLog.createWikiNote(\''+s.id+'\')" style="font-size:0.72rem;">+ Nota Wiki</button>'
               ) +
               '<button class="btn btn-ghost btn-sm" onclick="SessioniLog.edit(\''+s.id+'\')" style="font-size:0.72rem;">✏️ Modifica</button>' +
-              '<button class="btn btn-ghost btn-sm" onclick="ExportPDF.exportSessione(\''+s.id+'\')" style="font-size:0.72rem;display:inline-flex;align-items:center;gap:4px;" title="Esporta questa sessione in PDF">' +
-                '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg> PDF' +
-              '</button>' +
               (s.stato !== 'giocata' ?
                 '<button class="btn btn-primary btn-sm" onclick="SessioniLog.setInCorso(\''+s.id+'\')" style="font-size:0.72rem;">▶ In corso</button>' : '') +
               '<button class="btn btn-ghost btn-sm" onclick="SessioniLog.remove(\''+s.id+'\')" style="font-size:0.72rem;color:var(--accent-danger);"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>' +
@@ -15262,30 +14909,40 @@ const Settings = (() => {
     const [r,g,b] = _hexToRgb(hex), [tr,tg,tb] = _hexToRgb(target);
     return _rgbToHex(r+(tr-r)*amt, g+(tg-g)*amt, b+(tb-b)*amt);
   };
-  const _luminance = (hex) => { const [r,g,b] = _hexToRgb(hex); return (0.299*r + 0.587*g + 0.114*b) / 255; };
-
   const BG_VARS = ['--bg-primary','--bg-secondary','--bg-tertiary','--bg-card','--bg-card-hover'];
   const TEXT_VARS = ['--text-primary','--text-secondary','--text-muted'];
   const BORDER_VARS = ['--border','--border-strong'];
+  const NAV_VARS = ['--nav-bg','--nav-text','--nav-active'];
 
+  // La luminosita' della palette segue il tema chiaro/scuro ATTIVO, non il colore scelto in
+  // se': lo sfondo personalizzato e' quindi una tonalita' (hue) applicata sopra il tema
+  // corrente, non un tema alternativo indipendente. Cosi' "Grigio medio" resta riconoscibile
+  // sia in chiaro che in scuro, e il toggle tema ha sempre effetto invece di essere ignorato.
+  // La sidebar (--nav-*) segue la stessa tonalita', leggermente piu' satura del contenuto.
   const _applyBgPalette = (baseHex) => {
     const root = document.documentElement.style;
-    const isDark = _luminance(baseHex) < 0.5;
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+
     const shades = isDark
-      ? [baseHex, _mix(baseHex,'#ffffff',0.06), _mix(baseHex,'#ffffff',0.12), _mix(baseHex,'#ffffff',0.09), _mix(baseHex,'#ffffff',0.16)]
-      : [baseHex, _mix(baseHex,'#000000',0.05), _mix(baseHex,'#000000',0.09), _mix(baseHex,'#ffffff',0.6), _mix(baseHex,'#000000',0.03)];
+      ? [_mix(baseHex,'#000000',0.55), _mix(baseHex,'#000000',0.45), _mix(baseHex,'#000000',0.35), _mix(baseHex,'#000000',0.50), _mix(baseHex,'#000000',0.40)]
+      : [_mix(baseHex,'#ffffff',0.88), _mix(baseHex,'#ffffff',0.82), _mix(baseHex,'#ffffff',0.76), _mix(baseHex,'#ffffff',0.94), _mix(baseHex,'#ffffff',0.88)];
     BG_VARS.forEach((v, i) => root.setProperty(v, shades[i]));
 
-    // Testo e bordi coerenti col contrasto dello sfondo scelto, indipendentemente dal tema chiaro/scuro attivo
     const text = isDark ? ['#f0ebe4','#c0b8ae','#9a9088'] : ['#1a1714','#4a4540','#7a736b'];
     TEXT_VARS.forEach((v, i) => root.setProperty(v, text[i]));
-    const borders = isDark ? ['#2e2a24','#3e3830'] : ['#d4cfc8','#b5aea5'];
+
+    const borders = isDark ? [_mix(baseHex,'#000000',0.25), _mix(baseHex,'#000000',0.15)] : [_mix(baseHex,'#000000',0.12), _mix(baseHex,'#000000',0.22)];
     BORDER_VARS.forEach((v, i) => root.setProperty(v, borders[i]));
+
+    const nav = isDark
+      ? [_mix(baseHex,'#000000',0.60), text[2], text[0]]
+      : [_mix(baseHex,'#ffffff',0.80), text[1], text[0]];
+    NAV_VARS.forEach((v, i) => root.setProperty(v, nav[i]));
   };
 
   const _clearBgPalette = () => {
     const root = document.documentElement.style;
-    [...BG_VARS, ...TEXT_VARS, ...BORDER_VARS].forEach(v => root.removeProperty(v));
+    [...BG_VARS, ...TEXT_VARS, ...BORDER_VARS, ...NAV_VARS].forEach(v => root.removeProperty(v));
   };
 
   const setBg = (key) => {
@@ -15302,6 +14959,14 @@ const Settings = (() => {
     });
   };
 
+  // Ricalcola lo sfondo personalizzato attivo (se c'e') per il tema chiaro/scuro appena
+  // impostato — chiamata da App.applyTheme ad ogni cambio tema.
+  const reapplyBg = () => {
+    const s = _getSettings();
+    const color = BG_COLORS[s.bgColor || 'default'];
+    if (color) _applyBgPalette(color);
+  };
+
   const _initBgUI = () => {
     const s = _getSettings();
     const currentBg = s.bgColor || 'default';
@@ -15310,7 +14975,7 @@ const Settings = (() => {
     });
   };
 
-  return { setFontSize, setTheme, setBg, setDensity, updateAuthInfo, open, init, _initBgUI };
+  return { setFontSize, setTheme, setBg, reapplyBg, setDensity, updateAuthInfo, open, init, _initBgUI };
 })();
 
 const DriveBackup = (() => {
