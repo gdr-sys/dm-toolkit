@@ -1814,15 +1814,23 @@
          PAGINA: SCHERMO DM
     ════════════════════════ -->
     <!-- PAGINA: TRAME -->
-    <section class="page" id="page-trame">
-      <div class="page-header">
-        <div>
-          <h1 class="page-title">Trame</h1>
-          <p class="page-subtitle">Scheletro narrativo — linee A, B, C e archi dei personaggi</p>
+    <section class="page" id="page-trame" style="padding:0;height:calc(100vh - var(--header-height));">
+
+      <!-- Lista trame -->
+      <div id="trame-list" style="height:100%;overflow-y:auto;padding:20px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:8px;">
+          <div>
+            <h2 style="font-family:var(--font-display);font-size:1.2rem;margin:0;">Trame</h2>
+            <p style="font-size:0.75rem;color:var(--text-muted);margin:4px 0 0;">Scheletro narrativo — linee A, B, C e archi dei personaggi</p>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="Trame.newTrama()">+ Nuova Trama</button>
         </div>
-        <button class="btn btn-primary" onclick="Trame.newTrama()">+ Nuova Trama</button>
+        <div id="trame-container"></div>
       </div>
-      <div id="trame-container" style="display:flex;flex-direction:column;gap:14px;"></div>
+
+      <!-- Dettaglio trama -->
+      <div id="trame-detail" style="display:none;height:100%;overflow-y:auto;padding:20px;"></div>
+
     </section>
 
 
@@ -3844,7 +3852,16 @@ const App = (() => {
         setTimeout(() => { try { WikiSections.renderCounters(); } catch(e) {} }, 100);
         break;
     case 'trame':
-        setTimeout(() => { try { Trame.renderList(); } catch(e) {} }, 100);
+        setTimeout(() => {
+        try {
+          Trame.renderList();
+          // Mostra lista, nascondi dettaglio
+          const tl = document.getElementById('trame-list');
+          const td = document.getElementById('trame-detail');
+          if (tl) tl.style.display = '';
+          if (td) td.style.display = 'none';
+        } catch(e) { console.error('Trame render:', e); }
+      }, 100);
         break;
     }
   };
