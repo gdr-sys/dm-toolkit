@@ -361,9 +361,6 @@
     <header id="topbar">
       <h1 class="topbar-title" id="topbar-title">Home</h1>
       <div class="topbar-actions" style="display:flex;align-items:center;gap:8px;">
-        <button id="topbar-settings-btn" title="Impostazioni" onclick="Settings.open()" style="display:none;background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:1.1rem;padding:4px 8px;border-radius:var(--radius-sm);">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-        </button>
         <button title="Scratchpad (note rapide)" onclick="Scratchpad.toggle()"
           style="background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:1.1rem;padding:4px 8px;border-radius:var(--radius-sm);transition:background 0.15s;"
           onmouseenter="this.style.background='var(--bg-tertiary)'" onmouseleave="this.style.background='none'">
@@ -395,6 +392,19 @@
       <div style="padding:6px 14px;border-top:1px solid var(--border);font-size:0.65rem;color:var(--text-muted);flex-shrink:0;">
         Salvato in locale · Ctrl+K per ricerca globale
       </div>
+    </div>
+
+    <!-- Tab-bar sezioni Wiki/Mondo: sempre visibile in pagina, non solo nel drawer -->
+    <div id="wiki-section-tabbar" class="tabs" style="display:none;margin:var(--space-sm) var(--space-lg) 0;overflow-x:auto;flex-wrap:nowrap;">
+      <button class="tab-btn" data-wiki-tab="png" onclick="WikiSections.goto('png')">PNG</button>
+      <button class="tab-btn" data-wiki-tab="luoghi" onclick="WikiSections.goto('luoghi')">Luoghi</button>
+      <button class="tab-btn" data-wiki-tab="fazioni" onclick="WikiSections.goto('fazioni')">Fazioni</button>
+      <button class="tab-btn" data-wiki-tab="lore" onclick="WikiSections.goto('lore')">Lore</button>
+      <button class="tab-btn" data-wiki-tab="sessioni" onclick="WikiSections.goto('sessioni')">Sessioni</button>
+      <button class="tab-btn" data-wiki-tab="quest" onclick="WikiSections.goto('quest')">Quest</button>
+      <button class="tab-btn" data-wiki-tab="pg" onclick="WikiSections.goto('pg')">PG</button>
+      <button class="tab-btn" data-wiki-tab="incontri" onclick="WikiSections.goto('incontri')">Incontri</button>
+      <button class="tab-btn" data-wiki-tab="trame" onclick="WikiSections.gotoTrame()">Trame</button>
     </div>
 
     <!-- ════════════════════════
@@ -3830,6 +3840,11 @@ const App = (() => {
       Debug.warn(`Elemento #page-${pageId} non trovato`);
     }
 
+    const wikiTabbar = document.getElementById('wiki-section-tabbar');
+    if (wikiTabbar && !pageId.startsWith('wiki-') && pageId !== 'trame') {
+      wikiTabbar.style.display = 'none';
+    }
+
     document.querySelectorAll('.nav-item').forEach(el => {
       el.classList.toggle('active', el.dataset.page === pageId);
     });
@@ -4137,10 +4152,11 @@ const openCampaign = (id) => {
     if (!camp) return;
     openConfirmModal(
       `Eliminare "${camp.name}"?`,
-      'Questa azione non può essere annullata. Tutti i dati della campagna verranno persi.',
+      'Questa azione non può essere annullata. Tutti i dati della campagna verranno persi, anche sugli altri dispositivi collegati.',
       () => {
         Storage.deleteCampaign(id);
         if (activeCampaign && activeCampaign.id === id) setActiveCampaign(null);
+        try { FirebaseSync.deleteCampaign?.(camp); } catch(e) {}
         renderHomePage();
         Toast.show('Campagna eliminata', 'info');
       }
@@ -13493,6 +13509,8 @@ const FirebaseSync = (() => {
           const pointer = campSnap.val();
           if (!pointer || !pointer.id) continue;
 
+          if (pointer.__deleted) { _handleRemoteDelete(pointer.id, key); continue; }
+
           // Controlla se serve scaricare PRIMA di andare su Drive, cosi' non si scarica
           // inutilmente una campagna gia' aggiornata in locale
           const local = Storage.getCampaign(pointer.id);
@@ -13597,6 +13615,7 @@ const FirebaseSync = (() => {
     _campRef.child('data').on('value', snap => {
       const remote = snap.val();
       if (!remote) return;
+      if (remote.__deleted) { _handleRemoteDelete(remote.id || campId, key); return; }
       if (remote.updatedAt <= (_lastSyncAt || 0)) return;
 
       if (remote.updatedBy === _user.uid) return;
@@ -13613,6 +13632,53 @@ const FirebaseSync = (() => {
     if (_campRef) { _campRef.off(); _campRef = null; }
     if (_presenceRef) { _presenceRef.remove(); _presenceRef = null; }
     _listening = false;
+  };
+
+  // Applica in locale una cancellazione arrivata da un altro dispositivo (tombstone __deleted
+  // su campagne/{key}/data). Rimuove anche il riferimento dall'indice dell'utente, cosi' i
+  // prossimi sync non ritrovano piu' questa campagna.
+  const _handleRemoteDelete = (campId, key) => {
+    if (!campId) return;
+    const hadLocal = !!Storage.getCampaign(campId);
+    if (hadLocal) Storage.deleteCampaign(campId);
+
+    if (_db && _user && !_user.isAnonymous && key) {
+      _db.ref('utenti/' + _user.uid + '/campagne/' + key).remove().catch(() => {});
+    }
+
+    const active = App.getActiveCampaign?.();
+    if (active && active.id === campId) {
+      App.setActiveCampaign(null);
+      _stopSync();
+      try { App.navigateTo('home'); } catch(e) {}
+    }
+
+    if (hadLocal) {
+      try { App.renderHomePage(); } catch(e) {}
+      Toast.show('Campagna eliminata da un altro dispositivo', 'info', 3000);
+    }
+  };
+
+  // Propaga la cancellazione di una campagna a Firebase (tombstone, non una semplice rimozione:
+  // cosi' i dispositivi ancora offline al momento della cancellazione la trovano comunque al
+  // prossimo sync) e ripulisce il file dedicato su Drive.
+  const deleteCampaign = async (camp) => {
+    if (!camp || !camp.id) return;
+    if (!_db || !_user || _user.isAnonymous) return;
+    const key = camp.shareCode || _campKey(camp.id);
+    try {
+      await _db.ref('campagne/' + key + '/data').set({
+        __deleted: true, id: camp.id,
+        deletedAt: firebase.database.ServerValue.TIMESTAMP,
+        deletedBy: _user.uid,
+      });
+      await _db.ref('utenti/' + _user.uid + '/campagne/' + key).remove();
+    } catch(e) {
+      Debug.warn('Propagazione eliminazione:', e.message);
+      Toast.show('Eliminazione non propagata al cloud: ' + e.message, 'error', 5000);
+    }
+    if (_campRef && _campRef.key === key) _stopSync();
+    try { if (typeof DriveBackup !== 'undefined') await DriveBackup.deleteFromDrive?.(camp.id); } catch(e) {}
   };
 
   // Se Drive e' collegato, i dati veri (con le immagini) vanno su Drive e Firebase riceve solo
@@ -13959,7 +14025,7 @@ const FirebaseSync = (() => {
     loginAnonymous, loginGoogle, loginEmail, registerEmail,
     useLocal, upgradeToGoogle, switchMode,
     syncNow, push, pushNow, flush, onCampagnaSaved, onCampagnaActivated,
-    getCampCode, copyCode, joinCampaign,
+    getCampCode, copyCode, joinCampaign, deleteCampaign,
   };
 })();
 
@@ -15147,6 +15213,16 @@ const DriveBackup = (() => {
     return await res.json();
   };
 
+  // Cancella il file dedicato di una campagna (se esiste) quando la campagna viene eliminata,
+  // cosi' non resta un file orfano sul Drive dell'utente.
+  const deleteFromDrive = async (campId) => {
+    if (!isConnected()) return;
+    const fileId = _getSyncFileId(campId);
+    if (!fileId) return;
+    try { await _driveFetch('drive/v3/files/' + fileId, { method: 'DELETE' }); } catch(e) {}
+    localStorage.removeItem(_syncFileIdKey(campId));
+  };
+
   const backupNow = async () => {
     if (!_connected) return;
     if (!GDrive.loggedIn || !GDrive.token) {
@@ -15393,7 +15469,7 @@ const DriveBackup = (() => {
   return {
     init, connect, connectFromWelcome, dismissWelcome, backupNow, disconnect, showWelcomeIfNeeded, _updateUI,
     listBackups, openRestoreModal, restoreBackup,
-    isConnected, syncToDrive, downloadFromDrive, uploadImage, replaceImagesWithDriveLinks,
+    isConnected, syncToDrive, downloadFromDrive, deleteFromDrive, uploadImage, replaceImagesWithDriveLinks,
   };
 })();
 
@@ -15871,7 +15947,16 @@ const WikiSections = (() => {
       if (chev) chev.style.transform = 'rotate(180deg)';
     }
 
+    _updateTabbar(type);
     renderList(type);
+  };
+
+  const _updateTabbar = (activeType) => {
+    const bar = document.getElementById('wiki-section-tabbar');
+    if (bar) bar.style.display = 'flex';
+    document.querySelectorAll('#wiki-section-tabbar .tab-btn').forEach(b => {
+      b.classList.toggle('active', b.dataset.wikiTab === activeType);
+    });
   };
 
   const renderList = (type) => {
@@ -16411,6 +16496,7 @@ const WikiSections = (() => {
       if (sub) sub.style.display = 'flex';
       if (chev) chev.style.transform = 'rotate(180deg)';
     }
+    _updateTabbar('trame');
   };
 
   const _renderDetailPub = (type, item, mode) => _renderDetail(type, item, mode);
@@ -19669,13 +19755,10 @@ const isMobile = () => window.innerWidth <= 768;
 
 const initMobileNav = () => {
   const mobileNav = document.getElementById('mobile-nav');
-  const settingsBtn = document.getElementById('topbar-settings-btn');
   if (isMobile()) {
     if (mobileNav) mobileNav.style.display = 'flex';
-    if (settingsBtn) settingsBtn.style.display = 'flex';
   } else {
     if (mobileNav) mobileNav.style.display = 'none';
-    if (settingsBtn) settingsBtn.style.display = 'none';
   }
 };
 
