@@ -4106,6 +4106,9 @@ const openCampaign = (id) => {
     const camp = Storage.getCampaign(id);
     if (!camp) { Toast.show('Campagna non trovata', 'error'); return; }
     setActiveCampaign(camp);
+    // Spinge subito i dati al cloud all'apertura, cosi' una campagna appena creata o importata
+    // non aspetta la prima modifica per comparire sugli altri dispositivi
+    try { FirebaseSync.onCampagnaSaved?.(camp); } catch(e) {}
 
     try { if (typeof Compendio !== 'undefined') Compendio.changeSistema(camp.system || '5e2024'); } catch(e) {}
     navigateTo('campagna');
