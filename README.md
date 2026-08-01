@@ -19,7 +19,8 @@ Campaign management web app for D&D 5e Dungeon Masters (2014 and 2024 editions).
 | Sessions | Combat tracker, scene planner, session log, clocks |
 | Compendium | SRD 5.1 + 5.2.1, homebrew, Wiki sync |
 | DM Screen | Drag & drop layout, customizable blocks |
-| Sync | Firebase realtime, local / anonymous / Google auth |
+| Sync | Firebase realtime, local / anonymous / Google auth, or Google Drive backup |
+| PWA | Installable on desktop and mobile, offline-capable |
 
 ---
 
@@ -49,6 +50,7 @@ The World and Wiki stay in sync automatically and bidirectionally:
 - Rename an entity → all `[[links]]` across all notes updated automatically
 - NPC card shows all Wiki notes that mention it, with direct navigation
 - "Update World" button on a linked note pushes changes back to the entity
+- Player Characters follow the same rule between the Party roster (Live Session) and the Wiki PG section: creating or editing a PC in either place updates the other
 
 ### World
 
@@ -64,7 +66,15 @@ NPC cards with full data: role, goals, DM secrets, morale, combat stats, relatio
 
 **Combat tracker** — initiative, HP, AC, conditions, concentration with automatic save DC. Effects with round countdown that auto-decrement each turn. Short and Long Rest with automatic resets.
 
+**Party** — player character roster with class, level, HP, AC, passive scores and inspiration, ready to drop into the combat tracker. Kept in sync with the Wiki PG section.
+
 **Clocks** — progress trackers for rituals, chases, faction pressure, and other timed narrative elements.
+
+### Storylines & Quests
+
+**Storylines** — narrative threads grouped by category (Main Plot, Plot B/C, character arcs, subplots, mysteries) with status tracking (ongoing, completed, on hold, abandoned) and a rich-text body per thread.
+
+**Quests** tracked in the Wiki alongside NPCs, Locations, and Factions, with wikilinks and full-text search.
 
 ### Compendium
 
@@ -76,7 +86,7 @@ Drag-and-drop grid layout with customizable blocks: party passive perceptions, q
 
 ### Utilities
 
-Always-accessible scratchpad in the topbar for in-session quick notes. PDF export of the full campaign (cover, NPCs, locations, factions, Wiki notes). JSON backup and restore per campaign or full data. 13 quick generators for improvisation at the table.
+Always-accessible scratchpad in the topbar for in-session quick notes. PDF export of the full campaign (cover, NPCs, locations, factions, Wiki notes). JSON backup and restore per campaign or full data, with an optional automatic backup to the user's own Google Drive. 13 quick generators for improvisation at the table.
 
 ---
 
@@ -95,6 +105,16 @@ Anonymous accounts can be upgraded to Google at any time without data loss via F
 **Real-time collaboration**
 
 Each campaign has a unique invite code. A co-author enters the code to access the same campaign on Firebase Realtime Database. Changes are pushed with a 2-second debounce. Merge strategy: Wiki notes use most-recent-wins per note; new NPCs are additive without overwriting locally-edited ones. Online presence is shown in the topbar.
+
+**Google Drive backup**
+
+An alternative to (or complement of) Firebase sync: campaigns are backed up as JSON files in a "DM Toolkit" folder on the user's own Google Drive, keeping Firebase usage light. Authentication uses a single shared, public OAuth Client ID configured for the live domain — users just click "Collega Drive" and pick their Google account, with no setup of their own required. Each user's backups stay private to their own Drive; the shared Client ID only identifies the app to Google, not the data.
+
+---
+
+## Installable app (PWA)
+
+DM Toolkit can be installed as a standalone app — "Install app" in Chrome/Edge on desktop, or "Add to Home Screen" on iOS/Android. A service worker caches the app shell for offline use (network-first, so updates are always picked up when online) and the toolkit ships its own icon for the browser tab, the installed app, and the phone home screen.
 
 ---
 
