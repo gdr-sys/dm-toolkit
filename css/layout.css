@@ -130,7 +130,9 @@
 @media (max-width: 768px) {
   :root { --nav-width:220px; --nav-collapsed:60px; --mobile-nav-height:56px; }
   #sidebar { display:none !important; }
-  #sidebar-overlay { display:none !important; }
+  #sidebar.mobile-open { display:flex !important; z-index:500; box-shadow:var(--shadow-xl); width:min(80vw, 300px); }
+  #sidebar-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:450; }
+  #sidebar-overlay.active { display:block !important; }
   #main-content { margin-left:0 !important; padding-bottom:var(--mobile-nav-height); }
   #topbar { padding:env(safe-area-inset-top, 0px) var(--space-sm) 0; min-height:calc(var(--header-height) + env(safe-area-inset-top, 0px)); }
   #mobile-nav { display:flex; position:fixed; bottom:0; left:0; right:0; height:var(--mobile-nav-height); background:var(--nav-bg); border-top:1px solid rgba(255,255,255,0.08); z-index:400; align-items:stretch; }
