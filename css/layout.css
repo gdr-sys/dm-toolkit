@@ -25,6 +25,10 @@
 .sidebar-footer.collapsed-footer { flex-direction:column; gap:var(--space-xs); }
 .sidebar-toggle { width:36px; height:36px; background:rgba(255,255,255,0.08); border:none; border-radius:var(--radius-sm); color:var(--nav-text); cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all var(--transition-fast); flex-shrink:0; }
 .sidebar-toggle:hover { background:rgba(255,255,255,0.15); color:var(--nav-active); }
+/* Il pannello laterale resta scuro in entrambi i temi: i bottoni al suo interno devono
+   sempre usare i colori testo pensati per quello sfondo, non quelli del tema chiaro/scuro attivo */
+.sidebar-footer .btn-ghost { color:var(--nav-text); }
+.sidebar-footer .btn-ghost:hover:not(:disabled) { background:rgba(255,255,255,0.08); color:var(--nav-active); }
 
 #main-content { margin-left:var(--nav-width); flex:1; min-height:100vh; display:flex; flex-direction:column; transition:margin-left var(--transition-normal); }
 #main-content.expanded { margin-left:var(--nav-collapsed); }
