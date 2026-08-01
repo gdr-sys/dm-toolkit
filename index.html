@@ -12208,8 +12208,8 @@ const ExportPDF = (() => {
 <div class="modal-overlay hidden" id="modal-gdrive-setup" style="display:none;" onclick="if(event.target===this)Modal.close('gdrive-setup')">
   <div class="modal" style="max-width:480px;">
     <div class="modal-header">
-      <h3 class="modal-title"> Configura Google Drive</h3>
-      <button class="btn btn-ghost btn-icon-sm" onclick="Modal.close('gdrive-setup')"></button>
+      <h3 class="modal-title">Configura Google Drive</h3>
+      <button class="btn btn-ghost btn-icon-sm" onclick="Modal.close('gdrive-setup')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
     <div class="modal-body" style="font-size:0.85rem;line-height:1.7;">
       <p>Per sincronizzare e collaborare tramite Google Drive ti serve un <strong>Client ID OAuth 2.0</strong> gratuito.</p>
@@ -12234,8 +12234,8 @@ const ExportPDF = (() => {
 <div class="modal-overlay hidden" id="modal-gdrive-options" style="display:none;" onclick="if(event.target===this)Modal.close('gdrive-options')">
   <div class="modal" style="max-width:440px;">
     <div class="modal-header">
-      <h3 class="modal-title"> Google Drive</h3>
-      <button class="btn btn-ghost btn-icon-sm" onclick="Modal.close('gdrive-options')"></button>
+      <h3 class="modal-title">Google Drive</h3>
+      <button class="btn btn-ghost btn-icon-sm" onclick="Modal.close('gdrive-options')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
     <div class="modal-body">
       <div id="gdrive-user-info" style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--bg-secondary);border-radius:var(--radius-md);margin-bottom:16px;">
@@ -12283,8 +12283,8 @@ const ExportPDF = (() => {
 <div class="modal-overlay hidden" id="modal-firebase-setup" style="display:none;" onclick="if(event.target===this)Modal.close('firebase-setup')">
   <div class="modal" style="max-width:520px;">
     <div class="modal-header">
-      <h3 class="modal-title"> Configura Firebase</h3>
-      <button class="btn btn-ghost btn-icon-sm" onclick="Modal.close('firebase-setup')"></button>
+      <h3 class="modal-title">Configura Firebase</h3>
+      <button class="btn btn-ghost btn-icon-sm" onclick="Modal.close('firebase-setup')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
     <div class="modal-body" style="font-size:0.85rem;line-height:1.7;">
       <p>Firebase è <strong>gratuito</strong> e permette collaborazione in tempo reale. Setup in 5 minuti:</p>
@@ -12411,8 +12411,8 @@ const ExportPDF = (() => {
 <div class="modal-overlay hidden" id="modal-collab" style="display:none;" onclick="if(event.target===this)Modal.close('collab')">
   <div class="modal" style="max-width:440px;">
     <div class="modal-header">
-      <h3 class="modal-title"> Collaborazione</h3>
-      <button class="btn btn-ghost btn-icon-sm" onclick="Modal.close('collab')"></button>
+      <h3 class="modal-title">Collaborazione</h3>
+      <button class="btn btn-ghost btn-icon-sm" onclick="Modal.close('collab')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
     <div class="modal-body">
       <!-- Info utente -->
@@ -12487,7 +12487,7 @@ const ExportPDF = (() => {
   <div class="modal" style="max-width:600px;">
     <div class="modal-header">
       <h3 class="modal-title" id="session-log-title">Nuova Sessione</h3>
-      <button class="btn btn-ghost btn-icon-sm" onclick="Modal.close('session-log')"></button>
+      <button class="btn btn-ghost btn-icon-sm" onclick="Modal.close('session-log')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
     <div class="modal-body" style="display:flex;flex-direction:column;gap:12px;">
       <input type="hidden" id="sl-id">
@@ -12548,7 +12548,7 @@ const ExportPDF = (() => {
   <div class="modal" style="max-width:520px;max-height:90vh;overflow-y:auto;">
     <div class="modal-header" style="position:sticky;top:0;background:var(--bg-card);z-index:1;">
       <h3 class="modal-title">Impostazioni</h3>
-      <button class="btn btn-ghost btn-icon-sm" onclick="Modal.close('settings')"></button>
+      <button class="btn btn-ghost btn-icon-sm" onclick="Modal.close('settings')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
     <div class="modal-body" style="display:flex;flex-direction:column;gap:20px;padding:20px;">
 
@@ -12817,17 +12817,18 @@ const ExportPDF = (() => {
 const GDrive = (() => {
 
   let CLIENT_ID = localStorage.getItem('dm_gdrive_client_id') || '';
-  const SCOPES = 'https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/drive.readonly';
+  const SCOPES = 'https://www.googleapis.com/auth/drive.file';
   const FILE_NAME = 'dm-toolkit-campagna.json';
 
-  let _loggedIn = false;
-  let _fileId = null;
-  let _userInfo = null;
+  let _loggedIn  = false;
+  let _fileId    = null;
+  let _userInfo  = null;
+  let _token     = null;
+  let _tokenClient = null;
 
   const init = () => {
     const btn = document.getElementById('gdrive-btn');
     if (btn) btn.style.display = '';
-
     _fileId = localStorage.getItem('dm_gdrive_fileid') || null;
     const savedId = localStorage.getItem('dm_gdrive_client_id');
     if (savedId) CLIENT_ID = savedId;
@@ -12837,12 +12838,13 @@ const GDrive = (() => {
   const _updateBtn = () => {
     const btn = document.getElementById('gdrive-btn');
     if (!btn) return;
+    const SVG = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg>';
     if (_loggedIn && _userInfo) {
-      btn.textContent = '☁️ ' + (_userInfo.name?.split(' ')[0] || 'Drive');
-      btn.title = 'Connesso come ' + _userInfo.email + ' — clicca per opzioni';
+      btn.innerHTML = SVG + ' ' + (_userInfo.name?.split(' ')[0] || 'Drive');
+      btn.title  = 'Connesso come ' + _userInfo.email;
       btn.style.color = 'var(--accent-secondary)';
     } else {
-      btn.textContent = '☁️ Drive';
+      btn.innerHTML = SVG + ' Drive';
       btn.title = 'Connetti Google Drive';
       btn.style.color = '';
     }
@@ -12854,137 +12856,136 @@ const GDrive = (() => {
     else { _login(); }
   };
 
-  const _login = async () => {
-    if (!window.gapi) {
-      Toast.show('Aggiungi prima il Client ID (clicca ☁️ Drive)', 'warning', 3000);
-      Modal.open('gdrive-setup');
-      return;
+  const _login = () => {
+    if (!window.google?.accounts?.oauth2) {
+      // Carica GIS dinamicamente
+      const s = document.createElement('script');
+      s.src = 'https://accounts.google.com/gsi/client';
+      s.onload = () => _doLogin();
+      document.head.appendChild(s);
+    } else {
+      _doLogin();
     }
+  };
+
+  const _doLogin = () => {
+    if (!CLIENT_ID) { Modal.open('gdrive-setup'); return; }
     try {
-      await gapi.auth2.getAuthInstance().signIn();
-      _loggedIn = true;
-      const profile = gapi.auth2.getAuthInstance().currentUser.get().getBasicProfile();
-      _userInfo = { name: profile.getName(), email: profile.getEmail(), picture: profile.getImageUrl() };
-      _updateBtn();
-      Toast.show('✓ Connesso come ' + _userInfo.name, 'success', 2000);
+      _tokenClient = google.accounts.oauth2.initTokenClient({
+        client_id: CLIENT_ID,
+        scope: SCOPES,
+        callback: async (resp) => {
+          if (resp.error) {
+            Toast.show('Login fallito: ' + resp.error, 'error');
+            return;
+          }
+          _token = resp.access_token;
+          _loggedIn = true;
+          // Recupera info utente
+          try {
+            const r = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+              headers: { Authorization: 'Bearer ' + _token }
+            });
+            const info = await r.json();
+            _userInfo = { name: info.name, email: info.email, picture: info.picture };
+          } catch(e) {}
+          _updateBtn();
+          Toast.show('Connesso come ' + (_userInfo?.name || 'Drive'), 'success', 2000);
+        },
+      });
+      _tokenClient.requestAccessToken();
     } catch(e) {
-      Toast.show('Login fallito: ' + (e.error || e.message), 'error');
+      Toast.show('Errore login Drive: ' + e.message, 'error');
     }
   };
 
   const logout = () => {
-    if (window.gapi) gapi.auth2.getAuthInstance().signOut();
+    if (_token) google.accounts.oauth2.revoke(_token, () => {});
     _loggedIn = false;
+    _token    = null;
     _userInfo = null;
-    _fileId = null;
+    _fileId   = null;
     localStorage.removeItem('dm_gdrive_fileid');
     _updateBtn();
-    Toast.show('Disconnesso da Google Drive', 'info');
-    Modal.close('gdrive-options');
+    Toast.show('Disconnesso da Drive', 'info');
   };
 
-  const save = async (campagna) => {
-    if (!_loggedIn) return false;
+  const _getHeaders = () => ({ Authorization: 'Bearer ' + _token, 'Content-Type': 'application/json' });
+
+  const saveToCloud = async (data) => {
+    if (!_loggedIn || !_token) { Toast.show('Connetti Google Drive prima', 'warning'); return; }
     try {
-      const body = JSON.stringify({ campagna, savedAt: Date.now(), version: 1 });
+      const body = JSON.stringify(data);
+      let res;
       if (_fileId) {
-        await gapi.client.request({
-          path: '/upload/drive/v3/files/' + _fileId,
+        res = await fetch('https://www.googleapis.com/upload/drive/v3/files/' + _fileId + '?uploadType=media', {
           method: 'PATCH',
-          params: { uploadType: 'media' },
+          headers: { Authorization: 'Bearer ' + _token, 'Content-Type': 'application/json' },
           body,
         });
       } else {
-        const res = await gapi.client.drive.files.create({
-          resource: { name: FILE_NAME, mimeType: 'application/json' },
-          media: { mimeType: 'application/json', body },
-          fields: 'id, webViewLink',
+        const meta = await fetch('https://www.googleapis.com/drive/v3/files', {
+          method: 'POST',
+          headers: _getHeaders(),
+          body: JSON.stringify({ name: FILE_NAME, mimeType: 'application/json' }),
         });
-        _fileId = res.result.id;
+        const metaJson = await meta.json();
+        _fileId = metaJson.id;
         localStorage.setItem('dm_gdrive_fileid', _fileId);
+        res = await fetch('https://www.googleapis.com/upload/drive/v3/files/' + _fileId + '?uploadType=media', {
+          method: 'PATCH',
+          headers: { Authorization: 'Bearer ' + _token, 'Content-Type': 'application/json' },
+          body,
+        });
       }
-      return true;
+      if (res.ok) Toast.show('Salvato su Drive', 'success', 2000);
+      else Toast.show('Errore salvataggio Drive', 'error');
     } catch(e) {
-      Debug.warn('GDrive save error:', e);
-      return false;
+      Toast.show('Errore Drive: ' + e.message, 'error');
     }
   };
 
-  const load = async (fileId) => {
-    if (!_loggedIn) return null;
+  const loadFromCloud = async () => {
+    if (!_loggedIn || !_token) { Toast.show('Connetti Google Drive prima', 'warning'); return null; }
     try {
-      const fid = fileId || _fileId;
-      if (!fid) return null;
-      const res = await gapi.client.drive.files.get({ fileId: fid, alt: 'media' });
-      return res.result;
-    } catch(e) {
-      Debug.warn('GDrive load error:', e);
-      return null;
-    }
-  };
-
-  const generateInvite = async () => {
-    if (!_loggedIn) { Toast.show('Connettiti prima a Google Drive', 'warning'); return null; }
-    if (!_fileId) { Toast.show('Salva prima la campagna su Drive', 'warning'); return null; }
-    try {
-
-      await gapi.client.drive.permissions.create({
-        fileId: _fileId,
-        resource: { role: 'writer', type: 'anyone' },
+      // Cerca il file per nome se non abbiamo fileId
+      if (!_fileId) {
+        const q = encodeURIComponent("name='" + FILE_NAME + "' and trashed=false");
+        const r = await fetch('https://www.googleapis.com/drive/v3/files?q=' + q + '&fields=files(id,name)', {
+          headers: { Authorization: 'Bearer ' + _token }
+        });
+        const list = await r.json();
+        if (list.files?.length) {
+          _fileId = list.files[0].id;
+          localStorage.setItem('dm_gdrive_fileid', _fileId);
+        } else {
+          Toast.show('Nessuna campagna su Drive', 'info'); return null;
+        }
+      }
+      const r = await fetch('https://www.googleapis.com/drive/v3/files/' + _fileId + '?alt=media', {
+        headers: { Authorization: 'Bearer ' + _token }
       });
-
-      const code = btoa(_fileId).replace(/=/g,'').slice(0,16).toUpperCase();
-
-      const invites = JSON.parse(localStorage.getItem('dm_invites') || '{}');
-      invites[code] = _fileId;
-      localStorage.setItem('dm_invites', JSON.stringify(invites));
-      return { code, fileId: _fileId };
+      if (!r.ok) { Toast.show('Errore lettura Drive', 'error'); return null; }
+      return await r.json();
     } catch(e) {
-      Debug.warn('GDrive invite error:', e);
+      Toast.show('Errore Drive: ' + e.message, 'error');
       return null;
     }
   };
 
-  const acceptInvite = async (code) => {
-    if (!_loggedIn) { await _login(); if (!_loggedIn) return false; }
-
-    let fileId = null;
-
-    const invites = JSON.parse(localStorage.getItem('dm_invites') || '{}');
-    if (invites[code]) { fileId = invites[code]; }
-    else {
-
-      try { fileId = atob(code + '=='.slice(0, (4 - code.length % 4) % 4)); } catch(e) {}
-    }
-    if (!fileId) {
-
-      fileId = code;
-    }
-    try {
-      const data = await load(fileId);
-      if (!data?.campagna) { Toast.show('Codice non valido o campagna non trovata', 'error'); return false; }
-      _fileId = fileId;
-      localStorage.setItem('dm_gdrive_fileid', fileId);
-      return data.campagna;
-    } catch(e) {
-      Toast.show('Errore accesso: ' + (e.message||''), 'error');
-      return false;
-    }
-  };
-
-  const _saveClientId = () => {
-    const id = document.getElementById('gdrive-client-id-input')?.value?.trim();
-    if (!id) { Toast.show('Inserisci il Client ID', 'warning'); return; }
-    CLIENT_ID = id;
-    localStorage.setItem('dm_gdrive_client_id', id);
+  const setClientId = (id) => {
+    CLIENT_ID = id.trim();
+    localStorage.setItem('dm_gdrive_client_id', CLIENT_ID);
     Modal.close('gdrive-setup');
-    Toast.show('Client ID salvato — ricarica la pagina', 'success', 3000);
+    Toast.show('Client ID salvato — prova a connettere Drive', 'success', 3000);
   };
 
-  const isLoggedIn = () => _loggedIn;
-  const getFileId = () => _fileId;
+  const showWelcomeIfNeeded = () => {};
+  const acceptInvite = async (code) => null;
 
-  return { init, toggleLogin, logout, save, load, generateInvite, acceptInvite, isLoggedIn, getFileId, _saveClientId };
+  return { init, toggleLogin, logout, saveToCloud, loadFromCloud, setClientId,
+           showWelcomeIfNeeded, acceptInvite,
+           get loggedIn() { return _loggedIn; } };
 })();
 
 let _wikiViewMode = 'view';
@@ -20010,7 +20011,7 @@ document.addEventListener('DOMContentLoaded', initMobileNav);
     <div id="modal-wiki-tpl" class="modal-overlay" style="display:none;" onclick="if(event.target===this)Modal.close('wiki-tpl')">
       <div class="modal" style="max-width:380px;">
         <div class="modal-header">
-          <h3 class="modal-title">📄 Scegli template</h3>
+          <h3 class="modal-title">Scegli template</h3>
           <button class="btn btn-ghost btn-icon-sm" onclick="Modal.close('wiki-tpl')">✕</button>
         </div>
         <div class="modal-body" id="wiki-tpl-list" style="max-height:60vh;overflow-y:auto;"></div>
@@ -20043,7 +20044,7 @@ document.addEventListener('DOMContentLoaded', initMobileNav);
 <div class="modal-overlay hidden" id="modal-gdrive-setup" style="display:none;" onclick="if(event.target===this)Modal.close('gdrive-setup')">
   <div class="modal" style="max-width:480px;">
     <div class="modal-header">
-      <h3 class="modal-title">☁️ Configura Google Drive</h3>
+      <h3 class="modal-title">Configura Google Drive</h3>
       <button class="btn btn-ghost btn-icon-sm" onclick="Modal.close('gdrive-setup')">✕</button>
     </div>
     <div class="modal-body" style="font-size:0.85rem;line-height:1.7;">
@@ -20069,7 +20070,7 @@ document.addEventListener('DOMContentLoaded', initMobileNav);
 <div class="modal-overlay hidden" id="modal-gdrive-options" style="display:none;" onclick="if(event.target===this)Modal.close('gdrive-options')">
   <div class="modal" style="max-width:440px;">
     <div class="modal-header">
-      <h3 class="modal-title">☁️ Google Drive</h3>
+      <h3 class="modal-title">Google Drive</h3>
       <button class="btn btn-ghost btn-icon-sm" onclick="Modal.close('gdrive-options')">✕</button>
     </div>
     <div class="modal-body">
@@ -20118,7 +20119,7 @@ document.addEventListener('DOMContentLoaded', initMobileNav);
 <div class="modal-overlay hidden" id="modal-firebase-setup" style="display:none;" onclick="if(event.target===this)Modal.close('firebase-setup')">
   <div class="modal" style="max-width:520px;">
     <div class="modal-header">
-      <h3 class="modal-title">🔥 Configura Firebase</h3>
+      <h3 class="modal-title">Configura Firebase</h3>
       <button class="btn btn-ghost btn-icon-sm" onclick="Modal.close('firebase-setup')">✕</button>
     </div>
     <div class="modal-body" style="font-size:0.85rem;line-height:1.7;">
@@ -20155,7 +20156,7 @@ document.addEventListener('DOMContentLoaded', initMobileNav);
 <div class="modal-overlay hidden" id="modal-auth-choice" style="display:none;" onclick="if(event.target===this)Modal.close('auth-choice')">
   <div class="modal" style="max-width:480px;">
     <div class="modal-header">
-      <h3 class="modal-title">🎲 Benvenuto nel DM Toolkit</h3>
+      <h3 class="modal-title">Benvenuto nel DM Toolkit</h3>
       <button class="btn btn-ghost btn-icon-sm" onclick="Modal.close('auth-choice')">✕</button>
     </div>
     <div class="modal-body" style="display:flex;flex-direction:column;gap:10px;padding:20px;">
@@ -20228,7 +20229,7 @@ document.addEventListener('DOMContentLoaded', initMobileNav);
 <div class="modal-overlay hidden" id="modal-collab" style="display:none;" onclick="if(event.target===this)Modal.close('collab')">
   <div class="modal" style="max-width:440px;">
     <div class="modal-header">
-      <h3 class="modal-title">👥 Collaborazione</h3>
+      <h3 class="modal-title">Collaborazione</h3>
       <button class="btn btn-ghost btn-icon-sm" onclick="Modal.close('collab')">✕</button>
     </div>
     <div class="modal-body">
