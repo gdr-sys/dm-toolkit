@@ -187,6 +187,11 @@ a:hover { color: var(--accent-secondary); }
 .hidden  { display: none !important; }
 .visible { display: block; }
 
+.badge,
+[style*="border-radius:var(--radius-full)"] {
+  white-space: nowrap;
+}
+
 .badge {
   display: inline-flex;
   align-items: center;
