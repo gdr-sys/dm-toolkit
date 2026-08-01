@@ -359,9 +359,6 @@
 
     <!-- Topbar -->
     <header id="topbar">
-      <button id="mobile-menu-btn" onclick="toggleMobileMenu()" aria-label="Apri menu" title="Menu">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-      </button>
       <h1 class="topbar-title" id="topbar-title">Home</h1>
       <div class="topbar-actions" style="display:flex;align-items:center;gap:8px;">
         <button id="topbar-settings-btn" title="Impostazioni" onclick="Settings.open()" style="display:none;background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:1.1rem;padding:4px 8px;border-radius:var(--radius-sm);">
@@ -4110,7 +4107,7 @@ const openCampaign = (id) => {
     setActiveCampaign(camp);
     // Spinge subito i dati al cloud all'apertura, cosi' una campagna appena creata o importata
     // non aspetta la prima modifica per comparire sugli altri dispositivi
-    try { FirebaseSync.onCampagnaSaved?.(camp); } catch(e) {}
+    try { FirebaseSync.pushNow?.(camp); } catch(e) {}
 
     try { if (typeof Compendio !== 'undefined') Compendio.changeSistema(camp.system || '5e2024'); } catch(e) {}
     navigateTo('campagna');
@@ -13593,6 +13590,23 @@ const FirebaseSync = (() => {
     _listening = false;
   };
 
+  const _writeCampaign = async (camp) => {
+    try {
+      await _campRef.child('data').set({
+        ...camp,
+        updatedAt: firebase.database.ServerValue.TIMESTAMP,
+        updatedBy: _user.uid,
+        updatedByName: _user.displayName || _user.email,
+      });
+      _lastSyncAt = Date.now();
+      _updateSyncStatus('Sync: ' + new Date().toLocaleTimeString('it-IT'));
+    } catch(e) {
+      Debug.warn('Firebase push error:', e.message);
+    }
+  };
+
+  let _pendingCamp = null;
+
   const push = (camp) => {
     if (!_db || !_user || !_campRef) return;
 
@@ -13603,21 +13617,36 @@ const FirebaseSync = (() => {
       localStorage.setItem('dm_last_share_code', key);
     }
 
+    _pendingCamp = camp;
     if (_syncTimeout) clearTimeout(_syncTimeout);
-    _syncTimeout = setTimeout(async () => {
-      try {
-        await _campRef.child('data').set({
-          ...camp,
-          updatedAt: firebase.database.ServerValue.TIMESTAMP,
-          updatedBy: _user.uid,
-          updatedByName: _user.displayName || _user.email,
-        });
-        _lastSyncAt = Date.now();
-        _updateSyncStatus('Sync: ' + new Date().toLocaleTimeString('it-IT'));
-      } catch(e) {
-        Debug.warn('Firebase push error:', e.message);
-      }
-    }, 2000);
+    _syncTimeout = setTimeout(() => { _syncTimeout = null; _pendingCamp = null; _writeCampaign(camp); }, 2000);
+  };
+
+  // Scrive subito un push in attesa (debounce) — usato quando la pagina sta per essere
+  // nascosta/sospesa (cambio app su mobile, chiusura tab), cosi' un salvataggio in coda
+  // non va perso perche' il timeout di 2s non ha fatto in tempo a scattare.
+  const flush = () => {
+    if (!_syncTimeout || !_pendingCamp) return;
+    clearTimeout(_syncTimeout);
+    _syncTimeout = null;
+    const camp = _pendingCamp;
+    _pendingCamp = null;
+    _writeCampaign(camp);
+  };
+
+  // Come push(), ma scrive subito senza attendere il debounce — usato quando una campagna
+  // viene appena aperta/creata: su mobile una tab in background puo' essere sospesa prima
+  // che i 2 secondi di debounce scattino, perdendo il salvataggio.
+  const pushNow = (camp) => {
+    if (!_db || !_user || !_campRef) return;
+    if (!_user.isAnonymous) {
+      const key = camp?.shareCode || _campKey(camp?.id || '');
+      _registerCampaignForUser(camp, key);
+      localStorage.setItem('dm_last_camp_id', camp?.id || '');
+      localStorage.setItem('dm_last_share_code', key);
+    }
+    if (_syncTimeout) clearTimeout(_syncTimeout);
+    _writeCampaign(camp);
   };
 
   const syncNow = () => {
@@ -13868,11 +13897,14 @@ const FirebaseSync = (() => {
     }
   };
 
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') flush(); });
+  window.addEventListener('pagehide', flush);
+
   return {
     init, toggleAuth, logout, saveConfig,
     loginAnonymous, loginGoogle, loginEmail, registerEmail,
     useLocal, upgradeToGoogle, switchMode,
-    syncNow, push, onCampagnaSaved, onCampagnaActivated,
+    syncNow, push, pushNow, flush, onCampagnaSaved, onCampagnaActivated,
     getCampCode, copyCode, joinCampaign,
   };
 })();
@@ -19433,10 +19465,6 @@ document.addEventListener('DOMContentLoaded', () => {
     <span class="mobile-nav-icon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span>
     <span class="mobile-nav-label">Home</span>
   </button>
-  <button class="mobile-nav-item" data-page="campagna" onclick="App.navigateTo('campagna');setMobileActive(this)" aria-label="Dashboard">
-    <span class="mobile-nav-icon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></span>
-    <span class="mobile-nav-label">Dashboard</span>
-  </button>
   <button class="mobile-nav-item" data-page="wiki-png" onclick="WikiSections.goto('png');setMobileActive(this)" aria-label="Wiki">
     <span class="mobile-nav-icon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
     <span class="mobile-nav-label">Wiki</span>
@@ -19445,13 +19473,13 @@ document.addEventListener('DOMContentLoaded', () => {
     <span class="mobile-nav-icon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 17.5L3 6V3h3l11.5 11.5"/><line x1="13" y1="19" x2="19" y2="13"/><line x1="16" y1="16" x2="20" y2="20"/><line x1="19" y1="21" x2="21" y2="19"/></svg></span>
     <span class="mobile-nav-label">Sessione</span>
   </button>
-  <button class="mobile-nav-item" data-page="compendio" onclick="App.navigateTo('compendio');setMobileActive(this)" aria-label="Compendio">
-    <span class="mobile-nav-icon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></span>
-    <span class="mobile-nav-label">Compendio</span>
-  </button>
   <button class="mobile-nav-item" data-page="schermo" onclick="App.navigateTo('schermo');setMobileActive(this)" aria-label="Schermo DM">
     <span class="mobile-nav-icon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></span>
     <span class="mobile-nav-label">Schermo</span>
+  </button>
+  <button class="mobile-nav-item" onclick="toggleMobileMenu()" aria-label="Menu">
+    <span class="mobile-nav-icon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></span>
+    <span class="mobile-nav-label">Menu</span>
   </button>
 </nav>
 
@@ -19461,15 +19489,12 @@ const isMobile = () => window.innerWidth <= 768;
 
 const initMobileNav = () => {
   const mobileNav = document.getElementById('mobile-nav');
-  const menuBtn = document.getElementById('mobile-menu-btn');
   const settingsBtn = document.getElementById('topbar-settings-btn');
   if (isMobile()) {
     if (mobileNav) mobileNav.style.display = 'flex';
-    if (menuBtn) menuBtn.style.display = 'flex';
     if (settingsBtn) settingsBtn.style.display = 'flex';
   } else {
     if (mobileNav) mobileNav.style.display = 'none';
-    if (menuBtn) menuBtn.style.display = 'none';
     if (settingsBtn) settingsBtn.style.display = 'none';
   }
 };
