@@ -1750,7 +1750,10 @@
           <p style="font-size:0.75rem;color:var(--text-muted);margin:2px 0 0;">Locazioni, dungeon, città e regioni</p></div>
           <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
             <input id="wiki-luoghi-search" type="text" class="form-input" placeholder="Cerca luoghi..." style="width:180px;font-size:0.82rem;" oninput="WikiSections.filter('luoghi',this.value)">
-            <button class="btn btn-ghost btn-sm" onclick="WikiSections.toggleLuoghiView()" id="luoghi-view-btn" style="font-size:0.75rem;">🌳 Albero</button>
+            <button class="btn btn-ghost btn-sm" onclick="WikiSections.toggleLuoghiView()" id="luoghi-view-btn" title="Passa tra vista a griglia e vista gerarchica per regione" style="font-size:0.75rem;display:inline-flex;align-items:center;gap:6px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="6" height="6" rx="1"/><rect x="15" y="3" width="6" height="6" rx="1"/><rect x="9" y="15" width="6" height="6" rx="1"/><path d="M6 9v2a2 2 0 0 0 2 2h1M18 9v2a2 2 0 0 1-2 2h-1"/></svg>
+              Vista gerarchica
+            </button>
             <button class="btn btn-primary btn-sm" onclick="WikiSections.newCard('luoghi')">+ Nuovo Luogo</button>
           </div>
         </div>
@@ -2642,7 +2645,7 @@
         <div class="img-upload-area" id="luogo-img-area" onclick="document.getElementById('luogo-img-file').click()">
           <img id="luogo-img-preview" src="" style="display:none;max-height:140px;border-radius:var(--radius-md);object-fit:cover;width:100%;">
           <div id="luogo-img-placeholder" style="text-align:center;color:var(--text-muted);padding:var(--space-md);">
-            <div style="font-size:2rem;">🏰</div>
+            <div style="display:flex;justify-content:center;margin-bottom:6px;"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg></div>
             <div class="text-sm">Clicca per caricare un'immagine</div>
           </div>
         </div>
@@ -2659,14 +2662,14 @@
         <div class="form-group">
           <label class="form-label">Tipo</label>
           <select id="luogo-tipo" class="form-select">
-            <option value="regno">🌍 Regno</option>
-            <option value="citta">🏙️ Città</option>
-            <option value="villaggio">🏘️ Villaggio</option>
-            <option value="dungeon">⚔️ Dungeon</option>
-            <option value="locanda" selected>🍺 Locanda</option>
-            <option value="edificio">🏛️ Edificio</option>
-            <option value="natura">🌲 Natura</option>
-            <option value="altro">📍 Altro</option>
+            <option value="regno">Regno</option>
+            <option value="citta">Città</option>
+            <option value="villaggio">Villaggio</option>
+            <option value="dungeon">Dungeon</option>
+            <option value="locanda" selected>Locanda</option>
+            <option value="edificio">Edificio</option>
+            <option value="natura">Natura</option>
+            <option value="altro">Altro</option>
           </select>
         </div>
       </div>
@@ -5018,10 +5021,16 @@ const NPC = (() => {
 const Luoghi = (() => {
   let _editingId = null;
 
+  const _ic = (path) => '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">' + path + '</svg>';
   const tipoIcon = {
-    regno: '🌍', citta: '🏙️', villaggio: '🏘️',
-    dungeon: '⚔️', locanda: '🍺', edificio: '🏛️',
-    natura: '🌲', altro: '📍'
+    regno:     _ic('<path d="m2 20 1.5-9L8 15l4-9 4 9 4.5-4L22 20z"/><path d="M2 20h20"/>'),
+    citta:     _ic('<path d="M4 21V9l6-4v16"/><path d="M14 21V5l6 4v12"/><path d="M4 21h16"/><path d="M8 9h.01M8 13h.01M8 17h.01M18 13h.01M18 17h.01"/>'),
+    villaggio: _ic('<path d="M4 21V11l5-4 5 4v10"/><path d="M2 21h20"/><path d="M9 21v-5h2v5"/><path d="M15 21v-6l4-3 3 3v6"/>'),
+    dungeon:   _ic('<path d="M4 21V10a8 8 0 0 1 16 0v11"/><path d="M4 21h16"/><path d="M9 21v-6h6v6"/>'),
+    locanda:   _ic('<path d="M6 10V4h9l3 3v3"/><path d="M4 10h16v2a6 6 0 0 1-6 6H10a6 6 0 0 1-6-6z"/><path d="M8 21h8"/>'),
+    edificio:  _ic('<rect x="4" y="3" width="16" height="18" rx="1"/><path d="M9 8h1M14 8h1M9 12h1M14 12h1M9 16h1M14 16h1"/>'),
+    natura:    _ic('<path d="M12 2 7 10h3l-4 7h5v5h2v-5h5l-4-7h3z"/>'),
+    altro:     _ic('<path d="M12 21s7-5.5 7-11a7 7 0 0 0-14 0c0 5.5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/>'),
   };
 
   const getAll = () => App.getActiveCampaign()?.locations || [];
@@ -5061,7 +5070,7 @@ const Luoghi = (() => {
         <div class="npc-card" onclick="Luoghi.openView('${l.id}')">
           ${l.immagine ? `<div style="height:90px;background:url('${l.immagine}') center/cover no-repeat;border-radius:var(--radius-lg) var(--radius-lg) 0 0;flex-shrink:0;"></div>` : ''}
           <div class="npc-card-header">
-            <div class="npc-avatar">${l.icon || tipoIcon[l.tipo] || '📍'}</div>
+            <div class="npc-avatar">${l.icon || tipoIcon[l.tipo] || tipoIcon.altro}</div>
             <div style="flex:1;min-width:0;">
               <div class="npc-name">${l.nome}</div>
               <div class="npc-meta">${l.tipo || ''} ${parent ? '· in ' + parent.nome : ''}</div>
@@ -5103,7 +5112,7 @@ const Luoghi = (() => {
       getAll().filter(l => l.id !== luogo?.id).forEach(l => {
         const opt = document.createElement('option');
         opt.value = l.id;
-        opt.textContent = (tipoIcon[l.tipo] || '📍') + ' ' + l.nome;
+        opt.textContent = l.nome;
         opt.selected = l.id === luogo?.parentId;
         parentSel.appendChild(opt);
       });
@@ -5172,20 +5181,20 @@ const Luoghi = (() => {
         <button onclick="event.stopPropagation();locImgAdjust.bind(null,'${l.id}')('z',-20)" style="width:24px;height:24px;background:none;border:none;color:#fff;cursor:pointer;font-size:1rem;line-height:1;" title="−">−</button>
         <button onclick="event.stopPropagation();locImgAdjust.bind(null,'${l.id}')('z',20)" style="width:24px;height:24px;background:none;border:none;color:#fff;cursor:pointer;font-size:1rem;line-height:1;" title="+">+</button>
       </div></div>` : ''}
-      <div class="text-xs text-muted" style="font-family:var(--font-display);letter-spacing:0.05em;text-transform:uppercase;margin-bottom:var(--space-sm);">
-        ${tipoIcon[l.tipo] || '📍'} ${l.tipo || ''} ${parent ? '· dentro ' + parent.nome : ''}
+      <div class="text-xs text-muted" style="font-family:var(--font-display);letter-spacing:0.05em;text-transform:uppercase;margin-bottom:var(--space-sm);display:flex;align-items:center;gap:6px;">
+        <span style="display:flex;">${tipoIcon[l.tipo] || tipoIcon.altro}</span> ${l.tipo || ''} ${parent ? '· dentro ' + parent.nome : ''}
       </div>
       ${l.desc ? `<div class="text-sm" style="line-height:1.7;margin-bottom:var(--space-md);">${l.desc}</div>` : ''}
       ${l.poi ? `<div class="card card-accent" style="margin-bottom:var(--space-sm);padding:var(--space-sm) var(--space-md);"><div class="text-xs text-muted" style="font-family:var(--font-display);text-transform:uppercase;letter-spacing:0.05em;">Punti di Interesse / PNG</div><div class="text-sm" style="margin-top:4px;">${l.poi}</div></div>` : ''}
-      ${l.loot ? `<div class="card card-gold" style="margin-bottom:var(--space-sm);padding:var(--space-sm) var(--space-md);"><div class="text-xs" style="font-family:var(--font-display);text-transform:uppercase;letter-spacing:0.05em;color:var(--accent-secondary);">🎁 Loot / Tesoro</div><div class="text-sm" style="margin-top:4px;">${l.loot}</div></div>` : ''}
-      ${l.note ? `<div class="card" style="padding:var(--space-sm) var(--space-md);"><div class="text-xs text-muted" style="font-family:var(--font-display);text-transform:uppercase;letter-spacing:0.05em;">Note DM 🔒</div><div class="text-sm" style="margin-top:4px;">${l.note}</div></div>` : ''}
-      ${figli.length ? `<div style="margin-top:var(--space-md);"><div class="comp-cat-header">Luoghi interni</div>${figli.map(f => `<div class="comp-row" onclick="Luoghi.openView('${f.id}')"><div class="comp-row-main"><span class="comp-row-name">${tipoIcon[f.tipo] || '📍'} ${f.nome}</span></div></div>`).join('')}</div>` : ''}
+      ${l.loot ? `<div class="card card-gold" style="margin-bottom:var(--space-sm);padding:var(--space-sm) var(--space-md);"><div class="text-xs" style="font-family:var(--font-display);text-transform:uppercase;letter-spacing:0.05em;color:var(--accent-secondary);display:flex;align-items:center;gap:6px;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13M12 8a2.5 2.5 0 1 1-2.5-2.5C11 5.5 12 8 12 8zM12 8a2.5 2.5 0 1 0 2.5-2.5C13 5.5 12 8 12 8z"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg> Loot / Tesoro</div><div class="text-sm" style="margin-top:4px;">${l.loot}</div></div>` : ''}
+      ${l.note ? `<div class="card" style="padding:var(--space-sm) var(--space-md);"><div class="text-xs text-muted" style="font-family:var(--font-display);text-transform:uppercase;letter-spacing:0.05em;display:flex;align-items:center;gap:6px;">Note DM <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div><div class="text-sm" style="margin-top:4px;">${l.note}</div></div>` : ''}
+      ${figli.length ? `<div style="margin-top:var(--space-md);"><div class="comp-cat-header">Luoghi interni</div>${figli.map(f => `<div class="comp-row" onclick="Luoghi.openView('${f.id}')"><div class="comp-row-main"><span class="comp-row-name" style="display:flex;align-items:center;gap:6px;">${tipoIcon[f.tipo] || tipoIcon.altro} ${f.nome}</span></div></div>`).join('')}</div>` : ''}
     `;
 
     const titleEl = document.getElementById('comp-detail-title');
     const bodyEl  = document.getElementById('comp-detail-body');
     const btn     = document.getElementById('comp-detail-combat-btn');
-    if (titleEl) titleEl.textContent = (l.icon || tipoIcon[l.tipo] || '📍') + ' ' + l.nome;
+    if (titleEl) titleEl.textContent = (l.icon ? l.icon + ' ' : '') + l.nome;
     if (bodyEl)  bodyEl.innerHTML = content;
     if (btn)     btn.style.display = 'none';
     Modal.open('comp-detail');
@@ -16122,6 +16131,9 @@ const WikiSections = (() => {
     _save(type);
   };
 
+  const ICON_TREE_VIEW = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="6" height="6" rx="1"/><rect x="15" y="3" width="6" height="6" rx="1"/><rect x="9" y="15" width="6" height="6" rx="1"/><path d="M6 9v2a2 2 0 0 0 2 2h1M18 9v2a2 2 0 0 1-2 2h-1"/></svg> Vista gerarchica';
+  const ICON_GRID_VIEW = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg> Vista a griglia';
+
   const toggleLuoghiView = () => {
     const grid = document.getElementById('wiki-luoghi-grid');
     const tree = document.getElementById('wiki-luoghi-tree');
@@ -16130,7 +16142,7 @@ const WikiSections = (() => {
     const showingTree = tree.style.display !== 'none';
     grid.style.display = showingTree ? '' : 'none';
     tree.style.display = showingTree ? 'none' : '';
-    if (btn) btn.textContent = showingTree ? '🌳 Albero' : '📋 Lista';
+    if (btn) btn.innerHTML = showingTree ? ICON_TREE_VIEW : ICON_GRID_VIEW;
     if (!showingTree) _renderLuoghiTree();
   };
 
@@ -16524,7 +16536,7 @@ const Trame = (() => {
     if (!trame.length) {
       container.innerHTML =
         '<div style="text-align:center;padding:40px;color:var(--text-muted);">' +
-        '<div style="font-size:2rem;opacity:0.3;margin-bottom:12px;">📖</div>' +
+        '<div style="opacity:0.3;margin-bottom:12px;display:flex;justify-content:center;"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div>' +
         '<div style="font-size:0.9rem;margin-bottom:16px;">Nessuna trama. Crea la prima per iniziare.</div>' +
         '<button class="btn btn-primary" onclick="Trame.newTrama()">+ Crea prima trama</button>' +
         '</div>';
