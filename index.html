@@ -3197,6 +3197,18 @@ const Storage = (() => {
     return list[idx];
   };
 
+  // Inserisce o sovrascrive per intero una campagna (per id) — usato per scrivere una campagna
+  // completa arrivata da fuori (es. scaricata da Firebase), a differenza di updateCampaign
+  // che fonde solo un aggiornamento parziale su una campagna gia' esistente in locale.
+  const saveCampaign = (camp) => {
+    if (!camp || !camp.id) return false;
+    const list = getCampaigns();
+    const idx = list.findIndex(c => c.id === camp.id);
+    if (idx >= 0) list[idx] = camp; else list.push(camp);
+    saveCampaigns(list);
+    return camp;
+  };
+
   const deleteCampaign = (id) => {
     let list = getCampaigns();
     const len = list.length;
@@ -3293,7 +3305,7 @@ const Storage = (() => {
   return {
     KEYS,
     get, set, remove,
-    getCampaigns, saveCampaigns, getCampaign,
+    getCampaigns, saveCampaigns, getCampaign, saveCampaign,
     createCampaign, updateCampaign, deleteCampaign, duplicateCampaign,
     getActiveCampaignId, setActiveCampaign,
     getSettings, updateSettings,
@@ -13456,6 +13468,7 @@ const FirebaseSync = (() => {
           localStorage.setItem('dm_last_share_code', key);
         } catch(e) {
           Debug.warn('Push campagna locale:', e.message);
+          Toast.show('Errore invio "' + (camp.name||'campagna') + '" a Firebase: ' + e.message, 'error', 5000);
         }
       }
 
@@ -13485,6 +13498,7 @@ const FirebaseSync = (() => {
           }
         } catch(e) {
           Debug.warn('Download campagna remota:', e.message);
+          Toast.show('Errore scaricando una campagna dal cloud: ' + e.message, 'error', 5000);
         }
       }
 
@@ -13496,6 +13510,7 @@ const FirebaseSync = (() => {
       }
     } catch(e) {
       Debug.warn('Errore syncAllCampaigns:', e.message);
+      Toast.show('Errore sincronizzazione cloud: ' + e.message, 'error', 5000);
     }
   };
 
@@ -13602,6 +13617,7 @@ const FirebaseSync = (() => {
       _updateSyncStatus('Sync: ' + new Date().toLocaleTimeString('it-IT'));
     } catch(e) {
       Debug.warn('Firebase push error:', e.message);
+      Toast.show('Sync Firebase fallita: ' + e.message, 'error', 5000);
     }
   };
 
