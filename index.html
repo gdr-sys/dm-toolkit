@@ -523,84 +523,6 @@
     </section>
 
     <!-- ════════════════════════
-         PAGINA: MONDO
-    ════════════════════════ -->
-    <section class="page" id="page-mondo">
-      <div class="page-header">
-        <div>
-          <h1 class="page-title">Mondo</h1>
-          <p class="page-subtitle">PNG, Luoghi e Fazioni della campagna</p>
-        </div>
-      </div>
-
-      <!-- Tabs principali -->
-      <div class="tabs" style="margin-bottom:var(--space-lg);max-width:400px;">
-        <button class="tab-btn active" onclick="switchTab(this,'mondo-tab-npc');if(window.NPC)NPC.init();">PNG</button>
-        <button class="tab-btn" onclick="switchTab(this,'mondo-tab-luoghi');if(window.Luoghi)Luoghi.init();">Luoghi</button>
-        <button class="tab-btn" onclick="switchTab(this,'mondo-tab-fazioni');if(window.Fazioni)Fazioni.init();">Fazioni</button>
-      </div>
-
-      <div id="mondo-tab-npc" class="tab-content active">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-md);flex-wrap:wrap;gap:var(--space-sm);">
-          <div style="display:flex;gap:var(--space-sm);flex-wrap:wrap;">
-            <div style="position:relative;display:inline-flex;align-items:center;flex:1;">
-            <input type="text" id="npc-search" class="form-input" placeholder="Cerca PNG..." aria-label="Cerca PNG" style="width:220px;" oninput="NPC.filter()">
-            <button onclick="document.getElementById('npc-search').value='';NPC.filter();" style="position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:0.85rem;padding:2px 4px;line-height:1;border-radius:var(--radius-sm);" title="Cancella ricerca"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-          </div>
-            <select id="npc-filter-status" class="form-select" style="width:auto;" onchange="NPC.filter()">
-              <option value="">Tutti gli stati</option>
-              <option value="vivo">🟢 Vivo</option>
-              <option value="morto">💀 Morto</option>
-              <option value="scomparso">❓ Scomparso</option>
-              <option value="alleato">🤝 Alleato</option>
-              <option value="nemico">⚔️ Nemico</option>
-            </select>
-            <select id="npc-filter-faction" class="form-select" style="width:auto;" onchange="NPC.filter()">
-              <option value="">Tutte le fazioni</option>
-            </select>
-          </div>
-          <button class="btn btn-primary" onclick="NPC.openModal(null)">+ Nuovo PNG</button>
-        </div>
-        <div id="npc-list" class="grid-auto"></div>
-      </div>
-
-      <div id="mondo-tab-luoghi" class="tab-content">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-md);flex-wrap:wrap;gap:var(--space-sm);">
-          <div style="display:flex;gap:var(--space-sm);flex-wrap:wrap;">
-            <div style="position:relative;display:inline-flex;align-items:center;flex:1;">
-            <input type="text" id="luoghi-search" class="form-input" placeholder="Cerca luogo..." aria-label="Cerca luogo" style="width:220px;" oninput="Luoghi.filter()">
-            <button onclick="document.getElementById('luoghi-search').value='';Luoghi.filter();" style="position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:0.85rem;padding:2px 4px;line-height:1;border-radius:var(--radius-sm);" title="Cancella ricerca"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-          </div>
-            <select id="luoghi-filter-tipo" class="form-select" style="width:auto;" onchange="Luoghi.filter()">
-              <option value="">Tutti i tipi</option>
-              <option value="regno">Regno</option>
-              <option value="citta">Città</option>
-              <option value="villaggio">Villaggio</option>
-              <option value="dungeon">Dungeon</option>
-              <option value="locanda">Locanda</option>
-              <option value="edificio">Edificio</option>
-              <option value="natura">Natura</option>
-              <option value="altro">Altro</option>
-            </select>
-          </div>
-          <button class="btn btn-primary" onclick="Luoghi.openModal(null)">+ Nuovo Luogo</button>
-        </div>
-        <div id="luoghi-list" class="grid-auto"></div>
-      </div>
-
-      <div id="mondo-tab-fazioni" class="tab-content">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-md);flex-wrap:wrap;gap:var(--space-sm);">
-          <div style="position:relative;display:inline-flex;align-items:center;flex:1;">
-            <input type="text" id="fazioni-search" class="form-input" placeholder="Cerca fazione..." aria-label="Cerca fazione" style="width:220px;" oninput="Fazioni.filter()">
-            <button onclick="document.getElementById('fazioni-search').value='';Fazioni.filter();" style="position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:0.85rem;padding:2px 4px;line-height:1;border-radius:var(--radius-sm);" title="Cancella ricerca"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-          </div>
-          <button class="btn btn-primary" onclick="Fazioni.openModal(null)">+ Nuova Fazione</button>
-        </div>
-        <div id="fazioni-list" class="grid-auto"></div>
-      </div>
-    </section>
-
-    <!-- ════════════════════════
          PAGINA: SESSIONE
     ════════════════════════ -->
     <section class="page" id="page-sessione">
@@ -2133,45 +2055,6 @@
   </div>
 </div>
 
-<!-- Modal: Quest -->
-<div class="modal-overlay hidden" id="modal-quest" style="display:none;">
-  <div class="modal">
-    <div class="modal-header">
-      <h2 style="font-family:var(--font-display);font-size:1.1rem;" id="quest-modal-title">Nuova Quest</h2>
-      <button class="btn btn-ghost btn-icon" onclick="Modal.close('quest')" aria-label="Chiudi"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-    </div>
-    <div class="modal-body">
-      <div class="form-group">
-        <label class="form-label">Titolo *</label>
-        <input type="text" id="qm-title" class="form-input" placeholder="es. Recupera la spada perduta">
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">Stato</label>
-          <select id="qm-status" class="form-select">
-            <option value="disponibile">Disponibile</option>
-            <option value="in_corso">In Corso</option>
-            <option value="completata">Completata</option>
-            <option value="fallita">Fallita</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Ricompensa</label>
-          <input type="text" id="qm-reward" class="form-input" placeholder="es. 500 mo + Spada +1">
-        </div>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Note</label>
-        <textarea id="qm-notes" class="form-textarea" rows="3" placeholder="Dettagli, step, NPC coinvolti..."></textarea>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="Modal.close('quest')">Annulla</button>
-      <button class="btn btn-primary" onclick="submitQuest()">Salva</button>
-    </div>
-  </div>
-</div>
-
 <!-- Modal: Evento Timeline -->
 <div class="modal-overlay hidden" id="modal-timeline" style="display:none;">
   <div class="modal" style="max-width:480px;">
@@ -2397,152 +2280,6 @@
   </div>
 </div>
 
-<!-- Modal: Scheda PNG (visualizzazione bifronte) -->
-<div class="modal-overlay hidden" id="modal-npc-view" style="display:none;">
-  <div class="modal modal-lg">
-    <div class="modal-header">
-      <div style="display:flex;align-items:center;gap:var(--space-sm);">
-        <span id="npc-view-icon" style="font-size:1.5rem;">👤</span>
-        <div>
-          <div style="font-family:var(--font-display);font-size:1.1rem;" id="npc-view-name">—</div>
-          <div class="text-xs text-muted" id="npc-view-meta">—</div>
-        </div>
-      </div>
-      <div style="display:flex;gap:var(--space-sm);align-items:center;flex-wrap:wrap;">
-        <button class="btn btn-gold btn-sm" id="npc-flip-btn" onclick="NPC.flipCard()">Combattimento</button>
-        <button class="btn btn-primary btn-sm" id="npc-add-combat-btn" onclick="NPC.addCurrentToCombat()" title="Aggiungi al Combat Tracker">+ Combat</button>
-        <button class="btn btn-secondary btn-sm" onclick="NPC.editFromView()">Modifica</button>
-        <button class="btn btn-ghost btn-icon" onclick="Modal.close('npc-view')" aria-label="Chiudi"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-      </div>
-    </div>
-    <div class="modal-body" style="padding:var(--space-md);">
-      <div id="npc-view-relation-wrap" style="margin-bottom:var(--space-md);">
-        <div class="relation-bar-labels">
-          <span>😡 Ostile</span>
-          <span id="npc-view-rel-label">Neutrale</span>
-          <span>Alleato 💚</span>
-        </div>
-        <div class="relation-bar-track" id="npc-view-rel-track" onclick="NPC.quickRelChange(event)" title="Clicca per modificare">
-          <div id="npc-view-rel-fill" class="relation-bar-fill" style="width:50%;"></div>
-        </div>
-        <div class="relation-bar-value" id="npc-view-rel-val">50 / 100</div>
-      </div>
-
-      <!-- Link nota wiki collegata -->
-      <div id="npc-wiki-link" style="display:none;margin-bottom:8px;">
-        <button class="btn btn-ghost btn-sm" style="font-size:0.72rem;width:100%;text-align:left;">
-          📝 Apri nota Wiki collegata
-        </button>
-      </div>
-
-      <!-- Citazioni in Wiki -->
-      <div style="margin-bottom:8px;">
-        <div style="font-size:0.68rem;font-family:var(--font-display);text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin-bottom:5px;">📖 Citato in Wiki</div>
-        <div id="npc-cronologia" style="max-height:100px;overflow-y:auto;font-size:0.78rem;"></div>
-      </div>
-
-      <div class="npc-flip-container" id="npc-flip-container">
-        <div class="npc-flip-inner" id="npc-flip-inner">
-          <!-- FRONTE: Ruolo -->
-          <div class="npc-face">
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-md);">
-              <div>
-                <div class="card card-accent" style="margin-bottom:var(--space-sm);padding:var(--space-sm) var(--space-md);">
-                  <div class="text-xs text-muted" style="font-family:var(--font-display);letter-spacing:0.05em;text-transform:uppercase;margin-bottom:2px;">Tratto</div>
-                  <div class="text-sm" id="npc-view-trait">—</div>
-                </div>
-                <div class="card" style="margin-bottom:var(--space-sm);padding:var(--space-sm) var(--space-md);">
-                  <div class="text-xs text-muted" style="font-family:var(--font-display);letter-spacing:0.05em;text-transform:uppercase;margin-bottom:2px;">🎭 Archetipo</div>
-                  <div class="text-sm" id="npc-view-archetipo">—</div>
-                </div>
-                <div class="card" style="margin-bottom:var(--space-sm);padding:var(--space-sm) var(--space-md);">
-                  <div class="text-xs text-muted" style="font-family:var(--font-display);letter-spacing:0.05em;text-transform:uppercase;margin-bottom:2px;">Voce & Tic</div>
-                  <div class="text-sm" id="npc-view-voice">—</div>
-                </div>
-                <div class="card" style="margin-bottom:var(--space-sm);padding:var(--space-sm) var(--space-md);">
-                  <div class="text-xs text-muted" style="font-family:var(--font-display);letter-spacing:0.05em;text-transform:uppercase;margin-bottom:2px;">Cadenza verbale</div>
-                  <div class="text-sm" id="npc-view-cadenza">—</div>
-                </div>
-                <div class="card" style="margin-bottom:var(--space-sm);padding:var(--space-sm) var(--space-md);">
-                  <div class="text-xs text-muted" style="font-family:var(--font-display);letter-spacing:0.05em;text-transform:uppercase;margin-bottom:2px;">Saluto</div>
-                  <div class="text-sm" id="npc-view-saluto">—</div>
-                </div>
-                <div class="card" style="margin-bottom:var(--space-sm);padding:var(--space-sm) var(--space-md);">
-                  <div class="text-xs text-muted" style="font-family:var(--font-display);letter-spacing:0.05em;text-transform:uppercase;margin-bottom:2px;">Argomento ricorrente</div>
-                  <div class="text-sm" id="npc-view-argomento">—</div>
-                </div>
-                <div class="card card-gold" style="padding:var(--space-sm) var(--space-md);margin-bottom:var(--space-sm);">
-                  <div class="text-xs" style="font-family:var(--font-display);letter-spacing:0.05em;text-transform:uppercase;margin-bottom:2px;color:var(--accent-secondary);">Segreto DM</div>
-                  <div class="text-sm" id="npc-view-secret">—</div>
-                </div>
-                <div class="card" style="padding:var(--space-sm) var(--space-md);">
-                  <div class="text-xs text-muted" style="font-family:var(--font-display);letter-spacing:0.05em;text-transform:uppercase;margin-bottom:2px;">Obiettivo segreto DM</div>
-                  <div class="text-sm" id="npc-view-obiettivo">—</div>
-                </div>
-                <div class="card" style="padding:var(--space-sm) var(--space-md);background:rgba(139,38,53,0.06);">
-                  <div class="text-xs" style="font-family:var(--font-display);letter-spacing:0.05em;text-transform:uppercase;margin-bottom:2px;color:var(--accent-primary);">🎬 Ora sta facendo</div>
-                  <div class="text-sm" id="npc-view-hook">—</div>
-                </div>
-              </div>
-              <div>
-                <div class="card" style="margin-bottom:var(--space-sm);padding:var(--space-sm) var(--space-md);">
-                  <div class="text-xs text-muted" style="font-family:var(--font-display);letter-spacing:0.05em;text-transform:uppercase;margin-bottom:2px;">Vuole dai PG</div>
-                  <div class="text-sm" id="npc-view-wants">—</div>
-                </div>
-                <div class="card" style="margin-bottom:var(--space-sm);padding:var(--space-sm) var(--space-md);">
-                  <div class="text-xs text-muted" style="font-family:var(--font-display);letter-spacing:0.05em;text-transform:uppercase;margin-bottom:2px;">Offre ai PG</div>
-                  <div class="text-sm" id="npc-view-offers">—</div>
-                </div>
-                <div class="card" style="padding:var(--space-sm) var(--space-md);margin-bottom:var(--space-sm);">
-                  <div class="text-xs text-muted" style="font-family:var(--font-display);letter-spacing:0.05em;text-transform:uppercase;margin-bottom:2px;">Legami</div>
-                  <div class="text-sm" id="npc-view-links">—</div>
-                </div>
-                <div class="card" id="npc-view-morale-wrap" style="padding:var(--space-sm) var(--space-md);display:none;">
-                  <div class="text-xs text-muted" style="font-family:var(--font-display);letter-spacing:0.05em;text-transform:uppercase;margin-bottom:2px;">Morale</div>
-                  <div class="text-sm" id="npc-view-morale">—</div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <!-- RETRO: Combattimento -->
-          <div class="npc-back">
-            <div class="stat-block">
-              <div class="stat-block-title" id="sb-name">—</div>
-              <div class="stat-block-subtitle" id="sb-subtitle">—</div>
-              <div class="stat-block-divider"></div>
-              <div class="stat-row"><strong>Classe Armatura</strong> <span id="sb-ac">—</span></div>
-              <div class="stat-row"><strong>Punti Ferita</strong> <span id="sb-hp">—</span></div>
-              <div class="stat-row"><strong>Velocità</strong> <span id="sb-speed">—</span></div>
-              <div class="stat-block-divider"></div>
-              <div class="stat-abilities" id="sb-abilities"></div>
-              <div class="stat-block-divider"></div>
-              <div class="stat-row" id="sb-saves-row" style="display:none;"><strong>Tiri Salvezza</strong> <span id="sb-saves">—</span></div>
-              <div class="stat-row" id="sb-immunities-row" style="display:none;"><strong>Immunità/Resistenze</strong> <span id="sb-immunities">—</span></div>
-              <div class="stat-row" id="sb-senses-row" style="display:none;"><strong>Sensi</strong> <span id="sb-senses">—</span></div>
-              <div class="stat-row" id="sb-lang-row" style="display:none;"><strong>Linguaggi</strong> <span id="sb-languages">—</span></div>
-              <div class="stat-row"><strong>GS</strong> <span id="sb-cr">—</span></div>
-              <div class="stat-row" id="sb-attacco-row"><strong>Attacco</strong> <span id="sb-attacco">—</span> &nbsp; <strong>Save DC</strong> <span id="sb-savedc">—</span></div>
-              <div class="stat-row" id="sb-nat-row"><strong>Attacchi/round</strong> <span id="sb-num-attacchi">—</span></div>
-              <div class="stat-block-divider"></div>
-              <div id="npc-view-ruolo-wrap" style="display:none;">
-                <div style="font-size:0.78rem;margin-bottom:4px;"><strong>Ruolo combattivo:</strong> <span id="npc-view-ruolo" style="color:var(--accent-secondary);">—</span></div>
-                <div style="font-size:0.78rem;color:var(--text-muted);"><em><span id="npc-view-abilita">—</span></em></div>
-              </div>
-              <div class="stat-block-divider"></div>
-              <div id="sb-special" style="margin-bottom:var(--space-sm);font-size:0.85rem;"></div>
-              <div style="font-family:var(--font-display);font-size:0.9rem;font-weight:700;color:var(--accent-primary);margin-bottom:4px;border-bottom:1px solid var(--accent-primary);padding-bottom:2px;">Azioni</div>
-              <ul class="action-list" id="sb-actions"></ul>
-              <div id="sb-notes" style="font-size:0.8rem;color:var(--text-muted);margin-top:var(--space-sm);font-style:italic;"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-
-
 <!-- Modal: Personaggio Party -->
 <div class="modal-overlay hidden" id="modal-pg-modal" style="display:none;">
   <div class="modal">
@@ -2631,204 +2368,6 @@
             <button onclick="document.getElementById('monster-search-input').value='';Sessione.searchMonster();" style="position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:0.85rem;padding:2px 4px;line-height:1;border-radius:var(--radius-sm);" title="Cancella ricerca"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
           </div>
       <div id="monster-search-results" class="comp-list" style="max-height:360px;overflow-y:auto;"></div>
-    </div>
-  </div>
-</div>
-
-
-<!-- ══════════════════════════════════════════════
-     MODAL: Luogo (crea/modifica)
-══════════════════════════════════════════════ -->
-<div class="modal-overlay hidden" id="modal-luogo" style="display:none;">
-  <div class="modal modal-lg">
-    <div class="modal-header">
-      <h2 style="font-family:var(--font-display);font-size:1.1rem;" id="luogo-modal-title">Nuovo Luogo</h2>
-      <button class="btn btn-ghost btn-icon" onclick="Modal.close('luogo')" aria-label="Chiudi"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-    </div>
-    <div class="modal-body">
-      <input type="hidden" id="luogo-id">
-
-      <!-- Immagine -->
-      <div class="form-group">
-        <label class="form-label">Immagine</label>
-        <div class="img-upload-area" id="luogo-img-area" onclick="document.getElementById('luogo-img-file').click()">
-          <img id="luogo-img-preview" src="" style="display:none;max-height:140px;border-radius:var(--radius-md);object-fit:cover;width:100%;">
-          <div id="luogo-img-placeholder" style="text-align:center;color:var(--text-muted);padding:var(--space-md);">
-            <div style="display:flex;justify-content:center;margin-bottom:6px;"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg></div>
-            <div class="text-sm">Clicca per caricare un'immagine</div>
-          </div>
-        </div>
-        <input type="file" id="luogo-img-file" accept="image/*" style="display:none;" onchange="handleImgUpload('luogo')">
-        <input type="text" id="luogo-img-url" class="form-input" placeholder="oppure incolla un URL immagine..." style="margin-top:6px;" oninput="handleImgUrl('luogo')">
-        <button class="btn btn-ghost btn-sm" id="luogo-img-clear" style="display:none;margin-top:4px;" onclick="clearImg('luogo')">Rimuovi immagine</button>
-      </div>
-
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">Nome *</label>
-          <input type="text" id="luogo-nome" class="form-input" placeholder="es. Locanda del Drago Ubriaco">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Tipo</label>
-          <select id="luogo-tipo" class="form-select">
-            <option value="regno">Regno</option>
-            <option value="citta">Città</option>
-            <option value="villaggio">Villaggio</option>
-            <option value="dungeon">Dungeon</option>
-            <option value="locanda" selected>Locanda</option>
-            <option value="edificio">Edificio</option>
-            <option value="natura">Natura</option>
-            <option value="altro">Altro</option>
-          </select>
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">Contenuto in</label>
-          <select id="luogo-parent" class="form-select">
-            <option value="">— Nessuno (luogo radice) —</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Icona / Emoji</label>
-          <input type="text" id="luogo-icon" class="form-input" placeholder="🏰" maxlength="4">
-        </div>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Descrizione</label>
-        <div class="mini-fmt-toolbar" style="display:flex;gap:2px;margin-bottom:4px;flex-wrap:wrap;align-items:center;">
-  <button type="button" class="nc-tb" onclick="miniFmt('luogo-desc','bold')" title="Grassetto"><b>B</b></button>
-  <button type="button" class="nc-tb" onclick="miniFmt('luogo-desc','italic')" title="Corsivo"><i>I</i></button>
-  <button type="button" class="nc-tb" onclick="miniFmt('luogo-desc','underline')" title="Sottolineato"><u>S</u></button>
-  <div style="width:1px;background:var(--border);margin:0 2px;height:18px;"></div>
-  <button type="button" class="nc-tb" onclick="miniFmt('luogo-desc','link')" title="[[Link]]" style="color:#5ba4f5;font-size:0.68rem;">[[]]</button>
-  <button type="button" class="nc-tb" onclick="miniFmt('luogo-desc','tag')" title="#tag" style="color:var(--accent-secondary);font-size:0.68rem;">#</button>
-  <button type="button" class="nc-tb" onclick="miniFmt('luogo-desc','secret')" title="🔒 Segreto DM" style="color:#c97bea;font-size:0.65rem;">🔒</button>
-  <button type="button" class="nc-tb" onclick="miniFmt('luogo-desc','clue')" title="🔍 Indizio" style="color:#5ba4f5;font-size:0.65rem;">🔍</button>
-  <div style="width:1px;background:var(--border);margin:0 2px;height:18px;"></div>
-  <button type="button" class="nc-tb" onclick="miniFmtColor('luogo-desc')" title="Colore testo" style="border-bottom:3px solid #f5a623;">A</button>
-  <button type="button" class="nc-tb" onclick="miniFmtHL('luogo-desc')" title="Evidenzia" style="background:rgba(245,166,35,0.25);border-bottom:3px solid rgba(245,166,35,0.7);">H</button>
-</div><div id="luogo-desc" contenteditable="true" data-placeholder="Atmosfera, dettagli sensoriali, cosa si vede appena si entra..." style="min-height:72px;padding:8px;background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-md);font-size:0.88rem;line-height:1.6;color:var(--text-primary);outline:none;overflow-y:auto;" oninput="void 0"></div>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">Punti di Interesse / PNG residenti</label>
-          <textarea id="luogo-poi" class="form-textarea" rows="2" placeholder="es. Il proprietario Garak, il mercante sospetto al tavolo d'angolo..."></textarea>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Loot / Tesoro (nascosto)</label>
-          <textarea id="luogo-loot" class="form-textarea" rows="2" placeholder="es. 50 mo in una cassetta sotto il pavimento..."></textarea>
-        </div>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Note DM</label>
-        <div class="mini-fmt-toolbar" style="display:flex;gap:2px;margin-bottom:4px;flex-wrap:wrap;align-items:center;">
-  <button type="button" class="nc-tb" onclick="miniFmt('luogo-note','bold')" title="Grassetto"><b>B</b></button>
-  <button type="button" class="nc-tb" onclick="miniFmt('luogo-note','italic')" title="Corsivo"><i>I</i></button>
-  <button type="button" class="nc-tb" onclick="miniFmt('luogo-note','underline')" title="Sottolineato"><u>S</u></button>
-  <div style="width:1px;background:var(--border);margin:0 2px;height:18px;"></div>
-  <button type="button" class="nc-tb" onclick="miniFmt('luogo-note','link')" title="[[Link]]" style="color:#5ba4f5;font-size:0.68rem;">[[]]</button>
-  <button type="button" class="nc-tb" onclick="miniFmt('luogo-note','tag')" title="#tag" style="color:var(--accent-secondary);font-size:0.68rem;">#</button>
-  <button type="button" class="nc-tb" onclick="miniFmt('luogo-note','secret')" title="🔒 Segreto DM" style="color:#c97bea;font-size:0.65rem;">🔒</button>
-  <button type="button" class="nc-tb" onclick="miniFmt('luogo-note','clue')" title="🔍 Indizio" style="color:#5ba4f5;font-size:0.65rem;">🔍</button>
-  <div style="width:1px;background:var(--border);margin:0 2px;height:18px;"></div>
-  <button type="button" class="nc-tb" onclick="miniFmtColor('luogo-note')" title="Colore testo" style="border-bottom:3px solid #f5a623;">A</button>
-  <button type="button" class="nc-tb" onclick="miniFmtHL('luogo-note')" title="Evidenzia" style="background:rgba(245,166,35,0.25);border-bottom:3px solid rgba(245,166,35,0.7);">H</button>
-</div><div id="luogo-note" contenteditable="true" data-placeholder="Informazioni riservate al master..." style="min-height:48px;padding:8px;background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-md);font-size:0.88rem;line-height:1.6;color:var(--text-primary);outline:none;overflow-y:auto;" oninput="void 0"></div>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="Modal.close('luogo')">Annulla</button>
-      <button class="btn btn-primary" onclick="Luoghi.submitModal()">Salva Luogo</button>
-    </div>
-  </div>
-</div>
-
-<!-- ══════════════════════════════════════════════
-     MODAL: Fazione (crea/modifica) nel Mondo
-══════════════════════════════════════════════ -->
-<div class="modal-overlay hidden" id="modal-fazione-mondo" style="display:none;">
-  <div class="modal">
-    <div class="modal-header">
-      <h2 style="font-family:var(--font-display);font-size:1.1rem;" id="fazione-mondo-title">Nuova Fazione</h2>
-      <button class="btn btn-ghost btn-icon" onclick="Modal.close('fazione-mondo')" aria-label="Chiudi"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-    </div>
-    <div class="modal-body">
-      <input type="hidden" id="fazione-mondo-id">
-
-      <!-- Immagine -->
-      <div class="form-group">
-        <label class="form-label">Immagine / Stemma</label>
-        <div class="img-upload-area" id="fazione-img-area" onclick="document.getElementById('fazione-img-file').click()" style="max-height:100px;">
-          <img id="fazione-img-preview" src="" style="display:none;max-height:80px;border-radius:var(--radius-md);object-fit:cover;width:100%;">
-          <div id="fazione-img-placeholder" style="text-align:center;color:var(--text-muted);padding:var(--space-sm);">
-            <div style="opacity:0.4;margin-bottom:4px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="width:1.8rem;height:1.8rem;" aria-hidden="true"><path d="M3 21h18"/><path d="M3 10h18"/><path d="M5 6l7-3 7 3"/><path d="M4 10v11"/><path d="M20 10v11"/><path d="M8 14v3"/><path d="M12 14v3"/><path d="M16 14v3"/></svg></div>
-            <div class="text-xs">Clicca per caricare</div>
-          </div>
-        </div>
-        <input type="file" id="fazione-img-file" accept="image/*" style="display:none;" onchange="handleImgUpload('fazione')">
-        <input type="text" id="fazione-img-url" class="form-input" placeholder="oppure URL immagine..." style="margin-top:6px;" oninput="handleImgUrl('fazione')">
-        <button class="btn btn-ghost btn-sm" id="fazione-img-clear" style="display:none;margin-top:4px;" onclick="clearImg('fazione')">Rimuovi</button>
-      </div>
-
-      <div class="form-row">
-        <div class="form-group">
-          <label class="form-label">Nome *</label>
-          <input type="text" id="fazione-mondo-nome" class="form-input" placeholder="es. Gli Arpisti">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Icona</label>
-          <input type="text" id="fazione-mondo-icon" class="form-input" placeholder="🏛️" maxlength="4">
-        </div>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Potere attuale (0–100): <span id="fazione-mondo-power-val">50</span></label>
-        <input type="range" id="fazione-mondo-power" min="0" max="100" value="50" style="width:100%;"
-               oninput="document.getElementById('fazione-mondo-power-val').textContent=this.value">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Zona di influenza</label>
-        <input type="text" id="fazione-mondo-influenza" class="form-input" placeholder="es. Controllo del commercio di Waterdeep">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Obiettivi e metodi</label>
-        <div class="mini-fmt-toolbar" style="display:flex;gap:2px;margin-bottom:4px;flex-wrap:wrap;align-items:center;">
-  <button type="button" class="nc-tb" onclick="miniFmt('fazione-mondo-obiettivi','bold')" title="Grassetto"><b>B</b></button>
-  <button type="button" class="nc-tb" onclick="miniFmt('fazione-mondo-obiettivi','italic')" title="Corsivo"><i>I</i></button>
-  <button type="button" class="nc-tb" onclick="miniFmt('fazione-mondo-obiettivi','underline')" title="Sottolineato"><u>S</u></button>
-  <div style="width:1px;background:var(--border);margin:0 2px;height:18px;"></div>
-  <button type="button" class="nc-tb" onclick="miniFmt('fazione-mondo-obiettivi','link')" title="[[Link]]" style="color:#5ba4f5;font-size:0.68rem;">[[]]</button>
-  <button type="button" class="nc-tb" onclick="miniFmt('fazione-mondo-obiettivi','tag')" title="#tag" style="color:var(--accent-secondary);font-size:0.68rem;">#</button>
-  <button type="button" class="nc-tb" onclick="miniFmt('fazione-mondo-obiettivi','secret')" title="🔒 Segreto DM" style="color:#c97bea;font-size:0.65rem;">🔒</button>
-  <button type="button" class="nc-tb" onclick="miniFmtColor('fazione-mondo-obiettivi')" title="Colore testo" style="border-bottom:3px solid #f5a623;">A</button>
-  <button type="button" class="nc-tb" onclick="miniFmtHL('fazione-mondo-obiettivi')" title="Evidenzia" style="background:rgba(245,166,35,0.25);border-bottom:3px solid rgba(245,166,35,0.7);">H</button>
-</div>
-        <div id="fazione-mondo-obiettivi" contenteditable="true" data-placeholder="Cosa vuole questa fazione e come lo persegue..." style="min-height:48px;padding:8px;background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-md);font-size:0.88rem;line-height:1.6;color:var(--text-primary);outline:none;overflow-y:auto;" oninput="void 0"></div>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Relazioni con altre fazioni</label>
-        <input type="text" id="fazione-mondo-relazioni" class="form-input" placeholder="es. Alleata: Ordine del Guanto | Rivale: Zhentarim">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Note DM</label>
-        <div class="mini-fmt-toolbar" style="display:flex;gap:2px;margin-bottom:4px;flex-wrap:wrap;align-items:center;">
-  <button type="button" class="nc-tb" onclick="miniFmt('fazione-mondo-note','bold')" title="Grassetto"><b>B</b></button>
-  <button type="button" class="nc-tb" onclick="miniFmt('fazione-mondo-note','italic')" title="Corsivo"><i>I</i></button>
-  <button type="button" class="nc-tb" onclick="miniFmt('fazione-mondo-note','underline')" title="Sottolineato"><u>S</u></button>
-  <div style="width:1px;background:var(--border);margin:0 2px;height:18px;"></div>
-  <button type="button" class="nc-tb" onclick="miniFmt('fazione-mondo-note','link')" title="[[Link]]" style="color:#5ba4f5;font-size:0.68rem;">[[]]</button>
-  <button type="button" class="nc-tb" onclick="miniFmt('fazione-mondo-note','tag')" title="#tag" style="color:var(--accent-secondary);font-size:0.68rem;">#</button>
-  <button type="button" class="nc-tb" onclick="miniFmt('fazione-mondo-note','secret')" title="🔒 Segreto DM" style="color:#c97bea;font-size:0.65rem;">🔒</button>
-  <button type="button" class="nc-tb" onclick="miniFmt('fazione-mondo-note','clue')" title="🔍 Indizio" style="color:#5ba4f5;font-size:0.65rem;">🔍</button>
-  <div style="width:1px;background:var(--border);margin:0 2px;height:18px;"></div>
-  <button type="button" class="nc-tb" onclick="miniFmtColor('fazione-mondo-note')" title="Colore testo" style="border-bottom:3px solid #f5a623;">A</button>
-  <button type="button" class="nc-tb" onclick="miniFmtHL('fazione-mondo-note')" title="Evidenzia" style="background:rgba(245,166,35,0.25);border-bottom:3px solid rgba(245,166,35,0.7);">H</button>
-</div><div id="fazione-mondo-note" contenteditable="true" data-placeholder="Piani segreti, leader, agenti..." style="min-height:48px;padding:8px;background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-md);font-size:0.88rem;line-height:1.6;color:var(--text-primary);outline:none;overflow-y:auto;" oninput="void 0"></div>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="Modal.close('fazione-mondo')">Annulla</button>
-      <button class="btn btn-primary" onclick="Fazioni.submitModal()">Salva Fazione</button>
     </div>
   </div>
 </div>
@@ -3666,46 +3205,6 @@ const submitConfirm = () => {
   if (_confirmCallback) { _confirmCallback(); _confirmCallback = null; }
 };
 
-let _editingQuestId = null;
-const openQuestModal = (quest) => {
-  _editingQuestId = quest ? quest.id : null;
-  document.getElementById('quest-modal-title').textContent = quest ? 'Modifica Quest' : 'Nuova Quest';
-  document.getElementById('qm-title').value = quest?.title || '';
-  document.getElementById('qm-status').value = quest?.status || 'disponibile';
-  document.getElementById('qm-reward').value = quest?.reward || '';
-  document.getElementById('qm-notes').value = quest?.notes || '';
-  Modal.open('quest');
-  setTimeout(() => document.getElementById('qm-title')?.focus(), 100);
-};
-
-const submitQuest = () => {
-  const title = document.getElementById('qm-title')?.value?.trim();
-  if (!title) { Toast.show('Inserisci un titolo', 'warning'); return; }
-
-  const camp = App.getActiveCampaign();
-  if (!camp) return;
-
-  const quests = [...(camp.quests || [])];
-  const questData = {
-    title,
-    status: document.getElementById('qm-status')?.value || 'disponibile',
-    reward: document.getElementById('qm-reward')?.value || '',
-    notes: document.getElementById('qm-notes')?.value || '',
-  };
-
-  if (_editingQuestId) {
-    const idx = quests.findIndex(q => q.id === _editingQuestId);
-    if (idx !== -1) quests[idx] = { ...quests[idx], ...questData };
-  } else {
-    quests.push({ id: 'q_' + Date.now(), ...questData });
-  }
-
-  App.saveActiveCampaign({ quests });
-  Modal.close('quest');
-  App.renderQuestList();
-  Toast.show(quest ? 'Quest aggiornata' : 'Quest aggiunta', 'success');
-};
-
 const openTimelineModal = () => {
   document.getElementById('tm-day').value = '';
   document.getElementById('tm-event').value = '';
@@ -3788,7 +3287,6 @@ const App = (() => {
   const pages = {
     home:       { label: 'Home',   icon: '🏠', navItem: true,  requiresCampaign: false },
     campagna:   { label: 'Dashboard',   icon: '📖', navItem: true,  requiresCampaign: true  },
-    mondo:      { label: 'Mondo',      icon: '🗺️', navItem: true,  requiresCampaign: true  },
     sessione:   { label: 'Sessione',   icon: '⚔️', navItem: true,  requiresCampaign: true  },
     generatori: { label: 'Generatori', icon: '✨', navItem: true,  requiresCampaign: false },
     compendio:  { label: 'Compendio',  icon: '📚', navItem: true,  requiresCampaign: false },
@@ -3856,13 +3354,6 @@ const App = (() => {
     switch (pageId) {
       case 'home':       renderHomePage(); break;
       case 'campagna':   renderCampaignPage(); setTimeout(() => { try { renderDashboard(); } catch(e){} try{QuestKanban.render();}catch(e){} }, 100); break;
-      case 'mondo': WikiSections.goto('png'); return;
-      case 'mondo_legacy':
-        App.reloadActiveCampaign();
-        try { NPC.init(); } catch(e) { Debug.warn('NPC non pronto: ' + e); }
-        try { Luoghi.init(); } catch(e) {}
-        try { Fazioni.init(); } catch(e) {}
-        break;
       case 'sessione':   try { Sessione.init(); setTimeout(() => NoteSessione.render(), 100); } catch(e) {} setTimeout(()=>{try{Clocks.render();}catch(e){}; try{ScenePlanner.render();}catch(e){}; try{SessioniLog.showTab('corrente');}catch(e){}},200); break;
       case 'generatori':
         setTimeout(() => { GeneratoriDD.enable(); Generatori.applyVisibility(); EncounterBuilder.init(); RNGLoot.init(); }, 100);
@@ -4196,63 +3687,6 @@ const openCampaign = (id) => {
     Debug.log('Riepilogo sessione salvato');
   };
 
-  const renderQuestList = () => {
-    if (!activeCampaign) return;
-    const quests = activeCampaign.quests || [];
-    const tabs = ['disponibile', 'in_corso', 'completata', 'fallita'];
-    const labels = { disponibile: 'Disponibili', in_corso: 'In Corso', completata: 'Completate', fallita: 'Fallite' };
-    const colors = { disponibile: 'badge-muted', in_corso: 'badge-primary', completata: 'badge-success', fallita: 'badge-warning' };
-
-    tabs.forEach(status => {
-      const el = document.getElementById(`quest-list-${status}`);
-      if (!el) return;
-      const filtered = quests.filter(q => q.status === status);
-      if (filtered.length === 0) {
-        el.innerHTML = `<div class="empty-state" style="padding:var(--space-lg)"><div class="text-muted text-sm">Nessuna quest ${labels[status].toLowerCase()}</div></div>`;
-        return;
-      }
-      el.innerHTML = filtered.map(q => `
-        <div class="quest-item status-${q.status}" style="border-left:3px solid var(--${q.status === 'disponibile' ? 'border' : q.status === 'in_corso' ? 'accent-primary' : q.status === 'completata' ? 'accent-success' : 'accent-danger'});padding-left:10px;margin-bottom:8px;">
-          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;">
-            <div style="flex:1;min-width:0;">
-              <div style="font-family:var(--font-display);font-size:0.9rem;font-weight:600;color:var(--text-primary);margin-bottom:2px;">${q.title}</div>
-              ${q.notes ? `<div style="font-size:0.78rem;color:var(--text-muted);margin-bottom:4px;">${q.notes}</div>` : ''}
-              ${q.reward ? `<div style="font-size:0.78rem;color:var(--accent-secondary);display:flex;align-items:center;gap:4px;margin-top:4px;">🏆 <span style="font-weight:600;">Ricompensa:</span> ${q.reward}</div>` : ''}
-              ${q.steps?.length ? `<div style="font-size:0.72rem;color:var(--text-muted);margin-top:3px;">📋 ${q.steps.filter(s=>s.done).length}/${q.steps.length} obiettivi completati</div>` : ''}
-            </div>
-            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0;">
-              <span class="badge ${colors[q.status]}" style="font-size:0.65rem;">${labels[q.status]}</span>
-              <div style="display:flex;gap:2px;">
-                <button class="btn btn-ghost btn-icon-sm" onclick="App.editQuest('${q.id}')" title="Modifica">✏️</button>
-                <button class="btn btn-ghost btn-icon-sm" onclick="App.deleteQuest('${q.id}')" title="Elimina" style="color:var(--accent-danger);">🗑️</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      `).join('');
-    });
-  };
-
-  const addQuest = () => {
-    openQuestModal(null);
-  };
-
-  const editQuest = (id) => {
-    if (!activeCampaign) return;
-    const quest = (activeCampaign.quests || []).find(q => q.id === id);
-    if (quest) openQuestModal(quest);
-  };
-
-  const deleteQuest = (id) => {
-    if (!activeCampaign) return;
-    openConfirmModal('Eliminare questa quest?', '', () => {
-      const quests = (activeCampaign.quests || []).filter(q => q.id !== id);
-      App.saveActiveCampaign({ quests });
-      renderQuestList();
-      Toast.show('Quest eliminata', 'info');
-    });
-  };
-
   const renderTimeline = () => {
     if (!activeCampaign) return;
     const events = (activeCampaign.timeline || []).sort((a, b) => a.day - b.day);
@@ -4429,8 +3863,6 @@ const openCampaign = (id) => {
     editCampaign,
     confirmDeleteCampaign,
     saveRecap,
-    addQuest, editQuest, deleteQuest,
-    renderQuestList,
     addTimelineEvent, deleteTimelineEvent,
     renderTimeline,
     addFaction, editFaction, deleteFaction,
@@ -5061,406 +4493,6 @@ const NPC = (() => {
     addAction, deleteNPC, switchModalTab,
     addCurrentToCombat,
   };
-})();
-
-/* ============================================================
-   LUOGHI.JS — Gestione luoghi con gerarchia e immagini
-   ============================================================ */
-
-const Luoghi = (() => {
-  let _editingId = null;
-
-  const _ic = (path) => '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">' + path + '</svg>';
-  const tipoIcon = {
-    regno:     _ic('<path d="m2 20 1.5-9L8 15l4-9 4 9 4.5-4L22 20z"/><path d="M2 20h20"/>'),
-    citta:     _ic('<path d="M4 21V9l6-4v16"/><path d="M14 21V5l6 4v12"/><path d="M4 21h16"/><path d="M8 9h.01M8 13h.01M8 17h.01M18 13h.01M18 17h.01"/>'),
-    villaggio: _ic('<path d="M4 21V11l5-4 5 4v10"/><path d="M2 21h20"/><path d="M9 21v-5h2v5"/><path d="M15 21v-6l4-3 3 3v6"/>'),
-    dungeon:   _ic('<path d="M4 21V10a8 8 0 0 1 16 0v11"/><path d="M4 21h16"/><path d="M9 21v-6h6v6"/>'),
-    locanda:   _ic('<path d="M6 10V4h9l3 3v3"/><path d="M4 10h16v2a6 6 0 0 1-6 6H10a6 6 0 0 1-6-6z"/><path d="M8 21h8"/>'),
-    edificio:  _ic('<rect x="4" y="3" width="16" height="18" rx="1"/><path d="M9 8h1M14 8h1M9 12h1M14 12h1M9 16h1M14 16h1"/>'),
-    natura:    _ic('<path d="M12 2 7 10h3l-4 7h5v5h2v-5h5l-4-7h3z"/>'),
-    altro:     _ic('<path d="M12 21s7-5.5 7-11a7 7 0 0 0-14 0c0 5.5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/>'),
-  };
-
-  const getAll = () => App.getActiveCampaign()?.locations || [];
-
-  const filter = () => render();
-
-  const render = () => {
-    const el = document.getElementById('luoghi-list');
-    if (!el) return;
-    const camp = App.getActiveCampaign();
-    if (!camp) return;
-
-    const q    = document.getElementById('luoghi-search')?.value?.toLowerCase() || '';
-    const tipo = document.getElementById('luoghi-filter-tipo')?.value || '';
-
-    let list = getAll().filter(l => {
-      if (q    && !l.nome.toLowerCase().includes(q)) return false;
-      if (tipo && l.tipo !== tipo) return false;
-      return true;
-    });
-
-    if (list.length === 0) {
-      el.innerHTML = `<div class="empty-state" style="grid-column:1/-1;">
-        <div class="module-placeholder-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" style="width:2.6rem;height:2.6rem;opacity:0.4;" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
-        <h3>${getAll().length ? 'Nessun luogo trovato' : 'Nessun luogo ancora'}</h3>
-        <p class="text-sm text-muted">Clicca "+ Nuovo Luogo" per cominciare</p>
-      </div>`;
-      return;
-    }
-
-    el.innerHTML = list.map(l => {
-      const parent = l.parentId ? getAll().find(x => x.id === l.parentId) : null;
-      const img = l.immagine
-        ? `<div style="height:100px;background:url('${l.immagine}') center/cover;border-radius:var(--radius-md) var(--radius-md) 0 0;margin:-var(--space-md) -var(--space-md) var(--space-sm);"></div>`
-        : '';
-      return `
-        <div class="npc-card" onclick="Luoghi.openView('${l.id}')">
-          ${l.immagine ? `<div style="height:90px;background:url('${l.immagine}') center/cover no-repeat;border-radius:var(--radius-lg) var(--radius-lg) 0 0;flex-shrink:0;"></div>` : ''}
-          <div class="npc-card-header">
-            <div class="npc-avatar">${l.icon || tipoIcon[l.tipo] || tipoIcon.altro}</div>
-            <div style="flex:1;min-width:0;">
-              <div class="npc-name">${l.nome}</div>
-              <div class="npc-meta">${l.tipo || ''} ${parent ? '· in ' + parent.nome : ''}</div>
-            </div>
-            <div style="display:flex;flex-direction:column;gap:4px;" onclick="event.stopPropagation()">
-              <button class="btn btn-ghost btn-icon-sm" onclick="Luoghi.openModal(Luoghi._getById('${l.id}'))"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
-              <button class="btn btn-ghost btn-icon-sm" onclick="Luoghi.delete('${l.id}')"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>
-            </div>
-          </div>
-          <div class="npc-card-body">
-            ${l.desc ? `<div class="text-sm text-muted" style="overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;">${l.desc}</div>` : ''}
-          </div>
-        </div>`;
-    }).join('');
-  };
-
-  const _getById = (id) => getAll().find(l => l.id === id) || null;
-
-  const openModal = (luogo) => {
-    _editingId = luogo?.id || null;
-    document.getElementById('luogo-modal-title').textContent = luogo ? 'Modifica Luogo' : 'Nuovo Luogo';
-    document.getElementById('luogo-id').value = luogo?.id || '';
-
-    const fields = {
-      'luogo-nome': luogo?.nome || '', 'luogo-tipo': luogo?.tipo || 'locanda',
-      'luogo-icon': luogo?.icon || '', 'luogo-desc': luogo?.desc || '',
-      'luogo-poi':  luogo?.poi  || '', 'luogo-loot': luogo?.loot || '',
-      'luogo-note': luogo?.note || '', 'luogo-img-url': luogo?.immagine || '',
-    };
-    Object.entries(fields).forEach(([id, val]) => {
-      const el = document.getElementById(id); if (el) el.value = val;
-    });
-
-    setImgPreview('luogo', luogo?.immagine || '');
-
-    const parentSel = document.getElementById('luogo-parent');
-    if (parentSel) {
-      parentSel.innerHTML = '<option value="">— Nessuno (luogo radice) —</option>';
-      getAll().filter(l => l.id !== luogo?.id).forEach(l => {
-        const opt = document.createElement('option');
-        opt.value = l.id;
-        opt.textContent = l.nome;
-        opt.selected = l.id === luogo?.parentId;
-        parentSel.appendChild(opt);
-      });
-    }
-
-    Modal.open('luogo');
-    setTimeout(() => document.getElementById('luogo-nome')?.focus(), 100);
-  };
-
-  const submitModal = () => {
-    const nome = document.getElementById('luogo-nome')?.value?.trim();
-    if (!nome) { Toast.show('Inserisci un nome', 'warning'); return; }
-    const camp = App.getActiveCampaign();
-    if (!camp) return;
-
-    const locations = [...(camp.locations || [])];
-    const data = {
-      nome,
-      tipo:      document.getElementById('luogo-tipo')?.value || 'altro',
-      icon:      document.getElementById('luogo-icon')?.value?.trim() || '',
-      parentId:  document.getElementById('luogo-parent')?.value || '',
-      desc:      _fieldVal('luogo-desc')?.trim() || '',
-      poi:       document.getElementById('luogo-poi')?.value?.trim() || '',
-      loot:      document.getElementById('luogo-loot')?.value?.trim() || '',
-      note:      _fieldVal('luogo-note')?.trim() || '',
-      immagine:  document.getElementById('luogo-img-url')?.value?.trim() || '',
-    };
-
-    const _oldLocNome = _editingId ? (locations.find(l => l.id === _editingId)?.nome || '') : '';
-
-    if (_editingId) {
-      const idx = locations.findIndex(l => l.id === _editingId);
-      if (idx !== -1) locations[idx] = { ...locations[idx], ...data };
-    } else {
-      locations.push({ id: 'loc_' + Date.now(), ...data });
-    }
-
-    App.saveActiveCampaign({ locations });
-    Modal.close('luogo');
-    render();
-    Toast.show(_editingId ? 'Luogo aggiornato' : 'Luogo aggiunto', 'success');
-    Debug.log(`Luogo salvato: ${nome}`);
-    if (_oldLocNome && _oldLocNome !== nome) _safeRename('luogo', _oldLocNome, nome);
-
-    setTimeout(() => {
-      try {
-        const camp2 = App.getActiveCampaign();
-        const saved = (camp2?.locations||[]).find(l => l.nome === nome);
-        if (saved) _mondoToWiki('luogo', saved);
-      } catch(e) { Debug.warn('Wiki sync Luogo:', e); }
-    }, 200);
-  };
-
-  const openView = (id) => {
-    const l = _getById(id);
-    if (!l) return;
-    const parent = l.parentId ? _getById(l.parentId) : null;
-    const figli = getAll().filter(x => x.parentId === id);
-
-    const content = `
-      ${l.immagine ? `<div style="position:relative;height:200px;width:100%;border-radius:var(--radius-md);margin-bottom:8px;overflow:hidden;"><div id="loc-img-${l.id}" style="width:100%;height:100%;background:url('${l.immagine}') ${l.imgPosX||50}% ${l.imgPosY||50}% / ${l.imgZoom||100}% auto no-repeat;"></div><div style="position:absolute;bottom:4px;right:4px;display:flex;gap:2px;background:rgba(0,0,0,0.65);border-radius:4px;padding:2px 3px;z-index:10;">
-        <button onclick="event.stopPropagation();locImgAdjust.bind(null,'${l.id}')('x',-10)" style="width:24px;height:24px;background:none;border:none;color:#fff;cursor:pointer;font-size:0.85rem;line-height:1;" title="←">←</button>
-        <button onclick="event.stopPropagation();locImgAdjust.bind(null,'${l.id}')('x',10)" style="width:24px;height:24px;background:none;border:none;color:#fff;cursor:pointer;font-size:0.85rem;line-height:1;" title="→">→</button>
-        <button onclick="event.stopPropagation();locImgAdjust.bind(null,'${l.id}')('y',-10)" style="width:24px;height:24px;background:none;border:none;color:#fff;cursor:pointer;font-size:0.85rem;line-height:1;" title="↑">↑</button>
-        <button onclick="event.stopPropagation();locImgAdjust.bind(null,'${l.id}')('y',10)" style="width:24px;height:24px;background:none;border:none;color:#fff;cursor:pointer;font-size:0.85rem;line-height:1;" title="↓">↓</button>
-        <button onclick="event.stopPropagation();locImgAdjust.bind(null,'${l.id}')('z',-20)" style="width:24px;height:24px;background:none;border:none;color:#fff;cursor:pointer;font-size:1rem;line-height:1;" title="−">−</button>
-        <button onclick="event.stopPropagation();locImgAdjust.bind(null,'${l.id}')('z',20)" style="width:24px;height:24px;background:none;border:none;color:#fff;cursor:pointer;font-size:1rem;line-height:1;" title="+">+</button>
-      </div></div>` : ''}
-      <div class="text-xs text-muted" style="font-family:var(--font-display);letter-spacing:0.05em;text-transform:uppercase;margin-bottom:var(--space-sm);display:flex;align-items:center;gap:6px;">
-        <span style="display:flex;">${tipoIcon[l.tipo] || tipoIcon.altro}</span> ${l.tipo || ''} ${parent ? '· dentro ' + parent.nome : ''}
-      </div>
-      ${l.desc ? `<div class="text-sm" style="line-height:1.7;margin-bottom:var(--space-md);">${l.desc}</div>` : ''}
-      ${l.poi ? `<div class="card card-accent" style="margin-bottom:var(--space-sm);padding:var(--space-sm) var(--space-md);"><div class="text-xs text-muted" style="font-family:var(--font-display);text-transform:uppercase;letter-spacing:0.05em;">Punti di Interesse / PNG</div><div class="text-sm" style="margin-top:4px;">${l.poi}</div></div>` : ''}
-      ${l.loot ? `<div class="card card-gold" style="margin-bottom:var(--space-sm);padding:var(--space-sm) var(--space-md);"><div class="text-xs" style="font-family:var(--font-display);text-transform:uppercase;letter-spacing:0.05em;color:var(--accent-secondary);display:flex;align-items:center;gap:6px;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13M12 8a2.5 2.5 0 1 1-2.5-2.5C11 5.5 12 8 12 8zM12 8a2.5 2.5 0 1 0 2.5-2.5C13 5.5 12 8 12 8z"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg> Loot / Tesoro</div><div class="text-sm" style="margin-top:4px;">${l.loot}</div></div>` : ''}
-      ${l.note ? `<div class="card" style="padding:var(--space-sm) var(--space-md);"><div class="text-xs text-muted" style="font-family:var(--font-display);text-transform:uppercase;letter-spacing:0.05em;display:flex;align-items:center;gap:6px;">Note DM <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div><div class="text-sm" style="margin-top:4px;">${l.note}</div></div>` : ''}
-      ${figli.length ? `<div style="margin-top:var(--space-md);"><div class="comp-cat-header">Luoghi interni</div>${figli.map(f => `<div class="comp-row" onclick="Luoghi.openView('${f.id}')"><div class="comp-row-main"><span class="comp-row-name" style="display:flex;align-items:center;gap:6px;">${tipoIcon[f.tipo] || tipoIcon.altro} ${f.nome}</span></div></div>`).join('')}</div>` : ''}
-    `;
-
-    const titleEl = document.getElementById('comp-detail-title');
-    const bodyEl  = document.getElementById('comp-detail-body');
-    const btn     = document.getElementById('comp-detail-combat-btn');
-    if (titleEl) titleEl.textContent = (l.icon ? l.icon + ' ' : '') + l.nome;
-    if (bodyEl)  bodyEl.innerHTML = content;
-    if (btn)     btn.style.display = 'none';
-    Modal.open('comp-detail');
-  };
-
-  const _delete = (id) => {
-    openConfirmModal('Eliminare questo luogo?', 'I luoghi interni rimarranno ma perderanno il genitore.', () => {
-      const camp = App.getActiveCampaign();
-      let locations = (camp?.locations || []).filter(l => l.id !== id);
-
-      locations = locations.map(l => l.parentId === id ? { ...l, parentId: '' } : l);
-      App.saveActiveCampaign({ locations });
-      render();
-      Toast.show('Luogo eliminato', 'info');
-    });
-  };
-
-  const init = () => { render(); Debug.log('Luoghi.init()'); };
-
-  return { init, render, filter, openModal, submitModal, openView, delete: _delete, _getById };
-})();
-
-/* ============================================================
-   FAZIONI.JS — Gestione fazioni nel Mondo con immagini
-   ============================================================ */
-
-const Fazioni = (() => {
-  let _editingId = null;
-
-  const getAll = () => {
-    const camp = App.getActiveCampaign();
-
-    return camp?.factions || [];
-  };
-
-  const relColor = (v) => {
-    v = Math.max(0, Math.min(100, parseInt(v || 50)));
-    if (v <= 25) return `rgb(200,${Math.round(60+v/25*100)},30)`;
-    if (v <= 50) return `rgb(${Math.round(200-(v-25)/25*30)},${Math.round(160+(v-25)/25*60)},30)`;
-    if (v <= 75) return `rgb(${Math.round(170-(v-50)/25*120)},${Math.round(200+(v-50)/25*20)},${Math.round(30+(v-50)/25*30)})`;
-    return `rgb(${Math.round(50-(v-75)/25*30)},${Math.round(220-(v-75)/25*110)},${Math.round(60+(v-75)/25*150)})`;
-  };
-
-  const filter = () => render();
-
-  const render = () => {
-    const el = document.getElementById('fazioni-list');
-    if (!el) return;
-
-    const q = document.getElementById('fazioni-search')?.value?.toLowerCase() || '';
-    let list = getAll().filter(f => !q || f.name.toLowerCase().includes(q));
-
-    if (list.length === 0) {
-      el.innerHTML = `<div class="empty-state" style="grid-column:1/-1;">
-        <div class="module-placeholder-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" style="width:2.6rem;height:2.6rem;opacity:0.4;" aria-hidden="true"><path d="M3 21h18"/><path d="M3 10h18"/><path d="M5 6l7-3 7 3"/><path d="M4 10v11"/><path d="M20 10v11"/><path d="M8 14v3"/><path d="M12 14v3"/><path d="M16 14v3"/></svg></div>
-        <h3>${getAll().length ? 'Nessuna fazione trovata' : 'Nessuna fazione ancora'}</h3>
-        <p class="text-sm text-muted">Clicca "+ Nuova Fazione" per cominciare</p>
-      </div>`;
-      return;
-    }
-
-    el.innerHTML = list.map(f => {
-      const pct = f.power ?? 50;
-      const col = relColor(pct);
-      const img = f.immagine;
-      return `
-        <div class="npc-card" onclick="Fazioni.openView('${f.id}')">
-          ${img ? `<div style="height:80px;background:url('${img}') center/cover no-repeat;border-radius:var(--radius-lg) var(--radius-lg) 0 0;flex-shrink:0;"></div>` : ''}
-          <div class="npc-card-header">
-            <div class="npc-avatar">${f.icon || '🏛️'}</div>
-            <div style="flex:1;min-width:0;">
-              <div class="npc-name">${f.name}</div>
-              <div class="npc-meta">${f.influence || ''}</div>
-            </div>
-            <div style="display:flex;flex-direction:column;gap:4px;" onclick="event.stopPropagation()">
-              <button class="btn btn-ghost btn-icon-sm" onclick="Fazioni.openModal(Fazioni._getById('${f.id}'))"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
-              <button class="btn btn-ghost btn-icon-sm" onclick="Fazioni.delete('${f.id}')"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>
-            </div>
-          </div>
-          <div class="npc-card-body">
-            <div class="relation-bar-wrap">
-              <div class="relation-bar-labels">
-                <span>Debole</span>
-                <span style="color:${col};font-weight:600;">${pct}%</span>
-                <span>Dominante</span>
-              </div>
-              <div class="relation-bar-track">
-                <div class="relation-bar-fill" style="width:${pct}%;background:${col};"></div>
-              </div>
-            </div>
-            ${f.notes ? `<div class="text-xs text-muted" style="margin-top:6px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;">${f.notes}</div>` : ''}
-          </div>
-        </div>`;
-    }).join('');
-  };
-
-  const _getById = (id) => getAll().find(f => f.id === id) || null;
-
-  const openModal = (fazione) => {
-    _editingId = fazione?.id || null;
-    document.getElementById('fazione-mondo-title').textContent = fazione ? 'Modifica Fazione' : 'Nuova Fazione';
-    document.getElementById('fazione-mondo-id').value = fazione?.id || '';
-
-    const fields = {
-      'fazione-mondo-nome':      fazione?.name      || '',
-      'fazione-mondo-icon':      fazione?.icon      || '',
-      'fazione-mondo-influenza': fazione?.influence || '',
-      'fazione-mondo-obiettivi': fazione?.obiettivi || '',
-      'fazione-mondo-relazioni': fazione?.relazioni || '',
-      'fazione-mondo-note':      fazione?.notes     || '',
-      'fazione-img-url':         fazione?.immagine  || '',
-    };
-    Object.entries(fields).forEach(([id, val]) => {
-      const el = document.getElementById(id); if (el) el.value = val;
-    });
-
-    const powerEl = document.getElementById('fazione-mondo-power');
-    const powerVal = document.getElementById('fazione-mondo-power-val');
-    if (powerEl) powerEl.value = fazione?.power ?? 50;
-    if (powerVal) powerVal.textContent = fazione?.power ?? 50;
-
-    setImgPreview('fazione', fazione?.immagine || '');
-    Modal.open('fazione-mondo');
-    setTimeout(() => document.getElementById('fazione-mondo-nome')?.focus(), 100);
-  };
-
-  const submitModal = () => {
-    const nome = document.getElementById('fazione-mondo-nome')?.value?.trim();
-    if (!nome) { Toast.show('Inserisci un nome', 'warning'); return; }
-    const camp = App.getActiveCampaign();
-    if (!camp) return;
-
-    const factions = [...(camp.factions || [])];
-    const data = {
-      name:      nome,
-      icon:      document.getElementById('fazione-mondo-icon')?.value?.trim()      || '🏛️',
-      power:     parseInt(document.getElementById('fazione-mondo-power')?.value)   || 50,
-      influence: document.getElementById('fazione-mondo-influenza')?.value?.trim() || '',
-      obiettivi: _fieldVal('fazione-mondo-obiettivi')?.trim() || '',
-      relazioni: document.getElementById('fazione-mondo-relazioni')?.value?.trim() || '',
-      notes:     _fieldVal('fazione-mondo-note')?.trim()      || '',
-      immagine:  document.getElementById('fazione-img-url')?.value?.trim()         || '',
-    };
-
-    if (_editingId) {
-      const idx = factions.findIndex(f => f.id === _editingId);
-      if (idx !== -1) factions[idx] = { ...factions[idx], ...data };
-    } else {
-      factions.push({ id: 'faz_' + Date.now(), ...data });
-    }
-
-    App.saveActiveCampaign({ factions });
-    Modal.close('fazione-mondo');
-    render();
-
-    if (window.App) App.renderFactionList();
-    Toast.show(_editingId ? 'Fazione aggiornata' : 'Fazione aggiunta', 'success');
-    Debug.log(`Fazione salvata: ${nome}`);
-
-    setTimeout(() => {
-      try {
-        const camp2 = App.getActiveCampaign();
-        const saved = (camp2?.factions||[]).find(f => f.nome === nome);
-        if (saved) _mondoToWiki('fazione', saved);
-      } catch(e) { Debug.warn('Wiki sync Fazione:', e); }
-    }, 200);
-  };
-
-  const openView = (id) => {
-    const f = _getById(id);
-    if (!f) return;
-    const pct = f.power ?? 50;
-    const col = relColor(pct);
-
-    const content = `
-      ${f.immagine ? `<div style="position:relative;height:160px;width:100%;border-radius:var(--radius-md);margin-bottom:8px;overflow:hidden;"><div id="faz-img-${f.id}" style="width:100%;height:100%;background:url('${f.immagine}') ${f.imgPosX||50}% ${f.imgPosY||50}% / ${f.imgZoom||100}% auto no-repeat;"></div><div style="position:absolute;bottom:4px;right:4px;display:flex;gap:2px;background:rgba(0,0,0,0.65);border-radius:4px;padding:2px 3px;z-index:10;">
-        <button onclick="event.stopPropagation();fazImgAdjust.bind(null,'${f.id}')('x',-10)" style="width:24px;height:24px;background:none;border:none;color:#fff;cursor:pointer;font-size:0.85rem;line-height:1;" title="←">←</button>
-        <button onclick="event.stopPropagation();fazImgAdjust.bind(null,'${f.id}')('x',10)" style="width:24px;height:24px;background:none;border:none;color:#fff;cursor:pointer;font-size:0.85rem;line-height:1;" title="→">→</button>
-        <button onclick="event.stopPropagation();fazImgAdjust.bind(null,'${f.id}')('y',-10)" style="width:24px;height:24px;background:none;border:none;color:#fff;cursor:pointer;font-size:0.85rem;line-height:1;" title="↑">↑</button>
-        <button onclick="event.stopPropagation();fazImgAdjust.bind(null,'${f.id}')('y',10)" style="width:24px;height:24px;background:none;border:none;color:#fff;cursor:pointer;font-size:0.85rem;line-height:1;" title="↓">↓</button>
-        <button onclick="event.stopPropagation();fazImgAdjust.bind(null,'${f.id}')('z',-20)" style="width:24px;height:24px;background:none;border:none;color:#fff;cursor:pointer;font-size:1rem;line-height:1;" title="−">−</button>
-        <button onclick="event.stopPropagation();fazImgAdjust.bind(null,'${f.id}')('z',20)" style="width:24px;height:24px;background:none;border:none;color:#fff;cursor:pointer;font-size:1rem;line-height:1;" title="+">+</button>
-      </div></div>` : ''}
-      <div style="margin-bottom:var(--space-md);">
-        <div class="relation-bar-labels"><span>Debole</span><span style="color:${col};font-weight:600;">${pct}% potere</span><span>Dominante</span></div>
-        <div class="relation-bar-track"><div class="relation-bar-fill" style="width:${pct}%;background:${col};"></div></div>
-      </div>
-      ${f.influence ? `<div class="text-sm" style="margin-bottom:var(--space-sm);"><strong>Zona di influenza:</strong> ${f.influence}</div>` : ''}
-      ${f.obiettivi ? `<div class="card card-accent" style="padding:var(--space-sm) var(--space-md);margin-bottom:var(--space-sm);"><div class="text-xs text-muted" style="font-family:var(--font-display);text-transform:uppercase;letter-spacing:0.05em;">Obiettivi</div><div class="text-sm" style="margin-top:4px;">${f.obiettivi}</div></div>` : ''}
-      ${f.relazioni ? `<div class="card" style="padding:var(--space-sm) var(--space-md);margin-bottom:var(--space-sm);"><div class="text-xs text-muted" style="font-family:var(--font-display);text-transform:uppercase;letter-spacing:0.05em;">Relazioni</div><div class="text-sm" style="margin-top:4px;">${f.relazioni}</div></div>` : ''}
-      ${f.notes ? `<div class="card card-gold" style="padding:var(--space-sm) var(--space-md);"><div class="text-xs" style="font-family:var(--font-display);text-transform:uppercase;letter-spacing:0.05em;color:var(--accent-secondary);">🔒 Note DM</div><div class="text-sm" style="margin-top:4px;">${f.notes}</div></div>` : ''}
-    `;
-
-    const titleEl = document.getElementById('comp-detail-title');
-    const bodyEl  = document.getElementById('comp-detail-body');
-    const btn     = document.getElementById('comp-detail-combat-btn');
-    if (titleEl) titleEl.textContent = (f.icon || '🏛️') + ' ' + f.name;
-    if (bodyEl)  bodyEl.innerHTML = content;
-    if (btn)     btn.style.display = 'none';
-    Modal.open('comp-detail');
-  };
-
-  const _delete = (id) => {
-    const f = _getById(id);
-    openConfirmModal(`Eliminare "${f?.name}"?`, '', () => {
-      const camp = App.getActiveCampaign();
-      const factions = (camp?.factions || []).filter(x => x.id !== id);
-      App.saveActiveCampaign({ factions });
-      render();
-      if (window.App) App.renderFactionList();
-      Toast.show('Fazione eliminata', 'info');
-    });
-  };
-
-  const init = () => { render(); Debug.log('Fazioni.init()'); };
-
-  return { init, render, filter, openModal, submitModal, openView, delete: _delete, _getById };
 })();
 
 /* ============================================================
@@ -11574,11 +10606,8 @@ const wikiNavigateLink = (key) => {
     const camp = App.getActiveCampaign();
     const npc = (camp?.npcs||[]).find(n => (n.name||n.nome||'').toLowerCase() === titolo.toLowerCase());
     if (npc) {
-      App.navigateTo('mondo');
-      setTimeout(() => {
-        try { NPC.init(); } catch(e) {}
-        setTimeout(() => NPC.openView(npc.id), 150);
-      }, 100);
+      WikiSections.goto('png');
+      setTimeout(() => WikiSections.openCard('png', npc.id), 150);
       return;
     }
     Toast.show('PNG "' + titolo + '" non trovato nel Mondo', 'warning', 2500);
@@ -11589,11 +10618,8 @@ const wikiNavigateLink = (key) => {
     const camp = App.getActiveCampaign();
     const loc = (camp?.locations||[]).find(l => (l.nome||'').toLowerCase() === titolo.toLowerCase());
     if (loc) {
-      App.navigateTo('mondo');
-      setTimeout(() => {
-        try { Luoghi.init(); } catch(e) {}
-        setTimeout(() => Luoghi.openView(loc.id), 150);
-      }, 100);
+      WikiSections.goto('luoghi');
+      setTimeout(() => WikiSections.openCard('luoghi', loc.id), 150);
       return;
     }
     Toast.show('Luogo "' + titolo + '" non trovato nel Mondo', 'warning', 2500);
@@ -11604,11 +10630,8 @@ const wikiNavigateLink = (key) => {
     const camp = App.getActiveCampaign();
     const faz = (camp?.factions||[]).find(f => (f.nome||'').toLowerCase() === titolo.toLowerCase());
     if (faz) {
-      App.navigateTo('mondo');
-      setTimeout(() => {
-        try { Fazioni.init(); } catch(e) {}
-        setTimeout(() => Fazioni.openView(faz.id), 150);
-      }, 100);
+      WikiSections.goto('fazioni');
+      setTimeout(() => WikiSections.openCard('fazioni', faz.id), 150);
       return;
     }
     Toast.show('Fazione "' + titolo + '" non trovata nel Mondo', 'warning', 2500);
@@ -11982,9 +11005,9 @@ const WikiGrafo = (() => {
 
   const _open = (d) => {
     if (d.tipo==='wiki'||d.tipo==='sessione') { WikiDM.switchSection(d.tipo==='sessione'?'sessioni':'lore'); WikiDM.openNote(d.ref.id); }
-    else if (d.tipo==='png') { App.navigateTo('mondo'); setTimeout(()=>NPC.openView(d.ref.id),150); }
-    else if (d.tipo==='luogo') { App.navigateTo('mondo'); setTimeout(()=>Luoghi.openView(d.ref.id),150); }
-    else if (d.tipo==='fazione') { App.navigateTo('mondo'); setTimeout(()=>Fazioni.openView(d.ref.id),150); }
+    else if (d.tipo==='png') { WikiSections.goto('png'); setTimeout(()=>WikiSections.openCard('png', d.ref.id),150); }
+    else if (d.tipo==='luogo') { WikiSections.goto('luoghi'); setTimeout(()=>WikiSections.openCard('luoghi', d.ref.id),150); }
+    else if (d.tipo==='fazione') { WikiSections.goto('fazioni'); setTimeout(()=>WikiSections.openCard('fazioni', d.ref.id),150); }
   };
 
   const render = () => {
@@ -12893,37 +11916,43 @@ const _enrichedSearch = (q, camp) => {
   const query = q.toLowerCase();
 
   (camp?.npcs||[]).forEach(n => {
-    const haystack = [n.name||n.nome, n.alias, n.job, n.race, n.trait, n.secret, n.wants, n.links].filter(Boolean).join(' ').toLowerCase();
+    const ruolo = n.job || n.ruolo || '', razza = n.race || n.razza || '';
+    const personalita = n.personality || n.personalita || '';
+    const segreto = n.secret || n.segreto || '';
+    const vuole = n.wants || n.vuole || '';
+    const haystack = [n.name||n.nome, n.alias, ruolo, razza, personalita, segreto, vuole].filter(Boolean).join(' ').toLowerCase();
     if (haystack.includes(query)) {
-      let sub = n.job || n.race || '';
+      let sub = ruolo || razza || '';
 
-      if ((n.trait||'').toLowerCase().includes(query)) sub = 'Tratto: ' + n.trait.slice(0,40);
-      else if ((n.secret||'').toLowerCase().includes(query)) sub = '🔒 Segreto';
-      else if ((n.wants||'').toLowerCase().includes(query)) sub = 'Vuole: ' + n.wants.slice(0,40);
+      if (personalita.toLowerCase().includes(query)) sub = 'Personalità: ' + personalita.slice(0,40);
+      else if (segreto.toLowerCase().includes(query)) sub = '🔒 Segreto';
+      else if (vuole.toLowerCase().includes(query)) sub = 'Vuole: ' + vuole.slice(0,40);
       results.push({ tipo:'👤 PNG', nome:n.name||n.nome||'', sub,
-        action:() => { Modal.close('global-search'); App.navigateTo('mondo'); setTimeout(()=>NPC.openView(n.id),150); }
+        action:() => { Modal.close('global-search'); WikiSections.goto('png'); setTimeout(()=>WikiSections.openCard('png', n.id),150); }
       });
     }
   });
 
   (camp?.locations||[]).forEach(l => {
-    const haystack = [l.nome, l.tipo, l.desc, l.note, l.poi].filter(Boolean).join(' ').toLowerCase();
+    const atmosfera = l.atmosfera || l.description || '';
+    const haystack = [l.nome, l.tipo, atmosfera, l.storia].filter(Boolean).join(' ').toLowerCase();
     if (haystack.includes(query)) {
       let sub = l.tipo || '';
-      if ((l.desc||'').toLowerCase().includes(query)) sub = l.desc.replace(/<[^>]+>/g,'').slice(0,40);
+      if (atmosfera.toLowerCase().includes(query)) sub = atmosfera.replace(/<[^>]+>/g,'').slice(0,40);
       results.push({ tipo:'🗺️ Luogo', nome:l.nome||'', sub,
-        action:() => { Modal.close('global-search'); App.navigateTo('mondo'); setTimeout(()=>Luoghi.openView(l.id),150); }
+        action:() => { Modal.close('global-search'); WikiSections.goto('luoghi'); setTimeout(()=>WikiSections.openCard('luoghi', l.id),150); }
       });
     }
   });
 
   (camp?.factions||[]).forEach(f => {
-    const haystack = [f.nome, f.tipo, f.obiettivi, f.note].filter(Boolean).join(' ').toLowerCase();
+    const obiettivo = f.obiettivo || f.description || '';
+    const haystack = [f.nome, f.tipo, obiettivo, f.risorse].filter(Boolean).join(' ').toLowerCase();
     if (haystack.includes(query)) {
       let sub = f.tipo || '';
-      if ((f.obiettivi||'').toLowerCase().includes(query)) sub = f.obiettivi.replace(/<[^>]+>/g,'').slice(0,40);
+      if (obiettivo.toLowerCase().includes(query)) sub = obiettivo.replace(/<[^>]+>/g,'').slice(0,40);
       results.push({ tipo:'⚔️ Fazione', nome:f.nome||'', sub,
-        action:() => { Modal.close('global-search'); App.navigateTo('mondo'); setTimeout(()=>Fazioni.openView(f.id),150); }
+        action:() => { Modal.close('global-search'); WikiSections.goto('fazioni'); setTimeout(()=>WikiSections.openCard('fazioni', f.id),150); }
       });
     }
   });
