@@ -88,6 +88,10 @@ Drag-and-drop grid layout with customizable blocks: party passive perceptions, q
 
 Always-accessible scratchpad in the topbar for in-session quick notes. JSON backup and restore per campaign or full data, with an optional automatic backup to the user's own Google Drive. 13 quick generators for improvisation at the table.
 
+**Loose threads** — a Dashboard card that surfaces NPCs, locations, factions, quests, and storylines untouched for 14+ days (excluding ones already marked dead/completed/abandoned), so hooks don't get forgotten between sessions.
+
+**Quick PNG card** — always-accessible topbar button that opens a compact, at-a-glance view of an NPC's personality, wants, hook, and DM secret, for reference mid-session without opening the full edit form.
+
 ---
 
 ## Collaboration & Sync
@@ -120,7 +124,7 @@ DM Toolkit can be installed as a standalone app — "Install app" in Chrome/Edge
 
 ## Tech stack
 
-Single HTML file. No framework, no bundler, no NPM dependencies.
+Core app in a single HTML file, no framework, no bundler, no NPM dependencies. A few self-contained features live in separate files under `js/`, loaded via plain `<script src>` tags — same no-build-step approach, just organized so the core file doesn't have to grow for every new addition.
 
 | Library | Purpose | Loading |
 |---|---|---|

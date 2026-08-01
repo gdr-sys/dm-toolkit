@@ -15711,6 +15711,7 @@ const Trame = (() => {
       stato: 'In corso',
       corpo: '',
       note: '',
+      aggiornatoAt: Date.now(),
     };
     trame.push(nuova);
     _save(trame);
@@ -15979,6 +15980,7 @@ const Trame = (() => {
     t.colore    = document.getElementById('trama-colore')?.value || t.colore;
     t.corpo     = document.getElementById('trama-corpo')?.innerHTML || t.corpo;
     t.note      = document.getElementById('trama-note')?.innerHTML || t.note;
+    t.aggiornatoAt = Date.now();
     _save(trame);
     // Il salvataggio automatico (debounce a ogni input) usa la stessa funzione ma senza
     // toast ne' cambio di vista, altrimenti interromperebbe la digitazione ad ogni carattere:
@@ -19356,6 +19358,11 @@ document.addEventListener('DOMContentLoaded', initMobileNav);
     </div>
   </div>
 </div>
+
+<!-- Funzionalita' aggiuntive in file separati: costruiscono la propria interfaccia a
+     runtime (card in Dashboard, pulsante+modal in topbar), senza aggiungere markup qui. -->
+<script src="js/fili-sospesi.js"></script>
+<script src="js/scheda-rapida.js"></script>
 
 </body>
 </html>
