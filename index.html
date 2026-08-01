@@ -13411,16 +13411,18 @@ const FirebaseSync = (() => {
       const lastShareCode = localStorage.getItem('dm_last_share_code');
       if (lastShareCode && _db) {
 
-        _db.ref('campagne/' + lastShareCode + '/data').once('value').then(snap => {
-          const remote = snap.val();
-          if (remote && remote.id) {
+        _db.ref('campagne/' + lastShareCode + '/data').once('value').then(async snap => {
+          const pointer = snap.val();
+          if (pointer && pointer.id) {
+            const remote = await _resolveRemote(pointer);
+            if (!remote || !remote.id) return;
             Storage.saveCampaign(remote);
             App.setActiveCampaign(remote);
             _startSync(remote.id);
             Toast.show('Campagna ripristinata dal cloud', 'success', 3000);
             setTimeout(() => { try { App.renderHomePage(); } catch(e) {} }, 300);
           }
-        }).catch(e => Debug.warn('Ripristino campagna fallito:', e.message));
+        }).catch(e => { Debug.warn('Ripristino campagna fallito:', e.message); Toast.show('Ripristino campagna fallito: ' + e.message, 'error', 5000); });
       }
     }
   };
@@ -13449,13 +13451,21 @@ const FirebaseSync = (() => {
           const existing = await _db.ref('campagne/' + key + '/data').once('value');
           if (!existing.val()) {
 
-            await _db.ref('campagne/' + key + '/data').set({
-              ...camp,
-              updatedAt: Date.now(),
-              updatedBy: uid,
-              updatedByName: user.displayName || user.email,
-              ownerId: uid,
-            });
+            if (typeof DriveBackup !== 'undefined' && DriveBackup.isConnected()) {
+              const driveFileId = await DriveBackup.syncToDrive(camp);
+              await _db.ref('campagne/' + key + '/data').set({
+                __pointer: true, driveFileId, id: camp.id, name: camp.name,
+                updatedAt: Date.now(), updatedBy: uid, updatedByName: user.displayName || user.email, ownerId: uid,
+              });
+            } else {
+              await _db.ref('campagne/' + key + '/data').set({
+                ...camp,
+                updatedAt: Date.now(),
+                updatedBy: uid,
+                updatedByName: user.displayName || user.email,
+                ownerId: uid,
+              });
+            }
           }
 
           await _db.ref('utenti/' + uid + '/campagne/' + key).set({
@@ -13480,22 +13490,21 @@ const FirebaseSync = (() => {
       for (const key of remoteKeys) {
         try {
           const campSnap = await _db.ref('campagne/' + key + '/data').once('value');
-          const remote = campSnap.val();
+          const pointer = campSnap.val();
+          if (!pointer || !pointer.id) continue;
+
+          // Controlla se serve scaricare PRIMA di andare su Drive, cosi' non si scarica
+          // inutilmente una campagna gia' aggiornata in locale
+          const local = Storage.getCampaign(pointer.id);
+          const remoteTs = pointer.updatedAt || 0;
+          const localTs  = local?.updatedAt || 0;
+          if (local && remoteTs <= localTs) continue;
+
+          const remote = await _resolveRemote(pointer);
           if (!remote || !remote.id) continue;
 
-          const local = Storage.getCampaign(remote.id);
-          const remoteTs = remote.updatedAt || 0;
-          const localTs  = local?.updatedAt || 0;
-
-          if (!local) {
-
-            Storage.saveCampaign(remote);
-            downloaded++;
-          } else if (remoteTs > localTs) {
-
-            Storage.saveCampaign(remote);
-            downloaded++;
-          }
+          Storage.saveCampaign(remote);
+          downloaded++;
         } catch(e) {
           Debug.warn('Download campagna remota:', e.message);
           Toast.show('Errore scaricando una campagna dal cloud: ' + e.message, 'error', 5000);
@@ -13592,7 +13601,8 @@ const FirebaseSync = (() => {
 
       if (remote.updatedBy === _user.uid) return;
 
-      _mergeRemote(remote);
+      _resolveRemote(remote).then(full => { if (full) _mergeRemote(full); })
+        .catch(e => { Debug.warn('Risoluzione dati da Drive:', e.message); Toast.show('Errore scaricando i dati da Drive: ' + e.message, 'error', 5000); });
     });
 
     _listening = true;
@@ -13605,20 +13615,48 @@ const FirebaseSync = (() => {
     _listening = false;
   };
 
+  // Se Drive e' collegato, i dati veri (con le immagini) vanno su Drive e Firebase riceve solo
+  // un puntatore leggero — cosi' Firebase resta minuscolo (pochi byte a campagna) ma il listener
+  // realtime continua a dare la sincronizzazione istantanea. Senza Drive, Firebase porta i dati
+  // per intero come prima (comportamento di ripiego).
   const _writeCampaign = async (camp) => {
     try {
-      await _campRef.child('data').set({
-        ...camp,
-        updatedAt: firebase.database.ServerValue.TIMESTAMP,
-        updatedBy: _user.uid,
-        updatedByName: _user.displayName || _user.email,
-      });
+      let payload;
+      if (typeof DriveBackup !== 'undefined' && DriveBackup.isConnected()) {
+        const driveFileId = await DriveBackup.syncToDrive(camp);
+        payload = {
+          __pointer: true, driveFileId,
+          id: camp.id, name: camp.name,
+          updatedAt: firebase.database.ServerValue.TIMESTAMP,
+          updatedBy: _user.uid,
+          updatedByName: _user.displayName || _user.email,
+        };
+      } else {
+        payload = {
+          ...camp,
+          updatedAt: firebase.database.ServerValue.TIMESTAMP,
+          updatedBy: _user.uid,
+          updatedByName: _user.displayName || _user.email,
+        };
+      }
+      await _campRef.child('data').set(payload);
       _lastSyncAt = Date.now();
       _updateSyncStatus('Sync: ' + new Date().toLocaleTimeString('it-IT'));
     } catch(e) {
       Debug.warn('Firebase push error:', e.message);
-      Toast.show('Sync Firebase fallita: ' + e.message, 'error', 5000);
+      Toast.show('Sync fallita: ' + e.message, 'error', 5000);
     }
+  };
+
+  // Risolve un valore letto da campagne/{key}/data: se e' un puntatore, scarica i dati veri da
+  // Drive; altrimenti (modalita' senza Drive) e' gia' la campagna completa.
+  const _resolveRemote = async (remote) => {
+    if (!remote) return null;
+    if (remote.__pointer && remote.driveFileId) {
+      const full = await DriveBackup.downloadFromDrive(remote.driveFileId);
+      return { ...full, updatedAt: remote.updatedAt, updatedBy: remote.updatedBy, updatedByName: remote.updatedByName };
+    }
+    return remote;
   };
 
   let _pendingCamp = null;
@@ -15047,6 +15085,68 @@ const DriveBackup = (() => {
     headers: { Authorization: 'Bearer ' + GDrive.token, ...(opts.headers || {}) },
   });
 
+  const isConnected = () => _connected && !!(GDrive.loggedIn && GDrive.token);
+
+  // Un file per campagna su Drive, cercato/aggiornato per id (stabile anche se la campagna
+  // viene rinominata), non per nome. L'id del file viene tenuto in cache in locale e viene
+  // ricreato automaticamente se non lo trova piu' (es. cancellato a mano su Drive).
+  const _syncFileIdKey = (campId) => 'dm_drive_syncfile_' + campId;
+  const _getSyncFileId = (campId) => localStorage.getItem(_syncFileIdKey(campId));
+  const _setSyncFileId = (campId, fileId) => localStorage.setItem(_syncFileIdKey(campId), fileId);
+
+  // Carica la campagna (con le immagini gia' sostituite da link Drive) nel suo file dedicato,
+  // creandolo se non esiste ancora. E' il cuore sia del backup manuale che del sync automatico.
+  const syncToDrive = async (camp) => {
+    if (!isConnected()) return null;
+    if (!_folderId) _folderId = await _getOrCreateFolder();
+
+    const campCopy = JSON.parse(JSON.stringify(camp));
+    await replaceImagesWithDriveLinks(campCopy);
+    const content = JSON.stringify(campCopy);
+    // Le immagini appena spostate su Drive vanno tolte anche dalla copia locale, altrimenti
+    // il base64 pesante resta comunque a occupare spazio sul dispositivo che le ha caricate.
+    // Aggiorna solo lo storage (non l'oggetto in memoria, per non riavviare il listener Firebase
+    // a meta' di un push) — dal prossimo caricamento la versione leggera sara' quella attiva.
+    if (content !== JSON.stringify(camp)) {
+      try { Storage.saveCampaign(campCopy); } catch(e) { Debug.warn('Aggiornamento locale post-upload immagini:', e.message); }
+    }
+    const filename = (camp.name || 'campagna').replace(/[^a-zA-Z0-9\s]/g, '-').trim() + '.json';
+
+    let fileId = _getSyncFileId(camp.id);
+    if (fileId) {
+      const uploadRes = await _driveFetch('upload/drive/v3/files/' + fileId + '?uploadType=media', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: content,
+      });
+      if (!uploadRes.ok) fileId = null; // probabilmente cancellato manualmente: ricrea sotto
+    }
+    if (!fileId) {
+      const boundary = 'dmtk' + Date.now();
+      const multipartBody =
+        `--${boundary}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n` +
+        JSON.stringify({ name: filename, parents: [_folderId] }) + `\r\n` +
+        `--${boundary}\r\nContent-Type: application/json\r\n\r\n` + content + `\r\n` +
+        `--${boundary}--`;
+      const createRes = await _driveFetch('upload/drive/v3/files?uploadType=multipart', {
+        method: 'POST',
+        headers: { 'Content-Type': 'multipart/related; boundary=' + boundary },
+        body: multipartBody,
+      });
+      if (!createRes.ok) throw new Error('Errore creazione file (' + createRes.status + ')');
+      const file = await createRes.json();
+      fileId = file.id;
+    }
+    _setSyncFileId(camp.id, fileId);
+    return fileId;
+  };
+
+  const downloadFromDrive = async (fileId) => {
+    const res = await _driveFetch('drive/v3/files/' + fileId + '?alt=media');
+    if (!res.ok) throw new Error('Errore download da Drive (' + res.status + ')');
+    return await res.json();
+  };
+
   const backupNow = async () => {
     if (!_connected) return;
     if (!GDrive.loggedIn || !GDrive.token) {
@@ -15060,42 +15160,10 @@ const DriveBackup = (() => {
     if (!camp) return;
 
     try {
-      if (!_folderId) _folderId = await _getOrCreateFolder();
-
-      const content = JSON.stringify(camp, null, 2);
-      const filename = (camp.name||'campagna').replace(/[^a-zA-Z0-9\s]/g,'-').trim() + '.json';
-
-      const q = encodeURIComponent(`name='${filename}' and '${_folderId}' in parents and trashed=false`);
-      const listRes = await _driveFetch('drive/v3/files?q=' + q + '&fields=files(id)');
-      if (!listRes.ok) throw new Error('Errore lista file (' + listRes.status + ')');
-      const list = await listRes.json();
-
-      if (list.files?.length) {
-        const uploadRes = await _driveFetch('upload/drive/v3/files/' + list.files[0].id + '?uploadType=media', {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: content,
-        });
-        if (!uploadRes.ok) throw new Error('Errore aggiornamento file (' + uploadRes.status + ')');
-      } else {
-        const boundary = 'dmtk' + Date.now();
-        const multipartBody =
-          `--${boundary}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n` +
-          JSON.stringify({ name: filename, parents: [_folderId] }) + `\r\n` +
-          `--${boundary}\r\nContent-Type: application/json\r\n\r\n` + content + `\r\n` +
-          `--${boundary}--`;
-        const createRes = await _driveFetch('upload/drive/v3/files?uploadType=multipart', {
-          method: 'POST',
-          headers: { 'Content-Type': 'multipart/related; boundary=' + boundary },
-          body: multipartBody,
-        });
-        if (!createRes.ok) throw new Error('Errore creazione file (' + createRes.status + ')');
-      }
-
+      await syncToDrive(camp);
       const now = new Date().toLocaleTimeString('it-IT', { hour:'2-digit', minute:'2-digit' });
       localStorage.setItem(LS_LAST, now);
       _updateLastBackup(now);
-
     } catch(e) {
       Debug.warn('Drive backup error:', e.message);
       if (!_warnedThisSession) {
@@ -15103,6 +15171,98 @@ const DriveBackup = (() => {
         Toast.show('Backup su Drive non riuscito: ' + e.message, 'error', 4000);
       }
     }
+  };
+
+  // ── Immagini su Drive ──
+  const _getOrCreateSubfolder = async (name, parentId) => {
+    const q = encodeURIComponent(`name='${name}' and mimeType='application/vnd.google-apps.folder' and '${parentId}' in parents and trashed=false`);
+    const res = await _driveFetch('drive/v3/files?q=' + q + '&fields=files(id)');
+    if (!res.ok) throw new Error('Errore ricerca sottocartella (' + res.status + ')');
+    const list = await res.json();
+    if (list.files?.length) return list.files[0].id;
+    const createRes = await _driveFetch('drive/v3/files', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, mimeType: 'application/vnd.google-apps.folder', parents: [parentId] }),
+    });
+    if (!createRes.ok) throw new Error('Errore creazione sottocartella (' + createRes.status + ')');
+    const folder = await createRes.json();
+    return folder.id;
+  };
+
+  let _imagesFolderId = null;
+  const _getImagesFolder = async () => {
+    if (_imagesFolderId) return _imagesFolderId;
+    if (!_folderId) _folderId = await _getOrCreateFolder();
+    _imagesFolderId = await _getOrCreateSubfolder('Immagini', _folderId);
+    return _imagesFolderId;
+  };
+
+  const _dataUriToBlobParts = (dataUri) => {
+    const [meta, b64] = dataUri.split(',');
+    const mime = meta.match(/data:([^;]+);/)?.[1] || 'image/png';
+    const bin = atob(b64);
+    const bytes = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    return { bytes, mime };
+  };
+
+  // Carica una singola immagine base64 su Drive e la rende visualizzabile da chiunque abbia il
+  // link (necessario perche' l'app la mostri anche sugli altri dispositivi/co-autori). In caso
+  // di errore lascia l'immagine com'era (base64) invece di perderla.
+  const uploadImage = async (dataUri, suggestedName) => {
+    if (!isConnected()) return dataUri;
+    try {
+      const folderId = await _getImagesFolder();
+      const { bytes, mime } = _dataUriToBlobParts(dataUri);
+      const ext = (mime.split('/')[1] || 'png').replace(/[^a-z0-9]/gi, '');
+      const filename = (suggestedName || 'img_' + Date.now()).replace(/[^a-zA-Z0-9_-]/g, '_') + '.' + ext;
+
+      const boundary = 'dmtkimg' + Date.now();
+      const metaPart = JSON.stringify({ name: filename, parents: [folderId] });
+      const pre = `--${boundary}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${metaPart}\r\n--${boundary}\r\nContent-Type: ${mime}\r\n\r\n`;
+      const post = `\r\n--${boundary}--`;
+      const body = new Blob([pre, bytes, post]);
+
+      const createRes = await _driveFetch('upload/drive/v3/files?uploadType=multipart', {
+        method: 'POST',
+        headers: { 'Content-Type': 'multipart/related; boundary=' + boundary },
+        body,
+      });
+      if (!createRes.ok) throw new Error('Errore upload immagine (' + createRes.status + ')');
+      const file = await createRes.json();
+
+      await _driveFetch('drive/v3/files/' + file.id + '/permissions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ role: 'reader', type: 'anyone' }),
+      });
+
+      return 'https://drive.google.com/uc?export=view&id=' + file.id;
+    } catch(e) {
+      Debug.warn('Upload immagine Drive:', e.message);
+      return dataUri;
+    }
+  };
+
+  const _isDataImage = (v) => typeof v === 'string' && v.startsWith('data:image');
+
+  // Attraversa ricorsivamente l'oggetto campagna e sostituisce ogni immagine base64 trovata
+  // con il link Drive corrispondente, mutando l'oggetto passato (va chiamata su una copia).
+  const replaceImagesWithDriveLinks = async (obj, nameHint) => {
+    if (!isConnected()) return obj;
+    if (Array.isArray(obj)) {
+      for (let i = 0; i < obj.length; i++) {
+        if (_isDataImage(obj[i])) obj[i] = await uploadImage(obj[i], nameHint ? nameHint + '_' + i : 'img_' + i);
+        else if (obj[i] && typeof obj[i] === 'object') await replaceImagesWithDriveLinks(obj[i], obj[i].nome || obj[i].name || nameHint);
+      }
+    } else if (obj && typeof obj === 'object') {
+      for (const k of Object.keys(obj)) {
+        if (_isDataImage(obj[k])) obj[k] = await uploadImage(obj[k], (nameHint || obj.nome || obj.name || 'img') + '_' + k);
+        else if (obj[k] && typeof obj[k] === 'object') await replaceImagesWithDriveLinks(obj[k], nameHint);
+      }
+    }
+    return obj;
   };
 
   const _getOrCreateFolder = async () => {
@@ -15230,7 +15390,11 @@ const DriveBackup = (() => {
     }
   };
 
-  return { init, connect, connectFromWelcome, dismissWelcome, backupNow, disconnect, showWelcomeIfNeeded, _updateUI, listBackups, openRestoreModal, restoreBackup };
+  return {
+    init, connect, connectFromWelcome, dismissWelcome, backupNow, disconnect, showWelcomeIfNeeded, _updateUI,
+    listBackups, openRestoreModal, restoreBackup,
+    isConnected, syncToDrive, downloadFromDrive, uploadImage, replaceImagesWithDriveLinks,
+  };
 })();
 
 const WikiSections = (() => {
@@ -20011,7 +20175,10 @@ document.addEventListener('DOMContentLoaded', initMobileNav);
 
       <!-- Google Drive Backup -->
       <section style="border-top:1px solid var(--border);padding-top:16px;">
-        <h4 style="font-family:var(--font-display);font-size:0.82rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin:0 0 12px;">Backup su Google Drive</h4>
+        <h4 style="font-family:var(--font-display);font-size:0.82rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin:0 0 12px;">Google Drive</h4>
+        <p style="font-size:0.75rem;color:var(--text-muted);line-height:1.5;margin:0 0 10px;">
+          Se sei entrata con Google, i dati sincronizzano già tra dispositivi tramite Firebase. Collegando anche Drive, i contenuti e le immagini vengono salvati lì (sul tuo Drive personale) invece che su Firebase — che resta solo il segnale di "c'è qualcosa di nuovo", restando così sempre nel piano gratuito.
+        </p>
         <div style="background:var(--bg-secondary);border-radius:var(--radius-md);padding:12px;margin-bottom:10px;font-size:0.82rem;">
           <div style="display:flex;align-items:center;gap:8px;">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
@@ -20141,27 +20308,30 @@ document.addEventListener('DOMContentLoaded', initMobileNav);
         </svg>
       </div>
 
-      <h3 style="font-family:var(--font-display);font-size:1.2rem;margin:0 0 8px;">Metti al sicuro la tua campagna</h3>
+      <h3 style="font-family:var(--font-display);font-size:1.2rem;margin:0 0 8px;">Ritrova la tua campagna su ogni dispositivo</h3>
       <p style="font-size:0.85rem;color:var(--text-muted);line-height:1.6;margin:0 0 20px;">
-        Ogni avventura merita di essere preservata. Collega Google Drive e le tue campagne verranno salvate automaticamente in una cartella <strong>DM Toolkit</strong> sul tuo Drive — al sicuro, sempre accessibili, solo tuoi.
+        Sei entrata con Google, quindi le modifiche si sincronizzano già in automatico. Collegando anche <strong>Google Drive</strong>, i dati veri e le immagini vengono salvati lì (sul tuo Drive, privato) invece che occupare il piano gratuito di Firebase — Firebase resta solo il segnale che avvisa gli altri dispositivi che c'è qualcosa di nuovo da scaricare.
       </p>
 
       <div style="background:var(--bg-secondary);border-radius:var(--radius-md);padding:12px 16px;margin-bottom:20px;text-align:left;">
         <div style="display:flex;flex-direction:column;gap:8px;">
           <div style="display:flex;align-items:center;gap:10px;font-size:0.82rem;">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent-secondary)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-            <span>Backup automatico ad ogni salvataggio</span>
+            <span>Sincronizzazione automatica tra dispositivi, senza clic</span>
           </div>
           <div style="display:flex;align-items:center;gap:10px;font-size:0.82rem;">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent-secondary)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-            <span>File JSON nella tua cartella Drive — sempre esportabile</span>
+            <span>Anche le immagini caricate vengono salvate su Drive</span>
           </div>
           <div style="display:flex;align-items:center;gap:10px;font-size:0.82rem;">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent-secondary)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-            <span>Nessun dato extra su Firebase — lo storage è tuo</span>
+            <span>Dati sul tuo Drive personale — Firebase riceve solo un piccolo segnale, non i contenuti</span>
           </div>
         </div>
       </div>
+      <p style="font-size:0.72rem;color:var(--text-muted);margin:-12px 0 20px;">
+        Senza Drive collegato, i dati continuano a sincronizzarsi comunque tramite Firebase — solo che restano lì anche i contenuti pesanti, non solo il segnale.
+      </p>
 
       <div style="display:flex;flex-direction:column;gap:8px;">
         <button class="btn btn-primary" style="width:100%;padding:12px;" onclick="DriveBackup.connectFromWelcome()">
