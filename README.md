@@ -19,7 +19,7 @@ Campaign management web app for D&D 5e Dungeon Masters (2014 and 2024 editions).
 | Sessions | Combat tracker, scene planner, session log, clocks |
 | Compendium | SRD 5.1 + 5.2.1, homebrew, Wiki sync |
 | DM Screen | Drag & drop layout, customizable blocks |
-| Sync | Firebase realtime, local / anonymous / Google auth, or Google Drive backup |
+| Sync | Firebase realtime signal + Google Drive storage, local / anonymous / Google auth |
 | PWA | Installable on desktop and mobile, offline-capable |
 
 ---
@@ -54,7 +54,7 @@ The World and Wiki stay in sync automatically and bidirectionally:
 
 ### World
 
-NPC cards with full data: role, goals, DM secrets, morale, combat stats, relationships with other NPCs. Locations and factions with positionable images. Note/Description fields support rich formatting and wikilinks. Filter NPCs by status (alive, dead, missing, ally, enemy) and by faction.
+NPC cards with full data: role, goals, DM secrets, morale, combat stats, relationships with other NPCs. Locations and factions with the same depth. Portrait images from a URL or uploaded directly from the device, shown in full regardless of orientation (never cropped); automatically stored on the user's own Google Drive when connected. Note/Description fields support rich formatting and wikilinks. Filter NPCs by status (alive, dead, missing, ally, enemy) and by faction.
 
 ### Sessions
 
@@ -104,11 +104,11 @@ Anonymous accounts can be upgraded to Google at any time without data loss via F
 
 **Real-time collaboration**
 
-Each campaign has a unique invite code. A co-author enters the code to access the same campaign on Firebase Realtime Database. Changes are pushed with a 2-second debounce. Merge strategy: Wiki notes use most-recent-wins per note; new NPCs are additive without overwriting locally-edited ones. Online presence is shown in the topbar.
+Each campaign has a unique invite code. A co-author enters the code to access the same campaign on Firebase Realtime Database. Changes are pushed with a 2-second debounce. Merge strategy: Wiki notes use most-recent-wins per note; new NPCs are additive without overwriting locally-edited ones. Deleting a campaign propagates to every connected device — including ones offline at the time of deletion, which pick it up on their next sync instead of re-uploading it. Online presence is shown in the topbar.
 
-**Google Drive backup**
+**Google Drive as primary storage**
 
-An alternative to (or complement of) Firebase sync: campaigns are backed up as JSON files in a "DM Toolkit" folder on the user's own Google Drive, keeping Firebase usage light. Authentication uses a single shared, public OAuth Client ID configured for the live domain — users just click "Collega Drive" and pick their Google account, with no setup of their own required. Each user's backups stay private to their own Drive; the shared Client ID only identifies the app to Google, not the data.
+When connected, Google Drive holds the actual campaign data and images; Firebase carries only a lightweight pointer (campaign id + last-updated timestamp) per campaign, used purely as an instant "something changed" signal to trigger sync across devices. This keeps Firebase usage minimal regardless of how large a campaign or its images get. Authentication uses a single shared, public OAuth Client ID configured for the live domain — users just click "Collega Drive" and pick their Google account, no setup of their own required. Each user's data stays private to their own Drive; the shared Client ID only identifies the app to Google, not the data. Without Drive connected, Firebase carries full campaign data directly instead (heavier, but works out of the box for anonymous and Google accounts alike).
 
 ---
 
