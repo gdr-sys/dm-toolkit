@@ -3907,6 +3907,16 @@ const App = (() => {
     if (moon) moon.style.display = theme === 'dark' ? 'block' : 'none';
     if (sun)  sun.style.display  = theme === 'dark' ? 'none'  : 'block';
     Storage.updateSettings({ theme });
+
+    // Uno sfondo personalizzato (Impostazioni > Aspetto) fissa i colori con uno stile
+    // inline sull'html, che vince sempre sulle variabili [data-theme]: col tema toggle
+    // non avrebbe alcun effetto visibile. Il cambio tema riporta quindi lo sfondo su
+    // "Default", cosi' chiaro/scuro funzionano sempre, qualunque sfondo fosse attivo.
+    const bgColor = Storage.getSettings()?.bgColor;
+    if (bgColor && bgColor !== 'default') {
+      try { Settings.setBg('default'); } catch(e) {}
+    }
+
     Debug.log(`Tema: ${theme}`);
   };
 
