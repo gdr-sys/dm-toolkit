@@ -11207,69 +11207,6 @@ const GDrive = (() => {
     Toast.show('Disconnesso da Drive', 'info');
   };
 
-  const _getHeaders = () => ({ Authorization: 'Bearer ' + _token, 'Content-Type': 'application/json' });
-
-  const saveToCloud = async (data) => {
-    if (!_loggedIn || !_token) { Toast.show('Connetti Google Drive prima', 'warning'); return; }
-    try {
-      const body = JSON.stringify(data);
-      let res;
-      if (_fileId) {
-        res = await fetch('https://www.googleapis.com/upload/drive/v3/files/' + _fileId + '?uploadType=media', {
-          method: 'PATCH',
-          headers: { Authorization: 'Bearer ' + _token, 'Content-Type': 'application/json' },
-          body,
-        });
-      } else {
-        const meta = await fetch('https://www.googleapis.com/drive/v3/files', {
-          method: 'POST',
-          headers: _getHeaders(),
-          body: JSON.stringify({ name: FILE_NAME, mimeType: 'application/json' }),
-        });
-        const metaJson = await meta.json();
-        _fileId = metaJson.id;
-        localStorage.setItem('dm_gdrive_fileid', _fileId);
-        res = await fetch('https://www.googleapis.com/upload/drive/v3/files/' + _fileId + '?uploadType=media', {
-          method: 'PATCH',
-          headers: { Authorization: 'Bearer ' + _token, 'Content-Type': 'application/json' },
-          body,
-        });
-      }
-      if (res.ok) Toast.show('Salvato su Drive', 'success', 2000);
-      else Toast.show('Errore salvataggio Drive', 'error');
-    } catch(e) {
-      Toast.show('Errore Drive: ' + e.message, 'error');
-    }
-  };
-
-  const loadFromCloud = async () => {
-    if (!_loggedIn || !_token) { Toast.show('Connetti Google Drive prima', 'warning'); return null; }
-    try {
-      // Cerca il file per nome se non abbiamo fileId
-      if (!_fileId) {
-        const q = encodeURIComponent("name='" + FILE_NAME + "' and trashed=false");
-        const r = await fetch('https://www.googleapis.com/drive/v3/files?q=' + q + '&fields=files(id,name)', {
-          headers: { Authorization: 'Bearer ' + _token }
-        });
-        const list = await r.json();
-        if (list.files?.length) {
-          _fileId = list.files[0].id;
-          localStorage.setItem('dm_gdrive_fileid', _fileId);
-        } else {
-          Toast.show('Nessuna campagna su Drive', 'info'); return null;
-        }
-      }
-      const r = await fetch('https://www.googleapis.com/drive/v3/files/' + _fileId + '?alt=media', {
-        headers: { Authorization: 'Bearer ' + _token }
-      });
-      if (!r.ok) { Toast.show('Errore lettura Drive', 'error'); return null; }
-      return await r.json();
-    } catch(e) {
-      Toast.show('Errore Drive: ' + e.message, 'error');
-      return null;
-    }
-  };
-
   const setClientId = (id) => {
     CLIENT_ID = id.trim();
     if (!CLIENT_ID) { Toast.show('Inserisci un Client ID valido', 'warning'); return; }
@@ -11280,10 +11217,9 @@ const GDrive = (() => {
   };
 
   const showWelcomeIfNeeded = () => {};
-  const acceptInvite = async (code) => null;
 
-  return { init, toggleLogin, logout, saveToCloud, loadFromCloud, setClientId, onConnect,
-           showWelcomeIfNeeded, acceptInvite, _updateBtn,
+  return { init, toggleLogin, logout, setClientId, onConnect,
+           showWelcomeIfNeeded, _updateBtn,
            get loggedIn() { return _loggedIn; },
            get token() { return _token; } };
 })();
@@ -12040,15 +11976,21 @@ const GDriveUI = (() => {
     const camp = App.getActiveCampaign();
     if (!camp) { Toast.show('Nessuna campagna attiva', 'warning'); return; }
     Toast.show('Salvataggio su Drive...', 'info', 2000);
-    // GDrive.saveToCloud mostra gia' da sola il toast di successo/errore.
-    await GDrive.saveToCloud(camp);
+    try {
+      await DriveBackup.syncToDrive(camp);
+      Toast.show('✓ Campagna salvata su Drive', 'success', 2000);
+    } catch(e) {
+      Toast.show('Errore salvataggio Drive: ' + e.message, 'error');
+    }
   };
 
   const generateInvite = async () => {
+    const camp = App.getActiveCampaign();
     const inp = document.getElementById('gdrive-invite-code');
     const hint = document.getElementById('gdrive-invite-hint');
+    if (!camp) { if (hint) hint.textContent = '✗ Apri prima una campagna.'; return; }
     if (inp) inp.value = 'Generazione...';
-    const result = await GDrive.generateInvite();
+    const result = await DriveBackup.generateInvite(camp);
     if (result) {
       if (inp) inp.value = result.code;
       if (hint) hint.textContent = '✓ Codice generato — condividilo con il co-autore. È valido finché la campagna è su Drive.';
@@ -12056,42 +11998,30 @@ const GDriveUI = (() => {
       try { await navigator.clipboard.writeText(result.code); if (hint) hint.textContent += ' (copiato!)'} catch(e) {}
     } else {
       if (inp) inp.value = '';
-      if (hint) hint.textContent = '✗ Errore — salva prima la campagna su Drive.';
+      if (hint) hint.textContent = '✗ Errore — riprova.';
     }
   };
 
   const joinCampaign = async () => {
-    const code = document.getElementById('gdrive-join-code')?.value?.trim().toUpperCase();
+    // L'id file Drive e' case-sensitive: a differenza dei codici Firebase, qui non va
+    // forzato in maiuscolo altrimenti il codice non corrisponde piu' a nessun file.
+    const code = document.getElementById('gdrive-join-code')?.value?.trim();
     if (!code) { Toast.show('Inserisci un codice', 'warning'); return; }
     Toast.show('Accesso alla campagna...', 'info', 2000);
-    const campagna = await GDrive.acceptInvite(code);
-    if (campagna) {
+    const campagna = await DriveBackup.acceptInvite(code);
+    if (!campagna) return;
 
-      if (campagna.id) {
+    Toast.show('✓ Campagna aggiunta: ' + (campagna.name||''), 'success', 3000);
+    App.setActiveCampaign(campagna);
 
-        const existing = Storage.getCampaigns().find(c => c.id === campagna.id);
-        if (existing) {
-
-          Storage.updateCampaign(campagna.id, campagna);
-          Toast.show('✓ Campagna sincronizzata: ' + campagna.name, 'success', 3000);
-        } else {
-
-          Storage.createCampaign(campagna);
-          Toast.show('✓ Campagna aggiunta: ' + campagna.name, 'success', 3000);
-        }
-
-        try {
-          const user = FirebaseSync.getUser?.();
-          if (user && !user.isAnonymous) {
-            setTimeout(() => {
-              FirebaseSync._syncAllCampaignsNow?.(user);
-            }, 500);
-          }
-        } catch(e) {}
-        App.init();
-        Modal.close('gdrive-options');
+    try {
+      const user = FirebaseSync.getUser?.();
+      if (user && !user.isAnonymous) {
+        setTimeout(() => { FirebaseSync._syncAllCampaignsNow?.(user); }, 500);
       }
-    }
+    } catch(e) {}
+    App.init();
+    Modal.close('gdrive-options');
   };
 
   const updateUserInfo = (userInfo) => {
@@ -14145,6 +14075,48 @@ const DriveBackup = (() => {
     localStorage.removeItem(_syncFileIdKey(campId));
   };
 
+  // Genera un codice invito per collaborare su una campagna via Drive: sincronizza la
+  // campagna sul suo file dedicato (come il sync automatico) e lo rende leggibile/scrivibile
+  // da chiunque abbia il link — stesso meccanismo gia' usato per le immagini caricate, qui
+  // applicato al file della campagna. Il codice condiviso e' semplicemente l'id del file:
+  // e' una stringa lunga e non indovinabile, non serve altra infrastruttura.
+  const generateInvite = async (camp) => {
+    if (!isConnected()) { Toast.show('Collega prima Google Drive', 'warning'); return null; }
+    if (!camp) return null;
+    try {
+      const fileId = await syncToDrive(camp);
+      if (!fileId) return null;
+      await _driveFetch('drive/v3/files/' + fileId + '/permissions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ role: 'writer', type: 'anyone' }),
+      });
+      return { code: fileId };
+    } catch(e) {
+      Toast.show('Errore generazione invito: ' + e.message, 'error');
+      return null;
+    }
+  };
+
+  // Importa la campagna condivisa tramite un codice invito (l'id del file Drive generato da
+  // generateInvite) e la collega per il sync automatico futuro, cosi' le modifiche di entrambi
+  // i collaboratori continuano ad andare sullo stesso file.
+  const acceptInvite = async (code) => {
+    if (!isConnected()) { Toast.show('Collega prima Google Drive', 'warning'); return null; }
+    const fileId = (code || '').trim();
+    if (!fileId) return null;
+    try {
+      const camp = await downloadFromDrive(fileId);
+      if (!camp || !camp.id) { Toast.show('Codice non valido', 'error'); return null; }
+      _setSyncFileId(camp.id, fileId);
+      Storage.saveCampaign(camp);
+      return camp;
+    } catch(e) {
+      Toast.show('Errore accesso alla campagna condivisa: ' + e.message, 'error');
+      return null;
+    }
+  };
+
   const backupNow = async () => {
     if (!_connected) return;
     if (!GDrive.loggedIn || !GDrive.token) {
@@ -14392,6 +14364,7 @@ const DriveBackup = (() => {
     init, connect, connectFromWelcome, dismissWelcome, backupNow, disconnect, showWelcomeIfNeeded, _updateUI,
     listBackups, openRestoreModal, restoreBackup,
     isConnected, syncToDrive, downloadFromDrive, deleteFromDrive, uploadImage, replaceImagesWithDriveLinks,
+    generateInvite, acceptInvite,
   };
 })();
 
