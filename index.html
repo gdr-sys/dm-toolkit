@@ -362,6 +362,9 @@
       <!-- hamburger rimosso: navigazione diretta via mobile-nav -->
       <h1 class="topbar-title" id="topbar-title">Home</h1>
       <div class="topbar-actions" style="display:flex;align-items:center;gap:8px;">
+        <button id="topbar-settings-btn" title="Impostazioni" onclick="Settings.open()" style="display:none;background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:1.1rem;padding:4px 8px;border-radius:var(--radius-sm);">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </button>
         <button title="Scratchpad (note rapide)" onclick="Scratchpad.toggle()"
           style="background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:1.1rem;padding:4px 8px;border-radius:var(--radius-sm);transition:background 0.15s;"
           onmouseenter="this.style.background='var(--bg-tertiary)'" onmouseleave="this.style.background='none'">
@@ -1875,7 +1878,7 @@
   <div class="modal" style="max-width:560px;">
     <div class="modal-header">
       <h2 style="font-family:var(--font-display);font-size:1.1rem;">🕐 Cronologia Backup</h2>
-      <button class="btn btn-ghost btn-icon" onclick="Modal.close('modal-snapshots')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+      <button class="btn btn-ghost btn-icon" onclick="Modal.close('snapshots')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
     <div class="modal-body">
       <div style="display:flex;gap:var(--space-sm);margin-bottom:var(--space-md);flex-wrap:wrap;">
@@ -3948,7 +3951,7 @@ const App = (() => {
         <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
         Snapshot
       </button>
-      <button class="btn btn-ghost btn-sm" onclick="Modal.open('modal-snapshots');renderSnapshotList();" title="Cronologia backup">
+      <button class="btn btn-ghost btn-sm" onclick="Modal.open('snapshots');renderSnapshotList();" title="Cronologia backup">
         <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
         Cronologia
       </button>
@@ -15057,10 +15060,71 @@ const DriveBackup = (() => {
     return folder.id;
   };
 
+  // Elenca i backup presenti nella cartella Drive, per poterli ripristinare su un altro dispositivo
+  const listBackups = async () => {
+    if (!GDrive.loggedIn || !GDrive.token) {
+      Toast.show('Collega prima Google Drive', 'warning');
+      return [];
+    }
+    try {
+      if (!_folderId) _folderId = await _getOrCreateFolder();
+      const q = encodeURIComponent(`'${_folderId}' in parents and trashed=false`);
+      const res = await _driveFetch('drive/v3/files?q=' + q + '&fields=files(id,name,modifiedTime)&orderBy=modifiedTime desc');
+      if (!res.ok) throw new Error('Errore lista backup (' + res.status + ')');
+      const list = await res.json();
+      return list.files || [];
+    } catch(e) {
+      Toast.show('Errore lettura backup: ' + e.message, 'error');
+      return [];
+    }
+  };
+
+  const openRestoreModal = async () => {
+    Modal.open('drive-restore');
+    const el = document.getElementById('drive-restore-list');
+    if (el) el.innerHTML = '<div class="text-muted text-sm" style="padding:12px 0;">Caricamento...</div>';
+    const files = await listBackups();
+    if (!el) return;
+    if (!files.length) {
+      el.innerHTML = '<div class="text-muted text-sm" style="padding:12px 0;">Nessun backup trovato su Drive.</div>';
+      return;
+    }
+    el.innerHTML = files.map(f => {
+      const date = f.modifiedTime ? new Date(f.modifiedTime).toLocaleString('it-IT', {day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '';
+      return `<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);">
+        <div style="min-width:0;">
+          <div style="font-size:0.85rem;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${f.name}</div>
+          <div style="font-size:0.72rem;color:var(--text-muted);">${date}</div>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="DriveBackup.restoreBackup('${f.id}')" style="flex-shrink:0;">Ripristina</button>
+      </div>`;
+    }).join('');
+  };
+
+  const restoreBackup = async (fileId) => {
+    if (!GDrive.loggedIn || !GDrive.token) { Toast.show('Collega prima Google Drive', 'warning'); return; }
+    try {
+      const res = await _driveFetch('drive/v3/files/' + fileId + '?alt=media');
+      if (!res.ok) throw new Error('Errore download (' + res.status + ')');
+      const jsonText = await res.text();
+      const camp = Storage.importCampaign(jsonText);
+      if (camp) {
+        Modal.close('drive-restore');
+        Toast.show('Campagna importata: ' + camp.name, 'success', 3000);
+        App.renderHomePage?.();
+      } else {
+        Toast.show('File di backup non valido', 'error');
+      }
+    } catch(e) {
+      Toast.show('Ripristino fallito: ' + e.message, 'error');
+    }
+  };
+
   const _updateUI = () => {
     const label = document.getElementById('drive-settings-label');
     const connectBtn = document.getElementById('drive-connect-btn');
     const backupBtn = document.getElementById('drive-backup-now-btn');
+    const restoreBtn = document.getElementById('drive-restore-btn');
     const disconnectBtn = document.getElementById('drive-disconnect-btn');
     const lastBackup = document.getElementById('drive-last-backup');
 
@@ -15068,12 +15132,14 @@ const DriveBackup = (() => {
       if (label) { label.textContent = 'Collegato — cartella "DM Toolkit" su Google Drive'; label.style.color = 'var(--accent-secondary)'; }
       if (connectBtn) connectBtn.style.display = 'none';
       if (backupBtn) backupBtn.style.display = '';
+      if (restoreBtn) restoreBtn.style.display = '';
       if (disconnectBtn) disconnectBtn.style.display = '';
       _updateLastBackup(localStorage.getItem(LS_LAST));
     } else {
       if (label) { label.textContent = 'Non collegato'; label.style.color = 'var(--text-muted)'; }
       if (connectBtn) connectBtn.style.display = '';
       if (backupBtn) backupBtn.style.display = 'none';
+      if (restoreBtn) restoreBtn.style.display = 'none';
       if (disconnectBtn) disconnectBtn.style.display = 'none';
       if (lastBackup) lastBackup.textContent = '';
     }
@@ -15102,7 +15168,7 @@ const DriveBackup = (() => {
     }
   };
 
-  return { init, connect, connectFromWelcome, dismissWelcome, backupNow, disconnect, showWelcomeIfNeeded, _updateUI };
+  return { init, connect, connectFromWelcome, dismissWelcome, backupNow, disconnect, showWelcomeIfNeeded, _updateUI, listBackups, openRestoreModal, restoreBackup };
 })();
 
 const WikiSections = (() => {
@@ -19382,12 +19448,15 @@ const isMobile = () => window.innerWidth <= 768;
 const initMobileNav = () => {
   const mobileNav = document.getElementById('mobile-nav');
   const menuBtn = document.getElementById('mobile-menu-btn');
+  const settingsBtn = document.getElementById('topbar-settings-btn');
   if (isMobile()) {
     if (mobileNav) mobileNav.style.display = 'flex';
     if (menuBtn) menuBtn.style.display = 'flex';
+    if (settingsBtn) settingsBtn.style.display = 'flex';
   } else {
     if (mobileNav) mobileNav.style.display = 'none';
     if (menuBtn) menuBtn.style.display = 'none';
+    if (settingsBtn) settingsBtn.style.display = 'none';
   }
 };
 
@@ -19897,6 +19966,7 @@ document.addEventListener('DOMContentLoaded', initMobileNav);
         <div style="display:flex;gap:8px;flex-wrap:wrap;">
           <button id="drive-connect-btn" class="btn btn-primary btn-sm" onclick="DriveBackup.connect()">Collega Drive</button>
           <button id="drive-backup-now-btn" class="btn btn-ghost btn-sm" style="display:none;" onclick="DriveBackup.backupNow()">Salva ora su Drive</button>
+          <button id="drive-restore-btn" class="btn btn-ghost btn-sm" style="display:none;" onclick="DriveBackup.openRestoreModal()">Ripristina da Drive</button>
           <button id="drive-disconnect-btn" class="btn btn-ghost btn-sm" style="display:none;color:var(--accent-danger);" onclick="DriveBackup.disconnect()">Scollega</button>
         </div>
         <div style="font-size:0.72rem;color:var(--text-muted);margin-top:8px;" id="drive-last-backup"></div>
@@ -19988,6 +20058,20 @@ document.addEventListener('DOMContentLoaded', initMobileNav);
 
 
 <!-- Modal: Connetti Google Drive (post-login) -->
+<!-- Modal: Ripristina campagna da Google Drive -->
+<div class="modal-overlay hidden" id="modal-drive-restore" style="display:none;" onclick="if(event.target===this)Modal.close('drive-restore')">
+  <div class="modal" style="max-width:460px;">
+    <div class="modal-header">
+      <h3 class="modal-title">Ripristina da Google Drive</h3>
+      <button class="btn btn-ghost btn-icon-sm" onclick="Modal.close('drive-restore')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:0.78rem;color:var(--text-muted);margin-bottom:10px;">Backup salvati nella cartella "DM Toolkit" del tuo Drive. Ripristinarne uno lo aggiunge come nuova campagna su questo dispositivo.</p>
+      <div id="drive-restore-list"></div>
+    </div>
+  </div>
+</div>
+
 <div class="modal-overlay hidden" id="modal-drive-welcome" style="display:none;" onclick="if(event.target===this)Modal.close('drive-welcome')">
   <div class="modal" style="max-width:440px;">
     <div class="modal-header" style="border-bottom:none;padding-bottom:0;">
