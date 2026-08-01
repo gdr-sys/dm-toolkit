@@ -3912,6 +3912,10 @@ const App = (() => {
       el.style.opacity = campaign ? '1' : '0.4';
     });
 
+    // Aggancia il listener realtime Firebase alla campagna appena attivata, altrimenti i salvataggi
+    // continuano a puntare (o non puntare affatto) alla campagna precedente
+    if (campaign) { try { FirebaseSync.onCampagnaActivated?.(campaign.id); } catch(e) {} }
+
     Debug.log(`Campagna attiva: ${campaign ? campaign.name : 'nessuna'}`);
   };
 
@@ -3927,7 +3931,12 @@ const App = (() => {
   const saveActiveCampaign = (partial) => {
     if (!activeCampaign) return;
     const updated = Storage.updateCampaign(activeCampaign.id, partial);
-    if (updated) activeCampaign = updated;
+    if (updated) {
+      activeCampaign = updated;
+      // Ogni salvataggio locale prova anche a inviare la modifica a Firebase (se collegato/attivo):
+      // senza questo, il push con debounce di 2s non scattava mai da nessun punto dell'app.
+      try { FirebaseSync.onCampagnaSaved?.(updated); } catch(e) {}
+    }
     return updated;
   };
 
