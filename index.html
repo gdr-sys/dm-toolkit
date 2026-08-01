@@ -12203,7 +12203,12 @@ const ExportPDF = (() => {
 
 const GDrive = (() => {
 
-  let CLIENT_ID = localStorage.getItem('dm_gdrive_client_id') || '';
+  // Client ID OAuth condiviso dell'app (pubblico, autorizzato solo per gdr-sys.github.io) —
+  // cosi ogni utente deve solo cliccare "Collega Drive" e scegliere il proprio account,
+  // senza doversi creare un proprio progetto Google Cloud. Puo' comunque essere sovrascritto
+  // da Settings > Configura Google Drive (utile per fork o sviluppo su altri domini).
+  const DEFAULT_CLIENT_ID = '343623970574-3ql8vgsdht8q7bvr7isrt749re76t8td.apps.googleusercontent.com';
+  let CLIENT_ID = localStorage.getItem('dm_gdrive_client_id') || DEFAULT_CLIENT_ID;
   const SCOPES = 'https://www.googleapis.com/auth/drive.file';
   const FILE_NAME = 'dm-toolkit-campagna.json';
 
