@@ -12145,22 +12145,32 @@ const ExportPDF = (() => {
     doc.setTextColor(0,0,0);
     y = 70;
 
-    if (camp.sessionRecap) {
-      h2(' Ultima sessione');
-      body(camp.sessionRecap);
+    const STATO_SESSIONE_LABELS = { pianificata:'Pianificata', in_corso:'In corso', giocata:'Giocata' };
+    const sessioni = [...(camp.sessioni_log || [])].sort((a,b) => (b.numero||0)-(a.numero||0));
+    if (sessioni.length) {
+      h2('Sessioni');
+      sessioni.forEach(s => {
+        checkY(12);
+        doc.setFontSize(11); doc.setFont('helvetica','bold');
+        doc.text('S'+(s.numero||'')+(s.titolo?' — '+s.titolo:'')+(s.data?' ('+s.data+')':''), margin+2, y); y += 6;
+        if (STATO_SESSIONE_LABELS[s.stato]) label('Stato', STATO_SESSIONE_LABELS[s.stato]);
+        if (s.recap) body(s.recap, 4);
+        y += 2;
+      });
       separator();
     }
 
+    const STATO_QUEST_LABELS = { Attiva:'[→]', 'In sospeso':'[ ]', Completata:'[]', Fallita:'[]', Nascosta:'[ ]' };
     const quests = camp.quests || [];
     if (quests.length) {
       h2('Quest');
       quests.forEach(q => {
         checkY(12);
         doc.setFontSize(11); doc.setFont('helvetica','bold');
-        const stato = {disponibile:'[ ]', in_corso:'[→]', completata:'[]', fallita:'[]'}[q.status]||'';
-        doc.text(stato + ' ' + (q.title||''), margin+2, y); y += 6;
-        if (q.notes) body(q.notes, 4);
-        if (q.reward) { doc.setFontSize(9); doc.setFont('helvetica','italic'); doc.text('Ricompensa: '+q.reward, margin+4, y); y+=5; }
+        const stato = STATO_QUEST_LABELS[q.stato] || '';
+        doc.text(stato + ' ' + (q.titolo||''), margin+2, y); y += 6;
+        if (q.obiettivo) body(q.obiettivo, 4);
+        if (q.ricompensa) { doc.setFontSize(9); doc.setFont('helvetica','italic'); doc.text('Ricompensa: '+q.ricompensa, margin+4, y); y+=5; }
         y += 2;
       });
       separator();
@@ -12172,11 +12182,12 @@ const ExportPDF = (() => {
       npcs.forEach(n => {
         checkY(15);
         doc.setFontSize(12); doc.setFont('helvetica','bold');
-        doc.text((n.name||''), margin+2, y); y+=6;
-        label('Razza/Classe', [n.race,n.job].filter(Boolean).join(' · '));
-        if (n.trait) label('Personalità', n.trait);
-        if (n.wants) label('Vuole', n.wants);
-        if (n.secret) { doc.setFontSize(9); doc.setFont('helvetica','italic'); doc.setTextColor(139,38,53); doc.text('[Segreto DM] '+n.secret, margin+4, y); y+=5; doc.setTextColor(0,0,0); }
+        doc.text((n.name||n.nome||''), margin+2, y); y+=6;
+        label('Razza/Classe', [n.race||n.razza,n.job||n.ruolo].filter(Boolean).join(' · '));
+        if (n.personality||n.personalita) label('Personalità', n.personality||n.personalita);
+        if (n.wants||n.vuole) label('Vuole', n.wants||n.vuole);
+        const segreto = n.secret||n.segreto;
+        if (segreto) { doc.setFontSize(9); doc.setFont('helvetica','italic'); doc.setTextColor(139,38,53); doc.text('[Segreto DM] '+segreto, margin+4, y); y+=5; doc.setTextColor(0,0,0); }
         y += 3;
       });
       separator();
@@ -12188,9 +12199,10 @@ const ExportPDF = (() => {
       locs.forEach(l => {
         checkY(12);
         doc.setFontSize(12); doc.setFont('helvetica','bold');
-        doc.text((l.nome||''), margin+2, y); y+=6;
+        doc.text((l.nome||l.name||''), margin+2, y); y+=6;
         if (l.tipo) label('Tipo', l.tipo);
-        if (l.descrizione) body(l.descrizione, 4);
+        const descLuogo = l.atmosfera||l.description;
+        if (descLuogo) body(descLuogo, 4);
         y += 3;
       });
       separator();
@@ -12202,8 +12214,9 @@ const ExportPDF = (() => {
       faz.forEach(f => {
         checkY(12);
         doc.setFontSize(12); doc.setFont('helvetica','bold');
-        doc.text((f.nome||''), margin+2, y); y+=6;
-        if (f.descrizione) body(f.descrizione, 4);
+        doc.text((f.nome||f.name||''), margin+2, y); y+=6;
+        const descFaz = f.obiettivo||f.description;
+        if (descFaz) body(descFaz, 4);
         y += 3;
       });
       separator();
@@ -12235,14 +12248,16 @@ const ExportPDF = (() => {
   const _exportHTML = (camp) => {
     const win = window.open('', '_blank');
     if (!win) { Toast.show('Popup bloccato — abilita i popup per il download', 'warning'); return; }
-    const npcs = (camp.npcs||[]).map(n => `<h3>${n.name||''}</h3><p>${n.trait||''} ${n.wants||''}</p>`).join('');
-    const quests = (camp.quests||[]).map(q => `<h3>${q.title||''}</h3><p>${q.notes||''}</p>`).join('');
+    const sessioni = [...(camp.sessioni_log||[])].sort((a,b) => (b.numero||0)-(a.numero||0))
+      .map(s => `<h3>S${s.numero||''}${s.titolo?' — '+s.titolo:''}</h3><p>${s.recap||''}</p>`).join('');
+    const npcs = (camp.npcs||[]).map(n => `<h3>${n.name||n.nome||''}</h3><p>${n.personality||n.personalita||''} ${n.wants||n.vuole||''}</p>`).join('');
+    const quests = (camp.quests||[]).map(q => `<h3>${q.titolo||''}</h3><p>${q.obiettivo||''}</p>`).join('');
     win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${camp.name||'Campagna'}</title>
       <style>body{font-family:Georgia,serif;max-width:800px;margin:40px auto;color:#222}h1{color:#8b2635}h2{border-bottom:2px solid #8b2635;padding-bottom:4px}@media print{body{margin:0}}</style>
 </head>
       <body><h1>${camp.name||'Campagna'}</h1>
       <p><em>Export del ${new Date().toLocaleDateString('it-IT')}</em></p>
-      ${camp.sessionRecap?'<h2>Ultima sessione</h2><p>'+camp.sessionRecap+'</p>':''}
+      ${sessioni?'<h2>Sessioni</h2>'+sessioni:''}
       ${quests?'<h2>Quest</h2>'+quests:''}
       ${npcs?'<h2>PNG</h2>'+npcs:''}
       <script>window.print();<\/script>
@@ -12250,7 +12265,128 @@ const ExportPDF = (() => {
     win.document.close();
   };
 
-  return { exportCampagna };
+  // ── Export PDF di una singola sessione (dal Session Log) ──
+  const exportSessione = async (id) => {
+    const camp = App.getActiveCampaign();
+    if (!camp) { Toast.show('Nessuna campagna attiva', 'warning'); return; }
+    const s = (camp.sessioni_log || []).find(x => x.id === id);
+    if (!s) { Toast.show('Sessione non trovata', 'warning'); return; }
+
+    Toast.show('Generazione PDF in corso...', 'info', 2000);
+
+    if (typeof window.jspdf === 'undefined' && typeof jsPDF === 'undefined') {
+      _exportSessioneHTML(camp, s);
+      return;
+    }
+
+    const { jsPDF } = window.jspdf || { jsPDF };
+    const doc = new jsPDF({ orientation:'portrait', unit:'mm', format:'a4' });
+    const pageW = 210, pageH = 297, margin = 15, contentW = pageW - margin*2;
+    let y = margin;
+
+    const addPage = () => { doc.addPage(); y = margin; };
+    const checkY = (needed = 8) => { if (y + needed > pageH - margin) addPage(); };
+    const h2 = (text) => {
+      checkY(10);
+      doc.setFontSize(13);
+      doc.setFont('helvetica','bold');
+      doc.setTextColor(60,60,60);
+      doc.text(text, margin, y);
+      y += 7;
+      doc.setDrawColor(200,200,200);
+      doc.line(margin, y-2, pageW-margin, y-2);
+      y += 3;
+      doc.setTextColor(0,0,0);
+    };
+    const body = (text, indent=0) => {
+      if (!text) return;
+      doc.setFontSize(10);
+      doc.setFont('helvetica','normal');
+      doc.setTextColor(50,50,50);
+      const plain = String(text).replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim();
+      const lines = doc.splitTextToSize(plain, contentW - indent);
+      lines.forEach(line => { checkY(5); doc.text(line, margin+indent, y); y+=5; });
+      doc.setTextColor(0,0,0);
+    };
+    const label = (lbl, val, indent=0) => {
+      if (!val) return;
+      checkY(6);
+      doc.setFontSize(9);
+      doc.setFont('helvetica','bold'); doc.text(lbl+':', margin+indent, y);
+      doc.setFont('helvetica','normal');
+      const x = margin + indent + doc.getTextWidth(lbl+': ');
+      const lines = doc.splitTextToSize(String(val), contentW - indent - doc.getTextWidth(lbl+': '));
+      doc.text(lines[0]||'', x, y); y += 5;
+      lines.slice(1).forEach(l => { checkY(5); doc.text(l, margin+indent+20, y); y+=5; });
+    };
+    const separator = () => { y += 4; doc.setDrawColor(230,230,230); doc.line(margin, y, pageW-margin, y); y += 6; };
+
+    const STATO_LABELS = { pianificata:'Pianificata', in_corso:'In corso', giocata:'Giocata' };
+
+    doc.setFillColor(139,38,53);
+    doc.rect(0, 0, pageW, 50, 'F');
+    doc.setTextColor(255,255,255);
+    doc.setFontSize(22); doc.setFont('helvetica','bold');
+    doc.text('Sessione '+(s.numero||'')+(s.titolo?' — '+s.titolo:''), margin, 26);
+    doc.setFontSize(11); doc.setFont('helvetica','normal');
+    doc.text((camp.name||'Campagna')+(s.data?' · '+s.data:''), margin, 38);
+    doc.setTextColor(0,0,0);
+    y = 60;
+
+    if (STATO_LABELS[s.stato]) label('Stato', STATO_LABELS[s.stato]);
+
+    const npcNames = (s.npcs||[]).map(nid => {
+      const n = (camp.npcs||[]).find(x => x.id === nid);
+      return n ? (n.name||n.nome||'') : '';
+    }).filter(Boolean);
+    if (npcNames.length) label('PNG coinvolti', npcNames.join(', '));
+    y += 3;
+
+    if (s.notePrep) { h2('Note di preparazione'); body(s.notePrep); separator(); }
+
+    if ((s.beats||[]).length) {
+      h2('Scene / Beat');
+      s.beats.forEach(b => {
+        checkY(10);
+        doc.setFontSize(10); doc.setFont('helvetica','bold');
+        doc.text((b.principale?'* ':'') + (b.titolo || b.tipo || ''), margin+2, y); y += 5;
+        if (b.note) body(b.note, 4);
+        y += 1;
+      });
+      separator();
+    }
+
+    if (s.recap) { h2('Recap'); body(s.recap); separator(); }
+
+    const filename = (camp.name||'campagna').replace(/[^a-zA-Z0-9]/g,'_') + '_sessione' + (s.numero||'') + '_' + new Date().toISOString().slice(0,10) + '.pdf';
+    doc.save(filename);
+    Toast.show('PDF esportato: '+filename, 'success', 3000);
+  };
+
+  const _exportSessioneHTML = (camp, s) => {
+    const win = window.open('', '_blank');
+    if (!win) { Toast.show('Popup bloccato — abilita i popup per il download', 'warning'); return; }
+    const STATO_LABELS = { pianificata:'Pianificata', in_corso:'In corso', giocata:'Giocata' };
+    const npcNames = (s.npcs||[]).map(nid => {
+      const n = (camp.npcs||[]).find(x => x.id === nid);
+      return n ? (n.name||n.nome||'') : '';
+    }).filter(Boolean);
+    const beats = (s.beats||[]).map(b => '<li>'+(b.principale?'<strong>':'')+(b.titolo||b.tipo||'')+(b.principale?'</strong>':'')+(b.note?' — '+b.note:'')+'</li>').join('');
+    win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Sessione ${s.numero||''} — ${camp.name||''}</title>
+      <style>body{font-family:Georgia,serif;max-width:800px;margin:40px auto;color:#222}h1{color:#8b2635}h2{border-bottom:2px solid #8b2635;padding-bottom:4px}@media print{body{margin:0}}</style>
+</head>
+      <body><h1>Sessione ${s.numero||''}${s.titolo?' — '+s.titolo:''}</h1>
+      <p><em>${camp.name||''}${s.data?' · '+s.data:''}${STATO_LABELS[s.stato]?' · '+STATO_LABELS[s.stato]:''}</em></p>
+      ${npcNames.length?'<p><strong>PNG coinvolti:</strong> '+npcNames.join(', ')+'</p>':''}
+      ${s.notePrep?'<h2>Note di preparazione</h2><p>'+s.notePrep+'</p>':''}
+      ${beats?'<h2>Scene / Beat</h2><ul>'+beats+'</ul>':''}
+      ${s.recap?'<h2>Recap</h2><p>'+s.recap+'</p>':''}
+      <script>window.print();<\/script>
+</body></html>`);
+    win.document.close();
+  };
+
+  return { exportCampagna, exportSessione };
 })();
 
 const GDrive = (() => {
@@ -14065,6 +14201,7 @@ const MentionPicker = (() => {
   let _results = [];
   let _editorEl = null;
   let _atRange  = null;
+  let _insertFn = null;
 
   const _getItems = (q) => {
     const camp = App.getActiveCampaign();
@@ -14125,6 +14262,7 @@ const MentionPicker = (() => {
     _idx    = 0;
     _results = [];
     _atRange = null;
+    _insertFn = null;
     const dd = document.getElementById('mention-dropdown');
     if (dd) dd.style.display = 'none';
   };
@@ -14167,6 +14305,7 @@ const MentionPicker = (() => {
 
     _query = afterAt;
     _active = true;
+    _insertFn = null;
 
     const rect = range.getBoundingClientRect();
     _show(rect.left, rect.top);
@@ -14186,7 +14325,11 @@ const MentionPicker = (() => {
 
   const pick = (i) => {
     const r = _results[i];
-    if (!r || !_atRange) { _hide(); return; }
+    if (!r) { _hide(); return; }
+
+    if (_insertFn) { _insertFn(r); _hide(); return; }
+
+    if (!_atRange) { _hide(); return; }
 
     const sel = window.getSelection();
     sel.removeAllRanges();
@@ -14222,6 +14365,22 @@ const MentionPicker = (() => {
   const attachToInput = (inputEl) => {
     if (!inputEl || inputEl._mpAttached) return;
     inputEl._mpAttached = true;
+
+    const insertInto = (item) => {
+      const name = item.key.replace(/^(png|luogo|fazione|wiki):/, '');
+      const val = inputEl.value;
+      const cursor = inputEl.selectionStart || val.length;
+      const before = val.slice(0, cursor);
+      const atIdx = before.lastIndexOf('@');
+      if (atIdx < 0) return;
+      const after = val.slice(cursor);
+      inputEl.value = val.slice(0, atIdx) + '@' + name + (after.startsWith(' ') ? after : ' ' + after);
+      const newCursor = atIdx + 1 + name.length + 1;
+      try { inputEl.setSelectionRange(newCursor, newCursor); } catch(e) {}
+      inputEl.dispatchEvent(new Event('input', { bubbles: true }));
+      inputEl.focus();
+    };
+
     inputEl.addEventListener('input', () => {
       const val = inputEl.value;
       const cursor = inputEl.selectionStart || val.length;
@@ -14233,35 +14392,20 @@ const MentionPicker = (() => {
       if (query.length > 30) { _hide(); return; }
       if (atIdx > 0 && /[a-zA-Z0-9]/.test(before[atIdx - 1])) { _hide(); return; }
       _query   = query;
+      _idx     = 0;
       _results = _getItems(query);
+      _insertFn = insertInto;
       if (!_results.length) { _hide(); return; }
+      _active = true;
       const rect = inputEl.getBoundingClientRect();
       _show(rect.left, rect.bottom + window.scrollY);
-      _render((item) => {
-        const name = item.key.replace(/^(png|luogo|fazione|wiki):/, '');
-        const before2 = val.slice(0, atIdx);
-        const after2  = val.slice(cursor);
-        inputEl.value = before2 + '@' + name + (after2.startsWith(' ') ? after2 : ' ' + after2);
-        inputEl.dispatchEvent(new Event('input', { bubbles: true }));
-        _hide();
-      });
     });
     inputEl.addEventListener('keydown', (e) => {
       if (!_active) return;
-      if (e.key === 'ArrowDown') { _idx = Math.min(_idx+1, _results.length-1); _render(); e.preventDefault(); }
-      else if (e.key === 'ArrowUp') { _idx = Math.max(_idx-1, 0); _render(); e.preventDefault(); }
+      if (e.key === 'ArrowDown') { _idx = Math.min(_idx+1, _results.length-1); _renderList(); e.preventDefault(); }
+      else if (e.key === 'ArrowUp') { _idx = Math.max(_idx-1, 0); _renderList(); e.preventDefault(); }
       else if (e.key === 'Enter' || e.key === 'Tab') {
-        if (_results[_idx]) {
-          const item = _results[_idx];
-          const name = item.key.replace(/^(png|luogo|fazione|wiki):/, '');
-          const val  = inputEl.value;
-          const cursor = inputEl.selectionStart || val.length;
-          const atIdx = val.slice(0, cursor).lastIndexOf('@');
-          inputEl.value = val.slice(0, atIdx) + '@' + name + ' ' + val.slice(cursor);
-          inputEl.dispatchEvent(new Event('input', { bubbles: true }));
-          _hide();
-        }
-        e.preventDefault();
+        if (_results[_idx]) { e.preventDefault(); pick(_idx); }
       } else if (e.key === 'Escape') _hide();
     });
     inputEl.addEventListener('blur', () => setTimeout(_hide, 150));
@@ -14540,6 +14684,9 @@ const SessioniLog = (() => {
                 '<button class="btn btn-ghost btn-sm" onclick="SessioniLog.createWikiNote(\''+s.id+'\')" style="font-size:0.72rem;">+ Nota Wiki</button>'
               ) +
               '<button class="btn btn-ghost btn-sm" onclick="SessioniLog.edit(\''+s.id+'\')" style="font-size:0.72rem;">✏️ Modifica</button>' +
+              '<button class="btn btn-ghost btn-sm" onclick="ExportPDF.exportSessione(\''+s.id+'\')" style="font-size:0.72rem;display:inline-flex;align-items:center;gap:4px;" title="Esporta questa sessione in PDF">' +
+                '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg> PDF' +
+              '</button>' +
               (s.stato !== 'giocata' ?
                 '<button class="btn btn-primary btn-sm" onclick="SessioniLog.setInCorso(\''+s.id+'\')" style="font-size:0.72rem;">▶ In corso</button>' : '') +
               '<button class="btn btn-ghost btn-sm" onclick="SessioniLog.remove(\''+s.id+'\')" style="font-size:0.72rem;color:var(--accent-danger);"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>' +
@@ -16190,10 +16337,22 @@ const WikiSections = (() => {
           '<button onclick="ImageViewer.open(document.getElementById(\'ws-inline-img\').src)" ' +
           'style="position:absolute;top:6px;right:6px;background:rgba(0,0,0,0.5);border:none;border-radius:var(--radius-sm);color:#fff;cursor:pointer;padding:3px 7px;font-size:0.7rem;z-index:2;">⤢ Ingrandisci</button>' +
           '</div>' : '') +
-      (isEdit && (type === 'png' || type === 'luoghi' || type === 'fazioni') ?
+      (isEdit && (type === 'png' || type === 'luoghi' || type === 'fazioni' || type === 'pg') ?
         '<div class="form-group" style="margin-bottom:16px;">' +
-        '<label class="form-label">Immagine URL</label>' +
-        '<input id="wsf-immagine" type="text" class="form-input" style="font-size:0.82rem;" value="' + _escHtml(item.immagine || '') + '" placeholder="https://..." oninput="WikiSections._fieldChange(\'' + type + '\',\'immagine\',this.value)">' +
+        '<label class="form-label">Immagine</label>' +
+        '<div style="display:flex;gap:10px;align-items:flex-start;flex-wrap:wrap;">' +
+          '<div id="wsf-immagine-preview" style="width:80px;height:80px;border-radius:var(--radius-md);overflow:hidden;background:var(--bg-secondary);border:1px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;color:var(--text-muted);">' +
+            _imgPreviewHTML(item.immagine) +
+          '</div>' +
+          '<div style="flex:1;min-width:200px;display:flex;flex-direction:column;gap:6px;">' +
+            '<input id="wsf-immagine" type="text" class="form-input" style="font-size:0.82rem;" value="' + _escHtml(item.immagine || '') + '" placeholder="https://..." oninput="WikiSections._fieldChange(\'' + type + '\',\'immagine\',this.value);WikiSections._refreshImgFieldPreview()">' +
+            '<label class="btn btn-ghost btn-sm" style="display:inline-flex;align-items:center;gap:6px;cursor:pointer;width:fit-content;">' +
+              '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>' +
+              'Carica dal dispositivo' +
+              '<input type="file" accept="image/*" style="display:none;" onchange="WikiSections._onImageFilePicked(event,\'' + type + '\')">' +
+            '</label>' +
+          '</div>' +
+        '</div>' +
         '</div>' : '') +
 
       '<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);padding:16px;margin-bottom:16px;">' +
@@ -16327,6 +16486,41 @@ const WikiSections = (() => {
     if (!_currentItem) return;
     _currentItem[key] = value;
     _scheduleAutosave(type);
+  };
+
+  const _imgPreviewPlaceholder = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.35;"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>';
+
+  const _imgPreviewHTML = (src) => src
+    ? '<img src="' + String(src).replace(/"/g,'&quot;') + '" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display=\'none\'">'
+    : _imgPreviewPlaceholder;
+
+  // Aggiorna l'anteprima quando l'utente incolla/modifica l'URL a mano (il caricamento da
+  // file la aggiorna direttamente da _onImageFilePicked).
+  const _refreshImgFieldPreview = () => {
+    const input = document.getElementById('wsf-immagine');
+    const preview = document.getElementById('wsf-immagine-preview');
+    if (!input || !preview) return;
+    preview.innerHTML = _imgPreviewHTML(input.value.trim());
+  };
+
+  // Carica un'immagine scelta dal dispositivo: si salva come data URI, esattamente come le
+  // immagini incollate da URL — se Google Drive e' collegato, al prossimo sync viene caricata
+  // la' e sostituita automaticamente con un link (vedi DriveBackup.replaceImagesWithDriveLinks),
+  // altrimenti resta salvata in locale.
+  const _onImageFilePicked = (e, type) => {
+    const file = e.target?.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) { Toast.show('Seleziona un file immagine', 'warning'); return; }
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const dataUri = ev.target.result;
+      const input = document.getElementById('wsf-immagine');
+      if (input) input.value = dataUri;
+      _fieldChange(type, 'immagine', dataUri);
+      _refreshImgFieldPreview();
+    };
+    reader.onerror = () => Toast.show('Errore nella lettura del file', 'error');
+    reader.readAsDataURL(file);
   };
 
   const _scheduleAutosave = (type) => {
@@ -16556,6 +16750,7 @@ const WikiSections = (() => {
   return { toggleExpand, goto, gotoTrame, toggleLuoghiView, renderList, openCard, editCard, closeDetail,
     newCard, deleteCard, filter, filterTag, renderCounters, init,
     _fieldChange, _jumpToEntity, _saveAndView, _parseLinks, _manualSave,
+    _refreshImgFieldPreview, _onImageFilePicked,
     _renderDetailPub, _scheduleAutosavePub, _getCfg, _saveWithCustom,
     get _currentType() { return _currentType; },
     get _currentItem()  { return _currentItem; },
@@ -17083,7 +17278,7 @@ const Trame = (() => {
 
         // Salva
         '<div style="display:flex;gap:8px;">' +
-          '<button class="btn btn-primary" onclick="Trame.saveCurrent()">Salva</button>' +
+          '<button class="btn btn-primary" onclick="Trame.saveCurrent(true)">Salva</button>' +
           '<button class="btn btn-ghost" onclick="Trame.closeDetail()">← Torna alla lista</button>' +
         '</div>' +
       '</div>';
@@ -17110,7 +17305,7 @@ const Trame = (() => {
   };
 
   // ── Salva trama corrente ──
-  const saveCurrent = () => {
+  const saveCurrent = (explicit) => {
     if (!_currentId) return;
     const trame = _getData();
     const t = trame.find(function(x) { return x.id === _currentId; });
@@ -17122,6 +17317,10 @@ const Trame = (() => {
     t.corpo     = document.getElementById('trama-corpo')?.innerHTML || t.corpo;
     t.note      = document.getElementById('trama-note')?.innerHTML || t.note;
     _save(trame);
+    // Il salvataggio automatico (debounce a ogni input) usa la stessa funzione ma senza
+    // toast, altrimenti spammerebbe un avviso ad ogni carattere digitato: il feedback
+    // visibile è riservato al click esplicito sul pulsante "Salva".
+    if (explicit) Toast.show('Trama salvata', 'success', 1500);
   };
 
   // ── Torna alla lista ──
