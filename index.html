@@ -3324,7 +3324,7 @@ const App = (() => {
 
     switch (pageId) {
       case 'home':       renderHomePage(); break;
-      case 'campagna':   renderCampaignPage(); setTimeout(() => { try { renderDashboard(); } catch(e){} try{QuestKanban.render();}catch(e){} }, 100); break;
+      case 'campagna':   setTimeout(() => { try { renderDashboard(); } catch(e){} try{QuestKanban.render();}catch(e){} }, 100); break;
       case 'sessione':   try { Sessione.init(); setTimeout(() => NoteSessione.render(), 100); } catch(e) {} setTimeout(()=>{try{Clocks.render();}catch(e){}; try{ScenePlanner.render();}catch(e){}; try{SessioniLog.showTab('corrente');}catch(e){}},200); break;
       case 'generatori':
         setTimeout(() => { GeneratoriDD.enable(); Generatori.applyVisibility(); EncounterBuilder.init(); RNGLoot.init(); }, 100);
@@ -3594,24 +3594,6 @@ const openCampaign = (id) => {
     );
   };
 
-  const renderCampaignPage = () => {
-    if (!activeCampaign) return;
-    const fresh = Storage.getCampaign(activeCampaign.id);
-    if (fresh) activeCampaign = fresh;
-
-    Debug.log(`renderCampaignPage: ${activeCampaign.name}`);
-
-    const titleEl = document.getElementById('camp-page-title');
-    if (titleEl) titleEl.textContent = activeCampaign.name;
-
-    const recapEl = document.getElementById('camp-session-recap');
-    if (recapEl) recapEl.value = activeCampaign.sessionRecap || '';
-
-    renderQuestList();
-    renderTimeline();
-    renderFactionList();
-  };
-
   const saveRecap = () => {
     const el = document.getElementById('camp-session-recap');
     if (!el || !activeCampaign) return;
@@ -3792,7 +3774,6 @@ const openCampaign = (id) => {
     reloadActiveCampaign,
     saveActiveCampaign,
     renderHomePage,
-    renderCampaignPage,
     openCampaign,
     editCampaign,
     confirmDeleteCampaign,
