@@ -171,8 +171,10 @@
   display: flex !important;
   flex-direction: column;
 }
-/* Wiki mobile */
-@media (max-width: 768px) {
+/* Wiki mobile: segue esattamente la stessa condizione di _isMobile() in JS (vedi sotto),
+   altrimenti la vista single-pane renderizzata da JS resta incastrata in un pannello
+   dimensionato per il layout desktop a due colonne. */
+@media (max-width: 768px), (max-width: 1024px) and (hover: none) {
   #wiki-sidebar { width: 100% !important; flex-shrink: 0; }
   #wiki-editor-area { width: 100% !important; }
   #wiki-topbar { flex-wrap: wrap; gap: 6px; padding: 6px 8px; }
@@ -185,8 +187,8 @@
 </style>
 
 <style>
-/* Toast sopra la mobile nav su mobile */
-@media (max-width: 768px) {
+/* Toast sopra la mobile nav, quando e' visibile (stessa condizione del layout "app touch") */
+@media (max-width: 768px), (max-width: 1024px) and (hover: none) {
   .toast-container,
   #toast-container,
   [class*="toast-box"],
@@ -9756,7 +9758,9 @@ const WikiDM = (() => {
     return { lore: [], sessioni: [], templates: [] };
   };
   const _saveWiki = (w) => App.saveActiveCampaign({ wiki: w });
-  const _isMobile = () => window.innerWidth <= 768;
+  // Stessa condizione della media query "app touch" in css/layout.css: sotto 768px sempre,
+  // oppure fino a 1024px su dispositivi touch (copre gli iPad in verticale).
+  const _isMobile = () => window.matchMedia('(max-width: 768px), (max-width: 1024px) and (hover: none)').matches;
   const _uid = () => 'n' + Date.now() + Math.random().toString(36).slice(2,5);
 
   const _builtinTemplates = () => [
@@ -18153,7 +18157,9 @@ const NoteCampagna = (() => {
     return camp?.noteCampagna || [];
   };
   const _save = (data) => App.saveActiveCampaign({ noteCampagna: data });
-  const _isMobile = () => window.innerWidth <= 768;
+  // Stessa condizione della media query "app touch" in css/layout.css: sotto 768px sempre,
+  // oppure fino a 1024px su dispositivi touch (copre gli iPad in verticale).
+  const _isMobile = () => window.matchMedia('(max-width: 768px), (max-width: 1024px) and (hover: none)').matches;
 
   const render = () => {
     if (_isMobile()) renderMobile();
@@ -18652,7 +18658,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 <script>
 // ══ MOBILE NAVIGATION ══
-const isMobile = () => window.innerWidth <= 768;
+const isMobile = () => window.matchMedia('(max-width: 768px), (max-width: 1024px) and (hover: none)').matches;
 
 const initMobileNav = () => {
   const mobileNav = document.getElementById('mobile-nav');

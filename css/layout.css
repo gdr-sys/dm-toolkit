@@ -127,7 +127,12 @@
   .schermo-grid { grid-template-columns: repeat(2, 1fr); }
 }
 
-@media (max-width: 768px) {
+/* Layout "app touch" (drawer al posto della sidebar fissa, barra di navigazione in basso):
+   scatta sotto 768px per qualunque dispositivo (com'era) E su qualunque dispositivo touch
+   fino a 1024px, che copre tutti gli iPad in verticale (744-1024px) senza intaccare la
+   modalita' desktop per una finestra stretta ma con mouse. Il landscape degli iPad parte da
+   1080px, quindi resta sulla sidebar desktop dove lo spazio non manca. */
+@media (max-width: 768px), (max-width: 1024px) and (hover: none) {
   :root { --nav-width:220px; --nav-collapsed:60px; --mobile-nav-height:56px; }
   #sidebar { display:none !important; }
   #sidebar.mobile-open { display:flex !important; z-index:500; box-shadow:var(--shadow-xl); width:min(80vw, 300px); }
@@ -142,11 +147,18 @@
   .mobile-nav-label { font-family:var(--font-display); font-size:0.52rem; letter-spacing:0.03em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%; }
   .mobile-nav-item.active .mobile-nav-icon,
   .mobile-nav-item.active .mobile-nav-label { color:var(--accent-primary); }
+  #dice-widget { bottom:calc(var(--mobile-nav-height) + var(--space-sm)); right:var(--space-sm); }
+  #debug-panel { left:var(--space-sm); bottom:calc(var(--mobile-nav-height) + var(--space-sm)); }
+}
+
+/* Regole di densita' contenuto (colonne griglia, padding, colonne combat-row...) restano
+   legate alla sola larghezza fisica: sotto i 768px lo spazio va spremuto, ma un iPad da
+   ~820-1024px col drawer aperto ha gia' quasi tutta la larghezza disponibile per il contenuto
+   e non ha bisogno dello stesso schiacciamento pensato per un telefono. */
+@media (max-width: 768px) {
   .grid-2, .grid-3, .grid-4 { grid-template-columns:1fr; }
   .form-row, .form-row-3 { grid-template-columns:1fr; }
   .schermo-grid { grid-template-columns:1fr; }
-  #dice-widget { bottom:calc(var(--mobile-nav-height) + var(--space-sm)); right:var(--space-sm); }
-  #debug-panel { left:var(--space-sm); bottom:calc(var(--mobile-nav-height) + var(--space-sm)); }
   .page { padding:var(--space-sm); }
   .combat-row { grid-template-columns:48px 1fr 130px 0 100px; }
   .combat-ca-col { display:none; }
@@ -158,9 +170,10 @@
   .page-header { flex-direction:column; align-items:flex-start; }
 }
 
-/* La tab-bar sezioni Wiki in pagina serve solo su mobile (sidebar nel drawer, nascosta di
-   default): su desktop il sidebar ha gia' il sottomenu Wiki, la tab-bar sarebbe ridondante. */
-@media (min-width: 769px) {
+/* La tab-bar sezioni Wiki in pagina serve solo quando la sidebar e' nel drawer (nascosta di
+   default): su desktop il sidebar ha gia' il sottomenu Wiki, la tab-bar sarebbe ridondante.
+   Stessa condizione del blocco "app touch" sopra, in negativo. */
+@media (min-width: 1025px), (min-width: 769px) and (hover: hover) {
   #wiki-section-tabbar { display: none !important; }
 }
 
