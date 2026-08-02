@@ -15110,6 +15110,16 @@ const WikiSections = (() => {
 
   const _escHtml = (s) => String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 
+  const _knownEntityNames = () => {
+    const camp = App.getActiveCampaign();
+    if (!camp) return [];
+    const names = [];
+    (camp.npcs || []).forEach(n => { const nm = n.name || n.nome; if (nm) names.push(nm); });
+    (camp.locations || []).forEach(l => { const nm = l.nome || l.name; if (nm) names.push(nm); });
+    (camp.factions || []).forEach(f => { const nm = f.nome || f.name; if (nm) names.push(nm); });
+    return names.sort((a, b) => b.length - a.length);
+  };
+
   const _parseLinks = (text) => {
     if (!text) return '';
     text = text.replace(/\[\[([^\]]+)\]\]/g, function(_, name) {
@@ -15117,10 +15127,23 @@ const WikiSections = (() => {
       var safe = clean.replace(/&/g, '&amp;').replace(/"/g, '&quot;');
       return '<span class="ws-link" data-name="' + safe + '" onclick="WikiSections._jumpToEntity(this.dataset.name)" style="cursor:pointer;color:var(--accent-primary);text-decoration:underline dotted;padding:0 2px;" title="Vai a ' + safe + '">' + clean + '</span>';
     });
-    text = text.replace(/@([\wA-Za-z][\w\s]{1,30}?)(?=[\s,;.!?]|$)/gm, function(_, name) {
-      var clean = name.trim();
-      var safe = clean.replace(/&/g, '&amp;').replace(/"/g, '&quot;');
-      return '<span class="ws-link" data-name="' + safe + '" onclick="WikiSections._jumpToEntity(this.dataset.name)" style="cursor:pointer;color:var(--accent-secondary);font-weight:600;" title="Vai a ' + safe + '">@' + clean + '</span>';
+    const knownNames = _knownEntityNames();
+    text = text.replace(/@([^\s@][\wÀ-ÿ'\s]{0,60})/g, function(full, rest) {
+      const restLower = rest.toLowerCase();
+      const known = knownNames.find(nm => restLower.startsWith(nm.toLowerCase()));
+      let nameLen;
+      if (known) {
+        nameLen = known.length;
+      } else {
+        const m = rest.match(/^[\wÀ-ÿ]+/);
+        nameLen = m ? m[0].length : 0;
+      }
+      if (nameLen === 0) return full;
+      const name = rest.slice(0, nameLen);
+      const remainder = rest.slice(nameLen);
+      const clean = name.trim();
+      const safe = clean.replace(/&/g, '&amp;').replace(/"/g, '&quot;');
+      return '<span class="ws-link" data-name="' + safe + '" onclick="WikiSections._jumpToEntity(this.dataset.name)" style="cursor:pointer;color:var(--accent-secondary);font-weight:600;" title="Vai a ' + safe + '">@' + clean + '</span>' + remainder;
     });
 
     text = text.replace(/#([\w\u00C0-\u00FF]+)/g, function(_, tag) {
