@@ -96,6 +96,15 @@
   border-radius: var(--radius-sm);
 }
 
+/* Su dispositivi touch i bottoni icona piccoli sono i piu' a rischio di tap sbagliato: 32px e'
+   pensato per un mouse. Sale a 40px indipendentemente dalla larghezza (vale anche per un iPad
+   in landscape, dove la sidebar desktop resta ma l'input e' comunque un dito). La regola non ha
+   !important, quindi lo shrink deliberato per i telefoni molto stretti (vedi .combat-actions-col
+   in layout.css, sotto i 768px) continua a vincere dov'e' gia' stato tarato di proposito. */
+@media (hover: none) {
+  .btn-icon-sm { width: 40px; height: 40px; padding: 8px; }
+}
+
 /* ── CARD ── */
 .card {
   background: var(--bg-card);

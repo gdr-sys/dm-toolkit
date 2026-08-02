@@ -254,6 +254,13 @@
 .combat-hp-fill { height:100%; border-radius:var(--radius-full); transition:width 0.3s ease, background 0.3s ease; }
 .combat-ca-col { text-align:center; }
 .combat-actions-col { display:flex; gap:2px; justify-content:flex-end; }
+/* Su touch i bottoni icona salgono a 40px (vedi .btn-icon-sm in components.css): la colonna
+   azioni e il suo gap crescono di conseguenza, altrimenti i 5-6 bottoni si schiaccerebbero
+   sotto la loro larghezza effettiva dentro i 140px pensati per i 32px del mouse. */
+@media (hover: none) {
+  .combat-row { grid-template-columns:60px 1fr 160px 50px 280px; }
+  .combat-actions-col { gap:6px; }
+}
 .party-card { background:var(--bg-secondary); border:1px solid var(--border); border-radius:var(--radius-md); padding:var(--space-sm) var(--space-md); min-width:0; overflow:hidden; }
 .party-stat-box { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-sm); padding:4px 2px; text-align:center; min-width:0; overflow:hidden; }
 .party-stat-label { font-size:0.58rem; font-family:var(--font-display); letter-spacing:0.03em; text-transform:uppercase; color:var(--text-muted); display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
