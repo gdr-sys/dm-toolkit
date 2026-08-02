@@ -2028,6 +2028,28 @@
   </div>
 </div>
 
+<!-- Modal: Input generico (sostituisce prompt()) -->
+<div class="modal-overlay hidden" id="modal-input" style="display:none;">
+  <div class="modal" style="max-width:440px;">
+    <div class="modal-header">
+      <h2 style="font-family:var(--font-display);font-size:1.1rem;" id="input-modal-title">Inserisci</h2>
+      <button class="btn btn-ghost btn-icon" onclick="Modal.close('input')" aria-label="Chiudi"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <div id="input-modal-hint" class="form-hint" style="display:none;white-space:pre-line;max-height:180px;overflow-y:auto;margin-top:0;margin-bottom:10px;"></div>
+      <div class="form-group" style="margin-bottom:0;">
+        <label class="form-label" id="input-modal-label" style="display:none;"></label>
+        <input id="input-modal-field" class="form-input" type="text" onkeydown="if(event.key==='Enter'){event.preventDefault();submitInputModal();}">
+        <textarea id="input-modal-textarea" class="form-textarea" style="display:none;" rows="5"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="Modal.close('input')">Annulla</button>
+      <button class="btn btn-primary" id="input-modal-confirm-btn" onclick="submitInputModal()">Conferma</button>
+    </div>
+  </div>
+</div>
+
 <!-- Modal: Evento Timeline -->
 <div class="modal-overlay hidden" id="modal-timeline" style="display:none;">
   <div class="modal" style="max-width:480px;">
@@ -3176,6 +3198,60 @@ const openConfirmModal = (title, body, callback) => {
 const submitConfirm = () => {
   Modal.close('confirm');
   if (_confirmCallback) { _confirmCallback(); _confirmCallback = null; }
+};
+
+// Sostituisce window.prompt(): stesso schema (titolo, valore di default, callback col
+// risultato) ma asincrono via Modal invece che bloccante, cosi' resta in tema e funziona bene
+// su touch. opts: { label, hint, placeholder, type:'text'|'number', multiline:bool, confirmLabel }.
+// Il callback viene chiamato SOLO su conferma (su Annulla/Esc/click fuori non viene chiamato
+// affatto, a differenza di prompt() che tornava null — i call site vanno scritti di conseguenza).
+let _inputModalCallback = null;
+const openInputModal = (title, defaultValue, callback, opts = {}) => {
+  document.getElementById('input-modal-title').textContent = title;
+  const field = document.getElementById('input-modal-field');
+  const textarea = document.getElementById('input-modal-textarea');
+  const isMultiline = !!opts.multiline;
+  field.style.display = isMultiline ? 'none' : '';
+  textarea.style.display = isMultiline ? '' : 'none';
+  const active = isMultiline ? textarea : field;
+  active.value = defaultValue ?? '';
+  active.placeholder = opts.placeholder || '';
+  if (!isMultiline) field.type = opts.type || 'text';
+  const labelEl = document.getElementById('input-modal-label');
+  if (opts.label) { labelEl.textContent = opts.label; labelEl.style.display = ''; } else { labelEl.style.display = 'none'; }
+  const hintEl = document.getElementById('input-modal-hint');
+  if (opts.hint) { hintEl.textContent = opts.hint; hintEl.style.display = ''; } else { hintEl.style.display = 'none'; }
+  document.getElementById('input-modal-confirm-btn').textContent = opts.confirmLabel || 'Conferma';
+  _inputModalCallback = callback;
+  Modal.open('input');
+  setTimeout(() => { active.focus(); active.select?.(); }, 100);
+};
+
+// Aprire il modal sposta il focus fuori dall'editor rich-text: senza salvare/ripristinare la
+// posizione del cursore, l'inserimento di tag/link/immagini dopo la conferma finirebbe alla
+// fine del testo (o comunque non dove l'utente aveva il cursore) invece che al punto esatto.
+let _savedEditorRange = null;
+const _saveEditorCaret = () => {
+  const sel = window.getSelection();
+  _savedEditorRange = (sel && sel.rangeCount > 0) ? sel.getRangeAt(0).cloneRange() : null;
+};
+const _restoreEditorCaret = (el) => {
+  el?.focus();
+  if (!_savedEditorRange) return;
+  const sel = window.getSelection();
+  sel?.removeAllRanges();
+  try { sel?.addRange(_savedEditorRange); } catch(e) {}
+};
+
+const submitInputModal = () => {
+  const field = document.getElementById('input-modal-field');
+  const textarea = document.getElementById('input-modal-textarea');
+  const active = textarea.style.display !== 'none' ? textarea : field;
+  const val = active.value;
+  Modal.close('input');
+  const cb = _inputModalCallback;
+  _inputModalCallback = null;
+  if (cb) cb(val);
 };
 
 const openTimelineModal = () => {
@@ -4914,16 +4990,16 @@ const Sessione = (() => {
   const changeHP = (id, delta) => {
     const c = _combat?.combatants.find(x => x.id === id);
     if (!c) return;
-    const val = prompt(`${delta > 0 ? 'Cura' : 'Danno'} per ${c.nome} (HP attuali: ${c.hp}/${c.maxHp}):`, '');
-    if (val === null) return;
-    const amount = parseInt(val);
-    if (isNaN(amount) || amount < 0) { Toast.show('Valore non valido', 'warning'); return; }
-    c.hp = Math.max(0, Math.min(c.maxHp || 9999, c.hp + (delta > 0 ? amount : -amount)));
-    if (c.hp === 0) Toast.show(`${c.nome} è a 0 PF!`, 'warning');
-    saveCombat(_combat);
-    _syncPartyHP(c);
-    renderCombat();
-    Debug.log(`${c.nome}: HP ${c.hp}/${c.maxHp}`);
+    openInputModal(delta > 0 ? `Cura per ${c.nome}` : `Danno per ${c.nome}`, '', (val) => {
+      const amount = parseInt(val);
+      if (isNaN(amount) || amount < 0) { Toast.show('Valore non valido', 'warning'); return; }
+      c.hp = Math.max(0, Math.min(c.maxHp || 9999, c.hp + (delta > 0 ? amount : -amount)));
+      if (c.hp === 0) Toast.show(`${c.nome} è a 0 PF!`, 'warning');
+      saveCombat(_combat);
+      _syncPartyHP(c);
+      renderCombat();
+      Debug.log(`${c.nome}: HP ${c.hp}/${c.maxHp}`);
+    }, { type: 'number', hint: `HP attuali: ${c.hp}/${c.maxHp}`, confirmLabel: delta > 0 ? 'Cura' : 'Danno' });
   };
 
   const setHP = (id, val) => {
@@ -4941,15 +5017,15 @@ const Sessione = (() => {
   const quickDamage = (id) => {
     const c = _combat?.combatants.find(x => x.id === id);
     if (!c) return;
-    const val = prompt(`Danno rapido per ${c.nome} (HP: ${c.hp}/${c.maxHp}):`, '');
-    if (val === null) return;
-    const amount = parseInt(val);
-    if (isNaN(amount)) return;
-    c.hp = Math.max(0, c.hp - amount);
-    if (c.hp === 0) Toast.show(`${c.nome} è a 0 PF!`, 'warning');
-    saveCombat(_combat);
-    _syncPartyHP(c);
-    renderCombat();
+    openInputModal(`Danno rapido per ${c.nome}`, '', (val) => {
+      const amount = parseInt(val);
+      if (isNaN(amount)) return;
+      c.hp = Math.max(0, c.hp - amount);
+      if (c.hp === 0) Toast.show(`${c.nome} è a 0 PF!`, 'warning');
+      saveCombat(_combat);
+      _syncPartyHP(c);
+      renderCombat();
+    }, { type: 'number', hint: `HP: ${c.hp}/${c.maxHp}`, confirmLabel: 'Danno' });
   };
 
   const openCondizioneModal = (id) => {
@@ -5033,11 +5109,11 @@ const Sessione = (() => {
   const openNote = (id) => {
     const c = _combat?.combatants.find(x => x.id === id);
     if (!c) return;
-    const nota = prompt(`Note per ${c.nome}:`, c.note || '');
-    if (nota === null) return;
-    c.note = nota;
-    saveCombat(_combat);
-    renderCombat();
+    openInputModal(`Note per ${c.nome}`, c.note || '', (nota) => {
+      c.note = nota;
+      saveCombat(_combat);
+      renderCombat();
+    }, { multiline: true });
   };
 
   const openCombatantSheet = async (id) => {
@@ -5331,32 +5407,34 @@ const Sessione = (() => {
     if (!m) return;
     if (!_combat) newCombat();
 
-    const qty = parseInt(prompt(`Quanti ${m.nome} aggiungere?`, '1')) || 1;
-    const pf = m.punti_ferita?.media || 10;
+    openInputModal(`Quanti ${m.nome} aggiungere?`, '1', (val) => {
+      const qty = parseInt(val) || 1;
+      const pf = m.punti_ferita?.media || 10;
 
-    for (let i = 0; i < qty; i++) {
-      const suffix = qty > 1 ? ` #${i + 1}` : '';
-      _combat.combatants.push({
-        id: 'comb_' + Date.now() + '_' + i,
-        nome: m.nome + suffix,
-        tipo: 'mostro',
-        monsterId: m.id,
-        hp: pf,
-        maxHp: pf,
-        ca: m.classe_armatura || 10,
-        gs: m.grado_sfida?.raw || '?',
-        iniziativa: rollInit(m.caratteristiche?.destrezza?.modificatore || 0),
-        iniziativaBonus: m.caratteristiche?.destrezza?.modificatore || 0,
-        condizioni: [],
-        note: '',
-        concentrazione: false,
-      });
-    }
-    saveCombat(_combat);
-    Modal.close('monster-search-modal');
-    renderCombat();
-    Toast.show(`${qty > 1 ? qty + '× ' : ''}${m.nome} aggiunto`, 'success');
-    Debug.log(`Mostro aggiunto al combat: ${m.nome} x${qty}`);
+      for (let i = 0; i < qty; i++) {
+        const suffix = qty > 1 ? ` #${i + 1}` : '';
+        _combat.combatants.push({
+          id: 'comb_' + Date.now() + '_' + i,
+          nome: m.nome + suffix,
+          tipo: 'mostro',
+          monsterId: m.id,
+          hp: pf,
+          maxHp: pf,
+          ca: m.classe_armatura || 10,
+          gs: m.grado_sfida?.raw || '?',
+          iniziativa: rollInit(m.caratteristiche?.destrezza?.modificatore || 0),
+          iniziativaBonus: m.caratteristiche?.destrezza?.modificatore || 0,
+          condizioni: [],
+          note: '',
+          concentrazione: false,
+        });
+      }
+      saveCombat(_combat);
+      Modal.close('monster-search-modal');
+      renderCombat();
+      Toast.show(`${qty > 1 ? qty + '× ' : ''}${m.nome} aggiunto`, 'success');
+      Debug.log(`Mostro aggiunto al combat: ${m.nome} x${qty}`);
+    }, { type: 'number' });
   };
 
   const addCustomCombatant = () => {
@@ -7946,14 +8024,14 @@ const Schermo = (() => {
   const editBlock = (id) => {
     const block = _blocks.find(b => b.id === id);
     if (!block) return;
-    const title = prompt('Titolo del blocco:', block.title || '');
-    if (title === null) return;
-    const content = prompt('Contenuto:', block.content || '');
-    if (content === null) return;
-    block.title = title || block.title;
-    block.content = content;
-    save();
-    render();
+    openInputModal('Titolo del blocco', block.title || '', (title) => {
+      openInputModal('Contenuto', block.content || '', (content) => {
+        block.title = title || block.title;
+        block.content = content;
+        save();
+        render();
+      }, { multiline: true });
+    });
   };
 
   const resetLayout = () => {
@@ -9652,14 +9730,16 @@ const ncEditorKeydown = (e) => {
 };
 
 const ncInsertTag = () => {
-  const tag = prompt('Nome tag (senza #):', '');
-  if (!tag?.trim()) return;
-  document.getElementById('nc-page-content')?.focus();
-  document.execCommand('insertHTML', false,
-    `<span class="nc-tag" onclick="ncClickTag(this)">#${tag.trim().toLowerCase().replace(/\s+/g,'_')}</span>&nbsp;`
-  );
-  NoteCampagna.savePage();
-  ncUpdateTagBar();
+  _saveEditorCaret();
+  openInputModal('Nome tag (senza #)', '', (tag) => {
+    if (!tag?.trim()) return;
+    _restoreEditorCaret(document.getElementById('nc-page-content'));
+    document.execCommand('insertHTML', false,
+      `<span class="nc-tag" onclick="ncClickTag(this)">#${tag.trim().toLowerCase().replace(/\s+/g,'_')}</span>&nbsp;`
+    );
+    NoteCampagna.savePage();
+    ncUpdateTagBar();
+  });
 };
 
 const ncInsertLink = () => {
@@ -9669,17 +9749,19 @@ const ncInsertLink = () => {
   cats.forEach(c => (c.pagine||[]).forEach(p => pages.push({ cat: c.nome, titolo: p.titolo, id: p.id })));
   if (!pages.length) { Toast.show('Nessuna nota disponibile', 'info'); return; }
   const titoli = pages.map((p,i) => `${i+1}. [${p.cat}] ${p.titolo}`).join('\n');
-  const input = prompt(`Link a quale nota?\n${titoli}\n\nScrivi il titolo:`, '');
-  if (!input?.trim()) return;
-  const found = pages.find(p => p.titolo.toLowerCase() === input.trim().toLowerCase());
-  const titolo = found ? found.titolo : input.trim();
-  const cls = found ? 'nc-wikilink' : 'nc-wikilink nc-broken';
-  document.getElementById('nc-page-content')?.focus();
-  document.execCommand('insertHTML', false,
-    `<span class="${cls}" data-link="${titolo}" onclick="ncClickLink(this)">[[${titolo}]]</span>&nbsp;`
-  );
-  NoteCampagna.savePage();
-  ncUpdateBacklinks();
+  _saveEditorCaret();
+  openInputModal('Link a quale nota? Scrivi il titolo', '', (input) => {
+    if (!input?.trim()) return;
+    const found = pages.find(p => p.titolo.toLowerCase() === input.trim().toLowerCase());
+    const titolo = found ? found.titolo : input.trim();
+    const cls = found ? 'nc-wikilink' : 'nc-wikilink nc-broken';
+    _restoreEditorCaret(document.getElementById('nc-page-content'));
+    document.execCommand('insertHTML', false,
+      `<span class="${cls}" data-link="${titolo}" onclick="ncClickLink(this)">[[${titolo}]]</span>&nbsp;`
+    );
+    NoteCampagna.savePage();
+    ncUpdateBacklinks();
+  }, { hint: titoli });
 };
 
 const ncClickTag = (el) => {
@@ -10139,8 +10221,7 @@ const WikiDM = (() => {
     if (!_noteId) return;
     const w = _getWiki();
     const nota = (w[_section]||[]).find(n => n.id === _noteId);
-    if (!confirm('Eliminare "' + (nota?.titolo||'questa nota') + '"? Sarà nel cestino per 30 giorni.')) return;
-
+    openConfirmModal('Eliminare nota?', 'Eliminare "' + (nota?.titolo||'questa nota') + '"? Sarà nel cestino per 30 giorni.', () => {
     try { WikiTrash.addToTrash(nota, _section); } catch(e) {}
     w[_section] = (w[_section]||[]).filter(n => n.id !== _noteId);
     _saveWiki(w);
@@ -10148,6 +10229,7 @@ const WikiDM = (() => {
     _mobileView = 'tree';
     _render();
     Toast.show('Nota spostata nel cestino', 'info', 1500);
+    });
   };
 
   const saveNote = () => {
@@ -10356,26 +10438,28 @@ const WikiDM = (() => {
   };
 
   const newTemplate = () => {
-    const nome = prompt('Nome del template:', 'Nuovo template');
-    if (!nome?.trim()) return;
-    const w = _getWiki();
-    if (!w.templates) w.templates = _builtinTemplates();
-    const tpl = { id:'tpl_'+Date.now(), nome:nome.trim(), icona:'📄', builtin:false, contenuto:`<h1>${nome.trim()}</h1>\n<p></p>` };
-    w.templates.push(tpl);
-    _saveWiki(w);
-    _noteId = tpl.id;
-    _render();
+    openInputModal('Nome del template', 'Nuovo template', (nome) => {
+      if (!nome?.trim()) return;
+      const w = _getWiki();
+      if (!w.templates) w.templates = _builtinTemplates();
+      const tpl = { id:'tpl_'+Date.now(), nome:nome.trim(), icona:'📄', builtin:false, contenuto:`<h1>${nome.trim()}</h1>\n<p></p>` };
+      w.templates.push(tpl);
+      _saveWiki(w);
+      _noteId = tpl.id;
+      _render();
+    });
   };
 
   const deleteTemplate = (id) => {
     const w = _getWiki();
     const tpl = (w.templates||[]).find(t => t.id === id);
     if (tpl?.builtin) { Toast.show('I template predefiniti non possono essere eliminati', 'warning'); return; }
-    if (!confirm('Eliminare questo template?')) return;
-    w.templates = (w.templates||[]).filter(t => t.id !== id);
-    _saveWiki(w);
-    _noteId = null;
-    _render();
+    openConfirmModal('Eliminare template?', 'Eliminare questo template?', () => {
+      w.templates = (w.templates||[]).filter(t => t.id !== id);
+      _saveWiki(w);
+      _noteId = null;
+      _render();
+    });
   };
 
   const togglePin = (id) => {
@@ -10455,11 +10539,13 @@ const wikiFB = (tag) => {
 };
 
 const wikiInsertTag = () => {
-  const tag = prompt('Nome tag (senza #):','');
-  if (!tag?.trim()) return;
-  document.getElementById('wiki-note-content')?.focus();
-  document.execCommand('insertHTML',false,`<span class="nc-tag">#${tag.trim().toLowerCase().replace(/\s+/g,'_')}</span>&nbsp;`);
-  WikiDM.saveNote();
+  _saveEditorCaret();
+  openInputModal('Nome tag (senza #)', '', (tag) => {
+    if (!tag?.trim()) return;
+    _restoreEditorCaret(document.getElementById('wiki-note-content'));
+    document.execCommand('insertHTML',false,`<span class="nc-tag">#${tag.trim().toLowerCase().replace(/\s+/g,'_')}</span>&nbsp;`);
+    WikiDM.saveNote();
+  });
 };
 
 const wikiInsertLink = () => {
@@ -10483,31 +10569,33 @@ const wikiInsertLink = () => {
   if (!pages.length) { Toast.show('Nessuna nota o entità disponibile','info'); return; }
 
   const list = pages.slice(0,30).map((p,i) => `${i+1}. ${p.tipo_label} ${p.titolo}`).join('\n');
-  const input = prompt('Collega a (numero o titolo):\n' + list, '');
-  if (!input?.trim()) return;
+  _saveEditorCaret();
+  openInputModal('Collega a (numero o titolo)', '', (input) => {
+    if (!input?.trim()) return;
 
-  let found = null;
-  const num = parseInt(input.trim());
-  if (!isNaN(num) && num >= 1 && num <= pages.length) {
-    found = pages[num-1];
-  } else {
-    found = pages.find(p => p.titolo.toLowerCase() === input.trim().toLowerCase());
-  }
+    let found = null;
+    const num = parseInt(input.trim());
+    if (!isNaN(num) && num >= 1 && num <= pages.length) {
+      found = pages[num-1];
+    } else {
+      found = pages.find(p => p.titolo.toLowerCase() === input.trim().toLowerCase());
+    }
 
-  const titolo = found ? found.titolo : input.trim();
-  const key = found ? found.key : titolo;
-  const cls = found ? 'nc-wikilink' : 'nc-wikilink nc-broken';
-  const label = found ? (
-    found.tipo === 'png' ? '👤 ' :
-    found.tipo === 'luogo' ? '🗺️ ' :
-    found.tipo === 'fazione' ? '⚔️ ' : ''
-  ) + titolo : titolo;
+    const titolo = found ? found.titolo : input.trim();
+    const key = found ? found.key : titolo;
+    const cls = found ? 'nc-wikilink' : 'nc-wikilink nc-broken';
+    const label = found ? (
+      found.tipo === 'png' ? '👤 ' :
+      found.tipo === 'luogo' ? '🗺️ ' :
+      found.tipo === 'fazione' ? '⚔️ ' : ''
+    ) + titolo : titolo;
 
-  document.getElementById('wiki-note-content')?.focus();
-  const _safeKey = key.replace(/'/g, "\\'");
-  const _span = '<span class="' + cls + '" data-link="' + key + '" data-tipo="' + (found?.tipo||'wiki') + '" onclick="wikiNavigateLink(\'' + _safeKey + '\')">[[' + label + ']]</span>&nbsp;';
-  document.execCommand('insertHTML', false, _span);
-  WikiDM.saveNote();
+    _restoreEditorCaret(document.getElementById('wiki-note-content'));
+    const _safeKey = key.replace(/'/g, "\\'");
+    const _span = '<span class="' + cls + '" data-link="' + key + '" data-tipo="' + (found?.tipo||'wiki') + '" onclick="wikiNavigateLink(\'' + _safeKey + '\')">[[' + label + ']]</span>&nbsp;';
+    document.execCommand('insertHTML', false, _span);
+    WikiDM.saveNote();
+  }, { hint: list });
 };
 
 const wikiNavigateLink = (key) => {
@@ -10698,10 +10786,11 @@ const Scratchpad = (() => {
   };
 
   const clear = () => {
-    if (!confirm('Pulire lo scratchpad?')) return;
-    localStorage.removeItem(KEY);
-    const ta = document.getElementById('scratchpad-text');
-    if (ta) ta.value = '';
+    openConfirmModal('Pulire lo scratchpad?', 'Pulire lo scratchpad?', () => {
+      localStorage.removeItem(KEY);
+      const ta = document.getElementById('scratchpad-text');
+      if (ta) ta.value = '';
+    });
   };
 
   return { toggle, save, clear };
@@ -10784,15 +10873,18 @@ const Clocks = (() => {
   };
 
   const add = () => {
-    const nome = prompt('Nome del clock (es. "Rituale del Profano", "Inseguimento"):', '');
-    if (!nome?.trim()) return;
-    const maxStr = prompt('Quanti segmenti? (4, 6, 8, 10...)', '6');
-    const max = Math.max(2, Math.min(20, parseInt(maxStr) || 6));
-    const nota = prompt('Nota opzionale (lascia vuoto per saltare):', '') || '';
-    const clocks = _getClocks();
-    clocks.push({ nome: nome.trim(), max, current: 0, nota });
-    _saveClocks(clocks);
-    render();
+    openInputModal('Nome del clock', '', (nome) => {
+      if (!nome?.trim()) return;
+      openInputModal('Quanti segmenti?', '6', (maxStr) => {
+        const max = Math.max(2, Math.min(20, parseInt(maxStr) || 6));
+        openInputModal('Nota opzionale', '', (nota) => {
+          const clocks = _getClocks();
+          clocks.push({ nome: nome.trim(), max, current: 0, nota: nota || '' });
+          _saveClocks(clocks);
+          render();
+        }, { placeholder: 'lascia vuoto per saltare' });
+      }, { type: 'number', placeholder: '4, 6, 8, 10...' });
+    }, { placeholder: 'es. "Rituale del Profano", "Inseguimento"' });
   };
 
   const tick = (i) => {
@@ -10813,11 +10905,12 @@ const Clocks = (() => {
   };
 
   const remove = (i) => {
-    if (!confirm('Rimuovere questo clock?')) return;
-    const clocks = _getClocks();
-    clocks.splice(i, 1);
-    _saveClocks(clocks);
-    render();
+    openConfirmModal('Rimuovere clock?', 'Rimuovere questo clock?', () => {
+      const clocks = _getClocks();
+      clocks.splice(i, 1);
+      _saveClocks(clocks);
+      render();
+    });
   };
 
   return { add, tick, untick, remove, render };
@@ -11003,20 +11096,24 @@ const WikiGrafo = (() => {
 })();
 
 const wikiInsertImage = () => {
-  const url = prompt('URL immagine (es. https://i.imgur.com/...):', '');
-  if (!url?.trim()) return;
-  const alt = prompt('Descrizione immagine (opzionale):', '') || 'immagine';
-  const el = document.getElementById('wiki-note-content');
-  if (!el) return;
-  el.focus();
-  document.execCommand('insertHTML', false,
-    '<figure style="margin:12px 0;text-align:center;">' +
-    '<img src="' + url.trim() + '" alt="' + alt + '" style="max-width:100%;border-radius:var(--radius-md);border:1px solid var(--border);" onerror="this.style.display=\'none\';this.nextSibling.style.display=\'block\'">' +
-    '<div style="display:none;padding:8px;background:var(--bg-tertiary);border-radius:var(--radius-md);color:var(--text-muted);font-size:0.78rem;">⚠️ Immagine non caricata: ' + url.trim() + '</div>' +
-    (alt !== 'immagine' ? '<figcaption style="font-size:0.72rem;color:var(--text-muted);margin-top:4px;">' + alt + '</figcaption>' : '') +
-    '</figure><p><br></p>'
-  );
-  WikiDM.saveNote();
+  _saveEditorCaret();
+  openInputModal('URL immagine', '', (url) => {
+    if (!url?.trim()) return;
+    openInputModal('Descrizione immagine (opzionale)', '', (altVal) => {
+      const alt = altVal || 'immagine';
+      const el = document.getElementById('wiki-note-content');
+      if (!el) return;
+      _restoreEditorCaret(el);
+      document.execCommand('insertHTML', false,
+        '<figure style="margin:12px 0;text-align:center;">' +
+        '<img src="' + url.trim() + '" alt="' + alt + '" style="max-width:100%;border-radius:var(--radius-md);border:1px solid var(--border);" onerror="this.style.display=\'none\';this.nextSibling.style.display=\'block\'">' +
+        '<div style="display:none;padding:8px;background:var(--bg-tertiary);border-radius:var(--radius-md);color:var(--text-muted);font-size:0.78rem;">⚠️ Immagine non caricata: ' + url.trim() + '</div>' +
+        (alt !== 'immagine' ? '<figcaption style="font-size:0.72rem;color:var(--text-muted);margin-top:4px;">' + alt + '</figcaption>' : '') +
+        '</figure><p><br></p>'
+      );
+      WikiDM.saveNote();
+    });
+  }, { placeholder: 'es. https://i.imgur.com/...' });
 };
 
 const GDrive = (() => {
@@ -11223,28 +11320,34 @@ const miniFmt = (fieldId, cmd) => {
       (camp?.locations||[]).forEach(l => pages.push({label:'🗺️ '+(l.nome||''), key:'luogo:'+(l.nome||'')}));
       (camp?.factions||[]).forEach(f => pages.push({label:'⚔️ '+(f.nome||''), key:'fazione:'+(f.nome||'')}));
       const list = pages.slice(0,25).map((p,i) => (i+1)+'. '+p.label).join('\n');
-      const input = prompt('Collega a (numero o titolo):\n'+list, '');
-      if (!input?.trim()) return;
-      const num = parseInt(input.trim());
-      const found = !isNaN(num) && num>=1 && num<=pages.length ? pages[num-1]
-                  : pages.find(p => p.label.toLowerCase().includes(input.trim().toLowerCase()));
-      const key = found ? found.key : input.trim();
-      const titolo = key.startsWith('png:') ? key.slice(4)
-                   : key.startsWith('luogo:') ? key.slice(6)
-                   : key.startsWith('fazione:') ? key.slice(8)
-                   : key;
-      const cls = found ? 'nc-wikilink' : 'nc-wikilink nc-broken';
-      const icon = !found ? '' : key.startsWith('png:') ? '👤 ' : key.startsWith('luogo:') ? '🗺️ ' : key.startsWith('fazione:') ? '⚔️ ' : '';
-      document.execCommand('insertHTML', false,
-        '<span class="'+cls+'" data-link="'+key+'" onclick="wikiNavigateLink(\''+key.replace(/'/g,"\\'")+'\')" style="cursor:pointer;">[['+icon+titolo+']]</span>&nbsp;'
-      );
+      _saveEditorCaret();
+      openInputModal('Collega a (numero o titolo)', '', (input) => {
+        if (!input?.trim()) return;
+        const num = parseInt(input.trim());
+        const found = !isNaN(num) && num>=1 && num<=pages.length ? pages[num-1]
+                    : pages.find(p => p.label.toLowerCase().includes(input.trim().toLowerCase()));
+        const key = found ? found.key : input.trim();
+        const titolo = key.startsWith('png:') ? key.slice(4)
+                     : key.startsWith('luogo:') ? key.slice(6)
+                     : key.startsWith('fazione:') ? key.slice(8)
+                     : key;
+        const cls = found ? 'nc-wikilink' : 'nc-wikilink nc-broken';
+        const icon = !found ? '' : key.startsWith('png:') ? '👤 ' : key.startsWith('luogo:') ? '🗺️ ' : key.startsWith('fazione:') ? '⚔️ ' : '';
+        _restoreEditorCaret(el);
+        document.execCommand('insertHTML', false,
+          '<span class="'+cls+'" data-link="'+key+'" onclick="wikiNavigateLink(\''+key.replace(/'/g,"\\'")+'\')" style="cursor:pointer;">[['+icon+titolo+']]</span>&nbsp;'
+        );
+      }, { hint: list });
     }
     else if (cmd === 'tag') {
-      const tag = prompt('Nome tag (senza #):', '');
-      if (!tag?.trim()) return;
-      document.execCommand('insertHTML', false,
-        '<span class="nc-tag">#'+tag.trim().toLowerCase().replace(/\s+/g,'_')+'</span>&nbsp;'
-      );
+      _saveEditorCaret();
+      openInputModal('Nome tag (senza #)', '', (tag) => {
+        if (!tag?.trim()) return;
+        _restoreEditorCaret(el);
+        document.execCommand('insertHTML', false,
+          '<span class="nc-tag">#'+tag.trim().toLowerCase().replace(/\s+/g,'_')+'</span>&nbsp;'
+        );
+      });
     }
     else if (cmd === 'secret') {
       document.execCommand('insertHTML', false,
@@ -11262,24 +11365,27 @@ const miniFmt = (fieldId, cmd) => {
   const start = el.selectionStart || 0, end = el.selectionEnd || 0;
   const text = el.value || '';
   const sel = text.slice(start, end);
+  const insertAtSelection = (insertText) => {
+    el.value = text.slice(0,start) + insertText + text.slice(end);
+    el.selectionStart = el.selectionEnd = start + insertText.length;
+    el.dispatchEvent(new Event('input'));
+    el.focus();
+  };
   let ins = '';
   if (cmd === 'bold')       ins = '**'+(sel||'testo')+'**';
   else if (cmd === 'italic') ins = '*'+(sel||'testo')+'*';
   else if (cmd === 'underline') ins = '__'+(sel||'testo')+'__';
   else if (cmd === 'tag') {
-    const tag = prompt('Nome tag:', '');
-    if (!tag?.trim()) return;
-    ins = '#'+tag.trim().toLowerCase().replace(/\s+/g,'_')+' ';
+    openInputModal('Nome tag', '', (tag) => {
+      if (!tag?.trim()) return;
+      insertAtSelection('#'+tag.trim().toLowerCase().replace(/\s+/g,'_')+' ');
+    });
+    return;
   }
   else if (cmd === 'link') { ins = '[[]]'; }
   else if (cmd === 'secret') { ins = '[SEGRETO DM: ...]'; }
   else if (cmd === 'clue')   { ins = '[INDIZIO: ...]'; }
-  if (ins) {
-    el.value = text.slice(0,start) + ins + text.slice(end);
-    el.selectionStart = el.selectionEnd = start + ins.length;
-    el.dispatchEvent(new Event('input'));
-    el.focus();
-  }
+  if (ins) insertAtSelection(ins);
 };
 const _getWordInTextarea = (el) => {
   const pos = el.selectionStart;
@@ -13173,9 +13279,10 @@ const ScenePlanner = (() => {
   };
 
   const clear = () => {
-    if (!confirm('Pulire tutti i beat della sessione?')) return;
-    _saveBeats([]);
-    render();
+    openConfirmModal('Pulire i beat?', 'Pulire tutti i beat della sessione?', () => {
+      _saveBeats([]);
+      render();
+    });
   };
 
   return { render, addBeat, setTipo, setTitolo, setNote, togglePrincipale, moveUp, moveDown, remove, clear };
@@ -13352,10 +13459,11 @@ const SessioniLog = (() => {
   };
 
   const remove = (id) => {
-    if (!confirm('Eliminare questa sessione?')) return;
-    const sessioni = (App.getActiveCampaign()?.sessioni_log||[]).filter(x => x.id !== id);
-    _saveSessioni(sessioni);
-    renderList();
+    openConfirmModal('Eliminare sessione?', 'Eliminare questa sessione?', () => {
+      const sessioni = (App.getActiveCampaign()?.sessioni_log||[]).filter(x => x.id !== id);
+      _saveSessioni(sessioni);
+      renderList();
+    });
   };
 
   const setInCorso = (id) => {
@@ -13571,9 +13679,10 @@ const WikiTrash = (() => {
   const getAll = () => _getTrash();
 
   const empty = () => {
-    if (!confirm('Svuotare definitivamente il cestino? Le note non saranno recuperabili.')) return;
-    localStorage.removeItem(KEY);
-    Toast.show('Cestino svuotato', 'info');
+    openConfirmModal('Svuotare il cestino?', 'Svuotare definitivamente il cestino? Le note non saranno recuperabili.', () => {
+      localStorage.removeItem(KEY);
+      Toast.show('Cestino svuotato', 'info');
+    });
   };
 
   return { addToTrash, restore, getAll, empty };
@@ -14261,13 +14370,14 @@ const DriveBackup = (() => {
   };
 
   const disconnect = () => {
-    if (!confirm('Scollegare Google Drive? I backup automatici verranno disattivati.')) return;
-    _connected = false;
-    _folderId = null;
-    localStorage.removeItem(LS_KEY);
-    localStorage.removeItem(LS_LAST);
-    _updateUI();
-    Toast.show('Google Drive scollegato', 'info');
+    openConfirmModal('Scollegare Google Drive?', 'Scollegare Google Drive? I backup automatici verranno disattivati.', () => {
+      _connected = false;
+      _folderId = null;
+      localStorage.removeItem(LS_KEY);
+      localStorage.removeItem(LS_LAST);
+      _updateUI();
+      Toast.show('Google Drive scollegato', 'info');
+    });
   };
 
   const showWelcomeIfNeeded = () => {
@@ -15234,28 +15344,32 @@ const WikiSections = (() => {
   };
 
   const deleteCard = (type, id) => {
-    if (!confirm('Eliminare questa voce? Verrà spostata nel cestino.')) return;
-    const camp = App.getActiveCampaign();
-    const cfg = TYPES[type];
+    openConfirmModal('Eliminare voce?', 'Eliminare questa voce? Verrà spostata nel cestino.', () => {
+      const camp = App.getActiveCampaign();
+      const cfg = TYPES[type];
 
-    const items = cfg.getData(camp);
-    const item = items.find(x => x.id === id);
-    if (item) try { WikiTrash.addToTrash({ id, titolo: item.nome }, type); } catch(e) {}
+      const items = cfg.getData(camp);
+      const item = items.find(x => x.id === id);
+      if (item) try { WikiTrash.addToTrash({ id, titolo: item.nome }, type); } catch(e) {}
 
-    if (type === 'png') {
-      App.saveActiveCampaign({ npcs: (camp.npcs || []).filter(n => n.id !== id) });
-    } else if (type === 'luoghi') {
-      App.saveActiveCampaign({ locations: (camp.locations || []).filter(l => l.id !== id) });
-    } else if (type === 'fazioni') {
-      App.saveActiveCampaign({ factions: (camp.factions || []).filter(f => f.id !== id) });
-    } else if (type === 'lore' || type === 'sessioni') {
-      const wiki = camp?.wiki || {};
-      const sec = type === 'lore' ? 'lore' : 'sessioni';
-      if (wiki[sec]) wiki[sec] = wiki[sec].filter(n => n.id !== id);
-      App.saveActiveCampaign({ wiki });
-    }
-    closeDetail(type);
-    Toast.show('Voce eliminata', 'info', 1500);
+      if (type === 'png') {
+        App.saveActiveCampaign({ npcs: (camp.npcs || []).filter(n => n.id !== id) });
+      } else if (type === 'luoghi') {
+        App.saveActiveCampaign({ locations: (camp.locations || []).filter(l => l.id !== id) });
+      } else if (type === 'fazioni') {
+        App.saveActiveCampaign({ factions: (camp.factions || []).filter(f => f.id !== id) });
+      } else if (type === 'lore' || type === 'sessioni') {
+        const wiki = camp?.wiki || {};
+        const sec = type === 'lore' ? 'lore' : 'sessioni';
+        if (wiki[sec]) wiki[sec] = wiki[sec].filter(n => n.id !== id);
+        App.saveActiveCampaign({ wiki });
+      }
+      // _currentItem va azzerato PRIMA di closeDetail(): altrimenti il suo autosave-on-close
+      // ririscrive nei dati la voce appena cancellata (bug preesistente, non legato al modal).
+      _currentItem = null;
+      closeDetail(type);
+      Toast.show('Voce eliminata', 'info', 1500);
+    });
   };
 
   const filter = (type, q) => {
@@ -15736,15 +15850,16 @@ const Trame = (() => {
   };
 
   const deleteTrama = (id) => {
-    if (!confirm('Eliminare questa trama?')) return;
-    const trame = _getData().filter(t => t.id !== id);
-    _save(trame);
-    _currentId = null;
-    renderList();
-    const detail = document.getElementById('trame-detail');
-    if (detail) detail.style.display = 'none';
-    const list = document.getElementById('trame-list');
-    if (list) list.style.display = '';
+    openConfirmModal('Eliminare trama?', 'Eliminare questa trama?', () => {
+      const trame = _getData().filter(t => t.id !== id);
+      _save(trame);
+      _currentId = null;
+      renderList();
+      const detail = document.getElementById('trame-detail');
+      if (detail) detail.style.display = 'none';
+      const list = document.getElementById('trame-list');
+      if (list) list.style.display = '';
+    });
   };
 
   // ── Lista card ──
@@ -18312,28 +18427,31 @@ const NoteCampagna = (() => {
   };
 
   const addCategoria = () => {
-    const nome = prompt('Nome categoria:', 'Nuova Categoria');
-    if (!nome?.trim()) return;
-    const data = _get();
-    data.push({ id: 'cat_'+Date.now(), nome: nome.trim(), pagine: [] });
-    _save(data); _catIdx = data.length-1; _pageIdx = 0;
-    if (_isMobile()) _mobileView = 'pages';
-    render();
+    openInputModal('Nome categoria', 'Nuova Categoria', (nome) => {
+      if (!nome?.trim()) return;
+      const data = _get();
+      data.push({ id: 'cat_'+Date.now(), nome: nome.trim(), pagine: [] });
+      _save(data); _catIdx = data.length-1; _pageIdx = 0;
+      if (_isMobile()) _mobileView = 'pages';
+      render();
+    });
   };
 
   const renameCategoria = (i) => {
     const data = _get();
-    const nome = prompt('Nuovo nome:', data[i]?.nome || '');
-    if (!nome?.trim()) return;
-    data[i].nome = nome.trim(); _save(data); renderSidebar(); renderPages();
+    openInputModal('Nuovo nome', data[i]?.nome || '', (nome) => {
+      if (!nome?.trim()) return;
+      data[i].nome = nome.trim(); _save(data); renderSidebar(); renderPages();
+    });
   };
 
   const deleteCategoria = (i) => {
     const data = _get();
-    if (!confirm('Eliminare "' + (data[i]?.nome||'') + '" e tutte le sue pagine?')) return;
-    data.splice(i, 1); _save(data);
-    if (_catIdx >= data.length) _catIdx = Math.max(0, data.length-1);
-    _pageIdx = 0; _mobileView = 'cats'; render();
+    openConfirmModal('Eliminare categoria?', 'Eliminare "' + (data[i]?.nome||'') + '" e tutte le sue pagine?', () => {
+      data.splice(i, 1); _save(data);
+      if (_catIdx >= data.length) _catIdx = Math.max(0, data.length-1);
+      _pageIdx = 0; _mobileView = 'cats'; render();
+    });
   };
 
   const addPage = () => {
@@ -18352,11 +18470,12 @@ const NoteCampagna = (() => {
     const data = _get();
     const pages = data[_catIdx]?.pagine;
     if (!pages?.length) return;
-    if (!confirm('Eliminare "' + (pages[_pageIdx]?.titolo||'questa pagina') + '"?')) return;
-    pages.splice(_pageIdx, 1); _save(data);
-    if (_pageIdx >= pages.length) _pageIdx = Math.max(0, pages.length-1);
-    if (_isMobile()) _mobileView = 'pages';
-    render();
+    openConfirmModal('Eliminare pagina?', 'Eliminare "' + (pages[_pageIdx]?.titolo||'questa pagina') + '"?', () => {
+      pages.splice(_pageIdx, 1); _save(data);
+      if (_pageIdx >= pages.length) _pageIdx = Math.max(0, pages.length-1);
+      if (_isMobile()) _mobileView = 'pages';
+      render();
+    });
   };
 
   const savePage = () => {
