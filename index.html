@@ -65,19 +65,19 @@
 }
 .nc-tb:hover { background: var(--bg-tertiary); border-color: var(--border-strong); }
 .nc-tb:active { background: var(--accent-primary); border-color: var(--accent-primary); color: #fff; }
-/* Contenuto formattato */
-#nc-page-content h1 { font-family:var(--font-display); font-size:1.4rem; font-weight:700; color:var(--accent-primary); margin:0.6em 0 0.3em; border-bottom:1px solid var(--border); padding-bottom:4px; }
-#nc-page-content h2 { font-family:var(--font-display); font-size:1.1rem; font-weight:700; color:var(--text-primary); margin:0.5em 0 0.2em; }
-#nc-page-content h3 { font-family:var(--font-display); font-size:0.95rem; font-weight:600; color:var(--accent-secondary); margin:0.4em 0 0.2em; }
-#nc-page-content p { margin: 0.3em 0; }
-#nc-page-content ul { padding-left: 1.4em; margin: 0.3em 0; }
-#nc-page-content ol { padding-left: 1.4em; margin: 0.3em 0; }
-#nc-page-content li { margin: 0.15em 0; }
-#nc-page-content blockquote { border-left: 3px solid var(--accent-secondary); margin: 0.4em 0; padding: 4px 12px; background: rgba(var(--accent-secondary-rgb, 93,130,90), 0.08); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; color: var(--text-secondary); font-style: italic; }
-#nc-page-content strong { color: var(--text-primary); }
-#nc-page-content em { color: var(--text-secondary); }
-#nc-page-content:empty::before { content: attr(data-placeholder); color: var(--text-muted); pointer-events: none; white-space: pre-line; }
-#nc-page-content:focus { outline: none; }
+/* Contenuto formattato negli editor rich-text (Wiki, Note libere, Trame, campi mini) */
+[contenteditable] h1 { font-family:var(--font-display); font-size:1.4rem; font-weight:700; color:var(--accent-primary); margin:0.6em 0 0.3em; border-bottom:1px solid var(--border); padding-bottom:4px; }
+[contenteditable] h2 { font-family:var(--font-display); font-size:1.1rem; font-weight:700; color:var(--text-primary); margin:0.5em 0 0.2em; }
+[contenteditable] h3 { font-family:var(--font-display); font-size:0.95rem; font-weight:600; color:var(--accent-secondary); margin:0.4em 0 0.2em; }
+[contenteditable] p { margin: 0.3em 0; }
+[contenteditable] ul { padding-left: 1.4em; margin: 0.3em 0; }
+[contenteditable] ol { padding-left: 1.4em; margin: 0.3em 0; }
+[contenteditable] li { margin: 0.15em 0; }
+[contenteditable] blockquote { border-left: 3px solid var(--accent-secondary); margin: 0.4em 0; padding: 4px 12px; background: rgba(var(--accent-secondary-rgb, 93,130,90), 0.08); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; color: var(--text-secondary); font-style: italic; }
+[contenteditable] strong { color: var(--text-primary); }
+[contenteditable] em { color: var(--text-secondary); }
+[contenteditable]:empty::before { content: attr(data-placeholder); color: var(--text-muted); pointer-events: none; white-space: pre-line; }
+[contenteditable]:focus { outline: none; }
 /* Callout blocks */
 .wiki-callout { border-radius:var(--radius-md); padding:10px 14px; margin:8px 0; border-left:4px solid; }
 .wiki-callout-read-aloud { background:rgba(105,204,133,0.1); border-color:#69cc85; }
@@ -87,11 +87,6 @@
 .wiki-callout-trap        { background:rgba(255,107,107,0.1); border-color:#ff6b6b; }
 .wiki-callout-improv      { background:rgba(93,164,90,0.1);   border-color:var(--accent-secondary); }
 .wiki-callout-label { font-size:0.65rem; font-family:var(--font-display); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:4px; display:block; opacity:0.8; }
-/* editor wiki stili */
-#wiki-note-content h1 { font-family:var(--font-display); font-size:1.4rem; font-weight:700; color:var(--accent-primary); margin:0.6em 0 0.3em; border-bottom:1px solid var(--border); padding-bottom:4px; }
-#wiki-note-content h2 { font-family:var(--font-display); font-size:1.1rem; font-weight:700; color:var(--text-primary); margin:0.5em 0 0.2em; }
-#wiki-note-content h3 { font-family:var(--font-display); font-size:0.95rem; font-weight:600; color:var(--accent-secondary); margin:0.4em 0 0.2em; }
-#wiki-note-content blockquote { border-left:3px solid var(--accent-secondary); margin:0.4em 0; padding:4px 12px; background:rgba(93,130,90,0.08); border-radius:0 var(--radius-sm) var(--radius-sm) 0; font-style:italic; }
 /* Wiki subnav */
 .nav-subitem { font-size:0.78rem !important; padding:5px 8px !important; }
 .nav-subitem.active { background:var(--bg-secondary); color:var(--accent-primary) !important; }
@@ -106,54 +101,8 @@
 #wiki-toolbar.view-mode { display:none !important; }
 #wiki-note-title[disabled] { opacity:1; background:transparent; border:none; cursor:default; pointer-events:none; }
 .wiki-view-badge { display:inline-flex; align-items:center; gap:4px; padding:2px 8px; background:var(--bg-tertiary); border:1px solid var(--border); border-radius:var(--radius-full); font-size:0.68rem; color:var(--text-muted); }
-/* Tag #hashtag */
-#nc-page-content .nc-tag {
-  display: inline-block;
-  background: rgba(93,164,90,0.15);
-  color: var(--accent-secondary);
-  border-radius: var(--radius-sm);
-  padding: 0 4px;
-  font-size: 0.85em;
-  cursor: pointer;
-  font-weight: 600;
-  text-decoration: none;
-}
-#nc-page-content .nc-tag:hover { background: rgba(93,164,90,0.3); }
-/* Wikilink [[Nota]] */
-#nc-page-content .nc-wikilink {
-  display: inline-block;
-  background: rgba(91,164,245,0.12);
-  color: #5ba4f5;
-  border-radius: var(--radius-sm);
-  padding: 0 4px;
-  font-size: 0.85em;
-  cursor: pointer;
-  border-bottom: 1px solid rgba(91,164,245,0.4);
-  text-decoration: none;
-}
-#nc-page-content .nc-wikilink:hover { background: rgba(91,164,245,0.25); }
-#nc-page-content .nc-wikilink.nc-broken { color: var(--text-muted); border-bottom-style: dashed; }
-/* Pannello backlinks */
-#nc-backlinks {
-  padding: 8px 12px;
-  border-top: 1px solid var(--border);
-  font-size: 0.75rem;
-  color: var(--text-muted);
-  background: var(--bg-secondary);
-}
-#nc-backlinks .nc-bl-item {
-  display: inline-block;
-  margin: 2px 4px 2px 0;
-  padding: 2px 8px;
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  color: #5ba4f5;
-}
-#nc-backlinks .nc-bl-item:hover { background: rgba(91,164,245,0.1); }
-/* Tag bar */
-#nc-tag-bar .nc-tb-tag {
+/* Tag bar (Wiki) */
+#wiki-tag-bar .nc-tb-tag {
   padding: 2px 8px;
   background: rgba(93,164,90,0.12);
   color: var(--accent-secondary);
@@ -161,11 +110,10 @@
   cursor: pointer;
   font-weight: 600;
 }
-#nc-tag-bar .nc-tb-tag:hover { background: rgba(93,164,90,0.25); }
+#wiki-tag-bar .nc-tb-tag:hover { background: rgba(93,164,90,0.25); }
 /* Mobile: toolbar più grande */
 @media (max-width: 768px) {
   .nc-tb { min-width: 34px; padding: 5px 8px; font-size: 0.82rem; }
-  #nc-toolbar { gap: 3px; padding: 6px 8px; }
 }
 #page-wiki.active {
   display: flex !important;
@@ -2458,6 +2406,17 @@
       </div>
     </div>
     <div class="modal-body" id="comp-detail-body"></div>
+  </div>
+</div>
+
+<!-- Modal: risultati ricerca per tag -->
+<div class="modal-overlay hidden" id="modal-tag-search" style="display:none;">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 style="font-family:var(--font-display);font-size:1.1rem;" id="tag-search-title">#tag</h2>
+      <button class="btn btn-ghost btn-icon" onclick="Modal.close('tag-search')" aria-label="Chiudi"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="modal-body" id="tag-search-list"></div>
   </div>
 </div>
 
@@ -9678,137 +9637,6 @@ const npcImgAdjust = (id,axis,delta) => { const s=_getImgState(id,'npc'); if(axi
 const locImgAdjust = (id,axis,delta) => { const s=_getImgState(id,'loc'); if(axis==='x')s.x=Math.max(0,Math.min(100,s.x+delta)); if(axis==='y')s.y=Math.max(0,Math.min(100,s.y+delta)); if(axis==='z')s.z=Math.max(50,Math.min(300,s.z+delta)); _applyImgState('loc',id,s); };
 const fazImgAdjust = (id,axis,delta) => { const s=_getImgState(id,'faz'); if(axis==='x')s.x=Math.max(0,Math.min(100,s.x+delta)); if(axis==='y')s.y=Math.max(0,Math.min(100,s.y+delta)); if(axis==='z')s.z=Math.max(50,Math.min(300,s.z+delta)); _applyImgState('faz',id,s); };
 
-const ncFmt = (cmd) => {
-  document.getElementById('nc-page-content')?.focus();
-  document.execCommand(cmd, false, null);
-  NoteCampagna.savePage();
-};
-
-const ncFmtBlock = (tag) => {
-  const el = document.getElementById('nc-page-content');
-  if (!el) return;
-  el.focus();
-
-  if (['h1','h2','h3','p'].includes(tag)) {
-    document.execCommand('formatBlock', false, '<' + tag + '>');
-  } else if (tag === 'blockquote') {
-    document.execCommand('formatBlock', false, '<blockquote>');
-  }
-  NoteCampagna.savePage();
-};
-
-const ncEditorKeydown = (e) => {
-
-  if (e.ctrlKey || e.metaKey) {
-    if (e.key === 'b') { e.preventDefault(); ncFmt('bold'); }
-    if (e.key === 'i') { e.preventDefault(); ncFmt('italic'); }
-    if (e.key === 'u') { e.preventDefault(); ncFmt('underline'); }
-  }
-
-  if (e.key === 'Tab') {
-    e.preventDefault();
-    document.execCommand('insertHTML', false, '&nbsp;&nbsp;&nbsp;&nbsp;');
-  }
-
-};
-
-const ncInsertTag = () => {
-  _saveEditorCaret();
-  openInputModal('Nome tag (senza #)', '', (tag) => {
-    if (!tag?.trim()) return;
-    _restoreEditorCaret(document.getElementById('nc-page-content'));
-    document.execCommand('insertHTML', false,
-      `<span class="nc-tag" onclick="ncClickTag(this)">#${tag.trim().toLowerCase().replace(/\s+/g,'_')}</span>&nbsp;`
-    );
-    NoteCampagna.savePage();
-    ncUpdateTagBar();
-  });
-};
-
-const ncInsertLink = () => {
-  const cats = NoteCampagna._getData ? NoteCampagna._getData() : [];
-
-  const pages = [];
-  cats.forEach(c => (c.pagine||[]).forEach(p => pages.push({ cat: c.nome, titolo: p.titolo, id: p.id })));
-  if (!pages.length) { Toast.show('Nessuna nota disponibile', 'info'); return; }
-  const titoli = pages.map((p,i) => `${i+1}. [${p.cat}] ${p.titolo}`).join('\n');
-  _saveEditorCaret();
-  openInputModal('Link a quale nota? Scrivi il titolo', '', (input) => {
-    if (!input?.trim()) return;
-    const found = pages.find(p => p.titolo.toLowerCase() === input.trim().toLowerCase());
-    const titolo = found ? found.titolo : input.trim();
-    const cls = found ? 'nc-wikilink' : 'nc-wikilink nc-broken';
-    _restoreEditorCaret(document.getElementById('nc-page-content'));
-    document.execCommand('insertHTML', false,
-      `<span class="${cls}" data-link="${titolo}" onclick="ncClickLink(this)">[[${titolo}]]</span>&nbsp;`
-    );
-    NoteCampagna.savePage();
-    ncUpdateBacklinks();
-  }, { hint: titoli });
-};
-
-const ncClickTag = (el) => {
-  const tag = el.textContent.slice(1);
-  Toast.show(`Tag: ${tag} — usa la ricerca per filtrare`, 'info', 2000);
-};
-
-const ncClickLink = (el) => {
-  const titolo = el.dataset.link;
-  const cats = NoteCampagna._getData ? NoteCampagna._getData() : [];
-  for (let ci = 0; ci < cats.length; ci++) {
-    const pi = (cats[ci].pagine||[]).findIndex(p => p.titolo === titolo);
-    if (pi >= 0) {
-      NoteCampagna.selectCat(ci);
-      NoteCampagna.selectPage(pi);
-      return;
-    }
-  }
-  Toast.show(`Nota "${titolo}" non trovata`, 'warning');
-};
-
-const ncUpdateTagBar = () => {
-  const el = document.getElementById('nc-page-content');
-  const bar = document.getElementById('nc-tag-bar');
-  if (!el || !bar) return;
-  const tags = [...el.querySelectorAll('.nc-tag')].map(t => t.textContent);
-  const unique = [...new Set(tags)];
-  if (!unique.length) { bar.style.display = 'none'; return; }
-  bar.style.display = 'flex';
-  bar.innerHTML = '<span style="color:var(--text-muted);margin-right:4px;">Tags:</span>' +
-    unique.map(t => `<span class="nc-tb-tag" onclick="ncClickTag({textContent:'${t}'})">${t}</span>`).join('');
-};
-
-const ncUpdateBacklinks = () => {
-  const panel = document.getElementById('nc-backlinks');
-  if (!panel) return;
-  const cats = NoteCampagna._getData ? NoteCampagna._getData() : [];
-  const currentPage = cats[NoteCampagna._catIdx]?.pagine?.[NoteCampagna._pageIdx];
-  if (!currentPage) { panel.style.display = 'none'; return; }
-  const titolo = currentPage.titolo;
-  const backlinks = [];
-  cats.forEach((c, ci) => {
-    (c.pagine||[]).forEach((p, pi) => {
-      if (p.id === currentPage.id) return;
-      if ((p.contenuto||'').includes(`data-link="${titolo}"`)) {
-        backlinks.push({ cat: c.nome, titolo: p.titolo, ci, pi });
-      }
-    });
-  });
-  if (!backlinks.length) { panel.style.display = 'none'; return; }
-  panel.style.display = 'block';
-  panel.innerHTML = '<span style="margin-right:6px;">🔗 Citata da:</span>' +
-    backlinks.map(b =>
-      `<span class="nc-bl-item" onclick="NoteCampagna.selectCat(${b.ci});NoteCampagna.selectPage(${b.pi})">
-        <span style="color:var(--text-muted);font-size:0.68rem;">${b.cat} / </span>${b.titolo}
-      </span>`
-    ).join('');
-};
-
-const ncRefreshEditor = () => {
-  ncUpdateTagBar();
-  ncUpdateBacklinks();
-};
-
 const WikiDM = (() => {
   'use strict';
 
@@ -10321,7 +10149,7 @@ const WikiDM = (() => {
     if (!tags?.length) { bar.style.display = 'none'; return; }
     bar.style.display = 'flex';
     bar.innerHTML = '<span style="color:var(--text-muted);margin-right:4px;flex-shrink:0;">Tags:</span>' +
-      [...new Set(tags)].map(t => `<span class="nc-tb-tag">${t}</span>`).join('');
+      [...new Set(tags)].map(t => `<span class="nc-tb-tag" onclick="wikiClickTag('${t.replace(/^#/,'')}')">${t}</span>`).join('');
   };
   const _hideTagBar = () => { const b = document.getElementById('wiki-tag-bar'); if(b) b.style.display='none'; };
 
@@ -10474,15 +10302,13 @@ const _getActiveEditor = () => {
   if (active && active.contentEditable === 'true') return active;
 
   return document.getElementById('wiki-note-content') ||
-         document.getElementById('ws-editor-free') ||
-         document.getElementById('nc-page-content');
+         document.getElementById('ws-editor-free');
 };
 
 const _saveActiveEditor = () => {
   const el = _getActiveEditor();
   if (!el) return;
   if (el.id === 'wiki-note-content') WikiDM.saveNote();
-  else if (el.id === 'nc-page-content') NoteCampagna.savePage?.();
   else if (el.id === 'ws-editor-free' && window.WikiSections?._currentType) {
     WikiSections._manualSave?.();
   }
@@ -10526,9 +10352,70 @@ const wikiInsertTag = () => {
   openInputModal('Nome tag (senza #)', '', (tag) => {
     if (!tag?.trim()) return;
     _restoreEditorCaret(document.getElementById('wiki-note-content'));
-    document.execCommand('insertHTML',false,`<span class="nc-tag">#${tag.trim().toLowerCase().replace(/\s+/g,'_')}</span>&nbsp;`);
+    document.execCommand('insertHTML',false,`<span class="nc-tag" onclick="wikiClickTag(this)" style="display:inline-block;padding:1px 7px;background:var(--accent-primary);opacity:0.8;color:#fff;border-radius:var(--radius-full);font-size:0.78rem;cursor:pointer;">#${tag.trim().toLowerCase().replace(/\s+/g,'_')}</span>&nbsp;`);
     WikiDM.saveNote();
   });
+};
+
+// Tipi che possono contenere testo taggato con #, cercati da wikiClickTag/MentionPicker.
+const TAG_SEARCH_TYPES = ['lore','sessioni','png','luoghi','fazioni','quest','pg','incontri'];
+
+// Tutte le occorrenze note del tag dato, cercando nel testo (contenuto/note) di ogni tipo wiki.
+const _allTagMatches = (tag) => {
+  const camp = App.getActiveCampaign();
+  if (!camp) return [];
+  const needle = '#' + tag.toLowerCase();
+  const results = [];
+  TAG_SEARCH_TYPES.forEach(type => {
+    const cfg = WikiSections._getCfg && WikiSections._getCfg(type);
+    if (!cfg) return;
+    (cfg.getData(camp) || []).forEach(item => {
+      const raw = ((item.contenuto || '') + ' ' + (item.note || '')).replace(/<[^>]+>/g, ' ').toLowerCase();
+      if (raw.includes(needle)) {
+        results.push({ type, id: item.id, nome: item.nome || item.titolo || 'Senza titolo', label: cfg.label });
+      }
+    });
+  });
+  return results;
+};
+
+// Estrae tutti i tag distinti gia' usati in campagna (per l'autocomplete #).
+const _allKnownTags = () => {
+  const camp = App.getActiveCampaign();
+  if (!camp) return [];
+  const tags = new Set();
+  TAG_SEARCH_TYPES.forEach(type => {
+    const cfg = WikiSections._getCfg && WikiSections._getCfg(type);
+    if (!cfg) return;
+    (cfg.getData(camp) || []).forEach(item => {
+      const raw = ((item.contenuto || '') + ' ' + (item.note || '')).replace(/<[^>]+>/g, ' ');
+      (raw.match(/#([\wÀ-ÿ_]+)/g) || []).forEach(t => tags.add(t.slice(1).toLowerCase()));
+    });
+  });
+  return [...tags];
+};
+
+// Click su un tag (dalla toolbar, dalla tag-bar o da un tag auto-rilevato nel testo):
+// mostra tutte le note/schede che lo contengono, con link diretto per aprirle.
+const wikiClickTag = (tagOrEl) => {
+  const tag = (typeof tagOrEl === 'string' ? tagOrEl : (tagOrEl?.dataset?.tag || tagOrEl?.textContent || ''))
+    .replace(/^#/, '').trim();
+  if (!tag) return;
+  const results = _allTagMatches(tag);
+  const title = document.getElementById('tag-search-title');
+  if (title) title.textContent = '#' + tag;
+  const list = document.getElementById('tag-search-list');
+  if (list) {
+    list.innerHTML = !results.length
+      ? '<p style="color:var(--text-muted);text-align:center;padding:20px;">Nessun risultato per questo tag.</p>'
+      : results.map(r => '<div onclick="Modal.close(\'tag-search\');WikiSections.goto(\'' + r.type + '\');' +
+          'setTimeout(()=>WikiSections.openCard(\'' + r.type + '\',\'' + r.id + '\'),150)" ' +
+          'style="padding:10px;border:1px solid var(--border);border-radius:var(--radius-md);margin-bottom:8px;cursor:pointer;background:var(--bg-secondary);">' +
+          '<strong>' + r.nome + '</strong>' +
+          '<span style="color:var(--text-muted);font-size:0.78rem;"> — ' + r.label + '</span>' +
+        '</div>').join('');
+  }
+  Modal.open('tag-search');
 };
 
 const wikiInsertLink = () => {
@@ -10797,23 +10684,6 @@ const wikiCallout = (tipo) => {
     '<p>...</p></div><p><br></p>'
   );
   WikiDM.saveNote();
-};
-
-const ncCallout = (tipo) => {
-  const labels = {
-    'read-aloud': '📢 READ ALOUD', 'secret': '🔒 SEGRETO DM',
-    'loot': '💰 LOOT', 'clue': '🔍 INDIZIO',
-    'trap': '⚠️ TRAPPOLA', 'improv': '💡 IMPROV',
-  };
-  const el = document.getElementById('nc-page-content');
-  if (!el) return;
-  el.focus();
-  document.execCommand('insertHTML', false,
-    '<div class="wiki-callout wiki-callout-' + tipo + '">' +
-    '<span class="wiki-callout-label">' + (labels[tipo]||tipo) + '</span>' +
-    '<p>...</p></div><p><br></p>'
-  );
-  NoteCampagna.savePage();
 };
 
 const Clocks = (() => {
@@ -12870,8 +12740,19 @@ const MentionPicker = (() => {
   let _editorEl = null;
   let _atRange  = null;
   let _insertFn = null;
+  let _trigger  = '@';
+
+  const _getTagItems = (q) => {
+    const lc = q.toLowerCase();
+    const known = (typeof _allKnownTags === 'function' ? _allKnownTags() : []).sort();
+    let matches = known.filter(t => !lc || t.includes(lc));
+    const typed = q.trim().toLowerCase().replace(/\s+/g, '_');
+    if (typed && !known.includes(typed)) matches = [typed, ...matches];
+    return matches.slice(0, 12).map(t => ({ label: '#' + t, key: t, tipo: 'tag', color: 'var(--accent-secondary)' }));
+  };
 
   const _getItems = (q) => {
+    if (_trigger === '#') return _getTagItems(q);
     const camp = App.getActiveCampaign();
     const wiki = camp?.wiki || {};
     const items = [];
@@ -12931,6 +12812,7 @@ const MentionPicker = (() => {
     _results = [];
     _atRange = null;
     _insertFn = null;
+    _trigger  = '@';
     const dd = document.getElementById('mention-dropdown');
     if (dd) dd.style.display = 'none';
   };
@@ -12962,16 +12844,20 @@ const MentionPicker = (() => {
     if (!anchor || anchor.nodeType !== Node.TEXT_NODE) { _hide(); return; }
     const textBefore = anchor.textContent.slice(0, sel.anchorOffset);
     const atIdx = textBefore.lastIndexOf('@');
-    if (atIdx < 0) { _hide(); return; }
+    const hashIdx = textBefore.lastIndexOf('#');
+    const triggerIdx = Math.max(atIdx, hashIdx);
+    if (triggerIdx < 0) { _hide(); return; }
+    const trigger = textBefore[triggerIdx];
 
-    const afterAt = textBefore.slice(atIdx + 1);
-    // Nasconde se: c'è uno spazio dopo la @, o la @ è troppo lontana (>30 char)
-    if (afterAt.includes(' ')) { _hide(); return; }
-    if (afterAt.length > 30) { _hide(); return; }
-    // Nasconde se la @ fa parte di un indirizzo email (char prima è alfanumerico)
-    if (atIdx > 0 && /[a-zA-Z0-9]/.test(textBefore[atIdx - 1])) { _hide(); return; }
+    const afterTrigger = textBefore.slice(triggerIdx + 1);
+    // Nasconde se: c'è uno spazio dopo il trigger, o è troppo lontano (>30 char)
+    if (afterTrigger.includes(' ')) { _hide(); return; }
+    if (afterTrigger.length > 30) { _hide(); return; }
+    // Nasconde se la @ fa parte di un indirizzo email (char prima è alfanumerico); non si applica a #
+    if (trigger === '@' && triggerIdx > 0 && /[a-zA-Z0-9]/.test(textBefore[triggerIdx - 1])) { _hide(); return; }
 
-    _query = afterAt;
+    _trigger = trigger;
+    _query = afterTrigger;
     _active = true;
     _insertFn = null;
 
@@ -12979,7 +12865,7 @@ const MentionPicker = (() => {
     _show(rect.left, rect.top);
 
     _atRange = document.createRange();
-    _atRange.setStart(anchor, atIdx);
+    _atRange.setStart(anchor, triggerIdx);
     _atRange.setEnd(anchor, sel.anchorOffset);
   };
 
@@ -13003,6 +12889,15 @@ const MentionPicker = (() => {
     sel.removeAllRanges();
     sel.addRange(_atRange);
 
+    if (r.tipo === 'tag') {
+      document.execCommand('insertHTML', false,
+        '<span class="nc-tag" onclick="wikiClickTag(this)" style="display:inline-block;padding:1px 7px;background:var(--accent-primary);opacity:0.8;color:#fff;border-radius:var(--radius-full);font-size:0.78rem;cursor:pointer;">#' + r.key + '</span>&nbsp;'
+      );
+      _hide();
+      if (_editorEl?.id === 'wiki-note-content') WikiDM.saveNote();
+      return;
+    }
+
     const titolo = r.tipo === 'wiki' ? r.key
                  : r.tipo === 'png'  ? r.key.slice(4)
                  : r.tipo === 'luogo' ? r.key.slice(6)
@@ -13021,7 +12916,6 @@ const MentionPicker = (() => {
     _hide();
 
     if (_editorEl?.id === 'wiki-note-content') WikiDM.saveNote();
-    else if (_editorEl?.id === 'nc-page-content') NoteCampagna.savePage();
   };
 
   document.addEventListener('click', (e) => {
@@ -13059,6 +12953,7 @@ const MentionPicker = (() => {
       if (/\s/.test(query)) { _hide(); return; }
       if (query.length > 30) { _hide(); return; }
       if (atIdx > 0 && /[a-zA-Z0-9]/.test(before[atIdx - 1])) { _hide(); return; }
+      _trigger = '@';
       _query   = query;
       _idx     = 0;
       _results = _getItems(query);
@@ -15227,7 +15122,7 @@ const WikiSections = (() => {
 
     text = text.replace(/#([\w\u00C0-\u00FF]+)/g, function(_, tag) {
       var safe = tag.replace(/"/g, "");
-      return '<span class="nc-tag" data-tag="' + safe + '" style="display:inline-block;padding:1px 7px;background:var(--accent-primary);opacity:0.8;color:#fff;border-radius:var(--radius-full);font-size:0.78rem;cursor:pointer;" title="#' + safe + '">#' + safe + '</span>';
+      return '<span class="nc-tag" data-tag="' + safe + '" onclick="wikiClickTag(this)" style="display:inline-block;padding:1px 7px;background:var(--accent-primary);opacity:0.8;color:#fff;border-radius:var(--radius-full);font-size:0.78rem;cursor:pointer;" title="#' + safe + '">#' + safe + '</span>';
     });
     return text;
   };
@@ -15321,10 +15216,34 @@ const WikiSections = (() => {
     _currentItem = { ...newItem };
     if (listEl2) listEl2.style.display = 'none';
     if (detailEl2) { detailEl2.style.display = ''; detailEl2.innerHTML = _renderDetail(type, newItem, 'edit'); }
-    const editor2 = document.getElementById('ws-editor-free');
-    if (editor2) editor2.addEventListener('input', () => { _currentItem.note = editor2.innerHTML; _scheduleAutosave(type); });
 
-    setTimeout(() => document.getElementById('wsf-nome')?.focus(), 100);
+    setTimeout(() => {
+      const editor2 = document.getElementById('ws-editor-free');
+      if (editor2) {
+        editor2.addEventListener('input', () => { _currentItem.note = editor2.innerHTML; _scheduleAutosave(type); });
+        editor2.addEventListener('blur', () => { if (_currentItem) _save(type); });
+        editor2.addEventListener('input', (e) => MentionPicker.onInput(e, editor2));
+        editor2.addEventListener('keydown', (e) => MentionPicker.onKeydown(e));
+      }
+
+      const detailEl3 = document.getElementById('wiki-' + type + '-detail');
+      if (detailEl3) {
+        detailEl3.querySelectorAll('input,textarea,select').forEach(el => {
+          el.addEventListener('blur', () => { if (_currentItem) _save(type); });
+        });
+        if (cfg?.fields) {
+          cfg.fields.forEach(f => {
+            if (f.type === 'mention' || f.type === 'mentions') {
+              const inp = detailEl3.querySelector('#wsf-' + f.key);
+              if (inp) MentionPicker.attachToInput(inp);
+            }
+          });
+        }
+        detailEl3.querySelectorAll('input.ws-custom-val').forEach(inp => MentionPicker.attachToInput(inp));
+      }
+
+      document.getElementById('wsf-nome')?.focus();
+    }, 50);
   };
 
   const deleteCard = (type, id) => {
@@ -18248,245 +18167,6 @@ const Calendario = (() => {
   const get = () => App.getActiveCampaign()?.calendario || null;
 
   return { initPreset, getDateStr, getTimeStr, advance, save, get, PRESET };
-})();
-
-const NoteCampagna = (() => {
-  let _catIdx = 0;
-  let _pageIdx = 0;
-  let _mobileView = 'cats';
-
-  const _get = () => {
-    const camp = App.getActiveCampaign();
-    return camp?.noteCampagna || [];
-  };
-  const _save = (data) => App.saveActiveCampaign({ noteCampagna: data });
-  // Stessa condizione della media query "app touch" in css/layout.css: sotto 768px sempre,
-  // oppure fino a 1024px su dispositivi touch (copre gli iPad in verticale).
-  const _isMobile = () => window.matchMedia('(max-width: 768px), (max-width: 1024px) and (hover: none)').matches;
-
-  const render = () => {
-    if (_isMobile()) renderMobile();
-    else renderDesktop();
-  };
-
-  const renderDesktop = () => {
-    const container = document.getElementById('nc-container');
-    if (!container) return;
-    container.style.flexDirection = 'row';
-
-    const sidebar = document.getElementById('nc-sidebar');
-    const pages = document.getElementById('nc-pages');
-    const editorWrap = document.getElementById('nc-editor-wrap');
-    if (sidebar) { sidebar.style.display = ''; sidebar.style.width = '180px'; sidebar.style.borderRight = '1px solid var(--border)'; sidebar.style.borderBottom = 'none'; }
-    if (pages) { pages.style.display = ''; pages.style.width = '200px'; pages.style.borderRight = '1px solid var(--border)'; pages.style.borderBottom = 'none'; }
-    if (editorWrap) editorWrap.style.display = '';
-
-    renderSidebar(); renderPages(); renderEditor();
-  };
-
-  const renderMobile = () => {
-    const container = document.getElementById('nc-container');
-    if (!container) return;
-    container.style.flexDirection = 'column';
-
-    const sidebar = document.getElementById('nc-sidebar');
-    const pages = document.getElementById('nc-pages');
-    const editorWrap = document.getElementById('nc-editor-wrap');
-
-    if (_mobileView === 'cats') {
-      if (sidebar) { sidebar.style.display = ''; sidebar.style.width = '100%'; sidebar.style.borderRight = 'none'; sidebar.style.borderBottom = '1px solid var(--border)'; }
-      if (pages) pages.style.display = 'none';
-      if (editorWrap) editorWrap.style.display = 'none';
-    } else if (_mobileView === 'pages') {
-      if (sidebar) sidebar.style.display = 'none';
-      if (pages) { pages.style.display = ''; pages.style.width = '100%'; pages.style.borderRight = 'none'; pages.style.borderBottom = '1px solid var(--border)'; }
-      if (editorWrap) editorWrap.style.display = 'none';
-    } else {
-      if (sidebar) sidebar.style.display = 'none';
-      if (pages) pages.style.display = 'none';
-      if (editorWrap) editorWrap.style.display = '';
-    }
-
-    renderSidebar(); renderPages(); renderEditor();
-  };
-
-  const renderSidebar = () => {
-    const el = document.getElementById('nc-sidebar');
-    if (!el) return;
-    const cats = _get();
-    const isMob = _isMobile();
-
-    const backBtn = isMob && _mobileView !== 'cats' ? '' : '';
-    el.innerHTML = cats.length === 0
-      ? '<div class="text-muted text-sm" style="padding:10px;font-size:0.75rem;">Nessuna categoria.<br>Clicca "+ Categoria"</div>'
-      : cats.map((cat, i) =>
-        '<div onclick="NoteCampagna.selectCat(' + i + ')" style="padding:9px 10px;cursor:pointer;font-size:0.82rem;font-family:var(--font-display);border-left:3px solid ' + (i===_catIdx?'var(--accent-primary)':'transparent') + ';background:' + (i===_catIdx?'var(--bg-card)':'transparent') + ';display:flex;align-items:center;gap:4px;border-bottom:1px solid var(--border);">' +
-          '<span style="flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + (cat.nome||'Categoria') + '</span>' +
-          (isMob ? '<span style="color:var(--text-muted);font-size:0.8rem;">›</span>' : '') +
-          '<button class="btn btn-ghost btn-icon-sm" style="font-size:0.6rem;opacity:0.5;flex-shrink:0;" onclick="event.stopPropagation();NoteCampagna.renameCategoria(' + i + ')"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>' +
-          '<button class="btn btn-ghost btn-icon-sm" style="opacity:0.5;flex-shrink:0;color:var(--accent-danger);" aria-label="Elimina categoria" onclick="event.stopPropagation();NoteCampagna.deleteCategoria(' + i + ')"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>' +
-        '</div>'
-      ).join('');
-  };
-
-  const renderPages = () => {
-    const el = document.getElementById('nc-pages');
-    if (!el) return;
-    const cats = _get();
-    const cat = cats[_catIdx];
-    const isMob = _isMobile();
-
-    if (!cat) { el.innerHTML = '<div class="text-muted text-sm" style="padding:10px;font-size:0.75rem;">Seleziona una categoria</div>'; return; }
-    const pages = cat.pagine || [];
-
-    el.innerHTML =
-      '<div style="padding:5px 8px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:6px;">' +
-        (isMob ? '<button class="btn btn-ghost btn-sm" style="font-size:0.7rem;padding:2px 6px;" onclick="NoteCampagna._mobileBack()">‹ Categorie</button>' : '') +
-        '<span style="font-size:0.65rem;font-family:var(--font-display);color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + cat.nome + '</span>' +
-        '<button class="btn btn-ghost btn-icon-sm" style="font-size:0.7rem;flex-shrink:0;" onclick="NoteCampagna.addPage()">+</button>' +
-      '</div>' +
-      (pages.length === 0
-        ? '<div class="text-muted text-sm" style="padding:10px;font-size:0.75rem;">Clicca + per aggiungere una pagina</div>'
-        : pages.map((p, i) =>
-          '<div onclick="NoteCampagna.selectPage(' + i + ')" style="padding:9px 10px;cursor:pointer;font-size:0.82rem;background:' + (i===_pageIdx?'var(--bg-tertiary)':'transparent') + ';border-bottom:1px solid var(--border);border-left:2px solid ' + (i===_pageIdx?'var(--accent-secondary)':'transparent') + ';display:flex;align-items:center;gap:4px;">' +
-            '<span style="flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + (p.titolo || '<em style="color:var(--text-muted)">Senza titolo</em>') + '</span>' +
-            (isMob ? '<span style="color:var(--text-muted);font-size:0.8rem;">›</span>' : '') +
-          '</div>'
-        ).join(''));
-  };
-
-  const renderEditor = () => {
-    const cats = _get();
-    const page = cats[_catIdx]?.pagine?.[_pageIdx];
-    const titleEl = document.getElementById('nc-page-title');
-    const contentEl = document.getElementById('nc-page-content');
-    const headerEl = document.getElementById('nc-editor-header');
-    if (!titleEl || !contentEl) return;
-
-    if (headerEl && _isMobile()) {
-      const backExists = headerEl.querySelector('.nc-back-btn');
-      if (!backExists) {
-        const backBtn = document.createElement('button');
-        backBtn.className = 'btn btn-ghost btn-sm nc-back-btn';
-        backBtn.style.cssText = 'font-size:0.7rem;padding:2px 6px;flex-shrink:0;';
-        backBtn.textContent = '‹ Pagine';
-        backBtn.onclick = () => NoteCampagna._mobileBack();
-        headerEl.insertBefore(backBtn, headerEl.firstChild);
-      }
-    } else if (headerEl) {
-      headerEl.querySelector('.nc-back-btn')?.remove();
-    }
-
-    if (!page) {
-      titleEl.value = ''; contentEl.value = '';
-      titleEl.disabled = true; contentEl.disabled = true;
-      return;
-    }
-    titleEl.disabled = false; contentEl.disabled = false;
-    titleEl.value = page.titolo || '';
-
-    setTimeout(() => ncRefreshEditor?.(), 50);
-
-    if (contentEl.contentEditable === 'true') {
-
-      const saved = page.contenuto || '';
-      contentEl.innerHTML = saved.includes('<') ? saved : saved.split('\n').map(l => l ? `<p>${l}</p>` : '<p><br></p>').join('');
-    } else {
-      contentEl.value = page.contenuto || '';
-    }
-  };
-
-  const _mobileBack = () => {
-    if (_mobileView === 'editor') _mobileView = 'pages';
-    else _mobileView = 'cats';
-    render();
-  };
-
-  const selectCat = (i) => {
-    _catIdx = i; _pageIdx = 0;
-    if (_isMobile()) { _mobileView = 'pages'; render(); }
-    else { renderSidebar(); renderPages(); renderEditor(); }
-  };
-
-  const selectPage = (i) => {
-    _pageIdx = i;
-    if (_isMobile()) { _mobileView = 'editor'; render(); }
-    else { renderPages(); renderEditor(); setTimeout(() => document.getElementById('nc-page-content')?.focus(), 50); }
-  };
-
-  const addCategoria = () => {
-    openInputModal('Nome categoria', 'Nuova Categoria', (nome) => {
-      if (!nome?.trim()) return;
-      const data = _get();
-      data.push({ id: 'cat_'+Date.now(), nome: nome.trim(), pagine: [] });
-      _save(data); _catIdx = data.length-1; _pageIdx = 0;
-      if (_isMobile()) _mobileView = 'pages';
-      render();
-    });
-  };
-
-  const renameCategoria = (i) => {
-    const data = _get();
-    openInputModal('Nuovo nome', data[i]?.nome || '', (nome) => {
-      if (!nome?.trim()) return;
-      data[i].nome = nome.trim(); _save(data); renderSidebar(); renderPages();
-    });
-  };
-
-  const deleteCategoria = (i) => {
-    const data = _get();
-    openConfirmModal('Eliminare categoria?', 'Eliminare "' + (data[i]?.nome||'') + '" e tutte le sue pagine?', () => {
-      data.splice(i, 1); _save(data);
-      if (_catIdx >= data.length) _catIdx = Math.max(0, data.length-1);
-      _pageIdx = 0; _mobileView = 'cats'; render();
-    });
-  };
-
-  const addPage = () => {
-    const data = _get();
-    if (!data[_catIdx]) return;
-    if (!data[_catIdx].pagine) data[_catIdx].pagine = [];
-    data[_catIdx].pagine.push({ id: 'p_'+Date.now(), titolo: '', contenuto: '' });
-    _pageIdx = data[_catIdx].pagine.length-1;
-    _save(data);
-    if (_isMobile()) _mobileView = 'editor';
-    render();
-    setTimeout(() => document.getElementById('nc-page-title')?.focus(), 80);
-  };
-
-  const deletePage = () => {
-    const data = _get();
-    const pages = data[_catIdx]?.pagine;
-    if (!pages?.length) return;
-    openConfirmModal('Eliminare pagina?', 'Eliminare "' + (pages[_pageIdx]?.titolo||'questa pagina') + '"?', () => {
-      pages.splice(_pageIdx, 1); _save(data);
-      if (_pageIdx >= pages.length) _pageIdx = Math.max(0, pages.length-1);
-      if (_isMobile()) _mobileView = 'pages';
-      render();
-    });
-  };
-
-  const savePage = () => {
-    const data = _get();
-    const page = data[_catIdx]?.pagine?.[_pageIdx];
-    if (!page) return;
-    page.titolo = document.getElementById('nc-page-title')?.value || '';
-    const el = document.getElementById('nc-page-content');
-
-    page.contenuto = el ? (el.contentEditable === 'true' ? el.innerHTML : el.value) : '';
-    _save(data);
-    ncUpdateTagBar?.();
-
-    const pageEls = document.querySelectorAll('#nc-pages > div');
-    const dataEl = pageEls[_pageIdx+1];
-    if (dataEl) {
-      const span = dataEl.querySelector('span');
-      if (span) span.textContent = page.titolo || 'Senza titolo';
-    }
-  };
-
-  return { render, selectCat, selectPage, addCategoria, renameCategoria, deleteCategoria, addPage, deletePage,
-    _getData: _get, get _catIdx() { return _catIdx; }, get _pageIdx() { return _pageIdx; }, savePage, _mobileBack };
 })();
 
 const NoteSessione = (() => {
