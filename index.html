@@ -1856,6 +1856,10 @@
         </div>
       </div>
       <div class="form-group">
+        <label class="form-label">Descrizione</label>
+        <textarea id="nc-description" class="form-textarea" rows="2" placeholder="Una riga per riconoscerla a colpo d'occhio nella lista campagne..."></textarea>
+      </div>
+      <div class="form-group">
         <label class="form-label" style="display:flex;align-items:center;gap:8px;cursor:pointer;">
           <input type="checkbox" id="nc-elettro">
           Usa monete di <strong>elettro</strong> (me) nel loot e tesoro
@@ -1917,6 +1921,10 @@
         </div>
       </div>
       <div class="form-group">
+        <label class="form-label">Descrizione</label>
+        <textarea id="ec-description" class="form-textarea" rows="2" placeholder="Una riga per riconoscerla a colpo d'occhio nella lista campagne..."></textarea>
+      </div>
+      <div class="form-group">
         <label class="form-label" style="display:flex;align-items:center;gap:8px;cursor:pointer;">
           <input type="checkbox" id="ec-elettro">
           Usa monete di <strong>elettro</strong> (me) nel loot e tesoro
@@ -1938,6 +1946,10 @@
           </select>
         </div>
       </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="Modal.close('edit-campaign')">Annulla</button>
+      <button class="btn btn-primary" onclick="submitEditCampaign()">Salva</button>
     </div>
   </div>
 </div>
@@ -3073,6 +3085,7 @@ const submitNewCampaign = () => {
   const name   = document.getElementById('nc-name')?.value?.trim();
   const type   = document.getElementById('nc-type')?.value   || 'campagna';
   const system = document.getElementById('nc-system')?.value || '5e2024';
+  const description = document.getElementById('nc-description')?.value?.trim() || '';
   const useElettro = document.getElementById('nc-elettro')?.checked || false;
   const useCalendario = document.getElementById('nc-calendario')?.checked || false;
   const calendarioTipo = document.getElementById('nc-calendario-tipo')?.value || 'fantasy';
@@ -3081,7 +3094,7 @@ const submitNewCampaign = () => {
 
   localStorage.setItem('dm_toolkit_last_system', system);
   const camp = Storage.createCampaign(name, type);
-  const updates = { system, useElettro };
+  const updates = { system, description, useElettro };
   if (useCalendario) {
     updates.calendario = Calendario.initPreset(calendarioTipo);
   }
@@ -3096,6 +3109,7 @@ const openEditCampaignModal = (camp) => {
   document.getElementById('ec-name').value = camp.name;
   document.getElementById('ec-type').value = camp.type || 'campagna';
   document.getElementById('ec-system').value = camp.system || '5e2024';
+  document.getElementById('ec-description').value = camp.description || '';
   document.getElementById('ec-elettro').checked = camp.useElettro || false;
   const hasCalendario = !!camp.calendario;
   document.getElementById('ec-calendario').checked = hasCalendario;
@@ -3117,6 +3131,7 @@ const submitEditCampaign = () => {
     name,
     type: document.getElementById('ec-type')?.value,
     system: document.getElementById('ec-system')?.value,
+    description: document.getElementById('ec-description')?.value?.trim() || '',
     useElettro: document.getElementById('ec-elettro')?.checked || false,
     calendario: useCalendario
       ? (camp?.calendario?.tipo === calendarioTipo ? camp.calendario : Calendario.initPreset(calendarioTipo))
@@ -3567,7 +3582,7 @@ const App = (() => {
     });
 
     const newCard = document.createElement('button');
-    newCard.className = 'campaign-card-new';
+    newCard.className = 'campaign-card campaign-card-new';
     newCard.setAttribute('aria-label', 'Crea nuova campagna o One Shot');
     newCard.onclick = openNewCampaignModal;
     newCard.innerHTML = `
