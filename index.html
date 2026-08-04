@@ -350,7 +350,6 @@
         <svg aria-hidden="true" id="theme-icon-moon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
         <svg aria-hidden="true" id="theme-icon-sun" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
       </button>
-      <button class="btn btn-ghost btn-icon" onclick="Debug.toggle()" aria-label="Pannello debug" data-tooltip="Debug" style="font-family:var(--font-mono);font-size:0.7rem;">DBG</button>
     </div>
   </nav>
 
@@ -622,7 +621,7 @@
         <!-- Clocks / Progress Tracker -->
         <div class="card" style="margin-top:var(--space-lg);">
           <div class="card-header">
-            <h3 class="card-title">⏱ Clocks</h3>
+            <h3 class="card-title">Clocks</h3>
             <button class="btn btn-primary btn-sm" onclick="Clocks.add()">+ Clock</button>
           </div>
           <div id="clocks-list" style="padding:8px;display:flex;flex-wrap:wrap;gap:12px;min-height:50px;">
@@ -635,10 +634,10 @@
           <div class="card-header" style="flex-wrap:wrap;gap:6px;">
             <h3 class="card-title">Contesto Sessione</h3>
             <div style="display:flex;gap:2px;background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-md);padding:2px;">
-              <button id="sess-ctx-tab-note" class="btn btn-primary btn-sm" onclick="SessCtx.showTab('note')" style="font-size:0.72rem;">📝 Note</button>
-              <button id="sess-ctx-tab-png" class="btn btn-ghost btn-sm" onclick="SessCtx.showTab('png')" style="font-size:0.72rem;">👤 PNG</button>
-              <button id="sess-ctx-tab-luoghi" class="btn btn-ghost btn-sm" onclick="SessCtx.showTab('luoghi')" style="font-size:0.72rem;">🗺️ Luoghi</button>
-              <button id="sess-ctx-tab-info" class="btn btn-ghost btn-sm" onclick="SessCtx.showTab('info')" style="font-size:0.72rem;">📋 Info</button>
+              <button id="sess-ctx-tab-note" class="btn btn-primary btn-sm" onclick="SessCtx.showTab('note')" style="font-size:0.72rem;">Note</button>
+              <button id="sess-ctx-tab-png" class="btn btn-ghost btn-sm" onclick="SessCtx.showTab('png')" style="font-size:0.72rem;">PNG</button>
+              <button id="sess-ctx-tab-luoghi" class="btn btn-ghost btn-sm" onclick="SessCtx.showTab('luoghi')" style="font-size:0.72rem;">Luoghi</button>
+              <button id="sess-ctx-tab-info" class="btn btn-ghost btn-sm" onclick="SessCtx.showTab('info')" style="font-size:0.72rem;">Info</button>
             </div>
             <button class="btn btn-ghost btn-sm" onclick="SessCtx.refresh()" title="Aggiorna" style="font-size:0.8rem;">↻</button>
           </div>
@@ -647,7 +646,7 @@
           <div id="sess-ctx-note" style="padding:8px;">
             <div style="display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap;">
               <button class="btn btn-secondary btn-sm" onclick="NoteSessione.addVoce()">+ Nota rapida</button>
-              <button class="btn btn-ghost btn-sm" onclick="SessCtx.openWikiSessione()" style="font-size:0.72rem;">📖 Wiki sessione →</button>
+              <button class="btn btn-ghost btn-sm" onclick="SessCtx.openWikiSessione()" style="font-size:0.72rem;">Wiki sessione →</button>
             </div>
             <div id="note-sessione-list" style="min-height:40px;"></div>
           </div>
@@ -797,7 +796,7 @@
         </div>
 <div class="card gen-card" data-gen-id="descrizione" style="grid-column:1/-1;">
           <div class="card-header">
-            <h3 class="card-title">🏙️ Descrizione Luoghi</h3>
+            <h3 class="card-title">Descrizione Luoghi</h3>
             <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
               <select id="gen-desc-tipo" class="form-select" style="width:auto;font-size:0.75rem;" onchange="DescrizioneGen.aggiornaSottotipo()">
                 <option value="taverna">🍺 Taverna</option>
@@ -816,7 +815,7 @@
                 <option value="normale" selected>⚖️ Normale</option>
                 <option value="lusso">👑 Lusso</option>
               </select>
-              <button class="btn btn-primary btn-sm" onclick="DescrizioneGen.genera()">🎲 Genera</button>
+              <button class="btn btn-primary btn-sm" onclick="DescrizioneGen.genera()">Genera</button>
               <button class="btn btn-ghost btn-sm" onclick="DescrizioneGen.genera()">↺ Rigenera</button>
             </div>
           </div>
@@ -826,7 +825,7 @@
         </div>
 <div class="card gen-card" data-gen-id="nomi_luoghi">
           <div class="card-header">
-            <h3 class="card-title">🗺️ Nomi Luoghi</h3>
+            <h3 class="card-title">Nomi Luoghi</h3>
             <select id="gen-nomluogo-tipo" class="form-select" style="width:auto;font-size:0.75rem;">
               <option value="citta">🏙️ Città</option>
               <option value="villaggio">🏘️ Villaggio</option>
@@ -912,10 +911,10 @@
         </div>
         <div class="card gen-card" data-gen-id="loot" style="grid-column:1/-1;">
           <div class="card-header">
-            <h3 class="card-title">💰 Loot Generator</h3>
+            <h3 class="card-title">Loot Generator</h3>
             <div style="display:flex;gap:4px;">
-              <button id="loot-tab-rng" class="btn btn-primary btn-sm" onclick="LootPanel.switchTab('rng')">🎲 RNG System</button>
-              <button id="loot-tab-dmg" class="btn btn-ghost btn-sm" onclick="LootPanel.switchTab('dmg')">📚 DMG Ufficiale</button>
+              <button id="loot-tab-rng" class="btn btn-primary btn-sm" onclick="LootPanel.switchTab('rng')">RNG System</button>
+              <button id="loot-tab-dmg" class="btn btn-ghost btn-sm" onclick="LootPanel.switchTab('dmg')">DMG Ufficiale</button>
             </div>
           </div>
           <div id="loot-panel-rng">
@@ -923,7 +922,7 @@
 
               <!-- Rango -->
               <div>
-                <div style="font-size:0.7rem;color:var(--text-muted);margin-bottom:6px;font-family:var(--font-display);text-transform:uppercase;letter-spacing:0.05em;">⚔️ Rango Nemico</div>
+                <div style="font-size:0.7rem;color:var(--text-muted);margin-bottom:6px;font-family:var(--font-display);text-transform:uppercase;letter-spacing:0.05em;">Rango Nemico</div>
                 <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;">
                   <button id="rng-rank-Minion" class="btn btn-primary btn-sm" onclick="RNGLoot.setRank('Minion')" style="display:flex;flex-direction:column;align-items:center;padding:6px 4px;gap:1px;">
                     <span>⚔️ Minion</span>
@@ -942,7 +941,7 @@
 
               <!-- Stato oggetti -->
               <div>
-                <div style="font-size:0.7rem;color:var(--text-muted);margin-bottom:3px;font-family:var(--font-display);text-transform:uppercase;letter-spacing:0.05em;">📦 Stato Oggetti <span style="font-weight:400;text-transform:none;letter-spacing:0;">(opzionale)</span></div>
+                <div style="font-size:0.7rem;color:var(--text-muted);margin-bottom:3px;font-family:var(--font-display);text-transform:uppercase;letter-spacing:0.05em;">Stato Oggetti <span style="font-weight:400;text-transform:none;letter-spacing:0;">(opzionale)</span></div>
                 <div style="font-size:0.72rem;color:var(--text-muted);margin-bottom:6px;font-style:italic;">Clicca per applicare una condizione al bottino generato. Utile se il combattimento ha danneggiato gli oggetti, se il DM vuole aggiungere un maleficio narrativo o se l'ambiente (es. acido, fuoco) ha rovinato l'equipaggiamento nemico.</div>
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;">
                   <button id="rng-cond-intatto" class="btn btn-ghost btn-sm" onclick="RNGLoot.setCond('intatto')">✓ Intatto</button>
@@ -954,7 +953,7 @@
 
               <!-- Categorie -->
               <div>
-                <div style="font-size:0.7rem;color:var(--text-muted);margin-bottom:6px;font-family:var(--font-display);text-transform:uppercase;letter-spacing:0.05em;">🐉 Tipo Nemico <span id="rng-cat-hint" style="color:var(--accent-secondary);font-family:var(--font-body);text-transform:none;letter-spacing:0;font-size:0.68rem;"></span></div>
+                <div style="font-size:0.7rem;color:var(--text-muted);margin-bottom:6px;font-family:var(--font-display);text-transform:uppercase;letter-spacing:0.05em;">Tipo Nemico <span id="rng-cat-hint" style="color:var(--accent-secondary);font-family:var(--font-body);text-transform:none;letter-spacing:0;font-size:0.68rem;"></span></div>
                 <div id="rng-cat-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:3px;max-height:220px;overflow-y:auto;"></div>
               </div>
 
@@ -970,7 +969,7 @@
                   <button class="btn btn-ghost btn-sm" onclick="RNGLoot.setMult(5)">×5</button>
                   <button class="btn btn-ghost btn-sm" onclick="RNGLoot.setMult(10)">×10</button>
                 </div>
-                <button class="btn btn-primary btn-sm" onclick="RNGLoot.genera()" style="margin-left:auto;">🎲 Tira!</button>
+                <button class="btn btn-primary btn-sm" onclick="RNGLoot.genera()" style="margin-left:auto;">Tira!</button>
               </div>
             </div>
             <div id="gen-loot-result" style="padding:0 12px 10px;min-height:40px;">
@@ -1071,7 +1070,7 @@
         </div>
 <div class="card gen-card" data-gen-id="encounter" style="grid-column:1/-1;">
           <div class="card-header">
-            <h3 class="card-title">⚔️ Encounter Builder</h3>
+            <h3 class="card-title">Encounter Builder</h3>
             <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
               <select id="enc-livello" class="form-select" style="width:auto;font-size:0.75rem;">
                 <option value="1">Liv. 1</option><option value="2">Liv. 2</option><option value="3">Liv. 3</option>
@@ -1092,7 +1091,7 @@
                 <option value="2">2 PG</option><option value="3">3 PG</option>
                 <option value="4" selected>4 PG</option><option value="5">5 PG</option><option value="6">6 PG</option>
               </select>
-              <button class="btn btn-primary btn-sm" onclick="EncounterBuilder.genera()">⚔️ Genera</button>
+              <button class="btn btn-primary btn-sm" onclick="EncounterBuilder.genera()">Genera</button>
             </div>
           </div>
 
@@ -1112,7 +1111,7 @@
           <!-- Sezione Loot -->
           <div id="enc-loot-section" style="display:none;border-top:1px solid var(--border);">
             <div style="padding:8px 12px;display:flex;align-items:center;justify-content:space-between;">
-              <span style="font-family:var(--font-display);font-size:0.82rem;">🎲 Loot Post-Combat</span>
+              <span style="font-family:var(--font-display);font-size:0.82rem;">Loot Post-Combat</span>
               <div style="display:flex;gap:6px;">
                 <select id="enc-loot-stato" class="form-select" style="width:auto;font-size:0.72rem;">
                   <option value="intatto">✓ Intatto</option>
@@ -1120,7 +1119,7 @@
                   <option value="inutilizzabile">✗ Inutilizzabile</option>
                   <option value="maledetto">☠ Maledetto</option>
                 </select>
-                <button class="btn btn-secondary btn-sm" onclick="EncounterBuilder.generaLoot()">🎲 Genera Loot</button>
+                <button class="btn btn-secondary btn-sm" onclick="EncounterBuilder.generaLoot()">Genera Loot</button>
               </div>
             </div>
             <div id="enc-loot-result" style="padding:0 12px 10px;"></div>
@@ -1184,7 +1183,7 @@
         </div>
 <div class="card gen-card" data-gen-id="ganci">
           <div class="card-header">
-            <h3 class="card-title">🎣 Gancio Narrativo</h3>
+            <h3 class="card-title">Gancio Narrativo</h3>
             <select id="gen-gancio-tipo" class="form-select" style="width:auto;font-size:0.75rem;">
               <option value="tutti">Tutti</option>
               <option value="mistero">🔍 Mistero</option>
@@ -1201,20 +1200,20 @@
         </div>
 <div class="card gen-card" data-gen-id="oracolo">
           <div class="card-header">
-            <h3 class="card-title">🔮 Oracolo</h3>
+            <h3 class="card-title">Oracolo</h3>
           </div>
           <div style="padding:8px 12px 4px;">
             <div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:6px;">Pensa alla domanda, poi lancia</div>
             <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;">
-              <button class="btn btn-primary btn-sm" style="flex:1;" onclick="OracoloGen.lancia('standard')">🎲 Lancia</button>
-              <button class="btn btn-secondary btn-sm" style="flex:1;" onclick="OracoloGen.lancia('complicato')">⚡ Con Twist</button>
+              <button class="btn btn-primary btn-sm" style="flex:1;" onclick="OracoloGen.lancia('standard')">Lancia</button>
+              <button class="btn btn-secondary btn-sm" style="flex:1;" onclick="OracoloGen.lancia('complicato')">Con Twist</button>
             </div>
           </div>
           <div id="gen-oracolo-result" style="padding:0 12px 10px;min-height:50px;"></div>
         </div>
 <div class="card gen-card" data-gen-id="missioni" style="grid-column:1/-1;">
           <div class="card-header">
-            <h3 class="card-title">📜 Missioni Secondarie</h3>
+            <h3 class="card-title">Missioni Secondarie</h3>
             <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
               <select id="gen-miss-livello" class="form-select" style="width:auto;font-size:0.75rem;">
                 <option value="1-4">Liv. 1–4</option>
@@ -1231,7 +1230,7 @@
                 <option value="intriga">🎭 Intriga</option>
                 <option value="salvataggio">💚 Salvataggio</option>
               </select>
-              <button class="btn btn-primary btn-sm" onclick="MissioniGen.genera()">🎲 Genera</button>
+              <button class="btn btn-primary btn-sm" onclick="MissioniGen.genera()">Genera</button>
               <button class="btn btn-ghost btn-sm" onclick="MissioniGen.genera()">↺ Rigenera</button>
             </div>
           </div>
@@ -1471,13 +1470,13 @@
       <!-- Topbar Wiki -->
       <div id="wiki-topbar" style="display:flex;align-items:center;gap:8px;padding:8px 16px;border-bottom:1px solid var(--border);background:var(--bg-card);flex-shrink:0;flex-wrap:wrap;">
         <div style="display:flex;gap:4px;flex-shrink:0;">
-          <button id="wiki-tab-lore" class="btn btn-primary btn-sm" onclick="WikiDM.switchSection('lore')">📚 Lore</button>
-          <button id="wiki-tab-sessioni" class="btn btn-ghost btn-sm" onclick="WikiDM.switchSection('sessioni')">📋 Sessioni</button>
-          <button id="wiki-tab-templates" class="btn btn-ghost btn-sm" onclick="WikiDM.switchSection('templates')">🗂️ Template</button>
-          <button id="wiki-tab-grafo" class="btn btn-ghost btn-sm" onclick="WikiDM.switchSection('grafo')">🕸 Grafo</button>
+          <button id="wiki-tab-lore" class="btn btn-primary btn-sm" onclick="WikiDM.switchSection('lore')">Lore</button>
+          <button id="wiki-tab-sessioni" class="btn btn-ghost btn-sm" onclick="WikiDM.switchSection('sessioni')">Sessioni</button>
+          <button id="wiki-tab-templates" class="btn btn-ghost btn-sm" onclick="WikiDM.switchSection('templates')">Template</button>
+          <button id="wiki-tab-grafo" class="btn btn-ghost btn-sm" onclick="WikiDM.switchSection('grafo')">Grafo</button>
         </div>
         <div style="flex:1;min-width:160px;max-width:320px;position:relative;">
-          <input id="wiki-search" type="text" class="form-input" placeholder="🔍 Cerca nel wiki..." style="width:100%;padding-left:8px;" oninput="WikiDM.search(this.value)">
+          <input id="wiki-search" type="text" class="form-input" placeholder="Cerca nel wiki..." style="width:100%;padding-left:8px;" oninput="WikiDM.search(this.value)">
         </div>
         <div id="wiki-section-actions" style="display:flex;gap:4px;flex-shrink:0;"></div>
       </div>
@@ -1501,14 +1500,14 @@
             <div id="wiki-compendio-sync" style="display:none;align-items:center;gap:6px;padding:2px 8px;background:var(--bg-tertiary);border:1px solid var(--border);border-radius:var(--radius-full);font-size:0.72rem;">
               <label style="display:flex;align-items:center;gap:4px;cursor:pointer;margin:0;">
                 <input type="checkbox" id="wiki-sync-check" onchange="WikiDM.toggleCompendioSync(this.checked)" style="cursor:pointer;">
-                <span>📦 Compendio</span>
+                <span>Compendio</span>
               </label>
             </div>
             <button class="btn btn-ghost btn-sm" onclick="wikiDuplicaNote()" title="Duplica questa nota" style="font-size:0.72rem;">⎘</button>
             <button class="btn btn-ghost btn-sm" onclick="ExportMarkdown.exportNote(WikiDM.getCurrentNote?.())" title="Esporta nota come Markdown" style="font-size:0.72rem;">↓ MD</button>
-            <button id="wiki-view-toggle" class="btn btn-ghost btn-sm" onclick="WikiDM.toggleViewMode()" title="Alterna modalità lettura/modifica" style="font-size:0.72rem;">👁 Vista</button>
+            <button id="wiki-view-toggle" class="btn btn-ghost btn-sm" onclick="WikiDM.toggleViewMode()" title="Alterna modalità lettura/modifica" style="font-size:0.72rem;">Vista</button>
             <div id="wiki-mondo-sync-btn" style="display:none;">
-              <button class="btn btn-ghost btn-sm" onclick="wikiToMondo(WikiDM._noteId)" title="Aggiorna l'entità nel Mondo con i dati di questa nota" style="font-size:0.72rem;">🌍 → Mondo</button>
+              <button class="btn btn-ghost btn-sm" onclick="wikiToMondo(WikiDM._noteId)" title="Aggiorna l'entità nel Mondo con i dati di questa nota" style="font-size:0.72rem;">→ Mondo</button>
             </div>
             <div id="wiki-note-actions" style="display:flex;gap:4px;flex-shrink:0;"></div>
           </div>
@@ -1573,7 +1572,7 @@
         <!-- Grafo visivo nodi -->
         <div id="wiki-grafo-panel" style="display:none;flex:1;flex-direction:column;min-width:0;position:relative;">
           <div style="padding:8px 16px;font-size:0.72rem;color:var(--text-muted);border-bottom:1px solid var(--border);background:var(--bg-secondary);flex-shrink:0;display:flex;align-items:center;flex-wrap:wrap;gap:8px;">
-            <span>🕸 Clicca un nodo per aprirlo · Trascina per spostare · Scroll per zoom</span>
+            <span>Clicca un nodo per aprirlo · Trascina per spostare · Scroll per zoom</span>
             <label style="display:flex;align-items:center;gap:3px;cursor:pointer;"><input type="checkbox" id="grafo-show-wiki" checked onchange="WikiGrafo.render()"> Note</label>
             <label style="display:flex;align-items:center;gap:3px;cursor:pointer;"><input type="checkbox" id="grafo-show-png" checked onchange="WikiGrafo.render()"> PNG</label>
             <label style="display:flex;align-items:center;gap:3px;cursor:pointer;"><input type="checkbox" id="grafo-show-luoghi" checked onchange="WikiGrafo.render()"> Luoghi</label>
@@ -1867,22 +1866,6 @@
 </div>
 
 
-<!-- ════════════════════════════════════════════════════════
-     DEBUG PANEL
-════════════════════════════════════════════════════════ -->
-<div id="debug-panel">
-  <button class="debug-toggle" onclick="Debug.toggleBody()">
-    <span style="width:8px;height:8px;background:#00c864;border-radius:50%;display:inline-block;"></span>
-    DEBUG
-  </button>
-  <div class="debug-body" id="debug-body">
-    <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
-      <span style="font-family:var(--font-mono);font-size:0.65rem;color:#00c864;">DM Toolkit Debug Console</span>
-      <button onclick="Debug.clear()" style="background:none;border:none;color:#ff4444;font-size:0.65rem;cursor:pointer;">CLR</button>
-    </div>
-  </div>
-</div>
-
 
 <!-- ════════════════════════════════════════════════════════
      TOAST CONTAINER
@@ -2156,12 +2139,12 @@
             </div>
           </div>
           <input type="file" id="npc-img-file" accept="image/*" style="display:none;" onchange="handleImgUpload('npc')">
-          <div style="font-size:0.68rem;color:var(--text-muted);margin-bottom:3px;">💡 Usa un URL esterno (imgur, drive) per salvare l'immagine. Upload = solo anteprima.</div>
+          <div style="font-size:0.68rem;color:var(--text-muted);margin-bottom:3px;">Usa un URL esterno (imgur, drive) per salvare l'immagine. Upload = solo anteprima.</div>
           <input type="text" id="npc-img-url" class="form-input" placeholder="URL immagine (es. https://...)" oninput="handleImgUrl('npc')" style="margin-bottom:4px;">
           <button class="btn btn-ghost btn-sm" id="npc-img-clear" style="display:none;margin-top:4px;" onclick="clearImg('npc')">Rimuovi immagine</button>
           <!-- Posizionamento immagine -->
           <div id="npc-img-pos-controls" style="display:none;margin-top:8px;padding:8px;background:var(--bg-secondary);border-radius:var(--radius-sm);">
-            <div style="font-size:0.68rem;color:var(--text-muted);margin-bottom:6px;font-family:var(--font-display);text-transform:uppercase;letter-spacing:0.05em;">📐 Posizione e zoom</div>
+            <div style="font-size:0.68rem;color:var(--text-muted);margin-bottom:6px;font-family:var(--font-display);text-transform:uppercase;letter-spacing:0.05em;">Posizione e zoom</div>
             <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;">
               <div><label style="font-size:0.68rem;color:var(--text-muted);">Orizzontale</label>
                 <input type="range" id="npc-img-pos-x" min="0" max="100" value="50" style="width:100%;" oninput="updateImgPreviewPos('npc')">
@@ -2333,7 +2316,7 @@
       <div id="cond-list" style="columns:2;gap:var(--space-md);margin-bottom:12px;"></div>
       <!-- Effetti personalizzati con countdown -->
       <div style="border-top:1px solid var(--border);padding-top:10px;">
-        <div style="font-size:0.72rem;color:var(--text-muted);margin-bottom:6px;font-family:var(--font-display);text-transform:uppercase;letter-spacing:0.05em;">⏱ Effetti con countdown</div>
+        <div style="font-size:0.72rem;color:var(--text-muted);margin-bottom:6px;font-family:var(--font-display);text-transform:uppercase;letter-spacing:0.05em;">Effetti con countdown</div>
         <div id="cond-effects-list" style="margin-bottom:8px;display:flex;flex-wrap:wrap;gap:4px;"></div>
         <div style="display:flex;gap:6px;align-items:center;">
           <input id="cond-effect-name" type="text" class="form-input" placeholder="Nome effetto..." style="flex:1;font-size:0.82rem;">
@@ -2359,7 +2342,7 @@
     </div>
     <div class="modal-body">
       <div style="position:relative;display:inline-flex;align-items:center;flex:1;">
-            <input type="text" id="monster-search-input" class="form-input" placeholder="🔍 Cerca mostro nel Compendio..." oninput="Sessione.searchMonster()" style="margin-bottom:var(--space-md);">
+            <input type="text" id="monster-search-input" class="form-input" placeholder="Cerca mostro nel Compendio..." oninput="Sessione.searchMonster()" style="margin-bottom:var(--space-md);">
             <button onclick="document.getElementById('monster-search-input').value='';Sessione.searchMonster();" style="position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:0.85rem;padding:2px 4px;line-height:1;border-radius:var(--radius-sm);" title="Cancella ricerca"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
           </div>
       <div id="monster-search-results" class="comp-list" style="max-height:360px;overflow-y:auto;"></div>
@@ -2416,7 +2399,7 @@
                  placeholder="Quanti aggiungere?">
         </div>
       </div>
-      <div class="form-hint">💡 Se inserisci più di 1, verranno aggiunti come #1, #2, #3... con iniziativa tirata individualmente.</div>
+      <div class="form-hint">Se inserisci più di 1, verranno aggiunti come #1, #2, #3... con iniziativa tirata individualmente.</div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="Modal.close('custom-combatant-modal')">Annulla</button>
@@ -15230,8 +15213,9 @@ const WikiSections = (() => {
       if (known) {
         nameLen = known.length;
       } else {
-        const m = rest.match(/^[\wÀ-ÿ]+/);
-        nameLen = m ? m[0].length : 0;
+        // Nome non ancora noto: linka tutto il testo fino alla virgola
+        // (il regex esterno si e' gia' fermato li'), non solo la prima parola.
+        nameLen = rest.replace(/\s+$/, '').length;
       }
       if (nameLen === 0) return full;
       const name = rest.slice(0, nameLen);
@@ -15439,6 +15423,7 @@ const WikiSections = (() => {
             }
           });
         }
+        detailEl2.querySelectorAll('input.ws-custom-val').forEach(inp => MentionPicker.attachToInput(inp));
       }
     }, 50);
   };
@@ -16330,6 +16315,9 @@ WikiSections._reattachEditListeners = function(type) {
         if (inp) MentionPicker.attachToInput(inp);
       }
     });
+  }
+  if (detailEl) {
+    detailEl.querySelectorAll('input.ws-custom-val').forEach(function(inp) { MentionPicker.attachToInput(inp); });
   }
 };
 
