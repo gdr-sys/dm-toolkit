@@ -12145,8 +12145,9 @@ const FirebaseSync = (() => {
     Modal.close('collab');
   };
 
-  const _onLogin = (user) => {
+  const _onLogin = async (user) => {
     _updateAuthBtn();
+    try { await _flushPendingDeletes(); } catch(e) {}
     if (user.isAnonymous) {
       Toast.show('Accesso anonimo attivo', 'info', 2000);
     } else {
@@ -12419,24 +12420,71 @@ const FirebaseSync = (() => {
     }
   };
 
+  // Se una campagna viene cancellata mentre il dispositivo e' sloggato (sessione Firebase
+  // scaduta, offline...) il tombstone non puo' essere scritto subito: la mette in coda qui,
+  // cosi' _flushPendingDeletes() la propaga al prossimo login, PRIMA che syncAllCampaigns
+  // riscarichi la campagna "fantasma" ancora presente (e mai cancellata) sul cloud.
+  const PENDING_DEL_KEY = 'dm_pending_campaign_deletions';
+  const _queuePendingDelete = (id, key) => {
+    try {
+      const list = JSON.parse(localStorage.getItem(PENDING_DEL_KEY) || '[]');
+      if (!list.some(p => p.id === id)) list.push({ id, key });
+      localStorage.setItem(PENDING_DEL_KEY, JSON.stringify(list));
+    } catch(e) {}
+  };
+  const _flushPendingDeletes = async () => {
+    if (!_db || !_user) return;
+    let list = [];
+    try { list = JSON.parse(localStorage.getItem(PENDING_DEL_KEY) || '[]'); } catch(e) {}
+    if (!list.length) return;
+    for (const p of list) {
+      try {
+        await _db.ref('campagne/' + p.key + '/data').set({
+          __deleted: true, id: p.id,
+          deletedAt: firebase.database.ServerValue.TIMESTAMP,
+          deletedBy: _user.uid,
+        });
+        if (!_user.isAnonymous) await _db.ref('utenti/' + _user.uid + '/campagne/' + p.key).remove();
+      } catch(e) { Debug.warn('Flush cancellazione in sospeso:', e.message); }
+    }
+    localStorage.removeItem(PENDING_DEL_KEY);
+  };
+
   // Propaga la cancellazione di una campagna a Firebase (tombstone, non una semplice rimozione:
   // cosi' i dispositivi ancora offline al momento della cancellazione la trovano comunque al
   // prossimo sync) e ripulisce il file dedicato su Drive.
   const deleteCampaign = async (camp) => {
     if (!camp || !camp.id) return;
-    if (!_db || !_user || _user.isAnonymous) return;
     const key = camp.shareCode || _campKey(camp.id);
-    try {
-      await _db.ref('campagne/' + key + '/data').set({
-        __deleted: true, id: camp.id,
-        deletedAt: firebase.database.ServerValue.TIMESTAMP,
-        deletedBy: _user.uid,
-      });
-      await _db.ref('utenti/' + _user.uid + '/campagne/' + key).remove();
-    } catch(e) {
-      Debug.warn('Propagazione eliminazione:', e.message);
-      Toast.show('Eliminazione non propagata al cloud: ' + e.message, 'error', 5000);
+
+    // Il tombstone su Firebase serve solo se questo dispositivo ha una sessione attiva —
+    // ma va scritto anche per gli utenti anonimi: push/pushNow scrivono i dati della
+    // campagna su Firebase anche per loro (serve solo il "codice invito" a essere
+    // riservato agli utenti Google), quindi anche la cancellazione deve propagarsi,
+    // altrimenti il listener realtime ancora agganciato ripesca la campagna "cancellata"
+    // al primo riconnect (causa esatta del bug "la campagna cancellata ricompare").
+    if (_db && _user) {
+      try {
+        await _db.ref('campagne/' + key + '/data').set({
+          __deleted: true, id: camp.id,
+          deletedAt: firebase.database.ServerValue.TIMESTAMP,
+          deletedBy: _user.uid,
+        });
+        if (!_user.isAnonymous) {
+          await _db.ref('utenti/' + _user.uid + '/campagne/' + key).remove();
+        }
+      } catch(e) {
+        Debug.warn('Propagazione eliminazione:', e.message);
+        Toast.show('Eliminazione non propagata al cloud: ' + e.message, 'error', 5000);
+      }
+    } else {
+      // Sloggata o offline in questo momento: mette in coda, verra' propagata al login.
+      _queuePendingDelete(camp.id, key);
     }
+
+    // Il resto va sempre eseguito, anche senza sessione Firebase: altrimenti il listener
+    // realtime resta agganciato alla campagna cancellata e i riferimenti locali
+    // ("ultima campagna") continuano a puntarci.
     if (_campRef && _campRef.key === key) _stopSync();
     if (localStorage.getItem('dm_last_camp_id') === camp.id) localStorage.removeItem('dm_last_camp_id');
     if (localStorage.getItem('dm_last_share_code') === key) localStorage.removeItem('dm_last_share_code');
