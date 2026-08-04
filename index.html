@@ -10587,11 +10587,27 @@ const GlobalSearch = (() => {
     });
 
     try {
-      const monsters = Compendio?.getData()?.monsters || [];
-      monsters.slice(0,500).forEach(m => {
+      const cd = Compendio?.getData() || {};
+      (cd.monsters||[]).slice(0,500).forEach(m => {
         if ((m.nome||'').toLowerCase().includes(query)) {
           _results.push({ tipo:'🐉 Mostro', nome:m.nome, sub:'GS '+(m.grado_sfida?.raw||'?'), action:() => { Modal.close('global-search'); App.navigateTo('compendio'); setTimeout(()=>Compendio.openMonster(m.id),200); } });
         }
+      });
+      [
+        { key:'magic_items', label:'✨ Oggetto Magico', open:'openMagicItem' },
+        { key:'equipment',   label:'🎒 Equipaggiamento', open:'openEquipment' },
+        { key:'rules',       label:'📖 Regola',          open:'openRule' },
+        { key:'spells',      label:'🔮 Incantesimo',     open:'openSpell' },
+      ].forEach(({ key, label, open }) => {
+        (cd[key]||[]).slice(0,500).forEach(item => {
+          const desc = (item.descrizione||'').replace(/<[^>]+>/g,'');
+          const haystack = [item.nome, item.tipo, item.scuola, desc].filter(Boolean).join(' ').toLowerCase();
+          if (haystack.includes(query)) {
+            let sub = item.tipo || item.scuola || '';
+            if (desc.toLowerCase().includes(query)) sub = desc.slice(0,40);
+            _results.push({ tipo:label, nome:item.nome, sub, action:() => { Modal.close('global-search'); App.navigateTo('compendio'); setTimeout(()=>Compendio[open](item.id),200); } });
+          }
+        });
       });
     } catch(e) {}
 
@@ -11799,6 +11815,39 @@ const _enrichedSearch = (q, camp) => {
       if (obiettivo.toLowerCase().includes(query)) sub = obiettivo.replace(/<[^>]+>/g,'').slice(0,40);
       results.push({ tipo:'⚔️ Fazione', nome:f.nome||'', sub,
         action:() => { Modal.close('global-search'); WikiSections.goto('fazioni'); setTimeout(()=>WikiSections.openCard('fazioni', f.id),150); }
+      });
+    }
+  });
+
+  [
+    { type:'quest',    label:'📜 Quest' },
+    { type:'pg',       label:'🧙 PG' },
+    { type:'incontri', label:'⚔️ Incontro' },
+  ].forEach(({ type, label }) => {
+    const cfg = WikiSections._getCfg && WikiSections._getCfg(type);
+    if (!cfg) return;
+    (cfg.getData(camp) || []).forEach(item => {
+      const note = (item.note || '').replace(/<[^>]+>/g,'');
+      const haystack = [item.nome, item.tipo, item.obiettivo, note].filter(Boolean).join(' ').toLowerCase();
+      if (haystack.includes(query)) {
+        let sub = item.tipo || item.stato || '';
+        if (note.toLowerCase().includes(query)) sub = note.slice(0,40);
+        results.push({ tipo:label, nome:item.nome||'Senza titolo', sub,
+          action:() => { Modal.close('global-search'); WikiSections.goto(type); setTimeout(()=>WikiSections.openCard(type, item.id),150); }
+        });
+      }
+    });
+  });
+
+  (camp?.trame||[]).forEach(t => {
+    const corpo = (t.corpo||'').replace(/<[^>]+>/g,'');
+    const note  = (t.note||'').replace(/<[^>]+>/g,'');
+    const haystack = [t.titolo, t.categoria, corpo, note].filter(Boolean).join(' ').toLowerCase();
+    if (haystack.includes(query)) {
+      let sub = t.categoria || '';
+      if (corpo.toLowerCase().includes(query)) sub = corpo.slice(0,40);
+      results.push({ tipo:'🎭 Trama', nome:t.titolo||'Senza titolo', sub,
+        action:() => { Modal.close('global-search'); App.navigateTo('trame'); setTimeout(()=>Trame.openTrama(t.id),150); }
       });
     }
   });
@@ -13469,8 +13518,6 @@ const SessioniLog = (() => {
     createWikiNote, openWiki,
   };
 })();
-
-const _enrichedSearchOrig = _enrichedSearch;
 
 const QuestKanban = (() => {
   let _view = 'kanban';
