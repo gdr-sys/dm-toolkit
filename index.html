@@ -12707,12 +12707,18 @@ const FirebaseSync = (() => {
 
       const existing = Storage.getCampaigns?.()?.find(c => c.shareCode === code || c.id === remote.id);
       if (existing) {
-        App.saveActiveCampaign({ ...remote, id: existing.id });
+        // saveCampaign (non App.saveActiveCampaign) perche' la campagna esistente potrebbe
+        // non essere quella aperta al momento — aggiornare "l'attiva" avrebbe silenziosamente
+        // sovrascritto una campagna diversa con questi dati.
+        Storage.saveCampaign({ ...remote, id: existing.id });
         Toast.show('Campagna sincronizzata: ' + (remote.name||''), 'success');
+        setTimeout(() => App.init?.(), 300);
       } else {
         const newId = remote.id || ('collab_' + Date.now());
         const newCamp = { ...remote, id: newId, shareCode: code };
-        try { Storage.createCampaign(newCamp); } catch(e) { Storage.updateCampaign?.(newId, newCamp); }
+        // saveCampaign (non createCampaign, che si aspetta un nome stringa e ne crea una
+        // vuota da zero) — qui la campagna arriva gia' completa dal cloud, va solo salvata.
+        Storage.saveCampaign(newCamp);
         Toast.show('Campagna aggiunta: ' + (remote.name||code), 'success');
         setTimeout(() => App.init?.(), 300);
       }
