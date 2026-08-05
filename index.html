@@ -1597,10 +1597,30 @@
               <option value="Fallita">Fallite</option>
               <option value="In sospeso">In sospeso</option>
             </select>
+            <button id="quest-view-list" class="btn btn-primary btn-sm" onclick="QuestKanban.setView('list')">Lista</button>
+            <button id="quest-view-kanban" class="btn btn-ghost btn-sm" onclick="QuestKanban.setView('kanban')">Kanban</button>
             <button class="btn btn-primary btn-sm" onclick="WikiSections.newCard('quest')">+ Nuova Quest</button>
           </div>
         </div>
         <div id="wiki-quest-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;"></div>
+        <div id="quest-kanban-view" style="display:none;gap:10px;overflow-x:auto;padding-bottom:8px;">
+          <div style="min-width:200px;flex:1;">
+            <div style="font-size:0.72rem;font-weight:600;color:#5ba4f5;margin-bottom:6px;">Attiva</div>
+            <div id="kanban-col-attiva" style="display:flex;flex-direction:column;gap:6px;min-height:60px;"></div>
+          </div>
+          <div style="min-width:200px;flex:1;">
+            <div style="font-size:0.72rem;font-weight:600;color:#f5a623;margin-bottom:6px;">In sospeso</div>
+            <div id="kanban-col-in_sospeso" style="display:flex;flex-direction:column;gap:6px;min-height:60px;"></div>
+          </div>
+          <div style="min-width:200px;flex:1;">
+            <div style="font-size:0.72rem;font-weight:600;color:#69cc85;margin-bottom:6px;">Completata</div>
+            <div id="kanban-col-completata" style="display:flex;flex-direction:column;gap:6px;min-height:60px;"></div>
+          </div>
+          <div style="min-width:200px;flex:1;">
+            <div style="font-size:0.72rem;font-weight:600;color:#ff6b6b;margin-bottom:6px;">Fallita</div>
+            <div id="kanban-col-fallita" style="display:flex;flex-direction:column;gap:6px;min-height:60px;"></div>
+          </div>
+        </div>
       </div>
       <div id="wiki-quest-detail" style="display:none;height:100%;overflow-y:auto;padding:20px;"></div>
     </section>
@@ -9487,16 +9507,6 @@ const switchTab = (btn, targetId) => {
   });
 };
 
-const switchQuestTab = (btn, status) => {
-  const parent = btn.closest('.tabs');
-  parent?.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  ['disponibile','in_corso','completata','fallita'].forEach(s => {
-    const el = document.getElementById(`quest-list-${s}`);
-    if (el) el.classList.toggle('active', s === status);
-  });
-};
-
 /* ══════════════════════════════════════
    GESTIONE IMMAGINI (PNG, Luoghi, Fazioni)
 ══════════════════════════════════════ */
@@ -13568,40 +13578,48 @@ const SessioniLog = (() => {
 })();
 
 const QuestKanban = (() => {
-  let _view = 'kanban';
+  // Colonne fisse sullo stato reale delle quest (vedi TYPES.quest in WikiSections):
+  // "Nascosta" resta fuori dal kanban di proposito, stesso criterio del filtro
+  // "Quest attive" in dashboard — una quest nascosta non e' nel flusso di lavoro visibile.
+  const STATI = [
+    { key: 'attiva',      stato: 'Attiva',      label: 'Attiva',      color: '#5ba4f5' },
+    { key: 'in_sospeso',  stato: 'In sospeso',  label: 'In sospeso',  color: '#f5a623' },
+    { key: 'completata',  stato: 'Completata',  label: 'Completata',  color: '#69cc85' },
+    { key: 'fallita',     stato: 'Fallita',     label: 'Fallita',     color: '#ff6b6b' },
+  ];
 
   const setView = (v) => {
-    _view = v;
     const kanban = document.getElementById('quest-kanban-view');
-    const list   = document.getElementById('quest-list-view');
+    const grid   = document.getElementById('wiki-quest-grid');
     const btnK   = document.getElementById('quest-view-kanban');
     const btnL   = document.getElementById('quest-view-list');
     if (kanban) kanban.style.display = v === 'kanban' ? 'flex' : 'none';
-    if (list)   list.style.display   = v === 'list' ? '' : 'none';
-    if (btnK) { btnK.className = v === 'kanban' ? 'btn btn-primary btn-sm' : 'btn btn-ghost btn-sm'; btnK.style.fontSize='0.72rem'; }
-    if (btnL) { btnL.className = v === 'list'   ? 'btn btn-primary btn-sm' : 'btn btn-ghost btn-sm'; btnL.style.fontSize='0.72rem'; }
+    if (grid)   grid.style.display   = v === 'list'   ? '' : 'none';
+    if (btnK) btnK.className = v === 'kanban' ? 'btn btn-primary btn-sm' : 'btn btn-ghost btn-sm';
+    if (btnL) btnL.className = v === 'list'   ? 'btn btn-primary btn-sm' : 'btn btn-ghost btn-sm';
     if (v === 'kanban') render();
   };
-
-  const COLORS = { disponibile:'#5ba4f5', in_corso:'#f5a623', completata:'#69cc85', fallita:'#ff6b6b' };
 
   const render = () => {
     const camp = App.getActiveCampaign();
     const quests = camp?.quests || [];
-    ['disponibile','in_corso','completata','fallita'].forEach(status => {
-      const col = document.getElementById('kanban-col-' + status);
+    STATI.forEach(s => {
+      const col = document.getElementById('kanban-col-' + s.key);
       if (!col) return;
-      const items = quests.filter(q => q.status === status);
-      col.innerHTML = items.length ? items.map(q =>
-        '<div draggable="true" data-qid="'+q.id+'" '+
-        'ondragstart="QuestKanban._dragStart(event,\''+q.id+'\')" '+
-        'style="background:var(--bg-card);border:1px solid var(--border);border-left:3px solid '+COLORS[status]+';'+
-        'border-radius:var(--radius-md);padding:8px 10px;cursor:grab;font-size:0.82rem;" '+
-        'onclick="App.openQuest(\''+q.id+'\')">' +
-          '<div style="font-weight:600;margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + (q.title||'') + '</div>' +
-          (q.notes ? '<div style="font-size:0.72rem;color:var(--text-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + q.notes.slice(0,50) + '</div>' : '') +
-        '</div>'
-      ).join('') :
+      const items = quests.filter(q => (q.stato || 'Attiva') === s.stato);
+      col.innerHTML = items.length ? items.map(q => {
+        const obiettivi = q.obiettivi_checklist || [];
+        const done = obiettivi.filter(o => o.fatto).length;
+        return '<div draggable="true" data-qid="' + q.id + '" ' +
+          'ondragstart="QuestKanban._dragStart(event,\'' + q.id + '\')" ' +
+          'onclick="QuestKanban.open(\'' + q.id + '\')" ' +
+          'style="background:var(--bg-card);border:1px solid var(--border);border-left:3px solid ' + s.color + ';' +
+          'border-radius:var(--radius-md);padding:8px 10px;cursor:grab;font-size:0.82rem;">' +
+            '<div style="font-weight:600;margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + (q.titolo || 'Senza titolo') + '</div>' +
+            (q.committente ? '<div style="font-size:0.72rem;color:var(--text-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + q.committente + '</div>' : '') +
+            (obiettivi.length ? '<div style="font-size:0.68rem;color:var(--text-muted);margin-top:3px;">' + done + '/' + obiettivi.length + ' obiettivi</div>' : '') +
+          '</div>';
+      }).join('') :
       '<div style="font-size:0.72rem;color:var(--text-muted);padding:8px;text-align:center;border:1px dashed var(--border);border-radius:var(--radius-md);">—</div>';
 
       col.ondragover = (e) => { e.preventDefault(); col.style.background = 'rgba(91,164,245,0.08)'; };
@@ -13610,22 +13628,24 @@ const QuestKanban = (() => {
         e.preventDefault();
         col.style.background = '';
         const qid = e.dataTransfer.getData('qid');
-        _drop(qid, status);
+        _drop(qid, s.stato);
       };
     });
   };
 
   const _dragStart = (e, id) => e.dataTransfer.setData('qid', id);
 
-  const _drop = (qid, newStatus) => {
+  const _drop = (qid, newStato) => {
     const camp = App.getActiveCampaign();
     if (!camp) return;
-    const quests = (camp.quests||[]).map(q => q.id === qid ? { ...q, status: newStatus } : q);
+    const quests = (camp.quests || []).map(q => q.id === qid ? { ...q, stato: newStato, aggiornatoAt: Date.now() } : q);
     App.saveActiveCampaign({ quests });
     render();
   };
 
-  return { setView, render, _dragStart };
+  const open = (id) => WikiSections.openCard('quest', id);
+
+  return { setView, render, _dragStart, open };
 })();
 
 const WikiTrash = (() => {
@@ -14688,6 +14708,7 @@ const WikiSections = (() => {
         obiettivo: q.obiettivo || q.description || '',
         ricompensa: q.ricompensa || '', ostacoli: q.ostacoli || '',
         sviluppi: q.sviluppi || '', segreto: q.segreto || q.secret || '',
+        obiettivi_checklist: q.obiettivi_checklist || [],
         note: q.noteLibere || '', tags: q.tags || [], _source: 'quests',
       })),
       saveItem: (camp, item) => {
@@ -14701,6 +14722,7 @@ const WikiSections = (() => {
           obiettivo: item.obiettivo, description: item.obiettivo,
           ricompensa: item.ricompensa, ostacoli: item.ostacoli,
           sviluppi: item.sviluppi, segreto: item.segreto, secret: item.segreto,
+          obiettivi_checklist: item.obiettivi_checklist || [],
           noteLibere: item.note, tags: item.tags || [], aggiornatoAt: Date.now(),
         };
         if (idx>=0) camp.quests[idx]=d; else camp.quests.push(d);
@@ -14710,7 +14732,7 @@ const WikiSections = (() => {
         id: 'q_' + Date.now() + '_' + Math.random().toString(36).slice(2,5),
         nome: '', tipo: 'Secondaria', stato: 'Attiva', priorita: 'Media',
         committente: '', png: '', luoghi: '', fazioni: '', obiettivo: '',
-        ricompensa: '', ostacoli: '', sviluppi: '', segreto: '', note: '', tags: [],
+        ricompensa: '', ostacoli: '', sviluppi: '', segreto: '', obiettivi_checklist: [], note: '', tags: [],
       }),
     },
 
@@ -14860,6 +14882,7 @@ const WikiSections = (() => {
 
     _updateTabbar(type);
     renderList(type);
+    if (type === 'quest') { try { QuestKanban.render(); } catch(e) {} }
   };
 
   const _updateTabbar = (activeType) => {
@@ -15091,6 +15114,8 @@ const WikiSections = (() => {
         cfg.fields.map(f => isEdit ? _editField(f) : _viewField(f, item[f.key])).join('') +
       '</div>' +
 
+      (type === 'quest' ? _renderObiettivi(item, isEdit) : '') +
+
       (() => {
         const custom = _currentItem?.campi_custom || item.campi_custom || [];
         if (!isEdit && !custom.length) return '';
@@ -15193,6 +15218,39 @@ const WikiSections = (() => {
 
   const _escHtml = (s) => String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 
+  // ── Obiettivi (checklist quest, con % completamento automatica) ──
+  // Interattiva sia in view che in edit: spuntare un obiettivo durante la sessione non deve
+  // richiedere di entrare in modifica, esattamente come l'Ispirazione nel party o le
+  // condizioni nel combat tracker. Solo testo/aggiungi/rimuovi restano dietro "Modifica".
+  const _renderObiettivi = (it, edit) => {
+    const list = it.obiettivi_checklist || [];
+    if (!edit && !list.length) return '';
+    const done = list.filter(o => o.fatto).length;
+    const pct = list.length ? Math.round(done / list.length * 100) : 0;
+    const rows = list.map((o, i) =>
+      '<div style="display:flex;align-items:center;gap:8px;padding:4px 0;">' +
+        '<input type="checkbox" ' + (o.fatto ? 'checked' : '') + ' onchange="WikiSections.toggleObiettivo(' + i + ')" style="cursor:pointer;flex-shrink:0;">' +
+        (edit
+          ? '<input type="text" value="' + _escHtml(o.testo || '') + '" placeholder="Obiettivo..." style="flex:1;background:transparent;border:none;border-bottom:1px solid var(--border);font-size:0.85rem;color:var(--text-primary);padding:2px 0;' + (o.fatto ? 'text-decoration:line-through;opacity:0.55;' : '') + '" oninput="WikiSections.editObiettivoText(' + i + ',this.value)">'
+          : '<span style="flex:1;font-size:0.85rem;' + (o.fatto ? 'text-decoration:line-through;opacity:0.55;' : '') + '">' + _escHtml(o.testo || '') + '</span>') +
+        (edit ? '<button onclick="WikiSections.removeObiettivo(' + i + ')" style="background:none;border:none;cursor:pointer;color:var(--text-muted);opacity:0.5;flex-shrink:0;" title="Rimuovi"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>' : '') +
+      '</div>'
+    ).join('');
+
+    return '<div id="quest-obiettivi-block" style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);padding:16px;margin-bottom:16px;">' +
+      '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">' +
+        '<div style="font-size:0.68rem;font-family:var(--font-display);text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);">Obiettivi</div>' +
+        (list.length ? '<div style="font-size:0.72rem;color:var(--text-muted);">' + done + '/' + list.length + ' · ' + pct + '%</div>' : '') +
+      '</div>' +
+      (list.length ? '<div style="height:5px;background:var(--bg-tertiary);border-radius:var(--radius-full);overflow:hidden;margin-bottom:10px;"><div style="height:100%;width:' + pct + '%;background:var(--accent-success);border-radius:var(--radius-full);transition:width 0.3s;"></div></div>' : '') +
+      rows +
+      (edit ? '<div style="display:flex;gap:6px;margin-top:8px;">' +
+        '<input id="qo-new-input" type="text" class="form-input" placeholder="Nuovo obiettivo..." style="flex:1;font-size:0.82rem;" onkeydown="if(event.key===\'Enter\'){event.preventDefault();WikiSections.addObiettivo();}">' +
+        '<button class="btn btn-ghost btn-sm" onclick="WikiSections.addObiettivo()">+ Aggiungi</button>' +
+      '</div>' : '') +
+    '</div>';
+  };
+
   const _knownEntityNames = () => {
     const camp = App.getActiveCampaign();
     if (!camp) return [];
@@ -15241,6 +15299,55 @@ const WikiSections = (() => {
     if (!_currentItem) return;
     _currentItem[key] = value;
     _scheduleAutosave(type);
+  };
+
+  // ── Obiettivi quest: interattivi anche in view, quindi non passano da _fieldChange
+  // (che presuppone un input controllato dalla UI editing) ma mutano _currentItem a mano. ──
+  const _refreshObiettivi = () => {
+    const block = document.getElementById('quest-obiettivi-block');
+    if (!block || !_currentItem) return;
+    const isEdit = !!document.getElementById('qo-new-input');
+    block.outerHTML = _renderObiettivi(_currentItem, isEdit);
+  };
+
+  const addObiettivo = () => {
+    if (!_currentItem) return;
+    const input = document.getElementById('qo-new-input');
+    const testo = input?.value?.trim();
+    if (!testo) return;
+    const list = [...(_currentItem.obiettivi_checklist || [])];
+    list.push({ id: 'ob_' + Date.now() + '_' + Math.random().toString(36).slice(2,5), testo, fatto: false });
+    _currentItem.obiettivi_checklist = list;
+    _scheduleAutosave('quest');
+    _refreshObiettivi();
+    setTimeout(() => document.getElementById('qo-new-input')?.focus(), 30);
+  };
+
+  const toggleObiettivo = (i) => {
+    if (!_currentItem) return;
+    const list = [...(_currentItem.obiettivi_checklist || [])];
+    if (!list[i]) return;
+    list[i] = { ...list[i], fatto: !list[i].fatto };
+    _currentItem.obiettivi_checklist = list;
+    _scheduleAutosave('quest');
+    _refreshObiettivi();
+  };
+
+  const editObiettivoText = (i, val) => {
+    if (!_currentItem) return;
+    const list = [...(_currentItem.obiettivi_checklist || [])];
+    if (!list[i]) return;
+    list[i] = { ...list[i], testo: val };
+    _currentItem.obiettivi_checklist = list;
+    _scheduleAutosave('quest');
+    // Niente re-render qui: si perderebbe il focus/cursore ad ogni carattere digitato.
+  };
+
+  const removeObiettivo = (i) => {
+    if (!_currentItem) return;
+    _currentItem.obiettivi_checklist = (_currentItem.obiettivi_checklist || []).filter((_, idx) => idx !== i);
+    _scheduleAutosave('quest');
+    _refreshObiettivi();
   };
 
   const _imgPreviewPlaceholder = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.35;"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>';
@@ -15311,6 +15418,7 @@ const WikiSections = (() => {
     if (listEl) listEl.style.display = '';
     if (detailEl) detailEl.style.display = 'none';
     renderList(type);
+    if (type === 'quest') { try { QuestKanban.render(); } catch(e) {} }
   };
 
   const newCard = (type) => {
@@ -15536,6 +15644,7 @@ const WikiSections = (() => {
     _fieldChange, _jumpToEntity, _saveAndView, _parseLinks, _manualSave,
     _refreshImgFieldPreview, _onImageFilePicked,
     _renderDetailPub, _scheduleAutosavePub, _getCfg, _saveWithCustom,
+    toggleObiettivo, addObiettivo, editObiettivoText, removeObiettivo,
     get _currentType() { return _currentType; },
     get _currentItem()  { return _currentItem; },
   };

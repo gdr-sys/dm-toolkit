@@ -136,47 +136,6 @@ const submitConfirm = () => {
   if (_confirmCallback) { _confirmCallback(); _confirmCallback = null; }
 };
 
-// ── MODAL: Quest ──
-let _editingQuestId = null;
-const openQuestModal = (quest) => {
-  _editingQuestId = quest ? quest.id : null;
-  document.getElementById('quest-modal-title').textContent = quest ? 'Modifica Quest' : 'Nuova Quest';
-  document.getElementById('qm-title').value = quest?.title || '';
-  document.getElementById('qm-status').value = quest?.status || 'disponibile';
-  document.getElementById('qm-reward').value = quest?.reward || '';
-  document.getElementById('qm-notes').value = quest?.notes || '';
-  Modal.open('quest');
-  setTimeout(() => document.getElementById('qm-title')?.focus(), 100);
-};
-
-const submitQuest = () => {
-  const title = document.getElementById('qm-title')?.value?.trim();
-  if (!title) { Toast.show('Inserisci un titolo', 'warning'); return; }
-
-  const camp = App.getActiveCampaign();
-  if (!camp) return;
-
-  const quests = [...(camp.quests || [])];
-  const questData = {
-    title,
-    status: document.getElementById('qm-status')?.value || 'disponibile',
-    reward: document.getElementById('qm-reward')?.value || '',
-    notes: document.getElementById('qm-notes')?.value || '',
-  };
-
-  if (_editingQuestId) {
-    const idx = quests.findIndex(q => q.id === _editingQuestId);
-    if (idx !== -1) quests[idx] = { ...quests[idx], ...questData };
-  } else {
-    quests.push({ id: 'q_' + Date.now(), ...questData });
-  }
-
-  App.saveActiveCampaign({ quests });
-  Modal.close('quest');
-  App.renderQuestList();
-  Toast.show(quest ? 'Quest aggiornata' : 'Quest aggiunta', 'success');
-};
-
 // ── MODAL: Timeline Event ──
 const openTimelineModal = () => {
   document.getElementById('tm-day').value = '';
