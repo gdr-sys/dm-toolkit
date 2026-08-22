@@ -1,12 +1,9 @@
 /* ============================================================
-   ONBOARDING.JS — Guida rapida per orientarsi nel tool: un bottone
-   "?" in fondo alla sidebar apre un riepilogo sintetico delle aree
-   principali. Modulo autonomo: costruisce la propria interfaccia a
+   ONBOARDING.JS — Guida rapida per orientarsi nel tool, raggiungibile
+   dalla voce "Guida rapida" nella sidebar (markup statico in
+   index.html). Modulo autonomo: costruisce il proprio modale a
    runtime, senza toccare il markup statico di index.html a parte il
-   tag <script>. La sidebar e' un elemento persistente (non viene
-   ridisegnata da App.navigateTo come le pagine), quindi qui non
-   serve il pattern di hook usato da fili-sospesi.js/previously-on.js
-   per re-iniettarsi ad ogni navigazione: basta farlo una volta.
+   tag <script>.
    ============================================================ */
 
 const Onboarding = (() => {
@@ -21,20 +18,6 @@ const Onboarding = (() => {
     { titolo: 'Schermo DM', testo: 'Una dashboard che componi tu, con i blocchi che usi più spesso durante la sessione.' },
     { titolo: 'Scorciatoie utili', testo: 'Ctrl+K apre la ricerca su tutto quello che hai scritto. Non serve premere "Salva": ogni modifica si salva da sola.' },
   ];
-
-  const _injectButton = () => {
-    if (document.getElementById('onboarding-btn')) return;
-    const footer = document.querySelector('.sidebar-footer');
-    if (!footer) return;
-    const btn = document.createElement('button');
-    btn.className = 'btn btn-ghost btn-icon';
-    btn.id = 'onboarding-btn';
-    btn.setAttribute('aria-label', 'Guida rapida');
-    btn.title = 'Guida rapida';
-    btn.innerHTML = '<svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>';
-    btn.onclick = open;
-    footer.appendChild(btn);
-  };
 
   const _injectModal = () => {
     if (document.getElementById('modal-onboarding')) return;
@@ -57,9 +40,6 @@ const Onboarding = (() => {
             '</div>'
           ).join('') +
         '</div>' +
-        '<div class="modal-footer" style="justify-content:flex-start;border-top:1px solid var(--border);">' +
-          '<button class="btn btn-ghost btn-sm" onclick="Modal.close(\'onboarding\');BugReport.open()">Hai trovato un problema? Segnalalo</button>' +
-        '</div>' +
       '</div>';
     document.body.appendChild(overlay);
   };
@@ -71,17 +51,16 @@ const Onboarding = (() => {
   };
 
   // Un solo avviso discreto, una volta sola per dispositivo/browser: non un tour invasivo,
-  // solo un invito a scoprire il bottone "?" da soli quando gli torna comodo.
+  // solo un invito a scoprire la guida da soli quando gli torna comodo.
   const _maybeNudge = () => {
     if (localStorage.getItem(SEEN_KEY)) return;
     setTimeout(() => {
-      try { Toast.show('Nuovo qui? Trovi una guida rapida cliccando l\'icona "?" in basso a sinistra.', 'info', 8000); } catch (e) {}
+      try { Toast.show('Nuovo qui? Trovi una guida rapida nella sidebar, sotto "Supporto".', 'info', 8000); } catch (e) {}
     }, 800);
   };
 
   const _hook = () => {
     if (typeof App === 'undefined' || App._onboardingHooked) return;
-    _injectButton();
     _maybeNudge();
     App._onboardingHooked = true;
   };
