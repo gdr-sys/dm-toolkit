@@ -51,10 +51,15 @@ const BugReport = (() => {
           '</div>' +
           '<div class="form-group">' +
             '<label class="form-label">Screenshot (opzionale)</label>' +
-            '<input id="bugreport-file" type="file" accept="image/*" class="form-input">' +
+            '<input id="bugreport-file" type="file" accept="image/*" class="form-input" onchange="BugReport._onFileChange()">' +
+            '<div id="bugreport-file-info" style="display:none;align-items:center;gap:8px;margin-top:6px;">' +
+              '<span id="bugreport-file-name" style="font-size:0.75rem;color:var(--text-secondary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span>' +
+              '<button type="button" class="btn btn-ghost btn-sm" onclick="BugReport._clearFile()" style="padding:2px 8px;flex-shrink:0;">Rimuovi</button>' +
+            '</div>' +
             '<span style="font-size:0.7rem;color:var(--text-muted);">Viene allegato automaticamente all\'invio (max 5MB).</span>' +
           '</div>' +
           '<div style="font-size:0.7rem;color:var(--text-muted);padding-top:4px;border-top:1px solid var(--border);">Vengono inviate automaticamente pagina corrente, browser, dimensioni finestra e tema — utili per capire il problema più in fretta.</div>' +
+          '<div id="bugreport-status" style="display:none;text-align:center;font-size:0.85rem;font-weight:600;padding:8px;border-radius:var(--radius-sm);"></div>' +
         '</div>' +
         '<div class="modal-footer">' +
           '<button class="btn btn-ghost" onclick="Modal.close(\'bugreport\')">Annulla</button>' +
@@ -64,14 +69,43 @@ const BugReport = (() => {
     document.body.appendChild(overlay);
   };
 
+  const _setStatus = (msg, kind) => {
+    const el = document.getElementById('bugreport-status');
+    if (!el) return;
+    if (!msg) { el.style.display = 'none'; return; }
+    el.style.display = 'block';
+    el.style.background = kind === 'error' ? 'rgba(139,38,53,0.15)' : 'rgba(58,125,68,0.15)';
+    el.style.color = kind === 'error' ? 'var(--accent-danger)' : 'var(--accent-success)';
+    el.textContent = msg;
+  };
+
+  const _onFileChange = () => {
+    const file = document.getElementById('bugreport-file')?.files?.[0];
+    const info = document.getElementById('bugreport-file-info');
+    const nameEl = document.getElementById('bugreport-file-name');
+    if (file) {
+      if (nameEl) nameEl.textContent = file.name;
+      if (info) info.style.display = 'flex';
+    } else if (info) {
+      info.style.display = 'none';
+    }
+  };
+
+  const _clearFile = () => {
+    const fileEl = document.getElementById('bugreport-file');
+    const info = document.getElementById('bugreport-file-info');
+    if (fileEl) fileEl.value = '';
+    if (info) info.style.display = 'none';
+  };
+
   const open = () => {
     _injectModal();
     const titoloEl = document.getElementById('bugreport-titolo');
     const descEl = document.getElementById('bugreport-descrizione');
-    const fileEl = document.getElementById('bugreport-file');
     if (titoloEl) titoloEl.value = '';
     if (descEl) descEl.value = '';
-    if (fileEl) fileEl.value = '';
+    _clearFile();
+    _setStatus(null);
     Modal.open('bugreport');
   };
 
@@ -81,9 +115,10 @@ const BugReport = (() => {
     const file = document.getElementById('bugreport-file')?.files?.[0];
     const btn = document.getElementById('bugreport-invia-btn');
 
+    _setStatus(null);
     if (!titolo) { try { Toast.show('Scrivi almeno un titolo breve', 'warning'); } catch (e) {} return; }
     if (!ACCESS_KEY || ACCESS_KEY.indexOf('INSERISCI_QUI') === 0) {
-      try { Toast.show('Invio non configurato: manca la Access Key Web3Forms', 'error'); } catch (e) {}
+      _setStatus('Invio non configurato: manca la Access Key Web3Forms', 'error');
       return;
     }
 
@@ -101,17 +136,18 @@ const BugReport = (() => {
       const res = await fetch('https://api.web3forms.com/submit', { method: 'POST', body: formData });
       const data = await res.json();
       if (data.success) {
-        try { Toast.show('Segnalazione inviata, grazie!', 'success'); } catch (e) {}
-        Modal.close('bugreport');
+        _setStatus('✓ Segnalazione inviata, grazie!', 'success');
+        if (btn) btn.style.display = 'none';
+        setTimeout(() => { Modal.close('bugreport'); if (btn) btn.style.display = ''; }, 1600);
       } else {
-        try { Toast.show('Invio non riuscito, riprova più tardi', 'error'); } catch (e) {}
+        _setStatus('Invio non riuscito, riprova più tardi.', 'error');
       }
     } catch (e) {
-      try { Toast.show('Invio non riuscito: controlla la connessione', 'error'); } catch (e2) {}
+      _setStatus('Invio non riuscito: controlla la connessione.', 'error');
     } finally {
       if (btn) { btn.disabled = false; btn.textContent = 'Invia segnalazione'; }
     }
   };
 
-  return { open, invia };
+  return { open, invia, _onFileChange, _clearFile };
 })();

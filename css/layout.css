@@ -14,12 +14,12 @@
 .nav-section { padding:var(--space-sm) 0; flex:1; overflow-y:auto; overflow-x:hidden; }
 .nav-section-label { font-family:var(--font-display); font-size:0.6rem; letter-spacing:0.12em; text-transform:uppercase; color:var(--nav-label-color); padding:var(--space-sm) var(--space-md) var(--space-xs); white-space:nowrap; overflow:hidden; transition:opacity var(--transition-fast); }
 #sidebar.collapsed .nav-section-label { opacity:0; }
-.nav-item { display:flex; align-items:center; gap:var(--space-md); padding:10px var(--space-md); color:var(--nav-text); text-decoration:none; cursor:pointer; transition:all var(--transition-fast); border:none; background:none; width:100%; text-align:left; border-radius:0; position:relative; white-space:nowrap; }
+.nav-item { display:flex; align-items:center; gap:var(--space-md); padding:10px var(--space-md); color:var(--nav-text); text-decoration:none; cursor:pointer; transition:all var(--transition-fast); border:none; background:none; width:100%; text-align:left; border-radius:0; position:relative; }
 .nav-item:hover, .nav-item:focus-visible { background:var(--nav-overlay-weak); color:var(--nav-active); outline:none; }
 .nav-item.active { background:rgba(139,38,53,0.25); color:var(--nav-active); }
 .nav-item.active::before { content:''; position:absolute; left:0; top:0; bottom:0; width:3px; background:var(--accent-primary); border-radius:0 2px 2px 0; }
 .nav-icon { width:24px; height:24px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
-.nav-label { font-family:var(--font-display); font-size:0.78rem; font-weight:600; letter-spacing:0.03em; opacity:1; transition:opacity var(--transition-fast); }
+.nav-label { font-family:var(--font-display); font-size:0.78rem; font-weight:600; letter-spacing:0.03em; opacity:1; transition:opacity var(--transition-fast); white-space:normal; overflow-wrap:break-word; line-height:1.25; min-width:0; }
 #sidebar.collapsed .nav-label { opacity:0; width:0; overflow:hidden; }
 .sidebar-footer { padding:var(--space-md); border-top:1px solid var(--nav-overlay-mid); display:flex; gap:var(--space-sm); align-items:center; }
 .sidebar-footer.collapsed-footer { flex-direction:column; gap:var(--space-xs); }
