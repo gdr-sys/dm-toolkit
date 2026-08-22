@@ -13,8 +13,8 @@ const Onboarding = (() => {
   const SEEN_KEY = 'dmtk_onboarding_seen';
 
   const SEZIONI = [
-    { titolo: 'Le basi', testo: 'Crea una campagna dalla Home, o aprine una esistente cliccandola. Tutto si salva da solo mentre lavori; trovi "Backup" ed "Esporta" in Home per una copia di sicurezza.' },
-    { titolo: 'Wiki', testo: 'Qui vive il mondo: PNG, Luoghi, Fazioni, Quest, Trame, PG, Sessioni, Lore. Scrivi @Nome in un campo per collegare due voci tra loro.' },
+    { titolo: 'Le basi', testo: 'Crea una campagna dalla Home, o apri una campagna esistente cliccandola. Tutto si salva da solo mentre lavori; trovi "Backup" e "Ripristina backup" in Home per una copia di sicurezza.' },
+    { titolo: 'Wiki', testo: 'Qui vive il mondo: PNG, Luoghi, Fazioni, Quest, Trame, PG, Sessioni, Lore. Scrivi @Nome in un campo per collegare due voci tra loro. Nelle schede di PNG e PG puoi anche registrare i loro "Momenti" salienti, una mini-timeline della loro storia con il party.' },
     { titolo: 'Sessione Live', testo: 'La schermata da usare al tavolo: combat tracker con iniziativa, party, scene planner, clock.' },
     { titolo: 'Calendario', testo: 'Se vuoi tracciare il tempo della storia: data corrente, eventi e scadenze nella vista Mese, tutto sull’asse della Timeline. Va attivato dalle impostazioni della campagna.' },
     { titolo: 'Compendio e Generatori', testo: 'Mostri, regole e incantesimi pronti da consultare; generatori casuali per nomi, incontri, negozi quando serve improvvisare al volo.' },
@@ -52,7 +52,7 @@ const Onboarding = (() => {
         '<div class="modal-body" style="display:flex;flex-direction:column;gap:16px;">' +
           SEZIONI.map(s =>
             '<div>' +
-              '<div style="font-family:var(--font-display);font-size:0.9rem;color:var(--accent-primary);margin-bottom:4px;">' + s.titolo + '</div>' +
+              '<div style="font-family:var(--font-display);font-weight:700;font-size:0.9rem;color:var(--accent-primary);margin-bottom:4px;">' + s.titolo + '</div>' +
               '<div style="font-size:0.85rem;line-height:1.6;color:var(--text-secondary);">' + s.testo + '</div>' +
             '</div>'
           ).join('') +

@@ -3502,6 +3502,10 @@ const App = (() => {
     const main = document.getElementById('main-content');
     const collapsed = sidebar.classList.toggle('collapsed');
     main.classList.toggle('expanded', collapsed);
+    // La fila di icone del footer (Impostazioni/Comprimi/Tema/Guida) non entra negli
+    // #nav-collapsed px della sidebar compressa - .collapsed-footer le impila in verticale
+    // invece di tagliarle (era gia' definita in css/layout.css ma mai applicata via JS).
+    document.querySelector('.sidebar-footer')?.classList.toggle('collapsed-footer', collapsed);
     Storage.updateSettings({ sidebarCollapsed: collapsed });
     Debug.log(`Sidebar: ${collapsed ? 'collapsed' : 'expanded'}`);
   };
@@ -3857,6 +3861,7 @@ const openCampaign = (id) => {
     if (settings.sidebarCollapsed) {
       document.getElementById('sidebar')?.classList.add('collapsed');
       document.getElementById('main-content')?.classList.add('expanded');
+      document.querySelector('.sidebar-footer')?.classList.add('collapsed-footer');
     }
 
     const savedId = Storage.getActiveCampaignId();
