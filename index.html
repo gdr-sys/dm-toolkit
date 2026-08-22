@@ -2643,19 +2643,30 @@ const Storage = (() => {
       Debug.error(`Storage.set(${key}):`, e.message);
 
       if (key.includes('campaigns') && Array.isArray(value)) {
+        // Non cancellare le immagini gia' salvate con successo in precedenza: rimuovi solo
+        // quella nuova/modificata che ha fatto superare la quota, confrontando con l'ultimo
+        // stato salvato con successo (rimasto intatto in localStorage, dato che setItem sopra e' fallito).
+        let previous = [];
+        try { previous = JSON.parse(localStorage.getItem(key) || '[]'); } catch (_) {}
+        const prevImgById = new Map();
+        (previous||[]).forEach(camp => {
+          ['npcs','locations','factions'].forEach(k => (camp?.[k]||[]).forEach(x => prevImgById.set(x.id, x.immagine || '')));
+        });
         const cleaned = value.map(camp => {
           const c = { ...camp };
-          const stripBase64 = (arr) => (arr||[]).map(x => ({
-            ...x, immagine: (x.immagine||'').startsWith('data:') ? '' : (x.immagine||'')
-          }));
-          c.npcs = stripBase64(c.npcs);
-          c.locations = stripBase64(c.locations);
-          c.factions = stripBase64(c.factions);
+          const stripNewBase64 = (arr) => (arr||[]).map(x => {
+            const img = x.immagine || '';
+            if (!img.startsWith('data:')) return x;
+            return img === prevImgById.get(x.id) ? x : { ...x, immagine: '' };
+          });
+          c.npcs = stripNewBase64(c.npcs);
+          c.locations = stripNewBase64(c.locations);
+          c.factions = stripNewBase64(c.factions);
           return c;
         });
         try {
           localStorage.setItem(key, JSON.stringify(cleaned));
-          Toast.show('Storage pieno: immagini file rimosse. Usa URL esterni per le immagini.', 'warning', 6000);
+          Toast.show('Storage pieno: la nuova immagine non e\' stata salvata. Usa un URL esterno o rimuovi altre immagini.', 'warning', 6000);
           return true;
         } catch(e2) {
           Toast.show('Storage esaurito! Esporta la campagna e riduci il contenuto.', 'error', 8000);
@@ -15379,16 +15390,36 @@ const WikiSections = (() => {
     const file = e.target?.files?.[0];
     if (!file) return;
     if (!file.type.startsWith('image/')) { Toast.show('Seleziona un file immagine', 'warning'); return; }
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      const dataUri = ev.target.result;
+    const objectUrl = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      // Ridimensiona e ricomprime prima di salvare come data URI: le foto/PNG moderni
+      // possono pesare diversi MB, e localStorage ha un limite di ~5-10MB per l'intera app -
+      // senza questo passaggio bastano un paio di immagini per saturare lo spazio disponibile.
+      const MAX_DIM = 1024;
+      let { width, height } = img;
+      if (width > MAX_DIM || height > MAX_DIM) {
+        const scale = MAX_DIM / Math.max(width, height);
+        width = Math.round(width * scale);
+        height = Math.round(height * scale);
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, width, height);
+      URL.revokeObjectURL(objectUrl);
+
+      let dataUri = canvas.toDataURL('image/webp', 0.85);
+      if (!dataUri.startsWith('data:image/webp')) dataUri = canvas.toDataURL('image/png');
+
       const input = document.getElementById('wsf-immagine');
       if (input) input.value = dataUri;
       _fieldChange(type, 'immagine', dataUri);
       _refreshImgFieldPreview();
     };
-    reader.onerror = () => Toast.show('Errore nella lettura del file', 'error');
-    reader.readAsDataURL(file);
+    img.onerror = () => { URL.revokeObjectURL(objectUrl); Toast.show('Errore nella lettura del file', 'error'); };
+    img.src = objectUrl;
   };
 
   const _scheduleAutosave = (type) => {
