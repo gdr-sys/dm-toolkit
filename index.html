@@ -14921,22 +14921,29 @@ const WikiSections = (() => {
       },
       saveItem: (camp, item) => {
         if (item._source==='sessioni_log') {
-          const sessioni = (camp.sessioni_log||[]).map(s =>
-            s.id===item._origId ? { ...s,
-              titolo: item.titolo || item.nome.replace(/^Sessione \d+\s*[\u2014-]\s*/, '').replace(/^Sessione \d+$/, ''),
-              data:item.data||'', data_inworld:item.data_inworld||null, meteo:item.meteo||'',
-              stato:item.stato==='In corso'?'in_corso':item.stato==='Giocata'?'giocata':'pianificata',
+          const list = camp.sessioni_log || [];
+          const idx = list.findIndex(s => s.id === item._origId);
+          const titoloClean = item.titolo || (item.nome||'').replace(/^Sessione \d+\s*[\u2014-]\s*/, '').replace(/^Sessione \d+$/, '');
+          const d = { ...(idx>=0 ? list[idx] : {}),
+            id: item._origId,
+            numero: parseInt(item.numero, 10) || (idx>=0 ? list[idx].numero : (list.length ? Math.max(...list.map(s=>s.numero||0))+1 : 1)),
+            titolo: titoloClean,
+            data:item.data||'', data_inworld:item.data_inworld||null, meteo:item.meteo||'',
+            stato:item.stato==='In corso'?'in_corso':item.stato==='Giocata'?'giocata':'pianificata',
 
-              png_previsti:item.png_previsti||'', luoghi_previsti:item.luoghi_previsti||'',
-              fazioni:item.fazioni||'', notePrep:item.obiettivi||'', obiettivi:item.obiettivi||'',
-              beat_prep:item.beat_prep||'', ganci_entrata:item.ganci_entrata||'', segreto:item.segreto||'',
+            png_previsti:item.png_previsti||'', luoghi_previsti:item.luoghi_previsti||'',
+            fazioni:item.fazioni||'', notePrep:item.obiettivi||'', obiettivi:item.obiettivi||'',
+            beat_prep:item.beat_prep||'', ganci_entrata:item.ganci_entrata||'', segreto:item.segreto||'',
 
-              png_nuovi:item.png_nuovi||'', luoghi_visitati:item.luoghi_vis||'',
-              successo:item.successo||'', decisioni:item.decisioni||'', lore_rivelata:item.lore_rivelata||'',
-              recap:item.recap||'', ganci:item.ganci||'', xp:item.xp||'',
-            } : s
-          );
-          App.saveActiveCampaign({ sessioni_log: sessioni });
+            png_nuovi:item.png_nuovi||'', luoghi_visitati:item.luoghi_vis||'',
+            successo:item.successo||'', decisioni:item.decisioni||'', lore_rivelata:item.lore_rivelata||'',
+            recap:item.recap||'', ganci:item.ganci||'', xp:item.xp||'',
+            npcs: idx>=0 ? (list[idx].npcs||[]) : [],
+            creatoAt: idx>=0 ? list[idx].creatoAt : Date.now(),
+            aggiornatoAt: Date.now(),
+          };
+          if (idx>=0) list[idx]=d; else list.push(d);
+          App.saveActiveCampaign({ sessioni_log: list });
         } else {
           const wiki = camp?.wiki || { lore:[], sessioni:[] };
           if (!wiki.sessioni) wiki.sessioni = [];
@@ -14947,18 +14954,21 @@ const WikiSections = (() => {
           App.saveActiveCampaign({ wiki });
         }
       },
-      newItem: () => ({ id:'ws_'+Date.now()+'_'+Math.random().toString(36).slice(2,5),
-        nome:'', numero:'', data:new Date().toISOString().slice(0,10), titolo:'',
-        stato:'Pianificata', meteo:'', png_previsti:'', luoghi_previsti:'', fazioni:'',
-        obiettivi:'', beat_prep:'', ganci_entrata:'', segreto:'',
-        png:'', png_nuovi:'', luoghi_vis:'', successo:'', decisioni:'', lore_rivelata:'',
-        recap:'', ganci:'', xp:'', contenuto:'', tags:['sessione'], _source:'wiki' }),
-      newItem: () => ({ id:'ws_'+Date.now()+'_'+Math.random().toString(36).slice(2,5),
-        nome:'', numero:'', data:new Date().toISOString().slice(0,10), data_inworld:null, titolo:'',
-        stato:'Pianificata', meteo:'', png_previsti:'', luoghi_previsti:'', fazioni:'',
-        obiettivi:'', beat_prep:'', ganci_entrata:'', segreto:'',
-        png:'', png_nuovi:'', luoghi_vis:'', successo:'', decisioni:'', lore_rivelata:'',
-        recap:'', ganci:'', xp:'', contenuto:'', tags:['sessione'], _source:'wiki' }),
+      // Una sessione nuova creata da qui deve diventare una voce reale di camp.sessioni_log
+      // (stesso modello dati di "+ Nuova Sessione" in Sessione Live), non una nota wiki
+      // semplificata: il form mostra meteo/obiettivi/PNG previsti/ecc, e _source:'wiki'
+      // li scarterebbe silenziosamente al salvataggio (persiste solo titolo e contenuto).
+      newItem: () => {
+        const id = 'sess_' + Date.now() + '_' + Math.random().toString(36).slice(2,5);
+        const camp = App.getActiveCampaign();
+        const log = camp?.sessioni_log || [];
+        const numero = log.length ? Math.max(...log.map(s => s.numero||0)) + 1 : 1;
+        return { id, nome:'', numero:String(numero), data:new Date().toISOString().slice(0,10), data_inworld:null, titolo:'',
+          stato:'Pianificata', meteo:'', png_previsti:'', luoghi_previsti:'', fazioni:'',
+          obiettivi:'', beat_prep:'', ganci_entrata:'', segreto:'',
+          png:'', png_nuovi:'', luoghi_vis:'', successo:'', decisioni:'', lore_rivelata:'',
+          recap:'', ganci:'', xp:'', contenuto:'', tags:['sessione'], _source:'sessioni_log', _origId:id };
+      },
     },
   };
 
