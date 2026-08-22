@@ -1,9 +1,11 @@
 /* ============================================================
-   BUG-REPORT.JS — "Segnala un bug": invia la segnalazione (con
-   eventuale screenshot allegato) direttamente dal sito via
-   Web3Forms (api.web3forms.com), senza aprire un client di posta.
-   Servizio gratuito: richiede una Access Key legata a un'email di
-   destinazione, generata su web3forms.com. Modulo autonomo:
+   BUG-REPORT.JS — "Segnala un bug": invia la segnalazione direttamente
+   dal sito via Web3Forms (api.web3forms.com), senza aprire un client
+   di posta. Servizio gratuito: richiede una Access Key legata a
+   un'email di destinazione, generata su web3forms.com. Niente
+   allegati: sul piano gratuito Web3Forms li rifiuta con "You are
+   trying to use a Pro feature" (verificato via chiamata diretta
+   all'API), quindi non vengono proposti in UI. Modulo autonomo:
    costruisce il proprio modale a runtime, non tocca il markup
    statico di index.html.
    ============================================================ */
@@ -11,15 +13,38 @@
 const BugReport = (() => {
   const ACCESS_KEY = 'c022699a-f9ba-47f6-87f7-c9725aeab6b7';
 
+  // Tiene traccia della pagina visitata prima di quella corrente: se l'utente
+  // lascia la pagina col problema prima di aprire "Segnala un bug" (es. per
+  // raggiungere la voce in sidebar), l'informazione sulla pagina "corrente"
+  // da sola sarebbe fuorviante — qui si registra anche quella precedente.
+  // #topbar-title e' l'unico elemento aggiornato da App.navigateTo ad ogni
+  // cambio pagina (page.label): a differenza di .page-title, che compare
+  // ripetuto — uno per ciascuna sezione #page-* sempre presente nel DOM —
+  // e non e' un indicatore di navigazione affidabile.
+  let _prevPage = null;
+
+  const _hookNav = () => {
+    if (typeof App === 'undefined' || App._bugReportNavHooked) return;
+    const origNavigateTo = App.navigateTo;
+    App.navigateTo = function () {
+      const before = document.getElementById('topbar-title')?.textContent?.trim();
+      if (before) _prevPage = before;
+      return origNavigateTo.apply(this, arguments);
+    };
+    App._bugReportNavHooked = true;
+  };
+  document.addEventListener('DOMContentLoaded', () => setTimeout(_hookNav, 200));
+
   const _pageLabel = () =>
-    document.querySelector('.page-title')?.textContent?.trim() ||
+    document.getElementById('topbar-title')?.textContent?.trim() ||
     document.title ||
     'sconosciuta';
 
   const _infoTecniche = () => {
     const tema = document.documentElement.getAttribute('data-theme') || 'automatico (sistema)';
+    const pagina = _pageLabel();
     return [
-      'Pagina: ' + _pageLabel(),
+      'Pagina: ' + pagina + (_prevPage && _prevPage !== pagina ? ' (prima: ' + _prevPage + ')' : ''),
       'Data/ora: ' + new Date().toLocaleString('it-IT'),
       'Finestra: ' + window.innerWidth + 'x' + window.innerHeight,
       'Tema: ' + tema,
@@ -49,15 +74,6 @@ const BugReport = (() => {
             '<label class="form-label">Descrizione</label>' +
             '<textarea id="bugreport-descrizione" class="form-textarea" rows="4" placeholder="Cosa stavi facendo, cosa ti aspettavi, cosa è successo invece..."></textarea>' +
           '</div>' +
-          '<div class="form-group">' +
-            '<label class="form-label">Screenshot (opzionale)</label>' +
-            '<input id="bugreport-file" type="file" accept="image/*" class="form-input" onchange="BugReport._onFileChange()">' +
-            '<div id="bugreport-file-info" style="display:none;align-items:center;gap:8px;margin-top:6px;">' +
-              '<span id="bugreport-file-name" style="font-size:0.75rem;color:var(--text-secondary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span>' +
-              '<button type="button" class="btn btn-ghost btn-sm" onclick="BugReport._clearFile()" style="padding:2px 8px;flex-shrink:0;">Rimuovi</button>' +
-            '</div>' +
-            '<span style="font-size:0.7rem;color:var(--text-muted);">Viene allegato automaticamente all\'invio (max 5MB).</span>' +
-          '</div>' +
           '<div style="font-size:0.7rem;color:var(--text-muted);padding-top:4px;border-top:1px solid var(--border);">Vengono inviate automaticamente pagina corrente, browser, dimensioni finestra e tema — utili per capire il problema più in fretta.</div>' +
           '<div id="bugreport-status" style="display:none;text-align:center;font-size:0.85rem;font-weight:600;padding:8px;border-radius:var(--radius-sm);"></div>' +
         '</div>' +
@@ -79,32 +95,12 @@ const BugReport = (() => {
     el.textContent = msg;
   };
 
-  const _onFileChange = () => {
-    const file = document.getElementById('bugreport-file')?.files?.[0];
-    const info = document.getElementById('bugreport-file-info');
-    const nameEl = document.getElementById('bugreport-file-name');
-    if (file) {
-      if (nameEl) nameEl.textContent = file.name;
-      if (info) info.style.display = 'flex';
-    } else if (info) {
-      info.style.display = 'none';
-    }
-  };
-
-  const _clearFile = () => {
-    const fileEl = document.getElementById('bugreport-file');
-    const info = document.getElementById('bugreport-file-info');
-    if (fileEl) fileEl.value = '';
-    if (info) info.style.display = 'none';
-  };
-
   const open = () => {
     _injectModal();
     const titoloEl = document.getElementById('bugreport-titolo');
     const descEl = document.getElementById('bugreport-descrizione');
     if (titoloEl) titoloEl.value = '';
     if (descEl) descEl.value = '';
-    _clearFile();
     _setStatus(null);
     Modal.open('bugreport');
   };
@@ -112,7 +108,6 @@ const BugReport = (() => {
   const invia = async () => {
     const titolo = document.getElementById('bugreport-titolo')?.value?.trim();
     const descrizione = document.getElementById('bugreport-descrizione')?.value?.trim();
-    const file = document.getElementById('bugreport-file')?.files?.[0];
     const btn = document.getElementById('bugreport-invia-btn');
 
     _setStatus(null);
@@ -128,7 +123,6 @@ const BugReport = (() => {
     formData.append('from_name', 'DM Toolkit - Segnalazione bug');
     formData.append('message', (descrizione || '(nessuna descrizione)') +
       '\n\n---\nInformazioni tecniche (aggiunte automaticamente):\n' + _infoTecniche());
-    if (file) formData.append('attachment', file);
 
     if (btn) { btn.disabled = true; btn.textContent = 'Invio in corso...'; }
 
@@ -149,5 +143,5 @@ const BugReport = (() => {
     }
   };
 
-  return { open, invia, _onFileChange, _clearFile };
+  return { open, invia };
 })();
