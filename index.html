@@ -269,6 +269,11 @@
         <span class="nav-label">Sessione Live</span>
       </button>
 
+      <button class="nav-item" data-page="calendario" data-requires-campaign="true" onclick="App.navigateTo('calendario');closeMobileMenu()">
+        <span class="nav-icon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>
+        <span class="nav-label">Calendario</span>
+      </button>
+
       <div class="nav-section-label" style="margin-top:8px;">Strumenti</div>
 
 
@@ -1738,6 +1743,43 @@
     </section>
 
 
+    <section class="page" id="page-calendario">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Calendario</h1>
+          <p class="page-subtitle">Data in-world, eventi, deadline e timeline della campagna</p>
+        </div>
+      </div>
+
+      <div class="tabs" style="margin-bottom:var(--space-lg);max-width:340px;">
+        <button class="tab-btn active" id="cal-tab-mese-btn" onclick="CalendarioUI.showTab('mese')">Mese</button>
+        <button class="tab-btn" id="cal-tab-timeline-btn" onclick="CalendarioUI.showTab('timeline')">Timeline</button>
+      </div>
+
+      <div id="calendario-tab-mese"></div>
+      <div id="calendario-tab-timeline" style="display:none;">
+        <div style="display:flex;gap:14px;flex-wrap:wrap;align-items:center;margin-bottom:12px;">
+          <label style="display:flex;align-items:center;gap:4px;font-size:0.78rem;"><input type="checkbox" id="catl-layer-campagna" checked onchange="CalendarioTimeline.render()"> Cronaca campagna</label>
+          <label style="display:flex;align-items:center;gap:4px;font-size:0.78rem;"><input type="checkbox" id="catl-layer-mondo" checked onchange="CalendarioTimeline.render()"> Storia del mondo</label>
+          <label style="display:flex;align-items:center;gap:4px;font-size:0.78rem;"><input type="checkbox" id="catl-sessioni" checked onchange="CalendarioTimeline.render()"> Sessioni</label>
+          <select id="catl-categoria" class="form-select" style="width:auto;font-size:0.78rem;" onchange="CalendarioTimeline.render()"></select>
+          <select id="catl-entita" class="form-select" style="width:auto;font-size:0.78rem;" onchange="CalendarioTimeline.render()"></select>
+        </div>
+        <div id="calendario-timeline-legend"></div>
+        <div id="calendario-timeline-empty" class="module-placeholder" style="display:none;"><h3>Nessun evento</h3><p class="text-muted" style="font-size:0.85rem;"></p></div>
+        <div id="calendario-timeline-wrap" style="border:1px solid var(--border);border-radius:var(--radius-md);overflow:hidden;">
+          <svg id="calendario-timeline-svg" width="100%" height="260" style="display:block;background:var(--bg-secondary);"></svg>
+          <div style="padding:4px 10px 8px;font-size:0.68rem;color:var(--text-muted);border-top:1px solid var(--border);">Trascina per spostare la vista, rotella o pulsanti per zoomare. Click su un punto per aprire l'entità o l'evento collegato.</div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:8px;justify-content:flex-end;">
+          <button class="btn btn-ghost btn-sm" onclick="CalendarioTimeline.zoomOut()">− Zoom</button>
+          <button class="btn btn-ghost btn-sm" onclick="CalendarioTimeline.zoomReset()">Reset</button>
+          <button class="btn btn-ghost btn-sm" onclick="CalendarioTimeline.zoomIn()">+ Zoom</button>
+        </div>
+      </div>
+    </section>
+
+
     <section class="page" id="page-schermo">
       <div class="page-header">
         <div>
@@ -2613,6 +2655,7 @@ const Storage = (() => {
       timeHours: 8, timeMinutes: 0,
       system: 'FR'
     },
+    calendarioEventi: [],
 
     generatorCache: {}
   });
@@ -3325,6 +3368,7 @@ const App = (() => {
     home:       { label: 'Home',   icon: '🏠', navItem: true,  requiresCampaign: false },
     campagna:   { label: 'Dashboard',   icon: '📖', navItem: true,  requiresCampaign: true  },
     sessione:   { label: 'Sessione',   icon: '⚔️', navItem: true,  requiresCampaign: true  },
+    calendario: { label: 'Calendario', icon: '',   navItem: true,  requiresCampaign: true  },
     generatori: { label: 'Generatori', icon: '✨', navItem: true,  requiresCampaign: false },
     compendio:  { label: 'Compendio',  icon: '📚', navItem: true,  requiresCampaign: false },
     schermo:    { label: 'Schermo DM', icon: '🖥️', navItem: true,  requiresCampaign: false },
@@ -3421,6 +3465,9 @@ const App = (() => {
           if (td) td.style.display = 'none';
         } catch(e) { console.error('Trame render:', e); }
       }, 100);
+        break;
+    case 'calendario':
+        setTimeout(() => { try { CalendarioUI.showTab('mese'); } catch(e) { console.error('CalendarioUI render:', e); } }, 100);
         break;
     }
   };
@@ -13309,6 +13356,43 @@ const SessioniLog = (() => {
 
   let _tempNpcs = [];
   let _editingId = null;
+  let _diState = null; // {giorno,mese,anno}|null - data in-world della sessione in editing nel modale
+
+  const _renderDataInworld = () => {
+    const wrap = document.getElementById('sl-data-inworld-wrap');
+    if (!wrap) return;
+    const cal = Calendario.get();
+    if (!cal || !cal.mesi?.length) {
+      wrap.innerHTML = '<div class="text-muted" style="font-size:0.78rem;">Attiva il Calendario (Modifica campagna) per collegare la sessione a una data in-world.</div>';
+      return;
+    }
+    const d = _diState;
+    const mese = d ? Math.max(0, Math.min(d.mese || 0, cal.mesi.length - 1)) : (cal.mese || 0);
+    const giorniInMese = cal.mesi[mese]?.giorni || 30;
+    const giorno = d ? Math.max(1, Math.min(d.giorno || 1, giorniInMese)) : (cal.giorno || 1);
+    const anno = d ? (d.anno ?? cal.anno) : (cal.anno ?? cal.anno_base ?? 1);
+    const giornoOpts = Array.from({ length: giorniInMese }, (_, i) => i + 1)
+      .map(g => '<option value="' + g + '"' + (g === giorno ? ' selected' : '') + '>' + g + '</option>').join('');
+    const meseOpts = cal.mesi.map((m, i) => '<option value="' + i + '"' + (i === mese ? ' selected' : '') + '>' + (m.it || m.nome) + '</option>').join('');
+    wrap.innerHTML = '<div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">' +
+      '<select id="sl-di-giorno" class="form-select" style="width:auto;font-size:0.82rem;"' + (!d ? ' disabled' : '') + ' onchange="SessioniLog._diChange(\'giorno\',this.value)">' + giornoOpts + '</select>' +
+      '<select id="sl-di-mese" class="form-select" style="width:auto;font-size:0.82rem;"' + (!d ? ' disabled' : '') + ' onchange="SessioniLog._diChange(\'mese\',this.value)">' + meseOpts + '</select>' +
+      '<input type="number" id="sl-di-anno" class="form-input" style="width:88px;font-size:0.82rem;" value="' + anno + '"' + (!d ? ' disabled' : '') + ' onchange="SessioniLog._diChange(\'anno\',this.value)">' +
+      '<label style="display:flex;align-items:center;gap:4px;font-size:0.78rem;color:var(--text-muted);"><input type="checkbox" id="sl-di-none"' + (d ? '' : ' checked') + ' onchange="SessioniLog._diToggle(this.checked)"> nessuna</label>' +
+      '</div>';
+  };
+
+  const _diChange = (part, value) => {
+    if (!_diState) _diState = { giorno: 1, mese: 0, anno: Calendario.get()?.anno_base || 1 };
+    _diState[part] = parseInt(value, 10) || 0;
+    if (part === 'mese') _renderDataInworld();
+  };
+
+  const _diToggle = (checked) => {
+    const cal = Calendario.get();
+    _diState = checked ? null : { giorno: cal?.giorno || 1, mese: cal?.mese || 0, anno: cal?.anno ?? cal?.anno_base ?? 1 };
+    _renderDataInworld();
+  };
 
   const _getSessioni = () => {
     const camp = App.getActiveCampaign();
@@ -13423,6 +13507,8 @@ const SessioniLog = (() => {
     document.getElementById('sl-note-prep').value= '';
     document.getElementById('sl-recap').value    = '';
     document.getElementById('session-log-title').textContent = 'Nuova Sessione';
+    _diState = null;
+    _renderDataInworld();
     _renderNpcsModal();
     _populateNpcSelect();
     Modal.open('session-log');
@@ -13441,6 +13527,8 @@ const SessioniLog = (() => {
     document.getElementById('sl-note-prep').value= s.notePrep || '';
     document.getElementById('sl-recap').value    = s.recap || '';
     document.getElementById('session-log-title').textContent = 'Sessione ' + s.numero;
+    _diState = s.data_inworld ? { ...s.data_inworld } : null;
+    _renderDataInworld();
     _renderNpcsModal();
     _populateNpcSelect();
     Modal.open('session-log');
@@ -13453,6 +13541,7 @@ const SessioniLog = (() => {
       numero:   parseInt(document.getElementById('sl-numero').value) || 1,
       titolo:   document.getElementById('sl-titolo').value.trim(),
       data:     document.getElementById('sl-data').value,
+      data_inworld: _diState ? { ..._diState } : null,
       stato:    document.getElementById('sl-stato').value,
       npcs:     [..._tempNpcs],
       notePrep: document.getElementById('sl-note-prep').value,
@@ -13591,6 +13680,7 @@ const SessioniLog = (() => {
     showTab, renderList, newSession, edit, save, remove,
     setInCorso, addNpc, _removeNpc,
     createWikiNote, openWiki,
+    _diChange, _diToggle,
   };
 })();
 
@@ -14431,6 +14521,8 @@ const WikiSections = (() => {
         { key: 'razza',       label: 'Razza / Specie',       type: 'short',   hint: 'es. Umano, Elfo, Nano' },
         { key: 'stato',       label: 'Stato',                type: 'select',  options: ['Vivo','Morto','Scomparso','Alleato','Nemico','Sconosciuto'] },
         { key: 'allineamento',label: 'Allineamento',         type: 'select',  options: ['','Legale Buono','Neutrale Buono','Caotico Buono','Legale Neutrale','Neutrale','Caotico Neutrale','Legale Malvagio','Neutrale Malvagio','Caotico Malvagio'] },
+        { key: 'nascita',     label: 'Data di nascita',      type: 'date_inworld' },
+        { key: 'morte',       label: 'Data di morte',        type: 'date_inworld' },
         { key: 'sede',        label: 'Luogo / Sede',         type: 'mention', hint: '@NomeLuogo' },
         { key: 'fazione',     label: 'Fazione / Gruppo',     type: 'mention', hint: '@NomeFazione' },
         { key: 'apparenza',   label: 'Aspetto fisico',       type: 'long',    hint: 'Come appare questo personaggio?' },
@@ -14446,6 +14538,7 @@ const WikiSections = (() => {
         immagine: n.immagine || '',
         ruolo: n.job || n.ruolo || '', razza: n.race || n.razza || '',
         stato: n.stato || 'Vivo', allineamento: n.alignment || n.allineamento || '',
+        nascita: n.nascita || null, morte: n.morte || null,
         sede: n.location || n.sede || '', fazione: n.fazione || '',
         apparenza: n.apparenza || n.description || '',
         personalita: n.personality || n.personalita || '',
@@ -14462,6 +14555,7 @@ const WikiSections = (() => {
         const d = { ...(idx>=0?npcs[idx]:{}), id:item.id, name:item.nome, nome:item.nome,
           immagine:item.immagine||'', job:item.ruolo, ruolo:item.ruolo, race:item.razza, razza:item.razza,
           stato:item.stato, alignment:item.allineamento, allineamento:item.allineamento,
+          nascita:item.nascita||null, morte:item.morte||null,
           location:item.sede, sede:item.sede, fazione:item.fazione,
           apparenza:item.apparenza, description:item.apparenza,
           personality:item.personalita, personalita:item.personalita,
@@ -14475,7 +14569,7 @@ const WikiSections = (() => {
         try { _mondoToWiki('npc', d, camp); } catch(e) {}
       },
       newItem: () => ({ id:'npc_'+Date.now()+'_'+Math.random().toString(36).slice(2,5),
-        nome:'', ruolo:'', razza:'', stato:'Vivo', allineamento:'', sede:'', fazione:'',
+        nome:'', ruolo:'', razza:'', stato:'Vivo', allineamento:'', nascita:null, morte:null, sede:'', fazione:'',
         apparenza:'', personalita:'', vuole:'', teme:'', relazioni:'', gancio:'', segreto:'', note:'', tags:[] }),
     },
 
@@ -14483,6 +14577,7 @@ const WikiSections = (() => {
       label: 'Luoghi', color: '#f5a623',
       fields: [
         { key: 'tipo',        label: 'Tipo di luogo',        type: 'select',  options: ['Città','Villaggio','Dungeon','Taverna','Castello','Tempio','Foresta','Regione','Paese','Porto','Torre','Altro'] },
+        { key: 'fondazione',  label: 'Data di fondazione',   type: 'date_inworld' },
         { key: 'regione',     label: 'Regione / Zona',       type: 'mention', hint: '@LuogoPadre' },
         { key: 'clima',       label: 'Clima / Ambiente',     type: 'short',   hint: 'es. Freddo e umido, desertico...' },
         { key: 'atmosfera',   label: 'Descrizione',          type: 'long',    hint: 'Cosa si vede, sente, percepisce entrando?' },
@@ -14494,7 +14589,7 @@ const WikiSections = (() => {
       ],
       getData: (camp) => (camp?.locations || []).map(l => ({
         id:l.id, nome:l.nome||l.name||'', immagine:l.immagine||'',
-        tipo:l.tipo||'', regione:l.regione||'', clima:l.clima||'',
+        tipo:l.tipo||'', fondazione:l.fondazione||null, regione:l.regione||'', clima:l.clima||'',
         atmosfera:l.atmosfera||l.description||'', abitanti:l.npcs||l.abitanti||'',
         punti:l.punti||'', storia:l.storia||'', pericoli:l.pericoli||'',
         segreto:l.secret||l.segreto||'', note:l.noteLibere||'', tags:l.tags||[],
@@ -14504,7 +14599,7 @@ const WikiSections = (() => {
         const locs = camp.locations || [];
         const idx = locs.findIndex(l => l.id === item.id);
         const d = { ...(idx>=0?locs[idx]:{}), id:item.id, nome:item.nome, name:item.nome,
-          immagine:item.immagine, tipo:item.tipo, regione:item.regione, clima:item.clima,
+          immagine:item.immagine, tipo:item.tipo, fondazione:item.fondazione||null, regione:item.regione, clima:item.clima,
           atmosfera:item.atmosfera, description:item.atmosfera,
           npcs:item.abitanti, abitanti:item.abitanti,
           punti:item.punti, storia:item.storia, pericoli:item.pericoli,
@@ -14515,7 +14610,7 @@ const WikiSections = (() => {
         try { _mondoToWiki('location', d, camp); } catch(e) {}
       },
       newItem: () => ({ id:'loc_'+Date.now()+'_'+Math.random().toString(36).slice(2,5),
-        nome:'', tipo:'Città', regione:'', clima:'', atmosfera:'', abitanti:'',
+        nome:'', tipo:'Città', fondazione:null, regione:'', clima:'', atmosfera:'', abitanti:'',
         punti:'', storia:'', pericoli:'', segreto:'', note:'', tags:[] }),
     },
 
@@ -14523,6 +14618,7 @@ const WikiSections = (() => {
       label: 'Fazioni', color: '#c97bea',
       fields: [
         { key: 'tipo',        label: 'Tipo',                 type: 'select',  options: ['Gilda','Ordine','Governo','Criminale','Militare','Mercantile','Religiosa','Arcana','Altro'] },
+        { key: 'creazione',   label: 'Data di creazione',    type: 'date_inworld' },
         { key: 'attitudine',  label: 'Attitudine verso party',type: 'select', options: ['Alleata','Amichevole','Neutrale','Sospettosa','Ostile','Sconosciuta'] },
         { key: 'simbolo', label: 'Simbolo / Motto', type: 'short', hint: 'es. Un drago rampante' },
         { key: 'leader',      label: 'Leader',               type: 'mention', hint: '@NomePNG' },
@@ -14535,7 +14631,7 @@ const WikiSections = (() => {
       ],
       getData: (camp) => (camp?.factions || []).map(f => ({
         id:f.id, nome:f.nome||f.name||'', immagine:f.immagine||'',
-        tipo:f.tipo||'', attitudine:f.attitudine||'Neutrale', simbolo:f.simbolo||'',
+        tipo:f.tipo||'', creazione:f.creazione||null, attitudine:f.attitudine||'Neutrale', simbolo:f.simbolo||'',
         leader:f.leader||'', sede:f.sede||'',
         obiettivo:f.obiettivo||f.description||'', vero_obiettivo:f.vero_obiettivo||'',
         risorse:f.risorse||'', nemici:f.nemici||'',
@@ -14546,7 +14642,7 @@ const WikiSections = (() => {
         const facs = camp.factions || [];
         const idx = facs.findIndex(f => f.id === item.id);
         const d = { ...(idx>=0?facs[idx]:{}), id:item.id, nome:item.nome, name:item.nome,
-          immagine:item.immagine, tipo:item.tipo, attitudine:item.attitudine, simbolo:item.simbolo,
+          immagine:item.immagine, tipo:item.tipo, creazione:item.creazione||null, attitudine:item.attitudine, simbolo:item.simbolo,
           leader:item.leader, sede:item.sede, obiettivo:item.obiettivo, description:item.obiettivo,
           vero_obiettivo:item.vero_obiettivo, risorse:item.risorse, nemici:item.nemici,
           secret:item.segreto, segreto:item.segreto, noteLibere:item.note,
@@ -14556,7 +14652,7 @@ const WikiSections = (() => {
         try { _mondoToWiki('faction', d, camp); } catch(e) {}
       },
       newItem: () => ({ id:'fac_'+Date.now()+'_'+Math.random().toString(36).slice(2,5),
-        nome:'', tipo:'Gilda', attitudine:'Neutrale', simbolo:'', leader:'', sede:'',
+        nome:'', tipo:'Gilda', creazione:null, attitudine:'Neutrale', simbolo:'', leader:'', sede:'',
         obiettivo:'', vero_obiettivo:'', risorse:'', nemici:'', segreto:'', note:'', tags:[] }),
     },
 
@@ -14759,6 +14855,7 @@ const WikiSections = (() => {
 
         { key: 'numero',        label: 'Numero',             type: 'short' },
         { key: 'data',          label: 'Data',               type: 'short' },
+        { key: 'data_inworld',  label: 'Data in-world',      type: 'date_inworld' },
         { key: 'titolo',        label: 'Titolo sessione',    type: 'short',   hint: 'es. La caduta di Velmoor' },
         { key: 'stato',         label: 'Stato',              type: 'select',  options: ['Pianificata','In corso','Giocata'] },
 
@@ -14788,7 +14885,7 @@ const WikiSections = (() => {
         const sessLog = camp?.sessioni_log || [];
         const fromLog = sessLog.map(s => ({
           id: s.id, nome: 'Sessione ' + s.numero + (s.titolo ? ' — ' + s.titolo : ''),
-          numero: String(s.numero||''), data: s.data||'', titolo: s.titolo||'',
+          numero: String(s.numero||''), data: s.data||'', data_inworld: s.data_inworld||null, titolo: s.titolo||'',
           stato: s.stato==='in_corso' ? 'In corso' : s.stato==='giocata' ? 'Giocata' : 'Pianificata',
           meteo: s.meteo||'',
 
@@ -14827,7 +14924,7 @@ const WikiSections = (() => {
           const sessioni = (camp.sessioni_log||[]).map(s =>
             s.id===item._origId ? { ...s,
               titolo: item.titolo || item.nome.replace(/^Sessione \d+\s*[\u2014-]\s*/, '').replace(/^Sessione \d+$/, ''),
-              data:item.data||'', meteo:item.meteo||'',
+              data:item.data||'', data_inworld:item.data_inworld||null, meteo:item.meteo||'',
               stato:item.stato==='In corso'?'in_corso':item.stato==='Giocata'?'giocata':'pianificata',
 
               png_previsti:item.png_previsti||'', luoghi_previsti:item.luoghi_previsti||'',
@@ -14857,7 +14954,7 @@ const WikiSections = (() => {
         png:'', png_nuovi:'', luoghi_vis:'', successo:'', decisioni:'', lore_rivelata:'',
         recap:'', ganci:'', xp:'', contenuto:'', tags:['sessione'], _source:'wiki' }),
       newItem: () => ({ id:'ws_'+Date.now()+'_'+Math.random().toString(36).slice(2,5),
-        nome:'', numero:'', data:new Date().toISOString().slice(0,10), titolo:'',
+        nome:'', numero:'', data:new Date().toISOString().slice(0,10), data_inworld:null, titolo:'',
         stato:'Pianificata', meteo:'', png_previsti:'', luoghi_previsti:'', fazioni:'',
         obiettivi:'', beat_prep:'', ganci_entrata:'', segreto:'',
         png:'', png_nuovi:'', luoghi_vis:'', successo:'', decisioni:'', lore_rivelata:'',
@@ -15016,6 +15113,8 @@ const WikiSections = (() => {
         // ("amico di @Tizio") — si riusa lo stesso parser delle note libere invece di
         // spezzare ingenuamente per virgola, che riconosceva solo l'elenco puro.
         content = '<span style="font-size:0.88rem;">' + _parseLinks(_escHtml(String(val))) + '</span>';
+      } else if (f.type === 'date_inworld') {
+        content = (val && typeof val === 'object') ? '<span style="font-size:0.88rem;">' + _escHtml(Calendario.formatDate(Calendario.get(), val)) + '</span>' : '';
       } else if (f.type === 'long' || f.type === 'secret') {
         content = '<div style="font-size:0.85rem;line-height:1.7;white-space:pre-wrap;">' + _escHtml(String(val)) + '</div>';
       } else if (f.type === 'select') {
@@ -15052,6 +15151,8 @@ const WikiSections = (() => {
         input = '<textarea id="wsf-' + f.key + '" class="form-textarea" rows="3" style="font-size:0.82rem;line-height:1.6;" oninput="WikiSections._fieldChange(\'' + type + '\',\'' + f.key + '\',this.value)">' + _escHtml(val) + '</textarea>';
       } else if (f.type === 'secret') {
         input = '<textarea id="wsf-' + f.key + '" rows="2" style="width:100%;background:rgba(255,107,107,0.08);border:1px solid rgba(255,107,107,0.3);border-radius:var(--radius-md);padding:8px;font-size:0.82rem;color:var(--text-primary);resize:vertical;" oninput="WikiSections._fieldChange(\'' + type + '\',\'' + f.key + '\',this.value)">' + _escHtml(val) + '</textarea>';
+      } else if (f.type === 'date_inworld') {
+        input = _dateInworldEditHTML(type, f, item[f.key] || null);
       } else {
         input = '<input id="wsf-' + f.key + '" type="text" class="form-input" style="font-size:0.82rem;" value="' + _escHtml(val) + '" placeholder="' + (f.type === 'mention' || f.type === 'mentions' ? 'Scrivi @nome...' : '') + '" oninput="WikiSections._fieldChange(\'' + type + '\',\'' + f.key + '\',this.value)">';
       }
@@ -15316,6 +15417,47 @@ const WikiSections = (() => {
     if (!_currentItem) return;
     _currentItem[key] = value;
     _scheduleAutosave(type);
+  };
+
+  // Campo 'date_inworld': il valore e' {giorno,mese,anno}|null, non una stringa, quindi
+  // non puo' passare da _fieldChange (che assume sempre value stringa da un singolo input).
+  const _dateInworldEditHTML = (type, f, val) => {
+    const cal = Calendario.get();
+    if (!cal || !cal.mesi?.length) {
+      return '<div id="wsf-' + f.key + '-wrap" class="text-muted" style="font-size:0.78rem;padding:6px 0;">Attiva il Calendario (Modifica campagna) per impostare date in-world.</div>';
+    }
+    const d = (val && typeof val === 'object') ? val : null;
+    const mese = d ? Math.max(0, Math.min(d.mese || 0, cal.mesi.length - 1)) : 0;
+    const giorniInMese = cal.mesi[mese]?.giorni || 30;
+    const giorno = d ? Math.max(1, Math.min(d.giorno || 1, giorniInMese)) : 1;
+    const anno = d ? (d.anno ?? cal.anno_base ?? 1) : (cal.anno_base ?? 1);
+    const giornoOpts = Array.from({ length: giorniInMese }, (_, i) => i + 1)
+      .map(g => '<option value="' + g + '"' + (g === giorno ? ' selected' : '') + '>' + g + '</option>').join('');
+    const meseOpts = cal.mesi.map((m, i) => '<option value="' + i + '"' + (i === mese ? ' selected' : '') + '>' + _escHtml(m.it || m.nome) + '</option>').join('');
+    return '<div id="wsf-' + f.key + '-wrap" style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">' +
+      '<select class="form-select" style="font-size:0.8rem;width:auto;" onchange="WikiSections._dateFieldChange(\'' + type + '\',\'' + f.key + '\',\'giorno\',this.value)">' + giornoOpts + '</select>' +
+      '<select class="form-select" style="font-size:0.8rem;width:auto;" onchange="WikiSections._dateFieldChange(\'' + type + '\',\'' + f.key + '\',\'mese\',this.value)">' + meseOpts + '</select>' +
+      '<input type="number" class="form-input" style="font-size:0.8rem;width:88px;" value="' + anno + '" onchange="WikiSections._dateFieldChange(\'' + type + '\',\'' + f.key + '\',\'anno\',this.value)">' +
+      (d ? '<button type="button" class="btn btn-sm" style="font-size:0.72rem;" onclick="WikiSections._dateFieldChange(\'' + type + '\',\'' + f.key + '\',\'clear\',null)">Rimuovi</button>' : '') +
+      '</div>';
+  };
+
+  const _dateFieldChange = (type, key, part, value) => {
+    if (!_currentItem) return;
+    if (part === 'clear') {
+      _currentItem[key] = null;
+    } else {
+      const cal = Calendario.get();
+      const cur = (_currentItem[key] && typeof _currentItem[key] === 'object')
+        ? { ..._currentItem[key] }
+        : { giorno: 1, mese: 0, anno: cal?.anno_base || 1 };
+      cur[part] = parseInt(value, 10) || 0;
+      _currentItem[key] = cur;
+    }
+    _scheduleAutosave(type);
+    const wrap = document.getElementById('wsf-' + key + '-wrap');
+    const f = TYPES[type]?.fields.find(ff => ff.key === key);
+    if (wrap && f) wrap.outerHTML = _dateInworldEditHTML(type, f, _currentItem[key]);
   };
 
   // ── Obiettivi quest: interattivi anche in view, quindi non passano da _fieldChange
@@ -15678,7 +15820,7 @@ const WikiSections = (() => {
 
   return { toggleExpand, goto, gotoTrame, toggleLuoghiView, renderList, openCard, editCard, closeDetail,
     newCard, deleteCard, filter, filterTag, renderCounters, init,
-    _fieldChange, _jumpToEntity, _saveAndView, _parseLinks, _manualSave,
+    _fieldChange, _dateFieldChange, _jumpToEntity, _saveAndView, _parseLinks, _manualSave,
     _refreshImgFieldPreview, _onImageFilePicked,
     _renderDetailPub, _scheduleAutosavePub, _getCfg, _saveWithCustom,
     toggleObiettivo, addObiettivo, editObiettivoText, removeObiettivo,
@@ -18416,13 +18558,594 @@ const Calendario = (() => {
       }
     }
     if (unit === 'mesi') { c.mese += amount; while(c.mese>=c.mesi.length){c.mese-=c.mesi.length;c.anno++;} while(c.mese<0){c.mese+=c.mesi.length;c.anno--;} }
+    if (unit === 'anni') { c.anno += amount; }
     return c;
   };
 
   const save = (cal) => App.saveActiveCampaign({ calendario: cal });
   const get = () => App.getActiveCampaign()?.calendario || null;
 
-  return { initPreset, getDateStr, getTimeStr, advance, save, get, PRESET };
+  // Somma dei giorni di tutti i mesi del preset (varia da preset a preset: es. Greyhawk
+  // ha 16 mesi di lunghezza diversa, gli altri 12 mesi regolari) - serve come "lunghezza
+  // dell'anno" per convertire una data in un numero assoluto comparabile.
+  const daysPerYear = (cal) => (cal?.mesi || []).reduce((s, m) => s + (m.giorni || 30), 0);
+
+  // Converte {giorno,mese,anno} in un intero assoluto ordinabile/comparabile (per Timeline
+  // e countdown deadline). L'indice mese e' clampato: se una data e' stata salvata sotto un
+  // preset con piu' mesi (es. Greyhawk, 16) e la campagna e' poi passata a uno con meno mesi
+  // (es. Fantasy, 12), l'indice fuori range non deve far esplodere il calcolo - il dato resta
+  // "semanticamente impreciso" ma il calcolo non crasha.
+  const toAbsoluteDay = (cal, date) => {
+    if (!cal || !date || !cal.mesi?.length) return null;
+    const mIdx = Math.max(0, Math.min(date.mese || 0, cal.mesi.length - 1));
+    const dayOfYear = cal.mesi.slice(0, mIdx).reduce((s, m) => s + (m.giorni || 30), 0) + ((date.giorno || 1) - 1);
+    return (date.anno || 0) * daysPerYear(cal) + dayOfYear;
+  };
+
+  const diffGiorni = (cal, dateA, dateB) => {
+    const a = toAbsoluteDay(cal, dateA), b = toAbsoluteDay(cal, dateB);
+    return (a == null || b == null) ? null : b - a;
+  };
+
+  // Formatta una data arbitraria (non necessariamente quella corrente della campagna).
+  // Senza calendario attivo (cal null) usa un fallback numerico gg/mm/aaaa.
+  const formatDate = (cal, date) => {
+    if (!date) return '';
+    if (!cal || !cal.mesi?.length) return `${date.giorno}/${(date.mese || 0) + 1}/${date.anno}`;
+    const mIdx = Math.max(0, Math.min(date.mese || 0, cal.mesi.length - 1));
+    const mese = cal.mesi[mIdx];
+    return `${date.giorno} ${mese?.it || mese?.nome || ''} — ${cal.prefisso_anno || ''} ${date.anno}`.replace(/\s+/g, ' ').trim();
+  };
+
+  return { initPreset, getDateStr, getTimeStr, advance, save, get, PRESET, toAbsoluteDay, diffGiorni, formatDate, daysPerYear };
+})();
+
+// Vista mensile + CRUD eventi/deadline del Calendario (sezioni 5.3/5.4 del backlog).
+// Timeline (sezione 6) e' un modulo separato, CalendarioTimeline, per tenere le due
+// responsabilita' distinte pur condividendo la stessa pagina/tab-bar.
+const CalendarioUI = (() => {
+  const CATEGORIE = {
+    '':            { color: 'var(--border-strong)', label: 'Generico' },
+    politico:      { color: '#5ba4f5', label: 'Politico' },
+    combattimento: { color: 'var(--accent-danger)', label: 'Combattimento' },
+    magia:         { color: '#c97bea', label: 'Magia' },
+    disastro:      { color: '#f5a623', label: 'Disastro' },
+    scoperta:      { color: '#69cc85', label: 'Scoperta' },
+    sociale:       { color: '#ff9f43', label: 'Sociale' },
+  };
+  const ENTITA_TIPI = { png: 'PNG', luoghi: 'Luogo', fazioni: 'Fazione', quest: 'Quest', trame: 'Trama' };
+  const ENTITA_TIPI_LIST = Object.keys(ENTITA_TIPI);
+
+  const _esc = (s) => String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+
+  let _viewMese = 0, _viewAnno = 1, _viewInited = false;
+  let _editingId = null;
+  let _editEntita = [];
+
+  const _getEventi = () => App.getActiveCampaign()?.calendarioEventi || [];
+  const _saveEventi = (list) => App.saveActiveCampaign({ calendarioEventi: list });
+
+  const showTab = (tab) => {
+    const btnMese = document.getElementById('cal-tab-mese-btn');
+    const btnTl = document.getElementById('cal-tab-timeline-btn');
+    const paneMese = document.getElementById('calendario-tab-mese');
+    const paneTl = document.getElementById('calendario-tab-timeline');
+    if (btnMese) btnMese.classList.toggle('active', tab === 'mese');
+    if (btnTl) btnTl.classList.toggle('active', tab === 'timeline');
+    if (paneMese) paneMese.style.display = tab === 'mese' ? '' : 'none';
+    if (paneTl) paneTl.style.display = tab === 'timeline' ? '' : 'none';
+    if (tab === 'mese') _renderMese();
+    else { try { CalendarioTimeline.render(); } catch (e) {} }
+  };
+
+  const _ensureViewInit = (cal) => {
+    if (!_viewInited && cal) {
+      _viewMese = cal.mese || 0;
+      _viewAnno = cal.anno ?? cal.anno_base ?? 1;
+      _viewInited = true;
+    }
+  };
+
+  const navMese = (delta) => {
+    const cal = Calendario.get();
+    if (!cal) return;
+    _ensureViewInit(cal);
+    _viewMese += delta;
+    while (_viewMese >= cal.mesi.length) { _viewMese -= cal.mesi.length; _viewAnno++; }
+    while (_viewMese < 0) { _viewMese += cal.mesi.length; _viewAnno--; }
+    _selectedGiorno = null;
+    _renderMese();
+  };
+  const navAnno = (delta) => { _viewAnno += delta; _selectedGiorno = null; _renderMese(); };
+  const oggi = () => {
+    const cal = Calendario.get();
+    if (!cal) return;
+    _viewMese = cal.mese || 0; _viewAnno = cal.anno ?? cal.anno_base ?? 1;
+    _selectedGiorno = null;
+    _renderMese();
+  };
+
+  // Legenda colori condivisa tra vista Mese e Timeline, cosi' i pallini/pillole non
+  // restano un codice muto: senza, l'unico modo per sapere cosa significa un colore
+  // e' aprire ogni evento uno per uno.
+  const _legendaHTML = (conSessione) => {
+    const voci = [
+      '<span style="display:inline-flex;align-items:center;gap:5px;font-size:0.72rem;color:var(--text-secondary);"><span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--accent-danger);flex-shrink:0;"></span>Deadline</span>',
+    ];
+    Object.keys(CATEGORIE).filter(k => k).forEach(k => {
+      voci.push('<span style="display:inline-flex;align-items:center;gap:5px;font-size:0.72rem;color:var(--text-secondary);"><span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:' + CATEGORIE[k].color + ';flex-shrink:0;"></span>' + _esc(CATEGORIE[k].label) + '</span>');
+    });
+    if (conSessione) voci.push('<span style="display:inline-flex;align-items:center;gap:5px;font-size:0.72rem;color:var(--text-secondary);"><span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:#5ba4f5;flex-shrink:0;"></span>Sessione</span>');
+    return '<div style="display:flex;flex-wrap:wrap;gap:14px;padding:8px 0;margin-bottom:10px;border-bottom:1px solid var(--border);">' + voci.join('') + '</div>';
+  };
+
+  let _selectedGiorno = null;
+
+  const _renderMese = () => {
+    const el = document.getElementById('calendario-tab-mese');
+    if (!el) return;
+    const cal = Calendario.get();
+    if (!cal || !cal.mesi?.length) {
+      el.innerHTML = '<div class="module-placeholder"><h3>Calendario non attivo</h3><p class="text-muted" style="font-size:0.85rem;">Attiva il Calendario in-game dalle impostazioni della campagna (Modifica campagna) per usare questa vista.</p></div>';
+      return;
+    }
+    _ensureViewInit(cal);
+    if (_viewMese >= cal.mesi.length) _viewMese = cal.mesi.length - 1;
+    if (_viewMese < 0) _viewMese = 0;
+    const mese = cal.mesi[_viewMese];
+    const giorniInMese = mese?.giorni || 30;
+    const eventi = _getEventi().filter(e => e.data && e.data.mese === _viewMese && e.data.anno === _viewAnno);
+    const eventiPerGiorno = {};
+    eventi.forEach(e => { (eventiPerGiorno[e.data.giorno] = eventiPerGiorno[e.data.giorno] || []).push(e); });
+
+    const nGiorniSett = cal.giorni_settimana?.length || 7;
+    const primoGiornoAssoluto = Calendario.toAbsoluteDay(cal, { giorno: 1, mese: _viewMese, anno: _viewAnno });
+    const offset = ((primoGiornoAssoluto % nGiorniSett) + nGiorniSett) % nGiorniSett;
+
+    let celle = '';
+    for (let i = 0; i < offset; i++) celle += '<div></div>';
+    for (let g = 1; g <= giorniInMese; g++) {
+      const evs = eventiPerGiorno[g] || [];
+      const isOggi = cal.giorno === g && cal.mese === _viewMese && cal.anno === _viewAnno;
+      const isSelected = _selectedGiorno === g;
+      const pills = evs.slice(0, 2).map(e => {
+        const cat = CATEGORIE[e.categoria] || CATEGORIE[''];
+        const colore = e.tipo === 'deadline' ? 'var(--accent-danger)' : cat.color;
+        const titolo = e.titolo || '(senza titolo)';
+        return '<div style="font-size:0.64rem;line-height:1.3;padding:1px 4px;margin-top:2px;border-radius:2px;border-left:3px solid ' + colore + ';background:var(--bg-tertiary);color:var(--text-secondary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="' + _esc(titolo) + '">' + _esc(titolo.length > 15 ? titolo.slice(0, 14) + '…' : titolo) + '</div>';
+      }).join('');
+      const extra = evs.length > 2 ? '<div style="font-size:0.62rem;color:var(--text-muted);margin-top:1px;">+' + (evs.length - 2) + ' altri</div>' : '';
+      const festa = (cal.festivita || []).find(f => f.mese === _viewMese && f.giorno === g);
+      celle += '<div id="cal-day-' + g + '" style="min-height:92px;border:' + (isOggi ? '2px solid var(--accent-primary)' : isSelected ? '2px solid var(--accent-secondary)' : '1px solid var(--border)') + ';border-radius:var(--radius-sm);padding:5px;cursor:pointer;' +
+        (isOggi ? 'background:var(--bg-tertiary);' : '') + '" onclick="CalendarioUI.openDay(' + g + ')">' +
+        '<div style="display:flex;align-items:center;justify-content:space-between;">' +
+          '<span style="font-size:0.82rem;font-weight:700;' + (isOggi ? 'color:var(--accent-primary);' : '') + '">' + g + '</span>' +
+          (isOggi ? '<span style="font-size:0.55rem;font-weight:700;letter-spacing:0.04em;color:var(--accent-primary);">OGGI</span>' : '') +
+        '</div>' +
+        (festa ? '<div style="font-size:0.62rem;color:var(--text-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="' + _esc(festa.nome) + '">' + _esc(festa.nome) + '</div>' : '') +
+        pills + extra +
+        '</div>';
+    }
+
+    const headerGiorni = (cal.giorni_settimana || []).map(g => '<div style="font-size:0.72rem;font-weight:600;color:var(--text-secondary);text-align:center;padding-bottom:4px;">' + _esc(String(g).slice(0, 3)) + '</div>').join('');
+
+    el.innerHTML =
+      '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px;">' +
+        '<div style="display:flex;align-items:center;gap:4px;">' +
+          '<button class="btn btn-ghost btn-icon-sm" onclick="CalendarioUI.navAnno(-1)" title="Anno precedente">«</button>' +
+          '<button class="btn btn-ghost btn-icon-sm" onclick="CalendarioUI.navMese(-1)" title="Mese precedente">‹</button>' +
+          '<div style="font-family:var(--font-display);font-size:1.05rem;min-width:200px;text-align:center;">' + _esc(mese?.it || mese?.nome || '') + ' — ' + _esc(cal.prefisso_anno || '') + ' ' + _viewAnno + '</div>' +
+          '<button class="btn btn-ghost btn-icon-sm" onclick="CalendarioUI.navMese(1)" title="Mese successivo">›</button>' +
+          '<button class="btn btn-ghost btn-icon-sm" onclick="CalendarioUI.navAnno(1)" title="Anno successivo">»</button>' +
+        '</div>' +
+        '<div style="display:flex;gap:6px;">' +
+          '<button class="btn btn-secondary btn-sm" onclick="CalendarioUI.oggi()">Vai a oggi</button>' +
+          '<button class="btn btn-primary btn-sm" onclick="CalendarioUI.newEvento()">+ Nuovo evento</button>' +
+        '</div>' +
+      '</div>' +
+      _legendaHTML(false) +
+      '<div style="display:grid;grid-template-columns:repeat(' + nGiorniSett + ',1fr);gap:2px;margin-bottom:4px;">' + headerGiorni + '</div>' +
+      '<div style="display:grid;grid-template-columns:repeat(' + nGiorniSett + ',1fr);gap:4px;">' + celle + '</div>' +
+      '<div id="calendario-day-panel" style="margin-top:16px;"></div>';
+  };
+
+  const openDay = (giorno) => {
+    const cal = Calendario.get();
+    if (!cal) return;
+    const panel = document.getElementById('calendario-day-panel');
+    if (!panel) return;
+
+    // Evidenzia la cella cliccata cosi' resta visibile un collegamento tra il click e il
+    // pannello sotto, anche in mesi con piu' righe dove altrimenti il click sarebbe "muto".
+    const prevSel = _selectedGiorno;
+    _selectedGiorno = giorno;
+    const prevEl = prevSel ? document.getElementById('cal-day-' + prevSel) : null;
+    if (prevEl && prevSel !== cal.giorno) prevEl.style.border = '1px solid var(--border)';
+    else if (prevEl) prevEl.style.border = '2px solid var(--accent-primary)';
+    const curEl = document.getElementById('cal-day-' + giorno);
+    if (curEl && giorno !== cal.giorno) curEl.style.border = '2px solid var(--accent-secondary)';
+
+    const eventi = _getEventi().filter(e => e.data && e.data.giorno === giorno && e.data.mese === _viewMese && e.data.anno === _viewAnno);
+    const mese = cal.mesi[_viewMese];
+    const titolo = giorno + ' ' + (mese?.it || mese?.nome || '') + ' — ' + (cal.prefisso_anno || '') + ' ' + _viewAnno;
+    panel.innerHTML = '<div class="card" style="padding:14px;border:1px solid var(--accent-secondary);">' +
+      '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">' +
+        '<div style="font-family:var(--font-display);font-size:0.95rem;">' + _esc(titolo) + '</div>' +
+        '<button class="btn btn-secondary btn-sm" onclick="CalendarioUI.newEvento(' + giorno + ')">+ Aggiungi evento</button>' +
+      '</div>' +
+      (eventi.length ? eventi.map(e => {
+        const cat = CATEGORIE[e.categoria] || CATEGORIE[''];
+        return '<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-top:1px solid var(--border);cursor:pointer;" onclick="CalendarioUI.editEvento(\'' + e.id + '\')">' +
+          '<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:' + (e.tipo === 'deadline' ? 'var(--accent-danger)' : cat.color) + ';flex-shrink:0;"></span>' +
+          '<span style="font-size:0.85rem;flex:1;">' + _esc(e.titolo || '(senza titolo)') + '</span>' +
+          '<span class="text-muted" style="font-size:0.7rem;">' + (e.tipo === 'deadline' ? 'Deadline' : cat.label) + '</span>' +
+        '</div>';
+      }).join('') : '<div class="text-muted" style="font-size:0.82rem;">Nessun evento in questo giorno.</div>') +
+      '</div>';
+  };
+
+  const _populateCategorieSelect = () => {
+    const sel = document.getElementById('cev-categoria');
+    if (!sel) return;
+    sel.innerHTML = Object.keys(CATEGORIE).map(k => '<option value="' + k + '">' + _esc(CATEGORIE[k].label) + '</option>').join('');
+  };
+
+  const _populateDataSelects = (cal, data) => {
+    const wrap = document.getElementById('cev-data-wrap');
+    if (!wrap) return;
+    const mese = Math.max(0, Math.min(data?.mese ?? cal.mese ?? 0, cal.mesi.length - 1));
+    const giorniInMese = cal.mesi[mese]?.giorni || 30;
+    const giorno = Math.max(1, Math.min(data?.giorno ?? cal.giorno ?? 1, giorniInMese));
+    const anno = data?.anno ?? cal.anno ?? cal.anno_base ?? 1;
+    const giornoOpts = Array.from({ length: giorniInMese }, (_, i) => i + 1).map(g => '<option value="' + g + '"' + (g === giorno ? ' selected' : '') + '>' + g + '</option>').join('');
+    const meseOpts = cal.mesi.map((m, i) => '<option value="' + i + '"' + (i === mese ? ' selected' : '') + '>' + _esc(m.it || m.nome) + '</option>').join('');
+    wrap.innerHTML =
+      '<select id="cev-giorno" class="form-select" style="width:auto;">' + giornoOpts + '</select>' +
+      '<select id="cev-mese" class="form-select" style="width:auto;" onchange="CalendarioUI._onMeseSelectChange()">' + meseOpts + '</select>' +
+      '<input type="number" id="cev-anno" class="form-input" style="width:90px;" value="' + anno + '">';
+  };
+
+  const _onMeseSelectChange = () => {
+    const cal = Calendario.get();
+    if (!cal) return;
+    const meseSel = document.getElementById('cev-mese');
+    const annoInput = document.getElementById('cev-anno');
+    const mese = parseInt(meseSel?.value, 10) || 0;
+    const anno = parseInt(annoInput?.value, 10) || (cal.anno_base || 1);
+    _populateDataSelects(cal, { giorno: 1, mese, anno });
+  };
+
+  const _populateEntitaTipoSelect = () => {
+    const sel = document.getElementById('cev-entita-tipo');
+    if (!sel) return;
+    sel.innerHTML = ENTITA_TIPI_LIST.map(t => '<option value="' + t + '">' + ENTITA_TIPI[t] + '</option>').join('');
+    _populateEntitaNome();
+  };
+
+  const _populateEntitaNome = () => {
+    const tipoSel = document.getElementById('cev-entita-tipo');
+    const nomeSel = document.getElementById('cev-entita-nome');
+    if (!tipoSel || !nomeSel) return;
+    const tipo = tipoSel.value;
+    const camp = App.getActiveCampaign();
+    let items = [];
+    if (tipo === 'trame') items = (camp?.trame || []).map(t => ({ id: t.id, nome: t.titolo || t.nome || '(senza titolo)' }));
+    else { try { items = (WikiSections._getCfg(tipo)?.getData(camp) || []).map(x => ({ id: x.id, nome: x.nome })); } catch (e) { items = []; } }
+    nomeSel.innerHTML = items.map(x => '<option value="' + x.id + '">' + _esc(x.nome) + '</option>').join('') || '<option value="">(nessuno)</option>';
+  };
+
+  const _renderEntitaChips = () => {
+    const list = document.getElementById('cev-entita-list');
+    if (!list) return;
+    list.innerHTML = _editEntita.map(e =>
+      '<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;background:var(--bg-tertiary);border-radius:var(--radius-full);font-size:0.75rem;cursor:pointer;" onclick="CalendarioUI.openEntita(\'' + e.tipo + '\',\'' + e.id + '\')">' +
+        ENTITA_TIPI[e.tipo] + ': ' + _esc(e.nome) +
+        '<button type="button" onclick="event.stopPropagation();CalendarioUI.removeEntita(\'' + e.tipo + '\',\'' + e.id + '\')" style="background:none;border:none;cursor:pointer;color:var(--text-muted);padding:0;line-height:1;">×</button>' +
+      '</span>'
+    ).join('') || '<span class="text-muted" style="font-size:0.78rem;">Nessuna entità collegata.</span>';
+  };
+
+  const addEntita = () => {
+    const tipoSel = document.getElementById('cev-entita-tipo');
+    const nomeSel = document.getElementById('cev-entita-nome');
+    if (!tipoSel || !nomeSel || !nomeSel.value) return;
+    const tipo = tipoSel.value, id = nomeSel.value, nome = nomeSel.options[nomeSel.selectedIndex]?.textContent || '';
+    if (_editEntita.some(e => e.tipo === tipo && e.id === id)) return;
+    _editEntita.push({ tipo, id, nome });
+    _renderEntitaChips();
+  };
+
+  const removeEntita = (tipo, id) => {
+    _editEntita = _editEntita.filter(e => !(e.tipo === tipo && e.id === id));
+    _renderEntitaChips();
+  };
+
+  const openEntita = (tipo, id) => {
+    Modal.close('calendario-evento');
+    if (tipo === 'trame') { WikiSections.gotoTrame(); setTimeout(() => Trame.openTrama(id), 150); return; }
+    WikiSections.goto(tipo);
+    setTimeout(() => WikiSections.openCard(tipo, id), 150);
+  };
+
+  const _onTipoChange = () => {
+    const tipo = document.getElementById('cev-tipo')?.value;
+    const wrap = document.getElementById('cev-promemoria-wrap');
+    if (wrap) wrap.style.display = tipo === 'deadline' ? '' : 'none';
+  };
+
+  const newEvento = (giorno) => {
+    const cal = Calendario.get();
+    if (!cal) { Toast.show('Attiva il Calendario per creare eventi', 'warning'); return; }
+    _editingId = null;
+    _editEntita = [];
+    document.getElementById('cev-id').value = '';
+    document.getElementById('cev-title').textContent = 'Nuovo evento';
+    document.getElementById('cev-titolo').value = '';
+    document.getElementById('cev-tipo').value = 'evento';
+    document.getElementById('cev-layer').value = 'campagna';
+    document.getElementById('cev-descrizione').value = '';
+    document.getElementById('cev-promemoria').value = 3;
+    document.getElementById('cev-completata').checked = false;
+    document.getElementById('cev-completata-wrap').style.display = 'none';
+    document.getElementById('cev-delete-btn').style.display = 'none';
+    _populateCategorieSelect();
+    _populateDataSelects(cal, giorno ? { giorno, mese: _viewMese, anno: _viewAnno } : { giorno: cal.giorno, mese: _viewMese, anno: _viewAnno });
+    _populateEntitaTipoSelect();
+    _renderEntitaChips();
+    _onTipoChange();
+    Modal.open('calendario-evento');
+  };
+
+  const editEvento = (id) => {
+    const ev = _getEventi().find(e => e.id === id);
+    if (!ev) return;
+    const cal = Calendario.get();
+    _editingId = id;
+    _editEntita = [...(ev.entita || [])];
+    document.getElementById('cev-id').value = ev.id;
+    document.getElementById('cev-title').textContent = 'Modifica evento';
+    document.getElementById('cev-titolo').value = ev.titolo || '';
+    document.getElementById('cev-tipo').value = ev.tipo || 'evento';
+    document.getElementById('cev-layer').value = ev.layer || 'campagna';
+    document.getElementById('cev-descrizione').value = ev.descrizione || '';
+    document.getElementById('cev-promemoria').value = ev.promemoriaGiorni ?? 3;
+    document.getElementById('cev-completata').checked = !!ev.completata;
+    document.getElementById('cev-completata-wrap').style.display = '';
+    document.getElementById('cev-delete-btn').style.display = '';
+    _populateCategorieSelect();
+    document.getElementById('cev-categoria').value = ev.categoria || '';
+    _populateDataSelects(cal, ev.data);
+    _populateEntitaTipoSelect();
+    _renderEntitaChips();
+    _onTipoChange();
+    Modal.open('calendario-evento');
+  };
+
+  const saveEvento = () => {
+    const cal = Calendario.get();
+    if (!cal) return;
+    const id = document.getElementById('cev-id').value || ('cev_' + Date.now() + '_' + Math.random().toString(36).slice(2, 5));
+    const giorno = parseInt(document.getElementById('cev-giorno')?.value, 10) || 1;
+    const mese = parseInt(document.getElementById('cev-mese')?.value, 10) || 0;
+    const anno = parseInt(document.getElementById('cev-anno')?.value, 10) || (cal.anno_base || 1);
+    const list = _getEventi();
+    const idx = list.findIndex(e => e.id === id);
+    const titolo = document.getElementById('cev-titolo').value.trim();
+    if (!titolo) { Toast.show('Serve un titolo', 'warning'); return; }
+    const ev = {
+      id,
+      titolo,
+      descrizione: document.getElementById('cev-descrizione').value,
+      tipo: document.getElementById('cev-tipo').value,
+      layer: document.getElementById('cev-layer').value,
+      categoria: document.getElementById('cev-categoria').value,
+      data: { giorno, mese, anno },
+      entita: [..._editEntita],
+      promemoriaGiorni: parseInt(document.getElementById('cev-promemoria').value, 10) || 0,
+      completata: !!document.getElementById('cev-completata').checked,
+      creatoAt: idx >= 0 ? list[idx].creatoAt : Date.now(),
+      aggiornatoAt: Date.now(),
+    };
+    if (idx >= 0) list[idx] = ev; else list.push(ev);
+    _saveEventi(list);
+    Modal.close('calendario-evento');
+    Toast.show('Evento salvato', 'success', 1500);
+    _renderMese();
+    openDay(giorno);
+  };
+
+  const deleteEventoCorrente = () => {
+    if (!_editingId) return;
+    const id = _editingId;
+    Modal.close('calendario-evento');
+    openConfirmModal('Eliminare evento?', 'Eliminare questo evento dal calendario?', () => {
+      _saveEventi(_getEventi().filter(e => e.id !== id));
+      _renderMese();
+    });
+  };
+
+  return {
+    showTab, navMese, navAnno, oggi, openDay,
+    newEvento, editEvento, saveEvento, deleteEventoCorrente,
+    addEntita, removeEntita, openEntita,
+    _onMeseSelectChange, _onTipoChange, _populateEntitaNome,
+    _renderMese, _getEventi, getCategorie: () => CATEGORIE, legendaHTML: _legendaHTML,
+  };
+})();
+
+// Timeline visuale (sezione 6 del backlog): asse cronologico in-world sopra gli stessi
+// camp.calendarioEventi di CalendarioUI, piu' le sessioni con data_inworld impostata.
+// Modulo separato da CalendarioUI perche' ha una responsabilita' diversa (visualizzazione
+// aggregata vs CRUD), pur condividendo dati/pagina/tab-bar.
+const CalendarioTimeline = (() => {
+  let _zoomBehavior = null;
+
+  const _esc = (s) => String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+
+  const _populateFiltri = (camp) => {
+    const catSel = document.getElementById('catl-categoria');
+    const entSel = document.getElementById('catl-entita');
+    if (catSel && !catSel.options.length) {
+      const CATEGORIE = CalendarioUI.getCategorie();
+      catSel.innerHTML = '<option value="">Tutte le categorie</option>' +
+        Object.keys(CATEGORIE).filter(k => k).map(k => '<option value="' + k + '">' + _esc(CATEGORIE[k].label) + '</option>').join('');
+    }
+    if (entSel) {
+      const seen = new Map();
+      (camp.calendarioEventi || []).forEach(e => (e.entita || []).forEach(x => seen.set(x.tipo + ':' + x.id, x)));
+      const cur = entSel.value;
+      entSel.innerHTML = '<option value="">Tutte le entità</option>' +
+        [...seen.entries()].map(([key, x]) => '<option value="' + key + '">' + _esc(x.nome) + '</option>').join('');
+      if ([...seen.keys()].includes(cur)) entSel.value = cur;
+    }
+  };
+
+  const _collectEventi = (camp, cal) => {
+    const showCampagna = document.getElementById('catl-layer-campagna')?.checked ?? true;
+    const showMondo = document.getElementById('catl-layer-mondo')?.checked ?? true;
+    const showSessioni = document.getElementById('catl-sessioni')?.checked ?? true;
+    const categoriaFiltro = document.getElementById('catl-categoria')?.value || '';
+    const entitaFiltro = document.getElementById('catl-entita')?.value || '';
+
+    let items = (camp.calendarioEventi || [])
+      .filter(e => e.data)
+      .filter(e => (e.layer === 'mondo' ? showMondo : showCampagna))
+      .filter(e => !categoriaFiltro || e.categoria === categoriaFiltro)
+      .filter(e => !entitaFiltro || (e.entita || []).some(x => (x.tipo + ':' + x.id) === entitaFiltro))
+      .map(e => ({ id: e.id, titolo: e.titolo, tipo: e.tipo, categoria: e.categoria, data: e.data, entita: e.entita || [], _kind: 'evento' }));
+
+    if (showSessioni && !entitaFiltro) {
+      const sess = (camp.sessioni_log || [])
+        .filter(s => s.data_inworld)
+        .map(s => ({ id: s.id, titolo: 'Sessione ' + s.numero + (s.titolo ? ' — ' + s.titolo : ''), tipo: 'sessione', categoria: '', data: s.data_inworld, entita: [], _kind: 'sessione' }));
+      items = items.concat(sess);
+    }
+
+    items.forEach(it => { it._abs = Calendario.toAbsoluteDay(cal, it.data); });
+    items = items.filter(it => it._abs !== null).sort((a, b) => a._abs - b._abs);
+    return items;
+  };
+
+  const _open = (it) => {
+    if (it._kind === 'sessione') {
+      App.navigateTo('wiki-sessioni');
+      setTimeout(() => { try { WikiSections.openCard('sessioni', it.id); } catch (e) {} }, 150);
+      return;
+    }
+    if (it.entita && it.entita.length) CalendarioUI.openEntita(it.entita[0].tipo, it.entita[0].id);
+    else CalendarioUI.editEvento(it.id);
+  };
+
+  const _setEmpty = (titolo, testo) => {
+    const el = document.getElementById('calendario-timeline-empty');
+    const svgWrap = document.getElementById('calendario-timeline-wrap');
+    const legend = document.getElementById('calendario-timeline-legend');
+    if (el) {
+      el.style.display = '';
+      const h3 = el.querySelector('h3'), p = el.querySelector('p');
+      if (h3) h3.textContent = titolo;
+      if (p) p.textContent = testo;
+    }
+    if (svgWrap) svgWrap.style.display = 'none';
+    if (legend) legend.innerHTML = '';
+  };
+
+  const render = () => {
+    const camp = App.getActiveCampaign();
+    const cal = Calendario.get();
+    if (!camp || !cal || !cal.mesi?.length) {
+      _setEmpty('Calendario non attivo', 'Attiva il Calendario in-game dalle impostazioni della campagna per usare la Timeline.');
+      return;
+    }
+    _populateFiltri(camp);
+    const items = _collectEventi(camp, cal);
+    if (!items.length) {
+      _setEmpty('Nessun evento', 'Crea eventi dalla vista Mese o aggiungi date in-world alle entità per popolare la timeline.');
+      return;
+    }
+    const emptyEl = document.getElementById('calendario-timeline-empty');
+    const svgWrap = document.getElementById('calendario-timeline-wrap');
+    const legendEl = document.getElementById('calendario-timeline-legend');
+    if (emptyEl) emptyEl.style.display = 'none';
+    if (svgWrap) svgWrap.style.display = '';
+    if (legendEl) legendEl.innerHTML = CalendarioUI.legendaHTML(true);
+
+    const svg = document.getElementById('calendario-timeline-svg');
+    if (!svg) return;
+    if (!svg.clientWidth) { setTimeout(render, 100); return; }
+    const W = svg.clientWidth || 800, H = 260, MARGIN = 50;
+    while (svg.firstChild) svg.removeChild(svg.firstChild);
+
+    const minAbs = items[0]._abs, maxAbs = items[items.length - 1]._abs;
+    const span = Math.max(1, maxAbs - minAbs);
+    const x0 = MARGIN, x1 = W - MARGIN;
+    const xFor = (abs) => x0 + (span === 0 ? (x1 - x0) / 2 : ((abs - minAbs) / span) * (x1 - x0));
+
+    const CATEGORIE = CalendarioUI.getCategorie();
+    const colorFor = (it) => it._kind === 'sessione' ? '#5ba4f5' : (it.tipo === 'deadline' ? 'var(--accent-danger)' : (CATEGORIE[it.categoria] || CATEGORIE['']).color);
+    const label = (it) => it.titolo.length > 18 ? it.titolo.slice(0, 16) + '…' : it.titolo;
+
+    if (typeof d3 === 'undefined') {
+      const ns = 'http://www.w3.org/2000/svg';
+      const axis = document.createElementNS(ns, 'line');
+      axis.setAttribute('x1', x0); axis.setAttribute('x2', x1); axis.setAttribute('y1', H / 2); axis.setAttribute('y2', H / 2);
+      axis.setAttribute('stroke', 'var(--border-strong)'); axis.setAttribute('stroke-width', '2');
+      svg.appendChild(axis);
+      items.forEach((it, i) => {
+        const x = xFor(it._abs), yOff = (i % 2 === 0) ? -1 : 1, y = H / 2 + yOff * 40;
+        const ln = document.createElementNS(ns, 'line');
+        ln.setAttribute('x1', x); ln.setAttribute('x2', x); ln.setAttribute('y1', H / 2); ln.setAttribute('y2', y);
+        ln.setAttribute('stroke', 'var(--border)'); svg.appendChild(ln);
+        const c = document.createElementNS(ns, 'circle');
+        c.setAttribute('cx', x); c.setAttribute('cy', y); c.setAttribute('r', 7);
+        c.setAttribute('fill', colorFor(it)); c.style.cursor = 'pointer';
+        c.onclick = () => _open(it);
+        svg.appendChild(c);
+        const t = document.createElementNS(ns, 'text');
+        t.setAttribute('x', x); t.setAttribute('y', y + (yOff > 0 ? 18 : -12));
+        t.setAttribute('text-anchor', 'middle'); t.setAttribute('font-size', '10'); t.setAttribute('fill', 'var(--text-secondary)');
+        t.textContent = label(it);
+        svg.appendChild(t);
+      });
+      return;
+    }
+
+    const d3svg = d3.select(svg);
+    const g = d3svg.append('g');
+    _zoomBehavior = d3.zoom().scaleExtent([0.2, 20]).on('zoom', e => g.attr('transform', e.transform));
+    d3svg.call(_zoomBehavior);
+
+    g.append('line').attr('x1', x0).attr('x2', x1).attr('y1', H / 2).attr('y2', H / 2)
+      .attr('stroke', 'var(--border-strong)').attr('stroke-width', 2);
+
+    const nodes = g.selectAll('g.tl-node').data(items).enter().append('g').attr('cursor', 'pointer')
+      .on('click', (e, d) => _open(d));
+
+    nodes.each(function (d, i) {
+      const x = xFor(d._abs), yOff = (i % 2 === 0) ? -1 : 1, y = H / 2 + yOff * 40;
+      const sel = d3.select(this);
+      sel.append('line').attr('x1', x).attr('x2', x).attr('y1', H / 2).attr('y2', y).attr('stroke', 'var(--border)');
+      sel.append('circle').attr('cx', x).attr('cy', y).attr('r', 7).attr('fill', colorFor(d)).attr('stroke', '#1a1a1a').attr('stroke-width', 1.5);
+      sel.append('text').attr('x', x).attr('y', y + (yOff > 0 ? 18 : -12)).attr('text-anchor', 'middle').attr('font-size', 10).attr('fill', 'var(--text-secondary)')
+        .text(label(d));
+    });
+  };
+
+  const _zoomBy = (factor) => {
+    const svg = document.getElementById('calendario-timeline-svg');
+    if (svg && _zoomBehavior && typeof d3 !== 'undefined') {
+      const center = [svg.clientWidth / 2, svg.clientHeight / 2];
+      d3.select(svg).transition().duration(200).call(_zoomBehavior.scaleBy, factor, center);
+    }
+  };
+  const zoomIn = () => _zoomBy(1.4);
+  const zoomOut = () => _zoomBy(1 / 1.4);
+  const zoomReset = () => {
+    const svg = document.getElementById('calendario-timeline-svg');
+    if (svg && _zoomBehavior && typeof d3 !== 'undefined') d3.select(svg).transition().duration(200).call(_zoomBehavior.transform, d3.zoomIdentity);
+  };
+
+  return { render, zoomIn, zoomOut, zoomReset };
 })();
 
 const NoteSessione = (() => {
@@ -19073,6 +19796,11 @@ document.addEventListener('DOMContentLoaded', initMobileNav);
       </div>
 
       <div class="form-group">
+        <label class="form-label">Data in-world</label>
+        <div id="sl-data-inworld-wrap"></div>
+      </div>
+
+      <div class="form-group">
         <label class="form-label">Titolo</label>
         <input type="text" id="sl-titolo" class="form-input" placeholder="es. La taverna di Waterdeep">
       </div>
@@ -19108,6 +19836,73 @@ document.addEventListener('DOMContentLoaded', initMobileNav);
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="Modal.close('session-log')">Annulla</button>
       <button class="btn btn-primary" onclick="SessioniLog.save()">Salva Sessione</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- Modal: Evento/Deadline Calendario -->
+<div class="modal-overlay hidden" id="modal-calendario-evento" style="display:none;" onclick="if(event.target===this)Modal.close('calendario-evento')">
+  <div class="modal" style="max-width:560px;">
+    <div class="modal-header">
+      <h3 class="modal-title" id="cev-title">Nuovo evento</h3>
+      <button class="btn btn-ghost btn-icon-sm" onclick="Modal.close('calendario-evento')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="modal-body" style="display:flex;flex-direction:column;gap:12px;">
+      <input type="hidden" id="cev-id">
+      <div class="form-group">
+        <label class="form-label">Titolo</label>
+        <input type="text" id="cev-titolo" class="form-input" placeholder="es. Il patto scade">
+      </div>
+      <div class="grid-2" style="gap:10px;">
+        <div class="form-group">
+          <label class="form-label">Tipo</label>
+          <select id="cev-tipo" class="form-select" onchange="CalendarioUI._onTipoChange()">
+            <option value="evento">Evento</option>
+            <option value="deadline">Deadline</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Categoria</label>
+          <select id="cev-categoria" class="form-select"></select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Layer<span style="font-weight:400;color:var(--text-muted);font-size:0.65rem;margin-left:6px;">"Storia del mondo" per eventi storici/passati, "Cronaca campagna" per ciò che succede durante le sessioni</span></label>
+        <select id="cev-layer" class="form-select">
+          <option value="campagna">Cronaca campagna</option>
+          <option value="mondo">Storia del mondo</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Data (in-world)</label>
+        <div id="cev-data-wrap" style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;"></div>
+      </div>
+      <div class="form-group" id="cev-promemoria-wrap">
+        <label class="form-label">Avvisa quanti giorni prima (deadline)</label>
+        <input type="number" id="cev-promemoria" class="form-input" min="0" value="3" style="max-width:120px;">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Descrizione</label>
+        <textarea id="cev-descrizione" class="form-textarea" rows="3"></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Entità collegate</label>
+        <div id="cev-entita-list" style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px;"></div>
+        <div style="display:flex;gap:6px;">
+          <select id="cev-entita-tipo" class="form-select" style="max-width:140px;" onchange="CalendarioUI._populateEntitaNome()"></select>
+          <select id="cev-entita-nome" class="form-select"></select>
+          <button type="button" class="btn btn-secondary btn-sm" onclick="CalendarioUI.addEntita()">Aggiungi</button>
+        </div>
+      </div>
+      <label style="display:flex;align-items:center;gap:6px;font-size:0.82rem;" id="cev-completata-wrap">
+        <input type="checkbox" id="cev-completata"> Completata / gestita
+      </label>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" id="cev-delete-btn" onclick="CalendarioUI.deleteEventoCorrente()" style="margin-right:auto;color:var(--accent-danger);">Elimina</button>
+      <button class="btn btn-ghost" onclick="Modal.close('calendario-evento')">Annulla</button>
+      <button class="btn btn-primary" onclick="CalendarioUI.saveEvento()">Salva</button>
     </div>
   </div>
 </div>
@@ -19417,6 +20212,7 @@ document.addEventListener('DOMContentLoaded', initMobileNav);
 <script src="js/fili-sospesi.js"></script>
 <script src="js/scheda-rapida.js"></script>
 <script src="js/previously-on.js"></script>
+<script src="js/prossime-scadenze.js"></script>
 
 </body>
 </html>
