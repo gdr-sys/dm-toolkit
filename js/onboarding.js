@@ -57,6 +57,9 @@ const Onboarding = (() => {
             '</div>'
           ).join('') +
         '</div>' +
+        '<div class="modal-footer" style="justify-content:flex-start;border-top:1px solid var(--border);">' +
+          '<button class="btn btn-ghost btn-sm" onclick="Modal.close(\'onboarding\');BugReport.open()">Hai trovato un problema? Segnalalo</button>' +
+        '</div>' +
       '</div>';
     document.body.appendChild(overlay);
   };
