@@ -16613,6 +16613,13 @@ const Trame = (() => {
   return { newTrama, deleteTrama, openTrama, edit, saveCurrent, closeDetail, render, renderList };
 })();
 
+// Apre una card Wiki (quest/png/sessioni) dai quick-link della Dashboard, stesso pattern
+// goto+openCard gia' usato altrove (fili-sospesi.js, prossime-scadenze.js, ecc).
+const _openWikiCard = (type, id) => {
+  WikiSections.goto(type);
+  setTimeout(() => { try { WikiSections.openCard(type, id); } catch (e) {} }, 150);
+};
+
 const renderDashboard = () => {
   const camp = App.getActiveCampaign();
   if (!camp) return;
@@ -16686,7 +16693,7 @@ const renderDashboard = () => {
 
   document.querySelectorAll('.dash-q-item').forEach(function(el){el.addEventListener('click',function(){_openWikiCard('quest',this.dataset.id);});});
   document.querySelectorAll('.dash-n-item').forEach(function(el){el.addEventListener('click',function(){_openWikiCard('png',this.dataset.id);});});
-  document.querySelectorAll('.dash-sess-open').forEach(function(el){el.addEventListener('click',function(){_openSessFromDash(this.dataset.id);});});
+  document.querySelectorAll('.dash-sess-open').forEach(function(el){el.addEventListener('click',function(){_openWikiCard('sessioni',this.dataset.id);});});
 
   var dashClocks = document.getElementById('dash-clocks-preview');
   if (dashClocks) {
@@ -19713,7 +19720,7 @@ document.addEventListener('DOMContentLoaded', initMobileNav);
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="Modal.close('gdrive-setup')">Annulla</button>
-      <button class="btn btn-primary" onclick="GDrive._saveClientId()">Salva e connetti</button>
+      <button class="btn btn-primary" onclick="GDrive.setClientId(document.getElementById('gdrive-client-id-input').value)">Salva e connetti</button>
     </div>
   </div>
 </div>
