@@ -14547,7 +14547,7 @@ const WikiSections = (() => {
         gancio: n.gancio || '',
         segreto: n.secret || n.segreto || '',
         note: n.noteLibere || '', tags: n.tags || [],
-        campi_custom: n.campi_custom || [], _source: 'mondo',
+        campi_custom: n.campi_custom || [], momenti: n.momenti || [], _source: 'mondo',
       })),
       saveItem: (camp, item) => {
         const npcs = camp.npcs || [];
@@ -14563,14 +14563,14 @@ const WikiSections = (() => {
           relazioni:item.relazioni, links:item.relazioni,
           gancio:item.gancio, secret:item.segreto, segreto:item.segreto,
           noteLibere:item.note, tags:item.tags||[],
-          campi_custom:item.campi_custom||[], aggiornatoAt:Date.now() };
+          campi_custom:item.campi_custom||[], momenti:item.momenti||[], aggiornatoAt:Date.now() };
         if (idx>=0) npcs[idx]=d; else npcs.push(d);
         App.saveActiveCampaign({ npcs });
         try { _mondoToWiki('npc', d, camp); } catch(e) {}
       },
       newItem: () => ({ id:'npc_'+Date.now()+'_'+Math.random().toString(36).slice(2,5),
         nome:'', ruolo:'', razza:'', stato:'Vivo', allineamento:'', nascita:null, morte:null, sede:'', fazione:'',
-        apparenza:'', personalita:'', vuole:'', teme:'', relazioni:'', gancio:'', segreto:'', note:'', tags:[] }),
+        apparenza:'', personalita:'', vuole:'', teme:'', relazioni:'', gancio:'', segreto:'', note:'', tags:[], momenti:[] }),
     },
 
     luoghi: {
@@ -14713,7 +14713,7 @@ const WikiSections = (() => {
         velocita:p.velocita||'', background:p.background||'',
         motivazione:p.motivazione||'', legami:p.legami||'',
         note_dm:p.note_dm||'', note:p.noteLibere||'',
-        tags:p.tags||[], campi_custom:p.campi_custom||[], _source:'pg',
+        tags:p.tags||[], campi_custom:p.campi_custom||[], momenti:p.momenti||[], _source:'pg',
       })),
       saveItem: (camp, item) => {
         if (!camp.pg) camp.pg = [];
@@ -14725,7 +14725,7 @@ const WikiSections = (() => {
           velocita:item.velocita, background:item.background,
           motivazione:item.motivazione, legami:item.legami, note_dm:item.note_dm,
           noteLibere:item.note, tags:item.tags||[],
-          campi_custom:item.campi_custom||[], aggiornatoAt:Date.now() };
+          campi_custom:item.campi_custom||[], momenti:item.momenti||[], aggiornatoAt:Date.now() };
         if (idx>=0) camp.pg[idx]=d; else camp.pg.push(d);
         App.saveActiveCampaign({ pg: camp.pg });
 
@@ -14750,7 +14750,7 @@ const WikiSections = (() => {
         nome:'', classe:'', razza:'', livello:'', giocatore:'',
         hp_max:'', ca:'', iniziativa:'', perc_pass:'', velocita:'',
         background:'', motivazione:'', legami:'', note_dm:'',
-        note:'', tags:[], campi_custom:[] }),
+        note:'', tags:[], campi_custom:[], momenti:[] }),
     },
 
     incontri: {
@@ -15243,6 +15243,7 @@ const WikiSections = (() => {
       '</div>' +
 
       (type === 'quest' ? _renderObiettivi(item, isEdit) : '') +
+      ((type === 'png' || type === 'pg') ? _renderMomenti(item, type, isEdit) : '') +
 
       (() => {
         const custom = _currentItem?.campi_custom || item.campi_custom || [];
@@ -15312,6 +15313,30 @@ const WikiSections = (() => {
           '</div>';
       })() : '') +
 
+      (type === 'sessioni' && item._source === 'sessioni_log' ? (() => {
+        const camp = App.getActiveCampaign();
+        const trovati = [];
+        (camp?.npcs||[]).forEach(n => (n.momenti||[]).forEach(m => { if (m.sessioneId === item._origId) trovati.push({ ...m, _entType:'png', _entId:n.id, _entNome:n.name||n.nome||'' }); }));
+        (camp?.pg||[]).forEach(p => (p.momenti||[]).forEach(m => { if (m.sessioneId === item._origId) trovati.push({ ...m, _entType:'pg', _entId:p.id, _entNome:p.nome||p.name||'' }); }));
+        if (!trovati.length) return '';
+        return '<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);padding:12px 16px;margin-bottom:16px;">' +
+          '<div style="font-size:0.68rem;font-family:var(--font-display);text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin-bottom:10px;">Momenti di questa sessione</div>' +
+          trovati.map(m => {
+            const cfg = MOMENTI_TIPI[m.tipo] || MOMENTI_TIPI[''];
+            return '<div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:8px;">' +
+              '<span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:' + cfg.color + ';margin-top:6px;flex-shrink:0;"></span>' +
+              '<div style="flex:1;min-width:0;">' +
+                '<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:2px;">' +
+                  '<span style="font-size:0.82rem;cursor:pointer;color:var(--accent-primary);" onclick="WikiSections.goto(\'' + m._entType + '\');setTimeout(()=>WikiSections.openCard(\'' + m._entType + '\',\'' + m._entId + '\'),150)">' + _escHtml(m._entNome) + '</span>' +
+                  '<span style="font-size:0.7rem;font-weight:700;color:' + cfg.color + ';">' + _escHtml(cfg.label) + '</span>' +
+                '</div>' +
+                '<div style="font-size:0.85rem;">' + _escHtml(m.testo || '') + '</div>' +
+              '</div>' +
+            '</div>';
+          }).join('') +
+          '</div>';
+      })() : '') +
+
       '<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);overflow:hidden;margin-bottom:16px;">' +
         '<div style="padding:8px 12px;border-bottom:1px solid var(--border);font-size:0.68rem;font-family:var(--font-display);text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);">Note libere</div>' +
         (isEdit ?
@@ -15377,6 +15402,144 @@ const WikiSections = (() => {
         '<button class="btn btn-ghost btn-sm" onclick="WikiSections.addObiettivo()">+ Aggiungi</button>' +
       '</div>' : '') +
     '</div>';
+  };
+
+  // ── Momenti (PNG/PG): mini-timeline di eventi salienti taggati per tipo e sessione.
+  // A differenza degli Obiettivi non hanno uno stato binario da spuntare, quindi in vista
+  // sono sola lettura; solo in modifica compaiono i controlli per aggiungere/modificare/rimuovere.
+  // Ordinati per numero della sessione collegata (storia cronologica del personaggio), non per
+  // ordine di inserimento — i momenti senza sessione vanno in fondo, ordinati per creazione. ──
+  const MOMENTI_TIPI = {
+    '':          { color: 'var(--border-strong)', label: 'Generico' },
+    heroico:     { color: '#69cc85', label: 'Heroico' },
+    tradimento:  { color: 'var(--accent-danger)', label: 'Tradimento' },
+    tragedia:    { color: '#5ba4f5', label: 'Tragedia' },
+    rivelazione: { color: '#c97bea', label: 'Rivelazione' },
+    comico:      { color: '#ff9f43', label: 'Comico' },
+    morte:       { color: '#888888', label: 'Morte' },
+    rinascita:   { color: '#56d4dd', label: 'Rinascita' },
+    legame:      { color: '#f5a623', label: 'Legame' },
+  };
+
+  const _renderMomenti = (it, type, edit) => {
+    const list = it.momenti || [];
+    if (!edit && !list.length) return '';
+    const camp = App.getActiveCampaign();
+    const sessLog = (camp?.sessioni_log || []).slice().sort((a, b) => (a.numero||0) - (b.numero||0));
+    const sessById = new Map(sessLog.map(s => [s.id, s]));
+    const sessLabel = (id) => { const s = sessById.get(id); return s ? ('S' + s.numero + (s.titolo ? ' — ' + s.titolo : '')) : ''; };
+
+    const sorted = list.map((m, i) => ({ ...m, _i: i })).sort((a, b) => {
+      const na = sessById.get(a.sessioneId)?.numero, nb = sessById.get(b.sessioneId)?.numero;
+      if (na != null && nb != null) return na - nb;
+      if (na != null) return -1;
+      if (nb != null) return 1;
+      return (a.creatoAt||0) - (b.creatoAt||0);
+    });
+
+    const tipoOptsFor = (cur) => Object.keys(MOMENTI_TIPI).map(k => '<option value="' + k + '"' + (k === (cur||'') ? ' selected' : '') + '>' + _escHtml(MOMENTI_TIPI[k].label) + '</option>').join('');
+    const sessOptsFor = (cur) => '<option value="">Nessuna sessione collegata</option>' + sessLog.map(s => '<option value="' + s.id + '"' + (s.id === cur ? ' selected' : '') + '>' + _escHtml('S' + s.numero + (s.titolo ? ' — ' + s.titolo : '')) + '</option>').join('');
+
+    const rows = sorted.map(m => {
+      const i = m._i;
+      const cfg = MOMENTI_TIPI[m.tipo] || MOMENTI_TIPI[''];
+      const label = sessLabel(m.sessioneId);
+      return edit
+        ? '<div style="display:flex;gap:6px;align-items:flex-start;padding:8px 0;border-top:1px solid var(--border);">' +
+            '<span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:' + cfg.color + ';margin-top:9px;flex-shrink:0;"></span>' +
+            '<div style="flex:1;display:flex;flex-direction:column;gap:4px;min-width:0;">' +
+              '<div style="display:flex;gap:6px;flex-wrap:wrap;">' +
+                '<select class="form-select" style="width:auto;font-size:0.76rem;" onchange="WikiSections.editMomentoTipo(' + i + ',this.value)">' + tipoOptsFor(m.tipo) + '</select>' +
+                '<select class="form-select" style="width:auto;font-size:0.76rem;" onchange="WikiSections.editMomentoSessione(' + i + ',this.value)">' + sessOptsFor(m.sessioneId) + '</select>' +
+              '</div>' +
+              '<input type="text" value="' + _escHtml(m.testo || '') + '" placeholder="Cosa e successo..." style="background:transparent;border:none;border-bottom:1px solid var(--border);font-size:0.85rem;color:var(--text-primary);padding:2px 0;" oninput="WikiSections.editMomentoTesto(' + i + ',this.value)">' +
+            '</div>' +
+            '<button onclick="WikiSections.removeMomento(' + i + ')" style="background:none;border:none;cursor:pointer;color:var(--text-muted);opacity:0.5;flex-shrink:0;margin-top:8px;" title="Rimuovi"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>' +
+          '</div>'
+        : '<div style="display:flex;gap:8px;align-items:flex-start;padding:6px 0;border-top:1px solid var(--border);">' +
+            '<span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:' + cfg.color + ';margin-top:6px;flex-shrink:0;"></span>' +
+            '<div style="flex:1;min-width:0;">' +
+              '<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:2px;">' +
+                '<span style="font-size:0.7rem;font-weight:700;color:' + cfg.color + ';">' + _escHtml(cfg.label) + '</span>' +
+                (label ? '<span style="font-size:0.7rem;color:var(--accent-primary);cursor:pointer;" onclick="WikiSections.goto(\'sessioni\');setTimeout(()=>WikiSections.openCard(\'sessioni\',\'' + m.sessioneId + '\'),150)">' + _escHtml(label) + '</span>' : '') +
+              '</div>' +
+              '<div style="font-size:0.85rem;">' + _escHtml(m.testo || '') + '</div>' +
+            '</div>' +
+          '</div>';
+    }).join('');
+
+    return '<div id="ws-momenti-block" style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);padding:16px;margin-bottom:16px;">' +
+      '<div style="font-size:0.68rem;font-family:var(--font-display);text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin-bottom:10px;">Momenti</div>' +
+      rows +
+      (edit ? '<div style="margin-top:10px;' + (list.length ? 'padding-top:10px;border-top:1px solid var(--border);' : '') + 'display:flex;flex-direction:column;gap:6px;">' +
+        '<div style="display:flex;gap:6px;flex-wrap:wrap;">' +
+          '<select id="mo-new-tipo" class="form-select" style="width:auto;font-size:0.78rem;">' + tipoOptsFor('') + '</select>' +
+          '<select id="mo-new-sessione" class="form-select" style="width:auto;font-size:0.78rem;">' + sessOptsFor('') + '</select>' +
+        '</div>' +
+        '<div style="display:flex;gap:6px;">' +
+          '<input id="mo-new-testo" type="text" class="form-input" placeholder="Nuovo momento..." style="flex:1;font-size:0.82rem;" onkeydown="if(event.key===\'Enter\'){event.preventDefault();WikiSections.addMomento();}">' +
+          '<button class="btn btn-ghost btn-sm" onclick="WikiSections.addMomento()">+ Aggiungi</button>' +
+        '</div>' +
+      '</div>' : '') +
+    '</div>';
+  };
+
+  const _refreshMomenti = () => {
+    const block = document.getElementById('ws-momenti-block');
+    if (!block || !_currentItem) return;
+    const isEdit = !!document.getElementById('mo-new-testo');
+    block.outerHTML = _renderMomenti(_currentItem, _currentType, isEdit);
+  };
+
+  const addMomento = () => {
+    if (!_currentItem) return;
+    const testo = document.getElementById('mo-new-testo')?.value?.trim();
+    if (!testo) return;
+    const tipo = document.getElementById('mo-new-tipo')?.value || '';
+    const sessioneId = document.getElementById('mo-new-sessione')?.value || null;
+    const list = [...(_currentItem.momenti || [])];
+    list.push({ id: 'mo_' + Date.now() + '_' + Math.random().toString(36).slice(2,5), tipo, sessioneId, testo, creatoAt: Date.now() });
+    _currentItem.momenti = list;
+    _scheduleAutosave(_currentType);
+    _refreshMomenti();
+    setTimeout(() => document.getElementById('mo-new-testo')?.focus(), 30);
+  };
+
+  const editMomentoTesto = (i, val) => {
+    if (!_currentItem) return;
+    const list = [...(_currentItem.momenti || [])];
+    if (!list[i]) return;
+    list[i] = { ...list[i], testo: val };
+    _currentItem.momenti = list;
+    _scheduleAutosave(_currentType);
+    // Niente re-render qui: si perderebbe il focus/cursore ad ogni carattere digitato.
+  };
+
+  const editMomentoTipo = (i, val) => {
+    if (!_currentItem) return;
+    const list = [...(_currentItem.momenti || [])];
+    if (!list[i]) return;
+    list[i] = { ...list[i], tipo: val };
+    _currentItem.momenti = list;
+    _scheduleAutosave(_currentType);
+    _refreshMomenti();
+  };
+
+  const editMomentoSessione = (i, val) => {
+    if (!_currentItem) return;
+    const list = [...(_currentItem.momenti || [])];
+    if (!list[i]) return;
+    list[i] = { ...list[i], sessioneId: val || null };
+    _currentItem.momenti = list;
+    _scheduleAutosave(_currentType);
+    _refreshMomenti();
+  };
+
+  const removeMomento = (i) => {
+    if (!_currentItem) return;
+    _currentItem.momenti = (_currentItem.momenti || []).filter((_, idx) => idx !== i);
+    _scheduleAutosave(_currentType);
+    _refreshMomenti();
   };
 
   const _knownEntityNames = () => {
@@ -15834,6 +15997,7 @@ const WikiSections = (() => {
     _refreshImgFieldPreview, _onImageFilePicked,
     _renderDetailPub, _scheduleAutosavePub, _getCfg, _saveWithCustom,
     toggleObiettivo, addObiettivo, editObiettivoText, removeObiettivo,
+    addMomento, editMomentoTesto, editMomentoTipo, editMomentoSessione, removeMomento,
     get _currentType() { return _currentType; },
     get _currentItem()  { return _currentItem; },
   };
