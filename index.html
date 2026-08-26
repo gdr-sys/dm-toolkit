@@ -7355,12 +7355,8 @@ const Schermo = (() => {
     const favs = camp?.compendioFavoriti || [];
     if (!favs.length) return '<div class="text-muted text-sm">Nessun preferito. Aggiungi ⭐ dal Compendio.</div>';
 
-    const openFn = {
-      monsters: 'openMonster', magic_items: 'openMagicItem',
-      equipment: 'openEquipment', rules: 'openRule', spells: 'openSpell',
-    };
     const tipoLabel = {
-      monsters: 'Mostri', magic_items: 'Oggetti Magici', equipment: 'Equipaggiamento', rules: 'Regole', spells: 'Incantesimi',
+      monsters: 'Mostri', magic_items: 'Oggetti Magici', equipment: 'Equipaggiamento', rules: 'Regole', spells: 'Incantesimi', homebrew: 'Homebrew',
     };
 
     const gruppi = {};
@@ -7372,7 +7368,7 @@ const Schermo = (() => {
     return Object.entries(gruppi).map(([tipo, items]) =>
       '<div style="margin-bottom:8px;">' +
         '<div style="font-family:var(--font-display);font-size:0.62rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px;">' +
-          tipoLabel[tipo] + ' ' + tipo.replace('_',' ') +
+          (tipoLabel[tipo] || tipo) +
         '</div>' +
         items.map(f =>
           '<div style="display:flex;align-items:center;justify-content:space-between;padding:3px 0;border-bottom:1px solid var(--border);font-size:0.82rem;">' +
@@ -16988,6 +16984,11 @@ const CompendioCache = (() => {
 })();
 
 const apriFavoritoSchermo = async (tipo, id) => {
+
+  if (tipo === 'homebrew') {
+    Compendio.openHomebrew(id);
+    return;
+  }
 
   if (!Compendio.getData()[tipo]?.length) {
     Toast.show('Caricamento...', 'info', 1500);
