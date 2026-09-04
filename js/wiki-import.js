@@ -46,10 +46,22 @@ const WikiImport = (() => {
     return cols;
   };
 
+  // Excel usa il separatore di lista del sistema operativo (in Italia spesso ';'
+  // e non ',') per decidere come dividere le colonne quando si apre un CSV con
+  // doppio click: senza aiuto, un file con virgole finisce tutto in una cella
+  // sola. Rileva quale dei due e' davvero in uso guardando l'intestazione.
+  const _rilevaSeparatore = (text) => {
+    const primaRiga = text.split(/\r?\n/).find(l => l.trim() !== '') || '';
+    const virgole = (primaRiga.match(/,/g) || []).length;
+    const puntoVirgola = (primaRiga.match(/;/g) || []).length;
+    return puntoVirgola > virgole ? ';' : ',';
+  };
+
   // ── CSV: parsing tollerante a virgole/newline dentro campi tra virgolette
   // (come li esporta Excel/Google Sheets), BOM ed \r sempre ignorati ──
   const _parseCSV = (text) => {
-    text = text.replace(/^﻿/, '');
+    text = text.replace(/^﻿/, '').replace(/^sep=.\r?\n/i, '');
+    const delim = _rilevaSeparatore(text);
     const rows = [];
     let row = [], cell = '', inQuotes = false;
     for (let i = 0; i < text.length; i++) {
@@ -59,7 +71,7 @@ const WikiImport = (() => {
         if (c === '"') { if (text[i + 1] === '"') { cell += '"'; i++; } else inQuotes = false; }
         else cell += c;
       } else if (c === '"') inQuotes = true;
-      else if (c === ',') { row.push(cell); cell = ''; }
+      else if (c === delim) { row.push(cell); cell = ''; }
       else if (c === '\n') { row.push(cell); rows.push(row); row = []; cell = ''; }
       else cell += c;
     }
@@ -85,7 +97,10 @@ const WikiImport = (() => {
       if (f?.type === 'select') return f.options.find(Boolean) || '';
       return f?.hint || '';
     });
-    const csv = [header, esempio].map(r => r.map(_csvCell).join(',')).join('\r\n');
+    // "sep=," e' una convenzione che Excel riconosce in prima riga per aprire
+    // subito il file diviso in colonne, qualunque sia la lingua di Windows
+    // (altrimenti in molti PC italiani il file si apre tutto in una cella sola).
+    const csv = 'sep=,\r\n' + [header, esempio].map(r => r.map(_csvCell).join(',')).join('\r\n');
     const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -214,7 +229,7 @@ const WikiImport = (() => {
         '<div class="modal-body" style="display:flex;flex-direction:column;gap:12px;">' +
           '<div style="font-size:0.8rem;color:var(--text-secondary);line-height:1.5;">' +
             '1. Scegli il tipo di scheda e scarica il template CSV.<br>' +
-            '2. Compila una riga per scheda in Excel/Google Sheets (la seconda riga e\' un esempio: sostituiscila o cancellala).<br>' +
+            '2. Compila una riga per scheda in Excel/Google Sheets (la seconda riga e\' un esempio: sostituiscila o cancellala). Se lo apri in Google Sheets e vedi una prima riga con scritto "sep=,", cancella solo quella riga.<br>' +
             '3. Salva/esporta come CSV e caricalo qui sotto.' +
           '</div>' +
           '<div class="form-group">' +
