@@ -1,9 +1,11 @@
 /* ============================================================
    NEWSLETTER-POPUP.JS — Invito all'iscrizione alla newsletter
    (form Brevo). Compare una sola volta per browser dopo un breve
-   ritardo, poi non si ripropone piu' (localStorage). Modulo
-   autonomo: costruisce il proprio modale a runtime riusando le
-   classi .modal-overlay/.modal/.btn* del sito, cosi' segue tema
+   ritardo, poi non si ripropone piu' (localStorage) — ma resta
+   sempre raggiungibile da una voce "Newsletter" in fondo al menu
+   (sezione Supporto), per chi la chiude e vuole iscriversi dopo.
+   Modulo autonomo: costruisce il proprio modale a runtime riusando
+   le classi .modal-overlay/.modal/.btn* del sito, cosi' segue tema
    chiaro/scuro e tipografia senza markup statico in index.html.
    ============================================================ */
 
@@ -37,6 +39,11 @@ const NewsletterPopup = (() => {
     document.body.appendChild(overlay);
   };
 
+  const open = () => {
+    _injectModal();
+    Modal.open('newsletter');
+  };
+
   const _tryShow = () => {
     if (localStorage.getItem(STORAGE_KEY)) return;
     setTimeout(() => {
@@ -44,12 +51,32 @@ const NewsletterPopup = (() => {
       // popup non si ripropone qualunque sia il modo in cui viene
       // chiuso (X, "No grazie", CTA, ESC, click fuori).
       localStorage.setItem(STORAGE_KEY, '1');
-      _injectModal();
-      Modal.open('newsletter');
+      open();
     }, DELAY_MS);
   };
 
-  document.addEventListener('DOMContentLoaded', () => setTimeout(_tryShow, 200));
+  // Punto d'accesso permanente in sidebar: chi chiude il popup automatico
+  // (o lo vede gia' una volta in una sessione precedente) puo' comunque
+  // trovare l'iscrizione da qui. Inserita subito dopo "Segnala un bug",
+  // stesso gruppo "Supporto", senza toccare il markup statico.
+  const _injectTrigger = () => {
+    if (document.getElementById('newsletter-trigger')) return;
+    const bugBtn = document.querySelector('button[onclick*="BugReport.open"]');
+    if (!bugBtn) return;
+    const btn = document.createElement('button');
+    btn.id = 'newsletter-trigger';
+    btn.className = 'nav-item';
+    btn.onclick = () => { open(); closeMobileMenu?.(); };
+    btn.innerHTML =
+      '<span class="nav-icon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></span>' +
+      '<span class="nav-label">Newsletter</span>';
+    bugBtn.insertAdjacentElement('afterend', btn);
+  };
 
-  return {};
+  document.addEventListener('DOMContentLoaded', () => {
+    _injectTrigger();
+    setTimeout(_tryShow, 200);
+  });
+
+  return { open };
 })();
