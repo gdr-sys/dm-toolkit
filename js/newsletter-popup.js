@@ -29,9 +29,9 @@ const NewsletterPopup = (() => {
           '<div style="color:var(--accent-secondary);margin-bottom:12px;"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 21 8 21 16 12 22 3 16 3 8 Z"/><path d="M12 2 12 22"/><path d="M3 8 12 12 21 8"/><path d="M3 16 12 12 21 16"/></svg></div>' +
           '<p style="color:var(--text-secondary);font-size:0.9rem;line-height:1.5;">Nuovi strumenti, aggiornamenti e funzioni per DM Toolkit, via email, senza spam.</p>' +
         '</div>' +
-        '<div class="modal-footer" style="justify-content:center;">' +
-          '<button class="btn btn-ghost" onclick="Modal.close(\'newsletter\')">No grazie</button>' +
-          '<a href="' + BREVO_URL + '" target="_blank" rel="noopener" class="btn btn-gold" onclick="Modal.close(\'newsletter\')">Iscrivimi alla newsletter</a>' +
+        '<div class="modal-footer" style="flex-direction:column;align-items:stretch;">' +
+          '<a href="' + BREVO_URL + '" target="_blank" rel="noopener" class="btn btn-gold" style="width:100%;white-space:normal;" onclick="Modal.close(\'newsletter\')">Iscrivimi alla newsletter</a>' +
+          '<button class="btn btn-ghost" style="width:100%;" onclick="Modal.close(\'newsletter\')">No grazie</button>' +
         '</div>' +
       '</div>';
     document.body.appendChild(overlay);
