@@ -2266,24 +2266,81 @@
         </div>
         <label class="form-label" style="margin-bottom:var(--space-sm);">Caratteristiche</label>
         <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:var(--space-sm);margin-bottom:var(--space-md);">
-          <div class="form-group" style="margin:0;"><label class="form-label" style="text-align:center;">FOR</label><input type="number" id="nm-str" class="form-input" style="text-align:center;" min="1" max="30" placeholder="10"></div>
-          <div class="form-group" style="margin:0;"><label class="form-label" style="text-align:center;">DES</label><input type="number" id="nm-dex" class="form-input" style="text-align:center;" min="1" max="30" placeholder="10"></div>
-          <div class="form-group" style="margin:0;"><label class="form-label" style="text-align:center;">COS</label><input type="number" id="nm-con" class="form-input" style="text-align:center;" min="1" max="30" placeholder="10"></div>
-          <div class="form-group" style="margin:0;"><label class="form-label" style="text-align:center;">INT</label><input type="number" id="nm-int" class="form-input" style="text-align:center;" min="1" max="30" placeholder="10"></div>
-          <div class="form-group" style="margin:0;"><label class="form-label" style="text-align:center;">SAG</label><input type="number" id="nm-wis" class="form-input" style="text-align:center;" min="1" max="30" placeholder="10"></div>
-          <div class="form-group" style="margin:0;"><label class="form-label" style="text-align:center;">CAR</label><input type="number" id="nm-cha" class="form-input" style="text-align:center;" min="1" max="30" placeholder="10"></div>
+          <div class="form-group" style="margin:0;"><label class="form-label" style="text-align:center;">FOR</label><input type="number" id="nm-str" class="form-input" style="text-align:center;" min="1" max="30" placeholder="10" oninput="NPC._recalcDerived()"></div>
+          <div class="form-group" style="margin:0;"><label class="form-label" style="text-align:center;">DES</label><input type="number" id="nm-dex" class="form-input" style="text-align:center;" min="1" max="30" placeholder="10" oninput="NPC._recalcDerived()"></div>
+          <div class="form-group" style="margin:0;"><label class="form-label" style="text-align:center;">COS</label><input type="number" id="nm-con" class="form-input" style="text-align:center;" min="1" max="30" placeholder="10" oninput="NPC._recalcDerived()"></div>
+          <div class="form-group" style="margin:0;"><label class="form-label" style="text-align:center;">INT</label><input type="number" id="nm-int" class="form-input" style="text-align:center;" min="1" max="30" placeholder="10" oninput="NPC._recalcDerived()"></div>
+          <div class="form-group" style="margin:0;"><label class="form-label" style="text-align:center;">SAG</label><input type="number" id="nm-wis" class="form-input" style="text-align:center;" min="1" max="30" placeholder="10" oninput="NPC._recalcDerived()"></div>
+          <div class="form-group" style="margin:0;"><label class="form-label" style="text-align:center;">CAR</label><input type="number" id="nm-cha" class="form-input" style="text-align:center;" min="1" max="30" placeholder="10" oninput="NPC._recalcDerived()"></div>
+        </div>
+
+        <div class="form-row-3">
+          <div class="form-group"><label class="form-label">Bonus Competenza</label><input type="number" id="nm-prof-bonus" class="form-input" min="0" max="12" placeholder="auto da GS" oninput="NPC._recalcDerived()"></div>
+          <div class="form-group"><label class="form-label">Iniziativa</label><input type="text" id="nm-iniziativa" class="form-input" placeholder="auto da DES"></div>
+          <div class="form-group"></div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" style="display:flex;align-items:center;justify-content:space-between;">
+            <span>Tiri Salvezza</span>
+            <button type="button" class="btn btn-ghost btn-sm" style="font-size:0.66rem;" onclick="NPC._recalcSaves(true)">Ricalcola</button>
+          </label>
+          <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:6px;">
+            <label style="font-size:0.78rem;display:flex;gap:3px;align-items:center;cursor:pointer;"><input type="checkbox" id="nm-save-str" onchange="NPC._recalcSaves(true)"> FOR</label>
+            <label style="font-size:0.78rem;display:flex;gap:3px;align-items:center;cursor:pointer;"><input type="checkbox" id="nm-save-dex" onchange="NPC._recalcSaves(true)"> DES</label>
+            <label style="font-size:0.78rem;display:flex;gap:3px;align-items:center;cursor:pointer;"><input type="checkbox" id="nm-save-con" onchange="NPC._recalcSaves(true)"> COS</label>
+            <label style="font-size:0.78rem;display:flex;gap:3px;align-items:center;cursor:pointer;"><input type="checkbox" id="nm-save-int" onchange="NPC._recalcSaves(true)"> INT</label>
+            <label style="font-size:0.78rem;display:flex;gap:3px;align-items:center;cursor:pointer;"><input type="checkbox" id="nm-save-wis" onchange="NPC._recalcSaves(true)"> SAG</label>
+            <label style="font-size:0.78rem;display:flex;gap:3px;align-items:center;cursor:pointer;"><input type="checkbox" id="nm-save-cha" onchange="NPC._recalcSaves(true)"> CAR</label>
+          </div>
+          <input type="text" id="nm-saves" class="form-input" placeholder="es. COS +5, SAG +3" oninput="NPC._savesTouched=true">
+          <div class="form-hint">Spunta le caratteristiche competenti (bonus calcolato) oppure scrivi a mano.</div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" style="display:flex;align-items:center;justify-content:space-between;">
+            <span>Abilità</span>
+            <button type="button" class="btn btn-ghost btn-sm" style="font-size:0.66rem;" onclick="NPC._recalcSkills(true)">Ricalcola</button>
+          </label>
+          <div id="nm-skill-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:2px 10px;margin-bottom:6px;"></div>
+          <input type="text" id="nm-skills" class="form-input" placeholder="es. Percezione +4, Furtività +6" oninput="NPC._skillsTouched=true">
+        </div>
+
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Immunità / Resistenze ai danni</label><input type="text" id="nm-immunities" class="form-input" placeholder="es. Immune veleno; Resist. fuoco"></div>
+          <div class="form-group"><label class="form-label">Vulnerabilità ai danni</label><input type="text" id="nm-vulnerabilities" class="form-input" placeholder="es. Fuoco, Tuono"></div>
         </div>
         <div class="form-row">
-          <div class="form-group"><label class="form-label">Immunità / Resistenze</label><input type="text" id="nm-immunities" class="form-input" placeholder="es. Immune veleno; Resist. fuoco"></div>
+          <div class="form-group"><label class="form-label">Immunità alle condizioni</label><input type="text" id="nm-cond-immunities" class="form-input" placeholder="es. Charmato, Spaventato, Avvelenato"></div>
           <div class="form-group"><label class="form-label">Sensi</label><input type="text" id="nm-senses" class="form-input" placeholder="es. Scurovisione 18 m, Percezione Passiva 13"></div>
         </div>
         <div class="form-group"><label class="form-label">Linguaggi</label><input type="text" id="nm-languages" class="form-input" placeholder="es. Comune, Nanico"></div>
         <div class="form-group"><label class="form-label">Tratti speciali</label><textarea id="nm-special" class="form-textarea" rows="2" placeholder="es. Furia nanica. Resistenza nanica..."></textarea></div>
+
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-sm);">
           <label class="form-label" style="margin:0;">Azioni</label>
           <button class="btn btn-secondary btn-sm" onclick="NPC.addAction()">+ Aggiungi</button>
         </div>
         <div id="nm-actions-list" style="margin-bottom:var(--space-md);"></div>
+
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-sm);">
+          <label class="form-label" style="margin:0;">Azioni bonus</label>
+          <button class="btn btn-secondary btn-sm" onclick="NPC.addBonusAction()">+ Aggiungi</button>
+        </div>
+        <div id="nm-bonus-actions-list" style="margin-bottom:var(--space-md);"></div>
+
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-sm);">
+          <label class="form-label" style="margin:0;">Reazioni</label>
+          <button class="btn btn-secondary btn-sm" onclick="NPC.addReaction()">+ Aggiungi</button>
+        </div>
+        <div id="nm-reactions-list" style="margin-bottom:var(--space-md);"></div>
+
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-sm);">
+          <label class="form-label" style="margin:0;">Azioni leggendarie</label>
+          <button class="btn btn-secondary btn-sm" onclick="NPC.addLegendaryAction()">+ Aggiungi</button>
+        </div>
+        <div id="nm-legendary-list" style="margin-bottom:var(--space-md);"></div>
+
         <div class="form-group"><label class="form-label">Note combattimento / Tattiche</label><textarea id="nm-combat-notes" class="form-textarea" rows="2" placeholder="Come combatte, quando fugge, alleati..."></textarea></div>
       </div>
     </div>
@@ -3989,50 +4046,111 @@ const NPC = (() => {
     });
   };
 
-  const addAction = () => {
-    const list = document.getElementById('nm-actions-list');
+  // ── Liste di azioni ripetibili (Azioni, Azioni bonus, Reazioni, Azioni leggendarie) ──
+  const _TRASH_SVG = '<svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>';
+  const _escAttr = (s) => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+
+  const _addActionRow = (listId, a) => {
+    const list = document.getElementById(listId);
     if (!list) return;
-    const id = 'act_' + Date.now();
     const row = document.createElement('div');
     row.className = 'action-item';
-    row.dataset.actionId = id;
-    row.innerHTML = `
-      <div style="flex:1;">
-        <input type="text" class="form-input action-name" placeholder="Nome azione (es. Spada corta)" style="margin-bottom:4px;">
-        <input type="text" class="form-input action-desc" placeholder="Descrizione (es. +4 al colpire, 1d6+2 perforanti)">
-      </div>
-      <button class="btn btn-ghost btn-icon-sm" onclick="this.closest('.action-item').remove()" style="flex-shrink:0;margin-top:4px;"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>
-    `;
+    row.dataset.actionId = 'act_' + Date.now() + Math.random().toString(36).slice(2, 5);
+    row.innerHTML =
+      '<div style="flex:1;">' +
+        '<input type="text" class="form-input action-name" value="' + _escAttr(a && a.name) + '" placeholder="Nome azione (es. Spada corta)" style="margin-bottom:4px;">' +
+        '<input type="text" class="form-input action-desc" value="' + _escAttr(a && a.desc) + '" placeholder="Descrizione (es. +4 al colpire, 1d6+2 perforanti)">' +
+      '</div>' +
+      '<button class="btn btn-ghost btn-icon-sm" onclick="this.closest(\'.action-item\').remove()" style="flex-shrink:0;margin-top:4px;">' + _TRASH_SVG + '</button>';
     list.appendChild(row);
   };
-
-  const getActions = () => {
-    const rows = document.querySelectorAll('#nm-actions-list .action-item');
-    return Array.from(rows).map(r => ({
-      name: r.querySelector('.action-name')?.value?.trim() || '',
-      desc: r.querySelector('.action-desc')?.value?.trim() || '',
-    })).filter(a => a.name);
-  };
-
-  const renderActionsInModal = (actions) => {
-    const list = document.getElementById('nm-actions-list');
+  const _getActionsFrom = (listId) => Array.from(document.querySelectorAll('#' + listId + ' .action-item')).map(r => ({
+    name: r.querySelector('.action-name')?.value?.trim() || '',
+    desc: r.querySelector('.action-desc')?.value?.trim() || '',
+  })).filter(a => a.name);
+  const _renderActionsIn = (listId, actions) => {
+    const list = document.getElementById(listId);
     if (!list) return;
     list.innerHTML = '';
-    (actions || []).forEach(a => {
-      const id = 'act_' + Date.now() + Math.random();
-      const row = document.createElement('div');
-      row.className = 'action-item';
-      row.dataset.actionId = id;
-      row.innerHTML = `
-        <div style="flex:1;">
-          <input type="text" class="form-input action-name" value="${a.name}" placeholder="Nome azione" style="margin-bottom:4px;">
-          <input type="text" class="form-input action-desc" value="${a.desc}" placeholder="Descrizione">
-        </div>
-        <button class="btn btn-ghost btn-icon-sm" onclick="this.closest('.action-item').remove()" style="flex-shrink:0;margin-top:4px;"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>
-      `;
-      list.appendChild(row);
-    });
+    (actions || []).forEach(a => _addActionRow(listId, a));
   };
+
+  const addAction = () => _addActionRow('nm-actions-list');
+  const addBonusAction = () => _addActionRow('nm-bonus-actions-list');
+  const addReaction = () => _addActionRow('nm-reactions-list');
+  const addLegendaryAction = () => _addActionRow('nm-legendary-list');
+  const getActions = () => _getActionsFrom('nm-actions-list');
+  const renderActionsInModal = (actions) => _renderActionsIn('nm-actions-list', actions);
+
+  // ── Tiri salvezza / abilità: calcolo automatico da caratteristiche + bonus competenza,
+  // sovrascrivibile a mano (il campo di testo è ciò che viene salvato). ──
+  const SKILLS = [
+    ['Acrobazia', 'dex'], ['Addestrare Animali', 'wis'], ['Arcano', 'int'], ['Atletica', 'str'],
+    ['Furtività', 'dex'], ['Indagare', 'int'], ['Inganno', 'cha'], ['Intimidire', 'cha'],
+    ['Intrattenere', 'cha'], ['Intuizione', 'wis'], ['Medicina', 'wis'], ['Natura', 'int'],
+    ['Percezione', 'wis'], ['Persuasione', 'cha'], ['Rapidità di Mano', 'dex'], ['Religione', 'int'],
+    ['Sopravvivenza', 'wis'], ['Storia', 'int'],
+  ];
+  const SAVE_KEYS = ['str', 'dex', 'con', 'int', 'wis', 'cha'];
+  const SAVE_LABELS = { str: 'FOR', dex: 'DES', con: 'COS', int: 'INT', wis: 'SAG', cha: 'CAR' };
+  let _savesTouched = false, _skillsTouched = false;
+
+  const _statMod = (k) => {
+    const map = { str: 'nm-str', dex: 'nm-dex', con: 'nm-con', int: 'nm-int', wis: 'nm-wis', cha: 'nm-cha' };
+    const v = parseInt(document.getElementById(map[k])?.value, 10);
+    return Math.floor(((Number.isFinite(v) ? v : 10) - 10) / 2);
+  };
+  const _crToProf = (cr) => {
+    const raw = String(cr || '').trim();
+    let n;
+    if (raw.includes('/')) { const [a, b] = raw.split('/').map(Number); n = b ? a / b : 0; }
+    else n = parseFloat(raw) || 0;
+    return n >= 29 ? 9 : n >= 25 ? 8 : n >= 21 ? 7 : n >= 17 ? 6 : n >= 13 ? 5 : n >= 9 ? 4 : n >= 5 ? 3 : 2;
+  };
+  const _profBonus = () => {
+    const v = parseInt(document.getElementById('nm-prof-bonus')?.value, 10);
+    return (Number.isFinite(v) && v > 0) ? v : _crToProf(document.getElementById('nm-cr')?.value);
+  };
+  const _fmtBonus = (n) => (n >= 0 ? '+' : '') + n;
+
+  const _recalcSaves = (force) => {
+    const field = document.getElementById('nm-saves');
+    if (!field || (_savesTouched && !force)) return;
+    _savesTouched = false;
+    const pb = _profBonus();
+    field.value = SAVE_KEYS
+      .filter(k => document.getElementById('nm-save-' + k)?.checked)
+      .map(k => SAVE_LABELS[k] + ' ' + _fmtBonus(_statMod(k) + pb))
+      .join(', ');
+  };
+
+  const _renderSkillGrid = (checkedIdx) => {
+    const grid = document.getElementById('nm-skill-grid');
+    if (!grid) return;
+    const set = new Set(checkedIdx || []);
+    grid.innerHTML = SKILLS.map(([nome, stat], i) =>
+      '<label style="font-size:0.76rem;display:flex;gap:4px;align-items:center;cursor:pointer;">' +
+        '<input type="checkbox" id="nm-skill-' + i + '"' + (set.has(i) ? ' checked' : '') + ' onchange="NPC._recalcSkills(true)"> ' +
+        nome + ' <span style="color:var(--text-muted);font-size:0.68rem;">(' + SAVE_LABELS[stat] + ')</span>' +
+      '</label>'
+    ).join('');
+  };
+
+  const _recalcSkills = (force) => {
+    const field = document.getElementById('nm-skills');
+    if (!field || (_skillsTouched && !force)) return;
+    _skillsTouched = false;
+    const pb = _profBonus();
+    field.value = SKILLS
+      .map(([nome, stat], i) => ({ nome, stat, i }))
+      .filter(s => document.getElementById('nm-skill-' + s.i)?.checked)
+      .map(s => s.nome + ' ' + _fmtBonus(_statMod(s.stat) + pb))
+      .join(', ');
+  };
+
+  // Chiamata quando cambia una caratteristica, il GS o il bonus competenza:
+  // aggiorna TS e abilità solo se non sono stati toccati a mano.
+  const _recalcDerived = () => { _recalcSaves(false); _recalcSkills(false); };
 
   const switchModalTab = (tab) => {
     const ruolo  = document.getElementById('npc-modal-ruolo');
@@ -4078,11 +4196,28 @@ const NPC = (() => {
       'nm-languages':    npc?.languages    || '',
       'nm-special':      npc?.special      || '',
       'nm-combat-notes': npc?.combatNotes  || '',
+      'nm-prof-bonus':   npc?.profBonus    || '',
+      'nm-iniziativa':   npc?.iniziativa   || '',
+      'nm-saves':        npc?.savingThrows || '',
+      'nm-skills':       npc?.skills       || '',
+      'nm-vulnerabilities': npc?.vulnerabilities || '',
+      'nm-cond-immunities': npc?.condImmunities  || '',
     };
     Object.entries(fields).forEach(([id, val]) => {
       const el = document.getElementById(id);
       if (el) el.value = val;
     });
+
+    // Tiri salvezza / abilità: ripristina le spunte di competenza e le stringhe salvate;
+    // il testo salvato è la fonte di verità (marcato "touched" così non viene sovrascritto
+    // finché non si tocca una spunta o "Ricalcola").
+    const saveProf = new Set(npc?.saveProf || []);
+    SAVE_KEYS.forEach(k => { const c = document.getElementById('nm-save-' + k); if (c) c.checked = saveProf.has(k); });
+    _renderSkillGrid(npc?.skillProf || []);
+    _savesTouched = !!(npc?.savingThrows);
+    _skillsTouched = !!(npc?.skills);
+    if (!npc?.savingThrows) _recalcSaves(true);
+    if (!npc?.skills) _recalcSkills(true);
 
     const alignEl = document.getElementById('nm-align');
     if (alignEl) alignEl.value = npc?.align || '';
@@ -4098,6 +4233,9 @@ const NPC = (() => {
     if (relEl) relEl.value = rel;
     updateRelationPreview(rel);
     renderActionsInModal(npc?.actions || []);
+    _renderActionsIn('nm-bonus-actions-list', npc?.azioniBonus || []);
+    _renderActionsIn('nm-reactions-list', npc?.reazioni || []);
+    _renderActionsIn('nm-legendary-list', npc?.azioniLeggendarie || []);
 
     if (window.setImgPreview) setImgPreview('npc', npc?.immagine || '');
     const aliasEl = document.getElementById('nm-alias');
@@ -4160,7 +4298,18 @@ const NPC = (() => {
       languages:   document.getElementById('nm-languages')?.value?.trim()    || '',
       special:     document.getElementById('nm-special')?.value?.trim()      || '',
       combatNotes: document.getElementById('nm-combat-notes')?.value?.trim() || '',
+      profBonus:   document.getElementById('nm-prof-bonus')?.value?.trim()   || '',
+      iniziativa:  document.getElementById('nm-iniziativa')?.value?.trim()   || '',
+      savingThrows: document.getElementById('nm-saves')?.value?.trim()       || '',
+      saveProf:    SAVE_KEYS.filter(k => document.getElementById('nm-save-' + k)?.checked),
+      skills:      document.getElementById('nm-skills')?.value?.trim()       || '',
+      skillProf:   SKILLS.map((s, i) => i).filter(i => document.getElementById('nm-skill-' + i)?.checked),
+      vulnerabilities: document.getElementById('nm-vulnerabilities')?.value?.trim() || '',
+      condImmunities:  document.getElementById('nm-cond-immunities')?.value?.trim() || '',
       actions: getActions(),
+      azioniBonus: _getActionsFrom('nm-bonus-actions-list'),
+      reazioni: _getActionsFrom('nm-reactions-list'),
+      azioniLeggendarie: _getActionsFrom('nm-legendary-list'),
       immagine: document.getElementById('npc-img-url')?.value?.trim() || '',
       imgPosX: parseInt(document.getElementById('npc-img-pos-x')?.value || 50),
       imgPosY: parseInt(document.getElementById('npc-img-pos-y')?.value || 50),
@@ -4543,8 +4692,12 @@ const NPC = (() => {
     openModal, submitModal,
     openView, flipCard, editFromView,
     quickRelChange, updateRelationPreview,
-    addAction, deleteNPC, switchModalTab,
+    addAction, addBonusAction, addReaction, addLegendaryAction,
+    deleteNPC, switchModalTab,
     addCurrentToCombat,
+    _recalcSaves, _recalcSkills, _recalcDerived,
+    get _savesTouched() { return _savesTouched; }, set _savesTouched(v) { _savesTouched = v; },
+    get _skillsTouched() { return _skillsTouched; }, set _skillsTouched(v) { _skillsTouched = v; },
   };
 })();
 
@@ -5421,7 +5574,8 @@ const Sessione = (() => {
     const nome = npc.name || 'NPC';
     const pf = parseInt(npc.hpMax || npc.hp) || 20;
     const ca = parseInt(npc.ca) || 12;
-    const bonusInit = Math.floor(((parseInt(npc.dex) || 10) - 10) / 2);
+    const initEsplicita = parseInt(npc.iniziativa, 10);
+    const bonusInit = Number.isFinite(initEsplicita) ? initEsplicita : Math.floor(((parseInt(npc.dex) || 10) - 10) / 2);
     const init = rollInit(bonusInit);
 
     _combat.combatants.push({
@@ -15492,6 +15646,22 @@ const WikiSections = (() => {
       special += '<div class="sb-action"><strong>' + _escHtml(nome.trim()) + '.</strong> ' + _escHtml((resto || '').replace(')', '').trim()) + '</div>';
     }
 
+    // Iniziativa: valore esplicito se impostato, altrimenti derivata dal modificatore di DES.
+    let iniz = '';
+    if (s.iniziativa !== undefined && s.iniziativa !== null && s.iniziativa !== '') {
+      const n = parseInt(s.iniziativa, 10);
+      iniz = Number.isFinite(n) ? (n >= 0 ? '+' + n : String(n)) : String(s.iniziativa);
+    } else if (s.dex) {
+      iniz = _m(s.dex);
+    }
+
+    const sect = (titolo, arr) => {
+      const items = (arr || []).filter(a => a && a.name);
+      if (!items.length) return '';
+      return '<div class="sb-section-title">' + titolo + '</div>' +
+        items.map(a => '<div class="sb-action"><strong>' + _escHtml(a.name) + '.</strong> ' + _escHtml(a.desc || '') + '</div>').join('');
+    };
+
     return '<div style="margin-bottom:16px;">' +
       '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">' +
         '<div style="font-size:0.68rem;font-family:var(--font-display);text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);">Statistiche di gioco</div>' +
@@ -15501,12 +15671,18 @@ const WikiSections = (() => {
         '<div class="stat-block-title">' + _escHtml(s.name || item.nome || 'PNG') + '</div>' +
         ((sub || s.cr) ? '<div class="stat-block-subtitle">' + _escHtml(sub) + (s.cr ? (sub ? ' · ' : '') + 'GS ' + _escHtml(String(s.cr)) : '') + '</div>' : '') +
         '<div class="stat-block-divider"></div>' +
-        row('CA', s.ac) + row('PF', s.hp) + row('Velocità', s.speed) +
+        row('CA', s.ac) + row('PF', s.hp) + row('Velocità', s.speed) + row('Iniziativa', iniz) +
         '<div class="stat-abilities">' + abils + '</div>' +
-        row('TS', s.savingThrows) +
-        row('Immunità / Resistenze', s.immunities) + row('Sensi', s.senses) + row('Linguaggi', s.languages) +
+        row('Tiri Salvezza', s.savingThrows) + row('Abilità', s.skills) +
+        (s.profBonus ? row('Bonus Competenza', (String(s.profBonus).startsWith('+') ? '' : '+') + s.profBonus) : '') +
+        row('Immunità / Resistenze', s.immunities) + row('Vulnerabilità', s.vulnerabilities) +
+        row('Immunità alle condizioni', s.condImmunities) +
+        row('Sensi', s.senses) + row('Linguaggi', s.languages) +
         (special ? '<div class="sb-section-title">Tratti</div>' + special : '') +
         (actions ? '<div class="sb-section-title">Azioni</div>' + actions : '') +
+        sect('Azioni bonus', s.azioniBonus) +
+        sect('Reazioni', s.reazioni) +
+        sect('Azioni leggendarie', s.azioniLeggendarie) +
         (s.combatNotes ? '<div class="stat-block-divider"></div><div class="text-muted" style="font-size:0.8rem;white-space:pre-wrap;">' + _escHtml(s.combatNotes) + '</div>' : '') +
       '</div>' +
     '</div>';
