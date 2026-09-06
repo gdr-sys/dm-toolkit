@@ -1763,12 +1763,14 @@
         </div>
       </div>
 
-      <div class="tabs" style="margin-bottom:var(--space-lg);max-width:340px;">
+      <div class="tabs" style="margin-bottom:var(--space-lg);max-width:460px;">
         <button class="tab-btn active" id="cal-tab-mese-btn" onclick="CalendarioUI.showTab('mese')">Mese</button>
         <button class="tab-btn" id="cal-tab-timeline-btn" onclick="CalendarioUI.showTab('timeline')">Timeline</button>
+        <button class="tab-btn" id="cal-tab-config-btn" onclick="CalendarioUI.showTab('config')">Impostazioni</button>
       </div>
 
       <div id="calendario-tab-mese"></div>
+      <div id="calendario-tab-config" style="display:none;"></div>
       <div id="calendario-tab-timeline" style="display:none;">
         <div style="display:flex;gap:14px;flex-wrap:wrap;align-items:center;margin-bottom:12px;">
           <label style="display:flex;align-items:center;gap:4px;font-size:0.78rem;"><input type="checkbox" id="catl-layer-campagna" checked onchange="CalendarioTimeline.render()"> Cronaca campagna</label>
@@ -4051,10 +4053,10 @@ const NPC = (() => {
     }
   };
 
-  const openModal = (npc) => {
+  const openModal = (npc, tab) => {
     _editingId = npc ? npc.id : null;
     populateFactionSelect();
-    switchModalTab('ruolo');
+    switchModalTab(tab === 'combat' ? 'combat' : 'ruolo');
     document.getElementById('npc-modal-title').textContent = npc ? 'Modifica PNG' : 'Nuovo PNG';
 
     const fields = {
@@ -4107,7 +4109,7 @@ const NPC = (() => {
     if (imgUrlEl) imgUrlEl.value = npc?.immagine || '';
 
     Modal.open('npc');
-    setTimeout(() => document.getElementById('nm-name')?.focus(), 100);
+    if (tab !== 'combat') setTimeout(() => document.getElementById('nm-name')?.focus(), 100);
     Debug.log(`NPC modal: ${npc ? npc.name : 'nuovo'}`);
   };
 
@@ -4201,6 +4203,12 @@ const NPC = (() => {
         const camp2 = App.getActiveCampaign();
         const savedNpc = (camp2?.npcs||[]).find(n => n.name === name);
         if (savedNpc) _mondoToWiki('npc', savedNpc);
+        // Se la scheda PNG della Wiki e' aperta su questo PNG, ridisegnala cosi'
+        // le statistiche appena modificate compaiono senza dover riaprire la scheda.
+        const wikiDetail = document.getElementById('wiki-png-detail');
+        if (savedNpc && wikiDetail && wikiDetail.style.display !== 'none' && typeof WikiSections !== 'undefined') {
+          WikiSections.openCard('png', savedNpc.id);
+        }
       } catch(e) { Debug.warn('Wiki sync NPC:', e); }
     }, 200);
   };
@@ -7914,7 +7922,8 @@ const Schermo = (() => {
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;">
         <button class="btn btn-ghost btn-sm" style="font-size:0.65rem;" onclick="Schermo._avanzaTempo('minuti',-10)">−10 min</button>
         <button class="btn btn-ghost btn-sm" style="font-size:0.65rem;" onclick="Schermo._avanzaTempo('giorni',-1)">−1 giorno</button>
-      </div>`;
+      </div>
+      <button class="btn btn-ghost btn-sm" style="font-size:0.65rem;width:100%;margin-top:4px;" onclick="App.navigateTo('calendario');setTimeout(()=>{try{CalendarioUI.showTab('config')}catch(e){}},150)">Imposta data e ora</button>`;
   };
 
   const _avanzaTempo = (unit, amount) => {
@@ -7927,6 +7936,10 @@ const Schermo = (() => {
   };
 
   const advanceTime = (minutes) => _avanzaTempo('minuti', minutes);
+
+  // Ridisegna i blocchi "tempo" senza far avanzare l'orologio: usato quando la data/ora
+  // corrente viene cambiata altrove (tab Impostazioni del Calendario).
+  const _refreshTempo = () => _blocks.filter(b => b.type === 'tempo').forEach(b => updateBlockContent(b));
 
   const renderVelocita = (blockId) => {
     const durata = document.getElementById(`vel-schermo-dur-${blockId}`)?.value || '8h';
@@ -8141,7 +8154,7 @@ const Schermo = (() => {
     removeBlock, resizeBlock, moveBlock, editBlock, resetLayout,
     rollDie, generateMeteo, saveNote, advanceTime, refreshCombat,
     setCompendioRef, _refreshCombat, _refreshFavoriti, _swapBlocks,
-    _refreshNoteSessione, _avanzaTempo, filterVelocita,
+    _refreshNoteSessione, _avanzaTempo, _refreshTempo, filterVelocita,
     startResize,
     _blocks: () => _blocks,
     _syncFromDOM: () => {
@@ -8523,7 +8536,7 @@ const Generatori = {
 
   openGeneratedNPC: () => {
     const npc = Generatori._lastGeneratedNPC;
-    if (!npc || !window.NPC) return;
+    if (!npc || typeof NPC === 'undefined') return;
     NPC.openModal(npc);
   },
 
@@ -15256,6 +15269,7 @@ const WikiSections = (() => {
       '</div>' +
 
       (type === 'quest' ? _renderObiettivi(item, isEdit) : '') +
+      (type === 'png' && !isEdit ? _renderStatBlock(item) : '') +
       ((type === 'png' || type === 'pg') ? _renderMomenti(item, type, isEdit) : '') +
 
       (() => {
@@ -15432,6 +15446,76 @@ const WikiSections = (() => {
     morte:       { color: '#888888', label: 'Morte' },
     rinascita:   { color: '#56d4dd', label: 'Rinascita' },
     legame:      { color: '#f5a623', label: 'Legame' },
+  };
+
+  // ── Statistiche di gioco (PNG): stat block completo, gli stessi campi delle schede
+  // che genera il "Generatore PNG Completo". I dati vivono su camp.npcs[n] (str, dex,
+  // ac, hp, cr, actions...) e si modificano con l'editor esistente (modal-npc, tab
+  // Combattimento). Qui la scheda della Wiki li mostra soltanto — o offre un pulsante
+  // per aggiungerli se il PNG e' ancora solo narrativo. Sta fuori dai piedi finche' non
+  // si usa: senza statistiche e' una riga sola. ──
+  const _renderStatBlock = (item) => {
+    const camp = App.getActiveCampaign();
+    const s = (camp?.npcs || []).find(n => n.id === item.id) || {};
+    const chiavi = ['str', 'dex', 'con', 'int_', 'wis', 'cha', 'hp', 'ac', 'cr'];
+    const has = chiavi.some(k => s[k] !== undefined && s[k] !== null && s[k] !== '');
+    const _m = (v) => { const n = Math.floor((parseInt(v || 10, 10) - 10) / 2); return (n >= 0 ? '+' : '') + n; };
+    const _btn = (label) => '<button class="btn btn-ghost btn-sm" onclick="WikiSections.openStatEditor(\'' + item.id + '\')">' + label + '</button>';
+
+    if (!has) {
+      return '<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);padding:14px 16px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">' +
+        '<div><div style="font-size:0.68rem;font-family:var(--font-display);text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);">Statistiche di gioco</div>' +
+        '<div class="text-muted" style="font-size:0.8rem;margin-top:2px;">CA, PF, caratteristiche, tiri salvezza, azioni…</div></div>' +
+        _btn('+ Aggiungi statistiche') +
+      '</div>';
+    }
+
+    const abils = [['FOR', s.str], ['DES', s.dex], ['COS', s.con], ['INT', s.int_], ['SAG', s.wis], ['CAR', s.cha]]
+      .map(([ab, v]) => '<div class="stat-ability-box"><div class="stat-ability-name">' + ab + '</div>' +
+        '<div class="stat-ability-score">' + (v || 10) + '</div><div class="stat-ability-mod">' + _m(v) + '</div></div>').join('');
+
+    const row = (label, val) => (val || val === 0) ? '<div class="stat-row"><strong>' + label + '</strong> ' + _escHtml(String(val)) + '</div>' : '';
+    const sub = [s.type || 'Umanoide', s.align].filter(Boolean).join(', ');
+
+    let actions = (s.actions || []).filter(a => a && a.name)
+      .map(a => '<div class="sb-action"><strong>' + _escHtml(a.name) + '.</strong> ' + _escHtml(a.desc || '') + '</div>').join('');
+    if (!actions && s.nomeArma && s.dadoAttacco) {
+      const atk = s.attaccoBonus !== undefined ? (s.attaccoBonus >= 0 ? '+' : '') + s.attaccoBonus + ' al tiro per colpire, ' : '';
+      let a = '<div class="sb-action"><strong>' + _escHtml(s.nomeArma) + '.</strong> ' + atk + 'danno ' + _escHtml(s.dadoAttacco) + ' da ' + _escHtml(s.tipoDanno || 'contundente') + '.</div>';
+      if (s.numAttacchi > 1) a = '<div class="sb-action"><strong>Multiattacco.</strong> ' + s.numAttacchi + ' attacchi con ' + _escHtml(s.nomeArma) + '.</div>' + a;
+      actions = a;
+    }
+    let special = s.special ? String(s.special).split('\n').filter(l => l.trim())
+      .map(l => '<div class="sb-action">' + _escHtml(l) + '</div>').join('') : '';
+    if (s.abilitaSpeciale) {
+      const [nome, resto] = String(s.abilitaSpeciale).split('(');
+      special += '<div class="sb-action"><strong>' + _escHtml(nome.trim()) + '.</strong> ' + _escHtml((resto || '').replace(')', '').trim()) + '</div>';
+    }
+
+    return '<div style="margin-bottom:16px;">' +
+      '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">' +
+        '<div style="font-size:0.68rem;font-family:var(--font-display);text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);">Statistiche di gioco</div>' +
+        _btn('Modifica') +
+      '</div>' +
+      '<div class="stat-block">' +
+        '<div class="stat-block-title">' + _escHtml(s.name || item.nome || 'PNG') + '</div>' +
+        ((sub || s.cr) ? '<div class="stat-block-subtitle">' + _escHtml(sub) + (s.cr ? (sub ? ' · ' : '') + 'GS ' + _escHtml(String(s.cr)) : '') + '</div>' : '') +
+        '<div class="stat-block-divider"></div>' +
+        row('CA', s.ac) + row('PF', s.hp) + row('Velocità', s.speed) +
+        '<div class="stat-abilities">' + abils + '</div>' +
+        row('TS', s.savingThrows) +
+        row('Immunità / Resistenze', s.immunities) + row('Sensi', s.senses) + row('Linguaggi', s.languages) +
+        (special ? '<div class="sb-section-title">Tratti</div>' + special : '') +
+        (actions ? '<div class="sb-section-title">Azioni</div>' + actions : '') +
+        (s.combatNotes ? '<div class="stat-block-divider"></div><div class="text-muted" style="font-size:0.8rem;white-space:pre-wrap;">' + _escHtml(s.combatNotes) + '</div>' : '') +
+      '</div>' +
+    '</div>';
+  };
+
+  const openStatEditor = (id) => {
+    const npc = (App.getActiveCampaign()?.npcs || []).find(n => n.id === id);
+    if (!npc || typeof NPC === 'undefined') { Toast.show('PNG non trovato', 'warning'); return; }
+    NPC.openModal(npc, 'combat');
   };
 
   const _renderMomenti = (it, type, edit) => {
@@ -16011,6 +16095,7 @@ const WikiSections = (() => {
     _renderDetailPub, _scheduleAutosavePub, _getCfg, _saveWithCustom,
     toggleObiettivo, addObiettivo, editObiettivoText, removeObiettivo,
     addMomento, editMomentoTesto, editMomentoTipo, editMomentoSessione, removeMomento,
+    openStatEditor,
     get _currentType() { return _currentType; },
     get _currentItem()  { return _currentItem; },
   };
@@ -18825,15 +18910,16 @@ const CalendarioUI = (() => {
   const _saveEventi = (list) => App.saveActiveCampaign({ calendarioEventi: list });
 
   const showTab = (tab) => {
-    const btnMese = document.getElementById('cal-tab-mese-btn');
-    const btnTl = document.getElementById('cal-tab-timeline-btn');
-    const paneMese = document.getElementById('calendario-tab-mese');
-    const paneTl = document.getElementById('calendario-tab-timeline');
-    if (btnMese) btnMese.classList.toggle('active', tab === 'mese');
-    if (btnTl) btnTl.classList.toggle('active', tab === 'timeline');
-    if (paneMese) paneMese.style.display = tab === 'mese' ? '' : 'none';
-    if (paneTl) paneTl.style.display = tab === 'timeline' ? '' : 'none';
+    const panes = { mese: 'calendario-tab-mese', timeline: 'calendario-tab-timeline', config: 'calendario-tab-config' };
+    const btns = { mese: 'cal-tab-mese-btn', timeline: 'cal-tab-timeline-btn', config: 'cal-tab-config-btn' };
+    Object.keys(panes).forEach(k => {
+      const btn = document.getElementById(btns[k]);
+      const pane = document.getElementById(panes[k]);
+      if (btn) btn.classList.toggle('active', tab === k);
+      if (pane) pane.style.display = tab === k ? '' : 'none';
+    });
     if (tab === 'mese') _renderMese();
+    else if (tab === 'config') { try { CalendarioConfig.render(); } catch (e) {} }
     else { try { CalendarioTimeline.render(); } catch (e) {} }
   };
 
@@ -20416,6 +20502,7 @@ document.addEventListener('DOMContentLoaded', initMobileNav);
 <script src="js/bug-report.js"></script>
 <script src="js/newsletter-popup.js"></script>
 <script src="js/wiki-import.js"></script>
+<script src="js/calendario-config.js"></script>
 
 </body>
 </html>
