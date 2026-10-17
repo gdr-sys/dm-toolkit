@@ -75,6 +75,15 @@ const MappaUI = (() => {
   const ICONA_PNG = '<circle cx="12" cy="7" r="1.6" fill="#fff"/><path d="M8.5 12.5 Q8.5 9 12 9 Q15.5 9 15.5 12.5 Z" fill="#fff"/>';
   const ICONA_MAPPA = '<rect x="9" y="6" width="6" height="6" rx="1" fill="#fff"/>';
   const ICONA_DEFAULT = '<circle cx="12" cy="9" r="3" fill="#fff"/>';
+  // Icone per i pin "etichetta libera" (senza scheda Wiki collegata) — per
+  // segnare al volo cose come loot o pericoli direttamente sulla mappa, con
+  // una nota scritta li' per li' invece di dover creare una scheda apposta.
+  const ICONA_LIBERO = {
+    '':        ICONA_DEFAULT,
+    tesoro:    '<rect x="8" y="9" width="8" height="3.8" rx="0.5" fill="#fff"/><rect x="8" y="6.8" width="8" height="2.4" rx="0.5" fill="#fff"/>',
+    pericolo:  '<path d="M12 5.8 L16 12.3 H8 Z" fill="none" stroke="#fff" stroke-width="1"/><rect x="11.55" y="8.2" width="0.9" height="2" fill="#fff"/><circle cx="12" cy="11.1" r="0.55" fill="#fff"/>',
+    nota:      '<rect x="8.3" y="5.8" width="7.4" height="7.2" rx="0.6" fill="none" stroke="#fff" stroke-width="1"/><line x1="9.8" y1="8.1" x2="14.2" y2="8.1" stroke="#fff" stroke-width="0.8"/><line x1="9.8" y1="10.1" x2="14.2" y2="10.1" stroke="#fff" stroke-width="0.8"/>',
+  };
 
   let _scale = 1, _panX = 0, _panY = 0;
   let _dragging = false, _dragMoved = false, _lastClientX = 0, _lastClientY = 0;
@@ -274,10 +283,15 @@ const MappaUI = (() => {
         // Icona in base al "Tipo di luogo" gia' scelto sulla scheda collegata
         // (Città, Villaggio, Castello...): nessun dato nuovo richiesto al DM.
         centro = (item && ICONA_LUOGO[item.tipo]) || ICONA_DEFAULT;
+      } else {
+        centro = ICONA_LIBERO[p.sottotipo || ''] || ICONA_DEFAULT;
       }
       const colore = p.colore || COLORI[0];
+      // Il titolo al passaggio del mouse anticipa anche l'inizio della nota,
+      // cosi' non serve aprire il pin solo per ricordarsi cosa c'e' scritto.
+      const anteprimaNota = (!p.tipo && p.note) ? ' — ' + p.note.slice(0, 60) + (p.note.length > 60 ? '…' : '') : '';
       return (
-        '<div class="mappa-pin" data-pin-id="' + p.id + '" title="' + _escHtml(nome) + '" ' +
+        '<div class="mappa-pin" data-pin-id="' + p.id + '" title="' + _escHtml(nome + anteprimaNota) + '" ' +
           'style="position:absolute;left:' + (p.x * 100) + '%;top:' + (p.y * 100) + '%;transform:translate(-50%,-100%);cursor:pointer;z-index:2;" ' +
           'onclick="MappaUI.onPinClick(\'' + p.id + '\', event)">' +
           '<svg width="26" height="26" viewBox="0 0 24 24" fill="' + colore + '" stroke="#fff" stroke-width="1.2"><path d="M12 0C7 0 3 4 3 9c0 6.5 9 15 9 15s9-8.5 9-15c0-5-4-9-9-9z"/>' + centro + '</svg>' +
@@ -413,7 +427,7 @@ const MappaUI = (() => {
     pinModal.onclick = (e) => { if (e.target === pinModal) Modal.close('mappa-pin'); };
     pinModal.innerHTML =
       '<div class="modal" style="max-width:420px;">' +
-        '<div class="modal-header"><h3 class="modal-title">Nuovo pin</h3>' +
+        '<div class="modal-header"><h3 class="modal-title" id="mappa-pin-titolo">Nuovo pin</h3>' +
           '<button class="btn btn-ghost btn-icon-sm" onclick="Modal.close(\'mappa-pin\')" aria-label="Chiudi"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>' +
         '</div>' +
         '<div class="modal-body">' +
@@ -438,8 +452,21 @@ const MappaUI = (() => {
             '</div>' +
             '<div class="form-hint" style="margin-top:4px;">Crea subito una scheda minima nella Wiki (potrai completarla con altri dettagli quando vuoi).</div>' +
           '</div>' +
-          '<div class="form-group" id="mappa-pin-label-wrap"><label class="form-label">Etichetta</label>' +
-            '<input type="text" id="mappa-pin-label" class="form-input" placeholder="es. Ponte crollato, Accampamento banditi...">' +
+          '<div id="mappa-pin-label-wrap">' +
+            '<div class="form-group"><label class="form-label">Etichetta</label>' +
+              '<input type="text" id="mappa-pin-label" class="form-input" placeholder="es. Loot, Trappola, Accampamento banditi...">' +
+            '</div>' +
+            '<div class="form-group"><label class="form-label">Icona</label>' +
+              '<select id="mappa-pin-icona-libera" class="form-select">' +
+                '<option value="">Generico</option>' +
+                '<option value="tesoro">Tesoro / Loot</option>' +
+                '<option value="pericolo">Pericolo / Trappola</option>' +
+                '<option value="nota">Nota</option>' +
+              '</select>' +
+            '</div>' +
+            '<div class="form-group"><label class="form-label">Note (facoltative)</label>' +
+              '<textarea id="mappa-pin-note" class="form-input" rows="3" placeholder="es. CD 15 Percezione per notarla, scarica 2d6 danni da fulmine se innescata..." style="resize:vertical;"></textarea>' +
+            '</div>' +
           '</div>' +
           '<div class="form-group"><label class="form-label">Colore</label>' +
             '<div id="mappa-pin-colori" style="display:flex;gap:6px;"></div>' +
@@ -447,7 +474,7 @@ const MappaUI = (() => {
         '</div>' +
         '<div class="modal-footer">' +
           '<button class="btn btn-ghost" onclick="Modal.close(\'mappa-pin\')">Annulla</button>' +
-          '<button class="btn btn-primary" onclick="MappaUI.confermaNuovoPin()">Aggiungi pin</button>' +
+          '<button class="btn btn-primary" id="mappa-pin-btn-conferma" onclick="MappaUI.confermaNuovoPin()">Aggiungi pin</button>' +
         '</div>' +
       '</div>';
     document.body.appendChild(pinModal);
@@ -584,23 +611,73 @@ const MappaUI = (() => {
     });
   };
 
-  /* ── Nuovo pin ── */
+  /* ── Nuovo pin / modifica pin esistente ── */
+
+  let _editingPinId = null;
 
   const apriModalNuovoPin = (fx, fy) => {
     _injectModals();
+    _editingPinId = null;
     _pendingPin = { x: fx, y: fy };
+    document.getElementById('mappa-pin-titolo').textContent = 'Nuovo pin';
+    document.getElementById('mappa-pin-btn-conferma').textContent = 'Aggiungi pin';
     document.getElementById('mappa-pin-tipo').value = '';
+    document.getElementById('mappa-pin-tipo').disabled = false;
     document.getElementById('mappa-pin-entita-wrap').style.display = 'none';
     document.getElementById('mappa-pin-nuovo-wrap').style.display = 'none';
     document.getElementById('mappa-pin-label-wrap').style.display = '';
     document.getElementById('mappa-pin-label').value = '';
+    document.getElementById('mappa-pin-icona-libera').value = '';
+    document.getElementById('mappa-pin-note').value = '';
     document.getElementById('mappa-pin-nuovo-nome').value = '';
     _pinColoreScelto = COLORI[0];
-    const colWrap = document.getElementById('mappa-pin-colori');
-    colWrap.innerHTML = COLORI.map((c, i) =>
-      '<span class="mappa-pin-colore-opt" data-colore="' + c + '" onclick="MappaUI._pickColore(this)" style="width:22px;height:22px;border-radius:50%;background:' + c + ';cursor:pointer;border:2px solid ' + (i === 0 ? 'var(--text-primary)' : 'transparent') + ';display:inline-block;"></span>'
-    ).join('');
+    _renderColoriPin(COLORI[0]);
     Modal.open('mappa-pin');
+  };
+
+  // Riapre lo stesso modale precompilato coi dati del pin esistente: oggi
+  // l'unico modo per "cambiare idea" su un pin era cancellarlo e rifarlo da
+  // zero, perdendo posizione e dati — specialmente scomodo per i pin con
+  // nota (loot, trappole...) pensati per essere aggiornati nel tempo.
+  const modificaPin = (pinId) => {
+    const pin = _trovaPin(pinId);
+    if (!pin) return;
+    _injectModals();
+    document.getElementById('mappa-pin-popover').style.display = 'none';
+    _editingPinId = pinId;
+    _pendingPin = null;
+    document.getElementById('mappa-pin-titolo').textContent = 'Modifica pin';
+    document.getElementById('mappa-pin-btn-conferma').textContent = 'Salva';
+    // Il tipo di collegamento (Luogo/PNG/mappa/libero) non si cambia qui:
+    // significherebbe ricreare il pin da un'altra categoria di dati. Si puo'
+    // sempre rimuoverlo e farne uno nuovo se serve collegarlo diversamente.
+    document.getElementById('mappa-pin-tipo').value = pin.tipo || '';
+    document.getElementById('mappa-pin-tipo').disabled = true;
+    _onPinTipoChange();
+    if (pin.tipo && pin.tipo !== 'mappa') {
+      const sel = document.getElementById('mappa-pin-entita');
+      if (sel.querySelector('option[value="' + pin.entitaId + '"]')) sel.value = pin.entitaId;
+      // _onPinTipoChange() sopra ha gia' richiamato _onPinEntitaChange() una
+      // volta, ma col primo valore di default della lista appena ricostruita
+      // ("+ Crea nuovo...") — va rifatto ora che il valore vero e' impostato,
+      // altrimenti il blocco "crea nuovo" resta visibile per errore.
+      _onPinEntitaChange();
+    } else if (pin.tipo === 'mappa') {
+      document.getElementById('mappa-pin-entita').value = pin.entitaId || '';
+    }
+    document.getElementById('mappa-pin-label').value = pin.label || '';
+    document.getElementById('mappa-pin-icona-libera').value = pin.sottotipo || '';
+    document.getElementById('mappa-pin-note').value = pin.note || '';
+    _pinColoreScelto = pin.colore || COLORI[0];
+    _renderColoriPin(_pinColoreScelto);
+    Modal.open('mappa-pin');
+  };
+
+  const _renderColoriPin = (selezionato) => {
+    const colWrap = document.getElementById('mappa-pin-colori');
+    colWrap.innerHTML = COLORI.map(c =>
+      '<span class="mappa-pin-colore-opt" data-colore="' + c + '" onclick="MappaUI._pickColore(this)" style="width:22px;height:22px;border-radius:50%;background:' + c + ';cursor:pointer;border:2px solid ' + (c === selezionato ? 'var(--text-primary)' : 'transparent') + ';display:inline-block;"></span>'
+    ).join('');
   };
 
   const _pickColore = (el) => {
@@ -659,10 +736,11 @@ const MappaUI = (() => {
   };
 
   const confermaNuovoPin = () => {
-    if (!_pendingPin) return;
+    const modifica = !!_editingPinId;
+    if (!modifica && !_pendingPin) return;
     const tipo = document.getElementById('mappa-pin-tipo').value || null;
     const colore = _pinColoreScelto || COLORI[0];
-    let entitaId = null, label = '';
+    let entitaId = null, label = '', sottotipo = '', note = '';
     if (tipo) {
       entitaId = document.getElementById('mappa-pin-entita')?.value || null;
       if (!entitaId) { Toast.show('Scegli a cosa collegare il pin', 'warning'); return; }
@@ -685,10 +763,27 @@ const MappaUI = (() => {
     } else {
       label = document.getElementById('mappa-pin-label')?.value?.trim() || '';
       if (!label) { Toast.show('Scrivi un’etichetta per il pin', 'warning'); return; }
+      sottotipo = document.getElementById('mappa-pin-icona-libera')?.value || '';
+      note = document.getElementById('mappa-pin-note')?.value?.trim() || '';
     }
+
+    if (modifica) {
+      _aggiornaMappaAttiva(m => ({
+        ...m,
+        pins: (m.pins || []).map(p => p.id === _editingPinId
+          ? { ...p, entitaId, label, sottotipo, note, colore }
+          : p),
+      }));
+      _editingPinId = null;
+      Modal.close('mappa-pin');
+      _renderPins();
+      Toast.show('Pin aggiornato', 'success', 1500);
+      return;
+    }
+
     const nuovoPin = {
       id: 'pin_' + Date.now() + '_' + Math.random().toString(36).slice(2, 5),
-      x: _pendingPin.x, y: _pendingPin.y, tipo, entitaId, label, colore,
+      x: _pendingPin.x, y: _pendingPin.y, tipo, entitaId, label, sottotipo, note, colore,
     };
     _aggiornaMappaAttiva(m => ({ ...m, pins: [...(m.pins || []), nuovoPin] }));
     _pendingPin = null;
@@ -728,10 +823,12 @@ const MappaUI = (() => {
     }
     const pop = document.getElementById('mappa-pin-popover');
     pop.innerHTML =
-      '<div style="font-family:var(--font-display);font-size:0.9rem;margin-bottom:8px;">' + _escHtml(nome) + '</div>' +
+      '<div style="font-family:var(--font-display);font-size:0.9rem;margin-bottom:' + (pin.note ? '4' : '8') + 'px;">' + _escHtml(nome) + '</div>' +
+      (pin.note ? '<div class="text-sm text-muted" style="margin-bottom:8px;white-space:pre-wrap;max-width:220px;">' + _escHtml(pin.note) + '</div>' : '') +
       '<div style="display:flex;flex-direction:column;gap:4px;">' +
         (item ? '<button class="btn btn-secondary btn-sm" onclick="QuickView.open(\'' + pin.tipo + '\',\'' + pin.entitaId + '\');document.getElementById(\'mappa-pin-popover\').style.display=\'none\';">Apri scheda</button>' : '') +
         (mappaCollegata ? '<button class="btn btn-secondary btn-sm" onclick="MappaUI.entraInMappa(\'' + mappaCollegata.id + '\')">Apri questa mappa</button>' : '') +
+        '<button class="btn btn-ghost btn-sm" onclick="MappaUI.modificaPin(\'' + pinId + '\')">Modifica pin</button>' +
         '<button class="btn btn-ghost btn-sm" onclick="MappaUI.iniziaMisuraDaPin(\'' + pinId + '\')">Misura distanza da qui</button>' +
         '<button class="btn btn-ghost btn-sm" style="color:var(--accent-danger);" onclick="MappaUI.rimuoviPin(\'' + pinId + '\')">Rimuovi pin</button>' +
       '</div>';
@@ -843,7 +940,7 @@ const MappaUI = (() => {
     init, zoom, zoomReset,
     vaiAMappa, tornaIndietro, entraInMappa, nuovaMappa, eliminaMappaCorrente,
     apriImpostazioni, salvaImpostazioni, _onFilePicked,
-    apriModalNuovoPin, confermaNuovoPin, _onPinTipoChange, _onPinEntitaChange, _pickColore,
+    apriModalNuovoPin, confermaNuovoPin, modificaPin, _onPinTipoChange, _onPinEntitaChange, _pickColore,
     onPinClick, rimuoviPin, iniziaMisuraDaPin, _ricalcolaMisura,
   };
 })();
