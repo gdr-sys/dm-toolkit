@@ -257,20 +257,25 @@ const MappaUI = (() => {
     const mappe = _getMappe();
     wrap.innerHTML = (mappa.pins || []).map(p => {
       let nome = p.label || '(senza nome)';
+      let centro = ICONA_DEFAULT;
       if (p.tipo === 'mappa') {
         const m = mappe.find(x => x.id === p.entitaId);
         nome = m ? m.nome : '(mappa eliminata)';
-      } else if (p.tipo) {
-        const cfg = WikiSections._getCfg(p.tipo);
+        centro = ICONA_MAPPA;
+      } else if (p.tipo === 'png') {
+        const cfg = WikiSections._getCfg('png');
         const item = cfg && (cfg.getData(camp) || []).find(x => x.id === p.entitaId);
         if (item) nome = item.nome;
+        centro = ICONA_PNG;
+      } else if (p.tipo === 'luoghi') {
+        const cfg = WikiSections._getCfg('luoghi');
+        const item = cfg && (cfg.getData(camp) || []).find(x => x.id === p.entitaId);
+        if (item) nome = item.nome;
+        // Icona in base al "Tipo di luogo" gia' scelto sulla scheda collegata
+        // (Città, Villaggio, Castello...): nessun dato nuovo richiesto al DM.
+        centro = (item && ICONA_LUOGO[item.tipo]) || ICONA_DEFAULT;
       }
       const colore = p.colore || COLORI[0];
-      // Pin "apri un'altra mappa": stessa forma, ma con un piccolo riquadro
-      // invece del pallino centrale, per distinguerla a colpo d'occhio.
-      const centro = p.tipo === 'mappa'
-        ? '<rect x="9" y="6" width="6" height="6" rx="1" fill="#fff"/>'
-        : '<circle cx="12" cy="9" r="3" fill="#fff"/>';
       return (
         '<div class="mappa-pin" data-pin-id="' + p.id + '" title="' + _escHtml(nome) + '" ' +
           'style="position:absolute;left:' + (p.x * 100) + '%;top:' + (p.y * 100) + '%;transform:translate(-50%,-100%);cursor:pointer;z-index:2;" ' +
@@ -415,14 +420,23 @@ const MappaUI = (() => {
           '<div class="form-group"><label class="form-label">Collegato a</label>' +
             '<select id="mappa-pin-tipo" class="form-select" onchange="MappaUI._onPinTipoChange()">' +
               '<option value="">Etichetta libera (nessuna scheda)</option>' +
-              '<option value="luoghi">Un Luogo esistente</option>' +
-              '<option value="png">Un PNG esistente</option>' +
+              '<option value="luoghi">Un Luogo (esistente o nuovo)</option>' +
+              '<option value="png">Un PNG (esistente o nuovo)</option>' +
               '<option value="mappa">Un’altra mappa (click per aprirla)</option>' +
             '</select>' +
           '</div>' +
           '<div class="form-group" id="mappa-pin-entita-wrap" style="display:none;">' +
             '<label class="form-label">Quale</label>' +
-            '<select id="mappa-pin-entita" class="form-select"></select>' +
+            '<select id="mappa-pin-entita" class="form-select" onchange="MappaUI._onPinEntitaChange()"></select>' +
+          '</div>' +
+          '<div class="form-group" id="mappa-pin-nuovo-wrap" style="display:none;">' +
+            '<label class="form-label" id="mappa-pin-nuovo-label">Nome</label>' +
+            '<input type="text" id="mappa-pin-nuovo-nome" class="form-input" placeholder="es. Il Gatto Ridens" style="margin-bottom:8px;">' +
+            '<div id="mappa-pin-nuovo-tipo-wrap" style="display:none;">' +
+              '<label class="form-label">Tipo di luogo</label>' +
+              '<select id="mappa-pin-nuovo-tipo" class="form-select"></select>' +
+            '</div>' +
+            '<div class="form-hint" style="margin-top:4px;">Crea subito una scheda minima nella Wiki (potrai completarla con altri dettagli quando vuoi).</div>' +
           '</div>' +
           '<div class="form-group" id="mappa-pin-label-wrap"><label class="form-label">Etichetta</label>' +
             '<input type="text" id="mappa-pin-label" class="form-input" placeholder="es. Ponte crollato, Accampamento banditi...">' +
@@ -577,8 +591,10 @@ const MappaUI = (() => {
     _pendingPin = { x: fx, y: fy };
     document.getElementById('mappa-pin-tipo').value = '';
     document.getElementById('mappa-pin-entita-wrap').style.display = 'none';
+    document.getElementById('mappa-pin-nuovo-wrap').style.display = 'none';
     document.getElementById('mappa-pin-label-wrap').style.display = '';
     document.getElementById('mappa-pin-label').value = '';
+    document.getElementById('mappa-pin-nuovo-nome').value = '';
     _pinColoreScelto = COLORI[0];
     const colWrap = document.getElementById('mappa-pin-colori');
     colWrap.innerHTML = COLORI.map((c, i) =>
@@ -596,7 +612,9 @@ const MappaUI = (() => {
   const _onPinTipoChange = () => {
     const tipo = document.getElementById('mappa-pin-tipo').value;
     const entitaWrap = document.getElementById('mappa-pin-entita-wrap');
+    const nuovoWrap = document.getElementById('mappa-pin-nuovo-wrap');
     const labelWrap = document.getElementById('mappa-pin-label-wrap');
+    nuovoWrap.style.display = 'none';
     if (!tipo) {
       entitaWrap.style.display = 'none';
       labelWrap.style.display = '';
@@ -613,11 +631,31 @@ const MappaUI = (() => {
         : '<option value="">Nessun’altra mappa ancora — creane una prima</option>';
       return;
     }
+    // Per Luoghi/PNG si può sempre creare una scheda minima al volo, non serve
+    // che esista già nella Wiki prima di poterla segnare sulla mappa.
     const cfg = WikiSections._getCfg(tipo);
     const items = (cfg.getData(_getCamp()) || []).slice().sort((a, b) => a.nome.localeCompare(b.nome, 'it'));
-    sel.innerHTML = items.length
-      ? items.map(x => '<option value="' + x.id + '">' + _escHtml(x.nome) + '</option>').join('')
-      : '<option value="">Nessuno ancora nella Wiki</option>';
+    const opzioneNuovo = '<option value="__nuovo__">+ Crea nuovo ' + (tipo === 'luoghi' ? 'Luogo' : 'PNG') + '...</option>';
+    sel.innerHTML = opzioneNuovo + items.map(x => '<option value="' + x.id + '">' + _escHtml(x.nome) + '</option>').join('');
+    _onPinEntitaChange();
+  };
+
+  const _onPinEntitaChange = () => {
+    const tipo = document.getElementById('mappa-pin-tipo').value;
+    const valore = document.getElementById('mappa-pin-entita')?.value;
+    const nuovoWrap = document.getElementById('mappa-pin-nuovo-wrap');
+    if (tipo === 'mappa' || valore !== '__nuovo__') { nuovoWrap.style.display = 'none'; return; }
+    nuovoWrap.style.display = '';
+    document.getElementById('mappa-pin-nuovo-label').textContent = 'Nome del nuovo ' + (tipo === 'luoghi' ? 'Luogo' : 'PNG');
+    const tipoLuogoWrap = document.getElementById('mappa-pin-nuovo-tipo-wrap');
+    if (tipo === 'luoghi') {
+      tipoLuogoWrap.style.display = '';
+      const campoTipo = WikiSections._getCfg('luoghi').fields.find(f => f.key === 'tipo');
+      const sel = document.getElementById('mappa-pin-nuovo-tipo');
+      sel.innerHTML = (campoTipo?.options || []).map(o => '<option value="' + _escHtml(o) + '">' + _escHtml(o) + '</option>').join('');
+    } else {
+      tipoLuogoWrap.style.display = 'none';
+    }
   };
 
   const confermaNuovoPin = () => {
@@ -628,6 +666,22 @@ const MappaUI = (() => {
     if (tipo) {
       entitaId = document.getElementById('mappa-pin-entita')?.value || null;
       if (!entitaId) { Toast.show('Scegli a cosa collegare il pin', 'warning'); return; }
+
+      if (entitaId === '__nuovo__') {
+        const nomeNuovo = document.getElementById('mappa-pin-nuovo-nome')?.value?.trim() || '';
+        if (!nomeNuovo) { Toast.show('Scrivi un nome per la nuova scheda', 'warning'); return; }
+        const cfg = WikiSections._getCfg(tipo);
+        const item = cfg.newItem();
+        item.nome = nomeNuovo;
+        if (tipo === 'luoghi') {
+          const tipoLuogo = document.getElementById('mappa-pin-nuovo-tipo')?.value;
+          if (tipoLuogo) item.tipo = tipoLuogo;
+        }
+        cfg.saveItem(_getCamp(), item);
+        try { WikiSections.renderCounters(); } catch(e) {}
+        entitaId = item.id;
+        Toast.show((tipo === 'luoghi' ? 'Luogo' : 'PNG') + ' "' + nomeNuovo + '" creato nella Wiki', 'success', 2500);
+      }
     } else {
       label = document.getElementById('mappa-pin-label')?.value?.trim() || '';
       if (!label) { Toast.show('Scrivi un’etichetta per il pin', 'warning'); return; }
@@ -789,7 +843,7 @@ const MappaUI = (() => {
     init, zoom, zoomReset,
     vaiAMappa, tornaIndietro, entraInMappa, nuovaMappa, eliminaMappaCorrente,
     apriImpostazioni, salvaImpostazioni, _onFilePicked,
-    apriModalNuovoPin, confermaNuovoPin, _onPinTipoChange, _pickColore,
+    apriModalNuovoPin, confermaNuovoPin, _onPinTipoChange, _onPinEntitaChange, _pickColore,
     onPinClick, rimuoviPin, iniziaMisuraDaPin, _ricalcolaMisura,
   };
 })();
