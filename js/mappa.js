@@ -1,20 +1,36 @@
 /* ============================================================
-   MAPPA.JS — Mappa interattiva con pin collegati al Mondo.
+   MAPPA.JS — Mappe interattive con pin collegati al Mondo.
 
-   Una campagna puo' avere una mappa (un'immagine a scelta: disegno,
-   scansione, mappa generata altrove) con sopra dei pin. Ogni pin puo'
-   essere collegato a un Luogo o un PNG gia' esistenti nella Wiki
-   (click -> QuickView, lo stesso pannello laterale delle @menzioni)
-   oppure essere un'etichetta libera senza scheda collegata.
+   Una campagna puo' avere PIU' mappe (camp.mappe[]), ognuna con la sua
+   immagine e i suoi pin. Ogni pin puo' essere collegato a un Luogo o
+   un PNG gia' esistenti nella Wiki (click -> QuickView, lo stesso
+   pannello laterale delle @menzioni), essere un'etichetta libera senza
+   scheda collegata, oppure aprire UN'ALTRA mappa della campagna (mappe
+   annidate: es. pin "citta'" sulla mappa del regno -> mappa della
+   citta' -> pin "taverna" -> mappa della taverna). La navigazione tra
+   mappe annidate usa una pila (si entra cliccando il pin, si torna
+   indietro col bottone apposito) cosi' la stessa mappa puo' essere
+   raggiunta da piu' pin/mappe diverse senza ambiguita'.
 
-   E' anche possibile calcolare la distanza tra due pin e il tempo di
-   viaggio a piedi/cavallo/barca/nave, riusando gli stessi ritmi di
-   viaggio ufficiali (Normale/Veloce/Lento) gia' presenti nei dati SRD
-   del Compendio — gli stessi numeri di Generatori.calcViaggio.
+   Migrazione automatica e silenziosa dal vecchio formato a mappa
+   singola (camp.mappa): se camp.mappe non esiste ancora ma camp.mappa
+   si', viene letta come prima mappa dell'elenco al primo accesso.
+   camp.mappa originale non viene mai toccato/cancellato (nessun
+   rischio di perdita dati), semplicemente smette di essere usato dal
+   primo salvataggio in poi.
 
-   Solo UNA mappa per campagna in questa prima versione (niente mappe
-   multiple o "mappa dentro la mappa"): se servisse di piu' si estende
-   in un secondo momento senza toccare il resto.
+   Immagini: si puo' sempre incollare un URL diretto (resta il modo
+   preferito — nessuna dipendenza da account collegati), oppure
+   caricarla dal dispositivo. Il caricamento usa DriveBackup.uploadImage
+   (stesso meccanismo gia' in uso per i ritratti PNG): se Drive e'
+   collegato la carica li' e usa il link pubblico risultante, altrimenti
+   la salva come immagine incorporata nella campagna stessa (nessun
+   account richiesto, semplicemente piu' pesante da sincronizzare).
+   Un link di condivisione di Google Drive incollato a mano (quello che
+   da' il bottone "Condividi", tipo drive.google.com/file/d/ID/view)
+   viene riconosciuto e convertito da solo nel formato diretto che un
+   tag <img> puo' davvero caricare — quello incollato cosi' com'e' non
+   funziona.
 
    Modulo autonomo: aggiunge la propria voce di navigazione e la
    propria pagina a runtime, tranne i tre punti che toccano per forza
@@ -44,14 +60,46 @@ const MappaUI = (() => {
   let _pendingPin = null;   // {x,y} in attesa di conferma dal modal "Nuovo pin"
   let _misuraDa = null;     // id del primo pin scelto per la misura distanza
   let _pinColoreScelto = COLORI[0];
+  let _navStack = [];       // pila di id mappa: [0]=radice di questa sessione di navigazione, ultimo=mappa attuale
+  let _pendingUploadDataUri = null; // immagine scelta dal dispositivo, in attesa di "Salva"
 
   const _escHtml = (s) => String(s || '')
     .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 
   const _getCamp = () => App.getActiveCampaign();
-  const _getMappa = () => _getCamp()?.mappa || null;
-  const _saveMappa = (mappa) => App.saveActiveCampaign({ mappa });
+
+  // Elenco mappe della campagna, con migrazione silenziosa una tantum dal
+  // vecchio formato a mappa singola (vedi nota in testa al file).
+  const _getMappe = () => {
+    const camp = _getCamp();
+    if (!camp) return [];
+    if (camp.mappe) return camp.mappe;
+    if (camp.mappa && camp.mappa.immagine) {
+      return [{
+        id: 'mappa_main', nome: 'Mappa principale',
+        immagine: camp.mappa.immagine, scalaKm: camp.mappa.scalaKm || 0,
+        pins: camp.mappa.pins || [],
+      }];
+    }
+    return [];
+  };
+  const _saveMappe = (mappe) => App.saveActiveCampaign({ mappe });
+
+  const _mappaAttivaId = () => _navStack[_navStack.length - 1] || null;
+  const _getMappaAttiva = () => {
+    const mappe = _getMappe();
+    if (!mappe.length) return null;
+    return mappe.find(m => m.id === _mappaAttivaId()) || mappe[0];
+  };
+  // Aggiorna la mappa attualmente aperta con una funzione (mappa) => mappaAggiornata;
+  // le altre mappe dell'elenco restano intatte.
+  const _aggiornaMappaAttiva = (updater) => {
+    const mappe = _getMappe();
+    const attuale = _getMappaAttiva();
+    if (!attuale) return;
+    _saveMappe(mappe.map(m => m.id === attuale.id ? updater({ ...m }) : m));
+  };
 
   /* ── Pagina ── */
 
@@ -62,21 +110,22 @@ const MappaUI = (() => {
     page.innerHTML =
       '<div style="display:flex;flex-direction:column;height:100%;">' +
         '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:var(--space-md) var(--space-lg);border-bottom:1px solid var(--border);flex-wrap:wrap;">' +
-          '<div>' +
+          '<div style="min-width:0;">' +
             '<h1 class="page-title" style="margin:0;">Mappa</h1>' +
-            '<p class="page-subtitle" style="margin:2px 0 0;">Click su uno spazio vuoto per aggiungere un pin, click su un pin per aprirlo</p>' +
+            '<div id="mappa-selettore-wrap" style="margin-top:6px;"></div>' +
           '</div>' +
-          '<div style="display:flex;align-items:center;gap:6px;">' +
+          '<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">' +
             '<button class="btn btn-ghost btn-icon-sm" onclick="MappaUI.zoom(-0.2)" title="Riduci">−</button>' +
             '<button class="btn btn-ghost btn-sm" onclick="MappaUI.zoomReset()" id="mappa-zoom-label" style="min-width:48px;">100%</button>' +
             '<button class="btn btn-ghost btn-icon-sm" onclick="MappaUI.zoom(0.2)" title="Ingrandisci">+</button>' +
             '<button class="btn btn-secondary btn-sm" onclick="MappaUI.apriImpostazioni()">Modifica mappa</button>' +
           '</div>' +
         '</div>' +
+        '<p class="page-subtitle" style="margin:0;padding:0 var(--space-lg) var(--space-sm);">Click su uno spazio vuoto per aggiungere un pin, click su un pin per aprirlo. Un pin puo\' anche aprire un\'altra mappa (es. la mappa di una citta\' o di un dungeon).</p>' +
         '<div id="mappa-canvas" style="flex:1;position:relative;overflow:hidden;background:var(--bg-tertiary);cursor:grab;touch-action:none;">' +
           '<div id="mappa-vuota" style="display:none;position:absolute;inset:0;flex-direction:column;align-items:center;justify-content:center;gap:12px;text-align:center;padding:24px;">' +
             '<div style="opacity:0.4;"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 6v16l7-4 8 4 7-4V2l-7 4-8-4-7 4z"/><path d="M8 2v16"/><path d="M16 6v16"/></svg></div>' +
-            '<div><h3 style="margin:0 0 4px;">Nessuna mappa caricata</h3><p class="text-sm text-muted" style="margin:0;max-width:340px;">Carica un’immagine (un disegno, una scansione, una mappa fatta altrove) e inizia a segnare luoghi e PNG sopra.</p></div>' +
+            '<div><h3 id="mappa-vuota-titolo" style="margin:0 0 4px;">Nessuna mappa ancora</h3><p class="text-sm text-muted" style="margin:0;max-width:340px;">Carica un’immagine (un disegno, una scansione, una mappa fatta altrove) e inizia a segnare luoghi e PNG sopra.</p></div>' +
             '<button class="btn btn-primary btn-sm" onclick="MappaUI.apriImpostazioni()">Carica una mappa</button>' +
           '</div>' +
           '<div id="mappa-inner" style="position:absolute;left:0;top:0;transform-origin:0 0;">' +
@@ -97,41 +146,115 @@ const MappaUI = (() => {
     canvas.addEventListener('click', _onCanvasClick);
   };
 
+  // Barra sopra la mappa: se si e' entrati qui navigando da un pin "apri mappa",
+  // un bottone "indietro" verso la mappa precedente; sempre, un selettore a
+  // tendina per saltare direttamente a una qualsiasi mappa della campagna.
+  const _renderSelettore = () => {
+    const wrap = document.getElementById('mappa-selettore-wrap');
+    if (!wrap) return;
+    const mappe = _getMappe();
+    const attuale = _getMappaAttiva();
+    const opzioni = mappe.map(m =>
+      '<option value="' + m.id + '"' + (attuale && m.id === attuale.id ? ' selected' : '') + '>' + _escHtml(m.nome) + '</option>'
+    ).join('');
+    const indietro = _navStack.length > 1
+      ? (() => {
+          const prevId = _navStack[_navStack.length - 2];
+          const prev = mappe.find(m => m.id === prevId);
+          return '<button class="btn btn-ghost btn-sm" onclick="MappaUI.tornaIndietro()" style="margin-right:6px;">← ' + _escHtml(prev ? prev.nome : 'Indietro') + '</button>';
+        })()
+      : '';
+    wrap.innerHTML = indietro +
+      (mappe.length
+        ? '<select id="mappa-selettore" class="form-select" style="font-size:0.78rem;padding:4px 8px;display:inline-block;width:auto;max-width:220px;" onchange="MappaUI.vaiAMappa(this.value)">' + opzioni + '</select>'
+        : '') +
+      '<button class="btn btn-ghost btn-icon-sm" title="Nuova mappa" onclick="MappaUI.nuovaMappa()" style="margin-left:6px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>';
+  };
+
   const _render = () => {
     _injectPage();
-    const mappa = _getMappa();
+    if (!_navStack.length) {
+      const mappe = _getMappe();
+      _navStack = [mappe.length ? mappe[0].id : null].filter(Boolean);
+    }
+    _renderSelettore();
+    const mappa = _getMappaAttiva();
     const vuota = document.getElementById('mappa-vuota');
     const inner = document.getElementById('mappa-inner');
     const img = document.getElementById('mappa-img');
     if (!mappa || !mappa.immagine) {
-      if (vuota) vuota.style.display = 'flex';
+      if (vuota) {
+        vuota.style.display = 'flex';
+        const t = document.getElementById('mappa-vuota-titolo');
+        if (t) t.textContent = mappa ? 'Nessuna immagine per "' + mappa.nome + '"' : 'Nessuna mappa ancora';
+      }
       if (inner) inner.style.display = 'none';
       return;
     }
     if (vuota) vuota.style.display = 'none';
     if (inner) inner.style.display = '';
     if (img.src !== mappa.immagine) img.src = mappa.immagine;
+    zoomReset();
     _renderPins();
   };
 
+  const vaiAMappa = (id) => {
+    if (!id) return;
+    _navStack = [id];
+    _render();
+  };
+
+  const tornaIndietro = () => {
+    if (_navStack.length > 1) _navStack.pop();
+    _render();
+  };
+
+  const entraInMappa = (id) => {
+    const mappe = _getMappe();
+    if (!mappe.find(m => m.id === id)) { Toast.show('Quella mappa non esiste piu’', 'warning'); return; }
+    document.getElementById('mappa-pin-popover').style.display = 'none';
+    _navStack.push(id);
+    _render();
+  };
+
+  const nuovaMappa = () => {
+    const nome = (prompt('Nome della nuova mappa (es. "Citta’ di Portovento", "Dungeon del Re Verme")') || '').trim();
+    if (!nome) return;
+    const mappe = _getMappe();
+    const nuova = { id: 'mappa_' + Date.now() + '_' + Math.random().toString(36).slice(2, 5), nome, immagine: '', scalaKm: 0, pins: [] };
+    _saveMappe([...mappe, nuova]);
+    _navStack.push(nuova.id);
+    _render();
+    apriImpostazioni();
+  };
+
   const _renderPins = () => {
-    const mappa = _getMappa();
+    const mappa = _getMappaAttiva();
     const wrap = document.getElementById('mappa-pins');
     if (!mappa || !wrap) return;
     const camp = _getCamp();
+    const mappe = _getMappe();
     wrap.innerHTML = (mappa.pins || []).map(p => {
       let nome = p.label || '(senza nome)';
-      if (p.tipo) {
+      if (p.tipo === 'mappa') {
+        const m = mappe.find(x => x.id === p.entitaId);
+        nome = m ? m.nome : '(mappa eliminata)';
+      } else if (p.tipo) {
         const cfg = WikiSections._getCfg(p.tipo);
         const item = cfg && (cfg.getData(camp) || []).find(x => x.id === p.entitaId);
         if (item) nome = item.nome;
       }
       const colore = p.colore || COLORI[0];
+      // Pin "apri un'altra mappa": stessa forma, ma con un piccolo riquadro
+      // invece del pallino centrale, per distinguerla a colpo d'occhio.
+      const centro = p.tipo === 'mappa'
+        ? '<rect x="9" y="6" width="6" height="6" rx="1" fill="#fff"/>'
+        : '<circle cx="12" cy="9" r="3" fill="#fff"/>';
       return (
         '<div class="mappa-pin" data-pin-id="' + p.id + '" title="' + _escHtml(nome) + '" ' +
           'style="position:absolute;left:' + (p.x * 100) + '%;top:' + (p.y * 100) + '%;transform:translate(-50%,-100%);cursor:pointer;z-index:2;" ' +
           'onclick="MappaUI.onPinClick(\'' + p.id + '\', event)">' +
-          '<svg width="26" height="26" viewBox="0 0 24 24" fill="' + colore + '" stroke="#fff" stroke-width="1.2"><path d="M12 0C7 0 3 4 3 9c0 6.5 9 15 9 15s9-8.5 9-15c0-5-4-9-9-9z"/><circle cx="12" cy="9" r="3" fill="#fff"/></svg>' +
+          '<svg width="26" height="26" viewBox="0 0 24 24" fill="' + colore + '" stroke="#fff" stroke-width="1.2"><path d="M12 0C7 0 3 4 3 9c0 6.5 9 15 9 15s9-8.5 9-15c0-5-4-9-9-9z"/>' + centro + '</svg>' +
         '</div>'
       );
     }).join('');
@@ -153,7 +276,7 @@ const MappaUI = (() => {
   const _pt = (e) => e.touches && e.touches[0] ? { x: e.touches[0].clientX, y: e.touches[0].clientY } : { x: e.clientX, y: e.clientY };
 
   const _onDragStart = (e) => {
-    if (!_getMappa()?.immagine) return;
+    if (!_getMappaAttiva()?.immagine) return;
     const p = _pt(e);
     _dragging = true; _dragMoved = false;
     _lastClientX = p.x; _lastClientY = p.y;
@@ -173,7 +296,7 @@ const MappaUI = (() => {
   const _onDragEnd = () => { _dragging = false; };
 
   const _onWheel = (e) => {
-    if (!_getMappa()?.immagine) return;
+    if (!_getMappaAttiva()?.immagine) return;
     e.preventDefault();
     zoom(e.deltaY < 0 ? 0.15 : -0.15);
   };
@@ -184,7 +307,7 @@ const MappaUI = (() => {
   const _onCanvasClick = (e) => {
     if (_dragMoved) { _dragMoved = false; return; }
     if (e.target.closest('.mappa-pin')) return;
-    const mappa = _getMappa();
+    const mappa = _getMappaAttiva();
     if (!mappa || !mappa.immagine) return;
     const inner = document.getElementById('mappa-inner');
     const rect = inner.getBoundingClientRect();
@@ -196,7 +319,18 @@ const MappaUI = (() => {
     apriModalNuovoPin(fx, fy);
   };
 
-  /* ── Impostazioni mappa (URL immagine + scala) ── */
+  /* ── Impostazioni mappa (nome, URL/upload immagine, scala) ── */
+
+  // Riconosce i formati di link "Condividi" di Google Drive (che un tag <img>
+  // non puo' caricare direttamente) e li converte nel link diretto equivalente.
+  // Se l'URL non sembra un link Drive di quel tipo, lo restituisce invariato.
+  const _normalizzaUrlImmagine = (url) => {
+    if (!url) return url;
+    let m = url.match(/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/)
+      || url.match(/drive\.google\.com\/open\?id=([a-zA-Z0-9_-]+)/)
+      || url.match(/drive\.google\.com\/.*[?&]id=([a-zA-Z0-9_-]+)/);
+    return m ? 'https://drive.google.com/uc?export=view&id=' + m[1] : url;
+  };
 
   const _injectModals = () => {
     if (document.getElementById('modal-mappa-settings')) return;
@@ -213,16 +347,21 @@ const MappaUI = (() => {
         '</div>' +
         '<div class="modal-body">' +
           '<div class="form-group">' +
-            '<label class="form-label">URL immagine</label>' +
+            '<label class="form-label">Nome mappa</label>' +
+            '<input type="text" id="mappa-set-nome" class="form-input" placeholder="es. Mappa del regno">' +
+          '</div>' +
+          '<div class="form-group">' +
+            '<label class="form-label">URL immagine (consigliato)</label>' +
             '<input type="text" id="mappa-set-url" class="form-input" placeholder="https://...">' +
-            '<div class="form-hint">Un link a un’immagine (imgur, drive condiviso...). Il caricamento da dispositivo qui sotto e’ solo anteprima e non si salva.</div>' +
+            '<div class="form-hint">Un link DIRETTO a un’immagine (es. imgur). Un link di "Condividi" di Google Drive va bene cosi’ com’e’: viene riconosciuto e corretto in automatico.</div>' +
           '</div>' +
           '<div class="form-group">' +
             '<label class="btn btn-ghost btn-sm" style="display:inline-flex;align-items:center;gap:6px;cursor:pointer;">' +
               '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>' +
-              'Carica dal dispositivo (anteprima)' +
+              'Carica dal dispositivo' +
               '<input type="file" id="mappa-set-file" accept="image/*" style="display:none;" onchange="MappaUI._onFilePicked()">' +
             '</label>' +
+            '<div class="form-hint" id="mappa-set-file-hint" style="margin-top:4px;"></div>' +
           '</div>' +
           '<div id="mappa-set-preview" style="display:none;margin-bottom:12px;border-radius:var(--radius-md);overflow:hidden;border:1px solid var(--border);"><img style="width:100%;display:block;"></div>' +
           '<div class="form-group">' +
@@ -231,9 +370,12 @@ const MappaUI = (() => {
             '<div class="form-hint">Quanti km copre l’immagine da un bordo all’altro — serve per calcolare le distanze tra i pin.</div>' +
           '</div>' +
         '</div>' +
-        '<div class="modal-footer">' +
-          '<button class="btn btn-ghost" onclick="Modal.close(\'mappa-settings\')">Annulla</button>' +
-          '<button class="btn btn-primary" onclick="MappaUI.salvaImpostazioni()">Salva</button>' +
+        '<div class="modal-footer" style="justify-content:space-between;">' +
+          '<button class="btn btn-ghost" id="mappa-set-elimina" style="color:var(--accent-danger);" onclick="MappaUI.eliminaMappaCorrente()">Elimina mappa</button>' +
+          '<div style="display:flex;gap:8px;">' +
+            '<button class="btn btn-ghost" onclick="Modal.close(\'mappa-settings\')">Annulla</button>' +
+            '<button class="btn btn-primary" onclick="MappaUI.salvaImpostazioni()">Salva</button>' +
+          '</div>' +
         '</div>' +
       '</div>';
     document.body.appendChild(settings);
@@ -254,6 +396,7 @@ const MappaUI = (() => {
               '<option value="">Etichetta libera (nessuna scheda)</option>' +
               '<option value="luoghi">Un Luogo esistente</option>' +
               '<option value="png">Un PNG esistente</option>' +
+              '<option value="mappa">Un’altra mappa (click per aprirla)</option>' +
             '</select>' +
           '</div>' +
           '<div class="form-group" id="mappa-pin-entita-wrap" style="display:none;">' +
@@ -289,11 +432,15 @@ const MappaUI = (() => {
 
   const apriImpostazioni = () => {
     _injectModals();
-    const mappa = _getMappa();
+    const mappa = _getMappaAttiva();
+    _pendingUploadDataUri = null;
+    document.getElementById('mappa-set-nome').value = mappa?.nome || '';
     document.getElementById('mappa-set-url').value = mappa?.immagine || '';
     document.getElementById('mappa-set-scala').value = mappa?.scalaKm || '';
     document.getElementById('mappa-set-preview').style.display = 'none';
     document.getElementById('mappa-set-file').value = '';
+    document.getElementById('mappa-set-file-hint').textContent = '';
+    document.getElementById('mappa-set-elimina').style.display = _getMappe().length > 1 ? '' : 'none';
     Modal.open('mappa-settings');
   };
 
@@ -301,27 +448,89 @@ const MappaUI = (() => {
     const input = document.getElementById('mappa-set-file');
     const file = input?.files?.[0];
     if (!file) return;
-    if (file.size > 4 * 1024 * 1024) { Toast.show('Immagine troppo grande (max 4MB)', 'warning'); return; }
+    if (file.size > 8 * 1024 * 1024) { Toast.show('Immagine troppo grande (max 8MB)', 'warning'); return; }
     const reader = new FileReader();
     reader.onload = (e) => {
+      _pendingUploadDataUri = e.target.result;
       const prev = document.getElementById('mappa-set-preview');
       prev.querySelector('img').src = e.target.result;
       prev.style.display = 'block';
-      Toast.show('Anteprima temporanea — serve un URL esterno per salvarla davvero', 'info', 4000);
+      const connesso = (typeof DriveBackup !== 'undefined') && DriveBackup.isConnected();
+      document.getElementById('mappa-set-file-hint').textContent = connesso
+        ? 'Verra’ caricata su Google Drive al salvataggio.'
+        : 'Google Drive non e’ collegato: verra’ salvata direttamente nella campagna (piu’ pesante da sincronizzare). Puoi collegare Drive da Impostazioni.';
+      // Se l'utente aveva gia' incollato un URL, un file scelto dopo non lo sostituisce
+      // silenziosamente: il link resta sempre la scelta preferita, vedi salvaImpostazioni.
+      if (document.getElementById('mappa-set-url')?.value?.trim()) {
+        Toast.show('Hai anche un URL incollato sopra: al salvataggio ha la precedenza sul file caricato', 'info', 4000);
+      }
     };
     reader.readAsDataURL(file);
   };
 
-  const salvaImpostazioni = () => {
-    const url = document.getElementById('mappa-set-url')?.value?.trim() || '';
+  const salvaImpostazioni = async () => {
+    const nome = document.getElementById('mappa-set-nome')?.value?.trim() || 'Mappa senza nome';
+    const urlInserito = document.getElementById('mappa-set-url')?.value?.trim() || '';
     const scala = parseFloat(document.getElementById('mappa-set-scala')?.value) || 0;
-    const mappaPrecedente = _getMappa() || { pins: [] };
-    const mappa = { ...mappaPrecedente, immagine: url, scalaKm: scala, pins: mappaPrecedente.pins || [] };
-    _saveMappa(mappa);
+    const mappaPrecedente = _getMappaAttiva() || { id: 'mappa_' + Date.now(), pins: [] };
+    const giaMappe = _getMappe();
+    const btn = document.querySelector('#modal-mappa-settings .btn-primary');
+
+    let immagine = mappaPrecedente.immagine || '';
+    if (urlInserito) {
+      // Il link incollato a mano e' sempre la scelta preferita: ha la precedenza
+      // su un eventuale file scelto nello stesso giro, e non tocca Drive.
+      const normalizzato = _normalizzaUrlImmagine(urlInserito);
+      if (normalizzato !== urlInserito) Toast.show('Link di Google Drive riconosciuto e corretto automaticamente', 'info', 3000);
+      immagine = normalizzato;
+    } else if (_pendingUploadDataUri) {
+      if (btn) { btn.disabled = true; btn.textContent = 'Caricamento...'; }
+      try {
+        immagine = (typeof DriveBackup !== 'undefined')
+          ? await DriveBackup.uploadImage(_pendingUploadDataUri, nome || 'mappa')
+          : _pendingUploadDataUri;
+      } catch (e) {
+        Toast.show('Caricamento immagine non riuscito: ' + (e?.message || 'errore sconosciuto'), 'error');
+        if (btn) { btn.disabled = false; btn.textContent = 'Salva'; }
+        return;
+      }
+      if (btn) { btn.disabled = false; btn.textContent = 'Salva'; }
+    }
+
+    const mappaAggiornata = { ...mappaPrecedente, nome, immagine, scalaKm: scala, pins: mappaPrecedente.pins || [] };
+    const esisteGia = giaMappe.some(m => m.id === mappaAggiornata.id);
+    const nuoveMappe = esisteGia
+      ? giaMappe.map(m => m.id === mappaAggiornata.id ? mappaAggiornata : m)
+      : [...giaMappe, mappaAggiornata];
+    _saveMappe(nuoveMappe);
+    if (!_navStack.includes(mappaAggiornata.id)) _navStack = [mappaAggiornata.id];
+    _pendingUploadDataUri = null;
     Modal.close('mappa-settings');
-    zoomReset();
     _render();
     Toast.show('Mappa aggiornata', 'success');
+  };
+
+  const eliminaMappaCorrente = () => {
+    const mappa = _getMappaAttiva();
+    const mappe = _getMappe();
+    if (!mappa || mappe.length <= 1) return;
+    Modal.close('mappa-settings');
+    openConfirmModal('Eliminare "' + mappa.nome + '"?', 'I pin di questa mappa andranno persi. I pin su altre mappe che la aprivano diventeranno etichette libere.', () => {
+      const restanti = mappe.filter(m => m.id !== mappa.id);
+      // I pin "apri mappa" che puntavano a quella eliminata diventano etichette
+      // libere invece di restare link rotti verso una mappa che non esiste piu'.
+      const pulite = restanti.map(m => ({
+        ...m,
+        pins: (m.pins || []).map(p => p.tipo === 'mappa' && p.entitaId === mappa.id
+          ? { ...p, tipo: null, entitaId: null, label: p.label || '(mappa eliminata)' }
+          : p),
+      }));
+      _saveMappe(pulite);
+      _navStack = _navStack.filter(id => id !== mappa.id);
+      if (!_navStack.length && pulite.length) _navStack = [pulite[0].id];
+      _render();
+      Toast.show('Mappa eliminata', 'info');
+    });
   };
 
   /* ── Nuovo pin ── */
@@ -358,9 +567,17 @@ const MappaUI = (() => {
     }
     entitaWrap.style.display = '';
     labelWrap.style.display = 'none';
+    const sel = document.getElementById('mappa-pin-entita');
+    if (tipo === 'mappa') {
+      const attuale = _getMappaAttiva();
+      const altre = _getMappe().filter(m => m.id !== attuale?.id).sort((a, b) => a.nome.localeCompare(b.nome, 'it'));
+      sel.innerHTML = altre.length
+        ? altre.map(m => '<option value="' + m.id + '">' + _escHtml(m.nome) + '</option>').join('')
+        : '<option value="">Nessun’altra mappa ancora — creane una prima</option>';
+      return;
+    }
     const cfg = WikiSections._getCfg(tipo);
     const items = (cfg.getData(_getCamp()) || []).slice().sort((a, b) => a.nome.localeCompare(b.nome, 'it'));
-    const sel = document.getElementById('mappa-pin-entita');
     sel.innerHTML = items.length
       ? items.map(x => '<option value="' + x.id + '">' + _escHtml(x.nome) + '</option>').join('')
       : '<option value="">Nessuno ancora nella Wiki</option>';
@@ -378,12 +595,11 @@ const MappaUI = (() => {
       label = document.getElementById('mappa-pin-label')?.value?.trim() || '';
       if (!label) { Toast.show('Scrivi un’etichetta per il pin', 'warning'); return; }
     }
-    const mappa = _getMappa() || { pins: [] };
-    const pins = [...(mappa.pins || []), {
+    const nuovoPin = {
       id: 'pin_' + Date.now() + '_' + Math.random().toString(36).slice(2, 5),
       x: _pendingPin.x, y: _pendingPin.y, tipo, entitaId, label, colore,
-    }];
-    _saveMappa({ ...mappa, pins });
+    };
+    _aggiornaMappaAttiva(m => ({ ...m, pins: [...(m.pins || []), nuovoPin] }));
     _pendingPin = null;
     Modal.close('mappa-pin');
     _renderPins();
@@ -403,15 +619,18 @@ const MappaUI = (() => {
     _apriPopoverPin(pinId, ev);
   };
 
-  const _trovaPin = (pinId) => (_getMappa()?.pins || []).find(p => p.id === pinId);
+  const _trovaPin = (pinId) => (_getMappaAttiva()?.pins || []).find(p => p.id === pinId);
 
   const _apriPopoverPin = (pinId, ev) => {
     const pin = _trovaPin(pinId);
     if (!pin) return;
     const camp = _getCamp();
     let nome = pin.label || '(senza nome)';
-    let cfg = null, item = null;
-    if (pin.tipo) {
+    let cfg = null, item = null, mappaCollegata = null;
+    if (pin.tipo === 'mappa') {
+      mappaCollegata = _getMappe().find(m => m.id === pin.entitaId);
+      nome = mappaCollegata ? mappaCollegata.nome : '(mappa eliminata)';
+    } else if (pin.tipo) {
       cfg = WikiSections._getCfg(pin.tipo);
       item = cfg && (cfg.getData(camp) || []).find(x => x.id === pin.entitaId);
       if (item) nome = item.nome;
@@ -421,6 +640,7 @@ const MappaUI = (() => {
       '<div style="font-family:var(--font-display);font-size:0.9rem;margin-bottom:8px;">' + _escHtml(nome) + '</div>' +
       '<div style="display:flex;flex-direction:column;gap:4px;">' +
         (item ? '<button class="btn btn-secondary btn-sm" onclick="QuickView.open(\'' + pin.tipo + '\',\'' + pin.entitaId + '\');document.getElementById(\'mappa-pin-popover\').style.display=\'none\';">Apri scheda</button>' : '') +
+        (mappaCollegata ? '<button class="btn btn-secondary btn-sm" onclick="MappaUI.entraInMappa(\'' + mappaCollegata.id + '\')">Apri questa mappa</button>' : '') +
         '<button class="btn btn-ghost btn-sm" onclick="MappaUI.iniziaMisuraDaPin(\'' + pinId + '\')">Misura distanza da qui</button>' +
         '<button class="btn btn-ghost btn-sm" style="color:var(--accent-danger);" onclick="MappaUI.rimuoviPin(\'' + pinId + '\')">Rimuovi pin</button>' +
       '</div>';
@@ -433,9 +653,7 @@ const MappaUI = (() => {
   const rimuoviPin = (pinId) => {
     document.getElementById('mappa-pin-popover').style.display = 'none';
     openConfirmModal('Rimuovere il pin?', '', () => {
-      const mappa = _getMappa();
-      if (!mappa) return;
-      _saveMappa({ ...mappa, pins: (mappa.pins || []).filter(p => p.id !== pinId) });
+      _aggiornaMappaAttiva(m => ({ ...m, pins: (m.pins || []).filter(p => p.id !== pinId) }));
       _renderPins();
       Toast.show('Pin rimosso', 'info', 1500);
     });
@@ -450,7 +668,7 @@ const MappaUI = (() => {
   };
 
   const _completaMisura = (id1, id2) => {
-    const mappa = _getMappa();
+    const mappa = _getMappaAttiva();
     const p1 = _trovaPin(id1), p2 = _trovaPin(id2);
     if (!mappa || !p1 || !p2) return;
     const scalaKm = mappa.scalaKm || 0;
@@ -467,6 +685,7 @@ const MappaUI = (() => {
 
   const _nomePin = (p) => {
     if (!p.tipo) return p.label || '(senza nome)';
+    if (p.tipo === 'mappa') return (_getMappe().find(m => m.id === p.entitaId) || {}).nome || '(mappa eliminata)';
     const cfg = WikiSections._getCfg(p.tipo);
     const item = cfg && (cfg.getData(_getCamp()) || []).find(x => x.id === p.entitaId);
     return item ? item.nome : (p.label || '(senza nome)');
@@ -522,11 +741,16 @@ const MappaUI = (() => {
 
   const init = () => {
     _injectModals();
+    if (!_navStack.length) {
+      const mappe = _getMappe();
+      if (mappe.length) _navStack = [mappe[0].id];
+    }
     _render();
   };
 
   return {
     init, zoom, zoomReset,
+    vaiAMappa, tornaIndietro, entraInMappa, nuovaMappa, eliminaMappaCorrente,
     apriImpostazioni, salvaImpostazioni, _onFilePicked,
     apriModalNuovoPin, confermaNuovoPin, _onPinTipoChange, _pickColore,
     onPinClick, rimuoviPin, iniziaMisuraDaPin, _ricalcolaMisura,
