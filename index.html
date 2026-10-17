@@ -3553,6 +3553,10 @@ const App = (() => {
     }
 
     currentPage = pageId;
+    // Ricordata per restare sulla stessa pagina dopo un reload (vedi App.init):
+    // prima si tornava sempre alla home della scelta campagna, anche ricaricando
+    // da dentro una pagina specifica come la Mappa.
+    try { localStorage.setItem('dm_last_page', pageId); } catch(e) {}
 
     switch (pageId) {
       case 'home':       renderHomePage(); break;
@@ -4045,7 +4049,20 @@ const openCampaign = (id) => {
 
     Dadi.init();
 
-    navigateTo('home');
+    // Resta sulla pagina dove si era prima del reload, invece di tornare sempre
+    // alla home della scelta campagna. Le sottopagine della Wiki (wiki-png,
+    // wiki-luoghi...) hanno un loro punto d'ingresso dedicato (WikiSections.goto)
+    // che oltre a cambiare pagina renderizza davvero la lista — richiamare solo
+    // navigateTo per quelle lascerebbe la pagina vuota.
+    let lastPage = null;
+    try { lastPage = localStorage.getItem('dm_last_page'); } catch(e) {}
+    if (lastPage && lastPage.startsWith('wiki-') && pages[lastPage]) {
+      try { WikiSections.goto(lastPage.replace('wiki-', '')); } catch(e) { navigateTo('home'); }
+    } else if (lastPage && pages[lastPage]) {
+      navigateTo(lastPage);
+    } else {
+      navigateTo('home');
+    }
 
     Debug.log('App.init() completato');
     Toast.show('DM Toolkit caricato ⚔️', 'success');
@@ -11476,15 +11493,22 @@ const GDrive = (() => {
     }
   };
 
-  const _doLogin = () => {
-    if (!CLIENT_ID) { Modal.open('gdrive-setup'); return; }
+  // silenzioso = tentativo invisibile all'avvio (prompt:'none'): se l'utente ha
+  // gia' un account Google attivo nel browser e aveva gia' acconsentito in
+  // passato, riottiene un token senza nessun popup; altrimenti fallisce senza
+  // disturbare (nessun toast d'errore — l'utente puo' sempre collegarsi a mano
+  // col bottone come prima). Senza questo, il token (mai persistito tra una
+  // ricarica e l'altra, a differenza del semplice flag "era collegato" salvato
+  // in locale) si perdeva ad ogni refresh della pagina.
+  const _doLogin = (silenzioso) => {
+    if (!CLIENT_ID) { if (!silenzioso) Modal.open('gdrive-setup'); return; }
     try {
       _tokenClient = google.accounts.oauth2.initTokenClient({
         client_id: CLIENT_ID,
         scope: SCOPES,
         callback: async (resp) => {
           if (resp.error) {
-            Toast.show('Login fallito: ' + resp.error, 'error');
+            if (!silenzioso) Toast.show('Login fallito: ' + resp.error, 'error');
             return;
           }
           _token = resp.access_token;
@@ -11498,14 +11522,29 @@ const GDrive = (() => {
             _userInfo = { name: info.name, email: info.email, picture: info.picture };
           } catch(e) {}
           _updateBtn();
-          Toast.show('Connesso come ' + (_userInfo?.name || 'Drive'), 'success', 2000);
+          if (!silenzioso) Toast.show('Connesso come ' + (_userInfo?.name || 'Drive'), 'success', 2000);
           const cbs = _onConnectCbs; _onConnectCbs = [];
           cbs.forEach(cb => { try { cb(); } catch(e) {} });
         },
       });
-      _tokenClient.requestAccessToken();
+      _tokenClient.requestAccessToken(silenzioso ? { prompt: 'none' } : {});
     } catch(e) {
-      Toast.show('Errore login Drive: ' + e.message, 'error');
+      if (!silenzioso) Toast.show('Errore login Drive: ' + e.message, 'error');
+    }
+  };
+
+  // Chiamato all'avvio se risulta "era collegato" dall'ultima sessione (vedi
+  // DriveBackup.init). Richiede lo script GIS come il login normale, poi
+  // tenta un token silenzioso.
+  const silentReconnect = () => {
+    if (!CLIENT_ID || _loggedIn) return;
+    if (!window.google?.accounts?.oauth2) {
+      const s = document.createElement('script');
+      s.src = 'https://accounts.google.com/gsi/client';
+      s.onload = () => _doLogin(true);
+      document.head.appendChild(s);
+    } else {
+      _doLogin(true);
     }
   };
 
@@ -11531,7 +11570,7 @@ const GDrive = (() => {
 
   const showWelcomeIfNeeded = () => {};
 
-  return { init, toggleLogin, logout, setClientId, onConnect,
+  return { init, toggleLogin, logout, setClientId, onConnect, silentReconnect,
            showWelcomeIfNeeded, _updateBtn,
            get loggedIn() { return _loggedIn; },
            get token() { return _token; } };
@@ -14524,7 +14563,14 @@ const DriveBackup = (() => {
 
   const init = async () => {
     _connected = localStorage.getItem(LS_KEY) === 'true';
-    if (_connected) _updateUI();
+    if (_connected) {
+      _updateUI();
+      // Il token OAuth non sopravvive a un reload (solo questo flag lo fa):
+      // senza un tentativo di riconnessione, l'app risultava "collegata" in
+      // locale ma ogni upload falliva silenziosamente sul fallback offline.
+      try { GDrive.silentReconnect(); } catch(e) {}
+      GDrive.onConnect(() => _onConnected());
+    }
   };
 
   // Autenticazione delegata a GDrive (stesso Client ID OAuth usato per la collaborazione),

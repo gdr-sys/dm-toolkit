@@ -459,11 +459,12 @@ const MappaUI = (() => {
       document.getElementById('mappa-set-file-hint').textContent = connesso
         ? 'Verra’ caricata su Google Drive al salvataggio.'
         : 'Google Drive non e’ collegato: verra’ salvata direttamente nella campagna (piu’ pesante da sincronizzare). Puoi collegare Drive da Impostazioni.';
-      // Se l'utente aveva gia' incollato un URL, un file scelto dopo non lo sostituisce
-      // silenziosamente: il link resta sempre la scelta preferita, vedi salvaImpostazioni.
-      if (document.getElementById('mappa-set-url')?.value?.trim()) {
-        Toast.show('Hai anche un URL incollato sopra: al salvataggio ha la precedenza sul file caricato', 'info', 4000);
-      }
+      // Il campo URL si apre gia' precompilato con l'immagine attuale: se non lo
+      // svuotiamo qui, scegliere un file non avrebbe mai effetto (vedi
+      // salvaImpostazioni, il link ha sempre la precedenza se il campo non e'
+      // vuoto) e l'utente si ritroverebbe "il file caricato non cambia nulla".
+      const urlField = document.getElementById('mappa-set-url');
+      if (urlField) urlField.value = '';
     };
     reader.readAsDataURL(file);
   };
@@ -476,10 +477,12 @@ const MappaUI = (() => {
     const giaMappe = _getMappe();
     const btn = document.querySelector('#modal-mappa-settings .btn-primary');
 
-    let immagine = mappaPrecedente.immagine || '';
+    // Il link e' sempre la scelta preferita se il campo non e' vuoto (anche
+    // svuotato di proposito per togliere l'immagine): un file scelto ha effetto
+    // solo quando il campo URL e' vuoto (per questo _onFilePicked lo svuota da
+    // solo appena si sceglie un file, cosi' le due scelte non sono ambigue).
+    let immagine = '';
     if (urlInserito) {
-      // Il link incollato a mano e' sempre la scelta preferita: ha la precedenza
-      // su un eventuale file scelto nello stesso giro, e non tocca Drive.
       const normalizzato = _normalizzaUrlImmagine(urlInserito);
       if (normalizzato !== urlInserito) Toast.show('Link di Google Drive riconosciuto e corretto automaticamente', 'info', 3000);
       immagine = normalizzato;
