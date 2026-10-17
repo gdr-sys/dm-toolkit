@@ -202,7 +202,7 @@ const CalendarioConfig = (() => {
     Calendario.save(nuovo);
     Toast.show('Data impostata: ' + Calendario.getDateStr(nuovo) + ' — ' + Calendario.getTimeStr(nuovo), 'success', 2500);
     try { CalendarioUI.oggi(); } catch (e) {}
-    try { if (window.Schermo && Schermo._refreshTempo) Schermo._refreshTempo(); } catch (e) {}
+    try { if (typeof Schermo !== 'undefined' && Schermo._refreshTempo) Schermo._refreshTempo(); } catch (e) {}
   };
 
   const aggiungiMese = () => {
