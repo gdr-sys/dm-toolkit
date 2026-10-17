@@ -2316,6 +2316,8 @@
           <div class="form-group"><label class="form-label">Sensi</label><input type="text" id="nm-senses" class="form-input" placeholder="es. Scurovisione 18 m, Percezione Passiva 13"></div>
         </div>
         <div class="form-group"><label class="form-label">Linguaggi</label><input type="text" id="nm-languages" class="form-input" placeholder="es. Comune, Nanico"></div>
+        <div class="form-group"><label class="form-label">Equipaggiamento / Armi</label><textarea id="nm-gear" class="form-textarea" rows="2" placeholder="es. Cotta di maglia, scudo, spada lunga, 3 giavellotti"></textarea><div class="form-hint">Cosa porta addosso. Gli attacchi con quelle armi vanno nelle Azioni qui sotto.</div></div>
+        <div class="form-group"><label class="form-label">Talenti / Privilegi</label><textarea id="nm-talenti" class="form-textarea" rows="2" placeholder="Uno per riga — es. Attaccante Selvaggio"></textarea></div>
         <div class="form-group"><label class="form-label">Tratti speciali</label><textarea id="nm-special" class="form-textarea" rows="2" placeholder="es. Furia nanica. Resistenza nanica..."></textarea></div>
 
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-sm);">
@@ -2354,13 +2356,18 @@
 
 <!-- Modal: Personaggio Party -->
 <div class="modal-overlay hidden" id="modal-pg-modal" style="display:none;">
-  <div class="modal">
+  <div class="modal modal-xl">
     <div class="modal-header">
       <h2 style="font-family:var(--font-display);font-size:1.1rem;" id="pg-modal-title">Aggiungi Personaggio</h2>
       <button class="btn btn-ghost btn-icon" onclick="Modal.close('pg-modal')" aria-label="Chiudi"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
     <div class="modal-body">
       <input type="hidden" id="pg-modal-id">
+      <div class="tabs" style="margin-bottom:var(--space-lg);max-width:340px;">
+        <button class="tab-btn active" id="pg-tab-scheda-btn" onclick="Sessione.switchPGTab('scheda')">Scheda</button>
+        <button class="tab-btn" id="pg-tab-combat-btn" onclick="Sessione.switchPGTab('combat')">Combattimento</button>
+      </div>
+      <div id="pg-modal-scheda">
       <div class="form-row">
         <div class="form-group"><label class="form-label">Nome *</label><input type="text" id="pg-nome" class="form-input" placeholder="Nome personaggio"></div>
         <div class="form-group"><label class="form-label">Giocatore</label><input type="text" id="pg-giocatore" class="form-input" placeholder="Nome giocatore"></div>
@@ -2389,6 +2396,36 @@
         <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:0.85rem;">
           <input type="checkbox" id="pg-inspirazione"> Ha ispirazione
         </label>
+      </div>
+      </div>
+
+      <!-- TAB COMBATTIMENTO -->
+      <div id="pg-modal-combat" style="display:none;">
+        <label class="form-label" style="margin-bottom:var(--space-sm);">Caratteristiche</label>
+        <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:var(--space-sm);margin-bottom:var(--space-md);">
+          <div class="form-group" style="margin:0;"><label class="form-label" style="text-align:center;">FOR</label><input type="number" id="pg-str" class="form-input" style="text-align:center;" min="1" max="30" placeholder="10"></div>
+          <div class="form-group" style="margin:0;"><label class="form-label" style="text-align:center;">DES</label><input type="number" id="pg-dex" class="form-input" style="text-align:center;" min="1" max="30" placeholder="10"></div>
+          <div class="form-group" style="margin:0;"><label class="form-label" style="text-align:center;">COS</label><input type="number" id="pg-con" class="form-input" style="text-align:center;" min="1" max="30" placeholder="10"></div>
+          <div class="form-group" style="margin:0;"><label class="form-label" style="text-align:center;">INT</label><input type="number" id="pg-int" class="form-input" style="text-align:center;" min="1" max="30" placeholder="10"></div>
+          <div class="form-group" style="margin:0;"><label class="form-label" style="text-align:center;">SAG</label><input type="number" id="pg-wis" class="form-input" style="text-align:center;" min="1" max="30" placeholder="10"></div>
+          <div class="form-group" style="margin:0;"><label class="form-label" style="text-align:center;">CAR</label><input type="number" id="pg-cha" class="form-input" style="text-align:center;" min="1" max="30" placeholder="10"></div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Tiri Salvezza</label><input type="text" id="pg-saves" class="form-input" placeholder="es. FOR +6, COS +5"></div>
+          <div class="form-group"><label class="form-label">Abilità</label><input type="text" id="pg-skills" class="form-input" placeholder="es. Atletica +6, Percezione +4"></div>
+        </div>
+
+        <div class="form-group"><label class="form-label">Equipaggiamento / Armi</label><textarea id="pg-gear" class="form-textarea" rows="2" placeholder="es. Cotta di maglia, scudo, spada lunga, zaino da avventuriero"></textarea><div class="form-hint">Cosa porta addosso. Gli attacchi con quelle armi vanno nelle Azioni qui sotto.</div></div>
+        <div class="form-group"><label class="form-label">Talenti / Privilegi di classe</label><textarea id="pg-talenti" class="form-textarea" rows="2" placeholder="Uno per riga — es. Attaccante Selvaggio"></textarea></div>
+
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-sm);">
+          <label class="form-label" style="margin:0;">Azioni</label>
+          <button class="btn btn-secondary btn-sm" onclick="Sessione.addPGAction()">+ Aggiungi</button>
+        </div>
+        <div id="pg-actions-list" style="margin-bottom:var(--space-md);"></div>
+
+        <div class="form-group"><label class="form-label">Note</label><textarea id="pg-note-combat" class="form-textarea" rows="2" placeholder="Tattiche, oggetti consumabili, promemoria..."></textarea></div>
       </div>
     </div>
     <div class="modal-footer">
@@ -4203,6 +4240,8 @@ const NPC = (() => {
       'nm-skills':       npc?.skills       || '',
       'nm-vulnerabilities': npc?.vulnerabilities || '',
       'nm-cond-immunities': npc?.condImmunities  || '',
+      'nm-gear':            npc?.gear            || '',
+      'nm-talenti':         npc?.talenti         || '',
     };
     Object.entries(fields).forEach(([id, val]) => {
       const el = document.getElementById(id);
@@ -4307,6 +4346,8 @@ const NPC = (() => {
       skillProf:   SKILLS.map((s, i) => i).filter(i => document.getElementById('nm-skill-' + i)?.checked),
       vulnerabilities: document.getElementById('nm-vulnerabilities')?.value?.trim() || '',
       condImmunities:  document.getElementById('nm-cond-immunities')?.value?.trim() || '',
+      gear:            document.getElementById('nm-gear')?.value?.trim()            || '',
+      talenti:         document.getElementById('nm-talenti')?.value?.trim()         || '',
       actions: getActions(),
       azioniBonus: _getActionsFrom('nm-bonus-actions-list'),
       reazioni: _getActionsFrom('nm-reactions-list'),
@@ -4694,6 +4735,7 @@ const NPC = (() => {
     openView, flipCard, editFromView,
     quickRelChange, updateRelationPreview,
     addAction, addBonusAction, addReaction, addLegendaryAction,
+    addActionRow: _addActionRow, getActionsFrom: _getActionsFrom, renderActionsIn: _renderActionsIn,
     deleteNPC, switchModalTab,
     addCurrentToCombat,
     _recalcSaves, _recalcSkills, _recalcDerived,
@@ -4853,20 +4895,42 @@ const Sessione = (() => {
     });
   };
 
+  // Scheda / Combattimento nel modale PG, come nella scheda PNG.
+  const switchPGTab = (tab) => {
+    const isCombat = tab === 'combat';
+    const scheda = document.getElementById('pg-modal-scheda');
+    const combat = document.getElementById('pg-modal-combat');
+    if (scheda) scheda.style.display = isCombat ? 'none' : '';
+    if (combat) combat.style.display = isCombat ? '' : 'none';
+    document.getElementById('pg-tab-scheda-btn')?.classList.toggle('active', !isCombat);
+    document.getElementById('pg-tab-combat-btn')?.classList.toggle('active', isCombat);
+  };
+
+  const addPGAction = () => NPC.addActionRow('pg-actions-list');
+
   const openPGModal = (pg) => {
     const fields = {
       'pg-nome': pg?.nome || '', 'pg-giocatore': pg?.giocatore || '',
       'pg-livello': pg?.livello || '', 'pg-classe': pg?.classe || '',
+      'pg-razza': pg?.razza || '', 'pg-velocita': pg?.velocita || '',
+      'pg-prof-bonus': pg?.profBonus || '',
       'pg-hp-max': pg?.hpMax || '', 'pg-hp-attuali': pg?.hpAttuali || '',
       'pg-ca': pg?.ca || '', 'pg-iniziativa-bonus': pg?.iniziativaBonus || '0',
       'pg-perc': pg?.percezionePassiva || '10',
       'pg-invest': pg?.investigazionePassiva || '10',
       'pg-intui': pg?.intuizionePassiva || '10',
+      'pg-str': pg?.str || '', 'pg-dex': pg?.dex || '', 'pg-con': pg?.con || '',
+      'pg-int': pg?.int_ || '', 'pg-wis': pg?.wis || '', 'pg-cha': pg?.cha || '',
+      'pg-saves': pg?.savingThrows || '', 'pg-skills': pg?.skills || '',
+      'pg-gear': pg?.gear || '', 'pg-talenti': pg?.talenti || '',
+      'pg-note-combat': pg?.noteCombat || '',
     };
     Object.entries(fields).forEach(([id, val]) => {
       const el = document.getElementById(id);
       if (el) el.value = val;
     });
+    NPC.renderActionsIn('pg-actions-list', pg?.azioni || []);
+    switchPGTab('scheda');
     document.getElementById('pg-modal-id').value = pg?.id || '';
     document.getElementById('pg-modal-title').textContent = pg ? 'Modifica Personaggio' : 'Aggiungi Personaggio';
     document.getElementById('pg-inspirazione').checked = pg?.inspirazione || false;
@@ -4895,11 +4959,28 @@ const Sessione = (() => {
       investigazionePassiva: parseInt(document.getElementById('pg-invest')?.value) || 10,
       intuizionePassiva:     parseInt(document.getElementById('pg-intui')?.value)  || 10,
       inspirazione: document.getElementById('pg-inspirazione')?.checked || false,
+      razza:     document.getElementById('pg-razza')?.value?.trim()    || '',
+      velocita:  document.getElementById('pg-velocita')?.value?.trim() || '',
+      profBonus: document.getElementById('pg-prof-bonus')?.value?.trim() || '',
+      str: document.getElementById('pg-str')?.value || '',
+      dex: document.getElementById('pg-dex')?.value || '',
+      con: document.getElementById('pg-con')?.value || '',
+      int_: document.getElementById('pg-int')?.value || '',
+      wis: document.getElementById('pg-wis')?.value || '',
+      cha: document.getElementById('pg-cha')?.value || '',
+      savingThrows: document.getElementById('pg-saves')?.value?.trim()  || '',
+      skills:       document.getElementById('pg-skills')?.value?.trim() || '',
+      gear:         document.getElementById('pg-gear')?.value?.trim()    || '',
+      talenti:      document.getElementById('pg-talenti')?.value?.trim() || '',
+      noteCombat:   document.getElementById('pg-note-combat')?.value?.trim() || '',
+      azioni: NPC.getActionsFrom('pg-actions-list'),
     };
 
     if (id) {
       const idx = party.findIndex(p => p.id === id);
-      if (idx !== -1) party[idx] = data;
+      // Fusione invece di sostituzione: un campo non ancora presente nel modale
+      // non deve sparire dal personaggio al primo salvataggio.
+      if (idx !== -1) party[idx] = { ...party[idx], ...data };
     } else {
       party.push(data);
     }
@@ -4923,6 +5004,8 @@ const Sessione = (() => {
       ...existing,
       id: data.id, nome: data.nome, name: data.nome,
       classe: data.classe, livello: data.livello, giocatore: data.giocatore,
+      razza: data.razza || existing.razza || '',
+      velocita: data.velocita || existing.velocita || '',
       hp_max: data.hpMax, ca: data.ca,
       iniziativa: (data.iniziativaBonus >= 0 ? '+' : '') + data.iniziativaBonus,
       perc_pass: data.percezionePassiva,
@@ -5763,6 +5846,7 @@ const Sessione = (() => {
   return {
     init,
     addPG, editPG, deletePG, submitPG, openPGModal, addPGtoCombat, toggleInspirazione,
+    switchPGTab, addPGAction,
     newCombat, nextTurn, prevTurn, changeHPSchermo, openCondizioneSchermo, addEffect, _removeEffect, rollAllInitiative, updateInit,
     changeHP, setHP, quickDamage,
     openCondizioneModal, submitCondizioni, removeCondizione,
@@ -15481,7 +15565,7 @@ const WikiSections = (() => {
       '</div>' +
 
       (type === 'quest' ? _renderObiettivi(item, isEdit) : '') +
-      (type === 'png' && !isEdit ? _renderStatBlock(item) : '') +
+      ((type === 'png' || type === 'pg') && !isEdit ? _renderStatBlock(item, type) : '') +
       ((type === 'png' || type === 'pg') ? _renderMomenti(item, type, isEdit) : '') +
 
       (() => {
@@ -15666,13 +15750,29 @@ const WikiSections = (() => {
   // Combattimento). Qui la scheda della Wiki li mostra soltanto — o offre un pulsante
   // per aggiungerli se il PNG e' ancora solo narrativo. Sta fuori dai piedi finche' non
   // si usa: senza statistiche e' una riga sola. ──
-  const _renderStatBlock = (item) => {
+  // I PG del Party usano nomi di campo propri: li riporta alla forma dello stat block
+  // dei PNG, cosi' la stessa funzione serve entrambe le schede.
+  const _pgComeStatBlock = (pg) => ({
+    name: pg.nome, hp: pg.hpMax, ac: pg.ca, speed: pg.velocita,
+    type: [pg.razza, pg.classe].filter(Boolean).join(' '),
+    str: pg.str, dex: pg.dex, con: pg.con, int_: pg.int_, wis: pg.wis, cha: pg.cha,
+    profBonus: pg.profBonus, iniziativa: pg.iniziativaBonus,
+    savingThrows: pg.savingThrows, skills: pg.skills,
+    senses: pg.percezionePassiva ? 'Percezione passiva ' + pg.percezionePassiva : '',
+    gear: pg.gear, talenti: pg.talenti, actions: pg.azioni, combatNotes: pg.noteCombat,
+  });
+
+  const _renderStatBlock = (item, type) => {
     const camp = App.getActiveCampaign();
-    const s = (camp?.npcs || []).find(n => n.id === item.id) || {};
+    const isPg = type === 'pg';
+    const sorgente = isPg
+      ? (camp?.party || []).find(x => x.id === item.id)
+      : (camp?.npcs || []).find(n => n.id === item.id);
+    const s = sorgente ? (isPg ? _pgComeStatBlock(sorgente) : sorgente) : {};
     const chiavi = ['str', 'dex', 'con', 'int_', 'wis', 'cha', 'hp', 'ac', 'cr'];
     const has = chiavi.some(k => s[k] !== undefined && s[k] !== null && s[k] !== '');
     const _m = (v) => { const n = Math.floor((parseInt(v || 10, 10) - 10) / 2); return (n >= 0 ? '+' : '') + n; };
-    const _btn = (label) => '<button class="btn btn-ghost btn-sm" onclick="WikiSections.openStatEditor(\'' + item.id + '\')">' + label + '</button>';
+    const _btn = (label) => '<button class="btn btn-ghost btn-sm" onclick="WikiSections.openStatEditor(\'' + item.id + '\', \'' + (type || 'png') + '\')">' + label + '</button>';
 
     if (!has) {
       return '<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);padding:14px 16px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">' +
@@ -15698,6 +15798,8 @@ const WikiSections = (() => {
       actions = a;
     }
     let special = s.special ? String(s.special).split('\n').filter(l => l.trim())
+      .map(l => '<div class="sb-action">' + _escHtml(l) + '</div>').join('') : '';
+    const talenti = s.talenti ? String(s.talenti).split('\n').filter(l => l.trim())
       .map(l => '<div class="sb-action">' + _escHtml(l) + '</div>').join('') : '';
     if (s.abilitaSpeciale) {
       const [nome, resto] = String(s.abilitaSpeciale).split('(');
@@ -15736,6 +15838,8 @@ const WikiSections = (() => {
         row('Immunità / Resistenze', s.immunities) + row('Vulnerabilità', s.vulnerabilities) +
         row('Immunità alle condizioni', s.condImmunities) +
         row('Sensi', s.senses) + row('Linguaggi', s.languages) +
+        row('Equipaggiamento', s.gear) +
+        (talenti ? '<div class="sb-section-title">Talenti</div>' + talenti : '') +
         (special ? '<div class="sb-section-title">Tratti</div>' + special : '') +
         (actions ? '<div class="sb-section-title">Azioni</div>' + actions : '') +
         sect('Azioni bonus', s.azioniBonus) +
@@ -15746,7 +15850,14 @@ const WikiSections = (() => {
     '</div>';
   };
 
-  const openStatEditor = (id) => {
+  const openStatEditor = (id, type) => {
+    if (type === 'pg') {
+      const pg = (App.getActiveCampaign()?.party || []).find(x => x.id === id);
+      if (!pg || typeof Sessione === 'undefined') { Toast.show('Personaggio non trovato nel Party', 'warning'); return; }
+      Sessione.openPGModal(pg);
+      Sessione.switchPGTab('combat');
+      return;
+    }
     const npc = (App.getActiveCampaign()?.npcs || []).find(n => n.id === id);
     if (!npc || typeof NPC === 'undefined') { Toast.show('PNG non trovato', 'warning'); return; }
     NPC.openModal(npc, 'combat');
