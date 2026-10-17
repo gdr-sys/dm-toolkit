@@ -188,14 +188,14 @@
 
       <!-- Wiki con sottovoci -->
       <div class="nav-group-wiki" id="nav-wiki-group">
-        <button class="nav-item" data-page="wiki" data-requires-campaign="true"
-          onclick="WikiSections.toggleExpand();closeMobileMenu()"
+        <button class="nav-item" data-page="wiki-hub" data-requires-campaign="true"
+          onclick="WikiSections.gotoHub();closeMobileMenu()"
           style="justify-content:space-between;">
           <span style="display:flex;align-items:center;gap:8px;">
             <span class="nav-icon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
             <span class="nav-label">Wiki</span>
           </span>
-          <span id="wiki-nav-chevron" style="font-size:0.6rem;color:var(--text-muted);transition:transform 0.2s;">▼</span>
+          <span id="wiki-nav-chevron" title="Mostra/nascondi sottovoci" onclick="event.stopPropagation();WikiSections.toggleExpand()" style="font-size:0.6rem;color:var(--text-muted);transition:transform 0.2s;cursor:pointer;padding:4px;">▼</span>
         </button>
         <!-- Sottovoci Wiki -->
         <div id="wiki-subnav" style="padding-left:16px;border-left:2px solid var(--border);margin-left:12px;display:none;flex-direction:column;gap:1px;">
@@ -1559,6 +1559,117 @@
             <button class="btn btn-ghost btn-sm" onclick="WikiDM.clearSearch()">✕ Chiudi</button>
           </div>
           <div id="wiki-search-list"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Hub Wiki — panoramica con tutte le voci, per non doverle scoprire scorrendo la sidebar -->
+    <section class="page" id="page-wiki-hub" style="padding:20px;height:calc(100vh - var(--header-height));overflow-y:auto;">
+      <div style="max-width:980px;margin:0 auto;">
+        <h2 style="font-family:var(--font-display);font-size:1.3rem;margin:0 0 4px;">Wiki</h2>
+        <p style="font-size:0.85rem;color:var(--text-muted);margin:0 0 20px;">Tutto quello che sai sul tuo mondo: personaggi, luoghi, fazioni, storia e altro. Scegli una categoria.</p>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px;">
+          <div class="card" style="cursor:pointer;padding:16px;" onclick="WikiSections.goto('png')">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+              <span style="color:#69cc85;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
+              <span id="wiki-hub-cnt-png" style="font-size:0.72rem;background:var(--bg-tertiary);padding:2px 8px;border-radius:var(--radius-full);color:var(--text-muted);">0</span>
+            </div>
+            <div style="font-weight:600;font-size:0.9rem;">PNG</div>
+            <div style="font-size:0.72rem;color:var(--text-muted);margin-top:2px;">Personaggi non giocanti</div>
+          </div>
+
+          <div class="card" style="cursor:pointer;padding:16px;" onclick="WikiSections.goto('luoghi')">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+              <span style="color:#f5a623;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg></span>
+              <span id="wiki-hub-cnt-luoghi" style="font-size:0.72rem;background:var(--bg-tertiary);padding:2px 8px;border-radius:var(--radius-full);color:var(--text-muted);">0</span>
+            </div>
+            <div style="font-weight:600;font-size:0.9rem;">Luoghi</div>
+            <div style="font-size:0.72rem;color:var(--text-muted);margin-top:2px;">Città, dungeon, regioni</div>
+          </div>
+
+          <div class="card" style="cursor:pointer;padding:16px;" onclick="WikiSections.goto('fazioni')">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+              <span style="color:#c97bea;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>
+              <span id="wiki-hub-cnt-fazioni" style="font-size:0.72rem;background:var(--bg-tertiary);padding:2px 8px;border-radius:var(--radius-full);color:var(--text-muted);">0</span>
+            </div>
+            <div style="font-weight:600;font-size:0.9rem;">Fazioni</div>
+            <div style="font-size:0.72rem;color:var(--text-muted);margin-top:2px;">Gruppi, gilde, culti</div>
+          </div>
+
+          <div class="card" style="cursor:pointer;padding:16px;" onclick="WikiSections.goto('lore')">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+              <span style="color:#5ba4f5;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></span>
+              <span id="wiki-hub-cnt-lore" style="font-size:0.72rem;background:var(--bg-tertiary);padding:2px 8px;border-radius:var(--radius-full);color:var(--text-muted);">0</span>
+            </div>
+            <div style="font-weight:600;font-size:0.9rem;">Lore</div>
+            <div style="font-size:0.72rem;color:var(--text-muted);margin-top:2px;">Storia, leggende, segreti</div>
+          </div>
+
+          <div class="card" style="cursor:pointer;padding:16px;" onclick="WikiSections.goto('sessioni')">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+              <span style="color:#ff9f43;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="14.5 17.5 3 6 3 3 6 3 17.5 14.5"/><line x1="13" y1="19" x2="19" y2="13"/><line x1="16" y1="16" x2="20" y2="20"/><line x1="19" y1="21" x2="21" y2="19"/></svg></span>
+              <span id="wiki-hub-cnt-sessioni" style="font-size:0.72rem;background:var(--bg-tertiary);padding:2px 8px;border-radius:var(--radius-full);color:var(--text-muted);">0</span>
+            </div>
+            <div style="font-weight:600;font-size:0.9rem;">Sessioni</div>
+            <div style="font-size:0.72rem;color:var(--text-muted);margin-top:2px;">Diario delle sessioni giocate</div>
+          </div>
+
+          <div class="card" style="cursor:pointer;padding:16px;" onclick="WikiSections.goto('quest')">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+              <span style="color:#e84393;"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m14.5 17.5-11-11V3h3.5l11 11"/><path d="m9.5 6.5 3-3h3v3l-3 3"/><path d="m17 15 4 4"/><path d="m3 19 4-4"/><path d="m19 21 2-2"/><path d="m3 3 2 2"/></svg></span>
+              <span id="wiki-hub-cnt-quest" style="font-size:0.72rem;background:var(--bg-tertiary);padding:2px 8px;border-radius:var(--radius-full);color:var(--text-muted);">0</span>
+            </div>
+            <div style="font-weight:600;font-size:0.9rem;">Quest</div>
+            <div style="font-size:0.72rem;color:var(--text-muted);margin-top:2px;">Obiettivi attivi e passati</div>
+          </div>
+
+          <div class="card" style="cursor:pointer;padding:16px;" onclick="WikiSections.goto('pg')">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+              <span style="color:#56d4dd;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a5 5 0 0 1 5 5v2a5 5 0 0 1-10 0V7a5 5 0 0 1 5-5z"/><path d="M20 21a8 8 0 1 0-16 0"/><line x1="12" y1="11" x2="12" y2="21"/></svg></span>
+              <span id="wiki-hub-cnt-pg" style="font-size:0.72rem;background:var(--bg-tertiary);padding:2px 8px;border-radius:var(--radius-full);color:var(--text-muted);">0</span>
+            </div>
+            <div style="font-weight:600;font-size:0.9rem;">PG</div>
+            <div style="font-size:0.72rem;color:var(--text-muted);margin-top:2px;">Personaggi del party</div>
+          </div>
+
+          <div class="card" style="cursor:pointer;padding:16px;" onclick="WikiSections.goto('incontri')">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+              <span style="color:#ff6b6b;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg></span>
+              <span id="wiki-hub-cnt-incontri" style="font-size:0.72rem;background:var(--bg-tertiary);padding:2px 8px;border-radius:var(--radius-full);color:var(--text-muted);">0</span>
+            </div>
+            <div style="font-weight:600;font-size:0.9rem;">Incontri</div>
+            <div style="font-size:0.72rem;color:var(--text-muted);margin-top:2px;">Combattimenti ed eventi pronti</div>
+          </div>
+
+          <div class="card" style="cursor:pointer;padding:16px;" onclick="WikiSections.gotoTrame()">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+              <span style="color:var(--accent-primary);"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></span>
+              <span id="wiki-hub-cnt-trame" style="font-size:0.72rem;background:var(--bg-tertiary);padding:2px 8px;border-radius:var(--radius-full);color:var(--text-muted);">0</span>
+            </div>
+            <div style="font-weight:600;font-size:0.9rem;">Trame</div>
+            <div style="font-size:0.72rem;color:var(--text-muted);margin-top:2px;">Storyline in corso</div>
+          </div>
+        </div>
+
+        <div style="margin-top:24px;">
+          <div style="font-size:0.72rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:8px;">Strumenti</div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            <div class="card" style="cursor:pointer;padding:12px 16px;display:flex;align-items:center;gap:10px;border-style:dashed;" onclick="WikiImport.open()">
+              <span style="color:var(--text-muted);"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></span>
+              <div>
+                <div style="font-weight:600;font-size:0.82rem;">Importa da foglio</div>
+                <div style="font-size:0.7rem;color:var(--text-muted);">Carica PNG, luoghi e altro da un file Excel/CSV</div>
+              </div>
+            </div>
+            <div class="card" style="cursor:pointer;padding:12px 16px;display:flex;align-items:center;gap:10px;border-style:dashed;" onclick="WikiTrashUI.open()">
+              <span style="color:var(--text-muted);"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></span>
+              <div>
+                <div style="font-weight:600;font-size:0.82rem;">Cestino</div>
+                <div style="font-size:0.7rem;color:var(--text-muted);">Voci eliminate di recente, ripristinabili</div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -3512,6 +3623,7 @@ const App = (() => {
     compendio:  { label: 'Compendio',  icon: '📚', navItem: true,  requiresCampaign: false },
     schermo:    { label: 'Schermo DM', icon: '🖥️', navItem: true,  requiresCampaign: false },
     wiki:       { label: 'Wiki',        icon: '📝', navItem: true,  requiresCampaign: true  },
+    'wiki-hub':      { label: 'Wiki',     icon: '📝', navItem: true,  requiresCampaign: true },
     'wiki-png':      { label: 'PNG',      icon: '📝', navItem: false, requiresCampaign: true },
     'wiki-luoghi':   { label: 'Luoghi',   icon: '📝', navItem: false, requiresCampaign: true },
     'wiki-fazioni':  { label: 'Fazioni',  icon: '📝', navItem: false, requiresCampaign: true },
@@ -3590,6 +3702,12 @@ const App = (() => {
           try { WikiDM.init(); } catch(e) { Debug.warn('WikiDM: ' + e); }
         }));
         break;
+    case 'wiki-hub': {
+        const tb = document.getElementById('wiki-section-tabbar');
+        if (tb) tb.style.display = 'none';
+        setTimeout(() => { try { WikiSections.renderCounters(); } catch(e) {} }, 100);
+        break;
+      }
     case 'wiki-png':
     case 'wiki-luoghi':
     case 'wiki-fazioni':
@@ -15473,6 +15591,23 @@ const WikiSections = (() => {
     if (_expanded && !_currentType) goto('png');
   };
 
+  // Pagina di panoramica Wiki (card per ogni voce) — risolve il problema delle
+  // sottovoci che non si vedono tutte nella sidebar senza scorrere.
+  const gotoHub = () => {
+    _currentType = null;
+    _currentItem = null;
+    App.navigateTo('wiki-hub');
+    document.querySelectorAll('.nav-subitem').forEach(b => b.classList.remove('active'));
+    if (!_expanded) {
+      _expanded = true;
+      const sub = document.getElementById('wiki-subnav');
+      const chev = document.getElementById('wiki-nav-chevron');
+      if (sub) sub.style.display = 'flex';
+      if (chev) chev.style.transform = 'rotate(180deg)';
+    }
+    renderCounters();
+  };
+
   const goto = (type) => {
     _currentType = type;
     _currentItem = null;
@@ -16496,9 +16631,15 @@ const WikiSections = (() => {
     const camp = App.getActiveCampaign();
     if (!camp) return;
     Object.keys(TYPES).forEach(type => {
+      let n = 0;
+      try { n = TYPES[type].getData(camp).length; } catch(e) {}
       const cnt = document.getElementById('wiki-cnt-' + type);
-      if (cnt) try { cnt.textContent = TYPES[type].getData(camp).length; } catch(e) {}
+      if (cnt) cnt.textContent = n;
+      const hubCnt = document.getElementById('wiki-hub-cnt-' + type);
+      if (hubCnt) hubCnt.textContent = n;
     });
+    const trameCnt = document.getElementById('wiki-hub-cnt-trame');
+    if (trameCnt) trameCnt.textContent = (camp.trame || []).length;
   };
 
   const init = () => {
@@ -16628,7 +16769,7 @@ const WikiSections = (() => {
     if (!showingTree) _renderLuoghiTree();
   };
 
-  return { toggleExpand, goto, gotoTrame, toggleLuoghiView, renderList, openCard, editCard, closeDetail,
+  return { toggleExpand, gotoHub, goto, gotoTrame, toggleLuoghiView, renderList, openCard, editCard, closeDetail,
     newCard, deleteCard, filter, filterTag, renderCounters, init,
     _fieldChange, _dateFieldChange, _jumpToEntity, _saveAndView, _parseLinks, _manualSave,
     _refreshImgFieldPreview, _onImageFilePicked,
