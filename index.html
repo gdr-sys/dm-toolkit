@@ -15480,7 +15480,11 @@ const WikiSections = (() => {
       } else if (f.type === 'date_inworld') {
         content = (val && typeof val === 'object') ? '<span style="font-size:0.88rem;">' + _escHtml(Calendario.formatDate(Calendario.get(), val)) + '</span>' : '';
       } else if (f.type === 'long' || f.type === 'secret') {
-        content = '<div style="font-size:0.85rem;line-height:1.7;white-space:pre-wrap;">' + _escHtml(String(val)) + '</div>';
+        // _parseLinks() come sopra per 'mention'/'mentions': prima una @menzione scritta
+        // dentro un campo di testo lungo (Descrizione, Personalita, Storia...) restava
+        // testo inerte, non cliccabile — funzionava solo nei pochi campi dedicati di tipo
+        // 'mention'. Qui e' dove la maggior parte delle @menzioni viene scritta davvero.
+        content = '<div style="font-size:0.85rem;line-height:1.7;white-space:pre-wrap;">' + _parseLinks(_escHtml(String(val))) + '</div>';
       } else if (f.type === 'select') {
         const sc = STATUS_COLORS[val] || cfg.color;
         content = '<span style="padding:2px 10px;background:' + sc + '22;color:' + sc + ';border:1px solid ' + sc + '44;border-radius:var(--radius-full);font-size:0.78rem;">' + _escHtml(String(val)) + '</span>';
@@ -15625,7 +15629,7 @@ const WikiSections = (() => {
             } else {
               if (!f.valore && f.valore !== 0) return '';
               var valDisplay = f.tipo === 'si_no' ? (f.valore === 'si' ? '● Sì' : '○ No')
-                : f.tipo === 'link' ? '<span style="color:var(--accent-primary);cursor:pointer;" onclick="WikiSections._jumpToEntity(\'' + (f.valore||'').replace(/^@/,'') + '\')">@' + _escHtml((f.valore||'').replace(/^@/,'')) + '</span>'
+                : f.tipo === 'link' ? '<span style="color:var(--accent-primary);cursor:pointer;" onclick="WikiSections._jumpToEntity(&#39;' + (f.valore||'').replace(/^@/,'') + '&#39;, event)">@' + _escHtml((f.valore||'').replace(/^@/,'')) + '</span>'
                 : _escHtml(String(f.valore));
               return '<div style="display:flex;gap:8px;align-items:baseline;padding:4px 0;border-bottom:1px solid var(--border);">' +
                 '<span style="font-size:0.72rem;color:var(--text-muted);min-width:120px;flex-shrink:0;">' + _escHtml(f.chiave||'') + '</span>' +
@@ -16016,13 +16020,16 @@ const WikiSections = (() => {
     _refreshMomenti();
   };
 
+  // Prima cercava il nome solo tra npc/luoghi/fazioni: una @menzione a un PG, una
+  // Quest, un Incontro o una voce di Lore non veniva riconosciuta come tale (il
+  // parser non sapeva dove finisse il nome). Ora scorre tutti gli 8 tipi Wiki.
   const _knownEntityNames = () => {
     const camp = App.getActiveCampaign();
     if (!camp) return [];
     const names = [];
-    (camp.npcs || []).forEach(n => { const nm = n.name || n.nome; if (nm) names.push(nm); });
-    (camp.locations || []).forEach(l => { const nm = l.nome || l.name; if (nm) names.push(nm); });
-    (camp.factions || []).forEach(f => { const nm = f.nome || f.name; if (nm) names.push(nm); });
+    Object.keys(TYPES).forEach(type => {
+      try { (TYPES[type].getData(camp) || []).forEach(x => { if (x.nome) names.push(x.nome); }); } catch (e) {}
+    });
     return names.sort((a, b) => b.length - a.length);
   };
 
@@ -16031,7 +16038,7 @@ const WikiSections = (() => {
     text = text.replace(/\[\[([^\]]+)\]\]/g, function(_, name) {
       var clean = name.trim();
       var safe = clean.replace(/&/g, '&amp;').replace(/"/g, '&quot;');
-      return '<span class="ws-link" data-name="' + safe + '" onclick="WikiSections._jumpToEntity(this.dataset.name)" style="cursor:pointer;color:var(--accent-primary);text-decoration:underline dotted;padding:0 2px;" title="Vai a ' + safe + '">' + clean + '</span>';
+      return '<span class="ws-link" data-name="' + safe + '" onclick="WikiSections._jumpToEntity(this.dataset.name, event)" style="cursor:pointer;color:var(--accent-primary);text-decoration:underline dotted;padding:0 2px;" title="Ctrl/Cmd+click per vedere senza spostarti — Vai a ' + safe + '">' + clean + '</span>';
     });
     const knownNames = _knownEntityNames();
     text = text.replace(/@([^\s@][\wÀ-ÿ'\s]{0,60})/g, function(full, rest) {
@@ -16050,7 +16057,7 @@ const WikiSections = (() => {
       const remainder = rest.slice(nameLen);
       const clean = name.trim();
       const safe = clean.replace(/&/g, '&amp;').replace(/"/g, '&quot;');
-      return '<span class="ws-link" data-name="' + safe + '" onclick="WikiSections._jumpToEntity(this.dataset.name)" style="cursor:pointer;color:var(--accent-secondary);font-weight:600;" title="Vai a ' + safe + '">@' + clean + '</span>' + remainder;
+      return '<span class="ws-link" data-name="' + safe + '" onclick="WikiSections._jumpToEntity(this.dataset.name, event)" style="cursor:pointer;color:var(--accent-secondary);font-weight:600;" title="Ctrl/Cmd+click per vedere senza spostarti — Vai a ' + safe + '">@' + clean + '</span>' + remainder;
     });
 
     text = text.replace(/#([\w\u00C0-\u00FF]+)/g, function(_, tag) {
@@ -16420,18 +16427,28 @@ const WikiSections = (() => {
 
   };
 
-  const _jumpToEntity = (name) => {
+  // Cerca il nome su tutti gli 8 tipi Wiki (prima solo PNG/Luoghi/Fazioni: una
+  // @menzione a un PG, una Quest, un Incontro o una voce di Lore non veniva mai
+  // trovata). Click normale: naviga come sempre. Ctrl/Cmd+click: apre la scheda
+  // nel pannello laterale (QuickView) senza abbandonare la pagina corrente.
+  const _jumpToEntity = (name, ev) => {
     const camp = App.getActiveCampaign();
     const lc = name.toLowerCase();
 
-    const npc = (camp?.npcs||[]).find(n => (n.name||n.nome||'').toLowerCase().includes(lc));
-    if (npc) { goto('png'); setTimeout(() => openCard('png', npc.id), 100); return; }
+    for (const type of Object.keys(TYPES)) {
+      let items;
+      try { items = TYPES[type].getData(camp) || []; } catch (e) { continue; }
+      const match = items.find(x => (x.nome || '').toLowerCase().includes(lc));
+      if (!match) continue;
 
-    const loc = (camp?.locations||[]).find(l => (l.nome||l.name||'').toLowerCase().includes(lc));
-    if (loc) { goto('luoghi'); setTimeout(() => openCard('luoghi', loc.id), 100); return; }
-
-    const fac = (camp?.factions||[]).find(f => (f.nome||f.name||'').toLowerCase().includes(lc));
-    if (fac) { goto('fazioni'); setTimeout(() => openCard('fazioni', fac.id), 100); return; }
+      if (ev && (ev.ctrlKey || ev.metaKey) && typeof QuickView !== 'undefined') {
+        QuickView.open(type, match.id);
+        return;
+      }
+      goto(type);
+      setTimeout(() => openCard(type, match.id), 100);
+      return;
+    }
     Toast.show('Entità non trovata: ' + name, 'warning', 2000);
   };
 
@@ -20894,6 +20911,7 @@ document.addEventListener('DOMContentLoaded', initMobileNav);
 <script src="js/update-popup.js"></script>
 <script src="js/wiki-import.js"></script>
 <script src="js/wiki-trash-ui.js"></script>
+<script src="js/quick-view.js"></script>
 <script src="js/calendario-config.js"></script>
 
 </body>
