@@ -12849,6 +12849,77 @@ const FirebaseSync = (() => {
     Toast.show('Sync inviata', 'success', 1500);
   };
 
+  // Campi di servizio: non vanno fusi voce per voce, li gestisce il chiamante.
+  const _MERGE_SKIP = new Set(['id', 'createdAt', 'shareCode', 'updatedAt', 'updatedBy',
+    'updatedByName', 'ownerId', '__pointer', '__deleted', 'driveFileId']);
+
+  const _voceTs = (o) => (o && (o.aggiornatoAt || o.updatedAt || o.modificatoAt || o.creatoAt || o.createdAt)) || 0;
+
+  const _hasIds = (arr) => arr.length > 0 && arr.every(x => x && typeof x === 'object' && x.id);
+
+  // Fonde due liste per id tenendo, per ogni voce, la copia con timestamp piu' recente.
+  // Le liste senza id (array di stringhe, di numeri...) non sono fondibili voce per voce:
+  // li' vince in blocco il lato della campagna salvata piu' di recente.
+  const _mergeList = (loc, rem, remoteNewer) => {
+    if (!Array.isArray(loc)) return Array.isArray(rem) ? rem : loc;
+    if (!Array.isArray(rem)) return loc;
+    if (!loc.length) return rem;
+    if (!rem.length) return loc;
+    if (!_hasIds(loc) || !_hasIds(rem)) return remoteNewer ? rem : loc;
+
+    const map = new Map();
+    loc.forEach(x => map.set(x.id, x));
+    rem.forEach(x => {
+      const cur = map.get(x.id);
+      if (!cur) { map.set(x.id, x); return; }
+      const tl = _voceTs(cur), tr = _voceTs(x);
+      if (tr > tl || (tr === tl && remoteNewer)) map.set(x.id, x);
+    });
+    return [...map.values()];
+  };
+
+  // Fonde la copia remota di una campagna su quella locale.
+  //
+  // Prima di questo fix venivano fuse soltanto wiki.lore, wiki.sessioni e npcs: per TUTTE
+  // le altre sezioni (luoghi, quest, trame, incontri, fazioni, timeline, party, pg,
+  // sessioni_log, calendario...) restava la versione locale, che subito dopo veniva
+  // ri-pushata su Firebase. Risultato: aprendo la campagna su un secondo dispositivo con
+  // una copia vecchia, i contenuti appena salvati dall'altro PC non comparivano e
+  // venivano per di piu' sovrascritti nel cloud con la copia vecchia.
+  //
+  // Nota: la fusione per id e' un'unione, quindi una voce cancellata su un dispositivo
+  // puo' riapparire se l'altro ce l'ha ancora. E' voluto: meglio una voce di troppo che
+  // una perdita di dati. Le cancellazioni di intere campagne restano gestite da __deleted.
+  const _mergeCampagne = (local, remote, remoteNewer) => {
+    const merged = { ...local };
+
+    Object.keys(remote).forEach(k => {
+      if (_MERGE_SKIP.has(k)) return;
+      const lv = local[k], rv = remote[k];
+
+      if (lv === undefined || lv === null) { merged[k] = rv; return; }
+      if (rv === undefined || rv === null) return;
+
+      if (Array.isArray(lv) || Array.isArray(rv)) { merged[k] = _mergeList(lv, rv, remoteNewer); return; }
+
+      // Oggetti contenitore di liste (wiki, generatorCache...): scende di un livello.
+      if (typeof lv === 'object' && typeof rv === 'object') {
+        const sub = { ...lv };
+        Object.keys(rv).forEach(sk => {
+          const slv = lv[sk], srv = rv[sk];
+          if (Array.isArray(slv) || Array.isArray(srv)) sub[sk] = _mergeList(slv, srv, remoteNewer);
+          else if (slv === undefined || slv === null || remoteNewer) sub[sk] = srv;
+        });
+        merged[k] = sub;
+        return;
+      }
+
+      if (remoteNewer) merged[k] = rv;
+    });
+
+    return merged;
+  };
+
   const _mergeRemote = (remote) => {
     const local = App.getActiveCampaign();
 
@@ -12861,37 +12932,11 @@ const FirebaseSync = (() => {
     }
     if (!local || local.id !== remote.id) return;
 
-    const merged = { ...local };
+    const remoteNewer = (remote.updatedAt || 0) > (local.updatedAt || 0);
+    const merged = _mergeCampagne(local, remote, remoteNewer);
 
-    if (remote.wiki) {
-      const localWiki = local.wiki || {};
-      ['lore','sessioni'].forEach(sec => {
-        const remNotes = remote.wiki[sec] || [];
-        const locNotes = localWiki[sec] || [];
-        const noteMap = {};
-        locNotes.forEach(n => noteMap[n.id] = n);
-        remNotes.forEach(n => {
-          if (!noteMap[n.id] || (n.aggiornatoAt||0) > (noteMap[n.id].aggiornatoAt||0)) {
-            noteMap[n.id] = n;
-          }
-        });
-        merged.wiki = merged.wiki || {};
-        merged.wiki[sec] = Object.values(noteMap).sort((a,b) => (b.aggiornatoAt||0)-(a.aggiornatoAt||0));
-      });
-    }
-
-    if (remote.npcs) {
-      const locMap = {};
-      (local.npcs||[]).forEach(n => locMap[n.id] = n);
-      (remote.npcs||[]).forEach(n => {
-        if (!locMap[n.id]) locMap[n.id] = n;
-
-      });
-      merged.npcs = Object.values(locMap);
-    }
-
-    App.saveActiveCampaign(merged);
     _lastSyncAt = Date.now();
+    App.saveActiveCampaign(merged);
 
     const nome = remote.updatedByName || 'Co-autore';
     Toast.show('' + nome + ' ha salvato modifiche', 'info', 2500);
