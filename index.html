@@ -12647,7 +12647,16 @@ const FirebaseSync = (() => {
           const remote = await _resolveRemote(pointer);
           if (!remote || !remote.id) continue;
 
-          Storage.saveCampaign(remote);
+          // Se esiste gia' una copia locale di questa campagna, la fonde voce per voce
+          // (stessa _mergeCampagne usata da _mergeRemote) invece di sovrascriverla tutta:
+          // altrimenti modifiche fatte su QUESTO dispositivo ma non ancora pubblicate
+          // (offline, non ancora loggato al momento di scriverle...) andrebbero perse solo
+          // perche' il cloud ha un updatedAt complessivo piu' recente. Questo e' il percorso
+          // di sync "all'apertura/login" — _mergeRemote copre solo gli aggiornamenti che
+          // arrivano mentre una campagna e' gia' attiva e in ascolto in tempo reale.
+          const daSalvare = local ? _mergeCampagne(local, remote, true) : remote;
+          daSalvare.updatedAt = Date.now();
+          Storage.saveCampaign(daSalvare);
           downloaded++;
         } catch(e) {
           Debug.warn('Download campagna remota:', e.message);
