@@ -448,17 +448,27 @@ const MappaUI = (() => {
     const input = document.getElementById('mappa-set-file');
     const file = input?.files?.[0];
     if (!file) return;
-    if (file.size > 8 * 1024 * 1024) { Toast.show('Immagine troppo grande (max 8MB)', 'warning'); return; }
+    const connesso = (typeof DriveBackup !== 'undefined') && DriveBackup.isConnected();
+    // Il limite basso (4MB) vale solo per il fallback senza Drive, perche' li'
+    // l'immagine finisce incorporata per intero nel JSON della campagna
+    // (Firebase/localStorage). Con Drive collegato i byte restano su Drive — in
+    // campagna finisce solo un link — quindi una mappa "pesante" (una scansione
+    // ad alta risoluzione puo' superare facilmente la vecchia soglia) puo'
+    // usare un limite molto piu' alto.
+    const limiteMB = connesso ? 40 : 4;
+    if (file.size > limiteMB * 1024 * 1024) {
+      Toast.show('Immagine troppo grande (max ' + limiteMB + 'MB' + (connesso ? '' : ' senza Drive collegato') + ')', 'warning', 4000);
+      return;
+    }
     const reader = new FileReader();
     reader.onload = (e) => {
       _pendingUploadDataUri = e.target.result;
       const prev = document.getElementById('mappa-set-preview');
       prev.querySelector('img').src = e.target.result;
       prev.style.display = 'block';
-      const connesso = (typeof DriveBackup !== 'undefined') && DriveBackup.isConnected();
       document.getElementById('mappa-set-file-hint').textContent = connesso
         ? 'Verra’ caricata su Google Drive al salvataggio.'
-        : 'Google Drive non e’ collegato: verra’ salvata direttamente nella campagna (piu’ pesante da sincronizzare). Puoi collegare Drive da Impostazioni.';
+        : 'Google Drive non e’ collegato: verra’ salvata direttamente nella campagna (piu’ pesante da sincronizzare, limite 4MB). Collega Drive da Impostazioni per mappe piu’ grandi.';
       // Il campo URL si apre gia' precompilato con l'immagine attuale: se non lo
       // svuotiamo qui, scegliere un file non avrebbe mai effetto (vedi
       // salvaImpostazioni, il link ha sempre la precedenza se il campo non e'
