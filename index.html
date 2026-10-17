@@ -16278,6 +16278,17 @@ const WikiSections = (() => {
         const sec = type === 'lore' ? 'lore' : 'sessioni';
         if (wiki[sec]) wiki[sec] = wiki[sec].filter(n => n.id !== id);
         App.saveActiveCampaign({ wiki });
+      } else if (type === 'incontri') {
+        App.saveActiveCampaign({ incontri: (camp.incontri || []).filter(e => e.id !== id) });
+      } else if (type === 'quest') {
+        App.saveActiveCampaign({ quests: (camp.quests || []).filter(q => q.id !== id) });
+      } else if (type === 'pg') {
+        // pg.saveItem tiene allineata una copia nel Party di Sessione Live (stesso id):
+        // va rimossa anche quella, altrimenti resta una voce orfana nel Party.
+        App.saveActiveCampaign({
+          pg: (camp.pg || []).filter(p => p.id !== id),
+          party: (camp.party || []).filter(p => p.id !== id),
+        });
       }
       // _currentItem va azzerato PRIMA di closeDetail(): altrimenti il suo autosave-on-close
       // ririscrive nei dati la voce appena cancellata (bug preesistente, non legato al modal).
