@@ -4994,6 +4994,90 @@ const Sessione = (() => {
     App.saveActiveCampaign({ party });
   };
 
+  // ─── Sync live con la Scheda PG (altro progetto single-file dello stesso autore,
+  // repo gdr-sys/Scheda-personaggio-dnd-interattiva) — canale Firebase separato da
+  // activeCombat, scritto/letto per nome del PG normalizzato, sotto lo stesso codice
+  // campagna già usato per la collaborazione in tempo reale: campagne/<codice>/pg_live/<slug>.
+  // Bidirezionale, last-write-wins su aggiornatoAt. Il giocatore che non imposta il
+  // codice campagna sulla sua scheda non ha mai un record qui: dm-toolkit funziona
+  // esattamente come prima per quel PG.
+  let _pgLiveListeners = {};
+
+  // Chiave Firebase interna, mai mostrata: niente normalizzazione accenti, i caratteri
+  // non alfanumerici (accentati inclusi) collassano comunque in un trattino.
+  const _slugNome = (nome) => (nome || '').toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+
+  const _pgLiveDbRef = (nome) => {
+    try {
+      if (typeof firebase === 'undefined' || !firebase.apps?.length) return null;
+      const code = typeof FirebaseSync !== 'undefined' ? FirebaseSync.getCampCode() : null;
+      const slug = _slugNome(nome);
+      if (!code || !slug) return null;
+      return firebase.database().ref('campagne/' + code + '/pg_live/' + slug);
+    } catch(e) { return null; }
+  };
+
+  // Scrive lo stato di un combattente PG sul canale live con source:'dm-toolkit' — da
+  // chiamare SOLO dalle azioni che il DM compie nel tracker, mai dal listener in arrivo
+  // (altrimenti le due app si rimbalzerebbero gli aggiornamenti all'infinito).
+  let _pgLivePushTimer = {};
+  const _pushPgLive = (c) => {
+    if (!c || c.tipo !== 'pg') return;
+    const ref = _pgLiveDbRef(c.nome);
+    if (!ref) return;
+    const slug = _slugNome(c.nome);
+    clearTimeout(_pgLivePushTimer[slug]);
+    _pgLivePushTimer[slug] = setTimeout(() => {
+      const at = Date.now();
+      ref.update({
+        hp: c.hp, hpMax: c.maxHp, ca: c.ca,
+        condizioni: c.condizioni || [], concentrazione: !!c.concentrazione,
+        aggiornatoAt: at, source: 'dm-toolkit',
+      }).catch(e => Debug.warn('pg_live push:', e.message));
+      c.pgLiveAt = at;
+    }, 400);
+  };
+
+  const _applyPgLiveUpdate = (c, data) => {
+    if (!c || !data) return;
+    if (data.aggiornatoAt && c.pgLiveAt && data.aggiornatoAt <= c.pgLiveAt) return;
+    c.pgLiveLinked = true;
+    if (data.source === 'dm-toolkit') { c.pgLiveAt = data.aggiornatoAt; return; } // eco di una nostra scrittura
+    if (typeof data.hp === 'number')    c.hp = Math.max(0, Math.min(data.hpMax || c.maxHp || 9999, data.hp));
+    if (typeof data.hpMax === 'number' && data.hpMax > 0) c.maxHp = data.hpMax;
+    if (typeof data.ca === 'number')    c.ca = data.ca;
+    if (Array.isArray(data.condizioni)) c.condizioni = data.condizioni;
+    if (typeof data.concentrazione === 'boolean') c.concentrazione = data.concentrazione;
+    c.mortePF = data.mortePF || null;
+    c.pgLiveAt = data.aggiornatoAt || Date.now();
+    saveCombat(_combat);
+    renderCombat();
+  };
+
+  // Al primo caricamento pagina Firebase non è ancora inizializzato (FirebaseSync.init
+  // parte con un ritardo di 500ms): se il ref non è ancora disponibile, riprova per
+  // qualche secondo invece di arrendersi subito e restare senza listener per sempre.
+  const _startPgLiveSync = (tentativo = 0) => {
+    if (!_combat) return;
+    let mancano = false;
+    _combat.combatants.filter(c => c.tipo === 'pg').forEach(c => {
+      const slug = _slugNome(c.nome);
+      if (!slug || _pgLiveListeners[slug]) return;
+      const ref = _pgLiveDbRef(c.nome);
+      if (!ref) { mancano = true; return; }
+      const handler = (snap) => _applyPgLiveUpdate(_combat?.combatants.find(x => x.nome === c.nome), snap.val());
+      ref.on('value', handler);
+      _pgLiveListeners[slug] = () => ref.off('value', handler);
+    });
+    if (mancano && tentativo < 10) setTimeout(() => _startPgLiveSync(tentativo + 1), 500);
+  };
+
+  const _stopPgLiveSync = () => {
+    Object.values(_pgLiveListeners).forEach(off => { try { off(); } catch(e) {} });
+    _pgLiveListeners = {};
+  };
+
   const init = () => {
     const camp = App.getActiveCampaign();
     if (!camp) { renderNoCampaign(); return; }
@@ -5009,6 +5093,7 @@ const Sessione = (() => {
     _combat = loadCombat();
     renderParty();
     renderCombat();
+    _startPgLiveSync();
     renderSavedSessions();
     Debug.log('Sessione.init()');
   };
@@ -5260,6 +5345,7 @@ const Sessione = (() => {
     sortCombatants();
     saveCombat(_combat);
     renderCombat();
+    _startPgLiveSync();
     Toast.show('Party aggiunto al combat', 'success');
   };
 
@@ -5385,6 +5471,7 @@ const Sessione = (() => {
               <div style="font-family:var(--font-display);font-size:0.88rem;${isDead ? 'text-decoration:line-through;opacity:0.5;' : ''}">${c.nome}</div>
               ${c.gs ? `<span class="text-xs text-muted">GS ${c.gs}</span>` : ''}
               ${c.concentrazione ? '<span class="badge badge-blue" style="font-size:0.6rem;">CONC.</span>' : ''}
+              ${c.pgLiveLinked ? '<span class="badge badge-success" style="font-size:0.55rem;" title="Collegato alla Scheda PG del giocatore — sincronizzato in tempo reale">● LIVE</span>' : ''}
             </div>
           </div>
           ${condizioniHTML ? `<div style="display:flex;flex-wrap:wrap;gap:3px;margin-top:4px;">${condizioniHTML}${effectsHTML}</div>` : ''}
@@ -5405,6 +5492,7 @@ const Sessione = (() => {
           <div class="combat-hp-bar">
             <div class="combat-hp-fill" style="width:${hpPct}%;background:${hpColor};"></div>
           </div>
+          ${isDead && c.mortePF ? `<div class="text-xs text-muted" style="margin-top:2px;" title="Tiri salvezza morte (dalla Scheda PG)">✛ ${c.mortePF.successi || 0} succ · ${c.mortePF.fallimenti || 0} fall</div>` : ''}
         </div>
 
         <!-- CA -->
@@ -5511,6 +5599,7 @@ const Sessione = (() => {
       if (c.hp === 0) Toast.show(`${c.nome} è a 0 PF!`, 'warning');
       saveCombat(_combat);
       _syncPartyHP(c);
+      _pushPgLive(c);
       renderCombat();
       Debug.log(`${c.nome}: HP ${c.hp}/${c.maxHp}`);
     }, { type: 'number', hint: `HP attuali: ${c.hp}/${c.maxHp}`, confirmLabel: delta > 0 ? 'Cura' : 'Danno' });
@@ -5522,6 +5611,7 @@ const Sessione = (() => {
     c.hp = Math.max(0, Math.min(c.maxHp || 9999, parseInt(val) || 0));
     saveCombat(_combat);
     _syncPartyHP(c);
+    _pushPgLive(c);
     const bar = document.querySelector(`#combatant-${id} .combat-hp-fill`);
     const pct = c.maxHp > 0 ? Math.round((c.hp / c.maxHp) * 100) : 100;
     const col = pct > 66 ? 'var(--accent-success)' : pct > 33 ? 'var(--accent-warning)' : 'var(--accent-danger)';
@@ -5538,6 +5628,7 @@ const Sessione = (() => {
       if (c.hp === 0) Toast.show(`${c.nome} è a 0 PF!`, 'warning');
       saveCombat(_combat);
       _syncPartyHP(c);
+      _pushPgLive(c);
       renderCombat();
     }, { type: 'number', hint: `HP: ${c.hp}/${c.maxHp}`, confirmLabel: 'Danno' });
   };
@@ -5565,6 +5656,7 @@ const Sessione = (() => {
     const checked = [...document.querySelectorAll('#cond-list input:checked')].map(i => i.value);
     c.condizioni = checked;
     saveCombat(_combat);
+    _pushPgLive(c);
     Modal.close('cond-modal');
     renderCombat();
   };
@@ -5574,6 +5666,7 @@ const Sessione = (() => {
     if (!c) return;
     c.condizioni = (c.condizioni || []).filter(x => x !== cond);
     saveCombat(_combat);
+    _pushPgLive(c);
     renderCombat();
   };
 
@@ -5617,6 +5710,7 @@ const Sessione = (() => {
     if (!c) return;
     c.concentrazione = !c.concentrazione;
     saveCombat(_combat);
+    _pushPgLive(c);
     renderCombat();
   };
 
@@ -6021,6 +6115,7 @@ const Sessione = (() => {
       App.saveActiveCampaign({ activeCombat: null });
       _combat = null;
       _sortedCombatants = [];
+      _stopPgLiveSync();
       renderCombat();
       renderSavedSessions();
       Toast.show('Scontro concluso', 'info');
@@ -6073,6 +6168,7 @@ const Sessione = (() => {
     addCustomCombatant, submitCustomCombatant, removeCombatant,
     saveCombatSession, endCombat, loadCombatSession,
     openCombatantSheet, _rollAction,
+    _slugNome, _pgLiveDbRef,
   };
 })();
 
@@ -15727,6 +15823,7 @@ const WikiSections = (() => {
     const detailEl = document.getElementById('wiki-' + type + '-detail');
     if (listEl) listEl.style.display = 'none';
     if (detailEl) { detailEl.style.display = ''; detailEl.innerHTML = _renderDetail(type, item, 'view'); }
+    if (type === 'pg') setTimeout(() => _loadPgLive(item.id), 30);
 
     const editor = document.getElementById('ws-editor-free');
     if (editor) {
@@ -15895,6 +15992,7 @@ const WikiSections = (() => {
       '</div>' +
 
       (type === 'quest' ? _renderObiettivi(item, isEdit) : '') +
+      (type === 'pg' && !isEdit ? _renderPgLive(item) : '') +
       ((type === 'png' || type === 'pg') && !isEdit ? _renderStatBlock(item, type) : '') +
       ((type === 'png' || type === 'pg') ? _renderMomenti(item, type, isEdit) : '') +
 
@@ -16091,6 +16189,47 @@ const WikiSections = (() => {
     senses: pg.percezionePassiva ? 'Percezione passiva ' + pg.percezionePassiva : '',
     gear: pg.gear, talenti: pg.talenti, actions: pg.azioni, combatNotes: pg.noteCombat,
   });
+
+  // Stato live dalla Scheda PG (altro progetto) — stesso canale Firebase usato dal combat
+  // tracker (Sessione._pgLiveDbRef), ma qui solo lettura una tantum all'apertura della card
+  // (niente listener persistente: si guarda la scheda per prepararsi, non la si tiene aperta
+  // a lungo come il tracker in combattimento). Se il giocatore non ha collegato il codice
+  // campagna sulla sua Scheda PG, non c'è nulla da mostrare e il blocco resta vuoto.
+  const _loadPgLive = async (id) => {
+    const box = document.getElementById('pg-live-box-' + id);
+    if (!box) return;
+    const camp = App.getActiveCampaign();
+    const item = (TYPES.pg.getData(camp) || []).find(p => p.id === id);
+    if (!item || typeof Sessione === 'undefined' || !Sessione._pgLiveDbRef) return;
+    const ref = Sessione._pgLiveDbRef(item.nome);
+    if (!ref) { box.innerHTML = ''; return; }
+    try {
+      const snap = await ref.once('value');
+      const data = snap.val();
+      if (!data) { box.innerHTML = ''; return; }
+      const ora = data.aggiornatoAt ? new Date(data.aggiornatoAt).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' }) : '';
+      const condHtml = (data.condizioni || []).map(c => '<span class="badge badge-primary" style="font-size:0.6rem;">' + _escHtml(c) + '</span>').join('');
+      box.innerHTML =
+        '<div style="background:var(--bg-card);border:1px solid var(--accent-success);border-radius:var(--radius-md);padding:12px 16px;margin-bottom:16px;">' +
+          '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">' +
+            '<span class="badge badge-success" style="font-size:0.6rem;">● LIVE</span>' +
+            '<span style="font-size:0.7rem;color:var(--text-muted);">Dalla Scheda PG' + (ora ? ' — aggiornato alle ' + ora : '') + '</span>' +
+            '<button class="btn btn-ghost btn-icon-sm" style="margin-left:auto;" title="Aggiorna" onclick="WikiSections._loadPgLive(\'' + id + '\')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg></button>' +
+          '</div>' +
+          '<div style="display:flex;gap:16px;flex-wrap:wrap;font-size:0.82rem;">' +
+            '<div><span class="text-muted">PF</span> ' + (data.hp ?? '?') + ' / ' + (data.hpMax ?? '?') + '</div>' +
+            '<div><span class="text-muted">CA</span> ' + (data.ca ?? '—') + '</div>' +
+            (data.concentrazione ? '<span class="badge badge-blue" style="font-size:0.6rem;">CONCENTRAZIONE</span>' : '') +
+          '</div>' +
+          (condHtml ? '<div style="display:flex;flex-wrap:wrap;gap:3px;margin-top:8px;">' + condHtml + '</div>' : '') +
+        '</div>';
+    } catch(e) { box.innerHTML = ''; }
+  };
+
+  const _renderPgLive = (item) => {
+    if (!item?.id) return '';
+    return '<div id="pg-live-box-' + item.id + '"></div>';
+  };
 
   const _renderStatBlock = (item, type) => {
     const camp = App.getActiveCampaign();
@@ -16723,6 +16862,7 @@ const WikiSections = (() => {
     const item = items.find(x => x.id === _currentItem?.id);
     const detailEl = document.getElementById('wiki-' + type + '-detail');
     if (detailEl && item) detailEl.innerHTML = _renderDetail(type, item, 'view');
+    if (type === 'pg' && item) setTimeout(() => _loadPgLive(item.id), 30);
     const status = document.getElementById('ws-autosave-status');
 
   };
@@ -16803,6 +16943,7 @@ const WikiSections = (() => {
     toggleObiettivo, addObiettivo, editObiettivoText, removeObiettivo,
     addMomento, editMomentoTesto, editMomentoTipo, editMomentoSessione, removeMomento,
     openStatEditor,
+    _loadPgLive,
     get _currentType() { return _currentType; },
     get _currentItem()  { return _currentItem; },
   };
