@@ -33,6 +33,12 @@ const UpdatePopup = (() => {
     overlay.className = 'modal-overlay hidden';
     overlay.id = 'modal-update-popup';
     overlay.style.display = 'none';
+    // .toast-container e' a z-index:9999, sopra il 1000 di .modal-overlay: su schermi
+    // stretti il footer di questo popup (4 voci, quindi piu' basso del solito) puo'
+    // finire proprio dove compaiono i toast (es. l'avviso backup a 5-11s dal caricamento),
+    // coprendo il bottone "Ho capito". Alzato sopra lo strato dei toast solo per questo
+    // popup, cosi' resta sempre interamente cliccabile.
+    overlay.style.zIndex = '10000';
     overlay.onclick = (e) => { if (e.target === overlay) Modal.close('update-popup'); };
     overlay.innerHTML =
       '<div class="modal" style="max-width:460px;">' +
