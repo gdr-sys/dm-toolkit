@@ -3481,6 +3481,10 @@ const submitFaction = () => {
 const App = (() => {
   let currentPage = 'home';
   let activeCampaign = null;
+  // Copia "congelata" di activeCampaign cosi' com'era all'ultimo salvataggio/caricamento —
+  // vedi il commento su _timbraModifiche piu' sotto per il perche' serve.
+  let _lastSnapshot = null;
+  const _deepClone = (x) => (x ? JSON.parse(JSON.stringify(x)) : x);
 
   const pages = {
     home:       { label: 'Home',   icon: '🏠', navItem: true,  requiresCampaign: false },
@@ -3632,6 +3636,7 @@ const App = (() => {
 
   const setActiveCampaign = (campaign) => {
     activeCampaign = campaign;
+    _lastSnapshot = _deepClone(campaign);
     Storage.setActiveCampaign(campaign ? campaign.id : null);
 
     const nameEl = document.getElementById('sidebar-campaign-name');
@@ -3656,15 +3661,61 @@ const App = (() => {
   const reloadActiveCampaign = () => {
     if (!activeCampaign) return;
     const fresh = Storage.getCampaign(activeCampaign.id);
-    if (fresh) activeCampaign = fresh;
+    if (fresh) { activeCampaign = fresh; _lastSnapshot = _deepClone(fresh); }
     return fresh;
+  };
+
+  // Confronta due elementi ignorando aggiornatoAt (il campo che stiamo per impostare noi).
+  const _hasId = (x) => x && typeof x === 'object' && !Array.isArray(x) && typeof x.id !== 'undefined';
+  const _elementiDiversi = (a, b) => {
+    if (a === b) return false;
+    const spoglia = (o) => { const { aggiornatoAt, ...resto } = o || {}; return resto; };
+    return JSON.stringify(spoglia(a)) !== JSON.stringify(spoglia(b));
+  };
+
+  // Timbra con aggiornatoAt ogni elemento nuovo o davvero cambiato, dentro qualunque
+  // array di oggetti-con-id trovato a QUALSIASI profondita' in 'valore' (lo confronta con
+  // la stessa posizione nel valore precedente 'vecchio'). Serve perche' il merge tra
+  // dispositivi (FirebaseSync._mergeList) sceglie quale versione di un elemento tenere
+  // guardando proprio questa data: senza, un elemento senza una propria data (es. un
+  // combattente di uno scontro, i cui PF cambiano in continuazione) veniva giudicato in
+  // base alla data dell'INTERA campagna — che puo' non avere nulla a che fare con quando
+  // quell'elemento specifico e' stato scritto, rischiando di scartare un valore piu'
+  // fresco scritto su un dispositivo solo perche' l'altro dispositivo aveva nel frattempo
+  // salvato qualcos'altro di estraneo con una campagna "piu' recente" in blocco.
+  const _timbraModifiche = (valore, vecchio) => {
+    if (Array.isArray(valore)) {
+      const vecchiMap = Array.isArray(vecchio) ? new Map(vecchio.filter(_hasId).map(x => [x.id, x])) : new Map();
+      return valore.map(el => {
+        if (!_hasId(el)) return _timbraModifiche(el, undefined);
+        const prec = vecchiMap.get(el.id);
+        const figlio = {};
+        for (const k of Object.keys(el)) figlio[k] = _timbraModifiche(el[k], prec ? prec[k] : undefined);
+        if (!prec || _elementiDiversi(el, prec)) figlio.aggiornatoAt = Date.now();
+        else if (prec.aggiornatoAt !== undefined && figlio.aggiornatoAt === undefined) figlio.aggiornatoAt = prec.aggiornatoAt;
+        return figlio;
+      });
+    }
+    if (valore && typeof valore === 'object') {
+      const out = {};
+      for (const k of Object.keys(valore)) out[k] = _timbraModifiche(valore[k], vecchio && typeof vecchio === 'object' ? vecchio[k] : undefined);
+      return out;
+    }
+    return valore;
   };
 
   const saveActiveCampaign = (partial) => {
     if (!activeCampaign) return;
+    // Confronta con l'ultimo stato SALVATO (snapshot congelato), non con activeCampaign
+    // "live": molto codice dell'app passa un oggetto gia' mutato in place (es.
+    // combat.combatants.push(...) seguito da saveActiveCampaign({activeCombat: combat})) —
+    // se confrontassimo con activeCampaign corrente, che e' spesso lo STESSO oggetto gia'
+    // mutato per riferimento, non vedremmo mai alcuna differenza da timbrare.
+    partial = _timbraModifiche(partial, _lastSnapshot || activeCampaign);
     const updated = Storage.updateCampaign(activeCampaign.id, partial);
     if (updated) {
       activeCampaign = updated;
+      _lastSnapshot = _deepClone(updated);
       // Ogni salvataggio locale prova anche a inviare la modifica a Firebase (se collegato/attivo):
       // senza questo, il push con debounce di 2s non scattava mai da nessun punto dell'app.
       try { FirebaseSync.onCampagnaSaved?.(updated); } catch(e) {}
