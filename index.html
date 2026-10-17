@@ -4720,10 +4720,14 @@ const NPC = (() => {
     Debug.log('NPC.init()');
   };
 
+  // Nota: al momento nessun pulsante dell'interfaccia chiama questa funzione — il
+  // metodo che cercava (Sessione.addNPCToCombat) non e' mai esistito, probabilmente
+  // rinominato in _addNPCById durante un refactoring senza aggiornare questo punto.
+  // Corretto per coerenza futura anche se oggi e' irraggiungibile dall'utente.
   const addCurrentToCombat = () => {
     if (!_viewingId) return;
-    if (typeof Sessione !== 'undefined' && Sessione.addNPCToCombat) {
-      Sessione.addNPCToCombat(_viewingId);
+    if (typeof Sessione !== 'undefined' && Sessione._addNPCById) {
+      Sessione._addNPCById(_viewingId);
     } else {
       Toast.show('Modulo Sessione non disponibile', 'warning');
     }
@@ -8281,7 +8285,17 @@ const Schermo = (() => {
     if (document.getElementById('schermo-block-content')) {
       document.getElementById('schermo-block-content').value = '';
     }
+    _onTypeChange(sel?.value);
     Modal.open('schermo-add-modal');
+  };
+
+  // Il campo "Contenuto" serve solo ai due tipi a testo libero (custom, note): per
+  // tutti gli altri va nascosto, altrimenti resta visibile e inutilizzato qualunque
+  // tipo si scelga (prima non esisteva affatto: l'onchange in index.html la chiamava
+  // gia' in modo difensivo — "Schermo._onTypeChange && ..." — proprio perche' mancava).
+  const _onTypeChange = (type) => {
+    const group = document.getElementById('schermo-content-group');
+    if (group) group.style.display = (type === 'custom' || type === 'note') ? '' : 'none';
   };
 
   const submitAddBlock = () => {
@@ -8401,7 +8415,7 @@ const Schermo = (() => {
   };
 
   return {
-    init, render, addBlock, submitAddBlock,
+    init, render, addBlock, submitAddBlock, _onTypeChange,
     removeBlock, resizeBlock, moveBlock, editBlock, resetLayout,
     rollDie, generateMeteo, saveNote, advanceTime, refreshCombat,
     setCompendioRef, _refreshCombat, _refreshFavoriti, _swapBlocks,
