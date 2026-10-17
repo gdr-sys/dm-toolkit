@@ -1373,6 +1373,7 @@
 
         <!-- Liste -->
         <div class="tab-content active" id="comp-panel-monsters">
+          <div id="comp-monsters-note" class="comp-note" style="display:none;">Anche in modalità 5e (2014) il bestiario è quello dell'SRD 2024: l'estrazione del bestiario 2014 era incompleta (mancavano goblin, lupi e molti altri) e con GS e PF sbagliati, quindi non viene più usata. Gli altri tab seguono il sistema selezionato.</div>
           <div id="comp-list-monsters" class="comp-list"></div>
         </div>
         <div class="tab-content" id="comp-panel-magic_items">
@@ -5787,10 +5788,18 @@ const Compendio = (() => {
   let _activeTab = 'monsters';
   let _searchTimer = null;
   let _sistema = '5e2024';
+  let _sistemaManuale = false;
+
+  // L'estrazione del bestiario 2014 (srd_5_1_monsters.json) è inservibile: 99 mostri
+  // su ~320 (mancano goblin, lupi, orchi...) e per 47 delle creature presenti GS, PF e
+  // azioni appartengono ad altre creature — il Lich risultava GS 1/2 con 22 PF e gli
+  // attacchi di un lucertoloide. Finché il dataset non viene rigenerato entrambi i
+  // sistemi usano il bestiario 5.2.1, e il tab Mostri lo dichiara (#comp-monsters-note).
+  const MONSTERS_FILE = 'srd_5_2_1_monsters.json';
 
   const SISTEMA_FILES = {
     '5e2024': {
-      monsters:    'srd_5_2_1_monsters.json',
+      monsters:    MONSTERS_FILE,
       magic_items: 'srd_5_2_1_magic_items.json',
       equipment:   'srd_5_2_1_equipment.json',
       rules:       'srd_5_2_1_rules.json',
@@ -5798,7 +5807,7 @@ const Compendio = (() => {
       dm_screen:   'dm_screen_2024.json',
     },
     '5e2014': {
-      monsters:    'srd_5_1_monsters.json',
+      monsters:    MONSTERS_FILE,
       magic_items: 'srd_5_1_magic_items.json',
       equipment:   'srd_5_1_equipment.json',
       rules:       'srd_5_1_rules.json',
@@ -5816,6 +5825,7 @@ const Compendio = (() => {
   const changeSistema = (sistema) => {
     if (_sistema === sistema) return;
     _sistema = sistema;
+    _sistemaManuale = true;
     _loaded = false;
     _data.monsters = [];
     _data.magic_items = [];
@@ -5884,7 +5894,7 @@ const Compendio = (() => {
     if (_loaded || _loading) return;
     _loading = true;
     showLoading(true);
-    _sistema = getSistema();
+    if (!_sistemaManuale) _sistema = getSistema();
     const sistemaFiles = SISTEMA_FILES[_sistema] || SISTEMA_FILES['5e2024'];
     Debug.log(`Compendio: caricamento ${_sistema}...`);
 
@@ -5893,6 +5903,9 @@ const Compendio = (() => {
 
     const sel = document.getElementById('comp-sistema-select');
     if (sel) sel.value = _sistema;
+
+    const note = document.getElementById('comp-monsters-note');
+    if (note) note.style.display = _sistema === '5e2014' ? '' : 'none';
 
     try {
       const base = 'data/';
@@ -17173,8 +17186,8 @@ const MonsterCache = (() => {
     try {
       const camp = App.getActiveCampaign();
       const sistema = camp?.system === '5e2014' ? '5e2014' : '5e2024';
-      const file = sistema === '5e2014' ? 'srd_5_1_monsters.json' : 'srd_5_2_1_monsters.json';
-      const r = await fetch('data/' + file);
+      // Bestiario unico per entrambi i sistemi: vedi Compendio.MONSTERS_FILE
+      const r = await fetch('data/srd_5_2_1_monsters.json');
       if (r.ok) {
         _monsters = await r.json();
         _loaded = true;
