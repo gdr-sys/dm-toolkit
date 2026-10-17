@@ -2811,6 +2811,8 @@ const Storage = (() => {
         const prevImgById = new Map();
         (previous||[]).forEach(camp => {
           ['npcs','locations','factions'].forEach(k => (camp?.[k]||[]).forEach(x => prevImgById.set(x.id, x.immagine || '')));
+          (camp?.mappe||[]).forEach(m => prevImgById.set('mappa_'+m.id, m.immagine || ''));
+          if (camp?.mappa) prevImgById.set('mappa_legacy_'+camp.id, camp.mappa.immagine || '');
         });
         const cleaned = value.map(camp => {
           const c = { ...camp };
@@ -2822,6 +2824,21 @@ const Storage = (() => {
           c.npcs = stripNewBase64(c.npcs);
           c.locations = stripNewBase64(c.locations);
           c.factions = stripNewBase64(c.factions);
+          // Le mappe possono avere immagini incorporate molto piu' pesanti di un
+          // ritratto (scansioni ad alta risoluzione): senza questa pulizia, una
+          // mappa caricata senza Drive collegato poteva da sola esaurire lo
+          // spazio e il salvataggio falliva comunque anche dopo aver ripulito
+          // ritratti/luoghi/fazioni, che qui non c'entravano nulla.
+          if (c.mappe) {
+            c.mappe = c.mappe.map(m => {
+              const img = m.immagine || '';
+              if (!img.startsWith('data:')) return m;
+              return img === prevImgById.get('mappa_'+m.id) ? m : { ...m, immagine: '' };
+            });
+          }
+          if (c.mappa && (c.mappa.immagine||'').startsWith('data:') && c.mappa.immagine !== prevImgById.get('mappa_legacy_'+c.id)) {
+            c.mappa = { ...c.mappa, immagine: '' };
+          }
           return c;
         });
         try {

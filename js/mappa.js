@@ -55,6 +55,27 @@ const MappaUI = (() => {
   const TERRENO_LABEL = { strada: 'Strada', pianura: 'Pianura', foresta: 'Foresta', colline: 'Colline', montagna: 'Montagna', palude: 'Palude', deserto: 'Deserto', mare: 'Mare aperto' };
   const COLORI = ['#8b2635', '#2d5a6b', '#3a7d44', '#c17f3b', '#c97bea', '#5a5248'];
 
+  // Icona interna del pin (stesso guscio a goccia per tutti, cambia solo il
+  // glifo bianco al centro) in base al "Tipo di luogo" gia' presente nella
+  // scheda Wiki collegata — nessun dato nuovo da inserire, si vede subito a
+  // colpo d'occhio cosa c'e' sulla mappa senza dover cliccare ogni pin.
+  const ICONA_LUOGO = {
+    'Città':     '<rect x="7.5" y="8" width="3" height="4.5" fill="#fff"/><rect x="11" y="5.5" width="3" height="7" fill="#fff"/><rect x="14.5" y="7" width="3" height="5.5" fill="#fff"/>',
+    'Villaggio': '<path d="M12 5.5 L16 9 L16 12.5 L8 12.5 L8 9 Z" fill="#fff"/>',
+    'Paese':     '<path d="M12 5.5 L16 9 L16 12.5 L8 12.5 L8 9 Z" fill="#fff"/>',
+    'Dungeon':   '<path d="M9 12.5 V9 A3 3 0 0 1 15 9 V12.5 Z" fill="#fff"/>',
+    'Taverna':   '<rect x="9" y="7" width="5" height="6" rx="0.5" fill="#fff"/><path d="M14 8.5 h1.3 a1.4 1.4 0 0 1 0 2.8 h-1.3" stroke="#fff" stroke-width="0.9" fill="none"/>',
+    'Castello':  '<path d="M8 12.5 V8 H9.3 V6.6 H10.7 V8 H13.3 V6.6 H14.7 V8 H16 V12.5 Z" fill="#fff"/>',
+    'Tempio':    '<path d="M12 5.3 L16.3 9 H7.7 Z" fill="#fff"/><rect x="8.2" y="9" width="1" height="3.5" fill="#fff"/><rect x="11.5" y="9" width="1" height="3.5" fill="#fff"/><rect x="14.8" y="9" width="1" height="3.5" fill="#fff"/>',
+    'Foresta':   '<path d="M12 5.3 L15.2 10.2 H8.8 Z" fill="#fff"/><rect x="11.3" y="10.2" width="1.4" height="2.3" fill="#fff"/>',
+    'Regione':   '<rect x="9" y="5.3" width="1" height="7.2" fill="#fff"/><path d="M10 5.3 L15 7 L10 8.7 Z" fill="#fff"/>',
+    'Porto':     '<circle cx="12" cy="6.4" r="1" fill="none" stroke="#fff" stroke-width="1"/><path d="M12 7.4 V12.3 M9 10.3 Q9 12.5 12 12.5 Q15 12.5 15 10.3" stroke="#fff" stroke-width="1" fill="none"/>',
+    'Torre':     '<rect x="10.5" y="6.3" width="3" height="6.2" fill="#fff"/><path d="M12 4.6 L13.6 6.3 H10.4 Z" fill="#fff"/>',
+  };
+  const ICONA_PNG = '<circle cx="12" cy="7" r="1.6" fill="#fff"/><path d="M8.5 12.5 Q8.5 9 12 9 Q15.5 9 15.5 12.5 Z" fill="#fff"/>';
+  const ICONA_MAPPA = '<rect x="9" y="6" width="6" height="6" rx="1" fill="#fff"/>';
+  const ICONA_DEFAULT = '<circle cx="12" cy="9" r="3" fill="#fff"/>';
+
   let _scale = 1, _panX = 0, _panY = 0;
   let _dragging = false, _dragMoved = false, _lastClientX = 0, _lastClientY = 0;
   let _pendingPin = null;   // {x,y} in attesa di conferma dal modal "Nuovo pin"
@@ -449,15 +470,18 @@ const MappaUI = (() => {
     const file = input?.files?.[0];
     if (!file) return;
     const connesso = (typeof DriveBackup !== 'undefined') && DriveBackup.isConnected();
-    // Il limite basso (4MB) vale solo per il fallback senza Drive, perche' li'
-    // l'immagine finisce incorporata per intero nel JSON della campagna
-    // (Firebase/localStorage). Con Drive collegato i byte restano su Drive — in
-    // campagna finisce solo un link — quindi una mappa "pesante" (una scansione
-    // ad alta risoluzione puo' superare facilmente la vecchia soglia) puo'
-    // usare un limite molto piu' alto.
-    const limiteMB = connesso ? 40 : 4;
+    // Con Drive collegato i byte restano su Drive (in campagna finisce solo un
+    // link), quindi una mappa pesante puo' usare un limite alto. SENZA Drive,
+    // l'immagine finisce incorporata per intero nel localStorage del browser —
+    // che in totale (per TUTTA l'app, tutte le campagne) e' spesso solo 5-10MB:
+    // un singolo file da qualche MB puo' da solo esaurirlo. Limite basso apposta.
+    const limiteMB = connesso ? 40 : 1.5;
     if (file.size > limiteMB * 1024 * 1024) {
-      Toast.show('Immagine troppo grande (max ' + limiteMB + 'MB' + (connesso ? '' : ' senza Drive collegato') + ')', 'warning', 4000);
+      Toast.show(
+        connesso
+          ? 'Immagine troppo grande (max ' + limiteMB + 'MB)'
+          : 'Immagine troppo grande per il salvataggio locale (max ' + limiteMB + 'MB senza Drive) — collega Google Drive da Impostazioni per caricare mappe piu’ pesanti senza rischiare di esaurire lo spazio del browser',
+        'warning', 6000);
       return;
     }
     const reader = new FileReader();
@@ -468,7 +492,7 @@ const MappaUI = (() => {
       prev.style.display = 'block';
       document.getElementById('mappa-set-file-hint').textContent = connesso
         ? 'Verra’ caricata su Google Drive al salvataggio.'
-        : 'Google Drive non e’ collegato: verra’ salvata direttamente nella campagna (piu’ pesante da sincronizzare, limite 4MB). Collega Drive da Impostazioni per mappe piu’ grandi.';
+        : 'Google Drive non e’ collegato: verra’ salvata direttamente nella campagna. Per mappe piu’ pesanti, collega Drive da Impostazioni (evita di riempire lo spazio del browser).';
       // Il campo URL si apre gia' precompilato con l'immagine attuale: se non lo
       // svuotiamo qui, scegliere un file non avrebbe mai effetto (vedi
       // salvaImpostazioni, il link ha sempre la precedenza se il campo non e'
