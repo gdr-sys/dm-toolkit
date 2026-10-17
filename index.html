@@ -274,6 +274,11 @@
         <span class="nav-label">Calendario</span>
       </button>
 
+      <button class="nav-item" data-page="mappa" data-requires-campaign="true" onclick="App.navigateTo('mappa');closeMobileMenu()">
+        <span class="nav-icon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 6v16l7-4 8 4 7-4V2l-7 4-8-4-7 4z"/><path d="M8 2v16"/><path d="M16 6v16"/></svg></span>
+        <span class="nav-label">Mappa</span>
+      </button>
+
       <div class="nav-section-label" style="margin-top:8px;">Strumenti</div>
 
 
@@ -1754,6 +1759,10 @@
       <div id="trame-detail" style="display:none;height:100%;overflow-y:auto;padding:20px;"></div>
 
     </section>
+
+
+    <!-- Contenuto costruito a runtime da js/mappa.js -->
+    <section class="page" id="page-mappa" style="padding:0;height:calc(100vh - var(--header-height));"></section>
 
 
     <section class="page" id="page-calendario">
@@ -3478,6 +3487,7 @@ const App = (() => {
     campagna:   { label: 'Dashboard',   icon: '📖', navItem: true,  requiresCampaign: true  },
     sessione:   { label: 'Sessione',   icon: '⚔️', navItem: true,  requiresCampaign: true  },
     calendario: { label: 'Calendario', icon: '',   navItem: true,  requiresCampaign: true  },
+    mappa:      { label: 'Mappa',      icon: '',   navItem: true,  requiresCampaign: true  },
     generatori: { label: 'Generatori', icon: '✨', navItem: true,  requiresCampaign: false },
     compendio:  { label: 'Compendio',  icon: '📚', navItem: true,  requiresCampaign: false },
     schermo:    { label: 'Schermo DM', icon: '🖥️', navItem: true,  requiresCampaign: false },
@@ -3549,6 +3559,7 @@ const App = (() => {
         setTimeout(() => { GeneratoriDD.enable(); Generatori.applyVisibility(); EncounterBuilder.init(); RNGLoot.init(); }, 100);
         break;
       case 'compendio':  try { Compendio.init(); } catch(e) {} break;
+      case 'mappa':      try { MappaUI.init(); } catch(e) {} break;
       case 'schermo':    try { Schermo.init(); } catch(e) {} break;
       case 'wiki':
         requestAnimationFrame(() => requestAnimationFrame(() => {
@@ -20912,6 +20923,7 @@ document.addEventListener('DOMContentLoaded', initMobileNav);
 <script src="js/wiki-import.js"></script>
 <script src="js/wiki-trash-ui.js"></script>
 <script src="js/quick-view.js"></script>
+<script src="js/mappa.js"></script>
 <script src="js/calendario-config.js"></script>
 
 </body>
