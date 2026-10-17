@@ -28305,5 +28305,242 @@
     "descrizione": "Attacco con arma a distanza: +3 al tiro per colpire, gittata 30/120 m, un bersaglio. Colpito: 6 (1d10 + 1) danni perforanti. I veterani sono combattenti professionisti che operano a pagamento o per proteggere qualcosa in cui credono o che per loro ha valore. Questa categoria comprende soldati che un tempo hanno prestato servizio nell'esercito e guerrieri che non hanno mai servito alcuna causa se non la propria."
    }
   ]
- }
+ },
+  {
+    "id": "orog",
+    "nome": "Orog",
+    "tipo": "Umanoide",
+    "dimensione": "Medio",
+    "allineamento": "caotico malvagio",
+    "classe_armatura": 18,
+    "punti_ferita": {
+      "media": 42,
+      "formula": "5d8 + 20"
+    },
+    "velocita": {
+      "camminata": "9 m"
+    },
+    "caratteristiche": {
+      "forza": {
+        "punteggio": 18,
+        "modificatore": 4,
+        "tiro_salvezza": 4
+      },
+      "destrezza": {
+        "punteggio": 12,
+        "modificatore": 1,
+        "tiro_salvezza": 1
+      },
+      "costituzione": {
+        "punteggio": 18,
+        "modificatore": 4,
+        "tiro_salvezza": 4
+      },
+      "intelligenza": {
+        "punteggio": 12,
+        "modificatore": 1,
+        "tiro_salvezza": 1
+      },
+      "saggezza": {
+        "punteggio": 11,
+        "modificatore": 0,
+        "tiro_salvezza": 0
+      },
+      "carisma": {
+        "punteggio": 12,
+        "modificatore": 1,
+        "tiro_salvezza": 1
+      }
+    },
+    "abilita": {
+      "intimidire": 3,
+      "percezione": 2
+    },
+    "sensi": {
+      "scurovisione": "18 m",
+      "percezione_passiva": 12
+    },
+    "lingue": [
+      "Ogre",
+      "Orchesco"
+    ],
+    "grado_sfida": {
+      "valore": 2,
+      "punti_esperienza": 450,
+      "raw": "2"
+    },
+    "bonus_competenza": 2,
+    "tratti": [
+      {
+        "nome": "Aggressivo",
+        "descrizione": "Come azione bonus, l'orog può muoversi fino alla sua velocità verso una creatura ostile che può vedere."
+      }
+    ],
+    "azioni": [
+      {
+        "nome": "Multiattacco",
+        "descrizione": "L'orog effettua due attacchi con la grande ascia o due attacchi con il giavellotto."
+      },
+      {
+        "nome": "Grande Ascia",
+        "descrizione": "Attacco con arma da mischia: +6 al tiro per colpire, portata 1,5 m, un bersaglio. Colpito: 10 (1d12 + 4) danni taglienti."
+      },
+      {
+        "nome": "Giavellotto",
+        "descrizione": "Attacco con arma da mischia o a distanza: +6 al tiro per colpire, portata 1,5 m o gittata 9/36 m, un bersaglio. Colpito: 7 (1d6 + 4) danni perforanti."
+      }
+    ]
+  },
+  {
+    "id": "orco_nogart_il_devastatore",
+    "nome": "Orco Devastatore",
+    "tipo": "Umanoide",
+    "dimensione": "Medio",
+    "allineamento": "caotico malvagio",
+    "classe_armatura": 13,
+    "punti_ferita": {
+      "media": 30,
+      "formula": "4d8 + 12"
+    },
+    "velocita": {
+      "camminata": "9 m"
+    },
+    "caratteristiche": {
+      "forza": {
+        "punteggio": 16,
+        "modificatore": 3,
+        "tiro_salvezza": 3
+      },
+      "destrezza": {
+        "punteggio": 12,
+        "modificatore": 1,
+        "tiro_salvezza": 1
+      },
+      "costituzione": {
+        "punteggio": 16,
+        "modificatore": 3,
+        "tiro_salvezza": 3
+      },
+      "intelligenza": {
+        "punteggio": 7,
+        "modificatore": -2,
+        "tiro_salvezza": -2
+      },
+      "saggezza": {
+        "punteggio": 11,
+        "modificatore": 0,
+        "tiro_salvezza": 0
+      },
+      "carisma": {
+        "punteggio": 10,
+        "modificatore": 0,
+        "tiro_salvezza": 0
+      }
+    },
+    "sensi": {
+      "scurovisione": "18 m",
+      "percezione_passiva": 10
+    },
+    "lingue": [
+      "Orchesco"
+    ],
+    "grado_sfida": {
+      "valore": 1,
+      "punti_esperienza": 200,
+      "raw": "1"
+    },
+    "bonus_competenza": 2,
+    "tratti": [
+      {
+        "nome": "Aggressivo",
+        "descrizione": "Come azione bonus, l'orco può muoversi fino alla sua velocità verso una creatura ostile che può vedere."
+      }
+    ],
+    "azioni": [
+      {
+        "nome": "Spadone",
+        "descrizione": "Attacco con arma da mischia: +5 al tiro per colpire, portata 1,5 m, un bersaglio. Colpito: 10 (2d6 + 3) danni taglienti."
+      }
+    ]
+  },
+  {
+    "id": "banderhobb",
+    "nome": "Banderhobb",
+    "tipo": "Mostruosità",
+    "dimensione": "Grande",
+    "allineamento": "neutrale malvagio",
+    "classe_armatura": 15,
+    "punti_ferita": {
+      "media": 84,
+      "formula": "8d10 + 40"
+    },
+    "velocita": {
+      "camminata": "9 m"
+    },
+    "caratteristiche": {
+      "forza": {
+        "punteggio": 20,
+        "modificatore": 5,
+        "tiro_salvezza": 5
+      },
+      "destrezza": {
+        "punteggio": 12,
+        "modificatore": 1,
+        "tiro_salvezza": 1
+      },
+      "costituzione": {
+        "punteggio": 20,
+        "modificatore": 5,
+        "tiro_salvezza": 5
+      },
+      "intelligenza": {
+        "punteggio": 11,
+        "modificatore": 0,
+        "tiro_salvezza": 0
+      },
+      "saggezza": {
+        "punteggio": 14,
+        "modificatore": 2,
+        "tiro_salvezza": 2
+      },
+      "carisma": {
+        "punteggio": 8,
+        "modificatore": -1,
+        "tiro_salvezza": -1
+      }
+    },
+    "abilita": {
+      "furto": 5,
+      "percezione": 5
+    },
+    "sensi": {
+      "scurovisione": "30 m",
+      "percezione_passiva": 15
+    },
+    "lingue": [
+      "comprende il Gergo Ladresco e le lingue del suo creatore ma non può parlare"
+    ],
+    "grado_sfida": {
+      "valore": 5,
+      "punti_esperienza": 1800,
+      "raw": "5"
+    },
+    "bonus_competenza": 3,
+    "tratti": [
+      {
+        "nome": "Passo d'Ombra",
+        "descrizione": "Come azione bonus, il banderhobb può teletrasportarsi fino a 9 metri in uno spazio non occupato che può vedere, a condizione che sia lo spazio di partenza che quello di arrivo si trovino in penombra o nell'oscurità."
+      }
+    ],
+    "azioni": [
+      {
+        "nome": "Multiattacco",
+        "descrizione": "Il banderhobb effettua due attacchi: uno con il morso e uno con la lingua."
+      },
+      {
+        "nome": "Morso",
+        "descrizione": "Attacco con arma da mischia: +8 al tiro per colpire, portata 1,5 m, un bersaglio. Colpito: 22 (5d6 + 5) danni perforanti. Se il bersaglio è una creatura di taglia Grande o inferiore, viene afferrata (CD 15 per fuggire) ed inghiottita se già afferrata."
+      }
+    ]
+  }
 ]
