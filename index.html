@@ -6086,6 +6086,7 @@ const Compendio = (() => {
 
   let _loaded = false;
   let _loading = false;
+  let _loadPromise = null;
   let _activeTab = 'monsters';
   let _searchTimer = null;
   let _sistema = '5e2024';
@@ -6184,8 +6185,14 @@ const Compendio = (() => {
     return String(text).replace(re, '<mark style="background:var(--accent-secondary);color:#fff;border-radius:2px;padding:0 2px;">$1</mark>');
   };
 
-  const load = async () => {
-    if (_loaded || _loading) return;
+  const load = () => {
+    if (_loaded) return Promise.resolve();
+    if (_loading) return _loadPromise;
+    _loadPromise = _doLoad();
+    return _loadPromise;
+  };
+
+  const _doLoad = async () => {
     _loading = true;
     showLoading(true);
     if (!_sistemaManuale) _sistema = getSistema();
@@ -7580,6 +7587,7 @@ const Compendio = (() => {
     _refreshHBForm, _getHB: _getHomebrew,
     sendCurrentToCombat, changeSistema, toggleFavorito,
     getData: () => _data,
+    ready: load,
     renderCercaTutto,
     _injectRules: (rules) => { _data.rules = rules; },
     searchVelocita,
@@ -17945,6 +17953,11 @@ const EncounterBuilder = (() => {
     if (!crAdatti.length) {
       el.innerHTML = '<div class="text-muted text-sm">Nessun CR adatto trovato.</div>'; return;
     }
+
+    // Il Compendio carica i mostri solo alla prima visita della sua pagina: se l'utente
+    // arriva qui (Generatori) senza esserci mai passato, Compendio.getData().monsters
+    // sarebbe vuoto e l'encounter builder non troverebbe mai nulla.
+    try { el.innerHTML = '<div class="text-muted text-sm">Caricamento mostri…</div>'; await Compendio.ready(); } catch (e) {}
 
     const dati = Compendio.getData();
     const monsters = [...(dati.monsters || [])];
