@@ -25,7 +25,12 @@
   background-color: var(--nav-bg);
   background-size: 100% 24px, 100% 24px, 100% 10px, 100% 10px;
   background-position: top, bottom, top, bottom;
+  /* Scrollbar dello stesso rosso della voce di menu selezionata: quella grigia di
+     default (vedi base.css) si vede a malapena su questo sfondo scuro, e con la
+     sottovoce Wiki che puo' diventare lunga serve un indizio di scroll piu' netto. */
+  scrollbar-color: var(--accent-primary) var(--nav-bg);
 }
+.nav-section::-webkit-scrollbar-thumb { background: var(--accent-primary); }
 .nav-section-label { font-family:var(--font-display); font-size:0.6rem; letter-spacing:0.12em; text-transform:uppercase; color:var(--nav-label-color); padding:var(--space-sm) var(--space-md) var(--space-xs); white-space:nowrap; overflow:hidden; transition:opacity var(--transition-fast); }
 #sidebar.collapsed .nav-section-label { opacity:0; }
 .nav-item { display:flex; align-items:center; gap:var(--space-md); padding:10px var(--space-md); color:var(--nav-text); text-decoration:none; cursor:pointer; transition:all var(--transition-fast); border:none; background:none; width:100%; text-align:left; border-radius:0; position:relative; }
