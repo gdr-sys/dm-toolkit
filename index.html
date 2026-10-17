@@ -14089,40 +14089,58 @@ const WikiTrash = (() => {
     localStorage.setItem(KEY, JSON.stringify(sorted));
   };
 
+  // 'nota' e' l'oggetto completo della voce (non solo id/titolo): serve per poterla
+  // ripristinare con tutti i suoi campi. 'sec' e' uno degli 8 tipi Wiki (png, luoghi,
+  // fazioni, lore, pg, incontri, quest, sessioni).
   const addToTrash = (nota, sec) => {
     const trash = _getTrash();
     trash.push({ ...nota, deletedAt: Date.now(), _sec: sec });
     _saveTrash(trash);
   };
 
+  // Ripristina riusando lo stesso saveItem() con cui quel tipo viene normalmente
+  // creato/modificato dalla Wiki: stessa normalizzazione campi, stessi eventuali
+  // effetti collaterali (es. pg -> copia sincronizzata nel Party). Prima andava SOLO
+  // per 'lore'/'sessioni' (scriveva sempre e solo in wiki[sec]); per gli altri 6 tipi
+  // (png, luoghi, fazioni, pg, quest, incontri) non faceva nulla di persistente: la
+  // voce finiva scritta in camp.wiki[tipo], un posto che nessuna schermata legge.
+  // 'titolo' resta l'alias storico di 'nome' usato dalle note create da WikiDM prima
+  // che esistesse questa struttura unificata (stesso storage, voce piu' vecchia).
   const restore = (id) => {
     const trash = _getTrash();
     const nota = trash.find(n => n.id === id);
     if (!nota) return;
-    const { deletedAt, _sec, ...clean } = nota;
-    const sec = _sec || 'lore';
-
+    const { deletedAt, _sec, ...item } = nota;
+    const cfg = typeof WikiSections !== 'undefined' ? WikiSections._getCfg(_sec) : null;
+    if (!cfg) { Toast.show('Impossibile ripristinare: tipo non riconosciuto', 'error'); return; }
     const camp = App.getActiveCampaign();
-    const wiki = camp?.wiki || {};
-    if (!wiki[sec]) wiki[sec] = [];
-    wiki[sec].unshift({ ...clean, titolo: (clean.titolo||'') + ' (ripristinata)' });
-    App.saveActiveCampaign({ wiki });
+    if (!camp) { Toast.show('Seleziona prima una campagna', 'warning'); return; }
+
+    const nome = item.nome || item.titolo || '(senza nome)';
+    cfg.saveItem(camp, { ...item, nome: nome + ' (ripristinata)' });
 
     _saveTrash(trash.filter(n => n.id !== id));
-    Toast.show('Nota ripristinata in ' + sec, 'success');
-    WikiDM.switchSection(sec);
+    Toast.show('"' + nome + '" ripristinata', 'success');
+    try { WikiSections.goto(_sec); } catch(e) {}
+  };
+
+  // Rimuove una voce dal cestino senza ripristinarla (eliminazione definitiva di una
+  // singola voce, a differenza di empty() che svuota tutto il cestino).
+  const removeOne = (id) => {
+    _saveTrash(_getTrash().filter(n => n.id !== id));
   };
 
   const getAll = () => _getTrash();
 
-  const empty = () => {
-    openConfirmModal('Svuotare il cestino?', 'Svuotare definitivamente il cestino? Le note non saranno recuperabili.', () => {
+  const empty = (onDone) => {
+    openConfirmModal('Svuotare il cestino?', 'Svuotare definitivamente il cestino? Le voci non saranno recuperabili.', () => {
       localStorage.removeItem(KEY);
       Toast.show('Cestino svuotato', 'info');
+      if (onDone) onDone();
     });
   };
 
-  return { addToTrash, restore, getAll, empty };
+  return { addToTrash, restore, removeOne, getAll, empty };
 })();
 
 const ExportMarkdown = (() => {
@@ -16265,7 +16283,9 @@ const WikiSections = (() => {
 
       const items = cfg.getData(camp);
       const item = items.find(x => x.id === id);
-      if (item) try { WikiTrash.addToTrash({ id, titolo: item.nome }, type); } catch(e) {}
+      // Passa l'oggetto completo (non solo id/titolo): serve per ripristinare davvero
+      // la voce con tutti i suoi campi, non solo il nome. Vedi WikiTrash.restore().
+      if (item) try { WikiTrash.addToTrash(item, type); } catch(e) {}
 
       if (type === 'png') {
         App.saveActiveCampaign({ npcs: (camp.npcs || []).filter(n => n.id !== id) });
@@ -19253,7 +19273,7 @@ const CalendarioUI = (() => {
     scoperta:      { color: '#69cc85', label: 'Scoperta' },
     sociale:       { color: '#ff9f43', label: 'Sociale' },
   };
-  const ENTITA_TIPI = { png: 'PNG', luoghi: 'Luogo', fazioni: 'Fazione', quest: 'Quest', trame: 'Trama' };
+  const ENTITA_TIPI = { png: 'PNG', luoghi: 'Luogo', fazioni: 'Fazione', pg: 'PG', incontri: 'Incontro', quest: 'Quest', trame: 'Trama' };
   const ENTITA_TIPI_LIST = Object.keys(ENTITA_TIPI);
 
   const _esc = (s) => String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -20859,6 +20879,7 @@ document.addEventListener('DOMContentLoaded', initMobileNav);
 <script src="js/newsletter-popup.js"></script>
 <script src="js/update-popup.js"></script>
 <script src="js/wiki-import.js"></script>
+<script src="js/wiki-trash-ui.js"></script>
 <script src="js/calendario-config.js"></script>
 
 </body>
