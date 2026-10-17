@@ -12952,6 +12952,9 @@ const FirebaseSync = (() => {
   const _resolveRemote = async (remote) => {
     if (!remote) return null;
     if (remote.__pointer && remote.driveFileId) {
+      if (!DriveBackup.isConnected()) {
+        throw new Error('questa campagna ha i dati su Google Drive, ma Drive non è collegato su questo dispositivo — vai su Impostazioni e collega Drive per scaricarla');
+      }
       const full = await DriveBackup.downloadFromDrive(remote.driveFileId);
       return { ...full, updatedAt: remote.updatedAt, updatedBy: remote.updatedBy, updatedByName: remote.updatedByName };
     }
@@ -14621,7 +14624,10 @@ const DriveBackup = (() => {
 
   const downloadFromDrive = async (fileId) => {
     const res = await _driveFetch('drive/v3/files/' + fileId + '?alt=media');
-    if (!res.ok) throw new Error('Errore download da Drive (' + res.status + ')');
+    if (res.status === 404) {
+      throw new Error('file non trovato su Drive — probabilmente è stato creato da un altro account Google (controlla di aver collegato lo stesso account usato sugli altri dispositivi) oppure è stato cancellato manualmente da Drive');
+    }
+    if (!res.ok) throw new Error('errore download da Drive (' + res.status + ')');
     return await res.json();
   };
 
