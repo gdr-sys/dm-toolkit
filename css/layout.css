@@ -11,7 +11,21 @@
 .campaign-dot { width:8px; height:8px; background:var(--accent-secondary); border-radius:50%; flex-shrink:0; animation:pulse 2s infinite; }
 .campaign-name { font-size:0.78rem; color:var(--nav-text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; flex:1; transition:opacity var(--transition-fast); }
 #sidebar.collapsed .campaign-name { opacity:0; width:0; }
-.nav-section { padding:var(--space-sm) 0; flex:1; overflow-y:auto; overflow-x:hidden; }
+.nav-section {
+  padding:var(--space-sm) 0; flex:1; overflow-y:auto; overflow-x:hidden;
+  /* Ombra di scroll (sparisce da sola a inizio/fine lista): la sottovoce Wiki puo'
+     allungare parecchio questa lista (8 tipi + Importa da foglio + Cestino) e senza
+     un indizio visivo non e' ovvio che ci sia altro sotto da scorrere. */
+  background:
+    linear-gradient(var(--nav-bg) 30%, rgba(0,0,0,0)) local,
+    linear-gradient(rgba(0,0,0,0), var(--nav-bg) 70%) local,
+    radial-gradient(farthest-side at 50% 0, rgba(0,0,0,.35), rgba(0,0,0,0)) scroll,
+    radial-gradient(farthest-side at 50% 100%, rgba(0,0,0,.35), rgba(0,0,0,0)) scroll;
+  background-repeat: no-repeat;
+  background-color: var(--nav-bg);
+  background-size: 100% 24px, 100% 24px, 100% 10px, 100% 10px;
+  background-position: top, bottom, top, bottom;
+}
 .nav-section-label { font-family:var(--font-display); font-size:0.6rem; letter-spacing:0.12em; text-transform:uppercase; color:var(--nav-label-color); padding:var(--space-sm) var(--space-md) var(--space-xs); white-space:nowrap; overflow:hidden; transition:opacity var(--transition-fast); }
 #sidebar.collapsed .nav-section-label { opacity:0; }
 .nav-item { display:flex; align-items:center; gap:var(--space-md); padding:10px var(--space-md); color:var(--nav-text); text-decoration:none; cursor:pointer; transition:all var(--transition-fast); border:none; background:none; width:100%; text-align:left; border-radius:0; position:relative; }
