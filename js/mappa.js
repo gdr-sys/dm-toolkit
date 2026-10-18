@@ -223,7 +223,20 @@ const MappaUI = (() => {
     }
     if (vuota) vuota.style.display = 'none';
     if (inner) inner.style.display = '';
-    if (img.src !== mappa.immagine) img.src = mappa.immagine;
+    // Guarisce al volo link di Drive salvati nel vecchio formato uc?export=view
+    // (non piu' affidabile come sorgente <img>, vedi DriveBackup.toEmbeddableUrl):
+    // cosi' le mappe caricate prima di questo fix tornano a vedersi senza dover
+    // essere ricaricate a mano.
+    const srcSanato = (typeof DriveBackup !== 'undefined') ? DriveBackup.toEmbeddableUrl(mappa.immagine) : mappa.immagine;
+    if (img.src !== srcSanato) img.src = srcSanato;
+    img.onerror = () => {
+      if (vuota) {
+        vuota.style.display = 'flex';
+        const t = document.getElementById('mappa-vuota-titolo');
+        if (t) t.textContent = 'Immagine non disponibile — riapri "Modifica mappa" e ricaricala';
+      }
+      if (inner) inner.style.display = 'none';
+    };
     zoomReset();
     _renderPins();
   };
@@ -366,10 +379,7 @@ const MappaUI = (() => {
   // Se l'URL non sembra un link Drive di quel tipo, lo restituisce invariato.
   const _normalizzaUrlImmagine = (url) => {
     if (!url) return url;
-    let m = url.match(/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/)
-      || url.match(/drive\.google\.com\/open\?id=([a-zA-Z0-9_-]+)/)
-      || url.match(/drive\.google\.com\/.*[?&]id=([a-zA-Z0-9_-]+)/);
-    return m ? 'https://drive.google.com/uc?export=view&id=' + m[1] : url;
+    return (typeof DriveBackup !== 'undefined') ? DriveBackup.toEmbeddableUrl(url) : url;
   };
 
   const _injectModals = () => {
