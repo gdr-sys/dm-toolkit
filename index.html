@@ -19759,6 +19759,9 @@ const CalendarioUI = (() => {
   };
   const ENTITA_TIPI = { png: 'PNG', luoghi: 'Luogo', fazioni: 'Fazione', pg: 'PG', incontri: 'Incontro', quest: 'Quest', trame: 'Trama' };
   const ENTITA_TIPI_LIST = Object.keys(ENTITA_TIPI);
+  // Stessi colori per tipo usati nell'hub Wiki, così un'entità collegata si
+  // riconosce a colpo d'occhio invece di doverne leggere tutta l'etichetta.
+  const ENTITA_TIPI_COLORE = { png: '#69cc85', luoghi: '#f5a623', fazioni: '#c97bea', pg: '#56d4dd', incontri: '#ff6b6b', quest: '#e84393', trame: 'var(--accent-primary)' };
 
   const _esc = (s) => String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
@@ -19976,14 +19979,27 @@ const CalendarioUI = (() => {
     let items = [];
     if (tipo === 'trame') items = (camp?.trame || []).map(t => ({ id: t.id, nome: t.titolo || t.nome || '(senza titolo)' }));
     else { try { items = (WikiSections._getCfg(tipo)?.getData(camp) || []).map(x => ({ id: x.id, nome: x.nome })); } catch (e) { items = []; } }
-    nomeSel.innerHTML = items.map(x => '<option value="' + x.id + '">' + _esc(x.nome) + '</option>').join('') || '<option value="">(nessuno)</option>';
+    // Le Trame non passano da WikiSections._getCfg (saveItem/newItem), quindi non
+    // si possono creare al volo da qui — solo i tipi Wiki veri e propri lo permettono.
+    const opzioneNuovo = tipo !== 'trame' ? '<option value="__nuovo__">+ Crea nuovo ' + ENTITA_TIPI[tipo] + '...</option>' : '';
+    nomeSel.innerHTML = opzioneNuovo + items.map(x => '<option value="' + x.id + '">' + _esc(x.nome) + '</option>').join('') || '<option value="">(nessuno)</option>';
+    _onEntitaNomeChange();
+  };
+
+  const _onEntitaNomeChange = () => {
+    const nomeSel = document.getElementById('cev-entita-nome');
+    const wrap = document.getElementById('cev-entita-nuovo-wrap');
+    if (!nomeSel || !wrap) return;
+    wrap.style.display = nomeSel.value === '__nuovo__' ? '' : 'none';
+    if (nomeSel.value === '__nuovo__') document.getElementById('cev-entita-nuovo-nome').value = '';
   };
 
   const _renderEntitaChips = () => {
     const list = document.getElementById('cev-entita-list');
     if (!list) return;
     list.innerHTML = _editEntita.map(e =>
-      '<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;background:var(--bg-tertiary);border-radius:var(--radius-full);font-size:0.75rem;cursor:pointer;" onclick="CalendarioUI.openEntita(\'' + e.tipo + '\',\'' + e.id + '\')">' +
+      '<span style="display:inline-flex;align-items:center;gap:5px;padding:2px 8px;background:var(--bg-tertiary);border-radius:var(--radius-full);font-size:0.75rem;cursor:pointer;" onclick="CalendarioUI.openEntita(\'' + e.tipo + '\',\'' + e.id + '\')">' +
+        '<span style="width:7px;height:7px;border-radius:50%;background:' + (ENTITA_TIPI_COLORE[e.tipo] || 'var(--text-muted)') + ';flex-shrink:0;"></span>' +
         ENTITA_TIPI[e.tipo] + ': ' + _esc(e.nome) +
         '<button type="button" onclick="event.stopPropagation();CalendarioUI.removeEntita(\'' + e.tipo + '\',\'' + e.id + '\')" style="background:none;border:none;cursor:pointer;color:var(--text-muted);padding:0;line-height:1;">×</button>' +
       '</span>'
@@ -19994,7 +20010,23 @@ const CalendarioUI = (() => {
     const tipoSel = document.getElementById('cev-entita-tipo');
     const nomeSel = document.getElementById('cev-entita-nome');
     if (!tipoSel || !nomeSel || !nomeSel.value) return;
-    const tipo = tipoSel.value, id = nomeSel.value, nome = nomeSel.options[nomeSel.selectedIndex]?.textContent || '';
+    const tipo = tipoSel.value;
+    let id = nomeSel.value, nome = nomeSel.options[nomeSel.selectedIndex]?.textContent || '';
+
+    if (id === '__nuovo__') {
+      const nomeNuovo = document.getElementById('cev-entita-nuovo-nome')?.value?.trim() || '';
+      if (!nomeNuovo) { Toast.show('Scrivi un nome per la nuova scheda', 'warning'); return; }
+      const cfg = WikiSections._getCfg(tipo);
+      if (!cfg) return;
+      const item = cfg.newItem();
+      item.nome = nomeNuovo;
+      cfg.saveItem(App.getActiveCampaign(), item);
+      try { WikiSections.renderCounters(); } catch (e) {}
+      id = item.id; nome = nomeNuovo;
+      Toast.show(ENTITA_TIPI[tipo] + ' "' + nomeNuovo + '" creato nella Wiki', 'success', 2500);
+      _populateEntitaNome();
+    }
+
     if (_editEntita.some(e => e.tipo === tipo && e.id === id)) return;
     _editEntita.push({ tipo, id, nome });
     _renderEntitaChips();
@@ -20043,8 +20075,9 @@ const CalendarioUI = (() => {
     const cat = CATEGORIE[ev.categoria || ''] || CATEGORIE[''];
     const dataStr = cal ? Calendario.formatDate(cal, ev.data) : '';
     const entitaHTML = (ev.entita || []).length
-      ? '<div style="display:flex;flex-wrap:wrap;gap:4px;">' +
-        ev.entita.map(x => '<span class="badge badge-primary" style="cursor:pointer;" onclick="Modal.close(\'calendario-evento\');CalendarioUI.openEntita(\'' + x.tipo + '\',\'' + x.id + '\')">' +
+      ? '<div style="display:flex;flex-wrap:wrap;gap:5px;">' +
+        ev.entita.map(x => '<span style="display:inline-flex;align-items:center;gap:5px;padding:3px 9px;background:var(--bg-tertiary);border-radius:var(--radius-full);font-size:0.78rem;cursor:pointer;" onclick="Modal.close(\'calendario-evento\');CalendarioUI.openEntita(\'' + x.tipo + '\',\'' + x.id + '\')">' +
+          '<span style="width:7px;height:7px;border-radius:50%;background:' + (ENTITA_TIPI_COLORE[x.tipo] || 'var(--text-muted)') + ';flex-shrink:0;"></span>' +
           _esc(ENTITA_TIPI[x.tipo] || x.tipo) + ': ' + _esc(x.nome) + '</span>').join('') +
         '</div>'
       : '<span class="text-muted" style="font-size:0.82rem;">Nessuna</span>';
@@ -20160,7 +20193,7 @@ const CalendarioUI = (() => {
     showTab, navMese, navAnno, oggi, openDay,
     newEvento, editEvento, viewEvento, saveEvento, deleteEventoCorrente,
     addEntita, removeEntita, openEntita,
-    _onMeseSelectChange, _onTipoChange, _populateEntitaNome,
+    _onMeseSelectChange, _onTipoChange, _populateEntitaNome, _onEntitaNomeChange,
     _renderMese, _getEventi, getCategorie: () => CATEGORIE, legendaHTML: _legendaHTML,
   };
 })();
@@ -21087,8 +21120,12 @@ document.addEventListener('DOMContentLoaded', initMobileNav);
         <div id="cev-entita-list" style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px;"></div>
         <div style="display:flex;gap:6px;">
           <select id="cev-entita-tipo" class="form-select" style="max-width:140px;" onchange="CalendarioUI._populateEntitaNome()"></select>
-          <select id="cev-entita-nome" class="form-select"></select>
+          <select id="cev-entita-nome" class="form-select" onchange="CalendarioUI._onEntitaNomeChange()"></select>
           <button type="button" class="btn btn-secondary btn-sm" onclick="CalendarioUI.addEntita()">Aggiungi</button>
+        </div>
+        <div id="cev-entita-nuovo-wrap" style="display:none;margin-top:6px;">
+          <input type="text" id="cev-entita-nuovo-nome" class="form-input" placeholder="Nome...">
+          <div class="form-hint" style="margin-top:2px;">Crea subito una scheda minima nella Wiki — potrai completarla con altri dettagli quando vuoi.</div>
         </div>
       </div>
       <label style="display:flex;align-items:center;gap:6px;font-size:0.82rem;" id="cev-completata-wrap">
