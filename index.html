@@ -20257,8 +20257,11 @@ const CalendarioTimeline = (() => {
       setTimeout(() => { try { WikiSections.openCard('sessioni', it.id); } catch (e) {} }, 150);
       return;
     }
-    if (it.entita && it.entita.length) CalendarioUI.openEntita(it.entita[0].tipo, it.entita[0].id);
-    else CalendarioUI.viewEvento(it.id);
+    // Mostra sempre prima la scheda dell'evento — le entità collegate restano
+    // cliccabili da lì dentro (vedi CalendarioUI.viewEvento) invece di saltare
+    // direttamente alla prima entità collegata, che nascondeva titolo/descrizione
+    // e le altre entità dell'evento.
+    CalendarioUI.viewEvento(it.id);
   };
 
   const _setEmpty = (titolo, testo) => {
