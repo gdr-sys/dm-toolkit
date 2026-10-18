@@ -13765,7 +13765,21 @@ const MentionPicker = (() => {
       }
     });
 
-    return items.slice(0, 12);
+    const risultati = items.slice(0, 12);
+    // "+ Crea nuovo PNG/Luogo/Fazione" quando si sta scrivendo un nome che ancora non
+    // esiste da nessuna parte: cosi' @mentions in Sessione, PNG, Luoghi ecc. puo' creare
+    // la scheda al volo esattamente come gia' succede nella Timeline del Calendario,
+    // invece di dover prima interrompersi per aggiungerla a mano dalla Wiki.
+    const nomeDigitato = q.trim();
+    if (nomeDigitato) {
+      const giaEsiste = (tipoCfg) => items.some(it => it.tipo === tipoCfg && it.label.toLowerCase().includes(nomeDigitato.toLowerCase()) && it.label.toLowerCase().replace(/^\S+\s/, '') === nomeDigitato.toLowerCase());
+      [['png','👤','PNG'], ['luogo','🗺️','Luogo'], ['fazione','⚔️','Fazione']].forEach(([tipoCfg, emoji, label]) => {
+        if (!giaEsiste(tipoCfg)) {
+          risultati.push({ label: '+ Crea ' + label + ' "' + nomeDigitato + '"', key: nomeDigitato, tipo: 'crea', tipoEntita: tipoCfg, color: 'var(--accent-primary)' });
+        }
+      });
+    }
+    return risultati;
   };
 
   const _show = (x, y) => {
@@ -13854,8 +13868,27 @@ const MentionPicker = (() => {
   };
 
   const pick = (i) => {
-    const r = _results[i];
+    let r = _results[i];
     if (!r) { _hide(); return; }
+
+    // "+ Crea nuovo ..." selezionato: crea davvero la scheda nella Wiki adesso, poi la
+    // tratta come se fosse un risultato normale (stesso tipo/colore/icona) cosi' il resto
+    // dell'inserimento del @mention funziona identico a quando si sceglie una voce esistente.
+    if (r.tipo === 'crea') {
+      // r.tipoEntita usa il vocabolario singolare dei @mention (png/luogo/fazione, lo stesso
+      // dei prefissi "key" qui sotto), ma le config di WikiSections sono indicizzate al
+      // plurale (png/luoghi/fazioni, come le voci di menu) — da qui la mappa.
+      const CFG_KEY = { png: 'png', luogo: 'luoghi', fazione: 'fazioni' };
+      const cfg = (typeof WikiSections !== 'undefined') ? WikiSections._getCfg(CFG_KEY[r.tipoEntita]) : null;
+      if (!cfg) { _hide(); return; }
+      const item = cfg.newItem();
+      item.nome = r.key;
+      cfg.saveItem(App.getActiveCampaign(), item);
+      try { WikiSections.renderCounters(); } catch(e) {}
+      Toast.show((r.tipoEntita === 'png' ? 'PNG' : r.tipoEntita === 'luogo' ? 'Luogo' : 'Fazione') + ' "' + r.key + '" creato nella Wiki', 'success', 2500);
+      const colore = r.tipoEntita === 'png' ? '#69cc85' : r.tipoEntita === 'luogo' ? '#f5a623' : '#ff6b6b';
+      r = { label: r.label, key: r.tipoEntita + ':' + r.key, tipo: r.tipoEntita, id: item.id, color: colore };
+    }
 
     if (_insertFn) { _insertFn(r); _hide(); return; }
 
