@@ -14834,7 +14834,10 @@ const DriveBackup = (() => {
   let _connected = false;
   let _warnedThisSession = false;
 
+  let _initStarted = false;
   const init = async () => {
+    if (_initStarted) return; // vedi ready(): può partire prima del setTimeout schedulato altrove
+    _initStarted = true;
     _connected = localStorage.getItem(LS_KEY) === 'true';
     if (_connected) {
       _updateUI();
@@ -14890,15 +14893,20 @@ const DriveBackup = (() => {
   // Attende l'esito del tentativo di riconnessione silenziosa a Drive dopo un
   // reload, invece di controllare isConnected() nell'istante stesso del login:
   // il token OAuth non sopravvive al reload e va richiesto di nuovo a Google in
-  // modo asincrono (DriveBackup.init parte con un ritardo, poi GDrive.silentReconnect
-  // e' un round-trip verso Google), mentre il login Firebase/la sync campagne può
-  // scattare subito dopo — senza questa attesa un dispositivo con Drive davvero
-  // collegato risultava "non collegato" solo perché il controllo arrivava troppo presto.
+  // modo asincrono (GDrive.silentReconnect e' un round-trip verso Google, più il
+  // possibile caricamento dello script GIS la prima volta), mentre il login
+  // Firebase/la sync campagne può scattare subito dopo — senza questa attesa un
+  // dispositivo con Drive davvero collegato risultava "non collegato" solo
+  // perché il controllo arrivava troppo presto. init() normalmente parte da solo
+  // con un ritardo fisso altrove: qui lo si innesca subito (è idempotente, vedi
+  // _initStarted) invece di stare fermi ad aspettare che tocchi a quel timer,
+  // che da solo mangiava già gran parte del margine disponibile.
   const ready = async () => {
     if (isConnected()) return;
     if (localStorage.getItem(LS_KEY) !== 'true') return; // mai collegato su questo dispositivo
+    try { init(); } catch (e) {}
     await new Promise(resolve => {
-      const timer = setTimeout(resolve, 4000);
+      const timer = setTimeout(resolve, 8000);
       try { GDrive.onConnect(() => { clearTimeout(timer); resolve(); }); }
       catch(e) { clearTimeout(timer); resolve(); }
     });
