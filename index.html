@@ -19920,7 +19920,7 @@ const CalendarioUI = (() => {
       '</div>' +
       (eventi.length ? eventi.map(e => {
         const cat = CATEGORIE[e.categoria] || CATEGORIE[''];
-        return '<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-top:1px solid var(--border);cursor:pointer;" onclick="CalendarioUI.editEvento(\'' + e.id + '\')">' +
+        return '<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-top:1px solid var(--border);cursor:pointer;" onclick="CalendarioUI.viewEvento(\'' + e.id + '\')">' +
           '<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:' + (e.tipo === 'deadline' ? 'var(--accent-danger)' : cat.color) + ';flex-shrink:0;"></span>' +
           '<span style="font-size:0.85rem;flex:1;">' + _esc(e.titolo || '(senza titolo)') + '</span>' +
           '<span class="text-muted" style="font-size:0.7rem;">' + (e.tipo === 'deadline' ? 'Deadline' : cat.label) + '</span>' +
@@ -20018,9 +20018,55 @@ const CalendarioUI = (() => {
     if (wrap) wrap.style.display = tipo === 'deadline' ? '' : 'none';
   };
 
+  // Passa tra la vista sola-lettura (primo click su un evento) e il form di modifica
+  // vero e proprio, senza chiudere/riaprire la modale.
+  const _mostraModaliEdit = () => {
+    document.getElementById('cev-edit-fields').style.display = 'contents';
+    document.getElementById('cev-edit-footer').style.display = 'contents';
+    document.getElementById('cev-view-fields').style.display = 'none';
+    document.getElementById('cev-view-footer').style.display = 'none';
+  };
+
+  const viewEvento = (id) => {
+    const ev = _getEventi().find(e => e.id === id);
+    if (!ev) return;
+    const cal = Calendario.get();
+    _editingId = id;
+    document.getElementById('cev-id').value = ev.id;
+    document.getElementById('cev-title').textContent = ev.titolo || 'Evento';
+
+    document.getElementById('cev-edit-fields').style.display = 'none';
+    document.getElementById('cev-edit-footer').style.display = 'none';
+    const viewEl = document.getElementById('cev-view-fields');
+    viewEl.style.display = 'contents';
+
+    const cat = CATEGORIE[ev.categoria || ''] || CATEGORIE[''];
+    const dataStr = cal ? Calendario.formatDate(cal, ev.data) : '';
+    const entitaHTML = (ev.entita || []).length
+      ? '<div style="display:flex;flex-wrap:wrap;gap:4px;">' +
+        ev.entita.map(x => '<span class="badge badge-primary" style="cursor:pointer;" onclick="Modal.close(\'calendario-evento\');CalendarioUI.openEntita(\'' + x.tipo + '\',\'' + x.id + '\')">' +
+          _esc(ENTITA_TIPI[x.tipo] || x.tipo) + ': ' + _esc(x.nome) + '</span>').join('') +
+        '</div>'
+      : '<span class="text-muted" style="font-size:0.82rem;">Nessuna</span>';
+
+    viewEl.innerHTML =
+      '<div class="form-group"><label class="form-label">Data</label><div style="font-size:0.9rem;">' + _esc(dataStr) + '</div></div>' +
+      '<div class="form-group" style="display:flex;gap:6px;flex-wrap:wrap;">' +
+        '<span class="badge" style="background:' + cat.color + ';color:#fff;">' + _esc(cat.label) + '</span>' +
+        (ev.tipo === 'deadline' ? '<span class="badge badge-warning">Deadline' + (ev.completata ? ' · completata' : '') + '</span>' : '') +
+        '<span class="badge badge-muted">' + (ev.layer === 'mondo' ? 'Storia del mondo' : 'Cronaca campagna') + '</span>' +
+      '</div>' +
+      (ev.descrizione ? '<div class="form-group"><label class="form-label">Descrizione</label><div style="font-size:0.88rem;white-space:pre-wrap;">' + _esc(ev.descrizione) + '</div></div>' : '') +
+      '<div class="form-group"><label class="form-label">Entità collegate</label>' + entitaHTML + '</div>';
+
+    document.getElementById('cev-view-footer').style.display = '';
+    Modal.open('calendario-evento');
+  };
+
   const newEvento = (giorno) => {
     const cal = Calendario.get();
     if (!cal) { Toast.show('Attiva il Calendario per creare eventi', 'warning'); return; }
+    _mostraModaliEdit();
     _editingId = null;
     _editEntita = [];
     document.getElementById('cev-id').value = '';
@@ -20045,6 +20091,7 @@ const CalendarioUI = (() => {
     const ev = _getEventi().find(e => e.id === id);
     if (!ev) return;
     const cal = Calendario.get();
+    _mostraModaliEdit();
     _editingId = id;
     _editEntita = [...(ev.entita || [])];
     document.getElementById('cev-id').value = ev.id;
@@ -20111,7 +20158,7 @@ const CalendarioUI = (() => {
 
   return {
     showTab, navMese, navAnno, oggi, openDay,
-    newEvento, editEvento, saveEvento, deleteEventoCorrente,
+    newEvento, editEvento, viewEvento, saveEvento, deleteEventoCorrente,
     addEntita, removeEntita, openEntita,
     _onMeseSelectChange, _onTipoChange, _populateEntitaNome,
     _renderMese, _getEventi, getCategorie: () => CATEGORIE, legendaHTML: _legendaHTML,
@@ -20178,7 +20225,7 @@ const CalendarioTimeline = (() => {
       return;
     }
     if (it.entita && it.entita.length) CalendarioUI.openEntita(it.entita[0].tipo, it.entita[0].id);
-    else CalendarioUI.editEvento(it.id);
+    else CalendarioUI.viewEvento(it.id);
   };
 
   const _setEmpty = (titolo, testo) => {
@@ -20995,6 +21042,10 @@ document.addEventListener('DOMContentLoaded', initMobileNav);
     </div>
     <div class="modal-body" style="display:flex;flex-direction:column;gap:12px;">
       <input type="hidden" id="cev-id">
+      <!-- Vista sola lettura: mostrata al primo click su un evento, con bottone "Modifica"
+           per passare alla modalità modifica sottostante invece di entrarci subito. -->
+      <div id="cev-view-fields" style="display:none;"></div>
+      <div id="cev-edit-fields" style="display:contents;">
       <div class="form-group">
         <label class="form-label">Titolo</label>
         <input type="text" id="cev-titolo" class="form-input" placeholder="es. Il patto scade">
@@ -21043,11 +21094,18 @@ document.addEventListener('DOMContentLoaded', initMobileNav);
       <label style="display:flex;align-items:center;gap:6px;font-size:0.82rem;" id="cev-completata-wrap">
         <input type="checkbox" id="cev-completata"> Completata / gestita
       </label>
+      </div>
     </div>
     <div class="modal-footer">
-      <button class="btn btn-ghost" id="cev-delete-btn" onclick="CalendarioUI.deleteEventoCorrente()" style="margin-right:auto;color:var(--accent-danger);">Elimina</button>
-      <button class="btn btn-ghost" onclick="Modal.close('calendario-evento')">Annulla</button>
-      <button class="btn btn-primary" onclick="CalendarioUI.saveEvento()">Salva</button>
+      <div id="cev-edit-footer" style="display:contents;">
+        <button class="btn btn-ghost" id="cev-delete-btn" onclick="CalendarioUI.deleteEventoCorrente()" style="margin-right:auto;color:var(--accent-danger);">Elimina</button>
+        <button class="btn btn-ghost" onclick="Modal.close('calendario-evento')">Annulla</button>
+        <button class="btn btn-primary" onclick="CalendarioUI.saveEvento()">Salva</button>
+      </div>
+      <div id="cev-view-footer" style="display:none;">
+        <button class="btn btn-ghost" onclick="Modal.close('calendario-evento')">Chiudi</button>
+        <button class="btn btn-primary" onclick="CalendarioUI.editEvento(document.getElementById('cev-id').value)">Modifica</button>
+      </div>
     </div>
   </div>
 </div>
