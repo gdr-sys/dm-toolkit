@@ -12878,8 +12878,27 @@ const FirebaseSync = (() => {
 
   const upgradeToGoogle = () => loginGoogle();
 
+  // "Cambia modalità" riusa la stessa schermata di scelta del primo avvio, che pero' da'
+  // per scontato che non ci sia ancora nessun account collegato. Se invece si e' gia'
+  // loggate (Google o anonimo), scegliere "Solo locale"/"Anonimo" o un account Google
+  // diverso in quella schermata esce di fatto dall'account attuale — con tutte le
+  // campagne che erano sincronizzate li' che smettono di essere visibili finche' non
+  // ci si riaccede. Prima lo si faceva senza nessun avviso ("cambia modalità" sembrava
+  // un'azione innocua): qui si mostra chi e' collegata ORA e cosa rischia di perdere,
+  // cosi' la scelta e' consapevole invece di un logout a sorpresa.
   const switchMode = () => {
     Modal.close('collab');
+    const titolo = document.getElementById('auth-choice-titolo');
+    const avviso = document.getElementById('auth-choice-avviso');
+    if (_user && titolo && avviso) {
+      titolo.textContent = 'Cambia modalità';
+      const chi = _user.isAnonymous ? 'in modalità anonima' : ('come ' + (_user.email || _user.displayName || 'account Google'));
+      avviso.style.display = 'block';
+      avviso.innerHTML = '⚠ Sei attualmente collegata ' + chi + '. Scegliendo un\'altra opzione qui sotto (o un account Google diverso) esci da questo accesso: le campagne sincronizzate su di esso spariscono dall\'app finché non ci riaccedi — restano comunque salvate, nulla viene cancellato.';
+    } else if (titolo) {
+      titolo.textContent = 'Benvenuto nel DM Toolkit';
+      if (avviso) avviso.style.display = 'none';
+    }
     Modal.open('auth-choice');
   };
 
@@ -20985,9 +21004,10 @@ document.addEventListener('DOMContentLoaded', initMobileNav);
 <div class="modal-overlay hidden" id="modal-auth-choice" style="display:none;" onclick="if(event.target===this)Modal.close('auth-choice')">
   <div class="modal" style="max-width:480px;">
     <div class="modal-header">
-      <h3 class="modal-title">Benvenuto nel DM Toolkit</h3>
+      <h3 class="modal-title" id="auth-choice-titolo">Benvenuto nel DM Toolkit</h3>
       <button class="btn btn-ghost btn-icon-sm" onclick="Modal.close('auth-choice')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
+    <div id="auth-choice-avviso" style="display:none;margin:12px 20px 0;padding:10px 12px;background:var(--bg-tertiary);border:1px solid var(--border-strong);border-left:3px solid var(--accent-primary);border-radius:var(--radius-sm);font-size:0.8rem;color:var(--text-secondary);"></div>
     <div class="modal-body" style="display:flex;flex-direction:column;gap:10px;padding:20px;">
 
       <!-- Opzione 1: Locale -->
