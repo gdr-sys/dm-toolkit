@@ -76,7 +76,7 @@
   --transition-slow:   400ms ease;
 
   /* Layout */
-  --nav-width:     220px;
+  --nav-width:     256px;
   --nav-collapsed: 60px;
   --header-height: 56px;
   --dice-size:     52px;
