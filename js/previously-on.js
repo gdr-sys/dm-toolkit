@@ -21,9 +21,23 @@ const PreviouslyOn = (() => {
   })[t] || t || 'una scena';
 
   // Solo sessioni con qualcosa da raccontare: giocate, o comunque con un recap scritto
-  // (utile a chi non aggiorna sempre lo stato a "giocata").
-  const _sessionsWithContent = (camp) =>
-    (camp.sessioni_log || []).filter(s => s.stato === 'giocata' || (s.recap && s.recap.trim()));
+  // (utile a chi non aggiorna sempre lo stato a "giocata"). Include anche le sessioni
+  // scritte come nota libera nella Wiki (camp.wiki.sessioni, campo "contenuto") invece
+  // che nel form strutturato del Log Sessioni: senza questo, un sunto scritto solo li'
+  // restava invisibile qui pur esistendo davvero — la causa piu' comune del "non mi
+  // mostra nulla anche se ho un sunto della sessione precedente".
+  const _sessionsWithContent = (camp) => {
+    const dalLog = (camp.sessioni_log || []).filter(s => s.stato === 'giocata' || (s.recap && s.recap.trim()));
+    const idGiaNelLog = new Set(dalLog.map(s => s.id));
+    const dallaWiki = (camp.wiki?.sessioni || [])
+      .filter(n => !idGiaNelLog.has(n.id) && n.contenuto && n.contenuto.replace(/<[^>]*>/g, '').trim())
+      .map(n => ({
+        id: n.id, numero: null, titolo: n.titolo || '', data: '',
+        recap: n.contenuto.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim(),
+        beats: [], npcs: [], _ordinamento: n.aggiornatoAt || 0,
+      }));
+    return [...dalLog, ...dallaWiki];
+  };
 
   const _npcNames = (s, camp) =>
     (s.npcs || []).map(id => {
@@ -51,25 +65,36 @@ const PreviouslyOn = (() => {
     return parts.join(' ');
   };
 
+  // Ordine cronologico unico per entrambe le fonti: le sessioni del Log hanno quasi
+  // sempre una data (precompilata alla creazione), le note Wiki no — per queste si usa
+  // l'ultimo salvataggio come proxy, altrimenti il numero sessione pesato.
+  const _quando = (s) => {
+    const t = s.data && Date.parse(s.data);
+    if (t) return t;
+    return s._ordinamento || (s.numero || 0) * 1000;
+  };
+
+  const _labelSessione = (s) => s.numero ? ('S' + s.numero + (s.titolo ? ' — ' + s.titolo : '')) : (s.titolo || 'Nota di sessione');
+
   // ── Generazione testo ──
   const generate = (n) => {
     const camp = App.getActiveCampaign();
     if (!camp) return '';
-    const pool = _sessionsWithContent(camp).sort((a, b) => (a.numero || 0) - (b.numero || 0));
+    const pool = _sessionsWithContent(camp).sort((a, b) => _quando(a) - _quando(b));
     const picked = pool.slice(-n);
     if (!picked.length) {
-      return 'Nessuna sessione con recap o beat trovata: gioca o compila almeno una sessione nel Log Sessioni prima di generare un riepilogo.';
+      return 'Nessuna sessione con recap o beat trovata: gioca o compila almeno una sessione nel Log Sessioni (o scrivi un sunto in una nota Wiki → Sessioni) prima di generare un riepilogo.';
     }
 
     if (picked.length === 1) {
       const s = picked[0];
-      const label = 'S' + (s.numero || '?') + (s.titolo ? ' — ' + s.titolo : '');
+      const label = _labelSessione(s);
       return 'Nella sessione precedente (' + label + (s.data ? ', ' + s.data : '') + '):\n\n' + _sessionParagraph(s, camp);
     }
 
     const intro = 'Riepilogo delle ultime ' + picked.length + ' sessioni:';
     const body = picked.map(s => {
-      const label = 'S' + (s.numero || '?') + (s.titolo ? ' — ' + s.titolo : '') + (s.data ? ' (' + s.data + ')' : '');
+      const label = _labelSessione(s) + (s.data ? ' (' + s.data + ')' : '');
       return '**' + label + '**\n' + _sessionParagraph(s, camp);
     }).join('\n\n');
     return intro + '\n\n' + body;
