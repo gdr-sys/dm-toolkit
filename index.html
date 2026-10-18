@@ -7813,6 +7813,38 @@ const Schermo = (() => {
   };
 
   let _blocks = [];
+  let _masonryRO = null;
+
+  // La griglia dello Schermo è CSS Grid "a righe": senza questo, un blocco alto
+  // in una colonna (es. una tabella di regole) allunga l'intera riga e lascia
+  // un vuoto enorme sotto i blocchi più corti della stessa riga (es. Party,
+  // Timer) — non si "avvicinano" come dovrebbero. Tecnica standard: righe
+  // implicite da 1px (vedi .schermo-grid in <style>) e un grid-row-end: span N
+  // calcolato sull'altezza reale di ciascun blocco, così ogni colonna si
+  // impacchetta per conto suo come un vero masonry invece di seguire la riga
+  // più alta. Un ResizeObserver lo ricalcola da solo quando un blocco cambia
+  // altezza (contenuto caricato in ritardo, resize manuale, risposta...).
+  const _layoutMasonry = () => {
+    const grid = document.getElementById('schermo-grid');
+    if (!grid) return;
+    const cs = getComputedStyle(grid);
+    const rowUnit = parseFloat(cs.gridAutoRows) || 1;
+    const rowGap = parseFloat(cs.rowGap || cs.gap) || 0;
+    grid.querySelectorAll('.schermo-block').forEach(el => {
+      const h = el.getBoundingClientRect().height;
+      const span = Math.max(1, Math.ceil((h + rowGap) / (rowUnit + rowGap)));
+      el.style.gridRowEnd = 'span ' + span;
+    });
+  };
+
+  const _enableMasonry = () => {
+    const grid = document.getElementById('schermo-grid');
+    if (!grid) return;
+    if (_masonryRO) { try { _masonryRO.disconnect(); } catch (e) {} }
+    _masonryRO = new ResizeObserver(() => _layoutMasonry());
+    grid.querySelectorAll('.schermo-block').forEach(el => _masonryRO.observe(el));
+    _layoutMasonry();
+  };
 
   const load = () => {
     try {
@@ -7864,6 +7896,7 @@ const Schermo = (() => {
     grid.innerHTML = _blocks.map((block, idx) => renderBlock(block, idx)).join('');
     _blocks.forEach(b => updateBlockContent(b));
     requestAnimationFrame(() => SchermoDD.enable());
+    requestAnimationFrame(() => _enableMasonry());
   };
 
   const renderBlock = (block, idx) => {
