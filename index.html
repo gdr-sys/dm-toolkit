@@ -6879,6 +6879,23 @@ const Compendio = (() => {
     if (!i) return;
     Debug.log(`Compendio: apro oggetto ${i.nome}`);
 
+    // Alcuni oggetti (es. Borsa dei trucchi, Pergamena magica) hanno tabelle di
+    // riferimento vere e proprie nell'SRD — stessa struttura sezioni[].righe già
+    // usata da openEquipment(), riusata identica qui perché prima non veniva
+    // renderizzata affatto e quelle tabelle sparivano in silenzio.
+    const sezioniHTML = (i.sezioni || []).map(s => {
+      if (!s.righe || !s.righe.length) return '';
+      const keys = Object.keys(s.righe[0]);
+      return `
+        <div style="margin-top:var(--space-md);">
+          <div class="comp-cat-header">${s.titolo}</div>
+          <table style="width:100%;font-size:0.82rem;border-collapse:collapse;">
+            <thead><tr>${keys.map(k => `<th style="text-align:left;padding:4px 6px;border-bottom:1px solid var(--border);font-family:var(--font-display);font-size:0.7rem;letter-spacing:0.05em;text-transform:uppercase;color:var(--text-muted);">${k}</th>`).join('')}</tr></thead>
+            <tbody>${s.righe.map(r => `<tr>${keys.map(k => `<td style="padding:4px 6px;border-bottom:1px solid var(--border);vertical-align:top;">${r[k] || ''}</td>`).join('')}</tr>`).join('')}</tbody>
+          </table>
+        </div>`;
+    }).join('');
+
     const content = `
       <div style="max-height:65vh;overflow-y:auto;">
         <div style="display:flex;align-items:center;gap:var(--space-sm);margin-bottom:var(--space-md);">
@@ -6887,6 +6904,7 @@ const Compendio = (() => {
           ${i.richiede_sintonia ? '<span class="badge badge-muted">richiede sintonia</span>' : ''}
         </div>
         <div class="text-sm" style="line-height:1.7;white-space:pre-wrap;">${i.descrizione || '—'}</div>
+        ${sezioniHTML}
       </div>`;
 
     openDetailModal(i.nome, content);

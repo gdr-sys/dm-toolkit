@@ -2586,5 +2586,23 @@
     "rarita": "raro",
     "richiede_sintonia": false,
     "descrizione": "Questo zaino è dotato di una tasca centrale e due laterali che si aprono su altrettanti spazi extradimensionali. Ognuna delle tasche laterali può custodire fino a 100 chilogrammi di materiale, per un volume che non superi 25 cubi con spigolo di 30 centimetri. La tasca centrale può contenere fino a 250 chilogrammi di materiale, per un volume massimo di 64 cubi con spigolo di 30 centimetri. Lo zaino pesa sempre 2,5 chilogrammi, a prescindere dal contenuto.\nRecuperare un oggetto dallo zainetto richiede un'azione di Utilizzo o un'azione bonus (a scelta del personaggio). Quando fruga nello zainetto alla ricerca di un oggetto specifico, questo si trova  sempre magicamente in cima.\nSe una delle sue tasche viene caricata eccessivamente, perforata o strappata, lo zainetto si rompe e viene distrutto. In tal caso, gli oggetti contenuti al suo interno sono perduti per sempre, anche se un manufatto prima o poi rispunterà fuori da qualche altra parte. Se lo zainetto viene rivoltato, tutto ciò che conteneva cade a terra senza danneggiarsi, ma lo zainetto deve essere rivoltato di nuovo per poter essere riutilizzato.Ogni tasca dello zainetto contiene una quantità d'aria sufficiente per 10 minuti, da dividere per il numero di creature che respirano al suo interno.\nCollocare uno zainetto all'interno di uno spazio extradimensionale, come quello creato da una borsa conservante, un buco portatile o da altri oggetti simili, distrugge istantaneamente entrambi gli oggetti e apre un portale sul Piano Astrale. Il por-tale ha origine nel punto in cui uno dei due oggetti è stato inserito nell'altro. Tutte le creature entro 3 metri dal portale e senza copertura totale ven-gono attirate al suo interno e depositate in un luogo casuale del Piano Astrale; dopodiché, il portale si chiude. Il portale è a senso unico e non può essere riaperto."
+  },
+  {
+    "id": "ali_del_volo",
+    "nome": "Ali del volo",
+    "tipo": "Oggetto meraviglioso",
+    "tipo_base": "Oggetto meraviglioso",
+    "rarita": "raro",
+    "richiede_sintonia": true,
+    "descrizione": "Mentre indossa questo mantello, il personaggio può effettuare un'azione di Magia per trasformarlo in un paio di ali sulla propria schiena. Le ali permangono per 1 ora o finché il personaggio non pone fine all'effetto con un'azione di Magia. Le ali forniscono una velocità di volo di 18 metri. Se il personaggio è in aria quando le ali spariscono, cade a terra. Dopo che le ali scompaiono, non è possibile utilizzarle di nuovo per 1d12 ore."
+  },
+  {
+    "id": "ammazzadraghi",
+    "nome": "Ammazzadraghi",
+    "tipo": "Arma (qualsiasi arma semplice o da guerra)",
+    "tipo_base": "Arma",
+    "rarita": "rara",
+    "richiede_sintonia": false,
+    "descrizione": "Il personaggio ottiene un bonus di +1 ai tiri per colpire e ai tiri per i danni effettuati con quest'arma magica.\nL'arma infligge 3d6 danni extra del tipo dell'arma se il bersaglio è un drago."
   }
 ]
