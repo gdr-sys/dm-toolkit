@@ -12925,7 +12925,27 @@ const FirebaseSync = (() => {
       const lastShareCode = localStorage.getItem('dm_last_share_code');
       if (lastShareCode && _db) {
 
-        _db.ref('campagne/' + lastShareCode + '/data').once('value').then(async snap => {
+        const _ripristinaDaPuntatore = (pointer, retriedOnConnect) => _resolveRemote(pointer).then(remote => {
+          if (!remote || !remote.id) return;
+          Storage.saveCampaign(remote);
+          App.setActiveCampaign(remote);
+          _startSync(remote.id);
+          Toast.show('Campagna ripristinata dal cloud', 'success', 3000);
+          setTimeout(() => { try { App.renderHomePage(); } catch(e) {} }, 300);
+        }).catch(e => {
+          Debug.warn('Ripristino campagna fallito:', e.message);
+          // Se il motivo e' Drive non (ancora) collegato, niente toast d'errore bloccante al primo
+          // colpo: si riprova in automatico non appena GDrive.onConnect scatta (riconnessione
+          // ritardata, o l'utente si ricollega a mano dalle Impostazioni) — senza che serva
+          // ricaricare la pagina. L'errore si mostra solo se anche questo secondo tentativo fallisce.
+          if (!retriedOnConnect && /Drive non è collegato|riconnessione automatica/i.test(e.message)) {
+            GDrive.onConnect(() => _ripristinaDaPuntatore(pointer, true));
+            return;
+          }
+          Toast.show('Ripristino campagna fallito: ' + e.message, 'error', 5000);
+        });
+
+        _db.ref('campagne/' + lastShareCode + '/data').once('value').then(snap => {
           const pointer = snap.val();
           if (pointer && pointer.__deleted) {
             // Campagna cancellata (anche da un altro dispositivo): non va ripristinata.
@@ -12935,15 +12955,7 @@ const FirebaseSync = (() => {
             localStorage.removeItem('dm_last_share_code');
             return;
           }
-          if (pointer && pointer.id) {
-            const remote = await _resolveRemote(pointer);
-            if (!remote || !remote.id) return;
-            Storage.saveCampaign(remote);
-            App.setActiveCampaign(remote);
-            _startSync(remote.id);
-            Toast.show('Campagna ripristinata dal cloud', 'success', 3000);
-            setTimeout(() => { try { App.renderHomePage(); } catch(e) {} }, 300);
-          }
+          if (pointer && pointer.id) _ripristinaDaPuntatore(pointer, false);
         }).catch(e => { Debug.warn('Ripristino campagna fallito:', e.message); Toast.show('Ripristino campagna fallito: ' + e.message, 'error', 5000); });
       }
     }
@@ -13144,8 +13156,18 @@ const FirebaseSync = (() => {
 
       if (remote.updatedBy === _user.uid) return;
 
-      _resolveRemote(remote).then(full => { if (full) _mergeRemote(full); })
-        .catch(e => { Debug.warn('Risoluzione dati da Drive:', e.message); Toast.show('Errore scaricando i dati da Drive: ' + e.message, 'error', 5000); });
+      const _risolviConRetry = (retriedOnConnect) => _resolveRemote(remote).then(full => { if (full) _mergeRemote(full); })
+        .catch(e => {
+          Debug.warn('Risoluzione dati da Drive:', e.message);
+          // Stesso ragionamento del ripristino iniziale: se la causa e' Drive non ancora
+          // collegato, si riprova in automatico al reconnect invece di arrendersi al primo colpo.
+          if (!retriedOnConnect && /Drive non è collegato|riconnessione automatica/i.test(e.message)) {
+            GDrive.onConnect(() => _risolviConRetry(true));
+            return;
+          }
+          Toast.show('Errore scaricando i dati da Drive: ' + e.message, 'error', 5000);
+        });
+      _risolviConRetry(false);
     });
 
     _listening = true;
@@ -13299,7 +13321,7 @@ const FirebaseSync = (() => {
     if (remote.__pointer && remote.driveFileId) {
       try { await DriveBackup.ready(); } catch(e) {}
       if (!DriveBackup.isConnected()) {
-        throw new Error('questa campagna ha i dati su Google Drive, ma Drive non è collegato su questo dispositivo — vai su Impostazioni e collega Drive per scaricarla');
+        throw new Error('la riconnessione automatica a Google Drive non è riuscita — apri Impostazioni, clicca su "Drive" per ricollegarti, poi riprova (i dati si aggiornano da soli appena ricollegata, senza bisogno di ricaricare la pagina)');
       }
       const full = await DriveBackup.downloadFromDrive(remote.driveFileId);
       return { ...full, updatedAt: remote.updatedAt, updatedBy: remote.updatedBy, updatedByName: remote.updatedByName };
@@ -14935,15 +14957,28 @@ const DriveBackup = (() => {
   // con un ritardo fisso altrove: qui lo si innesca subito (è idempotente, vedi
   // _initStarted) invece di stare fermi ad aspettare che tocchi a quel timer,
   // che da solo mangiava già gran parte del margine disponibile.
+  const _attendiConnessione = (ms) => new Promise(resolve => {
+    const timer = setTimeout(resolve, ms);
+    try { GDrive.onConnect(() => { clearTimeout(timer); resolve(); }); }
+    catch(e) { clearTimeout(timer); resolve(); }
+  });
+
   const ready = async () => {
     if (isConnected()) return;
     if (localStorage.getItem(LS_KEY) !== 'true') return; // mai collegato su questo dispositivo
     try { init(); } catch (e) {}
-    await new Promise(resolve => {
-      const timer = setTimeout(resolve, 8000);
-      try { GDrive.onConnect(() => { clearTimeout(timer); resolve(); }); }
-      catch(e) { clearTimeout(timer); resolve(); }
-    });
+    await _attendiConnessione(8000);
+    // Il token silenzioso di Google (prompt:'none') a volte non arriva mai a bersaglio al primo
+    // colpo — per esempio se il browser blocca i cookie di terze parti per accounts.google.com,
+    // o se lo script GIS non e' ancora pronto quando parte il primo tentativo — senza che questo
+    // produca mai un errore osservabile: la richiesta resta semplicemente senza risposta. Un
+    // secondo tentativo esplicito, con margine piu' corto, recupera buona parte di questi casi
+    // invece di dichiarare Drive "non collegato" (e perdere l'accesso ai dati della campagna)
+    // dopo un singolo colpo a vuoto.
+    if (!isConnected()) {
+      try { GDrive.silentReconnect(); } catch(e) {}
+      await _attendiConnessione(5000);
+    }
   };
 
   // Un file per campagna su Drive, cercato/aggiornato per id (stabile anche se la campagna
