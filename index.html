@@ -4026,12 +4026,19 @@ const openCampaign = (id) => {
     openConfirmModal(
       `Eliminare "${camp.name}"?`,
       'Questa azione non può essere annullata. Tutti i dati della campagna verranno persi, anche sugli altri dispositivi collegati.',
-      () => {
+      async () => {
+        // Il tombstone su Firebase va scritto e ATTESO prima di proseguire — non solo
+        // "lanciato" (come prima, senza await): altrimenti una sincronizzazione in corso
+        // nello stesso momento (es. un token refresh che rifà partire _syncAllCampaigns)
+        // puo' ancora trovare la campagna "viva" sul cloud e riscrivere l'indice utente
+        // subito dopo la pulizia, resuscitandola al prossimo accesso — causa plausibile
+        // del bug "la campagna cancellata ricompare ad ogni apertura".
+        Toast.show('Eliminazione in corso...', 'info', 4000);
+        try { await FirebaseSync.deleteCampaign?.(camp); } catch(e) {}
         Storage.deleteCampaign(id);
         if (activeCampaign && activeCampaign.id === id) setActiveCampaign(null);
-        try { FirebaseSync.deleteCampaign?.(camp); } catch(e) {}
         renderHomePage();
-        Toast.show('Campagna eliminata', 'info');
+        Toast.show('Campagna eliminata', 'success');
       }
     );
   };

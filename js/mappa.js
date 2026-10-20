@@ -422,7 +422,7 @@ const MappaUI = (() => {
         '</div>' +
         '<div class="modal-footer" style="justify-content:space-between;">' +
           '<button class="btn btn-ghost" id="mappa-set-elimina" style="color:var(--accent-danger);" onclick="MappaUI.eliminaMappaCorrente()">Elimina mappa</button>' +
-          '<div style="display:flex;gap:8px;">' +
+          '<div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;">' +
             '<button class="btn btn-ghost" onclick="Modal.close(\'mappa-settings\')">Annulla</button>' +
             '<button class="btn btn-primary" onclick="MappaUI.salvaImpostazioni()">Salva</button>' +
           '</div>' +
