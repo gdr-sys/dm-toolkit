@@ -95,6 +95,10 @@
 .scene-beat { transition: opacity 0.15s; }
 .scene-beat:active { opacity: 0.7; cursor: grabbing; }
 /* View mode */
+/* Le pagine non hanno piu' larghezza massima: su schermi larghi il testo della nota andava a capo
+   dopo oltre 2000px, illeggibile. Il riquadro resta largo quanto la pagina (scorrimento e clic
+   ovunque), ma il testo si ferma a ~900px tramite il padding destro. */
+#wiki-note-content { padding-right: max(16px, calc(100% - 64em)) !important; }
 #wiki-note-content[contenteditable="false"] { cursor:default; }
 #wiki-note-content[contenteditable="false"] .nc-wikilink { cursor:pointer; text-decoration:underline dotted; }
 #wiki-note-content[contenteditable="false"] .nc-wikilink:hover { background:rgba(91,164,245,0.25); border-radius:3px; }

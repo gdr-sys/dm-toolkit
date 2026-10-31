@@ -56,7 +56,9 @@
 .topbar-title { font-family:var(--font-display); font-size:1rem; font-weight:600; color:var(--text-primary); flex:1; }
 .topbar-actions { display:flex; align-items:center; gap:var(--space-sm); }
 
-.page { display:none; flex:1; padding:var(--space-lg); overflow-y:auto; max-width:1600px; width:100%; }
+/* Nessuna larghezza massima: su schermi grandi le pagine seguono la finestra invece di fermarsi
+   a 1600px lasciando una fascia vuota a destra. */
+.page { display:none; flex:1; padding:var(--space-lg); overflow-y:auto; width:100%; }
 .page.active { display:block; }
 #page-campagna.active { display:flex !important; flex-direction:column; overflow-y:auto; overflow-x:hidden; }
 .page-header { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:var(--space-lg); gap:var(--space-md); flex-wrap:wrap; }
