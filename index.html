@@ -3888,6 +3888,9 @@ const App = (() => {
     // combat.combatants.push(...) seguito da saveActiveCampaign({activeCombat: combat})) —
     // se confrontassimo con activeCampaign corrente, che e' spesso lo STESSO oggetto gia'
     // mutato per riferimento, non vedremmo mai alcuna differenza da timbrare.
+    // Link Drive incollati a mano (ritratti di PNG/Luoghi/...): si salvano gia' nel formato che
+    // si vede come immagine, invece di restare rotti fino al prossimo caricamento della campagna.
+    _sanaLinkDriveVecchi(partial, 0);
     partial = _timbraModifiche(partial, _lastSnapshot || activeCampaign);
     const updated = Storage.updateCampaign(activeCampaign.id, partial);
     if (updated) {
@@ -15358,6 +15361,11 @@ const DriveBackup = (() => {
   // campagne (vedi chiamate in mappa.js e nel rendering dei ritratti PNG).
   const toEmbeddableUrl = (url) => {
     if (typeof url !== 'string' || !url) return url;
+    // Solo stringhe che sono un link e nient'altro: viene applicata anche a tutti i campi della
+    // campagna (vedi _sanaLinkDriveVecchi), e una nota Wiki con dentro un link Drive veniva
+    // sostituita per intero dal solo link dell'immagine.
+    if (!/^https?:\/\/\S+$/.test(url.trim())) return url;
+    url = url.trim();
     const m = url.match(/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/)
       || url.match(/drive\.google\.com\/open\?id=([a-zA-Z0-9_-]+)/)
       || url.match(/drive\.google\.com\/thumbnail\?id=([a-zA-Z0-9_-]+)/)
@@ -16273,6 +16281,7 @@ const WikiSections = (() => {
           '</div>' +
           '<div style="flex:1;min-width:200px;display:flex;flex-direction:column;gap:6px;">' +
             '<input id="wsf-immagine" type="text" class="form-input" style="font-size:0.82rem;" value="' + _escHtml(item.immagine || '') + '" placeholder="https://..." oninput="WikiSections._fieldChange(\'' + type + '\',\'immagine\',this.value);WikiSections._refreshImgFieldPreview()">' +
+            '<div id="wsf-immagine-avviso" style="display:none;font-size:0.78rem;line-height:1.45;color:var(--accent-warning);"></div>' +
             '<label class="btn btn-ghost btn-sm" style="display:inline-flex;align-items:center;gap:6px;cursor:pointer;width:fit-content;">' +
               '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>' +
               'Carica dal dispositivo' +
@@ -16894,9 +16903,26 @@ const WikiSections = (() => {
 
   const _imgPreviewPlaceholder = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="opacity:0.35;"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>';
 
+  // Un link Drive incollato (drive.google.com/file/d/.../view) e' la pagina di Drive, non
+  // l'immagine: si converte nel link diretto all'immagine anche nell'anteprima, cosi' si vede
+  // subito se funziona. Se non si carica, sotto il campo compare il motivo probabile.
   const _imgPreviewHTML = (src) => src
-    ? '<img src="' + String(src).replace(/"/g,'&quot;') + '" style="max-width:100%;max-height:100%;object-fit:contain;" onerror="this.style.display=\'none\'">'
+    ? '<img src="' + String(typeof DriveBackup !== 'undefined' ? DriveBackup.toEmbeddableUrl(src) : src).replace(/"/g,'&quot;') + '" style="max-width:100%;max-height:100%;object-fit:contain;" onerror="this.style.display=\'none\';WikiSections._imgNonCaricata()">'
     : _imgPreviewPlaceholder;
+
+  const _imgNonCaricata = () => {
+    const avviso = document.getElementById('wsf-immagine-avviso');
+    const url = document.getElementById('wsf-immagine')?.value.trim() || '';
+    if (!avviso || !url) return;
+    if (/drive\.google\.com\/drive\/(u\/\d+\/)?folders\//.test(url)) {
+      avviso.textContent = 'Questo è il link di una cartella di Drive, non di un\'immagine: apri l\'immagine su Drive e copia il link di quella.';
+    } else if (url.includes('drive.google.com')) {
+      avviso.textContent = 'L\'immagine non si vede: su Google Drive, sull\'immagine, scegli Condividi → Accesso generale → "Chiunque abbia il link", poi ricarica.';
+    } else {
+      avviso.textContent = 'L\'immagine non si carica: controlla che il link porti direttamente a un\'immagine (di solito finisce con .jpg, .png o .webp).';
+    }
+    avviso.style.display = '';
+  };
 
   // Aggiorna l'anteprima quando l'utente incolla/modifica l'URL a mano (il caricamento da
   // file la aggiorna direttamente da _onImageFilePicked).
@@ -16904,6 +16930,8 @@ const WikiSections = (() => {
     const input = document.getElementById('wsf-immagine');
     const preview = document.getElementById('wsf-immagine-preview');
     if (!input || !preview) return;
+    const avviso = document.getElementById('wsf-immagine-avviso');
+    if (avviso) avviso.style.display = 'none';
     preview.innerHTML = _imgPreviewHTML(input.value.trim());
   };
 
@@ -17234,7 +17262,7 @@ const WikiSections = (() => {
   return { toggleExpand, gotoHub, goto, gotoTrame, toggleLuoghiView, renderList, openCard, editCard, closeDetail,
     newCard, deleteCard, filter, filterTag, renderCounters, init,
     _fieldChange, _dateFieldChange, _jumpToEntity, _saveAndView, _parseLinks, _manualSave,
-    _refreshImgFieldPreview, _onImageFilePicked,
+    _refreshImgFieldPreview, _onImageFilePicked, _imgNonCaricata,
     _renderDetailPub, _scheduleAutosavePub, _getCfg, _saveWithCustom,
     toggleObiettivo, addObiettivo, editObiettivoText, removeObiettivo,
     addMomento, editMomentoTesto, editMomentoTipo, editMomentoSessione, removeMomento,
