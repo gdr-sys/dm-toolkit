@@ -13334,7 +13334,12 @@ const FirebaseSync = (() => {
   // un puntatore leggero — cosi' Firebase resta minuscolo (pochi byte a campagna) ma il listener
   // realtime continua a dare la sincronizzazione istantanea. Senza Drive, Firebase porta i dati
   // per intero come prima (comportamento di ripiego).
-  const _writeCampaign = async (camp) => {
+  // Ultima scrittura partita (Drive + Firebase), per chi deve aspettarne la fine prima di
+  // ricaricare la pagina — vedi flushAndWait, usata dal banner "nuova versione".
+  let _ultimaScrittura = Promise.resolve();
+  const _writeCampaign = (camp) => (_ultimaScrittura = _writeCampaignNow(camp));
+
+  const _writeCampaignNow = async (camp) => {
     try {
       let payload;
       if (typeof DriveBackup !== 'undefined' && DriveBackup.isConnected()) {
@@ -13398,6 +13403,13 @@ const FirebaseSync = (() => {
   // Scrive subito un push in attesa (debounce) — usato quando la pagina sta per essere
   // nascosta/sospesa (cambio app su mobile, chiusura tab), cosi' un salvataggio in coda
   // non va perso perche' il timeout di 2s non ha fatto in tempo a scattare.
+  // Come flush, ma restituisce una promise che si risolve a salvataggio finito (o dopo maxMs,
+  // per non bloccare all'infinito se la rete e' lenta o assente).
+  const flushAndWait = (maxMs = 8000) => {
+    flush();
+    return Promise.race([_ultimaScrittura.catch(() => {}), new Promise(r => setTimeout(r, maxMs))]);
+  };
+
   const flush = () => {
     if (!_syncTimeout || !_pendingCamp) return;
     clearTimeout(_syncTimeout);
@@ -13733,7 +13745,7 @@ const FirebaseSync = (() => {
     init, toggleAuth, logout, saveConfig,
     loginAnonymous, loginGoogle, loginEmail, registerEmail,
     useLocal, upgradeToGoogle, switchMode,
-    syncNow, push, pushNow, flush, onCampagnaSaved, onCampagnaActivated,
+    syncNow, push, pushNow, flush, flushAndWait, onCampagnaSaved, onCampagnaActivated,
     getCampCode, copyCode, joinCampaign, deleteCampaign,
   };
 })();
@@ -21753,6 +21765,7 @@ document.addEventListener('DOMContentLoaded', initMobileNav);
 <script src="js/bug-report.js"></script>
 <script src="js/newsletter-popup.js"></script>
 <script src="js/update-popup.js"></script>
+<script src="js/update-banner.js"></script>
 <script src="js/wiki-import.js"></script>
 <script src="js/wiki-trash-ui.js"></script>
 <script src="js/quick-view.js"></script>

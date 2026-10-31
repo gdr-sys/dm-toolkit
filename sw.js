@@ -57,7 +57,7 @@ self.addEventListener('install', (event) => {
     const scripts = await _scriptsFromIndex();
     // Un file per volta invece di cache.addAll: con addAll un solo file non raggiungibile
     // (es. un CDN momentaneamente giu') annullava tutto il precaricamento.
-    await Promise.all([...APP_SHELL, ...DATA_FILES, ...scripts].map((u) => cache.add(u).catch(() => {})));
+    await Promise.all([...APP_SHELL, ...DATA_FILES, ...scripts].map((u) => cache.add(new Request(u, { cache: 'no-cache' })).catch(() => {})));
     await _fontFiles(cache);
   })());
   self.skipWaiting();
@@ -77,14 +77,21 @@ self.addEventListener('activate', (event) => {
 // messi in cache ne' sostituiti offline con index.html. Le immagini su drive.google.com invece
 // passano dalla cache come il resto, cosi' le mappe si vedono anche senza internet.
 const _soloRete = (url) => /(^|\.)googleapis\.com$/.test(url.hostname) && url.hostname !== 'fonts.googleapis.com'
-  || /firebaseio\.com$|firebasedatabase\.app$|accounts\.google\.com$/.test(url.hostname);
+  || /firebaseio\.com$|firebasedatabase\.app$|accounts\.google\.com$|^api\.github\.com$/.test(url.hostname);
 
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
   if (_soloRete(new URL(event.request.url))) return;
 
+  // File dell'app: GitHub Pages li fa tenere al browser fino a 10 minuti (max-age=600), quindi
+  // anche online si poteva ricevere la versione vecchia dopo un aggiornamento (e "Aggiorna" del
+  // banner non aggiornava niente). 'no-cache' chiede sempre al server se sono cambiati: se no,
+  // risponde 304 senza riscaricarli.
+  const url = new URL(event.request.url);
+  const richiesta = url.origin === self.location.origin ? fetch(event.request.url, { cache: 'no-cache' }) : fetch(event.request);
+
   event.respondWith(
-    fetch(event.request)
+    richiesta
       .then((response) => {
         const copy = response.clone();
         caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy)).catch(() => {});
