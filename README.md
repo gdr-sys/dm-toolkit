@@ -8,6 +8,10 @@
 
 Web app per Dungeon Master di D&D 5e (edizioni 2014 e 2024) per gestire una campagna dalla preparazione della sessione al combattimento al tavolo, da qualsiasi dispositivo e senza installare nulla.
 
+![La Dashboard della campagna di esempio](docs/img/dashboard.jpg)
+
+Per vederla in azione: apri l'app e, nella Home vuota, scegli **"Prova con una campagna di esempio"**. Si crea *Le Ceneri di Valmora*, già piena di PNG, luoghi, sessioni, tabelle e calendario.
+
 ---
 
 ## In breve
@@ -64,6 +68,9 @@ Carica un'immagine come mappa interattiva. Puoi spostarla trascinando e ingrandi
 
 ### Calendario e Timeline
 
+![Timeline della campagna](docs/img/timeline.jpg)
+
+
 - Calendario in-world con preset (Forgotten Realms, Greyhawk…) o **completamente personalizzato**: mesi, giorni della settimana, festività, data e ora di oggi.
 - **Eventi e scadenze** con promemoria; le scadenze vicine compaiono nella Dashboard.
 - **Timeline** di eventi e sessioni: gli eventi vicini nel tempo vanno su righe diverse, così i nomi non si sovrappongono mai. Lo zoom allarga solo il tempo, le scritte restano leggibili.
@@ -79,6 +86,9 @@ Carica un'immagine come mappa interattiva. Puoi spostarla trascinando e ingrandi
 - **Clock** — per rituali, inseguimenti, pressione delle fazioni.
 
 ### Generatori
+
+![Le mie tabelle e i generatori](docs/img/generatori.jpg)
+
 
 22 generatori per improvvisare: PNG completo, meteo, rumori e odori, descrizione di luoghi, nomi di luoghi, negozio (con i prezzi degli oggetti magici), biblioteca, bottino, viaggio, incontri, incontro bilanciato, voci di corridoio, accenti, nomi, follia, ganci, oracolo, missioni. Si possono nascondere e riordinare.
 
@@ -98,13 +108,27 @@ Carica un'immagine come mappa interattiva. Puoi spostarla trascinando e ingrandi
 
 ### Compendio
 
+![Il Compendio su schermo largo](docs/img/compendio.jpg)
+
+
 Mostri SRD 5.1 e 5.2.1 con GS normalizzato (comprese le frazioni 1/8, 1/4, 1/2), oggetti magici, equipaggiamento, incantesimi, regole, velocità di cavalcature e veicoli. Homebrew integrato: le note Wiki con tag `#oggetto` o `#mostro` finiscono nel Compendio. Preferiti per campagna, ricerca, filtri per tipo e GS. Su schermi larghi l'elenco va su più colonne.
+
+### Sessione Zero e sicurezza
+
+![Sessione Zero](docs/img/sessione-zero.jpg)
+
+- **Aspettative del tavolo** — tono, morte dei personaggi, conflitto tra PG, quanto combattimento, esplorazione e dialoghi, regole della casa.
+- **Linee e veli** — cosa non comparirà mai e cosa resterà fuori scena, con gli spunti più comuni da aggiungere in un clic.
+- **Strumenti al tavolo** — carta X, porta aperta, pausa, stelle e desideri, ciascuno spiegato.
+- **Carta X a schermo intero** dalla Dashboard, da mostrare al tavolo con un tocco.
 
 ### Schermo del DM
 
 Griglia di blocchi trascinabili e ridimensionabili: percezioni passive del party, dadi rapidi, meteo, condizioni, mini combat tracker, calcolatore di incontri (2014/2024), data e ora in-world, note libere.
 
 ### Dashboard e strumenti
+
+- **Primi passi** — in una campagna nuova, cinque cose da fare per partire (Sessione Zero, primo PNG, primo luogo, prima sessione, un generatore) che si spuntano da sole.
 
 - **Fili in sospeso** — PNG, luoghi, fazioni, quest e trame non toccati da un po', per non perdere i ganci.
 - **Prossime scadenze** dal calendario.

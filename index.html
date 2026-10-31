@@ -3470,6 +3470,13 @@ const submitEditCampaign = () => {
 let _confirmCallback = null;
 // etichetta/pericoloso: il pulsante diceva sempre "Elimina" in rosso, anche per azioni che non
 // cancellano niente (es. "Terminare lo scontro?", che invece salva lo scontro).
+// Statistiche del Compendio accorciate con i puntini (vedi .comp-stat-pill): il valore intero
+// compare come suggerimento passandoci sopra.
+document.addEventListener('mouseover', (e) => {
+  const p = e.target.closest && e.target.closest('.comp-stat-pill');
+  if (p && !p.title && p.scrollWidth > p.clientWidth) p.title = p.textContent;
+});
+
 const openConfirmModal = (title, body, callback, etichetta = 'Elimina', pericoloso = true) => {
   document.getElementById('confirm-title').textContent = title;
   document.getElementById('confirm-body').textContent = body;

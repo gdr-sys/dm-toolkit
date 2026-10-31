@@ -105,7 +105,6 @@ const CampagnaDemo = (() => {
         { id: 'sess_demo2', numero: 2, titolo: 'La cripta', data: new Date(ora - 7 * 864e5).toISOString().slice(0, 10), data_inworld: { anno: 742, mese: 8, giorno: 12 }, stato: 'giocata',
           recap: 'Fratello Orsino porta il party alla Cripta della Fiamma Quieta. All\'ingresso, i Custodi attaccano. Dentro, il primo dei tre anelli del sigillo è spezzato, e sul pavimento c\'è un\'impronta di zoccolo. Selvaggia nota che qualcuno è entrato e uscito molte volte.',
           creatoAt: ora, aggiornatoAt: ora },
-        { id: 'sess_demo3', numero: 3, titolo: 'Il secondo anello', stato: 'pianificata', data_inworld: null, notePrep: 'Madre Cinerea si presenta al villaggio con parole gentili. Elio sparisce di nuovo.', creatoAt: ora, aggiornatoAt: ora },
       ],
       tabelleCasuali: [
         { id: 'tab_demo1', nome: 'Incontri sul Monte Ardegna', dado: '20', luoghi: [ardegna],
