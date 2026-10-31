@@ -7900,6 +7900,13 @@ const Schermo = (() => {
       defaultSize: 'lg',
       repeatable: false,
     },
+    musica: {
+      label: 'Musica e atmosfere',
+      icon: _svgIcon('<path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>'),
+      desc: 'I tuoi link a playlist online o file audio su Drive, da aprire con un tocco',
+      defaultSize: 'md',
+      repeatable: false,
+    },
     generatore: {
       label: 'Generatore o tabella',
       icon: _svgIcon('<rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.2"/><circle cx="15.5" cy="15.5" r="1.2"/><circle cx="12" cy="12" r="1.2"/>'),
@@ -7935,6 +7942,41 @@ const Schermo = (() => {
     insediamenti: ['Taverne e insediamenti', 'GeneratoriExtra.generaInsediamento()', 'gx-ins-result'],
     eventi_viaggio: ['Eventi di viaggio e riposo', 'GeneratoriExtra.generaEvento()', 'gx-ev-result'],
   };
+
+  // ── Musica e atmosfere ──
+  // Solo link (playlist YouTube/Spotify/Tabletop Audio o file su Google Drive), salvati nella
+  // campagna in camp.musica: nessun file audio passa dall'app o da Firebase.
+  const _musica = () => App.getActiveCampaign()?.musica || [];
+  const renderMusica = () => {
+    const lista = _musica();
+    const gruppi = {};
+    lista.forEach((m, i) => { (gruppi[m.categoria || 'Altro'] = gruppi[m.categoria || 'Altro'] || []).push({ ...m, i }); });
+    const esc = (x) => String(x ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+    return (lista.length
+      ? Object.entries(gruppi).map(([cat, voci]) =>
+          '<div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted);margin:6px 0 4px;">' + esc(cat) + '</div>' +
+          '<div style="display:flex;flex-wrap:wrap;gap:6px;">' + voci.map(m =>
+            '<span style="display:inline-flex;align-items:center;border:1px solid var(--border);border-radius:var(--radius-full);overflow:hidden;">' +
+              '<a href="' + esc(m.url) + '" target="_blank" rel="noopener" style="padding:4px 10px;font-size:0.82rem;color:var(--text-primary);text-decoration:none;">' + esc(m.nome) + '</a>' +
+              '<button type="button" class="btn btn-ghost btn-sm" style="padding:2px 6px;border-radius:0;" aria-label="Rimuovi" onclick="Schermo.togliMusica(' + m.i + ')">×</button>' +
+            '</span>').join('') + '</div>').join('')
+      : '<div style="font-size:0.82rem;color:var(--text-muted);line-height:1.5;">Aggiungi i link alle tue playlist (YouTube, Spotify, Tabletop Audio…) o a file audio su Google Drive, divisi per atmosfera: combattimento, taverna, tensione…</div>') +
+      '<button type="button" class="btn btn-ghost btn-sm" style="margin-top:8px;" onclick="Schermo.aggiungiMusica()">+ Aggiungi link</button>';
+  };
+  const aggiungiMusica = () => {
+    openInputModal('Nome (es. Battaglia epica, Taverna allegra)', '', (nome) => {
+      if (!nome?.trim()) return;
+      openInputModal('Link alla playlist o al file su Drive', 'https://', (url) => {
+        url = String(url || '').trim();
+        if (!/^https?:\/\/\S+$/.test(url)) { Toast.show('Serve un link che inizi con https://', 'warning'); return; }
+        openInputModal('Atmosfera (es. Combattimento, Taverna, Tensione)', 'Combattimento', (categoria) => {
+          App.saveActiveCampaign({ musica: [..._musica(), { nome: nome.trim(), url, categoria: String(categoria || '').trim() || 'Altro' }] });
+          render();
+        });
+      });
+    });
+  };
+  const togliMusica = (i) => { App.saveActiveCampaign({ musica: _musica().filter((_, j) => j !== i) }); render(); };
 
   const _escGen = (x) => String(x ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;');
   const _eTabella = (g) => String(g || '').startsWith('tab:');
@@ -7980,7 +8022,7 @@ const Schermo = (() => {
       html = '<span style="color:var(--accent-danger);">Errore: ' + _escGen(e.message) + '</span>';
     }
     el.innerHTML = html;
-    block.ultimo = html; // resta visibile se lo schermo si ridisegna, e si salva con il layout
+    block.ultimo = html; // resta visibile se lo schermo si ridisegna mentre la pagina e' aperta
   };
 
   const SIZES = {
@@ -8119,6 +8161,7 @@ const Schermo = (() => {
       case 'dadi':           el.innerHTML = renderDadiMini(block.id); break;
       case 'meteo':          el.innerHTML = renderMeteoMini(block.id); break;
       case 'generatore':     el.innerHTML = renderGeneratore(block); break;
+      case 'musica':         el.innerHTML = renderMusica(); break;
       case 'note':           el.innerHTML = renderNote(block); break;
       case 'combat_mini':    el.innerHTML = renderCombatMini(); break;
       case 'combat_full':    el.innerHTML = renderCombatFull(); break;
@@ -8945,7 +8988,7 @@ const Schermo = (() => {
   };
 
   return {
-    init, render, addBlock, submitAddBlock, _onTypeChange, eseguiGeneratore,
+    init, render, addBlock, submitAddBlock, _onTypeChange, eseguiGeneratore, aggiungiMusica, togliMusica,
     removeBlock, resizeBlock, moveBlock, editBlock, resetLayout,
     rollDie, generateMeteo, saveNote, advanceTime, refreshCombat,
     setCompendioRef, _refreshCombat, _refreshFavoriti, _swapBlocks,

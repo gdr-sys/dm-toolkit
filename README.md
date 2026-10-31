@@ -130,7 +130,7 @@ Mostri SRD 5.1 e 5.2.1 con GS normalizzato (comprese le frazioni 1/8, 1/4, 1/2),
 
 ### Schermo del DM
 
-Griglia di blocchi trascinabili e ridimensionabili: percezioni passive del party, dadi rapidi, meteo, condizioni, mini combat tracker, calcolatore di incontri (2014/2024), data e ora in-world, note libere. Con il blocco **"Generatore o tabella"** puoi mettere sullo schermo qualsiasi generatore o una delle tue tabelle, con il suo pulsante.
+Griglia di blocchi trascinabili e ridimensionabili: percezioni passive del party, dadi rapidi, meteo, condizioni, mini combat tracker, calcolatore di incontri (2014/2024), data e ora in-world, note libere. Con il blocco **"Generatore o tabella"** puoi mettere sullo schermo qualsiasi generatore o una delle tue tabelle, con il suo pulsante. Il blocco **"Musica e atmosfere"** raccoglie i tuoi link a playlist online (YouTube, Spotify, Tabletop Audio…) o a file audio su Google Drive, divisi per atmosfera: nessun file audio passa dall'app.
 
 ### Dashboard e strumenti
 
