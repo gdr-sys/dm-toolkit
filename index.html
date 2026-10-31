@@ -8029,7 +8029,8 @@ const Schermo = (() => {
     s1: { label: '1 col',  cols: 1 },
     s2: { label: '2 col',  cols: 2 },
     s3: { label: '3 col',  cols: 3 },
-    s5: { label: 'Pieno',  cols: 5 },
+    s4: { label: '4 col',  cols: 4 },
+    s5: { label: '5 col',  cols: 5 },
   };
 
   let _blocks = [];
@@ -8136,9 +8137,13 @@ const Schermo = (() => {
           <span class="schermo-block-icon" style="cursor:grab;" title="Trascina per spostare">${def.icon}</span>
           <span class="schermo-block-title">${title}</span>
           <div class="schermo-block-actions">
-            <button class="btn btn-ghost btn-icon-sm" onclick="Schermo.resizeBlock('${block.id}')" title="Altezza: ${size.toUpperCase()}" style="font-family:var(--font-mono);font-size:0.6rem;width:auto;padding:0 4px;opacity:0.6;">${size.toUpperCase()}</button>
-            <button class="btn btn-ghost btn-icon-sm" onclick="Schermo.moveBlock('${block.id}', -1)" title="Sposta su"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg></button>
-            <button class="btn btn-ghost btn-icon-sm" onclick="Schermo.moveBlock('${block.id}', 1)" title="Sposta giù"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg></button>
+            <span style="display:inline-flex;align-items:center;border:1px solid var(--border);border-radius:var(--radius-sm);">
+              <button class="btn btn-ghost btn-icon-sm" onclick="Schermo.resizeBlock('${block.id}', -1)" title="Più stretto" aria-label="Più stretto" ${cols <= 1 ? 'disabled' : ''} style="width:22px;">−</button>
+              <button class="btn btn-ghost btn-icon-sm" onclick="Schermo.resizeBlock('${block.id}')" title="Larghezza: ${SIZES[size].label} (clic per cambiare)" style="font-family:var(--font-mono);font-size:0.68rem;width:auto;padding:0 4px;">${SIZES[size].label}</button>
+              <button class="btn btn-ghost btn-icon-sm" onclick="Schermo.resizeBlock('${block.id}', 1)" title="Più largo" aria-label="Più largo" ${cols >= 5 ? 'disabled' : ''} style="width:22px;">+</button>
+            </span>
+            <button class="btn btn-ghost btn-icon-sm" onclick="Schermo.moveBlock('${block.id}', -1)" title="Sposta prima (oppure trascina l'intestazione)" aria-label="Sposta prima"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg></button>
+            <button class="btn btn-ghost btn-icon-sm" onclick="Schermo.moveBlock('${block.id}', 1)" title="Sposta dopo (oppure trascina l'intestazione)" aria-label="Sposta dopo"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button>
             ${block.type === 'custom' || block.type === 'note' ? `<button class="btn btn-ghost btn-icon-sm" onclick="Schermo.editBlock('${block.id}')" title="Modifica"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>` : ''}
             <button class="btn btn-ghost btn-icon-sm" onclick="Schermo.removeBlock('${block.id}')" title="Rimuovi" aria-label="Rimuovi"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
           </div>
@@ -8900,12 +8905,13 @@ const Schermo = (() => {
     render();
   };
 
-  const resizeBlock = (id) => {
+  // dir: +1 piu' largo, -1 piu' stretto, assente = passa alla misura successiva (dopo 5 torna a 1)
+  const resizeBlock = (id, dir) => {
     const block = _blocks.find(b => b.id === id);
     if (!block) return;
     const sizeKeys = Object.keys(SIZES);
-    const cur = sizeKeys.indexOf(block.size || 'md');
-    block.size = sizeKeys[(cur + 1) % sizeKeys.length];
+    const cur = Math.max(0, sizeKeys.indexOf(block.size));
+    block.size = dir ? sizeKeys[Math.max(0, Math.min(sizeKeys.length - 1, cur + dir))] : sizeKeys[(cur + 1) % sizeKeys.length];
     save();
     render();
   };
@@ -21065,37 +21071,91 @@ const NoteSessione = (() => {
   return { render, addVoce, updateTipo, updateTesto, remove, clear, getData: _get };
 })();
 
+// Spostamento dei blocchi dello Schermo del DM. Prima usava SortableJS con il drag&drop nativo del
+// browser, che in pratica non spostava i blocchi (e sui tablet il drag&drop nativo non esiste).
+// Ora e' un trascinamento fatto a mano con i pointer event, che funzionano uguale con mouse, dita e
+// penna: si afferra l'intestazione di un blocco e lo si lascia sopra il blocco dove lo si vuole —
+// prende il suo posto (prima o dopo, secondo il lato su cui lo si lascia).
 const SchermoDD = (() => {
-  let _sortables = [];
+  const SOGLIA = 6; // px prima che una pressione diventi un trascinamento (cosi' i click restano click)
+  let _stato = null;
+
+  const _bersaglio = (x, y) => {
+    const el = document.elementFromPoint(x, y);
+    const b = el && el.closest && el.closest('#schermo-grid .schermo-block');
+    return b && b !== _stato?.blocco ? b : null;
+  };
+
+  const _pulisciEvidenza = () => document.querySelectorAll('#schermo-grid .schermo-block').forEach(b => { b.style.outline = ''; b.style.outlineOffset = ''; });
+
+  const _giu = (e) => {
+    if (e.button !== undefined && e.button !== 0) return;
+    const header = e.target.closest && e.target.closest('.schermo-block-header');
+    if (!header || e.target.closest('button, input, select, textarea, a')) return;
+    const blocco = header.closest('.schermo-block');
+    if (!blocco) return;
+    // Senza questo il browser, al primo movimento, avvia il suo trascinamento nativo (del testo o
+    // dell'icona dell'intestazione) e annulla i pointer event: era il motivo per cui i blocchi non
+    // si spostavano.
+    e.preventDefault();
+    _stato = { blocco, x: e.clientX, y: e.clientY, attivo: false };
+    window.addEventListener('pointermove', _muovi);
+    window.addEventListener('pointerup', _su);
+    window.addEventListener('pointercancel', _annulla);
+  };
+
+  const _muovi = (e) => {
+    if (!_stato) return;
+    if (!_stato.attivo) {
+      if (Math.hypot(e.clientX - _stato.x, e.clientY - _stato.y) < SOGLIA) return;
+      _stato.attivo = true;
+      _stato.blocco.style.opacity = '0.45';
+      _stato.blocco.style.pointerEvents = 'none'; // cosi' elementFromPoint trova il blocco sotto
+      document.body.style.userSelect = 'none';
+    }
+    e.preventDefault();
+    _pulisciEvidenza();
+    const t = _bersaglio(e.clientX, e.clientY);
+    if (t) { t.style.outline = '2px dashed var(--accent-secondary)'; t.style.outlineOffset = '2px'; }
+  };
+
+  const _fine = () => {
+    window.removeEventListener('pointermove', _muovi);
+    window.removeEventListener('pointerup', _su);
+    window.removeEventListener('pointercancel', _annulla);
+    if (_stato?.blocco) { _stato.blocco.style.opacity = ''; _stato.blocco.style.pointerEvents = ''; }
+    document.body.style.userSelect = '';
+    _pulisciEvidenza();
+  };
+
+  const _su = (e) => {
+    const st = _stato;
+    if (!st) return;
+    const t = st.attivo ? _bersaglio(e.clientX, e.clientY) : null;
+    _fine();
+    _stato = null;
+    if (!t) return;
+    const r = t.getBoundingClientRect();
+    // Lasciato sulla meta' sinistra (o superiore, su una colonna sola) del bersaglio: va prima
+    const prima = r.width > r.height * 0.6 ? e.clientX < r.left + r.width / 2 : e.clientY < r.top + r.height / 2;
+    t.parentNode.insertBefore(st.blocco, prima ? t : t.nextSibling);
+    Schermo._syncFromDOM();
+    Schermo.render();
+  };
+
+  const _annulla = () => { _fine(); _stato = null; };
 
   const enable = () => {
-    if (typeof Sortable === 'undefined') return;
-    _sortables.forEach(s => { try { s.destroy(); } catch(e) {} });
-    _sortables = [];
-
     const grid = document.getElementById('schermo-grid');
     if (!grid) return;
-
-    const s = Sortable.create(grid, {
-      animation: 150,
-      handle: '.schermo-block-header',
-      ghostClass: 'sortable-ghost',
-      chosenClass: 'sortable-chosen',
-      dragClass: 'sortable-drag',
-      forceFallback: false,
-      onEnd: () => Schermo._syncFromDOM(),
-    });
-    _sortables.push(s);
-
-    document.querySelectorAll('.schermo-block-header').forEach(h => {
-      h.style.cursor = 'grab';
-    });
+    grid.querySelectorAll('.schermo-block-header').forEach(h => { h.style.cursor = 'grab'; h.style.touchAction = 'none'; });
+    if (grid._spostamentoAttivo) return; // la griglia resta la stessa tra un render e l'altro
+    grid._spostamentoAttivo = true;
+    grid.addEventListener('pointerdown', _giu);
+    grid.addEventListener('dragstart', (e) => { if (e.target.closest && e.target.closest('.schermo-block-header')) e.preventDefault(); });
   };
 
-  const reset = () => {
-    _sortables.forEach(s => { try { s.destroy(); } catch(e) {} });
-    _sortables = [];
-  };
+  const reset = () => {};
 
   return { enable, reset };
 })();
