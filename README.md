@@ -57,6 +57,9 @@ PNG, Luoghi, Fazioni, Quest, PG, Trame e Incontri hanno ciascuno la propria sezi
 - **Momenti dei personaggi** — cronologia degli eventi importanti di ogni PNG e PG.
 - **Reputazione con le fazioni** — una scala da Nemica giurata a Devota, con la cronologia di cosa l'ha fatta cambiare e quando (anche in data in-world).
 - Rinominare un elemento aggiorna tutti i `[[collegamenti]]` nelle note.
+- **"Entra in scena"** — nella scheda di un luogo, un pulsante compone la scena con quello che hai già scritto: i PNG che stanno lì, le quest in gioco, il tempo secondo la stagione del calendario, rumori e odori, un evento in corso, una voce di corridoio con schede vere e un tiro su ogni tabella collegata. Si può rigenerare, copiare o aggiungere alle note della sessione.
+- **Segreti e indizi** — ogni segreto ha i suoi indizi, e ogni indizio sta in un PNG, un luogo o una quest, con la condizione per ottenerlo (per esempio "Persuasione CD 14"). La scheda di un PNG mostra **cosa sa** e come farselo dire; la Dashboard mostra i segreti non ancora rivelati e avvisa quando un segreto ha meno di tre indizi.
+- **Importa da un'altra campagna** — copia luoghi, fazioni, PNG, note Lore e tabelle da un'altra campagna, per una one shot o un secondo gruppo nello stesso mondo.
 - Una nota creata da un modello PNG o Luogo crea anche l'elemento corrispondente e resta collegata. Salvare un elemento invece **non** crea più note doppie nella Lore.
 
 ![Scheda di un luogo con la sua tabella casuale](docs/img/luogo.png)
@@ -74,6 +77,7 @@ Carica un'immagine come mappa interattiva. Puoi spostarla trascinando e ingrandi
 
 - Calendario in-world con preset (Forgotten Realms, Greyhawk…) o **completamente personalizzato**: mesi, giorni della settimana, festività, data e ora di oggi.
 - **Eventi e scadenze** con promemoria; le scadenze vicine compaiono nella Dashboard.
+- **Conseguenze programmate** — una scadenza può dire cosa succede se il party non interviene: prima della data compare come "Se scade…", dopo come "È successo…". Anche un clock pieno mostra la sua conseguenza.
 - **Timeline** di eventi e sessioni: gli eventi vicini nel tempo vanno su righe diverse, così i nomi non si sovrappongono mai. Lo zoom allarga solo il tempo, le scritte restano leggibili.
 
 ### Sessioni
@@ -82,6 +86,7 @@ Carica un'immagine come mappa interattiva. Puoi spostarla trascinando e ingrandi
 - **Schermo sempre acceso** — su tablet e telefono lo schermo non si spegne durante uno scontro (oppure sempre, o mai: si sceglie nelle Impostazioni).
 - **Scene planner** — la sequenza di momenti di ogni sessione (apertura, combattimento, sociale, esplorazione, rivelazione, cliffhanger…), riordinabile.
 - **Diario delle sessioni** — numero, titolo, date reale e in-world, stato, PNG coinvolti, preparazione e riassunto. Ogni sessione può avere la sua nota nella Wiki.
+- **Chiudi la sessione in 5 domande** — cosa è successo, XP e bottino, fili rimasti aperti, gancio per la prossima volta, momento migliore. Dalle risposte l'app compila da sola il diario della sessione, i ganci in Dashboard, la prossima sessione pianificata, un Momento del PG e il "Previously On…".
 - **"Previously On…"** — il riassunto dell'ultima sessione, pronto da leggere al tavolo.
 - **Party** — i PG con classe, livello, PF, CA, punteggi passivi e ispirazione, sincronizzati con la sezione PG della Wiki.
 - **Clock** — per rituali, inseguimenti, pressione delle fazioni.
@@ -91,7 +96,7 @@ Carica un'immagine come mappa interattiva. Puoi spostarla trascinando e ingrandi
 ![Le mie tabelle e i generatori](docs/img/generatori.png)
 
 
-22 generatori per improvvisare: PNG completo, meteo, rumori e odori, descrizione di luoghi, nomi di luoghi, negozio (con i prezzi degli oggetti magici), biblioteca, bottino, viaggio, incontri, incontro bilanciato, voci di corridoio, accenti, nomi, follia, ganci, oracolo, missioni. Si possono nascondere e riordinare.
+22 generatori per improvvisare: PNG completo, meteo, rumori e odori, descrizione di luoghi, nomi di luoghi, negozio (con i prezzi degli oggetti magici), biblioteca, bottino, viaggio, incontri, incontro bilanciato, voci di corridoio, accenti, nomi, follia, ganci, oracolo, missioni. Tutti, comprese "Le mie tabelle", si possono nascondere da **Personalizza** e riordinare. Il **Generatore Nomi** non propone nomi già usati dai tuoi PNG, e le **Voci di corridoio** aggiungono due voci costruite con PNG, luoghi e fazioni della tua campagna, cliccabili.
 
 - **Trappole ed enigmi** — trappole con innesco, CD e danni adatti al livello del party e alla pericolosità scelta, come accorgersene e disinnescarle; enigmi con suggerimento e soluzione; indovinelli con risposta. Soluzioni e risposte restano nascoste finché non le apri.
 - **Dungeon e stanze** — una stanza alla volta per tema (rovina, cripta, caverna, fortezza, tempio, tana di mostri) con dimensioni, sensazioni, uscite, contenuto e complicazioni, oppure un intero **dungeon in cinque stanze**.
@@ -125,7 +130,7 @@ Mostri SRD 5.1 e 5.2.1 con GS normalizzato (comprese le frazioni 1/8, 1/4, 1/2),
 
 ### Schermo del DM
 
-Griglia di blocchi trascinabili e ridimensionabili: percezioni passive del party, dadi rapidi, meteo, condizioni, mini combat tracker, calcolatore di incontri (2014/2024), data e ora in-world, note libere.
+Griglia di blocchi trascinabili e ridimensionabili: percezioni passive del party, dadi rapidi, meteo, condizioni, mini combat tracker, calcolatore di incontri (2014/2024), data e ora in-world, note libere. Con il blocco **"Generatore o tabella"** puoi mettere sullo schermo qualsiasi generatore o una delle tue tabelle, con il suo pulsante.
 
 ### Dashboard e strumenti
 
