@@ -11559,7 +11559,8 @@ const Clocks = (() => {
           '</div>' +
         '</div>' +
         '<div style="display:flex;height:14px;border-radius:4px;overflow:hidden;gap:1px;">' + segs + '</div>' +
-        (c.note ? '<div style="font-size:0.68rem;color:var(--text-muted);margin-top:4px;">' + c.note + '</div>' : '') +
+        // I clock sono salvati con 'nota' (vedi add): qui si leggeva 'note' e la nota non compariva mai
+        ((c.nota || c.note) ? '<div style="font-size:0.72rem;color:' + (pct >= 100 ? 'var(--text-primary)' : 'var(--text-muted)') + ';margin-top:4px;">' + (pct >= 100 ? 'È successo: ' : 'Quando si riempie: ') + String(c.nota || c.note).replace(/</g,'&lt;') + '</div>' : '') +
         (pct >= 100 ? '<div style="font-size:0.7rem;color:var(--accent-danger);margin-top:4px;font-weight:600;">⚡ COMPLETATO</div>' : '') +
       '</div>';
     }).join('');
@@ -11570,7 +11571,7 @@ const Clocks = (() => {
       if (!nome?.trim()) return;
       openInputModal('Quanti segmenti?', '6', (maxStr) => {
         const max = Math.max(2, Math.min(20, parseInt(maxStr) || 6));
-        openInputModal('Nota opzionale', '', (nota) => {
+        openInputModal('Cosa succede quando si riempie? (facoltativo)', '', (nota) => {
           const clocks = _getClocks();
           clocks.push({ nome: nome.trim(), max, current: 0, nota: nota || '' });
           _saveClocks(clocks);
@@ -18091,6 +18092,7 @@ const renderDashboard = () => {
         // progresso/totale e mostrava ogni clock fermo a 0/8.
         var filled = c.current != null ? c.current : (c.progresso || 0);
         var total  = c.max || c.totale || 8;
+        var scattato = filled >= total;
         var segs   = '';
         for (var s = 0; s < total; s++) {
           segs += '<div style="flex:1;height:8px;border-radius:2px;background:' + (s < filled ? (c.colore||'var(--accent-primary)') : 'var(--bg-tertiary)') + ';margin:0 1px;"></div>';
@@ -18098,9 +18100,11 @@ const renderDashboard = () => {
         return '<div style="margin-bottom:10px;">' +
           '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">' +
             '<span style="font-size:0.8rem;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:70%;">' + (c.nome||'Clock') + '</span>' +
-            '<span style="font-size:0.72rem;color:var(--text-muted);">' + filled + '/' + total + '</span>' +
+            '<span style="font-size:0.72rem;color:' + (scattato ? 'var(--accent-danger);font-weight:700' : 'var(--text-muted)') + ';">' + (scattato ? 'Scattato' : filled + '/' + total) + '</span>' +
           '</div>' +
           '<div style="display:flex;gap:1px;">' + segs + '</div>' +
+          // Clock pieno: la sua nota e' la conseguenza che ora accade
+          (scattato && c.nota ? '<div style="font-size:0.78rem;color:var(--text-primary);margin-top:4px;padding:4px 8px;border-left:3px solid var(--accent-danger);background:var(--bg-secondary);">' + String(c.nota).replace(/</g,'&lt;') + '</div>' : '') +
         '</div>';
       }).join('');
     } else {
@@ -20555,6 +20559,7 @@ const CalendarioUI = (() => {
     document.getElementById('cev-layer').value = 'campagna';
     document.getElementById('cev-descrizione').value = '';
     document.getElementById('cev-promemoria').value = 3;
+    document.getElementById('cev-conseguenza').value = '';
     document.getElementById('cev-completata').checked = false;
     document.getElementById('cev-completata-wrap').style.display = 'none';
     document.getElementById('cev-delete-btn').style.display = 'none';
@@ -20580,6 +20585,7 @@ const CalendarioUI = (() => {
     document.getElementById('cev-layer').value = ev.layer || 'campagna';
     document.getElementById('cev-descrizione').value = ev.descrizione || '';
     document.getElementById('cev-promemoria').value = ev.promemoriaGiorni ?? 3;
+    document.getElementById('cev-conseguenza').value = ev.conseguenza || '';
     document.getElementById('cev-completata').checked = !!ev.completata;
     document.getElementById('cev-completata-wrap').style.display = '';
     document.getElementById('cev-delete-btn').style.display = '';
@@ -20613,6 +20619,7 @@ const CalendarioUI = (() => {
       data: { giorno, mese, anno },
       entita: [..._editEntita],
       promemoriaGiorni: parseInt(document.getElementById('cev-promemoria').value, 10) || 0,
+      conseguenza: document.getElementById('cev-tipo').value === 'deadline' ? document.getElementById('cev-conseguenza').value.trim() : '',
       completata: !!document.getElementById('cev-completata').checked,
       creatoAt: idx >= 0 ? list[idx].creatoAt : Date.now(),
       aggiornatoAt: Date.now(),
@@ -21580,6 +21587,9 @@ document.addEventListener('DOMContentLoaded', initMobileNav);
       <div class="form-group" id="cev-promemoria-wrap">
         <label class="form-label">Avvisa quanti giorni prima (deadline)</label>
         <input type="number" id="cev-promemoria" class="form-input" min="0" value="3" style="max-width:120px;">
+        <label class="form-label" for="cev-conseguenza" style="margin-top:10px;">Se scade senza che il party intervenga, cosa succede?</label>
+        <textarea id="cev-conseguenza" class="form-textarea" rows="2" placeholder="es. Il rituale si compie: il secondo anello del sigillo si spezza e il clock dell'eruzione avanza di 2"></textarea>
+        <div style="font-size:0.75rem;color:var(--text-muted);margin-top:4px;">Quando la data arriva, la conseguenza compare nella Dashboard.</div>
       </div>
       <div class="form-group">
         <label class="form-label">Descrizione</label>

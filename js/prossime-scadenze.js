@@ -71,7 +71,15 @@ const ProssimeScadenze = (() => {
             '<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:' + (it.giorniRimanenti <= 0 ? 'var(--accent-danger)' : '#f5a623') + ';flex-shrink:0;"></span>' +
             '<span style="flex:1;font-size:0.83rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + _esc(it.titolo || 'Senza titolo') + '</span>' +
             '<span style="font-size:0.68rem;color:var(--text-muted);flex-shrink:0;">' + _label(it.giorniRimanenti) + '</span>' +
-          '</div>'
+          '</div>' +
+          // Conseguenza programmata: avviso prima della data, "è successo" quando scade
+          (it.conseguenza
+            ? '<div style="font-size:0.78rem;line-height:1.45;margin:-2px 0 6px 16px;padding:4px 8px;' +
+                (it.giorniRimanenti <= 0
+                  ? 'border-left:3px solid var(--accent-danger);background:var(--bg-secondary);color:var(--text-primary);"><strong>È successo:</strong> '
+                  : 'color:var(--text-muted);">Se scade: ') +
+                _esc(it.conseguenza) + '</div>'
+            : '')
         ).join('')
       : '<div class="text-muted text-sm" style="padding:6px 0;">Nessuna scadenza imminente.</div>';
   };

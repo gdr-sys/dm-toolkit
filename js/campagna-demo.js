@@ -96,7 +96,7 @@ const CampagnaDemo = (() => {
         { id: 'cev_demo1', titolo: 'Prima scossa sull\'Ardegna', data: { anno: 742, mese: 8, giorno: 2 }, tipo: 'evento', categoria: '', layer: 'mondo', descrizione: 'La terra trema per tutta la notte. Al mattino, dal cratere sale fumo.', entita: [{ tipo: 'luoghi', id: ardegna, nome: 'Monte Ardegna' }], promemoriaGiorni: 3, completata: false, creatoAt: ora, aggiornatoAt: ora },
         { id: 'cev_demo2', titolo: 'Il party arriva a Valmora', data: { anno: 742, mese: 8, giorno: 9 }, tipo: 'evento', categoria: '', layer: 'campagna', descrizione: 'Prima sera al Tino Rovesciato.', entita: [{ tipo: 'luoghi', id: valmora, nome: 'Valmora' }], promemoriaGiorni: 3, completata: false, creatoAt: ora, aggiornatoAt: ora },
         { id: 'cev_demo3', titolo: 'Scontro nella cripta', data: { anno: 742, mese: 8, giorno: 12 }, tipo: 'evento', categoria: 'combattimento', layer: 'campagna', descrizione: 'Il party respinge i Custodi all\'ingresso della cripta.', entita: [{ tipo: 'luoghi', id: cripta, nome: 'Cripta della Fiamma Quieta' }], promemoriaGiorni: 3, completata: false, creatoAt: ora, aggiornatoAt: ora },
-        { id: 'cev_demo4', titolo: 'Ultimi carri per Corvara', data: { anno: 742, mese: 8, giorno: 17 }, tipo: 'deadline', categoria: '', layer: 'campagna', descrizione: 'Dopo questa data la strada verrà chiusa dalla guardia.', entita: [{ tipo: 'luoghi', id: corvara, nome: 'Corvara' }], promemoriaGiorni: 5, completata: false, creatoAt: ora, aggiornatoAt: ora },
+        { id: 'cev_demo4', titolo: 'Ultimi carri per Corvara', data: { anno: 742, mese: 8, giorno: 17 }, tipo: 'deadline', categoria: '', layer: 'campagna', descrizione: 'Dopo questa data la strada verrà chiusa dalla guardia.', entita: [{ tipo: 'luoghi', id: corvara, nome: 'Corvara' }], promemoriaGiorni: 5, conseguenza: 'La guardia chiude la strada: il vino resta a Valmora, Bertrando rischia la rovina e la Gilda dei Vignaioli diventa sospettosa verso il party.', completata: false, creatoAt: ora, aggiornatoAt: ora },
       ],
       sessioni_log: [
         { id: 'sess_demo1', numero: 1, titolo: 'Cenere sul vino', data: new Date(ora - 14 * 864e5).toISOString().slice(0, 10), data_inworld: { anno: 742, mese: 8, giorno: 9 }, stato: 'giocata',
@@ -116,8 +116,8 @@ const CampagnaDemo = (() => {
       ],
       sessioneZero: { aspettative: { tono: 'Avventura classica', morte: 'Possibile', pvp: 'Solo con il consenso di entrambi', combattimento: 'Bilanciato', esplorazione: 'Molta', interazione: 'Bilanciata', note: 'Ogni due venerdì alle 21. I tiri si fanno in vista.' },
         linee: ['Violenza su bambini'], veli: ['Tortura esplicita'], strumenti: ['cartaX', 'linee', 'porta', 'stelle'], aggiornatoAt: ora },
-      clocks: [{ nome: 'Eruzione dell\'Ardegna', max: 8, current: 3, nota: 'Avanza di 1 ogni volta che un anello del sigillo si spezza o passa una settimana' },
-               { nome: 'Pazienza della guardia di Corvara', max: 6, current: 1, nota: '' }],
+      clocks: [{ nome: 'Eruzione dell\'Ardegna', max: 8, current: 3, nota: 'L\'Ardegna erutta: la cenere copre la valle e Valmora va evacuata (avanza di 1 per ogni anello spezzato o settimana passata)' },
+               { nome: 'Pazienza della guardia di Corvara', max: 6, current: 1, nota: 'La guardia chiude la valle: nessuno entra o esce senza un lasciapassare' }],
       wiki: { ...(App.getActiveCampaign().wiki || {}), lore: [
         { id: 'n_demo1', titolo: 'L\'Ordine della Fiamma Quieta', categoria: 'Storia', tags: ['storia', 'ordine'], creatoAt: ora, aggiornatoAt: ora,
           contenuto: '<p>Tre secoli fa i monaci dell\'Ordine incatenarono il fuoco del <a class="nc-wikilink">[[Monte Ardegna]]</a> con un sigillo di tre anelli, nascosto nella <a class="nc-wikilink">[[Cripta della Fiamma Quieta]]</a>.</p><p>L\'ordine si sciolse un secolo fa. Ne resta solo <a class="nc-wikilink">[[Fratello Orsino]]</a>. #storia</p>' },
