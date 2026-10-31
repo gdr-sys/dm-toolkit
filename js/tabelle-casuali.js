@@ -202,7 +202,9 @@ const TabelleCasuali = (() => {
     if (!griglia) return;
     const card = document.createElement('div');
     card.id = 'tc-card';
-    card.className = 'card';
+    // gen-card + data-gen-id: si puo' nascondere da Generatori → Personalizza come gli altri
+    card.className = 'card gen-card';
+    card.dataset.genId = 'tabelle';
     card.style.marginBottom = 'var(--space-md)';
     card.innerHTML =
       '<div class="card-header" style="flex-wrap:wrap;gap:8px;">' +
@@ -219,6 +221,8 @@ const TabelleCasuali = (() => {
       '</div>' +
       '<div id="tc-lista"></div>';
     griglia.parentNode.insertBefore(card, griglia);
+    // La card nasce dopo che i Generatori hanno applicato la visibilita': va riapplicata
+    try { Generatori.applyVisibility(); } catch (e) {}
   };
 
   const render = () => {
@@ -451,6 +455,12 @@ const TabelleCasuali = (() => {
     };
     App._tabelleCasualiHooked = true;
   };
+
+  // Registrata subito (lo script e' in fondo al body): cosi' e' nell'elenco di Personalizza gia'
+  // quando i Generatori applicano la visibilita' all'avvio.
+  if (typeof Generatori !== 'undefined' && Generatori._GEN_DEFS && !Generatori._GEN_DEFS.tabelle) {
+    Generatori._GEN_DEFS = { tabelle: { label: 'Le mie tabelle', emoji: '' }, ...Generatori._GEN_DEFS };
+  }
 
   document.addEventListener('DOMContentLoaded', () => setTimeout(() => { _aggancia(); render(); }, 200));
 

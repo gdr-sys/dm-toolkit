@@ -2689,6 +2689,10 @@
           <input type="text" id="schermo-block-title" class="form-input" placeholder="Lascia vuoto per default">
         </div>
       </div>
+      <div class="form-group" id="schermo-gen-group" style="display:none;">
+        <label class="form-label" for="schermo-block-gen">Quale generatore o tabella</label>
+        <select id="schermo-block-gen" class="form-select"></select>
+      </div>
       <div class="form-group" id="schermo-content-group">
         <label class="form-label">Contenuto (per blocchi personalizzati)</label>
         <textarea id="schermo-block-content" class="form-textarea" rows="4" placeholder="Testo libero, regole, note..."></textarea>
@@ -7896,6 +7900,87 @@ const Schermo = (() => {
       defaultSize: 'lg',
       repeatable: false,
     },
+    generatore: {
+      label: 'Generatore o tabella',
+      icon: _svgIcon('<rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.2"/><circle cx="15.5" cy="15.5" r="1.2"/><circle cx="12" cy="12" r="1.2"/>'),
+      desc: 'Un generatore o una delle tue tabelle, con il suo pulsante',
+      defaultSize: 'md',
+      repeatable: true,
+    },
+  };
+
+  // Generatori utilizzabili in un blocco dello Schermo: [etichetta, chiamata, riquadro del risultato
+  // nella pagina Generatori]. Il blocco esegue la chiamata e copia il risultato (senza pulsanti e
+  // campi, che agirebbero sulla pagina Generatori). Le opzioni (stagione, ambiente...) sono quelle
+  // scelte nella pagina Generatori. Esclusi Bottino, Incontro bilanciato e Viaggio: hanno
+  // un'interfaccia propria che non sta in un blocco.
+  const GEN_SCHERMO = {
+    npc: ['PNG completo', 'Generatori.rollNPC()', 'gen-npc-result'],
+    meteo: ['Meteo', 'Generatori.rollWeather()', 'gen-weather-result'],
+    sensori: ['Rumori e odori', 'Generatori.rollSensori()', 'gen-sensori-result'],
+    descrizione: ['Descrizione luoghi', 'DescrizioneGen.genera()', 'gen-desc-result'],
+    nomi_luoghi: ['Nomi luoghi', 'NomiLuoghiGen.genera()', 'gen-nomluogo-result'],
+    shop: ['Negozio', 'Generatori.rollShop()', 'gen-shop-result'],
+    biblioteca: ['Biblioteca', 'Generatori.rollBiblioteca()', 'gen-bib-result'],
+    incontri: ['Incontri casuali', 'Generatori.rollIncontro()', 'gen-incontri-result'],
+    rumors: ['Voci di corridoio', 'Generatori.rollRumors()', 'gen-rumors-result'],
+    accento: ['Voce e accento', 'Generatori.rollAccent()', 'gen-accent-result'],
+    nomi: ['Nomi', 'Generatori.rollNomi()', 'gen-nomi-result'],
+    follia: ['Follia', 'Generatori.rollFollia()', 'gen-follia-result'],
+    ganci: ['Ganci narrativi', 'GanciGen.genera()', 'gen-gancio-result'],
+    oracolo: ['Oracolo', "OracoloGen.lancia('standard')", 'gen-oracolo-result'],
+    missioni: ['Missioni secondarie', 'MissioniGen.genera()', 'gen-miss-result'],
+    trappole: ['Trappole ed enigmi', 'GeneratoriExtra.generaTrappola()', 'gx-trap-result'],
+    dungeon: ['Dungeon: una stanza', 'GeneratoriExtra.generaStanza()', 'gx-dun-result'],
+    insediamenti: ['Taverne e insediamenti', 'GeneratoriExtra.generaInsediamento()', 'gx-ins-result'],
+    eventi_viaggio: ['Eventi di viaggio e riposo', 'GeneratoriExtra.generaEvento()', 'gx-ev-result'],
+  };
+
+  const _escGen = (x) => String(x ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;');
+  const _eTabella = (g) => String(g || '').startsWith('tab:');
+
+  const _opzioniGeneratore = () => {
+    const tab = (App.getActiveCampaign()?.tabelleCasuali || []).slice().sort((a, b) => (a.nome || '').localeCompare(b.nome || '', 'it'));
+    return '<optgroup label="Generatori">' + Object.entries(GEN_SCHERMO).map(([k, [l]]) => '<option value="' + k + '">' + l + '</option>').join('') + '</optgroup>' +
+      (tab.length ? '<optgroup label="Le mie tabelle">' + tab.map(t => '<option value="tab:' + t.id + '">' + _escGen(t.nome) + '</option>').join('') + '</optgroup>' : '');
+  };
+
+  const _etichettaGeneratore = (g) => _eTabella(g)
+    ? ((App.getActiveCampaign()?.tabelleCasuali || []).find(t => t.id === g.slice(4))?.nome || 'Tabella')
+    : (GEN_SCHERMO[g]?.[0] || 'Generatore');
+
+  const renderGeneratore = (block) =>
+    '<div style="display:flex;justify-content:flex-end;margin-bottom:6px;">' +
+      '<button type="button" class="btn btn-primary btn-sm" onclick="Schermo.eseguiGeneratore(\'' + block.id + '\')">' + (_eTabella(block.gen) ? 'Tira' : 'Genera') + '</button>' +
+    '</div>' +
+    '<div id="sgen-' + block.id + '" style="font-size:0.85rem;line-height:1.55;">' +
+      (block.ultimo || '<span style="color:var(--text-muted);">Premi il pulsante per ' + (_eTabella(block.gen) ? 'tirare sulla tabella' : 'generare') + '.</span>') +
+    '</div>';
+
+  const eseguiGeneratore = async (id) => {
+    const block = _blocks.find(b => b.id === id);
+    const el = document.getElementById('sgen-' + id);
+    if (!block || !el) return;
+    let html = '';
+    try {
+      if (_eTabella(block.gen)) {
+        const testo = TabelleCasuali.tiraTesto(block.gen.slice(4));
+        html = testo ? _escGen(testo) : '<span style="color:var(--text-muted);">La tabella non esiste più o è vuota.</span>';
+      } else {
+        const def = GEN_SCHERMO[block.gen];
+        if (!def) return;
+        await (new Function('return ' + def[1]))();
+        await new Promise(r => setTimeout(r, 50));
+        const src = document.getElementById(def[2]);
+        const copia = src ? src.cloneNode(true) : null;
+        if (copia) copia.querySelectorAll('button, select, input').forEach(n => n.remove());
+        html = copia ? copia.innerHTML : '';
+      }
+    } catch (e) {
+      html = '<span style="color:var(--accent-danger);">Errore: ' + _escGen(e.message) + '</span>';
+    }
+    el.innerHTML = html;
+    block.ultimo = html; // resta visibile se lo schermo si ridisegna, e si salva con il layout
   };
 
   const SIZES = {
@@ -8033,6 +8118,7 @@ const Schermo = (() => {
       case 'note_sessione':  el.innerHTML = renderNoteSessione(); break;
       case 'dadi':           el.innerHTML = renderDadiMini(block.id); break;
       case 'meteo':          el.innerHTML = renderMeteoMini(block.id); break;
+      case 'generatore':     el.innerHTML = renderGeneratore(block); break;
       case 'note':           el.innerHTML = renderNote(block); break;
       case 'combat_mini':    el.innerHTML = renderCombatMini(); break;
       case 'combat_full':    el.innerHTML = renderCombatFull(); break;
@@ -8733,6 +8819,11 @@ const Schermo = (() => {
   const _onTypeChange = (type) => {
     const group = document.getElementById('schermo-content-group');
     if (group) group.style.display = (type === 'custom' || type === 'note') ? '' : 'none';
+    const gen = document.getElementById('schermo-gen-group');
+    if (gen) {
+      gen.style.display = type === 'generatore' ? '' : 'none';
+      if (type === 'generatore') document.getElementById('schermo-block-gen').innerHTML = _opzioniGeneratore();
+    }
   };
 
   const submitAddBlock = () => {
@@ -8741,11 +8832,13 @@ const Schermo = (() => {
     const title   = document.getElementById('schermo-block-title')?.value?.trim() || '';
     const content = document.getElementById('schermo-block-content')?.value?.trim() || '';
 
+    const gen = type === 'generatore' ? (document.getElementById('schermo-block-gen')?.value || '') : '';
     const block = {
       id: 'sb_' + Date.now(),
       type, size,
-      title: title || BLOCK_TYPES[type]?.label || 'Blocco',
+      title: title || (gen ? _etichettaGeneratore(gen) : '') || BLOCK_TYPES[type]?.label || 'Blocco',
       content,
+      ...(gen ? { gen } : {}),
     };
 
     const colCounts = [0,1,2,3].map(c => _blocks.filter(b => (b.col ?? 0) === c).length);
@@ -8852,7 +8945,7 @@ const Schermo = (() => {
   };
 
   return {
-    init, render, addBlock, submitAddBlock, _onTypeChange,
+    init, render, addBlock, submitAddBlock, _onTypeChange, eseguiGeneratore,
     removeBlock, resizeBlock, moveBlock, editBlock, resetLayout,
     rollDie, generateMeteo, saveNote, advanceTime, refreshCombat,
     setCompendioRef, _refreshCombat, _refreshFavoriti, _swapBlocks,
@@ -8922,8 +9015,11 @@ const Generatori = {
   // campagna li conteneva gia', e un generatore aggiunto dopo (es. da js/generatori-extra.js)
   // risultava nascosto finche' non lo si attivava a mano. Ora un generatore che la campagna non
   // conosceva ancora quando ha salvato le preferenze e' visibile.
-  _GEN_STORICI: ['npc','meteo','sensori','rumors','accento','shop','viaggio','loot','biblioteca','nomi',
-    'incontri','follia','encounter','descrizione','nomi_luoghi','ganci','oracolo','missioni'],
+  // Solo i generatori del primo elenco: quelli aggiunti dopo (encounter, descrizione, nomi_luoghi,
+  // ganci, oracolo, missioni, loot) prima erano forzati sempre visibili in applyVisibility proprio
+  // perche' le preferenze salvate allora non li contenevano. Ora che quella forzatura non c'e' piu'
+  // (si possono nascondere tutti), per le preferenze vecchie restano visibili trattandoli da nuovi.
+  _GEN_STORICI: ['npc','meteo','sensori','rumors','accento','shop','viaggio','biblioteca','nomi','incontri','follia'],
 
   _getEnabledGen: () => {
     const camp = App.getActiveCampaign();
@@ -8942,7 +9038,6 @@ const Generatori = {
     document.querySelectorAll('.gen-card[data-gen-id]').forEach(card => {
       const id = card.dataset.genId;
 
-      if (['encounter','descrizione','nomi_luoghi','ganci','oracolo','missioni','loot'].includes(id)) { card.style.display = ''; return; }
       card.style.display = enabled.includes(id) ? '' : 'none';
     });
   },
