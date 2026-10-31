@@ -130,7 +130,7 @@
 .dice-result-detail { font-family:var(--font-mono); font-size:0.7rem; color:var(--text-muted); max-width:100%; overflow-wrap:anywhere; }
 .dice-rolling { animation:diceRoll 0.4s ease; }
 .dice-result-appear { animation:diceResult 0.3s ease; }
-.dice-history { margin-top:var(--space-sm); max-height:80px; overflow-y:auto; }
+.dice-history { margin-top:var(--space-sm); max-height:170px; overflow-y:auto; }
 .dice-history-item { font-family:var(--font-mono); font-size:0.68rem; color:var(--text-muted); padding:2px 0; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:baseline; gap:6px; }
 .dice-history-item > span { min-width:0; overflow-wrap:anywhere; }
 .dice-history-item > span:last-child { flex-shrink:0; }

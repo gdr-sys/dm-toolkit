@@ -3265,16 +3265,27 @@ const Dadi = (() => {
   const updateHistory = () => {
     const el = document.getElementById('dice-history-list');
     if (!el) return;
-    const history = Storage.getDiceHistory().slice(0, 10);
+    // Registro dei tiri: i tiri sono salvati con i dadi in "results" (vedi Storage.addDiceRoll),
+    // ma qui si leggeva "rolls" e i singoli dadi non comparivano mai. Mostra tutti i tiri salvati
+    // (fino a 50) con l'ora, in un riquadro che scorre.
+    const history = Storage.getDiceHistory();
+    const ora = (ts) => ts ? new Date(ts).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' }) : '';
+    const dadi = (h) => { const r = h.results || h.rolls; return Array.isArray(r) ? r.flat(2).join(', ') : (r ?? ''); };
     el.innerHTML = history.length === 0
       ? '<div class="text-muted text-sm" style="text-align:center;padding:4px;">Nessun tiro</div>'
-      : history.map((h, i) => `
-        <div class="dice-history-item" style="${i===0?'opacity:1;':'opacity:0.7;'}">
-          <span style="color:var(--text-muted);font-size:0.72rem;">${h.formula.toUpperCase()}</span>
-          <span style="font-size:0.72rem;color:var(--text-muted);">${h.rolls?.join(', ')||''}</span>
+      : `<div style="display:flex;justify-content:space-between;align-items:center;font-size:0.68rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;padding:2px 0 4px;">
+           <span>Ultimi tiri (${history.length})</span>
+           <button type="button" class="btn btn-ghost btn-sm" style="font-size:0.66rem;padding:1px 6px;" onclick="Dadi.svuotaStorico()">Svuota</button>
+         </div>` +
+        history.map((h, i) => `
+        <div class="dice-history-item" style="${i===0?'opacity:1;':'opacity:0.75;'}">
+          <span style="color:var(--text-muted);font-size:0.72rem;">${ora(h.ts)} · ${String(h.formula || '').toUpperCase()}</span>
+          <span style="font-size:0.72rem;color:var(--text-muted);">${dadi(h)}</span>
           <span class="text-accent font-bold" style="font-size:${i===0?'1.1rem':'0.9rem'};font-family:var(--font-mono);">${h.total}</span>
         </div>`).join('');
   };
+
+  const svuotaStorico = () => { try { localStorage.setItem('dmtoolkit_dice_history', '[]'); } catch (e) {} updateHistory(); };
 
   const rollFormula = (formula) => {
     const result = roll(formula);
@@ -3319,7 +3330,7 @@ const Dadi = (() => {
     Debug.log('Dadi inizializzati');
   };
 
-  return { init, roll, rollDie, rollFormula, rollCustom, rollFormulaInput, togglePanel };
+  return { init, roll, rollDie, rollFormula, rollCustom, rollFormulaInput, togglePanel, svuotaStorico };
 })();
 
 /* ============================================================
@@ -16365,6 +16376,7 @@ const WikiSections = (() => {
       ((type === 'png' || type === 'pg') && !isEdit ? _renderStatBlock(item, type) : '') +
       ((type === 'png' || type === 'pg') ? _renderMomenti(item, type, isEdit) : '') +
       (type === 'luoghi' && !isEdit && typeof TabelleCasuali !== 'undefined' ? TabelleCasuali.bloccoLuogo(item.id) : '') +
+      (type === 'fazioni' && !isEdit && typeof Reputazione !== 'undefined' ? Reputazione.blocco(item.id) : '') +
 
       (() => {
         const custom = _currentItem?.campi_custom || item.campi_custom || [];
@@ -21925,6 +21937,7 @@ document.addEventListener('DOMContentLoaded', initMobileNav);
 <script src="js/sessione-zero.js"></script>
 <script src="js/campagna-demo.js"></script>
 <script src="js/primi-passi.js"></script>
+<script src="js/reputazione.js"></script>
 <script src="js/schermo-acceso.js"></script>
 <script src="js/wiki-import.js"></script>
 <script src="js/wiki-trash-ui.js"></script>
