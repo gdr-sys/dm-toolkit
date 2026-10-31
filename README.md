@@ -55,6 +55,7 @@ PNG, Luoghi, Fazioni, Quest, PG, Trame e Incontri hanno ciascuno la propria sezi
 - **Ritratti** da link o caricati dal dispositivo. Con Google Drive collegato finiscono sul tuo Drive. Si possono incollare anche i link di condivisione di Drive: l'app li trasforma da sola nell'immagine, e se non si vede spiega il perché (per esempio se il file non è condiviso con "Chiunque abbia il link").
 - **Statistiche complete** per PNG e PG: caratteristiche, CA, PF, tiri salvezza, azioni.
 - **Momenti dei personaggi** — cronologia degli eventi importanti di ogni PNG e PG.
+- **Reputazione con le fazioni** — una scala da Nemica giurata a Devota, con la cronologia di cosa l'ha fatta cambiare e quando (anche in data in-world).
 - Rinominare un elemento aggiorna tutti i `[[collegamenti]]` nelle note.
 - Una nota creata da un modello PNG o Luogo crea anche l'elemento corrispondente e resta collegata. Salvare un elemento invece **non** crea più note doppie nella Lore.
 
@@ -134,7 +135,7 @@ Griglia di blocchi trascinabili e ridimensionabili: percezioni passive del party
 - **Prossime scadenze** dal calendario.
 - **Scheda rapida PNG** dalla barra in alto, per consultare un PNG a metà sessione.
 - **Blocco note** sempre a portata di mano.
-- **Lanciadadi** sempre a portata di mano, con formule (`4d6kh3`, `2d8+5`) e gli ultimi tiri.
+- **Lanciadadi** sempre a portata di mano, con formule (`4d6kh3`, `2d8+5`) e il registro degli ultimi 50 tiri, con l'ora e i singoli dadi.
 - Backup e ripristino in JSON, per campagna o completo, e backup automatico su Google Drive.
 
 ---
