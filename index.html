@@ -3951,6 +3951,10 @@ const App = (() => {
           <button class="btn btn-primary" onclick="openNewCampaignModal()" style="font-size:0.95rem;padding:10px 24px;">
             + Nuova Campagna
           </button>
+          ${typeof CampagnaDemo !== 'undefined' ? `<div style="margin-top:12px;">
+            <button class="btn btn-ghost" onclick="CampagnaDemo.crea()" style="font-size:0.88rem;">Prova con una campagna di esempio</button>
+            <div style="font-size:0.76rem;color:var(--text-muted);margin-top:4px;">Già piena di PNG, luoghi, sessioni e tabelle, per vedere cosa sa fare l'app. Puoi eliminarla quando vuoi.</div>
+          </div>` : ''}
           <div style="margin-top:32px;display:flex;flex-direction:column;gap:10px;text-align:left;max-width:260px;margin-left:auto;margin-right:auto;">
             <div style="display:flex;align-items:center;gap:12px;font-size:0.82rem;color:var(--text-muted);">
               <div style="width:24px;height:24px;background:var(--accent-primary);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:0.72rem;font-weight:700;flex-shrink:0;">1</div>
@@ -17992,6 +17996,9 @@ const renderDashboard = () => {
       if (sub) sub.textContent = 'S'+(ultima.numero||'?')+(ultima.titolo?' — '+ultima.titolo:'')+(ultima.data?' · '+ultima.data:'');
     } else {
       dashUlt.innerHTML = '<div style="color:var(--text-muted);font-size:0.82rem;">Nessuna sessione ancora.</div>';
+      // Senza sessioni restava il sottotitolo della campagna aperta prima
+      var subVuoto = document.getElementById('dash-ultima-sess-sub');
+      if (subVuoto) subVuoto.textContent = camp.name || 'Panoramica della campagna attiva';
     }
   }
 
@@ -18052,9 +18059,10 @@ const renderDashboard = () => {
     var activeClocks = clocks.filter(function(c){ return c.attivo !== false; });
     if (activeClocks.length) {
       dashClocks.innerHTML = activeClocks.map(function(c) {
-        var pct = Math.round(((c.progresso||0) / (c.totale||8)) * 100);
-        var filled = c.progresso || 0;
-        var total  = c.totale || 8;
+        // I clock vengono salvati come {max, current} (vedi Clocks): la Dashboard leggeva solo
+        // progresso/totale e mostrava ogni clock fermo a 0/8.
+        var filled = c.current != null ? c.current : (c.progresso || 0);
+        var total  = c.max || c.totale || 8;
         var segs   = '';
         for (var s = 0; s < total; s++) {
           segs += '<div style="flex:1;height:8px;border-radius:2px;background:' + (s < filled ? (c.colore||'var(--accent-primary)') : 'var(--bg-tertiary)') + ';margin:0 1px;"></div>';
@@ -21908,6 +21916,8 @@ document.addEventListener('DOMContentLoaded', initMobileNav);
 <script src="js/tabelle-casuali.js"></script>
 <script src="js/generatori-extra.js"></script>
 <script src="js/sessione-zero.js"></script>
+<script src="js/campagna-demo.js"></script>
+<script src="js/primi-passi.js"></script>
 <script src="js/schermo-acceso.js"></script>
 <script src="js/wiki-import.js"></script>
 <script src="js/wiki-trash-ui.js"></script>
