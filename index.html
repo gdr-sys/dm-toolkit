@@ -16996,12 +16996,27 @@ const WikiSections = (() => {
     renderCounters();
   };
 
+  // Una voce appena creata con "+ Nuovo" e chiusa senza nome ne' note: newCard la salva subito
+  // (serve per autosave e menzioni), quindi senza questo controllo ogni ripensamento lasciava una
+  // voce vuota "senza nome" nell'elenco.
+  const _voceVuota = (item) => {
+    const nome = String(item.nome || item.titolo || item.name || '').trim();
+    const note = String(item.note || '').replace(/<[^>]*>|&nbsp;/g, '').trim();
+    return !nome && !note;
+  };
+
   const closeDetail = (type) => {
 
-    if (_currentItem) {
+    if (_currentItem && _currentItem.id === _idAppenaCreato && _voceVuota(_currentItem)) {
+      clearTimeout(_autosaveTimer);
+      const id = _currentItem.id;
+      _currentItem = null;
+      _rimuoviVoce(type, id);
+    } else if (_currentItem) {
       try { WikiSections._saveCustomFields(type); } catch(e) {}
       _save(type);
     }
+    _idAppenaCreato = null;
     _currentItem = null;
     const listEl   = document.getElementById('wiki-' + type + '-list');
     const detailEl = document.getElementById('wiki-' + type + '-detail');
@@ -17011,12 +17026,15 @@ const WikiSections = (() => {
     if (type === 'quest') { try { QuestKanban.render(); } catch(e) {} }
   };
 
+  let _idAppenaCreato = null;
+
   const newCard = (type) => {
     const cfg = TYPES[type];
     const newItem = cfg.newItem();
 
     const camp = App.getActiveCampaign();
     cfg.saveItem(camp, newItem);
+    _idAppenaCreato = newItem.id;
 
     const detailEl2 = document.getElementById('wiki-' + type + '-detail');
     const listEl2   = document.getElementById('wiki-' + type + '-list');
@@ -17065,17 +17083,34 @@ const WikiSections = (() => {
       // la voce con tutti i suoi campi, non solo il nome. Vedi WikiTrash.restore().
       if (item) try { WikiTrash.addToTrash(item, type); } catch(e) {}
 
+      _rimuoviVoce(type, id);
+      // _currentItem va azzerato PRIMA di closeDetail(): altrimenti il suo autosave-on-close
+      // ririscrive nei dati la voce appena cancellata (bug preesistente, non legato al modal).
+      _currentItem = null;
+      closeDetail(type);
+      Toast.show('Voce eliminata', 'info', 1500);
+    });
+  };
+
+  // Toglie una voce dai dati della campagna (senza cestino ne' conferma: ci pensa il chiamante)
+  const _rimuoviVoce = (type, id) => {
+      const camp = App.getActiveCampaign();
       if (type === 'png') {
         App.saveActiveCampaign({ npcs: (camp.npcs || []).filter(n => n.id !== id) });
       } else if (type === 'luoghi') {
         App.saveActiveCampaign({ locations: (camp.locations || []).filter(l => l.id !== id) });
       } else if (type === 'fazioni') {
         App.saveActiveCampaign({ factions: (camp.factions || []).filter(f => f.id !== id) });
-      } else if (type === 'lore' || type === 'sessioni') {
+      } else if (type === 'lore') {
         const wiki = camp?.wiki || {};
-        const sec = type === 'lore' ? 'lore' : 'sessioni';
-        if (wiki[sec]) wiki[sec] = wiki[sec].filter(n => n.id !== id);
+        if (wiki.lore) wiki.lore = wiki.lore.filter(n => n.id !== id);
         App.saveActiveCampaign({ wiki });
+      } else if (type === 'sessioni') {
+        // Le sessioni vere stanno in sessioni_log (vedi TYPES.sessioni.getData): prima si
+        // filtrava solo wiki.sessioni, e una sessione eliminata dalla Wiki restava al suo posto.
+        const wiki = camp?.wiki || {};
+        if (wiki.sessioni) wiki.sessioni = wiki.sessioni.filter(n => n.id !== id && n.sessioneId !== id);
+        App.saveActiveCampaign({ wiki, sessioni_log: (camp.sessioni_log || []).filter(s => s.id !== id) });
       } else if (type === 'incontri') {
         App.saveActiveCampaign({ incontri: (camp.incontri || []).filter(e => e.id !== id) });
       } else if (type === 'quest') {
@@ -17088,12 +17123,6 @@ const WikiSections = (() => {
           party: (camp.party || []).filter(p => p.id !== id),
         });
       }
-      // _currentItem va azzerato PRIMA di closeDetail(): altrimenti il suo autosave-on-close
-      // ririscrive nei dati la voce appena cancellata (bug preesistente, non legato al modal).
-      _currentItem = null;
-      closeDetail(type);
-      Toast.show('Voce eliminata', 'info', 1500);
-    });
   };
 
   const filter = (type, q) => {
