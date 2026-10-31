@@ -600,7 +600,7 @@ const MappaUI = (() => {
       prev.style.display = 'block';
       document.getElementById('mappa-set-file-hint').textContent = connesso
         ? 'Verra’ caricata su Google Drive al salvataggio.'
-        : 'Google Drive non e’ collegato: verra’ salvata direttamente nella campagna. Per mappe piu’ pesanti, collega Drive da Impostazioni (evita di riempire lo spazio del browser).';
+        : 'Google Drive non è collegato: la mappa resta solo su questo dispositivo (non arriva agli altri né sul cloud). Collega Drive dalle Impostazioni per vederla ovunque e non riempire lo spazio del browser.';
       // Il campo URL si apre gia' precompilato con l'immagine attuale: se non lo
       // svuotiamo qui, scegliere un file non avrebbe mai effetto (vedi
       // salvaImpostazioni, il link ha sempre la precedenza se il campo non e'

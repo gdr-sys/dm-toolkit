@@ -16337,6 +16337,9 @@ const WikiSections = (() => {
               'Carica dal dispositivo' +
               '<input type="file" accept="image/*" style="display:none;" onchange="WikiSections._onImageFilePicked(event,\'' + type + '\')">' +
             '</label>' +
+            (typeof DriveBackup !== 'undefined' && !DriveBackup.isConnected()
+              ? '<div style="font-size:0.76rem;line-height:1.45;color:var(--text-muted);">Google Drive non è collegato: un\'immagine caricata dal dispositivo resta <strong>solo su questo dispositivo</strong> (non arriva agli altri né sul cloud). Collega Drive dalle Impostazioni per vederla ovunque.</div>'
+              : '') +
           '</div>' +
         '</div>' +
         '</div>' : '') +
@@ -17021,6 +17024,9 @@ const WikiSections = (() => {
       if (input) input.value = dataUri;
       _fieldChange(type, 'immagine', dataUri);
       _refreshImgFieldPreview();
+      if (typeof DriveBackup !== 'undefined' && !DriveBackup.isConnected()) {
+        Toast.show('Immagine salvata solo su questo dispositivo: collega Google Drive per averla anche sugli altri', 'info', 5000);
+      }
     };
     img.onerror = () => { URL.revokeObjectURL(objectUrl); Toast.show('Errore nella lettura del file', 'error'); };
     img.src = objectUrl;
