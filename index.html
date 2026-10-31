@@ -1268,7 +1268,7 @@
         <!-- Filtri Mostri -->
         <div id="comp-filters-monsters" class="comp-filters">
           <div style="position:relative;display:inline-flex;align-items:center;flex:1;min-width:0;">
-            <input type="text" id="comp-search-monsters" class="form-input" placeholder="Cerca mostro..." style="flex:1;min-width:180px;" oninput="Compendio.onSearch('monsters')">
+            <input autocomplete="off" type="text" id="comp-search-monsters" class="form-input" placeholder="Cerca mostro..." style="flex:1;min-width:180px;" oninput="Compendio.onSearch('monsters')">
             <button onclick="document.getElementById('comp-search-monsters').value='';Compendio.onSearch('monsters')" style="position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:0.85rem;padding:2px 4px;line-height:1;border-radius:var(--radius-sm);" title="Cancella"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
           </div>
           <select class="form-select" id="comp-filter-tipo-monsters" style="width:auto;" onchange="Compendio.onFilter('monsters','tipo',this.value)">
@@ -1285,7 +1285,7 @@
         <!-- Filtri Oggetti Magici -->
         <div id="comp-filters-magic_items" class="comp-filters hidden">
           <div style="position:relative;display:inline-flex;align-items:center;flex:1;min-width:0;">
-            <input type="text" id="comp-search-magic_items" class="form-input" placeholder="Cerca oggetto..." style="flex:1;min-width:180px;" oninput="Compendio.onSearch('magic_items')">
+            <input autocomplete="off" type="text" id="comp-search-magic_items" class="form-input" placeholder="Cerca oggetto..." style="flex:1;min-width:180px;" oninput="Compendio.onSearch('magic_items')">
             <button onclick="document.getElementById('comp-search-magic_items').value='';Compendio.onSearch('magic_items')" style="position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:0.85rem;padding:2px 4px;line-height:1;border-radius:var(--radius-sm);" title="Cancella"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
           </div>
           <select class="form-select" id="comp-filter-tipo-magic" style="width:auto;" onchange="Compendio.onFilter('magic_items','tipo_base',this.value)">
@@ -1306,7 +1306,7 @@
         <!-- Filtri Equipaggiamento -->
         <div id="comp-filters-equipment" class="comp-filters hidden">
           <div style="position:relative;display:inline-flex;align-items:center;flex:1;min-width:0;">
-            <input type="text" id="comp-search-equipment" class="form-input" placeholder="Cerca equipaggiamento..." style="flex:1;min-width:180px;" oninput="Compendio.onSearch('equipment')">
+            <input autocomplete="off" type="text" id="comp-search-equipment" class="form-input" placeholder="Cerca equipaggiamento..." style="flex:1;min-width:180px;" oninput="Compendio.onSearch('equipment')">
             <button onclick="document.getElementById('comp-search-equipment').value='';Compendio.onSearch('equipment')" style="position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:0.85rem;padding:2px 4px;line-height:1;border-radius:var(--radius-sm);" title="Cancella"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
           </div>
           <select class="form-select" id="comp-filter-tipo-equip" style="width:auto;" onchange="Compendio.onFilter('equipment','tipo',this.value)">
@@ -1320,7 +1320,7 @@
         <!-- Filtri Incantesimi -->
         <div id="comp-filters-spells" class="comp-filters hidden">
           <div style="position:relative;display:inline-flex;align-items:center;flex:1;min-width:0;">
-            <input type="text" id="comp-search-spells" class="form-input" placeholder="Cerca incantesimo..." style="flex:1;min-width:180px;" oninput="Compendio.onSearch('spells')">
+            <input autocomplete="off" type="text" id="comp-search-spells" class="form-input" placeholder="Cerca incantesimo..." style="flex:1;min-width:180px;" oninput="Compendio.onSearch('spells')">
             <button onclick="document.getElementById('comp-search-spells').value='';Compendio.onSearch('spells')" style="position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:0.85rem;padding:2px 4px;line-height:1;border-radius:var(--radius-sm);" title="Cancella"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
           </div>
           <select class="form-select" id="comp-filter-livello-spells" style="width:auto;" onchange="Compendio.onFilter('spells','livello',this.value)">
@@ -1344,7 +1344,7 @@
         <!-- Filtri Homebrew -->
         <div id="comp-filters-homebrew" class="comp-filters hidden">
           <div style="position:relative;display:inline-flex;align-items:center;flex:1;min-width:0;">
-            <input type="text" id="comp-search-homebrew" class="form-input" placeholder="Cerca homebrew..." style="flex:1;min-width:150px;" oninput="Compendio.onSearch('homebrew')">
+            <input autocomplete="off" type="text" id="comp-search-homebrew" class="form-input" placeholder="Cerca homebrew..." style="flex:1;min-width:150px;" oninput="Compendio.onSearch('homebrew')">
             <button onclick="document.getElementById('comp-search-homebrew').value='';Compendio.onSearch('homebrew')" style="position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:0.85rem;padding:2px 4px;line-height:1;border-radius:var(--radius-sm);" title="Cancella"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
           </div>
           <select class="form-select" id="comp-filter-cat-homebrew" style="width:auto;" onchange="Compendio.onFilter('homebrew','categoria',this.value)">
@@ -1362,7 +1362,7 @@
         <!-- Filtri Cerca tutto -->
         <div id="comp-filters-cerca" class="comp-filters hidden">
           <div style="position:relative;display:inline-flex;align-items:center;flex:1;min-width:0;">
-            <input type="text" id="comp-search-cerca" class="form-input" placeholder="Cerca in tutto il Compendio..." style="flex:1;min-width:200px;"
+            <input autocomplete="off" type="text" id="comp-search-cerca" class="form-input" placeholder="Cerca in tutto il Compendio..." style="flex:1;min-width:200px;"
             oninput="Compendio.onSearch('cerca')" autofocus>
             <button onclick="document.getElementById('comp-search-cerca').value='';Compendio.onSearch('cerca')" style="position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:0.85rem;padding:2px 4px;line-height:1;border-radius:var(--radius-sm);" title="Cancella"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
           </div>
@@ -1372,7 +1372,7 @@
         <!-- Filtri Regole -->
         <div id="comp-filters-rules" class="comp-filters hidden">
           <div style="position:relative;display:inline-flex;align-items:center;flex:1;min-width:0;">
-            <input type="text" id="comp-search-rules" class="form-input" placeholder="Cerca regola..." style="flex:1;min-width:180px;" oninput="Compendio.onSearch('rules')">
+            <input autocomplete="off" type="text" id="comp-search-rules" class="form-input" placeholder="Cerca regola..." style="flex:1;min-width:180px;" oninput="Compendio.onSearch('rules')">
             <button onclick="document.getElementById('comp-search-rules').value='';Compendio.onSearch('rules')" style="position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:0.85rem;padding:2px 4px;line-height:1;border-radius:var(--radius-sm);" title="Cancella"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
           </div>
           <select class="form-select" id="comp-filter-cat-rules" style="width:auto;" onchange="Compendio.onFilter('rules','categoria',this.value)">
@@ -1393,7 +1393,7 @@
         <div class="tab-content" id="comp-panel-velocita">
           <div class="comp-filters" style="flex-wrap:wrap;gap:6px;">
             <div style="position:relative;display:inline-flex;align-items:center;flex:1;min-width:0;">
-            <input type="text" id="vel-search" class="form-input" placeholder="Cerca creatura o veicolo..." oninput="Compendio.searchVelocita()" style="flex:1;min-width:160px;">
+            <input autocomplete="off" type="text" id="vel-search" class="form-input" placeholder="Cerca creatura o veicolo..." oninput="Compendio.searchVelocita()" style="flex:1;min-width:160px;">
             <button onclick="document.getElementById('vel-search').value='';Compendio.searchVelocita()" style="position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:0.85rem;padding:2px 4px;line-height:1;border-radius:var(--radius-sm);" title="Cancella"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
           </div>
             <select id="vel-cat" class="form-select" onchange="Compendio.searchVelocita()" style="width:auto;font-size:0.8rem;">
@@ -1450,7 +1450,7 @@
           <button id="wiki-tab-grafo" class="btn btn-ghost btn-sm" onclick="WikiDM.switchSection('grafo')">Grafo</button>
         </div>
         <div style="flex:1;min-width:160px;max-width:320px;position:relative;">
-          <input id="wiki-search" type="text" class="form-input" placeholder="Cerca nel wiki..." style="width:100%;padding-left:8px;" oninput="WikiDM.search(this.value)">
+          <input autocomplete="off" id="wiki-search" type="text" class="form-input" placeholder="Cerca nel wiki..." style="width:100%;padding-left:8px;" oninput="WikiDM.search(this.value)">
         </div>
         <div id="wiki-section-actions" style="display:flex;gap:4px;flex-shrink:0;"></div>
       </div>
@@ -1687,7 +1687,7 @@
           <div><h2 style="font-family:var(--font-display);font-size:1.2rem;margin:0;">PG</h2>
           <p style="font-size:0.75rem;color:var(--text-muted);margin:2px 0 0;">Personaggi del party</p></div>
           <div style="display:flex;gap:6px;align-items:center;">
-            <input id="wiki-pg-search" type="text" class="form-input" placeholder="Cerca PG..." style="width:180px;font-size:0.82rem;" oninput="WikiSections.filter('pg',this.value)">
+            <input autocomplete="off" id="wiki-pg-search" type="text" class="form-input" placeholder="Cerca PG..." style="width:180px;font-size:0.82rem;" oninput="WikiSections.filter('pg',this.value)">
             <button class="btn btn-primary btn-sm" onclick="WikiSections.newCard('pg')">+ Nuovo PG</button>
           </div>
         </div>
@@ -1703,7 +1703,7 @@
           <div><h2 style="font-family:var(--font-display);font-size:1.2rem;margin:0;">Incontri</h2>
           <p style="font-size:0.75rem;color:var(--text-muted);margin:2px 0 0;">Incontri preparati per la campagna</p></div>
           <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
-            <input id="wiki-incontri-search" type="text" class="form-input" placeholder="Cerca incontri..." style="width:180px;font-size:0.82rem;" oninput="WikiSections.filter('incontri',this.value)">
+            <input autocomplete="off" id="wiki-incontri-search" type="text" class="form-input" placeholder="Cerca incontri..." style="width:180px;font-size:0.82rem;" oninput="WikiSections.filter('incontri',this.value)">
             <select id="wiki-incontri-filter" class="form-select" style="width:130px;font-size:0.78rem;" onchange="WikiSections.filterTag('incontri',this.value)">
               <option value="">Tutti i tipi</option>
               <option value="Combattimento">Combattimento</option>
@@ -1726,7 +1726,7 @@
           <div><h2 style="font-family:var(--font-display);font-size:1.2rem;margin:0;">Quest</h2>
           <p style="font-size:0.75rem;color:var(--text-muted);margin:2px 0 0;">Missioni, obiettivi e ganci narrativi</p></div>
           <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
-            <input id="wiki-quest-search" type="text" class="form-input" placeholder="Cerca quest..." style="width:180px;font-size:0.82rem;" oninput="WikiSections.filter('quest',this.value)">
+            <input autocomplete="off" id="wiki-quest-search" type="text" class="form-input" placeholder="Cerca quest..." style="width:180px;font-size:0.82rem;" oninput="WikiSections.filter('quest',this.value)">
             <select id="wiki-quest-filter-stato" class="form-select" style="width:130px;font-size:0.78rem;" onchange="WikiSections.filterTag('quest',this.value)">
               <option value="">Tutti gli stati</option>
               <option value="Attiva">Attive</option>
@@ -1770,7 +1770,7 @@
           <div><h2 style="font-family:var(--font-display);font-size:1.2rem;margin:0;">PNG</h2>
           <p style="font-size:0.75rem;color:var(--text-muted);margin:2px 0 0;">Personaggi non giocanti della campagna</p></div>
           <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
-            <input id="wiki-png-search" type="text" class="form-input" placeholder="Cerca PNG..." style="width:180px;font-size:0.82rem;" oninput="WikiSections.filter('png',this.value)">
+            <input autocomplete="off" id="wiki-png-search" type="text" class="form-input" placeholder="Cerca PNG..." style="width:180px;font-size:0.82rem;" oninput="WikiSections.filter('png',this.value)">
             <button class="btn btn-primary btn-sm" onclick="WikiSections.newCard('png')">+ Nuovo PNG</button>
           </div>
         </div>
@@ -1786,7 +1786,7 @@
           <div><h2 style="font-family:var(--font-display);font-size:1.2rem;margin:0;">Luoghi</h2>
           <p style="font-size:0.75rem;color:var(--text-muted);margin:2px 0 0;">Locazioni, dungeon, città e regioni</p></div>
           <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
-            <input id="wiki-luoghi-search" type="text" class="form-input" placeholder="Cerca luoghi..." style="width:180px;font-size:0.82rem;" oninput="WikiSections.filter('luoghi',this.value)">
+            <input autocomplete="off" id="wiki-luoghi-search" type="text" class="form-input" placeholder="Cerca luoghi..." style="width:180px;font-size:0.82rem;" oninput="WikiSections.filter('luoghi',this.value)">
             <button class="btn btn-ghost btn-sm" onclick="WikiSections.toggleLuoghiView()" id="luoghi-view-btn" title="Passa tra vista a griglia e vista gerarchica per regione" style="font-size:0.75rem;display:inline-flex;align-items:center;gap:6px;">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="6" height="6" rx="1"/><rect x="15" y="3" width="6" height="6" rx="1"/><rect x="9" y="15" width="6" height="6" rx="1"/><path d="M6 9v2a2 2 0 0 0 2 2h1M18 9v2a2 2 0 0 1-2 2h-1"/></svg>
               Vista gerarchica
@@ -1807,7 +1807,7 @@
           <div><h2 style="font-family:var(--font-display);font-size:1.2rem;margin:0;">Fazioni</h2>
           <p style="font-size:0.75rem;color:var(--text-muted);margin:2px 0 0;">Organizzazioni, gilde e fazioni della campagna</p></div>
           <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
-            <input id="wiki-fazioni-search" type="text" class="form-input" placeholder="Cerca fazioni..." style="width:180px;font-size:0.82rem;" oninput="WikiSections.filter('fazioni',this.value)">
+            <input autocomplete="off" id="wiki-fazioni-search" type="text" class="form-input" placeholder="Cerca fazioni..." style="width:180px;font-size:0.82rem;" oninput="WikiSections.filter('fazioni',this.value)">
             <button class="btn btn-primary btn-sm" onclick="WikiSections.newCard('fazioni')">+ Nuova Fazione</button>
           </div>
         </div>
@@ -1823,7 +1823,7 @@
           <div><h2 style="font-family:var(--font-display);font-size:1.2rem;margin:0;">Lore</h2>
           <p style="font-size:0.75rem;color:var(--text-muted);margin:2px 0 0;">Note libere, lore, segreti e storia del mondo</p></div>
           <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
-            <input id="wiki-lore-search" type="text" class="form-input" placeholder="Cerca lore..." style="width:180px;font-size:0.82rem;" oninput="WikiSections.filter('lore',this.value)">
+            <input autocomplete="off" id="wiki-lore-search" type="text" class="form-input" placeholder="Cerca lore..." style="width:180px;font-size:0.82rem;" oninput="WikiSections.filter('lore',this.value)">
             <select id="wiki-lore-filter-tag" class="form-select" style="width:140px;font-size:0.78rem;" onchange="WikiSections.filterTag('lore',this.value)">
               <option value="">Tutti i tag</option>
             </select>
@@ -1842,7 +1842,7 @@
           <div><h2 style="font-family:var(--font-display);font-size:1.2rem;margin:0;">Sessioni</h2>
           <p style="font-size:0.75rem;color:var(--text-muted);margin:2px 0 0;">Note sessioni, recap e ganci narrativi</p></div>
           <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
-            <input id="wiki-sessioni-search" type="text" class="form-input" placeholder="Cerca sessioni..." style="width:180px;font-size:0.82rem;" oninput="WikiSections.filter('sessioni',this.value)">
+            <input autocomplete="off" id="wiki-sessioni-search" type="text" class="form-input" placeholder="Cerca sessioni..." style="width:180px;font-size:0.82rem;" oninput="WikiSections.filter('sessioni',this.value)">
             <button class="btn btn-primary btn-sm" onclick="WikiSections.newCard('sessioni')">+ Nuova Nota Sessione</button>
           </div>
         </div>
@@ -2596,7 +2596,7 @@
     </div>
     <div class="modal-body">
       <div style="position:relative;display:inline-flex;align-items:center;flex:1;">
-            <input type="text" id="monster-search-input" class="form-input" placeholder="Cerca mostro nel Compendio..." oninput="Sessione.searchMonster()" style="margin-bottom:var(--space-md);">
+            <input autocomplete="off" type="text" id="monster-search-input" class="form-input" placeholder="Cerca mostro nel Compendio..." oninput="Sessione.searchMonster()" style="margin-bottom:var(--space-md);">
             <button onclick="document.getElementById('monster-search-input').value='';Sessione.searchMonster();" style="position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:0.85rem;padding:2px 4px;line-height:1;border-radius:var(--radius-sm);" title="Cancella ricerca"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
           </div>
       <div id="monster-search-results" class="comp-list" style="max-height:360px;overflow-y:auto;"></div>
@@ -5981,7 +5981,7 @@ const Sessione = (() => {
       </div>
       <div class="modal-body" style="padding:0;max-height:50vh;overflow-y:auto;">
         <div class="comp-filters" style="padding:8px;border-bottom:1px solid var(--border);">
-          <input type="text" class="form-input" placeholder="🔍 Cerca NPC..." style="flex:1;"
+          <input autocomplete="off" type="text" class="form-input" placeholder="🔍 Cerca NPC..." style="flex:1;"
             oninput="this.closest('.modal').querySelectorAll('.comp-row').forEach(r=>r.style.display=r.textContent.toLowerCase().includes(this.value.toLowerCase())?'':'none')">
         </div>
         ${npcs.map(npc => `
@@ -21043,7 +21043,7 @@ document.addEventListener('DOMContentLoaded', initMobileNav);
     <div class="modal-header" style="padding:10px 16px;">
       <div style="display:flex;align-items:center;gap:8px;flex:1;">
         <span style="display:flex;color:var(--text-muted);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
-        <input id="gs-input" type="text" placeholder="Cerca in tutto... (PNG, Luoghi, Fazioni, Note, Compendio)"
+        <input autocomplete="off" id="gs-input" type="text" placeholder="Cerca in tutto... (PNG, Luoghi, Fazioni, Note, Compendio)"
           class="form-input" style="flex:1;border:none;background:transparent;font-size:0.95rem;padding:0;"
           oninput="GlobalSearch.search(this.value)" onkeydown="GlobalSearch.keydown(event)" autocomplete="off">
         <kbd style="font-size:0.65rem;color:var(--text-muted);background:var(--bg-tertiary);padding:2px 6px;border-radius:3px;">ESC</kbd>
@@ -21221,16 +21221,19 @@ document.addEventListener('DOMContentLoaded', initMobileNav);
             <div style="font-size:0.75rem;color:var(--text-muted);">Registrati o accedi con email.</div>
           </div>
         </div>
-        <div style="display:flex;flex-direction:column;gap:6px;">
-          <input id="auth-email" type="email" class="form-input" placeholder="email@esempio.com" style="font-size:0.85rem;">
-          <input id="auth-password" type="password" class="form-input" placeholder="Password (min 6 caratteri)" style="font-size:0.85rem;"
+        <!-- Un <form> vero, con autocomplete esplicito: senza, Chrome non sapeva a quali campi
+             appartenessero email e password salvate e a ogni caricamento scriveva l'email nel
+             primo campo di testo della pagina (la ricerca). Non viene mai inviato davvero. -->
+        <form style="display:flex;flex-direction:column;gap:6px;" onsubmit="event.preventDefault()">
+          <input id="auth-email" type="email" class="form-input" placeholder="email@esempio.com" style="font-size:0.85rem;" autocomplete="username">
+          <input id="auth-password" type="password" class="form-input" placeholder="Password (min 6 caratteri)" style="font-size:0.85rem;" autocomplete="current-password"
             onkeydown="if(event.key==='Enter') FirebaseSync.loginEmail()">
           <div style="display:flex;gap:6px;">
-            <button class="btn btn-primary" style="flex:1;font-size:0.82rem;" onclick="FirebaseSync.loginEmail()">Accedi</button>
-            <button class="btn btn-ghost" style="flex:1;font-size:0.82rem;" onclick="FirebaseSync.registerEmail()">Registrati</button>
+            <button type="button" class="btn btn-primary" style="flex:1;font-size:0.82rem;" onclick="FirebaseSync.loginEmail()">Accedi</button>
+            <button type="button" class="btn btn-ghost" style="flex:1;font-size:0.82rem;" onclick="FirebaseSync.registerEmail()">Registrati</button>
           </div>
           <div id="auth-email-error" style="font-size:0.72rem;color:var(--accent-danger);display:none;"></div>
-        </div>
+        </form>
       </div>
 
       <div style="font-size:0.7rem;color:var(--text-muted);text-align:center;margin-top:4px;">

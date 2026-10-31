@@ -27,7 +27,7 @@ const QuickCard = (() => {
           '</button>' +
         '</div>' +
         '<div class="modal-body">' +
-          '<input id="qc-search" type="text" class="form-input" placeholder="Cerca PNG..." oninput="QuickCard.search(this.value)" style="margin-bottom:10px;">' +
+          '<input autocomplete="off" id="qc-search" type="text" class="form-input" placeholder="Cerca PNG..." oninput="QuickCard.search(this.value)" style="margin-bottom:10px;">' +
           '<div id="qc-results"></div>' +
           '<div id="qc-card" style="display:none;"></div>' +
         '</div>' +
