@@ -13157,7 +13157,7 @@ const FirebaseSync = (() => {
 
         _db.ref('campagne/' + lastShareCode + '/data').once('value').then(snap => {
           const pointer = snap.val();
-          if (pointer && pointer.__deleted) {
+          if (pointer && (pointer.__deleted || _eliminata(pointer.id))) {
             // Campagna cancellata (anche da un altro dispositivo): non va ripristinata.
             // Ripulisce il riferimento locale, altrimenti si ritenterebbe il ripristino
             // ad ogni login futuro su questo stesso dispositivo.
@@ -13171,8 +13171,21 @@ const FirebaseSync = (() => {
     }
   };
 
+  // Campagne eliminate da questo dispositivo (o di cui e' arrivata la cancellazione): nessuna
+  // scrittura sul cloud deve piu' toccarle. Senza questo un salvataggio rimasto in coda (debounce
+  // di 2 s, o un caricamento su Drive lento) arrivava DOPO il tombstone e lo sovrascriveva:
+  // la campagna cancellata ricompariva ad ogni aggiornamento della pagina.
+  const ELIMINATE_KEY = 'dm_campagne_eliminate';
+  const _eliminate = () => { try { return JSON.parse(localStorage.getItem(ELIMINATE_KEY) || '[]'); } catch(e) { return []; } };
+  const _eliminata = (id) => !!id && _eliminate().includes(id);
+  const _segnaEliminata = (id) => {
+    if (!id || _eliminata(id)) return;
+    try { localStorage.setItem(ELIMINATE_KEY, JSON.stringify([..._eliminate(), id].slice(-200))); } catch(e) {}
+  };
+
   const _registerCampaignForUser = (camp, key) => {
     if (!_db || !_user || _user.isAnonymous) return;
+    if (_eliminata(camp?.id)) return;
     const uid = _user.uid;
     _db.ref('utenti/' + uid + '/campagne/' + key).set({
       nome: camp.name || '',
@@ -13191,6 +13204,7 @@ const FirebaseSync = (() => {
       const localCamps = Storage.getCampaigns() || [];
       for (const camp of localCamps) {
         const key = camp.shareCode || _campKey(camp.id);
+        if (_eliminata(camp.id)) { _handleRemoteDelete(camp.id, key); continue; }
 
         try {
           const existing = await _db.ref('campagne/' + key + '/data').once('value');
@@ -13248,7 +13262,7 @@ const FirebaseSync = (() => {
           const pointer = campSnap.val();
           if (!pointer || !pointer.id) continue;
 
-          if (pointer.__deleted) { _handleRemoteDelete(pointer.id, key); continue; }
+          if (pointer.__deleted || _eliminata(pointer.id)) { _handleRemoteDelete(pointer.id, key); continue; }
 
           // Controlla se serve scaricare PRIMA di andare su Drive, cosi' non si scarica
           // inutilmente una campagna gia' aggiornata in locale
@@ -13418,6 +13432,7 @@ const FirebaseSync = (() => {
   // prossimi sync non ritrovano piu' questa campagna.
   const _handleRemoteDelete = (campId, key) => {
     if (!campId) return;
+    _segnaEliminata(campId);
     const hadLocal = !!Storage.getCampaign(campId);
     if (hadLocal) Storage.deleteCampaign(campId);
 
@@ -13480,6 +13495,15 @@ const FirebaseSync = (() => {
     if (!camp || !camp.id) return;
     const key = camp.shareCode || _campKey(camp.id);
 
+    // Prima blocca ogni salvataggio di questa campagna: annulla quello in coda e aspetta
+    // quello eventualmente gia' in corso, cosi' non puo' arrivare dopo il tombstone.
+    _segnaEliminata(camp.id);
+    if (_pendingCamp && _pendingCamp.id === camp.id) {
+      if (_syncTimeout) clearTimeout(_syncTimeout);
+      _syncTimeout = null; _pendingCamp = null;
+    }
+    try { await Promise.race([_ultimaScrittura, new Promise(r => setTimeout(r, 8000))]); } catch(e) {}
+
     // Il tombstone su Firebase serve solo se questo dispositivo ha una sessione attiva —
     // ma va scritto anche per gli utenti anonimi: push/pushNow scrivono i dati della
     // campagna su Firebase anche per loro (serve solo il "codice invito" a essere
@@ -13524,7 +13548,13 @@ const FirebaseSync = (() => {
   const _writeCampaign = (camp) => (_ultimaScrittura = _writeCampaignNow(camp));
 
   const _writeCampaignNow = async (camp) => {
+    if (!camp || !camp.id || _eliminata(camp.id) || !_db || !_user) return;
+    // Il riferimento si calcola dalla campagna, non da _campRef: durante un caricamento su Drive
+    // lento l'utente puo' aver aperto un'altra campagna, e i dati finirebbero nel posto sbagliato.
+    const ref = _db.ref('campagne/' + (camp.shareCode || _campKey(camp.id)) + '/data');
     try {
+      const attuale = (await ref.once('value')).val();
+      if (attuale && attuale.__deleted) { _handleRemoteDelete(camp.id, camp.shareCode || _campKey(camp.id)); return; }
       let payload;
       if (typeof DriveBackup !== 'undefined' && DriveBackup.isConnected()) {
         const driveFileId = await DriveBackup.syncToDrive(camp);
@@ -13543,7 +13573,8 @@ const FirebaseSync = (() => {
           updatedByName: _user.displayName || _user.email,
         };
       }
-      await _campRef.child('data').set(payload);
+      if (_eliminata(camp.id)) return;
+      await ref.set(payload);
       _lastSyncAt = Date.now();
       _updateSyncStatus('Sync: ' + new Date().toLocaleTimeString('it-IT'));
     } catch(e) {
@@ -13570,7 +13601,7 @@ const FirebaseSync = (() => {
   let _pendingCamp = null;
 
   const push = (camp) => {
-    if (!_db || !_user || !_campRef) return;
+    if (!_db || !_user || !_campRef || _eliminata(camp?.id)) return;
 
     if (!_user.isAnonymous) {
       const key = camp?.shareCode || _campKey(camp?.id || '');
@@ -13607,7 +13638,7 @@ const FirebaseSync = (() => {
   // viene appena aperta/creata: su mobile una tab in background puo' essere sospesa prima
   // che i 2 secondi di debounce scattino, perdendo il salvataggio.
   const pushNow = (camp) => {
-    if (!_db || !_user || !_campRef) return;
+    if (!_db || !_user || !_campRef || _eliminata(camp?.id)) return;
     if (!_user.isAnonymous) {
       const key = camp?.shareCode || _campKey(camp?.id || '');
       _registerCampaignForUser(camp, key);
@@ -13740,6 +13771,7 @@ const FirebaseSync = (() => {
     const local = App.getActiveCampaign();
 
     if (!local && remote && remote.id) {
+      if (_eliminata(remote.id)) return;
       Storage.saveCampaign(remote);
       App.setActiveCampaign(remote);
       Toast.show('Campagna caricata dal cloud', 'success', 2000);
