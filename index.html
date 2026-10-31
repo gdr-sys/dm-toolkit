@@ -1983,7 +1983,7 @@
         </button>
       </div>
       <div style="display:flex;gap:4px;">
-        <input type="text" id="dice-formula-field" class="dice-formula-input" placeholder="Formula: 4d6kh3, 2d8+5..." 
+        <input type="text" id="dice-formula-field" class="dice-formula-input" placeholder="es. 4d6kh3, 2d8+5" 
                onkeydown="if(event.key==='Enter')Dadi.rollFormulaInput()">
         <button class="btn btn-secondary btn-sm" style="flex-shrink:0;" onclick="Dadi.rollFormulaInput()">→</button>
       </div>
@@ -13053,7 +13053,7 @@ const FirebaseSync = (() => {
               });
             } else {
               await _db.ref('campagne/' + key + '/data').set({
-                ...camp,
+                ..._alleggerisci(camp),
                 updatedAt: Date.now(),
                 updatedBy: uid,
                 updatedByName: user.displayName || user.email,
@@ -13377,7 +13377,7 @@ const FirebaseSync = (() => {
         };
       } else {
         payload = {
-          ...camp,
+          ..._alleggerisci(camp),
           updatedAt: firebase.database.ServerValue.TIMESTAMP,
           updatedBy: _user.uid,
           updatedByName: _user.displayName || _user.email,
@@ -13508,7 +13508,45 @@ const FirebaseSync = (() => {
   // Nota: la fusione per id e' un'unione, quindi una voce cancellata su un dispositivo
   // puo' riapparire se l'altro ce l'ha ancora. E' voluto: meglio una voce di troppo che
   // una perdita di dati. Le cancellazioni di intere campagne restano gestite da __deleted.
+  // ── Immagini e file pesanti fuori da Firebase ──
+  // Senza Drive collegato, Firebase riceve la campagna intera: le immagini caricate dal dispositivo
+  // (data URI base64, centinaia di KB l'una) consumavano la quota del piano gratuito. Ora al loro
+  // posto viaggia un segnaposto: l'immagine resta sul dispositivo (e su Drive appena lo si collega,
+  // vedi DriveBackup.replaceImagesWithDriveLinks). Quando la copia remota torna indietro,
+  // _ripristinaPesanti rimette al posto dei segnaposto le immagini che questo dispositivo ha.
+  const _SEGNAPOSTO_PESANTE = 'dm-solo-sul-dispositivo';
+  const _pesante = (v) => typeof v === 'string' && v.startsWith('data:') && v.length > 2000;
+
+  const _alleggerisci = (camp) => {
+    const copia = (v, prof) => {
+      if (_pesante(v)) return _SEGNAPOSTO_PESANTE;
+      if (!v || typeof v !== 'object' || prof > 12) return v;
+      if (Array.isArray(v)) return v.map(x => copia(x, prof + 1));
+      const o = {};
+      Object.keys(v).forEach(k => { o[k] = copia(v[k], prof + 1); });
+      return o;
+    };
+    return copia(camp, 0);
+  };
+
+  const _ripristinaPesanti = (remoto, locale) => {
+    const fondi = (r, l, prof) => {
+      if (r === _SEGNAPOSTO_PESANTE) return (typeof l === 'string' && l !== _SEGNAPOSTO_PESANTE) ? l : r;
+      if (!r || typeof r !== 'object' || !l || typeof l !== 'object' || prof > 12) return r;
+      if (Array.isArray(r)) {
+        if (!Array.isArray(l)) return r;
+        const perId = new Map(l.filter(x => x && typeof x === 'object' && x.id).map(x => [x.id, x]));
+        return r.map((x, i) => fondi(x, (x && typeof x === 'object' && x.id) ? perId.get(x.id) : l[i], prof + 1));
+      }
+      const o = { ...r };
+      Object.keys(o).forEach(k => { o[k] = fondi(o[k], l[k], prof + 1); });
+      return o;
+    };
+    return fondi(remoto, locale, 0);
+  };
+
   const _mergeCampagne = (local, remote, remoteNewer) => {
+    remote = _ripristinaPesanti(remote, local);
     const merged = { ...local };
 
     Object.keys(remote).forEach(k => {

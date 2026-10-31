@@ -121,16 +121,19 @@
 .dice-custom-row { display:flex; gap:var(--space-xs); margin-bottom:var(--space-sm); align-items:center; }
 .dice-custom-input { width:48px; padding:6px 8px; background:var(--bg-secondary); border:1px solid var(--border); border-radius:var(--radius-sm); font-family:var(--font-mono); font-size:0.8rem; color:var(--text-primary); text-align:center; outline:none; }
 .dice-custom-input:focus { border-color:var(--accent-primary); }
-.dice-formula-input { flex:1; padding:6px 10px; background:var(--bg-secondary); border:1px solid var(--border); border-radius:var(--radius-sm); font-family:var(--font-mono); font-size:0.8rem; color:var(--text-primary); outline:none; }
+/* min-width:0: senza, il campo era largo almeno quanto il testo d'esempio e con il pulsante usciva dal pannello */
+.dice-formula-input { flex:1; min-width:0; width:0; padding:6px 10px; background:var(--bg-secondary); border:1px solid var(--border); border-radius:var(--radius-sm); font-family:var(--font-mono); font-size:0.8rem; color:var(--text-primary); outline:none; }
 .dice-formula-input:focus { border-color:var(--accent-primary); }
 .dice-result { background:var(--bg-secondary); border:1px solid var(--border); border-radius:var(--radius-md); padding:var(--space-sm) var(--space-md); text-align:center; min-height:60px; display:flex; flex-direction:column; align-items:center; justify-content:center; }
-.dice-result-formula { font-family:var(--font-mono); font-size:0.7rem; color:var(--text-muted); margin-bottom:2px; }
+.dice-result-formula { font-family:var(--font-mono); font-size:0.7rem; color:var(--text-muted); margin-bottom:2px; max-width:100%; overflow-wrap:anywhere; }
 .dice-result-value { font-family:var(--font-display); font-size:2rem; font-weight:700; color:var(--accent-primary); }
-.dice-result-detail { font-family:var(--font-mono); font-size:0.7rem; color:var(--text-muted); }
+.dice-result-detail { font-family:var(--font-mono); font-size:0.7rem; color:var(--text-muted); max-width:100%; overflow-wrap:anywhere; }
 .dice-rolling { animation:diceRoll 0.4s ease; }
 .dice-result-appear { animation:diceResult 0.3s ease; }
 .dice-history { margin-top:var(--space-sm); max-height:80px; overflow-y:auto; }
-.dice-history-item { font-family:var(--font-mono); font-size:0.68rem; color:var(--text-muted); padding:2px 0; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; }
+.dice-history-item { font-family:var(--font-mono); font-size:0.68rem; color:var(--text-muted); padding:2px 0; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:baseline; gap:6px; }
+.dice-history-item > span { min-width:0; overflow-wrap:anywhere; }
+.dice-history-item > span:last-child { flex-shrink:0; }
 
 #debug-panel { position:fixed; bottom:var(--space-lg); left:calc(var(--nav-width) + var(--space-lg)); z-index:400; max-width:420px; display:none; }
 #debug-panel.active { display:block; }
