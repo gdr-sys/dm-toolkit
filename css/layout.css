@@ -630,6 +630,36 @@
   }
 }
 
+/* ── Schermi larghi ──
+   Le pagine seguono la larghezza della finestra: senza questi accorgimenti, su un monitor grande
+   le card a riga intera diventavano larghe 2000px e piu', con il titolo a un capo e i pulsanti o i
+   dati all'altro. Qui le card vanno su piu' colonne, cosi' tutto resta vicino a cio' a cui si
+   riferisce. */
+@media (min-width: 1800px) {
+  /* Dashboard: righe flessibili da circa 4 card piccole o 2 larghe. A differenza di una griglia
+     a colonne fisse, l'ultima card di una riga si allarga a riempirla: niente buchi vuoti. */
+  .dash-grid { display: flex; flex-wrap: wrap; }
+  .dash-grid > * { flex: 1 1 calc(25% - 12px); min-width: 0; }
+  .dash-grid > .dash-card-full { flex-basis: calc(50% - 12px); }
+
+  /* Sessione: combat tracker e party restano a riga intera, Scene Planner e Clocks affiancati */
+  #sessione-content { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-lg); align-items: start; }
+  #sessione-content > * { grid-column: 1 / -1; margin-top: 0 !important; }
+  #sessione-content > .card:nth-child(3),
+  #sessione-content > .card:nth-child(4) { grid-column: auto; }
+}
+
+/* Compendio: oltre una certa larghezza l'elenco va su piu' colonne, cosi' GS/PF/CA restano accanto
+   al nome invece che all'estremo opposto della riga. Il bordo tra le righe e' lo sfondo del
+   contenitore che si vede nello spazio di 1px tra una cella e l'altra. */
+@media (min-width: 1300px) {
+  #page-compendio .comp-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(440px, 1fr)); gap: 1px; background: var(--border); }
+  #page-compendio .comp-list > * { background: var(--bg-card); }
+  #page-compendio .comp-list > .comp-row { border-bottom: none; }
+  #page-compendio .comp-list > .comp-row:hover { background: var(--bg-card-hover); }
+  #page-compendio .comp-list > :not(.comp-row) { grid-column: 1 / -1; }
+}
+
 [id^="page-wiki-"] {
   position: relative;
 }
