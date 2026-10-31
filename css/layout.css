@@ -355,7 +355,16 @@
 .schermo-block-resize:hover::after { background: var(--accent-primary); width: 48px; }
 @media (hover: none) { .schermo-block-resize::after { background: var(--border-strong); } }
 
+/* Generatori: righe flessibili invece di una griglia a colonne fisse. Con la griglia, le card
+   piccole prima di una card a tutta larghezza (o a fine sezione) restavano da sole con mezza riga
+   vuota accanto; cosi' le card di ogni riga si allargano e la riempiono sempre. Titoli di sezione
+   e card larghe (grid-column:1/-1 nel markup) occupano una riga intera. */
+.generatori-grid { display: flex; flex-wrap: wrap; gap: var(--space-md); }
+.generatori-grid > * { flex: 1 1 340px; min-width: 0; }
+.generatori-grid > [style*="grid-column:1/-1"] { flex-basis: 100%; }
 .gen-card { height: auto !important; align-self: start; }
+/* Card affiancate della stessa altezza, cosi' ogni riga ha un bordo inferiore pulito */
+.generatori-grid > .gen-card { align-self: stretch; }
 .gen-card .card-header { flex-wrap: wrap; row-gap: 6px; align-items: flex-start; }
 .gen-card .card-body, .gen-card > *:not(.card-header) { overflow: visible; }
 
