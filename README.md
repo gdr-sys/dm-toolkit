@@ -6,134 +6,154 @@
 [![Firebase](https://img.shields.io/badge/sync-Firebase-FFCA28?style=flat-square&logo=firebase&logoColor=black)](https://firebase.google.com/)
 [![License](https://img.shields.io/badge/game%20data-SRD%20OGL%2FORC-lightgrey?style=flat-square)](https://www.dndbeyond.com/srd)
 
-Campaign management web app for D&D 5e Dungeon Masters (2014 and 2024 editions). Built to handle the full DM workflow — from session prep to live combat — on any device, with no installation required.
+Web app per Dungeon Master di D&D 5e (edizioni 2014 e 2024) per gestire una campagna dalla preparazione della sessione al combattimento al tavolo, da qualsiasi dispositivo e senza installare nulla.
 
 ---
 
-## Overview
+## In breve
 
-| Area | Key features |
+| Area | Cosa offre |
 |---|---|
-| Wiki | WYSIWYG editor, wikilinks, tags, visual graph, templates |
-| World | NPCs, Locations, Factions with automatic Wiki sync |
-| Sessions | Combat tracker, scene planner, session log, clocks |
-| Compendium | SRD 5.1 + 5.2.1, homebrew, Wiki sync |
-| DM Screen | Drag & drop layout, customizable blocks |
-| Sync | Firebase realtime signal + Google Drive storage, local / anonymous / Google auth |
-| PWA | Installable on desktop and mobile, offline-capable |
+| Wiki | Editor completo, [[collegamenti]], @menzioni, tag, grafo, modelli, import da foglio di calcolo |
+| Mondo | PNG, Luoghi, Fazioni, Quest, PG, Trame, Incontri |
+| Mappe | Mappe interattive con segnaposto, mappe annidate, misura distanze, zoom con due dita |
+| Calendario | Calendario in-world personalizzabile, eventi, scadenze, timeline |
+| Sessioni | Combat tracker, scene planner, diario delle sessioni, clock |
+| Generatori | 18 generatori pronti + **le tue tabelle casuali** |
+| Compendio | SRD 5.1 e 5.2.1, homebrew |
+| Schermo del DM | Blocchi personalizzabili, trascinabili |
+| Sincronizzazione | Google Drive per i dati, Firebase come segnale in tempo reale |
+| App installabile | Su PC, tablet e telefono, funziona anche offline |
 
 ---
 
-## Features
+## Funzionalità
 
-### Wiki & Knowledge Base
+### Wiki
 
-Full WYSIWYG editor with formatting toolbar including heading levels, bold, italic, color, highlighter, and callout blocks. Notes support:
+Editor con barra di formattazione (titoli, grassetto, corsivo, colori, evidenziatore) e riquadri speciali: Da leggere ad alta voce, Segreto DM, Bottino, Indizio, Trappola, Idea al volo. Le note supportano:
 
-- **Bidirectional wikilinks** — `[[NPC Name]]`, `[[location:Castle]]`, `[[faction:Guild]]` with direct navigation to the linked entity
-- **@mention** — type `@` anywhere in an editor to get an inline autocomplete picker for all campaign entities
-- **Tags** — colored `#tags` with tag bar and filter
-- **Automatic backlinks** — every note tracks what links to it
-- **Visual graph** — d3-force node graph of all connections between entities; click a node to open it
-- **Callout blocks** — Read Aloud, DM Secret, Loot, Clue, Trap, Improv
-- **Templates** — Session, Lore, NPC, Location, Magic Item, Dungeon/Room, Event/Secret, Shop; custom templates supported
-- Read-only / edit toggle, pinned notes, duplicate note, inline images via URL
+- **Collegamenti** — `[[Nome PNG]]`, `[[location:Castello]]`, `[[faction:Gilda]]`, con navigazione diretta all'elemento collegato
+- **@menzioni** — scrivi `@` in qualsiasi editor per scegliere un elemento della campagna, o crearne uno nuovo al volo
+- **Tag** — `#tag` colorati, con barra e filtro
+- **Collegamenti inversi** — ogni nota sa chi la cita
+- **Grafo** — tutti i collegamenti tra gli elementi della campagna, cliccabili
+- **Modelli** — Sessione, Lore, PNG, Luogo, Oggetto magico, Dungeon/Stanza, Evento/Segreto, Negozio, più i tuoi
+- **Import da foglio di calcolo** — PNG, luoghi e altro da CSV (compatibile con Excel in italiano)
+- **Cestino** — le voci eliminate si possono recuperare
 
-Global search `Ctrl+K` covers notes, NPCs, locations, factions, and compendium — including field contents, not just titles.
+La ricerca globale `Ctrl+K` cerca in note, PNG, luoghi, fazioni e Compendio, anche nel contenuto dei campi.
 
-### World & Wiki Sync
+### Mondo
 
-The World and Wiki stay in sync automatically and bidirectionally:
+PNG, Luoghi, Fazioni, Quest, PG, Trame e Incontri hanno ciascuno la propria sezione nella Wiki, con campi dedicati (per esempio ruolo, obiettivi, segreto DM, attitudine della fazione verso il party) e date in-world di nascita, fondazione o creazione.
 
-- Create an NPC in World → Wiki note generated with pre-filled structure and wikilinks
-- Create a note from an NPC/Location template → corresponding entity created in World
-- Rename an entity → all `[[links]]` across all notes updated automatically
-- NPC card shows all Wiki notes that mention it, with direct navigation
-- "Update World" button on a linked note pushes changes back to the entity
-- Player Characters follow the same rule between the Party roster (Live Session) and the Wiki PG section: creating or editing a PC in either place updates the other
+- **Ritratti** da link o caricati dal dispositivo. Con Google Drive collegato finiscono sul tuo Drive. Si possono incollare anche i link di condivisione di Drive: l'app li trasforma da sola nell'immagine, e se non si vede spiega il perché (per esempio se il file non è condiviso con "Chiunque abbia il link").
+- **Statistiche complete** per PNG e PG: caratteristiche, CA, PF, tiri salvezza, azioni.
+- **Momenti dei personaggi** — cronologia degli eventi importanti di ogni PNG e PG.
+- Rinominare un elemento aggiorna tutti i `[[collegamenti]]` nelle note.
+- Una nota creata da un modello PNG o Luogo crea anche l'elemento corrispondente e resta collegata. Salvare un elemento invece **non** crea più note doppie nella Lore.
 
-### World
+### Mappe
 
-NPC cards with full data: role, goals, DM secrets, morale, combat stats, relationships with other NPCs. Locations and factions with the same depth. Portrait images from a URL or uploaded directly from the device, shown in full regardless of orientation (never cropped); automatically stored on the user's own Google Drive when connected. Note/Description fields support rich formatting and wikilinks. Filter NPCs by status (alive, dead, missing, ally, enemy) and by faction.
+Carica un'immagine come mappa interattiva. Puoi spostarla trascinando e ingrandirla con la rotella o, su tablet e telefono, **con due dita**.
 
-### Sessions
+- **Segnaposto** collegabili a PNG, luoghi, fazioni o note; le coordinate sono in percentuale, quindi restano giuste su ogni schermo.
+- **Mappe annidate** — un segnaposto può aprire un'altra mappa (regione → città → taverna), con il pulsante per tornare indietro.
+- **Misura distanze** tra due segnaposto, in base alla scala della mappa.
 
-**Scene Planner** — each session has its own sequence of beats (Opening, Combat, Social, Exploration, Revelation, Cliffhanger, Rest, Free). Beats are reorderable, include title and notes, and one can be marked as the main encounter. Beats are stored per session, not globally.
+### Calendario e Timeline
 
-**Session Log** — full history of all campaign sessions. Each session stores: number, title, date, status (planned / active / played), involved NPCs, beats, prep notes, and post-session recap. One session can be set as active at a time; the Scene Planner reflects whichever session is currently active.
+- Calendario in-world con preset (Forgotten Realms, Greyhawk…) o **completamente personalizzato**: mesi, giorni della settimana, festività, data e ora di oggi.
+- **Eventi e scadenze** con promemoria; le scadenze vicine compaiono nella Dashboard.
+- **Timeline** di eventi e sessioni: gli eventi vicini nel tempo vanno su righe diverse, così i nomi non si sovrappongono mai. Lo zoom allarga solo il tempo, le scritte restano leggibili.
 
-**Wiki integration** — each session in the log can generate a linked Wiki note with pre-filled structure (NPCs as wikilinks, beat list, recap section). Once created, the note is accessible directly from the session card.
+### Sessioni
 
-**Combat tracker** — initiative, HP, AC, conditions, concentration with automatic save DC. Effects with round countdown that auto-decrement each turn. Short and Long Rest with automatic resets.
+- **Combat tracker** — iniziativa, PF, CA, condizioni, concentrazione con CD automatica, effetti con conto alla rovescia dei round, riposi brevi e lunghi.
+- **Scene planner** — la sequenza di momenti di ogni sessione (apertura, combattimento, sociale, esplorazione, rivelazione, cliffhanger…), riordinabile.
+- **Diario delle sessioni** — numero, titolo, date reale e in-world, stato, PNG coinvolti, preparazione e riassunto. Ogni sessione può avere la sua nota nella Wiki.
+- **"Previously On…"** — il riassunto dell'ultima sessione, pronto da leggere al tavolo.
+- **Party** — i PG con classe, livello, PF, CA, punteggi passivi e ispirazione, sincronizzati con la sezione PG della Wiki.
+- **Clock** — per rituali, inseguimenti, pressione delle fazioni.
 
-**Party** — player character roster with class, level, HP, AC, passive scores and inspiration, ready to drop into the combat tracker. Kept in sync with the Wiki PG section.
+### Generatori
 
-**Clocks** — progress trackers for rituals, chases, faction pressure, and other timed narrative elements.
+18 generatori per improvvisare: PNG completo, meteo, rumori e odori, descrizione di luoghi, nomi di luoghi, negozio (con i prezzi degli oggetti magici), biblioteca, bottino, viaggio, incontri, incontro bilanciato, voci di corridoio, accenti, nomi, follia, ganci, oracolo, missioni. Si possono nascondere e riordinare.
 
-### Storylines & Quests
+**Le mie tabelle** — le tabelle casuali del tuo mondo: le scrivi tu, l'app le tira.
 
-**Storylines** — narrative threads grouped by category (Main Plot, Plot B/C, character arcs, subplots, mysteries) with status tracking (ongoing, completed, on hold, abandoned) and a rich-text body per thread.
+- Dado d4, d6, d8, d10, d12, d20, d100 oppure **pesi liberi**.
+- Una voce per riga: con l'intervallo davanti (`1-3 Goblin`), solo il testo (le voci si dividono il dado), o con il peso (`3 Goblin`, esce tre volte più spesso).
+- Dentro una voce, `{2d6+1}` tira dei dadi e `[[Altra tabella]]` tira su un'altra delle tue tabelle.
+- L'anteprima mostra gli intervalli e avvisa di numeri scoperti, doppi o tabelle richiamate che non esistono.
+- **Import da CSV** (anche da Excel), sempre rivisto prima di salvare.
+- **Collegabili ai Luoghi**: "Incontri nella Foresta di Velmor" compare nella scheda della foresta, con il suo pulsante Tira.
 
-**Quests** tracked in the Wiki alongside NPCs, Locations, and Factions, with wikilinks and full-text search.
+### Compendio
 
-### Compendium
+Mostri SRD 5.1 e 5.2.1 con GS normalizzato (comprese le frazioni 1/8, 1/4, 1/2), oggetti magici, equipaggiamento, incantesimi, regole, velocità di cavalcature e veicoli. Homebrew integrato: le note Wiki con tag `#oggetto` o `#mostro` finiscono nel Compendio. Preferiti per campagna, ricerca, filtri per tipo e GS. Su schermi larghi l'elenco va su più colonne.
 
-SRD 5.1 and 5.2.1 monsters with normalized CR (including fractions 1/8, 1/4, 1/2). Magic items, equipment, spells, rules. Homebrew integrated natively. Wiki notes tagged `#item` or `#monster` sync automatically with the Compendium homebrew section. Favorites per campaign, full-text search, type and CR filters.
+### Schermo del DM
 
-### DM Screen
+Griglia di blocchi trascinabili e ridimensionabili: percezioni passive del party, dadi rapidi, meteo, condizioni, mini combat tracker, calcolatore di incontri (2014/2024), data e ora in-world, note libere.
 
-Drag-and-drop grid layout with customizable blocks: party passive perceptions, quick dice, weather, conditions reference, combat mini-tracker, XP encounter calculator (2014/2024), in-game calendar, free notes. Combat tracker controls function from within the screen.
+### Dashboard e strumenti
 
-### Utilities
-
-Always-accessible scratchpad in the topbar for in-session quick notes. JSON backup and restore per campaign or full data, with an optional automatic backup to the user's own Google Drive. 13 quick generators for improvisation at the table.
-
-**Loose threads** — a Dashboard card that surfaces NPCs, locations, factions, quests, and storylines untouched for 14+ days (excluding ones already marked dead/completed/abandoned), so hooks don't get forgotten between sessions.
-
-**Quick PNG card** — always-accessible topbar button that opens a compact, at-a-glance view of an NPC's personality, wants, hook, and DM secret, for reference mid-session without opening the full edit form.
+- **Fili in sospeso** — PNG, luoghi, fazioni, quest e trame non toccati da un po', per non perdere i ganci.
+- **Prossime scadenze** dal calendario.
+- **Scheda rapida PNG** dalla barra in alto, per consultare un PNG a metà sessione.
+- **Blocco note** sempre a portata di mano.
+- Backup e ripristino in JSON, per campagna o completo, e backup automatico su Google Drive.
 
 ---
 
-## Collaboration & Sync
+## Sincronizzazione e collaborazione
 
-Three modes, chosen at first login:
+Tre modalità, scelte al primo accesso:
 
 ```
-Local        ->  localStorage only. No account required.
-Anonymous    ->  Firebase. Cloud storage, no credentials.
-Google/Email ->  Firebase. Multi-device sync and real-time co-authors.
+Solo locale    ->  dati solo su questo dispositivo, nessun account
+Anonimo        ->  Firebase, dati sul cloud senza credenziali
+Google / Email ->  Firebase, più dispositivi e co-autori in tempo reale
 ```
 
-Anonymous accounts can be upgraded to Google at any time without data loss via Firebase `linkWithPopup`.
+Un account anonimo si può trasformare in account Google in qualsiasi momento senza perdere dati.
 
-**Real-time collaboration**
+**Google Drive come archivio principale.** Con Drive collegato, i dati veri della campagna e le immagini stanno sul tuo Drive, in un file per campagna nella cartella "DM Toolkit". Firebase conserva solo un piccolo riferimento per campagna, usato come segnale istantaneo "qualcosa è cambiato" per aggiornare gli altri dispositivi.
 
-Each campaign has a unique invite code. A co-author enters the code to access the same campaign on Firebase Realtime Database. Changes are pushed with a 2-second debounce. Merge strategy: Wiki notes use most-recent-wins per note; new NPCs are additive without overwriting locally-edited ones. Deleting a campaign propagates to every connected device — including ones offline at the time of deletion, which pick it up on their next sync instead of re-uploading it. Online presence is shown in the topbar.
+- I dati restano privati nel tuo Drive. Il Client ID OAuth dell'app è condiviso e serve solo a identificare l'app presso Google: basta cliccare "Collega Drive" e scegliere il proprio account.
+- **Su un dispositivo nuovo** le campagne si scaricano da sole appena colleghi Drive, anche se lo colleghi dopo aver fatto l'accesso.
+- Ogni campagna ha **un solo file** su Drive, anche usandola da più dispositivi, e ogni immagine viene caricata **una volta sola**.
+- **Ripristina da Drive** elenca i backup con data e peso, così si riconoscono subito quelli vuoti.
+- Senza Drive collegato, Firebase porta i dati completi della campagna (più pesante, ma funziona subito).
 
-**Google Drive as primary storage**
-
-When connected, Google Drive holds the actual campaign data and images; Firebase carries only a lightweight pointer (campaign id + last-updated timestamp) per campaign, used purely as an instant "something changed" signal to trigger sync across devices. This keeps Firebase usage minimal regardless of how large a campaign or its images get. Authentication uses a single shared, public OAuth Client ID configured for the live domain — users just click "Collega Drive" and pick their Google account, no setup of their own required. Each user's data stays private to their own Drive; the shared Client ID only identifies the app to Google, not the data. Without Drive connected, Firebase carries full campaign data directly instead (heavier, but works out of the box for anonymous and Google accounts alike).
-
----
-
-## Installable app (PWA)
-
-DM Toolkit can be installed as a standalone app — "Install app" in Chrome/Edge on desktop, or "Add to Home Screen" on iOS/Android. A service worker caches the app shell for offline use (network-first, so updates are always picked up when online) and the toolkit ships its own icon for the browser tab, the installed app, and the phone home screen.
+**Collaborazione in tempo reale.** Ogni campagna ha un codice invito: un co-autore lo inserisce e accede alla stessa campagna. Le modifiche partono 2 secondi dopo ogni cambiamento; le modifiche dei due lati vengono unite voce per voce, senza sovrascriversi. Cancellare una campagna vale per tutti i dispositivi, anche quelli offline in quel momento. La presenza online è mostrata nella barra in alto.
 
 ---
 
-## Tech stack
+## App installabile e offline
 
-Core app in a single HTML file, no framework, no bundler, no NPM dependencies. A few self-contained features live in separate files under `js/`, loaded via plain `<script src>` tags — same no-build-step approach, just organized so the core file doesn't have to grow for every new addition.
+DM Toolkit si installa come un'app: "Installa app" in Chrome o Edge su PC, "Aggiungi alla schermata Home" su iPad, iPhone e Android.
 
-| Library | Purpose | Loading |
+- **Funziona offline** in tutte le sue parti: al primo avvio con internet scarica dati, Compendio, generatori, font e librerie. Le immagini delle mappe già viste si vedono anche senza connessione. Le modifiche fatte offline si sincronizzano al ritorno della rete.
+- **Aggiornamenti** — all'apertura arriva sempre la versione più recente. Se l'app resta aperta a lungo (succede spesso su tablet) e nel frattempo esce un aggiornamento, compare un banner "È disponibile una nuova versione" con il pulsante Aggiorna, che prima aspetta la fine dei salvataggi in corso.
+- Le pagine si adattano alla larghezza dello schermo, dal telefono al monitor grande.
+
+---
+
+## Tecnologie
+
+Il cuore dell'app è un unico file HTML: niente framework, niente bundler, nessuna dipendenza NPM. Alcune funzioni autonome stanno in file separati nella cartella `js/`, caricati con normali tag `<script src>`, così il file principale non deve crescere a ogni aggiunta.
+
+| Libreria | Uso | Caricamento |
 |---|---|---|
-| Firebase 10 compat | Auth + Realtime Database | CDN (optional) |
-| d3 v7 | Visual node graph | CDN |
-| SortableJS 1.15 | Drag & drop DM Screen | CDN |
+| Firebase 10 compat | Accesso + Realtime Database | CDN (opzionale) |
+| d3 v7 | Grafo della Wiki, timeline | CDN |
+| SortableJS 1.15 | Trascinamento nello Schermo del DM | CDN |
 
 ---
 
-## License
+## Licenza
 
-Game data from the D&D 5e System Reference Document (SRD), released under OGL and ORC licenses by Wizards of the Coast.
+I dati di gioco provengono dal System Reference Document (SRD) di D&D 5e, pubblicato da Wizards of the Coast con licenze OGL e ORC.
