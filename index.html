@@ -15100,12 +15100,15 @@ const DriveBackup = (() => {
       } catch(e) {}
     }
     if (fileId) {
-      const uploadRes = await _driveFetch('upload/drive/v3/files/' + fileId + '?uploadType=media', {
+      const uploadRes = await _driveFetch('upload/drive/v3/files/' + fileId + '?uploadType=media&fields=id,trashed', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: content,
       });
       if (!uploadRes.ok) fileId = null; // probabilmente cancellato manualmente: ricrea sotto
+      // Un file nel cestino di Drive accetta ancora le scritture: senza questo controllo un
+      // dispositivo continuava a salvare in un file che l'utente aveva buttato (e non vedeva piu').
+      else if ((await uploadRes.json().catch(() => ({}))).trashed) fileId = null;
     }
     if (!fileId) {
       const boundary = 'dmtk' + Date.now();
@@ -20573,62 +20576,79 @@ const CalendarioTimeline = (() => {
     const svg = document.getElementById('calendario-timeline-svg');
     if (!svg) return;
     if (!svg.clientWidth) { setTimeout(render, 100); return; }
-    const W = svg.clientWidth || 800, H = 260, MARGIN = 50;
+    const W = svg.clientWidth || 800, MARGIN = 50;
     while (svg.firstChild) svg.removeChild(svg.firstChild);
 
     const minAbs = items[0]._abs, maxAbs = items[items.length - 1]._abs;
     const span = Math.max(1, maxAbs - minAbs);
-    const x0 = MARGIN, x1 = W - MARGIN;
+
+    // Con le corsie (sotto) le etichette non si coprono piu', quindi si mostra quasi tutto il titolo
+    const label = (it) => it.titolo.length > 32 ? it.titolo.slice(0, 30) + '…' : it.titolo;
+
+    // Larghezza reale di ogni etichetta, nello stesso font dell'SVG, per sapere quando due si toccano
+    const ctx = document.createElement('canvas').getContext('2d');
+    ctx.font = '10px ' + getComputedStyle(svg).fontFamily;
+    items.forEach(it => { it._label = label(it); it._w = ctx.measureText(it._label).width; });
+
+    // Margini abbastanza larghi da contenere meta' della prima/ultima etichetta, che altrimenti
+    // finivano tagliate dal bordo dell'SVG
+    const x0 = Math.max(MARGIN, items[0]._w / 2 + 12);
+    const x1 = W - Math.max(MARGIN, items[items.length - 1]._w / 2 + 12);
     const xFor = (abs) => x0 + (span === 0 ? (x1 - x0) / 2 : ((abs - minAbs) / span) * (x1 - x0));
 
     const CATEGORIE = CalendarioUI.getCategorie();
     const colorFor = (it) => it._kind === 'sessione' ? '#5ba4f5' : (it.tipo === 'deadline' ? 'var(--accent-danger)' : (CATEGORIE[it.categoria] || CATEGORIE['']).color);
-    const label = (it) => it.titolo.length > 18 ? it.titolo.slice(0, 16) + '…' : it.titolo;
-
-    if (typeof d3 === 'undefined') {
-      const ns = 'http://www.w3.org/2000/svg';
-      const axis = document.createElementNS(ns, 'line');
-      axis.setAttribute('x1', x0); axis.setAttribute('x2', x1); axis.setAttribute('y1', H / 2); axis.setAttribute('y2', H / 2);
-      axis.setAttribute('stroke', 'var(--border-strong)'); axis.setAttribute('stroke-width', '2');
-      svg.appendChild(axis);
-      items.forEach((it, i) => {
-        const x = xFor(it._abs), yOff = (i % 2 === 0) ? -1 : 1, y = H / 2 + yOff * 40;
-        const ln = document.createElementNS(ns, 'line');
-        ln.setAttribute('x1', x); ln.setAttribute('x2', x); ln.setAttribute('y1', H / 2); ln.setAttribute('y2', y);
-        ln.setAttribute('stroke', 'var(--border)'); svg.appendChild(ln);
-        const c = document.createElementNS(ns, 'circle');
-        c.setAttribute('cx', x); c.setAttribute('cy', y); c.setAttribute('r', 7);
-        c.setAttribute('fill', colorFor(it)); c.style.cursor = 'pointer';
-        c.onclick = () => _open(it);
-        svg.appendChild(c);
-        const t = document.createElementNS(ns, 'text');
-        t.setAttribute('x', x); t.setAttribute('y', y + (yOff > 0 ? 18 : -12));
-        t.setAttribute('text-anchor', 'middle'); t.setAttribute('font-size', '10'); t.setAttribute('fill', 'var(--text-secondary)');
-        t.textContent = label(it);
-        svg.appendChild(t);
+    // Corsie alternate sopra/sotto l'asse (1a sopra, 1a sotto, 2a sopra, 2a sotto...): ogni evento va
+    // nella prima corsia dove la sua etichetta non tocca l'ultima gia' messa li'. Prima si alternava
+    // solo sopra/sotto a altezza fissa: tre eventi vicini nel tempo si scrivevano uno sull'altro.
+    const BASE = 40, STEP = 24, GAP = 8, MAX_CORSIE = 16;
+    const layout = (xOf) => {
+      const fine = [];
+      let maxLiv = 0;
+      const pos = items.map(it => {
+        const x = xOf(it._abs);
+        let k = 0;
+        while (k < MAX_CORSIE - 1 && fine[k] !== undefined && fine[k] + GAP > x - it._w / 2) k++;
+        fine[k] = Math.max(fine[k] ?? -Infinity, x + it._w / 2);
+        const liv = Math.floor(k / 2);
+        maxLiv = Math.max(maxLiv, liv);
+        return { it, x, lato: k % 2 === 0 ? -1 : 1, off: BASE + liv * STEP };
       });
-      return;
-    }
+      return { pos, H: Math.max(260, 2 * (BASE + maxLiv * STEP + 30)) };
+    };
 
-    const d3svg = d3.select(svg);
-    const g = d3svg.append('g');
-    _zoomBehavior = d3.zoom().scaleExtent([0.2, 20]).on('zoom', e => g.attr('transform', e.transform));
-    d3svg.call(_zoomBehavior);
+    const ns = 'http://www.w3.org/2000/svg';
+    const el = (tag, attrs, parent) => {
+      const n = document.createElementNS(ns, tag);
+      Object.entries(attrs).forEach(([k, v]) => n.setAttribute(k, v));
+      parent.appendChild(n);
+      return n;
+    };
+    const g = el('g', {}, svg);
 
-    g.append('line').attr('x1', x0).attr('x2', x1).attr('y1', H / 2).attr('y2', H / 2)
-      .attr('stroke', 'var(--border-strong)').attr('stroke-width', 2);
+    // Ridisegna con le x date: lo zoom allarga solo l'asse del tempo, scritte e pallini restano
+    // della stessa misura, e le corsie si ricalcolano (zoomando, gli eventi vicini si separano).
+    const draw = (xOf) => {
+      while (g.firstChild) g.removeChild(g.firstChild);
+      const { pos, H } = layout(xOf);
+      svg.setAttribute('height', H);
+      const mid = H / 2;
+      el('line', { x1: 0, x2: W, y1: mid, y2: mid, stroke: 'var(--border-strong)', 'stroke-width': 2 }, g);
+      pos.forEach(({ it, x, lato, off }) => {
+        const y = mid + lato * off;
+        const nodo = el('g', { cursor: 'pointer' }, g);
+        nodo.addEventListener('click', () => _open(it));
+        el('title', {}, nodo).textContent = it.titolo;
+        el('line', { x1: x, x2: x, y1: mid, y2: y, stroke: 'var(--border)' }, nodo);
+        el('circle', { cx: x, cy: y, r: 7, fill: colorFor(it), stroke: '#1a1a1a', 'stroke-width': 1.5 }, nodo);
+        el('text', { x, y: y + (lato > 0 ? 18 : -12), 'text-anchor': 'middle', 'font-size': 10, fill: 'var(--text-secondary)' }, nodo).textContent = it._label;
+      });
+    };
+    draw(xFor);
 
-    const nodes = g.selectAll('g.tl-node').data(items).enter().append('g').attr('cursor', 'pointer')
-      .on('click', (e, d) => _open(d));
-
-    nodes.each(function (d, i) {
-      const x = xFor(d._abs), yOff = (i % 2 === 0) ? -1 : 1, y = H / 2 + yOff * 40;
-      const sel = d3.select(this);
-      sel.append('line').attr('x1', x).attr('x2', x).attr('y1', H / 2).attr('y2', y).attr('stroke', 'var(--border)');
-      sel.append('circle').attr('cx', x).attr('cy', y).attr('r', 7).attr('fill', colorFor(d)).attr('stroke', '#1a1a1a').attr('stroke-width', 1.5);
-      sel.append('text').attr('x', x).attr('y', y + (yOff > 0 ? 18 : -12)).attr('text-anchor', 'middle').attr('font-size', 10).attr('fill', 'var(--text-secondary)')
-        .text(label(d));
-    });
+    if (typeof d3 === 'undefined') return;
+    _zoomBehavior = d3.zoom().scaleExtent([0.2, 20]).on('zoom', e => draw(abs => e.transform.applyX(xFor(abs))));
+    d3.select(svg).call(_zoomBehavior);
   };
 
   const _zoomBy = (factor) => {

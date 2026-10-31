@@ -13,15 +13,15 @@
    ============================================================ */
 
 const UpdatePopup = (() => {
-  const VERSION = '2026-10-17';
+  const VERSION = '2026-10-31';
   const STORAGE_KEY = 'dmtk_update_seen';
   const DELAY_MS = 1200; // prima del popup newsletter (3000ms), cosi' non si accavallano
 
   const CORREZIONI = [
-    'Compendio dei mostri: in D&D 5e (2014) mancavano molte creature (goblin, lupi e altre) e i Gradi di Sfida di parecchi mostri erano sbagliati — ora il bestiario è completo e corretto.',
-    'Sincronizzazione cloud: aprendo la stessa campagna da un altro dispositivo, i contenuti aggiunti di recente potevano sparire — ora vengono sempre uniti correttamente invece di andare persi.',
-    'Eliminare un PG, una Quest o un Incontro dalla Wiki: a volte la voce restava anche dopo aver confermato la cancellazione — ora viene rimossa davvero.',
-    'Scheda PG: ora puoi inserire caratteristiche, tiri salvezza, abilità, equipaggiamento e talenti anche per i Personaggi Giocanti, non solo per i PNG.',
+    'Nuovo dispositivo (es. iPad): le campagne salvate su Google Drive non si scaricavano, nemmeno dopo aver collegato Drive — ora arrivano da sole appena Drive si collega.',
+    'Google Drive: le immagini venivano caricate più volte e le campagne finivano in più copie con lo stesso nome — ora ogni immagine e ogni campagna ha un solo file. In "Ripristina" vedi anche quanto pesa ogni backup, per riconoscere quelli vuoti.',
+    'Drive risultava "non collegato" a ogni apertura, e una campagna cancellata poteva ricomparire — entrambi risolti.',
+    'Mappe e Timeline: sulle mappe ora puoi zoomare con due dita su tablet e telefono; nella Timeline i nomi degli eventi vicini non si sovrappongono più.',
   ];
 
   const _checkSvg = () =>
