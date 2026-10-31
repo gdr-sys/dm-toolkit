@@ -9323,8 +9323,13 @@ const Generatori = {
 
     const n = nomi[razza] || nomi.umano;
     const r = (arr) => arr[Math.floor(Math.random()*arr.length)];
-    const genM = r(n.m||[]);
-    const genF = r(n.f||[]);
+    // Niente doppioni: si scartano i nomi gia' usati da PNG e PG della campagna (se restano alternative)
+    const _camp = App.getActiveCampaign();
+    const usati = new Set([...(_camp?.npcs || []), ...(_camp?.pg || []), ...(_camp?.party || [])]
+      .map(x => String(x.nome || x.name || '').trim().split(/\s+/)[0].toLowerCase()).filter(Boolean));
+    const rLibero = (arr) => { const liberi = arr.filter(x => !usati.has(String(x).toLowerCase())); return r(liberi.length ? liberi : arr); };
+    const genM = rLibero(n.m||[]);
+    const genF = rLibero(n.f||[]);
     const genC = r(n.c||n.v||['—']);
 
     el.innerHTML = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">' +
@@ -16375,6 +16380,7 @@ const WikiSections = (() => {
       (type === 'pg' && !isEdit ? _renderPgLive(item) : '') +
       ((type === 'png' || type === 'pg') && !isEdit ? _renderStatBlock(item, type) : '') +
       ((type === 'png' || type === 'pg') ? _renderMomenti(item, type, isEdit) : '') +
+      (type === 'luoghi' && !isEdit && typeof EntraInScena !== 'undefined' ? EntraInScena.pulsante(item.id) : '') +
       (type === 'luoghi' && !isEdit && typeof TabelleCasuali !== 'undefined' ? TabelleCasuali.bloccoLuogo(item.id) : '') +
       (type === 'fazioni' && !isEdit && typeof Reputazione !== 'undefined' ? Reputazione.blocco(item.id) : '') +
 
@@ -21942,6 +21948,8 @@ document.addEventListener('DOMContentLoaded', initMobileNav);
 <script src="js/primi-passi.js"></script>
 <script src="js/reputazione.js"></script>
 <script src="js/chiusura-sessione.js"></script>
+<script src="js/voci-campagna.js"></script>
+<script src="js/entra-in-scena.js"></script>
 <script src="js/schermo-acceso.js"></script>
 <script src="js/wiki-import.js"></script>
 <script src="js/wiki-trash-ui.js"></script>

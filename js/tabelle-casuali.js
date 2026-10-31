@@ -142,6 +142,17 @@ const TabelleCasuali = (() => {
     _aggiornaRisultati(id);
   };
 
+  // Tira e restituisce il risultato come testo (per chi lo mostra altrove, es. Entra in scena)
+  const tiraTesto = (id) => {
+    const t = _tabelle().find(x => x.id === id);
+    if (!t) return '';
+    _ultimi[id] = _tiraTabella(t);
+    _aggiornaRisultati(id);
+    const r = _ultimi[id];
+    if (r.vuota) return '';
+    return (t.dado === 'pesi' ? '' : 'd' + t.dado + ' → ' + r.numero + ': ') + (r.testo || 'nessuna voce per ' + r.numero);
+  };
+
   const _risultatoHTML = (t) => {
     const r = _ultimi[t.id];
     if (!r) return '';
@@ -443,5 +454,5 @@ const TabelleCasuali = (() => {
 
   document.addEventListener('DOMContentLoaded', () => setTimeout(() => { _aggancia(); render(); }, 200));
 
-  return { render, tira, apriEditor, importaFile, bloccoLuogo, interpreta, daCSV, _anteprima, _salvaEditor, _elimina };
+  return { render, tira, tiraTesto, apriEditor, importaFile, bloccoLuogo, interpreta, daCSV, _anteprima, _salvaEditor, _elimina };
 })();
