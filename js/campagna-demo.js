@@ -58,13 +58,13 @@ const CampagnaDemo = (() => {
       risorse: 'Denaro, carri, il rispetto di tutto il villaggio.' });
 
     // ── PNG ──
-    nuovo('png', { nome: 'Tessa Brunvento', ruolo: 'Ostessa del Tino Rovesciato', razza: 'Umana', stato: 'Vivo', sede: '@Il Tino Rovesciato',
+    const tessa = nuovo('png', { nome: 'Tessa Brunvento', ruolo: 'Ostessa del Tino Rovesciato', razza: 'Umana', stato: 'Vivo', sede: '@Il Tino Rovesciato',
       personalita: 'Schietta, ride forte, ricorda il nome di ogni cliente.', vuole: 'Che il villaggio resti unito.', teme: 'Che suo figlio si unisca ai Custodi.',
       segreto: 'Suo figlio Elio frequenta già i Custodi della Cenere di nascosto.' });
-    nuovo('png', { nome: 'Fratello Orsino', ruolo: 'Ultimo monaco della Fiamma Quieta', razza: 'Nano', stato: 'Vivo', sede: '@Monte Ardegna',
+    const orsino = nuovo('png', { nome: 'Fratello Orsino', ruolo: 'Ultimo monaco della Fiamma Quieta', razza: 'Nano', stato: 'Vivo', sede: '@Monte Ardegna',
       personalita: 'Vecchio, distratto, parla per enigmi.', vuole: 'Riparare il sigillo prima che sia tardi.',
       segreto: 'Ha più di trecento anni: è legato al sigillo, e se il sigillo si spezza del tutto morirà.' });
-    nuovo('png', { nome: 'Madre Cinerea', ruolo: 'Guida dei Custodi della Cenere', razza: 'Tiefling', stato: 'Vivo', fazione: '@Custodi della Cenere',
+    const cinerea = nuovo('png', { nome: 'Madre Cinerea', ruolo: 'Guida dei Custodi della Cenere', razza: 'Tiefling', stato: 'Vivo', fazione: '@Custodi della Cenere',
       personalita: 'Calma, gentile, convincente. Non alza mai la voce.', vuole: 'L\'eruzione.',
       segreto: 'È stata lei a guidare i Custodi nella cripta e a spezzare il primo dei tre anelli del sigillo.' });
     nuovo('png', { nome: 'Bertrando Viti', ruolo: 'Capo della Gilda dei Vignaioli', razza: 'Halfling', stato: 'Vivo', fazione: '@Gilda dei Vignaioli',
@@ -113,6 +113,15 @@ const CampagnaDemo = (() => {
           sorgente: '3 La cenere forma per un istante un volto nel cielo\n2 Tutti gli uccelli della valle tacciono di colpo\n2 Le botti del Tino Rovesciato si scaldano da sole\n1 Una scossa apre una crepa che mostra un\'antica scalinata', creatoAt: ora, aggiornatoAt: ora },
         { id: 'tab_demo3', nome: 'Voci al Tino Rovesciato', dado: '6', luoghi: [locanda],
           sorgente: 'Bertrando ha venduto metà della vendemmia prima ancora di raccoglierla\nDi notte si vedono torce salire verso il cratere\nFratello Orsino non invecchia: mia nonna lo conosceva già vecchio\nA Corvara pagano il triplo per il vino che sa di cenere\nElio, il figlio di Tessa, porta un amuleto nuovo\nNella cripta c\'è un tesoro dei monaci, e nessuno ha il coraggio di prenderlo', creatoAt: ora, aggiornatoAt: ora },
+      ],
+      segreti: [
+        { id: 'seg_demo1', titolo: 'Madre Cinerea ha spezzato il primo anello', scoperto: false, creatoAt: ora, aggiornatoAt: ora,
+          descrizione: 'Madre Cinerea è entrata nella cripta tre mesi fa con i Custodi e ha spezzato il primo anello del sigillo. Le impronte di zoccolo sono sue.',
+          indizi: [
+            { id: 'ind_demo1', testo: 'Le impronte di zoccolo nella cripta: chi ha sangue infernale ha i piedi caprini', dove: { tipo: 'luoghi', id: cripta, nome: 'Cripta della Fiamma Quieta' }, condizione: 'Indagare CD 13 nella cripta', trovato: true },
+            { id: 'ind_demo2', testo: 'Elio ha visto Madre Cinerea uscire dalla cripta con una chiave di bronzo', dove: { tipo: 'png', id: tessa, nome: 'Tessa Brunvento' }, condizione: 'Tessa lo dice solo se il party promette di proteggere Elio', trovato: false },
+            { id: 'ind_demo3', testo: 'La chiave di bronzo della cripta manca dal reliquiario dei monaci', dove: { tipo: 'png', id: orsino, nome: 'Fratello Orsino' }, condizione: 'Persuasione CD 14, oppure aiutarlo a riordinare il reliquiario', trovato: false },
+          ] },
       ],
       sessioneZero: { aspettative: { tono: 'Avventura classica', morte: 'Possibile', pvp: 'Solo con il consenso di entrambi', combattimento: 'Bilanciato', esplorazione: 'Molta', interazione: 'Bilanciata', note: 'Ogni due venerdì alle 21. I tiri si fanno in vista.' },
         linee: ['Violenza su bambini'], veli: ['Tortura esplicita'], strumenti: ['cartaX', 'linee', 'porta', 'stelle'], aggiornatoAt: ora },
