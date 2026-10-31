@@ -8896,15 +8896,23 @@ const Generatori = {
     missioni:     { label: 'Missioni Secondarie',      emoji: '📜' },
   },
 
+  // Generatori che esistevano prima di generatoriConosciuti: l'elenco dei visibili salvato da una
+  // campagna li conteneva gia', e un generatore aggiunto dopo (es. da js/generatori-extra.js)
+  // risultava nascosto finche' non lo si attivava a mano. Ora un generatore che la campagna non
+  // conosceva ancora quando ha salvato le preferenze e' visibile.
+  _GEN_STORICI: ['npc','meteo','sensori','rumors','accento','shop','viaggio','loot','biblioteca','nomi',
+    'incontri','follia','encounter','descrizione','nomi_luoghi','ganci','oracolo','missioni'],
+
   _getEnabledGen: () => {
     const camp = App.getActiveCampaign();
     const saved = camp?.generatoriAbilitati;
     if (!saved) return Object.keys(Generatori._GEN_DEFS);
-    return saved;
+    const conosciuti = camp.generatoriConosciuti || Generatori._GEN_STORICI;
+    return Object.keys(Generatori._GEN_DEFS).filter(id => saved.includes(id) || !conosciuti.includes(id));
   },
 
   _saveEnabledGen: (list) => {
-    App.saveActiveCampaign({ generatoriAbilitati: list });
+    App.saveActiveCampaign({ generatoriAbilitati: list, generatoriConosciuti: Object.keys(Generatori._GEN_DEFS) });
   },
 
   applyVisibility: () => {
@@ -21854,6 +21862,7 @@ document.addEventListener('DOMContentLoaded', initMobileNav);
 <script src="js/update-popup.js"></script>
 <script src="js/update-banner.js"></script>
 <script src="js/tabelle-casuali.js"></script>
+<script src="js/generatori-extra.js"></script>
 <script src="js/schermo-acceso.js"></script>
 <script src="js/wiki-import.js"></script>
 <script src="js/wiki-trash-ui.js"></script>
