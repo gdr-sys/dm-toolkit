@@ -17998,7 +17998,10 @@ const renderDashboard = () => {
   const camp = App.getActiveCampaign();
   if (!camp) return;
   const sessLog = camp.sessioni_log || [];
-  const ultima = sessLog.slice().sort(function(a,b){ return (b.numero||0)-(a.numero||0); })[0];
+  // L'ultima sessione GIOCATA (con riassunto e ganci), non la piu' alta in numero: dopo aver
+  // pianificato la prossima, la Dashboard mostrava una sessione vuota e "Nessun gancio".
+  const _perNumero = sessLog.slice().sort(function(a,b){ return (b.numero||0)-(a.numero||0); });
+  const ultima = _perNumero.find(function(s){ return s.stato === 'giocata'; }) || _perNumero[0];
 
   var dashUlt = document.getElementById('dash-ultima-sessione');
   if (dashUlt) {
@@ -18023,7 +18026,7 @@ const renderDashboard = () => {
 
   var dashGanci = document.getElementById('dash-ganci');
   if (dashGanci) dashGanci.innerHTML = (ultima&&ultima.ganci)
-    ? '<div style="font-size:0.85rem;line-height:1.7;">'+ultima.ganci+'</div>'
+    ? '<div style="font-size:0.85rem;line-height:1.7;">'+String(ultima.ganci).replace(/\n/g,'<br>')+'</div>'
     : '<div style="color:var(--text-muted);font-size:0.82rem;">Nessun gancio.</div>';
 
   var dashQuest = document.getElementById('dash-quest-attive');
@@ -21938,6 +21941,7 @@ document.addEventListener('DOMContentLoaded', initMobileNav);
 <script src="js/campagna-demo.js"></script>
 <script src="js/primi-passi.js"></script>
 <script src="js/reputazione.js"></script>
+<script src="js/chiusura-sessione.js"></script>
 <script src="js/schermo-acceso.js"></script>
 <script src="js/wiki-import.js"></script>
 <script src="js/wiki-trash-ui.js"></script>
