@@ -12997,6 +12997,7 @@ const FirebaseSync = (() => {
     }).catch(e => Debug.warn('Errore registrazione campagna:', e.message));
   };
 
+  let _retrySyncOnDrive = false;
   const _syncAllCampaigns = async (user) => {
     if (!_db || !user || user.isAnonymous) return;
     const uid = user.uid;
@@ -13056,6 +13057,7 @@ const FirebaseSync = (() => {
       const remoteKeys = Object.keys(remoteIndex);
 
       let downloaded = 0;
+      let bloccatePerDrive = 0;
       for (const key of remoteKeys) {
         try {
           const campSnap = await _db.ref('campagne/' + key + '/data').once('value');
@@ -13087,8 +13089,29 @@ const FirebaseSync = (() => {
           downloaded++;
         } catch(e) {
           Debug.warn('Download campagna remota:', e.message);
+          // Drive non (ancora) collegato su questo dispositivo: i dati veri stanno su Drive e
+          // Firebase ha solo il puntatore. Niente toast d'errore per ogni campagna — se ne conta
+          // il numero e si riprova tutto in automatico appena Drive si collega (vedi sotto).
+          if (/Drive non è collegato|riconnessione automatica/i.test(e.message)) { bloccatePerDrive++; continue; }
           Toast.show('Errore scaricando una campagna dal cloud: ' + e.message, 'error', 5000);
         }
+      }
+
+      // Su un dispositivo nuovo (es. iPad) Drive non e' mai stato collegato quando parte questa
+      // sync al login, quindi le campagne salvate su Drive non si possono scaricare. Prima di questo
+      // fix collegare (o scollegare e ricollegare) Drive dopo non rilanciava mai la sync: l'app
+      // restava vuota anche con tutto collegato correttamente. Ora si riprova appena Drive si collega.
+      if (bloccatePerDrive > 0) {
+        Toast.show(bloccatePerDrive + (bloccatePerDrive > 1 ? ' campagne sono' : ' campagna è') +
+          ' su Google Drive: collega Drive dalle Impostazioni per scaricarle', 'warning', 8000);
+        if (!_retrySyncOnDrive) {
+          _retrySyncOnDrive = true;
+          GDrive.onConnect(() => {
+            _retrySyncOnDrive = false;
+            if (_user && _user.uid === uid) _syncAllCampaigns(_user);
+          });
+        }
+        return;
       }
 
       if (downloaded > 0) {
@@ -15066,6 +15089,16 @@ const DriveBackup = (() => {
     const filename = (camp.name || 'campagna').replace(/[^a-zA-Z0-9\s]/g, '-').trim() + '.json';
 
     let fileId = _getSyncFileId(camp.id);
+    // Id non in cache su questo dispositivo (dispositivo nuovo, dati del browser cancellati...):
+    // prima di crearne uno nuovo cerca il file gia' esistente di questa campagna, marcato con
+    // appProperties alla creazione. Prima ogni dispositivo creava il suo file con lo stesso nome.
+    if (!fileId) {
+      try {
+        const q = encodeURIComponent(`appProperties has { key='dmCampId' and value='${camp.id}' } and '${_folderId}' in parents and trashed=false`);
+        const res = await _driveFetch('drive/v3/files?q=' + q + '&fields=files(id)&orderBy=modifiedTime desc');
+        if (res.ok) fileId = (await res.json()).files?.[0]?.id || null;
+      } catch(e) {}
+    }
     if (fileId) {
       const uploadRes = await _driveFetch('upload/drive/v3/files/' + fileId + '?uploadType=media', {
         method: 'PATCH',
@@ -15078,7 +15111,7 @@ const DriveBackup = (() => {
       const boundary = 'dmtk' + Date.now();
       const multipartBody =
         `--${boundary}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n` +
-        JSON.stringify({ name: filename, parents: [_folderId] }) + `\r\n` +
+        JSON.stringify({ name: filename, parents: [_folderId], appProperties: { dmCampId: camp.id } }) + `\r\n` +
         `--${boundary}\r\nContent-Type: application/json\r\n\r\n` + content + `\r\n` +
         `--${boundary}--`;
       const createRes = await _driveFetch('upload/drive/v3/files?uploadType=multipart', {
@@ -15100,7 +15133,12 @@ const DriveBackup = (() => {
       throw new Error('file non trovato su Drive — probabilmente è stato creato da un altro account Google (controlla di aver collegato lo stesso account usato sugli altri dispositivi) oppure è stato cancellato manualmente da Drive');
     }
     if (!res.ok) throw new Error('errore download da Drive (' + res.status + ')');
-    return await res.json();
+    const camp = await res.json();
+    // Su un dispositivo nuovo l'id del file non e' ancora in cache: senza ricordarlo qui, il
+    // primo salvataggio da questo dispositivo creava un SECONDO file su Drive e spostava il
+    // puntatore Firebase su quello, staccando gli altri dispositivi dal file originale.
+    if (camp && camp.id) _setSyncFileId(camp.id, fileId);
+    return camp;
   };
 
   // Cancella il file dedicato di una campagna (se esiste) quando la campagna viene eliminata,
@@ -15198,12 +15236,29 @@ const DriveBackup = (() => {
     return folder.id;
   };
 
-  let _imagesFolderId = null;
-  const _getImagesFolder = async () => {
-    if (_imagesFolderId) return _imagesFolderId;
-    if (!_folderId) _folderId = await _getOrCreateFolder();
-    _imagesFolderId = await _getOrCreateSubfolder('Immagini', _folderId);
-    return _imagesFolderId;
+  // Si tiene in cache la promise, non solo l'id: due sync quasi simultanee (es. backup automatico
+  // + push Firebase) facevano entrambe la ricerca prima che l'altra avesse creato la cartella, e
+  // su Drive finivano DUE cartelle "Immagini".
+  let _imagesFolderPromise = null;
+  const _getImagesFolder = () => {
+    if (!_imagesFolderPromise) {
+      _imagesFolderPromise = (async () => {
+        if (!_folderId) _folderId = await _getOrCreateFolder();
+        return _getOrCreateSubfolder('Immagini', _folderId);
+      })().catch(e => { _imagesFolderPromise = null; throw e; });
+    }
+    return _imagesFolderPromise;
+  };
+
+  // Stessa immagine = stesso link Drive. syncToDrive sostituisce il base64 col link solo nella
+  // copia salvata, non nella campagna in memoria: senza questa cache ogni salvataggio successivo
+  // (fino al ricaricamento della pagina) ricaricava di nuovo tutte le immagini, riempiendo Drive
+  // di copie identiche. La chiave e' l'hash del contenuto, la cache sopravvive ai ricaricamenti.
+  const _IMG_CACHE_PREFIX = 'dm_drive_img_';
+  const _imgUploads = new Map(); // hash -> promise del link, copre anche upload in corso
+  const _hashImage = async (dataUri) => {
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(dataUri));
+    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
   };
 
   const _dataUriToBlobParts = (dataUri) => {
@@ -15220,6 +15275,22 @@ const DriveBackup = (() => {
   // di errore lascia l'immagine com'era (base64) invece di perderla.
   const uploadImage = async (dataUri, suggestedName) => {
     if (!isConnected()) return dataUri;
+    let hash = null;
+    try { hash = await _hashImage(dataUri); } catch(e) {}
+    if (hash) {
+      const cached = localStorage.getItem(_IMG_CACHE_PREFIX + hash);
+      if (cached) return cached;
+      if (_imgUploads.has(hash)) return _imgUploads.get(hash);
+    }
+    const p = _uploadImageFile(dataUri, suggestedName).then(url => {
+      if (hash && url !== dataUri) { try { localStorage.setItem(_IMG_CACHE_PREFIX + hash, url); } catch(e) {} }
+      return url;
+    }).finally(() => { if (hash) _imgUploads.delete(hash); });
+    if (hash) _imgUploads.set(hash, p);
+    return p;
+  };
+
+  const _uploadImageFile = async (dataUri, suggestedName) => {
     try {
       const folderId = await _getImagesFolder();
       const { bytes, mime } = _dataUriToBlobParts(dataUri);
@@ -15291,7 +15362,14 @@ const DriveBackup = (() => {
     return obj;
   };
 
-  const _getOrCreateFolder = async () => {
+  // Promise in cache per lo stesso motivo di _getImagesFolder: evita cartelle "DM Toolkit" doppie.
+  let _folderPromise = null;
+  const _getOrCreateFolder = () => {
+    if (!_folderPromise) _folderPromise = _findOrCreateFolder().catch(e => { _folderPromise = null; throw e; });
+    return _folderPromise;
+  };
+
+  const _findOrCreateFolder = async () => {
     const q = encodeURIComponent(`name='${FOLDER_NAME}' and mimeType='application/vnd.google-apps.folder' and trashed=false`);
     const res = await _driveFetch('drive/v3/files?q=' + q + '&fields=files(id)');
     if (!res.ok) throw new Error('Errore ricerca cartella (' + res.status + ')');
@@ -15316,8 +15394,9 @@ const DriveBackup = (() => {
     }
     try {
       if (!_folderId) _folderId = await _getOrCreateFolder();
-      const q = encodeURIComponent(`'${_folderId}' in parents and trashed=false`);
-      const res = await _driveFetch('drive/v3/files?q=' + q + '&fields=files(id,name,modifiedTime)&orderBy=modifiedTime desc');
+      // Esclude le sottocartelle ("Immagini"): comparivano in lista come backup da ripristinare.
+      const q = encodeURIComponent(`'${_folderId}' in parents and trashed=false and mimeType != 'application/vnd.google-apps.folder'`);
+      const res = await _driveFetch('drive/v3/files?q=' + q + '&fields=files(id,name,modifiedTime,size)&orderBy=modifiedTime desc');
       if (!res.ok) throw new Error('Errore lista backup (' + res.status + ')');
       const list = await res.json();
       return list.files || [];
@@ -15339,10 +15418,14 @@ const DriveBackup = (() => {
     }
     el.innerHTML = files.map(f => {
       const date = f.modifiedTime ? new Date(f.modifiedTime).toLocaleString('it-IT', {day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '';
+      // Con piu' file dallo stesso nome, la dimensione e' l'unico modo di capire quale ha
+      // davvero dei contenuti: una campagna appena creata e mai riempita pesa meno di 1 KB.
+      const bytes = Number(f.size) || 0;
+      const peso = bytes < 1024 ? 'quasi vuota' : Math.round(bytes / 1024) + ' KB';
       return `<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);">
         <div style="min-width:0;">
           <div style="font-size:0.85rem;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${f.name}</div>
-          <div style="font-size:0.72rem;color:var(--text-muted);">${date}</div>
+          <div style="font-size:0.72rem;color:var(--text-muted);">${date} · ${peso}</div>
         </div>
         <button class="btn btn-primary btn-sm" onclick="DriveBackup.restoreBackup('${f.id}')" style="flex-shrink:0;">Ripristina</button>
       </div>`;
@@ -15402,6 +15485,8 @@ const DriveBackup = (() => {
     openConfirmModal('Scollegare Google Drive?', 'Scollegare Google Drive? I backup automatici verranno disattivati.', () => {
       _connected = false;
       _folderId = null;
+      _folderPromise = null;
+      _imagesFolderPromise = null;
       localStorage.removeItem(LS_KEY);
       localStorage.removeItem(LS_LAST);
       _updateUI();
