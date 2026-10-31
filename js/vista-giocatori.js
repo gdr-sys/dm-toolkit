@@ -90,6 +90,17 @@ const VistaGiocatori = (() => {
     let card = document.getElementById('dash-vista-giocatori');
     if (!card) { card = document.createElement('div'); card.id = 'dash-vista-giocatori'; card.className = 'card'; griglia.appendChild(card); }
     const s = _impost();
+    // Pulsante sempre visibile nell'intestazione della Dashboard: la card sta in fondo alla
+    // griglia e non si trova al volo quando al tavolo serve mandare il link
+    const testata = document.getElementById('gdrive-btn')?.parentElement;
+    if (testata) {
+      let btn = document.getElementById('vg-condividi-btn');
+      if (!btn) { btn = document.createElement('button'); btn.type = 'button'; btn.id = 'vg-condividi-btn'; btn.className = 'btn btn-secondary btn-sm'; testata.prepend(btn); }
+      btn.onclick = () => (_impost().attiva && _impost().id ? copiaLink() : apri());
+      btn.title = s.attiva ? 'Copia il link della vista giocatori' : 'Scegli cosa mostrare ai giocatori e crea il link';
+      btn.innerHTML = '<svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg> ' +
+        (s.attiva ? 'Copia link giocatori' : 'Condividi con i giocatori');
+    }
     card.innerHTML = '<div class="card-header"><h3 class="card-title">Vista giocatori</h3><button type="button" class="btn btn-ghost btn-sm" onclick="VistaGiocatori.apri()">' + (s.attiva ? 'Gestisci' : 'Attiva') + '</button></div>' +
       (s.attiva
         ? '<div style="font-size:0.82rem;color:var(--text-secondary);line-height:1.5;">I giocatori vedono ' + [s.riassunti && 'i riassunti', s.iniziativa && 'l\'iniziativa', s.luoghi.length && s.luoghi.length + ' luoghi', s.png.length && s.png.length + ' PNG', s.lore.length && s.lore.length + ' documenti', s.mappe.length && s.mappe.length + ' mappe'].filter(Boolean).join(', ') + '.</div>' +

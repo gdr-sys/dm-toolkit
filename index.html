@@ -307,20 +307,31 @@
 
       <div class="nav-section-label" style="margin-top:8px;">Supporto</div>
 
-      <button class="nav-item" onclick="Onboarding.open();closeMobileMenu()">
+      <!-- Aiuto e contatti: voci usate di rado, raccolte in un gruppo apribile (come la Wiki)
+           per non allungare il menu oltre l'altezza dello schermo su iPad e portatili -->
+      <button class="nav-item" id="nav-aiuto-toggle" aria-expanded="false" aria-controls="nav-aiuto" onclick="toggleNavAiuto()" style="justify-content:space-between;">
+        <span style="display:flex;align-items:center;gap:8px;">
+          <span class="nav-icon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
+          <span class="nav-label">Aiuto e contatti</span>
+        </span>
+        <span id="nav-aiuto-chevron" aria-hidden="true" style="font-size:0.6rem;color:var(--text-muted);transition:transform 0.2s;padding:4px;">▼</span>
+      </button>
+      <div id="nav-aiuto" style="padding-left:8px;border-left:2px solid var(--border);margin-left:8px;display:none;flex-direction:column;gap:1px;">
+      <button class="nav-item nav-subitem" onclick="Onboarding.open();closeMobileMenu()">
         <span class="nav-icon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
         <span class="nav-label">Guida rapida</span>
       </button>
 
-      <button class="nav-item" onclick="BugReport.open();closeMobileMenu()">
+      <button class="nav-item nav-subitem" onclick="BugReport.open();closeMobileMenu()">
         <span class="nav-icon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></span>
         <span class="nav-label">Segnala un bug</span>
       </button>
 
-      <button class="nav-item" onclick="Suggerisci.open();closeMobileMenu()">
+      <button class="nav-item nav-subitem" onclick="Suggerisci.open();closeMobileMenu()">
         <span class="nav-icon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.3 1 2.3h6c0-1 .4-1.8 1-2.3A7 7 0 0 0 12 2z"/></svg></span>
         <span class="nav-label">Suggerisci una funzione</span>
       </button>
+      </div>
     </div>
 
     <!-- Footer sidebar -->
@@ -4037,7 +4048,8 @@ const App = (() => {
               <span class="cc-name" title="${camp.name}">${camp.name}</span>
             </div>
           </div>
-          <div class="cc-desc">${camp.description || 'Nessuna descrizione.'}</div>
+          <div class="cc-desc${camp.description ? '' : ' cc-desc-vuota'}">${camp.description || 'Nessuna descrizione.'}</div>
+          <button type="button" class="cc-desc-toggle" hidden onclick="event.stopPropagation();const d=this.previousElementSibling;const a=d.classList.toggle('is-open');this.textContent=a?'Mostra meno':'Leggi tutto';this.setAttribute('aria-expanded',a)" aria-expanded="false">Leggi tutto</button>
         </div>
         <div class="cc-footer">
           <div class="cc-footer-meta">
@@ -4067,6 +4079,12 @@ const App = (() => {
       <span style="font-family:var(--font-display);font-size:0.75rem;letter-spacing:0.06em;color:inherit;">Nuova Campagna</span>
     `;
     grid.appendChild(newCard);
+
+    // "Leggi tutto" solo dove la descrizione e' davvero piu' lunga dello spazio della card
+    requestAnimationFrame(() => grid.querySelectorAll('.cc-desc').forEach(d => {
+      const b = d.nextElementSibling;
+      if (b && b.classList.contains('cc-desc-toggle')) b.hidden = d.scrollHeight <= d.clientHeight + 2;
+    }));
   };
 
 const openCampaign = (id) => {
@@ -21359,6 +21377,26 @@ const toggleMobileMenu = () => {
   sidebar?.classList.toggle('mobile-open', !isOpen);
   overlay?.classList.toggle('active', !isOpen);
 };
+
+// Gruppo "Aiuto e contatti" nel menu: chiuso di default, lo stato aperto/chiuso si ricorda.
+const toggleNavAiuto = (aperto) => {
+  const box = document.getElementById('nav-aiuto');
+  if (!box) return;
+  const daClic = typeof aperto !== 'boolean';
+  if (daClic) aperto = box.style.display === 'none';
+  box.style.display = aperto ? 'flex' : 'none';
+  document.getElementById('nav-aiuto-toggle')?.setAttribute('aria-expanded', String(aperto));
+  const ch = document.getElementById('nav-aiuto-chevron');
+  if (ch) ch.style.transform = aperto ? 'rotate(180deg)' : '';
+  try { localStorage.setItem('dm_nav_aiuto_aperto', aperto ? '1' : '0'); } catch(e) {}
+  // Aperto con un clic: porta in vista le sottovoci, che sugli schermi bassi finiscono sotto il bordo
+  if (daClic && aperto) box.lastElementChild?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+};
+document.addEventListener('DOMContentLoaded', () => {
+  let aperto = false;
+  try { aperto = localStorage.getItem('dm_nav_aiuto_aperto') === '1'; } catch(e) {}
+  toggleNavAiuto(aperto);
+});
 
 const closeMobileMenu = () => {
   document.getElementById('sidebar')?.classList.remove('mobile-open');
