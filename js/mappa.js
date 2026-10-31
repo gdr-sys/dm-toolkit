@@ -169,9 +169,12 @@ const MappaUI = (() => {
     canvas.addEventListener('mousedown', _onDragStart);
     window.addEventListener('mousemove', _onDragMove);
     window.addEventListener('mouseup', _onDragEnd);
-    canvas.addEventListener('touchstart', _onDragStart, { passive: true });
-    canvas.addEventListener('touchmove', _onDragMove, { passive: false });
-    canvas.addEventListener('touchend', _onDragEnd);
+    canvas.addEventListener('touchstart', _onTouchStart, { passive: true });
+    canvas.addEventListener('touchmove', _onTouchMove, { passive: false });
+    canvas.addEventListener('touchend', _onTouchEnd);
+    canvas.addEventListener('touchcancel', _onTouchEnd);
+    // Safari iOS: senza questo il pizzico zooma l'intera pagina invece della mappa
+    canvas.addEventListener('gesturestart', (e) => e.preventDefault());
     canvas.addEventListener('wheel', _onWheel, { passive: false });
     canvas.addEventListener('click', _onCanvasClick);
   };
@@ -347,6 +350,60 @@ const MappaUI = (() => {
     }
   };
   const _onDragEnd = () => { _dragging = false; };
+
+  // Zoom a due dita (tablet/telefono): la scala segue la distanza tra le dita e il punto
+  // della mappa che stava sotto il centro del pizzico resta sotto le dita, cosi' si puo'
+  // ingrandire e spostare nello stesso gesto. Il transform ha origine 0 0, quindi un punto
+  // della mappa c finisce sullo schermo in pan + scale * c.
+  let _pinch = null;
+  const _touchDist = (t) => Math.hypot(t[0].clientX - t[1].clientX, t[0].clientY - t[1].clientY);
+  const _touchMid = (t, rect) => ({
+    x: (t[0].clientX + t[1].clientX) / 2 - rect.left,
+    y: (t[0].clientY + t[1].clientY) / 2 - rect.top,
+  });
+
+  const _onTouchStart = (e) => {
+    if (e.touches.length === 2 && _getMappaAttiva()?.immagine) {
+      const rect = e.currentTarget.getBoundingClientRect();
+      const m = _touchMid(e.touches, rect);
+      _pinch = {
+        dist: _touchDist(e.touches) || 1, scale: _scale,
+        cx: (m.x - _panX) / _scale, cy: (m.y - _panY) / _scale,
+      };
+      _dragging = false;
+      _dragMoved = true; // il tap che chiude il gesto non deve proporre un nuovo pin
+      return;
+    }
+    _onDragStart(e);
+  };
+
+  const _onTouchMove = (e) => {
+    if (_pinch && e.touches.length === 2) {
+      const rect = e.currentTarget.getBoundingClientRect();
+      const m = _touchMid(e.touches, rect);
+      _scale = Math.max(0.2, Math.min(5, _pinch.scale * _touchDist(e.touches) / _pinch.dist));
+      _panX = m.x - _scale * _pinch.cx;
+      _panY = m.y - _scale * _pinch.cy;
+      _applyTransform();
+      if (e.cancelable) e.preventDefault();
+      return;
+    }
+    _onDragMove(e);
+  };
+
+  const _onTouchEnd = (e) => {
+    if (_pinch) {
+      _pinch = null;
+      // Se resta un dito appoggiato si continua a spostare la mappa da li', senza salti
+      if (e.touches.length === 1) {
+        const p = _pt(e);
+        _dragging = true;
+        _lastClientX = p.x; _lastClientY = p.y;
+      }
+      return;
+    }
+    _onDragEnd();
+  };
 
   const _onWheel = (e) => {
     if (!_getMappaAttiva()?.immagine) return;
