@@ -117,7 +117,9 @@ Carica un'immagine come mappa interattiva. Puoi spostarla trascinando e ingrandi
 ![Il Compendio](docs/img/compendio.png)
 
 
-Mostri SRD 5.1 e 5.2.1 con GS normalizzato (comprese le frazioni 1/8, 1/4, 1/2), oggetti magici, equipaggiamento, incantesimi, regole, velocità di cavalcature e veicoli. Homebrew integrato: le note Wiki con tag `#oggetto` o `#mostro` finiscono nel Compendio. Preferiti per campagna, ricerca, filtri per tipo e GS. Su schermi larghi l'elenco va su più colonne.
+Mostri SRD 5.1 e 5.2.1 con GS normalizzato (comprese le frazioni 1/8, 1/4, 1/2), oggetti magici, equipaggiamento, incantesimi, regole, velocità di cavalcature e veicoli. Homebrew integrato: le note Wiki con tag `#oggetto` o `#mostro` finiscono nel Compendio. Preferiti per campagna, ricerca, filtri per tipo e GS.
+
+**Mostri modificabili** — nella scheda di ogni mostro puoi cambiare il **Grado di Sfida** (come su 5e.tools): PF, CA, bonus di competenza, tiri salvezza, abilità, bonus per colpire, danni e CD si ricalcolano con la tabella della Guida del DM. Puoi anche dargli un nuovo nome e cambiare il tipo di danno (il goblin di fuoco, il lupo gelido) e mandare la variante direttamente al combattimento. Su schermi larghi l'elenco va su più colonne.
 
 ### Sessione Zero e sicurezza
 

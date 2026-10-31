@@ -6888,9 +6888,11 @@ const Compendio = (() => {
     }).join('');
   };
 
-  const openMonster = (id) => {
-    const m = _data.monsters.find(x => x.id === id);
-    if (!m) return;
+  // varianti: { gs, nome, tipoDanno } — mostro modificato con MostriMod (js/mostri-modificabili.js)
+  const openMonster = (id, varianti) => {
+    const base = _data.monsters.find(x => x.id === id);
+    if (!base) return;
+    const m = varianti && typeof MostriMod !== 'undefined' ? MostriMod.applica(base, varianti) : base;
     Debug.log(`Compendio: apro mostro ${m.nome}`);
 
     const gs = m.grado_sfida || {};
@@ -6919,7 +6921,7 @@ const Compendio = (() => {
 
     const immunLine = (label, arr) => arr && arr.length ? `<div class="stat-row"><strong>${label}</strong> <span>${arr.join(', ')}</span></div>` : '';
 
-    const content = `
+    const content = (typeof MostriMod !== 'undefined' ? MostriMod.barra(base, varianti || {}) : '') + `
       <div class="stat-block" style="max-height:65vh;overflow-y:auto;">
         <div class="stat-block-title">${m.nome}</div>
         <div class="stat-block-subtitle">${m.dimensione || ''} ${m.tipo || ''}${m.allineamento ? ', ' + m.allineamento : ''}</div>
@@ -22143,6 +22145,7 @@ document.addEventListener('DOMContentLoaded', initMobileNav);
 <script src="js/segreti.js"></script>
 <script src="js/importa-campagna.js"></script>
 <script src="js/musica.js"></script>
+<script src="js/mostri-modificabili.js"></script>
 <script src="js/schermo-acceso.js"></script>
 <script src="js/wiki-import.js"></script>
 <script src="js/wiki-trash-ui.js"></script>
