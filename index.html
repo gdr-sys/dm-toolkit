@@ -16300,6 +16300,7 @@ const WikiSections = (() => {
       (type === 'pg' && !isEdit ? _renderPgLive(item) : '') +
       ((type === 'png' || type === 'pg') && !isEdit ? _renderStatBlock(item, type) : '') +
       ((type === 'png' || type === 'pg') ? _renderMomenti(item, type, isEdit) : '') +
+      (type === 'luoghi' && !isEdit && typeof TabelleCasuali !== 'undefined' ? TabelleCasuali.bloccoLuogo(item.id) : '') +
 
       (() => {
         const custom = _currentItem?.campi_custom || item.campi_custom || [];
@@ -21835,6 +21836,7 @@ document.addEventListener('DOMContentLoaded', initMobileNav);
 <script src="js/newsletter-popup.js"></script>
 <script src="js/update-popup.js"></script>
 <script src="js/update-banner.js"></script>
+<script src="js/tabelle-casuali.js"></script>
 <script src="js/wiki-import.js"></script>
 <script src="js/wiki-trash-ui.js"></script>
 <script src="js/quick-view.js"></script>
