@@ -177,9 +177,9 @@ const VistaGiocatori = (() => {
 
   const _paginaHTML = (d) => {
     if (!d || d.chiusa) return '<div style="max-width:640px;margin:15vh auto;text-align:center;padding:20px;color:var(--text-secondary);font-family:var(--font-body);">Il master non sta condividendo nulla in questo momento.</div>';
-    const ini = d.iniziativa ? '<div style="display:flex;flex-direction:column;gap:6px;">' +
+    const ini = (d.iniziativa && (d.iniziativa.ordine || []).length) ? '<div style="display:flex;flex-direction:column;gap:6px;">' +
       '<div style="font-size:0.8rem;color:var(--text-muted);">Round ' + d.iniziativa.round + '</div>' +
-      d.iniziativa.ordine.map((x, i) => '<div style="display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:var(--radius-sm);border:1px solid ' + (i === d.iniziativa.turno ? 'var(--accent-secondary)' : 'var(--border)') + ';background:' + (i === d.iniziativa.turno ? 'var(--bg-secondary)' : 'transparent') + ';' + (x.ko ? 'opacity:0.45;text-decoration:line-through;' : '') + '">' +
+      (d.iniziativa.ordine || []).map((x, i) => '<div style="display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:var(--radius-sm);border:1px solid ' + (i === d.iniziativa.turno ? 'var(--accent-secondary)' : 'var(--border)') + ';background:' + (i === d.iniziativa.turno ? 'var(--bg-secondary)' : 'transparent') + ';' + (x.ko ? 'opacity:0.45;text-decoration:line-through;' : '') + '">' +
         '<span style="width:22px;color:var(--text-muted);font-family:var(--font-mono);">' + (i + 1) + '</span><span style="flex:1;' + (x.pg ? 'font-weight:600;' : '') + '">' + _esc(x.nome) + '</span>' + (i === d.iniziativa.turno ? '<span style="font-size:0.75rem;color:var(--accent-secondary);">Di turno</span>' : '') + '</div>').join('') + '</div>' : '';
     const card = (img, titolo, sotto, testo) => '<div style="display:flex;gap:12px;padding:12px;border:1px solid var(--border);border-radius:var(--radius-md);background:var(--bg-card);">' +
       (img ? '<img src="' + _esc(img) + '" alt="" style="width:84px;height:84px;object-fit:cover;border-radius:var(--radius-sm);flex-shrink:0;" onerror="this.remove()">' : '') +
@@ -196,7 +196,7 @@ const VistaGiocatori = (() => {
       _sezione('Personaggi', (d.png || []).length ? griglia(d.png.map(n => card(n.immagine, n.nome, [n.razza, n.ruolo].filter(Boolean).join(' · '), n.aspetto)).join('')) : '') +
       _sezione('Documenti', (d.documenti || []).map(x => '<details style="border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 12px;margin-bottom:6px;background:var(--bg-card);"><summary style="cursor:pointer;font-family:var(--font-display);">' + _esc(x.titolo) + '</summary><div style="line-height:1.6;margin-top:6px;font-size:0.92rem;">' + x.html + '</div></details>').join('')) +
       _sezione('Mappe', (d.mappe || []).map(m => '<figure style="margin:0 0 14px;"><div style="position:relative;display:inline-block;max-width:100%;"><img src="' + _esc(m.immagine) + '" alt="' + _esc(m.nome) + '" style="max-width:100%;border-radius:var(--radius-sm);display:block;">' +
-        m.pins.map(p => '<span title="' + _esc(p.nome) + '" style="position:absolute;left:' + (p.x * 100) + '%;top:' + (p.y * 100) + '%;transform:translate(-50%,-50%);background:var(--accent-primary);color:#fff;font-size:0.7rem;padding:2px 6px;border-radius:999px;white-space:nowrap;">' + _esc(p.nome) + '</span>').join('') +
+        (m.pins || []).map(p => '<span title="' + _esc(p.nome) + '" style="position:absolute;left:' + (p.x * 100) + '%;top:' + (p.y * 100) + '%;transform:translate(-50%,-50%);background:var(--accent-primary);color:#fff;font-size:0.7rem;padding:2px 6px;border-radius:999px;white-space:nowrap;">' + _esc(p.nome) + '</span>').join('') +
         '</div><figcaption style="font-size:0.8rem;color:var(--text-muted);margin-top:4px;">' + _esc(m.nome) + '</figcaption></figure>').join('')) +
       '<div style="margin-top:30px;font-size:0.72rem;color:var(--text-muted);">Aggiornato ' + new Date(d.aggiornatoAt || Date.now()).toLocaleString('it-IT') + ' · DM Toolkit</div>' +
     '</div>';
@@ -218,7 +218,10 @@ const VistaGiocatori = (() => {
         return setTimeout(attendi, 250);
       }
       const auth = firebase.auth();
-      const leggi = () => firebase.database().ref('campagne/' + PARAM + '/data').on('value', snap => { pag.innerHTML = _paginaHTML(snap.val()); }, () => { pag.innerHTML = _paginaHTML(null); });
+      const leggi = () => firebase.database().ref('campagne/' + PARAM + '/data').on('value', snap => {
+        try { pag.innerHTML = _paginaHTML(snap.val()); }
+        catch (e) { console.warn('[VistaGiocatori]', e); pag.innerHTML = '<div style="max-width:640px;margin:15vh auto;text-align:center;padding:20px;">Non riesco a mostrare la pagina. Chiedi al master di ripubblicarla.</div>'; }
+      }, () => { pag.innerHTML = _paginaHTML(null); });
       const un = auth.onAuthStateChanged(u => {
         un();
         if (u) leggi();
