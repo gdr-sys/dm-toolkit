@@ -19,7 +19,7 @@ Web app per Dungeon Master di D&D 5e (edizioni 2014 e 2024) per gestire una camp
 | Mappe | Mappe interattive con segnaposto, mappe annidate, misura distanze, zoom con due dita |
 | Calendario | Calendario in-world personalizzabile, eventi, scadenze, timeline |
 | Sessioni | Combat tracker, scene planner, diario delle sessioni, clock |
-| Generatori | 18 generatori pronti + **le tue tabelle casuali** |
+| Generatori | 22 generatori pronti + **le tue tabelle casuali** |
 | Compendio | SRD 5.1 e 5.2.1, homebrew |
 | Schermo del DM | Blocchi personalizzabili, trascinabili |
 | Sincronizzazione | Google Drive per i dati, Firebase come segnale in tempo reale |
@@ -71,6 +71,7 @@ Carica un'immagine come mappa interattiva. Puoi spostarla trascinando e ingrandi
 ### Sessioni
 
 - **Combat tracker** — iniziativa, PF, CA, condizioni, concentrazione con CD automatica, effetti con conto alla rovescia dei round, riposi brevi e lunghi.
+- **Schermo sempre acceso** — su tablet e telefono lo schermo non si spegne durante uno scontro (oppure sempre, o mai: si sceglie nelle Impostazioni).
 - **Scene planner** — la sequenza di momenti di ogni sessione (apertura, combattimento, sociale, esplorazione, rivelazione, cliffhanger…), riordinabile.
 - **Diario delle sessioni** — numero, titolo, date reale e in-world, stato, PNG coinvolti, preparazione e riassunto. Ogni sessione può avere la sua nota nella Wiki.
 - **"Previously On…"** — il riassunto dell'ultima sessione, pronto da leggere al tavolo.
@@ -79,7 +80,12 @@ Carica un'immagine come mappa interattiva. Puoi spostarla trascinando e ingrandi
 
 ### Generatori
 
-18 generatori per improvvisare: PNG completo, meteo, rumori e odori, descrizione di luoghi, nomi di luoghi, negozio (con i prezzi degli oggetti magici), biblioteca, bottino, viaggio, incontri, incontro bilanciato, voci di corridoio, accenti, nomi, follia, ganci, oracolo, missioni. Si possono nascondere e riordinare.
+22 generatori per improvvisare: PNG completo, meteo, rumori e odori, descrizione di luoghi, nomi di luoghi, negozio (con i prezzi degli oggetti magici), biblioteca, bottino, viaggio, incontri, incontro bilanciato, voci di corridoio, accenti, nomi, follia, ganci, oracolo, missioni. Si possono nascondere e riordinare.
+
+- **Trappole ed enigmi** — trappole con innesco, CD e danni adatti al livello del party e alla pericolosità scelta, come accorgersene e disinnescarle; enigmi con suggerimento e soluzione; indovinelli con risposta. Soluzioni e risposte restano nascoste finché non le apri.
+- **Dungeon e stanze** — una stanza alla volta per tema (rovina, cripta, caverna, fortezza, tempio, tana di mostri) con dimensioni, sensazioni, uscite, contenuto e complicazioni, oppure un intero **dungeon in cinque stanze**.
+- **Taverne e insediamenti** — taverne con oste, clientela, specialità, voci e problemi; villaggi, paesi e città con popolazione, chi comanda, PNG chiave e problema del momento. Un clic e diventano un Luogo della tua campagna.
+- **Eventi di viaggio e riposo** — cosa succede lungo la strada o al campo, per ambiente (foresta, montagna, palude, deserto, pianura, costa, sotterraneo, città).
 
 **Le mie tabelle** — le tabelle casuali del tuo mondo: le scrivi tu, l'app le tira.
 
@@ -104,6 +110,7 @@ Griglia di blocchi trascinabili e ridimensionabili: percezioni passive del party
 - **Prossime scadenze** dal calendario.
 - **Scheda rapida PNG** dalla barra in alto, per consultare un PNG a metà sessione.
 - **Blocco note** sempre a portata di mano.
+- **Lanciadadi** sempre a portata di mano, con formule (`4d6kh3`, `2d8+5`) e gli ultimi tiri.
 - Backup e ripristino in JSON, per campagna o completo, e backup automatico su Google Drive.
 
 ---
@@ -126,7 +133,7 @@ Un account anonimo si può trasformare in account Google in qualsiasi momento se
 - **Su un dispositivo nuovo** le campagne si scaricano da sole appena colleghi Drive, anche se lo colleghi dopo aver fatto l'accesso.
 - Ogni campagna ha **un solo file** su Drive, anche usandola da più dispositivi, e ogni immagine viene caricata **una volta sola**.
 - **Ripristina da Drive** elenca i backup con data e peso, così si riconoscono subito quelli vuoti.
-- Senza Drive collegato, Firebase porta i dati completi della campagna (più pesante, ma funziona subito).
+- Senza Drive collegato, Firebase porta i dati della campagna, ma **mai le immagini e i file pesanti**: quelli restano sul dispositivo e passano su Drive appena lo colleghi. Così Firebase resta leggero e dentro la quota gratuita.
 
 **Collaborazione in tempo reale.** Ogni campagna ha un codice invito: un co-autore lo inserisce e accede alla stessa campagna. Le modifiche partono 2 secondi dopo ogni cambiamento; le modifiche dei due lati vengono unite voce per voce, senza sovrascriversi. Cancellare una campagna vale per tutti i dispositivi, anche quelli offline in quel momento. La presenza online è mostrata nella barra in alto.
 
