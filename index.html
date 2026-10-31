@@ -3791,8 +3791,27 @@ const App = (() => {
     });
   };
 
+  // Fino a ottobre 2026 ogni luogo/fazione salvato dalla Wiki o dalla Mappa creava anche una nota
+  // "copia" nella Lore: vuota (il tipo 'location'/'faction' non corrispondeva a nessun modello) e
+  // con il tag sbagliato #fazione. Doppioni inutili, che facevano sembrare ogni luogo finito anche
+  // in Lore. Qui si tolgono solo quelle copie vuote collegate a un luogo/fazione che esiste ancora:
+  // le note scritte a mano, o con del contenuto, restano.
+  const _rimuoviCopieLoreVuote = (camp) => {
+    const lore = camp?.wiki?.lore;
+    if (!Array.isArray(lore) || !lore.length) return;
+    const esiste = (n) => n.mondoTipo === 'location' ? (camp.locations || []).some(l => l.id === n.mondoId)
+      : n.mondoTipo === 'faction' ? (camp.factions || []).some(f => f.id === n.mondoId) : false;
+    const pulita = lore.filter(n => !(n && n.mondoId && !String(n.contenuto || '').trim() && esiste(n)));
+    if (pulita.length === lore.length) return;
+    camp.wiki.lore = pulita;
+    // Va scritto anche in memoria locale: saveActiveCampaign fonde le modifiche sulla copia salvata,
+    // e senza questo le copie rimosse ricomparivano al primo salvataggio successivo.
+    try { Storage.updateCampaign(camp.id, { wiki: camp.wiki }); } catch (e) {}
+  };
+
   const setActiveCampaign = (campaign) => {
     _sanaLinkDriveVecchi(campaign, 0);
+    _rimuoviCopieLoreVuote(campaign);
     activeCampaign = campaign;
     _lastSnapshot = _deepClone(campaign);
     Storage.setActiveCampaign(campaign ? campaign.id : null);
@@ -3819,7 +3838,7 @@ const App = (() => {
   const reloadActiveCampaign = () => {
     if (!activeCampaign) return;
     const fresh = Storage.getCampaign(activeCampaign.id);
-    if (fresh) { _sanaLinkDriveVecchi(fresh, 0); activeCampaign = fresh; _lastSnapshot = _deepClone(fresh); }
+    if (fresh) { _sanaLinkDriveVecchi(fresh, 0); _rimuoviCopieLoreVuote(fresh); activeCampaign = fresh; _lastSnapshot = _deepClone(fresh); }
     return fresh;
   };
 
@@ -12280,16 +12299,21 @@ const _updateCompendioToggle = (nota) => {
   }
 };
 
+// Aggiorna la nota Lore gia' collegata a un PNG/luogo/fazione (quella creata scrivendo una nota da
+// modello "PNG" o "Luogo", che a sua volta crea l'entita'). Non crea piu' note nuove: PNG, Luoghi e
+// Fazioni hanno ormai le loro sezioni nella Wiki, e una copia automatica in Lore era solo un
+// doppione. Il collegamento si cerca solo per id: prima anche per titolo, e una nota di Lore scritta
+// a mano con lo stesso nome di un luogo veniva sovrascritta.
 const _mondoToWiki = (tipo, entita) => {
+  tipo = { location: 'luogo', faction: 'fazione' }[tipo] || tipo;
   const w = (() => {
     const camp = App.getActiveCampaign();
     return camp?.wiki || { lore: [], sessioni: [], templates: [] };
   })();
 
   const nome = entita.name || entita.nome || '';
-  const existing = (w.lore || []).find(n =>
-    n.mondoId === entita.id || n.titolo === nome
-  );
+  const existing = (w.lore || []).find(n => n.mondoId === entita.id);
+  if (!existing) return;
 
   let contenuto = '';
 
@@ -12346,31 +12370,12 @@ const _mondoToWiki = (tipo, entita) => {
 
   const now = Date.now();
 
-  if (existing) {
+  existing.titolo = nome;
+  existing.aggiornatoAt = now;
 
-    existing.titolo = nome;
-    existing.aggiornatoAt = now;
-
-    const userExtra = _extractUserAdditions(existing.contenuto);
-    existing.contenuto = contenuto + (userExtra ? '\n<hr>\n' + userExtra : '');
-    existing.mondoId = entita.id;
-    existing.mondoTipo = tipo;
-  } else {
-
-    const uid = 'n' + now + Math.random().toString(36).slice(2,5);
-    const nota = {
-      id: uid,
-      titolo: nome,
-      contenuto,
-      tags: [tipo === 'npc' ? 'npc' : tipo === 'luogo' ? 'luogo' : 'fazione'],
-      creatoAt: now,
-      aggiornatoAt: now,
-      mondoId: entita.id,
-      mondoTipo: tipo,
-    };
-    if (!w.lore) w.lore = [];
-    w.lore.unshift(nota);
-  }
+  const userExtra = _extractUserAdditions(existing.contenuto);
+  existing.contenuto = contenuto + (userExtra ? '\n<hr>\n' + userExtra : '');
+  existing.mondoTipo = tipo;
 
   App.saveActiveCampaign({ wiki: w });
 };
