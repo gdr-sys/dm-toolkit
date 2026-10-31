@@ -151,6 +151,12 @@ Una pagina per preparare **più playlist** — Battaglia, Taverna, Esplorazione,
 
 ---
 
+## Vista giocatori
+
+Un link da mandare ai giocatori, che apre una pagina di sola lettura con **solo ciò che scegli tu**: il "Previously On…", i riassunti delle sessioni, l'**ordine di iniziativa in diretta** durante gli scontri, e i luoghi, i PNG, i documenti della Wiki e le mappe che selezioni. Si aggiorna da sola mentre giochi.
+
+I giocatori non vedono mai la campagna: l'app pubblica una copia separata e ridotta sotto un codice lungo e non indovinabile, e da quella copia restano sempre esclusi i riquadri "Segreto DM", i campi segreti, motivazioni e personalità dei PNG e i punti ferita dei mostri. Serve aver fatto l'accesso (Google o anonimo).
+
 ## Sincronizzazione e collaborazione
 
 Tre modalità, scelte al primo accesso:
