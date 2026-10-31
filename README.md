@@ -146,6 +146,7 @@ Una pagina per preparare **più playlist** — Battaglia, Taverna, Esplorazione,
 - **Prossime scadenze** dal calendario.
 - **Scheda rapida PNG** dalla barra in alto, per consultare un PNG a metà sessione.
 - **Blocco note** sempre a portata di mano.
+- **Segnala un bug** e **Suggerisci una funzione**, direttamente dall'app.
 - **Lanciadadi** sempre a portata di mano, con formule (`4d6kh3`, `2d8+5`) e il registro degli ultimi 50 tiri, con l'ora e i singoli dadi.
 - Backup e ripristino in JSON, per campagna o completo, e backup automatico su Google Drive.
 
