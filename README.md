@@ -8,7 +8,7 @@
 
 Web app per Dungeon Master di D&D 5e (edizioni 2014 e 2024) per gestire una campagna dalla preparazione della sessione al combattimento al tavolo, da qualsiasi dispositivo e senza installare nulla.
 
-![La Dashboard della campagna di esempio](docs/img/dashboard.jpg)
+![La Dashboard della campagna di esempio](docs/img/dashboard.png)
 
 Per vederla in azione: apri l'app e, nella Home vuota, scegli **"Prova con una campagna di esempio"**. Si crea *Le Ceneri di Valmora*, già piena di PNG, luoghi, sessioni, tabelle e calendario.
 
@@ -59,6 +59,8 @@ PNG, Luoghi, Fazioni, Quest, PG, Trame e Incontri hanno ciascuno la propria sezi
 - Rinominare un elemento aggiorna tutti i `[[collegamenti]]` nelle note.
 - Una nota creata da un modello PNG o Luogo crea anche l'elemento corrispondente e resta collegata. Salvare un elemento invece **non** crea più note doppie nella Lore.
 
+![Scheda di un luogo con la sua tabella casuale](docs/img/luogo.png)
+
 ### Mappe
 
 Carica un'immagine come mappa interattiva. Puoi spostarla trascinando e ingrandirla con la rotella o, su tablet e telefono, **con due dita**.
@@ -68,8 +70,6 @@ Carica un'immagine come mappa interattiva. Puoi spostarla trascinando e ingrandi
 - **Misura distanze** tra due segnaposto, in base alla scala della mappa.
 
 ### Calendario e Timeline
-
-![Timeline della campagna](docs/img/timeline.jpg)
 
 
 - Calendario in-world con preset (Forgotten Realms, Greyhawk…) o **completamente personalizzato**: mesi, giorni della settimana, festività, data e ora di oggi.
@@ -88,7 +88,7 @@ Carica un'immagine come mappa interattiva. Puoi spostarla trascinando e ingrandi
 
 ### Generatori
 
-![Le mie tabelle e i generatori](docs/img/generatori.jpg)
+![Le mie tabelle e i generatori](docs/img/generatori.png)
 
 
 22 generatori per improvvisare: PNG completo, meteo, rumori e odori, descrizione di luoghi, nomi di luoghi, negozio (con i prezzi degli oggetti magici), biblioteca, bottino, viaggio, incontri, incontro bilanciato, voci di corridoio, accenti, nomi, follia, ganci, oracolo, missioni. Si possono nascondere e riordinare.
@@ -109,14 +109,14 @@ Carica un'immagine come mappa interattiva. Puoi spostarla trascinando e ingrandi
 
 ### Compendio
 
-![Il Compendio su schermo largo](docs/img/compendio.jpg)
+![Il Compendio](docs/img/compendio.png)
 
 
 Mostri SRD 5.1 e 5.2.1 con GS normalizzato (comprese le frazioni 1/8, 1/4, 1/2), oggetti magici, equipaggiamento, incantesimi, regole, velocità di cavalcature e veicoli. Homebrew integrato: le note Wiki con tag `#oggetto` o `#mostro` finiscono nel Compendio. Preferiti per campagna, ricerca, filtri per tipo e GS. Su schermi larghi l'elenco va su più colonne.
 
 ### Sessione Zero e sicurezza
 
-![Sessione Zero](docs/img/sessione-zero.jpg)
+![Sessione Zero](docs/img/sessione-zero.png)
 
 - **Aspettative del tavolo** — tono, morte dei personaggi, conflitto tra PG, quanto combattimento, esplorazione e dialoghi, regole della casa.
 - **Linee e veli** — cosa non comparirà mai e cosa resterà fuori scena, con gli spunti più comuni da aggiungere in un clic.
