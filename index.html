@@ -2166,7 +2166,7 @@
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="Modal.close('confirm')">Annulla</button>
-      <button class="btn btn-danger" onclick="submitConfirm()">Elimina</button>
+      <button class="btn btn-danger" id="confirm-ok-btn" onclick="submitConfirm()">Elimina</button>
     </div>
   </div>
 </div>
@@ -3468,9 +3468,13 @@ const submitEditCampaign = () => {
 };
 
 let _confirmCallback = null;
-const openConfirmModal = (title, body, callback) => {
+// etichetta/pericoloso: il pulsante diceva sempre "Elimina" in rosso, anche per azioni che non
+// cancellano niente (es. "Terminare lo scontro?", che invece salva lo scontro).
+const openConfirmModal = (title, body, callback, etichetta = 'Elimina', pericoloso = true) => {
   document.getElementById('confirm-title').textContent = title;
   document.getElementById('confirm-body').textContent = body;
+  const ok = document.getElementById('confirm-ok-btn');
+  if (ok) { ok.textContent = etichetta; ok.className = 'btn ' + (pericoloso ? 'btn-danger' : 'btn-primary'); }
   _confirmCallback = callback;
   Modal.open('confirm');
 };
@@ -5243,7 +5247,7 @@ const Sessione = (() => {
       saveParty(party);
       renderParty();
       Toast.show('Personaggio rimosso', 'info');
-    });
+    }, 'Rimuovi');
   };
 
   // Scheda / Combattimento nel modale PG, come nella scheda PNG.
@@ -6168,7 +6172,7 @@ const Sessione = (() => {
       renderCombat();
       renderSavedSessions();
       Toast.show('Scontro concluso', 'info');
-    });
+    }, 'Termina', false);
   };
 
   const renderSavedSessions = () => {
@@ -8777,7 +8781,7 @@ const Schermo = (() => {
       save();
       render();
       Toast.show('Schermo resettato', 'info');
-    });
+    }, 'Resetta');
   };
 
   const refreshCombat = () => {
@@ -11461,7 +11465,7 @@ const Scratchpad = (() => {
       localStorage.removeItem(KEY);
       const ta = document.getElementById('scratchpad-text');
       if (ta) ta.value = '';
-    });
+    }, 'Pulisci');
   };
 
   return { toggle, save, clear };
@@ -11564,7 +11568,7 @@ const Clocks = (() => {
       clocks.splice(i, 1);
       _saveClocks(clocks);
       render();
-    });
+    }, 'Rimuovi');
   };
 
   return { add, tick, untick, remove, render };
@@ -14223,7 +14227,7 @@ const ScenePlanner = (() => {
     openConfirmModal('Pulire i beat?', 'Pulire tutti i beat della sessione?', () => {
       _saveBeats([]);
       render();
-    });
+    }, 'Pulisci');
   };
 
   return { render, addBeat, setTipo, setTitolo, setNote, togglePrincipale, moveUp, moveDown, remove, clear };
@@ -14692,7 +14696,7 @@ const WikiTrash = (() => {
       localStorage.removeItem(KEY);
       Toast.show('Cestino svuotato', 'info');
       if (onDone) onDone();
-    });
+    }, 'Svuota');
   };
 
   return { addToTrash, restore, removeOne, getAll, empty };
@@ -15523,7 +15527,7 @@ const DriveBackup = (() => {
       localStorage.removeItem(LS_LAST);
       _updateUI();
       Toast.show('Google Drive scollegato', 'info');
-    });
+    }, 'Scollega', false);
   };
 
   const showWelcomeIfNeeded = () => {
@@ -20821,7 +20825,7 @@ const NoteSessione = (() => {
     openConfirmModal('Cancella tutte le note sessione?', '', () => {
       _save([]);
       render();
-    });
+    }, 'Cancella');
   };
 
   return { render, addVoce, updateTipo, updateTesto, remove, clear, getData: _get };
@@ -21601,6 +21605,19 @@ document.addEventListener('DOMContentLoaded', initMobileNav);
             <button onclick="Settings.setDensity('wide')"     class="btn btn-ghost btn-sm settings-density-btn" data-density="wide"     style="font-size:0.82rem;">Wide</button>
           </div>
         </div>
+
+        <!-- Schermo sempre acceso (gestito da js/schermo-acceso.js) -->
+        <div style="margin-top:14px;">
+          <div style="margin-bottom:8px;">
+            <div style="font-size:0.88rem;font-weight:600;">Schermo sempre acceso</div>
+            <div id="wake-lock-desc" style="font-size:0.72rem;color:var(--text-muted);">Su tablet e telefono, evita che lo schermo si spenga mentre giochi</div>
+          </div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            <button onclick="SchermoAcceso.imposta('scontri')" class="btn btn-ghost btn-sm wake-lock-btn" data-modo="scontri" style="font-size:0.78rem;">Durante gli scontri</button>
+            <button onclick="SchermoAcceso.imposta('sempre')"  class="btn btn-ghost btn-sm wake-lock-btn" data-modo="sempre"  style="font-size:0.78rem;">Sempre</button>
+            <button onclick="SchermoAcceso.imposta('mai')"     class="btn btn-ghost btn-sm wake-lock-btn" data-modo="mai"     style="font-size:0.78rem;">Mai</button>
+          </div>
+        </div>
       </section>
 
       <!-- Account -->
@@ -21837,6 +21854,7 @@ document.addEventListener('DOMContentLoaded', initMobileNav);
 <script src="js/update-popup.js"></script>
 <script src="js/update-banner.js"></script>
 <script src="js/tabelle-casuali.js"></script>
+<script src="js/schermo-acceso.js"></script>
 <script src="js/wiki-import.js"></script>
 <script src="js/wiki-trash-ui.js"></script>
 <script src="js/quick-view.js"></script>
