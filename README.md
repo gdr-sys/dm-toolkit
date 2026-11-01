@@ -155,6 +155,13 @@ Una pagina per preparare **più playlist** — Battaglia, Taverna, Esplorazione,
 - **Lanciadadi** sempre a portata di mano, con formule (`4d6kh3`, `2d8+5`) e il registro degli ultimi 50 tiri, con l'ora e i singoli dadi.
 - Backup e ripristino in JSON, per campagna o completo, e backup automatico su Google Drive.
 
+### Aspetto: tema e sfondo
+
+- **Tema scuro o chiaro** — si cambia al volo con il pulsante luna/sole nella barra in alto, oppure da **Impostazioni > Aspetto**. La scelta resta salvata.
+- **Colore di sfondo** — sempre in Impostazioni > Aspetto: Default, Grigio scuro, Grigio medio, Grigio chiaro, Ardesia e Pergamena. Lo sfondo scelto è una tinta che segue il tema: cambiando da scuro a chiaro resta la stessa tonalità, con la luminosità adatta al tema, e tutta l'interfaccia (pagina, sezioni, card) si adegua insieme.
+- **Leggibilità garantita** — ogni combinazione di sfondo e tema è controllata perché i testi restino sopra la soglia di contrasto WCAG AA.
+- **Dimensione del testo** — per ingrandire o ridurre il testo dell'interfaccia.
+
 ---
 
 ## Vista giocatori

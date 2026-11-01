@@ -13636,6 +13636,9 @@ const FirebaseSync = (() => {
         throw new Error('la riconnessione automatica a Google Drive non è riuscita — apri Impostazioni, clicca su "Drive" per ricollegarti, poi riprova (i dati si aggiornano da soli appena ricollegata, senza bisogno di ricaricare la pagina)');
       }
       const full = await DriveBackup.downloadFromDrive(remote.driveFileId);
+      // Il file letto e' quello giusto: i salvataggi di questo dispositivo vanno li', invece di
+      // cercarne (o crearne) un altro.
+      if (full && full.id) { try { DriveBackup.adottaFileSync(full.id, remote.driveFileId); } catch(e) {} }
       return { ...full, updatedAt: remote.updatedAt, updatedBy: remote.updatedBy, updatedByName: remote.updatedByName };
     }
     return remote;
@@ -15410,10 +15413,44 @@ const DriveBackup = (() => {
   const _syncFileIdKey = (campId) => 'dm_drive_syncfile_' + campId;
   const _getSyncFileId = (campId) => localStorage.getItem(_syncFileIdKey(campId));
   const _setSyncFileId = (campId, fileId) => localStorage.setItem(_syncFileIdKey(campId), fileId);
+  // Usa come file di sync quello indicato dal puntatore Firebase, se questo dispositivo non ne
+  // ha ancora uno: cosi' un dispositivo nuovo scrive nel file gia' esistente.
+  const adottaFileSync = (campId, fileId) => {
+    if (campId && fileId && !_getSyncFileId(campId)) _setSyncFileId(campId, fileId);
+  };
 
   // Carica la campagna (con le immagini gia' sostituite da link Drive) nel suo file dedicato,
   // creandolo se non esiste ancora. E' il cuore sia del backup manuale che del sync automatico.
-  const syncToDrive = async (camp) => {
+  // Un salvataggio alla volta per campagna. syncToDrive viene chiamata da piu' parti (backup
+  // automatico, push Firebase, primo caricamento) senza aspettarsi a vicenda: senza coda, due
+  // chiamate quasi simultanee non trovavano ancora il file, e ognuna ne creava uno suo (su Drive
+  // finivano copie della stessa campagna create a pochi millisecondi di distanza).
+  const _syncQueue = new Map(); // campId -> promise dell'ultimo salvataggio accodato
+  const syncToDrive = (camp) => {
+    if (!camp || !camp.id) return Promise.resolve(null);
+    const prev = _syncQueue.get(camp.id) || Promise.resolve();
+    const next = prev.catch(() => {}).then(() => _syncToDriveNow(camp));
+    _syncQueue.set(camp.id, next);
+    next.finally(() => { if (_syncQueue.get(camp.id) === next) _syncQueue.delete(camp.id); }).catch(() => {});
+    return next;
+  };
+
+  // Se esistono piu' file per la stessa campagna (doppioni creati prima della coda, o da due
+  // dispositivi nello stesso istante) si tiene il piu' recente e gli altri vanno nel cestino di
+  // Drive: recuperabili, ma non piu' in mezzo.
+  const _cestinaDoppioni = async (ids) => {
+    for (const id of ids) {
+      try {
+        await _driveFetch('drive/v3/files/' + id, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ trashed: true }),
+        });
+      } catch(e) {}
+    }
+  };
+
+  const _syncToDriveNow = async (camp) => {
     if (!isConnected()) return null;
     if (!_folderId) _folderId = await _getOrCreateFolder();
 
@@ -15437,7 +15474,11 @@ const DriveBackup = (() => {
       try {
         const q = encodeURIComponent(`appProperties has { key='dmCampId' and value='${camp.id}' } and '${_folderId}' in parents and trashed=false`);
         const res = await _driveFetch('drive/v3/files?q=' + q + '&fields=files(id)&orderBy=modifiedTime desc');
-        if (res.ok) fileId = (await res.json()).files?.[0]?.id || null;
+        if (res.ok) {
+          const files = (await res.json()).files || [];
+          fileId = files[0]?.id || null;
+          if (files.length > 1) _cestinaDoppioni(files.slice(1).map(f => f.id));
+        }
       } catch(e) {}
     }
     if (fileId) {
@@ -15446,7 +15487,11 @@ const DriveBackup = (() => {
         headers: { 'Content-Type': 'application/json' },
         body: content,
       });
-      if (!uploadRes.ok) fileId = null; // probabilmente cancellato manualmente: ricrea sotto
+      // Solo un file che non esiste piu' (404, cancellato a mano) va ricreato. Prima qualsiasi
+      // errore (token scaduto, limite di richieste, Drive momentaneamente giu') faceva creare un
+      // file nuovo accanto a quello buono: un altro doppione a ogni intoppo.
+      if (uploadRes.status === 404) fileId = null;
+      else if (!uploadRes.ok) throw new Error('Errore salvataggio su Drive (' + uploadRes.status + ')');
       // Un file nel cestino di Drive accetta ancora le scritture: senza questo controllo un
       // dispositivo continuava a salvare in un file che l'utente aveva buttato (e non vedeva piu').
       else if ((await uploadRes.json().catch(() => ({}))).trashed) fileId = null;
@@ -15887,7 +15932,7 @@ const DriveBackup = (() => {
     init, connect, connectFromWelcome, dismissWelcome, backupNow, disconnect, showWelcomeIfNeeded, _updateUI,
     listBackups, openRestoreModal, restoreBackup,
     isConnected, ready, syncToDrive, downloadFromDrive, deleteFromDrive, _aggiornaStato, uploadImage, replaceImagesWithDriveLinks, toEmbeddableUrl,
-    generateInvite, acceptInvite,
+    generateInvite, acceptInvite, adottaFileSync,
   };
 })();
 
