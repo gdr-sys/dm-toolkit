@@ -168,7 +168,7 @@
     </a>
 
     <!-- Campagna attiva -->
-    <div class="sidebar-campaign" onclick="App.navigateTo('home')">
+    <div class="sidebar-campaign" role="button" tabindex="0" title="Apri la pagina della campagna" onclick="CampagnaHub.apri();closeMobileMenu()" onkeydown="if(event.key==='Enter'){CampagnaHub.apri();closeMobileMenu()}">
       <div class="campaign-dot" id="sidebar-campaign-dot" style="display:none;"></div>
       <span class="campaign-name" id="sidebar-campaign-name">Nessuna campagna</span>
     </div>
@@ -1579,6 +1579,11 @@
     </section>
 
     <!-- Hub Wiki — panoramica con tutte le voci, per non doverle scoprire scorrendo la sidebar -->
+    <!-- Pagina della campagna: tutte le sezioni a card (js/campagna-hub.js) -->
+    <section class="page" id="page-campagna-hub" style="padding:20px;">
+      <div id="campagna-hub-body" style="max-width:1100px;margin:0 auto;padding-bottom:80px;"></div>
+    </section>
+
     <section class="page" id="page-wiki-hub" style="padding:20px;height:calc(100vh - var(--header-height));overflow-y:auto;">
       <div style="max-width:980px;margin:0 auto;">
         <h2 style="font-family:var(--font-display);font-size:1.3rem;margin:0 0 4px;">Wiki</h2>
@@ -3659,6 +3664,7 @@ const App = (() => {
   const pages = {
     home:       { label: 'Home',   icon: '🏠', navItem: true,  requiresCampaign: false },
     campagna:   { label: 'Dashboard',   icon: '📖', navItem: true,  requiresCampaign: true  },
+    'campagna-hub': { label: 'Campagna', icon: '', navItem: false, requiresCampaign: true },
     sessione:   { label: 'Sessione',   icon: '⚔️', navItem: true,  requiresCampaign: true  },
     calendario: { label: 'Calendario', icon: '',   navItem: true,  requiresCampaign: true  },
     mappa:      { label: 'Mappa',      icon: '',   navItem: true,  requiresCampaign: true  },
@@ -22215,6 +22221,8 @@ document.addEventListener('DOMContentLoaded', initMobileNav);
 <script src="js/vista-giocatori.js"></script>
 <script src="js/suggerisci.js"></script>
 <script src="js/generatori-schede.js"></script>
+<script src="js/dashboard-mia.js"></script>
+<script src="js/campagna-hub.js"></script>
 <script src="js/schermo-acceso.js"></script>
 <script src="js/wiki-import.js"></script>
 <script src="js/wiki-trash-ui.js"></script>

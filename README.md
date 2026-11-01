@@ -96,7 +96,7 @@ Carica un'immagine come mappa interattiva. Puoi spostarla trascinando e ingrandi
 ![Le mie tabelle e i generatori](docs/img/generatori.png)
 
 
-22 generatori per improvvisare: PNG completo, meteo, rumori e odori, descrizione di luoghi, nomi di luoghi, negozio (con i prezzi degli oggetti magici), biblioteca, bottino, viaggio, incontri, incontro bilanciato, voci di corridoio, accenti, nomi, follia, ganci, oracolo, missioni. Tutti, comprese "Le mie tabelle", si possono nascondere da **Personalizza** e riordinare. Il **Generatore Nomi** non propone nomi già usati dai tuoi PNG, e le **Voci di corridoio** aggiungono due voci costruite con PNG, luoghi e fazioni della tua campagna, cliccabili.
+22 generatori per improvvisare: PNG completo, meteo, rumori e odori, descrizione di luoghi, nomi di luoghi, negozio (con i prezzi degli oggetti magici), biblioteca, bottino, viaggio, incontri, incontro bilanciato, voci di corridoio, accenti, nomi, follia, ganci, oracolo, missioni. Sono divisi in **schede per categoria** (PNG, ambiente, negozio, bottino, viaggio, strumenti narrativi, dungeon) con una **ricerca per nome**, così vedi solo quello che ti serve. Tutti, comprese "Le mie tabelle", si possono nascondere da **Personalizza** e riordinare. Il **Generatore Nomi** non propone nomi già usati dai tuoi PNG, e le **Voci di corridoio** aggiungono due voci costruite con PNG, luoghi e fazioni della tua campagna, cliccabili.
 
 - **Trappole ed enigmi** — trappole con innesco, CD e danni adatti al livello del party e alla pericolosità scelta, come accorgersene e disinnescarle; enigmi con suggerimento e soluzione; indovinelli con risposta. Soluzioni e risposte restano nascoste finché non le apri.
 - **Dungeon e stanze** — una stanza alla volta per tema (rovina, cripta, caverna, fortezza, tempio, tana di mostri) con dimensioni, sensazioni, uscite, contenuto e complicazioni, oppure un intero **dungeon in cinque stanze**.
@@ -110,6 +110,7 @@ Carica un'immagine come mappa interattiva. Puoi spostarla trascinando e ingrandi
 - Dentro una voce, `{2d6+1}` tira dei dadi e `[[Altra tabella]]` tira su un'altra delle tue tabelle.
 - L'anteprima mostra gli intervalli e avvisa di numeri scoperti, doppi o tabelle richiamate che non esistono.
 - **Import da CSV** (anche da Excel), sempre rivisto prima di salvare.
+- Ogni tabella può avere una **categoria**: compare anche nella scheda dei generatori corrispondente (per esempio gli incontri in "Viaggio & Incontri").
 - **Collegabili ai Luoghi**: "Incontri nella Foresta di Velmor" compare nella scheda della foresta, con il suo pulsante Tira.
 
 ### Compendio
@@ -139,6 +140,9 @@ Griglia di blocchi trascinabili e ridimensionabili: percezioni passive del party
 Una pagina per preparare **più playlist** — Battaglia, Taverna, Esplorazione, il tema di un nemico — con i link ai brani: YouTube, Spotify, Tabletop Audio, file su Google Drive. I video di YouTube si ascoltano direttamente nella pagina e la musica continua mentre usi il resto dell'app. Si salvano solo i link: nessun file audio passa dall'app.
 
 ### Dashboard e strumenti
+
+- **Pagina della campagna** — clicca il nome della campagna in cima al menu: tutto a card con i conteggi, diviso in "Al tavolo", "Il mondo" e "Prepara".
+- **La mia dashboard** — accanto alla Panoramica, una seconda vista dove scegli tu quali card vedere e in che ordine.
 
 - **Primi passi** — in una campagna nuova, cinque cose da fare per partire (Sessione Zero, primo PNG, primo luogo, prima sessione, un generatore) che si spuntano da sole.
 

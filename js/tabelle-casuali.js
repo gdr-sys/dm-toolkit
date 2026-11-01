@@ -22,6 +22,8 @@ const TabelleCasuali = (() => {
   const DADI = [4, 6, 8, 10, 12, 20, 100];
   const MAX_ANNIDAMENTO = 5;
   const _ultimi = {}; // id tabella -> ultimo risultato (solo in memoria)
+  // Filtro impostato dalle schede dei Generatori (js/generatori-schede.js): { categoria, cerca }
+  let _filtro = null;
   let _editId = null;
 
   const _esc = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -187,6 +189,7 @@ const TabelleCasuali = (() => {
         '<div style="flex:1;min-width:160px;">' +
           '<div style="font-family:var(--font-display);font-size:0.92rem;color:var(--text-primary);">' + _esc(t.nome || 'Senza nome') + '</div>' +
           '<div style="font-size:0.75rem;color:var(--text-muted);margin-top:2px;">' + _dadoLabel(t) + ' · ' + voci.length + (voci.length === 1 ? ' voce' : ' voci') +
+            (t.categoria && !_filtro?.categoria ? ' · ' + _esc(t.categoria) : '') +
             (luoghi.length ? ' · ' + luoghi.map(l => _esc(l.nome || l.name)).join(', ') : '') + '</div>' +
         '</div>' +
         '<button type="button" class="btn btn-ghost btn-icon-sm" title="Modifica tabella" aria-label="Modifica tabella" onclick="TabelleCasuali.apriEditor(\'' + t.id + '\')">' + _iconaMatita + '</button>' +
@@ -210,7 +213,7 @@ const TabelleCasuali = (() => {
       '<div class="card-header" style="flex-wrap:wrap;gap:8px;">' +
         '<div>' +
           '<h3 class="card-title">Le mie tabelle</h3>' +
-          '<div style="font-size:0.78rem;color:var(--text-muted);margin-top:2px;">Tabelle casuali del tuo mondo: le scrivi tu, l\'app le tira.</div>' +
+          '<div id="tc-sottotitolo" style="font-size:0.78rem;color:var(--text-muted);margin-top:2px;">Tabelle casuali del tuo mondo: le scrivi tu, l\'app le tira.</div>' +
         '</div>' +
         '<div style="display:flex;gap:6px;flex-wrap:wrap;">' +
           '<label class="btn btn-ghost btn-sm" style="cursor:pointer;" title="Importa una tabella da un file CSV o di testo">Importa CSV' +
@@ -230,7 +233,10 @@ const TabelleCasuali = (() => {
     const el = document.getElementById('tc-lista');
     if (!el) return;
     if (!_camp()) { el.innerHTML = '<div class="text-muted text-sm" style="padding:8px 0;">Apri una campagna per creare le tue tabelle.</div>'; return; }
-    const lista = [..._tabelle()].sort((a, b) => (a.nome || '').localeCompare(b.nome || '', 'it'));
+    const lista = filtrate();
+    const sotto = document.getElementById('tc-sottotitolo');
+    if (sotto) sotto.textContent = _filtro?.categoria ? 'Le tue tabelle in questa categoria.' : "Tabelle casuali del tuo mondo: le scrivi tu, l'app le tira.";
+    if (!lista.length && _filtro) { el.innerHTML = ''; return; }
     el.innerHTML = lista.length
       ? lista.map(t => _rigaTabella(t, true)).join('')
       : '<div style="padding:10px 0;font-size:0.88rem;color:var(--text-secondary);line-height:1.6;max-width:760px;">' +
@@ -238,6 +244,12 @@ const TabelleCasuali = (() => {
           'scrivi una voce per riga, scegli il dado e premi <strong>Tira</strong> quando ti serve. Puoi collegare una tabella a un Luogo per ritrovarla nella sua scheda.' +
         '</div>';
   };
+
+  const filtrate = (f = _filtro) => [..._tabelle()]
+    .filter(t => !f?.categoria || t.categoria === f.categoria)
+    .filter(t => !f?.cerca || (t.nome || '').toLowerCase().includes(f.cerca))
+    .sort((a, b) => (a.nome || '').localeCompare(b.nome || '', 'it'));
+  const filtra = (f) => { _filtro = f || null; render(); };
 
   // ── Blocco nella scheda Luogo (Wiki) ──
 
@@ -274,6 +286,9 @@ const TabelleCasuali = (() => {
                 '<option value="pesi">Pesi liberi</option>' +
               '</select></div>' +
           '</div>' +
+          '<div class="form-group" style="margin-bottom:12px;"><label class="form-label" for="tc-categoria">Categoria nei Generatori</label>' +
+            '<select id="tc-categoria" class="form-select"></select>' +
+            '<div style="font-size:0.75rem;color:var(--text-muted);margin-top:4px;">La tabella compare anche in quella scheda dei Generatori, oltre che in Le mie tabelle.</div></div>' +
           '<div class="form-group" style="margin-bottom:6px;"><label class="form-label" for="tc-sorgente">Voci — una per riga</label>' +
             '<textarea id="tc-sorgente" class="form-textarea" rows="9" spellcheck="false" style="font-family:var(--font-mono);font-size:0.82rem;line-height:1.6;" oninput="TabelleCasuali._anteprima()" placeholder="1-8 Un branco di lupi\n9-14 {1d4} banditi con un carro rubato\n15-19 Un druido che chiede aiuto\n20 Tira di nuovo: [[Eventi strani]]"></textarea></div>' +
           '<div style="font-size:0.78rem;color:var(--text-muted);line-height:1.55;margin-bottom:12px;">' +
@@ -324,12 +339,17 @@ const TabelleCasuali = (() => {
     if (!_camp()) { Toast.show('Apri prima una campagna', 'warning'); return; }
     _assicuraModale();
     const t = id ? _tabelle().find(x => x.id === id) : null;
-    const dati = t || bozza || { nome: '', dado: '20', sorgente: '', luoghi: [] };
+    // Creata da una scheda dei Generatori: parte gia' con quella categoria
+    const dati = t || bozza || { nome: '', dado: '20', sorgente: '', luoghi: [], categoria: _filtro?.categoria || '' };
     _editId = t ? t.id : null;
     document.getElementById('tc-titolo').textContent = t ? 'Modifica tabella' : 'Nuova tabella';
     document.getElementById('tc-nome').value = dati.nome || '';
     document.getElementById('tc-dado').value = String(dati.dado || '20');
     document.getElementById('tc-sorgente').value = dati.sorgente || '';
+    const categorie = (typeof GeneratoriSchede !== 'undefined' && GeneratoriSchede.categorie) ? GeneratoriSchede.categorie() : [];
+    if (dati.categoria && !categorie.includes(dati.categoria)) categorie.push(dati.categoria);
+    document.getElementById('tc-categoria').innerHTML = '<option value="">Solo in Le mie tabelle</option>' +
+      categorie.map(c => '<option value="' + _esc(c) + '"' + (c === dati.categoria ? ' selected' : '') + '>' + _esc(c) + '</option>').join('');
     document.getElementById('tc-elimina').style.visibility = t ? 'visible' : 'hidden';
     const luoghi = [...(_camp()?.locations || [])].sort((a, b) => (a.nome || a.name || '').localeCompare(b.nome || b.name || '', 'it'));
     document.getElementById('tc-luoghi').innerHTML = luoghi.length
@@ -352,6 +372,7 @@ const TabelleCasuali = (() => {
     const dati = {
       nome, sorgente,
       dado: document.getElementById('tc-dado').value,
+      categoria: document.getElementById('tc-categoria').value || '',
       luoghi: [...document.querySelectorAll('#tc-luoghi input:checked')].map(c => c.value),
       aggiornatoAt: Date.now(),
     };
@@ -383,6 +404,7 @@ const TabelleCasuali = (() => {
   // Dopo un salvataggio: lista nei Generatori e, se aperta, la scheda Luogo
   const _ridisegnaTutto = () => {
     render();
+    if (typeof GeneratoriSchede !== 'undefined') GeneratoriSchede.applica();
     const dettaglio = document.getElementById('wiki-luoghi-detail');
     if (dettaglio && dettaglio.style.display !== 'none' && typeof WikiSections !== 'undefined') {
       const id = WikiSections._currentItem?.id;
@@ -464,5 +486,5 @@ const TabelleCasuali = (() => {
 
   document.addEventListener('DOMContentLoaded', () => setTimeout(() => { _aggancia(); render(); }, 200));
 
-  return { render, tira, tiraTesto, apriEditor, importaFile, bloccoLuogo, interpreta, daCSV, _anteprima, _salvaEditor, _elimina };
+  return { render, filtra, filtrate, tira, tiraTesto, apriEditor, importaFile, bloccoLuogo, interpreta, daCSV, _anteprima, _salvaEditor, _elimina };
 })();

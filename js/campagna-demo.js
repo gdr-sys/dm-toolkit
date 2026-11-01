@@ -107,11 +107,11 @@ const CampagnaDemo = (() => {
           creatoAt: ora, aggiornatoAt: ora },
       ],
       tabelleCasuali: [
-        { id: 'tab_demo1', nome: 'Incontri sul Monte Ardegna', dado: '20', luoghi: [ardegna],
+        { id: 'tab_demo1', nome: 'Incontri sul Monte Ardegna', dado: '20', categoria: 'Viaggio & Incontri', luoghi: [ardegna],
           sorgente: '1-6 Una colata di lava improvvisa taglia il sentiero\n7-10 {1d4+1} Custodi della Cenere in pellegrinaggio\n11-14 Un elementale del fuoco minore che vaga confuso\n15-17 Un eremita che chiede di riportare il suo mulo a valle\n18-19 Una galleria di gas: TS su Costituzione CD 13\n20 Qualcosa di strano: [[Segni del vulcano]]', creatoAt: ora, aggiornatoAt: ora },
-        { id: 'tab_demo2', nome: 'Segni del vulcano', dado: 'pesi', luoghi: [],
+        { id: 'tab_demo2', nome: 'Segni del vulcano', dado: 'pesi', categoria: 'Ambiente & Atmosfera', luoghi: [],
           sorgente: '3 La cenere forma per un istante un volto nel cielo\n2 Tutti gli uccelli della valle tacciono di colpo\n2 Le botti del Tino Rovesciato si scaldano da sole\n1 Una scossa apre una crepa che mostra un\'antica scalinata', creatoAt: ora, aggiornatoAt: ora },
-        { id: 'tab_demo3', nome: 'Voci al Tino Rovesciato', dado: '6', luoghi: [locanda],
+        { id: 'tab_demo3', nome: 'Voci al Tino Rovesciato', dado: '6', categoria: 'Strumenti Narrativi', luoghi: [locanda],
           sorgente: 'Bertrando ha venduto metà della vendemmia prima ancora di raccoglierla\nDi notte si vedono torce salire verso il cratere\nFratello Orsino non invecchia: mia nonna lo conosceva già vecchio\nA Corvara pagano il triplo per il vino che sa di cenere\nElio, il figlio di Tessa, porta un amuleto nuovo\nNella cripta c\'è un tesoro dei monaci, e nessuno ha il coraggio di prenderlo', creatoAt: ora, aggiornatoAt: ora },
       ],
       segreti: [
