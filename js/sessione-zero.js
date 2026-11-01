@@ -18,7 +18,7 @@ const SessioneZero = (() => {
   const SUGGERIMENTI = ['Violenza su bambini', 'Violenza sessuale', 'Tortura esplicita', 'Ragni', 'Insetti', 'Body horror', 'Suicidio e autolesionismo', 'Razzismo nel mondo di gioco', 'Crudeltà sugli animali', 'Malattie e contagi', 'Annegamento', 'Possessione e perdita di controllo', 'Scene romantiche esplicite', 'Fobie (chiedere quali)'];
 
   const STRUMENTI = [
-    ['cartaX', 'Carta X', 'Chiunque tocchi la carta (o la mostri sul tablet) può far saltare il contenuto in corso, senza dover spiegare perché. Si va avanti e basta.'],
+    ['cartaX', 'Carta X', 'Chiunque tocchi la carta sul tavolo può far saltare il contenuto in corso, senza dover spiegare perché. Si va avanti e basta.'],
     ['linee', 'Linee e veli', 'Le linee sono temi che non compaiono mai nel gioco. I veli possono esistere, ma fuori scena: "dissolvenza al nero".'],
     ['porta', 'Porta aperta', 'Chiunque può lasciare il tavolo, per una pausa o per sempre, senza doverlo giustificare.'],
     ['pausa', 'Pausa e controllo', 'Chiunque può chiedere una pausa per parlare fuori dal personaggio di come sta andando.'],
@@ -47,7 +47,6 @@ const SessioneZero = (() => {
       '<div class="card-header" style="flex-wrap:wrap;gap:6px;">' +
         '<h3 class="card-title">Sessione Zero</h3>' +
         '<div style="display:flex;gap:6px;">' +
-          '<button type="button" class="btn btn-ghost btn-sm" onclick="SessioneZero.mostraCartaX()" title="Mostra la carta X a schermo intero">Carta X</button>' +
           '<button type="button" class="btn btn-ghost btn-sm" onclick="SessioneZero.apri()">Apri</button>' +
         '</div>' +
       '</div>' +
@@ -91,7 +90,6 @@ const SessioneZero = (() => {
         '</div>' +
         '<div class="modal-body" id="sz-body"></div>' +
         '<div class="modal-footer">' +
-          '<button type="button" class="btn btn-ghost" onclick="SessioneZero.mostraCartaX()">Mostra carta X</button>' +
           '<button type="button" class="btn btn-primary" style="margin-left:auto;" onclick="Modal.close(\'sessione-zero\')">Fatto</button>' +
         '</div>' +
       '</div>';
@@ -188,26 +186,6 @@ const SessioneZero = (() => {
   const togli = (lista, i) => { const d = _dati(); _salva({ [lista]: d[lista].filter((_, j) => j !== i) }); _dopo(); };
   const strumento = (k, on) => { const s = new Set(_dati().strumenti); on ? s.add(k) : s.delete(k); _salva({ strumenti: [...s] }); render(); };
 
-  // ── Carta X a schermo intero ──
-
-  const mostraCartaX = () => {
-    if (document.getElementById('sz-carta-x')) return;
-    const el = document.createElement('div');
-    el.id = 'sz-carta-x';
-    el.setAttribute('role', 'dialog');
-    el.setAttribute('aria-label', 'Carta X');
-    el.style.cssText = 'position:fixed;inset:0;z-index:10001;background:#111;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;cursor:pointer;padding:24px;text-align:center;';
-    el.innerHTML =
-      '<svg aria-hidden="true" viewBox="0 0 100 100" style="width:min(60vw,60vh);height:min(60vw,60vh);"><rect x="4" y="4" width="92" height="92" rx="10" fill="none" stroke="#fff" stroke-width="5"/><line x1="25" y1="25" x2="75" y2="75" stroke="#fff" stroke-width="11" stroke-linecap="round"/><line x1="75" y1="25" x2="25" y2="75" stroke="#fff" stroke-width="11" stroke-linecap="round"/></svg>' +
-      '<div style="font-family:var(--font-display);font-size:1.3rem;letter-spacing:0.04em;">Saltiamo questa parte</div>' +
-      '<div style="font-size:0.9rem;opacity:0.7;">Nessuna spiegazione necessaria. Tocca per chiudere.</div>';
-    const chiudi = () => { el.remove(); document.removeEventListener('keydown', esc); };
-    const esc = (e) => { if (e.key === 'Escape') chiudi(); };
-    el.addEventListener('click', chiudi);
-    document.addEventListener('keydown', esc);
-    document.body.appendChild(el);
-  };
-
   const _aggancia = () => {
     if (typeof App === 'undefined' || App._sessioneZeroHooked) return;
     const orig = App.navigateTo;
@@ -219,5 +197,5 @@ const SessioneZero = (() => {
   };
   document.addEventListener('DOMContentLoaded', () => setTimeout(_aggancia, 200));
 
-  return { render, apri, imposta, aggiungi, aggiungiTesto, togli, strumento, mostraCartaX };
+  return { render, apri, imposta, aggiungi, aggiungiTesto, togli, strumento };
 })();

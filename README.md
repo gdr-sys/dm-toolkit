@@ -87,6 +87,7 @@ Carica un'immagine come mappa interattiva. Puoi spostarla trascinando e ingrandi
 - **Scene planner** — la sequenza di momenti di ogni sessione (apertura, combattimento, sociale, esplorazione, rivelazione, cliffhanger…), riordinabile.
 - **Diario delle sessioni** — numero, titolo, date reale e in-world, stato, PNG coinvolti, preparazione e riassunto. Ogni sessione può avere la sua nota nella Wiki.
 - **Chiudi la sessione in 5 domande** — cosa è successo, XP e bottino, fili rimasti aperti, gancio per la prossima volta, momento migliore. Dalle risposte l'app compila da sola il diario della sessione, i ganci in Dashboard, la prossima sessione pianificata, un Momento del PG e il "Previously On…".
+- **Avvio guidato della sessione** (facoltativo, si attiva da Impostazioni) — prima di iniziare, in un colpo d'occhio: il "Previously On…" da leggere, la sessione pianificata, clock e ganci aperti, segreti da far emergere, linee e veli della Sessione Zero.
 - **"Previously On…"** — il riassunto dell'ultima sessione, pronto da leggere al tavolo.
 - **Party** — i PG con classe, livello, PF, CA, punteggi passivi e ispirazione, sincronizzati con la sezione PG della Wiki.
 - **Clock** — per rituali, inseguimenti, pressione delle fazioni.
@@ -129,7 +130,6 @@ Mostri SRD 5.1 e 5.2.1 con GS normalizzato (comprese le frazioni 1/8, 1/4, 1/2),
 - **Aspettative del tavolo** — tono, morte dei personaggi, conflitto tra PG, quanto combattimento, esplorazione e dialoghi, regole della casa.
 - **Linee e veli** — cosa non comparirà mai e cosa resterà fuori scena, con gli spunti più comuni da aggiungere in un clic.
 - **Strumenti al tavolo** — carta X, porta aperta, pausa, stelle e desideri, ciascuno spiegato.
-- **Carta X a schermo intero** dalla Dashboard, da mostrare al tavolo con un tocco.
 
 ### Schermo del DM
 

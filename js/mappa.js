@@ -155,7 +155,7 @@ const MappaUI = (() => {
         '<div id="mappa-canvas" style="flex:1;position:relative;overflow:hidden;background:var(--bg-tertiary);cursor:grab;touch-action:none;">' +
           '<div id="mappa-vuota" style="display:none;position:absolute;inset:0;flex-direction:column;align-items:center;justify-content:center;gap:12px;text-align:center;padding:24px;">' +
             '<div style="opacity:0.4;"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 6v16l7-4 8 4 7-4V2l-7 4-8-4-7 4z"/><path d="M8 2v16"/><path d="M16 6v16"/></svg></div>' +
-            '<div><h3 id="mappa-vuota-titolo" style="margin:0 0 4px;">Nessuna mappa ancora</h3><p class="text-sm text-muted" style="margin:0;max-width:340px;">Carica un’immagine (un disegno, una scansione, una mappa fatta altrove) e inizia a segnare luoghi e PNG sopra.</p></div>' +
+            '<div><h3 id="mappa-vuota-titolo" style="margin:0 0 4px;">Nessuna mappa ancora</h3><p id="mappa-vuota-testo" class="text-sm text-muted" style="margin:0 auto;max-width:420px;line-height:1.55;">Carica un’immagine (un disegno, una scansione, una mappa fatta altrove) e inizia a segnare luoghi e PNG sopra.</p></div>' +
             '<button class="btn btn-primary btn-sm" onclick="MappaUI.apriImpostazioni()">Carica una mappa</button>' +
           '</div>' +
           '<div id="mappa-inner" style="position:absolute;left:0;top:0;transform-origin:0 0;">' +
@@ -204,8 +204,12 @@ const MappaUI = (() => {
       '<button class="btn btn-ghost btn-icon-sm" title="Nuova mappa" onclick="MappaUI.nuovaMappa()" style="margin-left:6px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>';
   };
 
+  const TESTO_VUOTA = 'Carica un’immagine (un disegno, una scansione, una mappa fatta altrove) e inizia a segnare luoghi e PNG sopra.';
+  const _testoVuota = (t) => { const el = document.getElementById('mappa-vuota-testo'); if (el) el.textContent = t || TESTO_VUOTA; };
+
   const _render = () => {
     _injectPage();
+    _testoVuota();
     if (!_navStack.length) {
       const mappe = _getMappe();
       _navStack = [mappe.length ? mappe[0].id : null].filter(Boolean);
@@ -220,6 +224,20 @@ const MappaUI = (() => {
         vuota.style.display = 'flex';
         const t = document.getElementById('mappa-vuota-titolo');
         if (t) t.textContent = mappa ? 'Nessuna immagine per "' + mappa.nome + '"' : 'Nessuna mappa ancora';
+      }
+      if (inner) inner.style.display = 'none';
+      return;
+    }
+    // Immagine caricata su un altro dispositivo senza Drive collegato: e' rimasta solo li', qui
+    // arriva il segnaposto (vedi _alleggerisci in FirebaseSync). Si spiega cosa fare invece del
+    // generico "immagine non disponibile".
+    if (mappa.immagine === 'dm-solo-sul-dispositivo') {
+      if (vuota) {
+        vuota.style.display = 'flex';
+        const t = document.getElementById('mappa-vuota-titolo');
+        if (t) t.textContent = 'Immagine rimasta su un altro dispositivo';
+        _testoVuota('L’immagine di “' + mappa.nome + '” è stata caricata su un dispositivo senza Drive collegato ed è rimasta solo lì. ' +
+          'Se quel dispositivo ce l’ha ancora, aprilo con Drive collegato e fai una modifica qualsiasi: verrà caricata su Drive da sola. Altrimenti ricaricala da “Modifica mappa”.');
       }
       if (inner) inner.style.display = 'none';
       return;
