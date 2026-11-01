@@ -11983,8 +11983,27 @@ const GDrive = (() => {
   let _tokenClient = null;
   let _onConnectCbs = [];
   const _valido = () => _loggedIn && !!_token && Date.now() < _scadenza;
+
+  // Il token resta valido fino alla sua scadenza anche se la pagina si ricarica, ma prima stava
+  // solo in memoria: ogni ricarica (aggiornamento automatico al rientro, tablet che chiude l'app in
+  // background) lo perdeva, e il rinnovo all'avvio apre una finestra di Google che il browser
+  // blocca senza un tocco. Risultato: Drive "si scollegava" ogni pochi minuti. Ora il token
+  // (permesso drive.file, solo sui file creati dall'app, valido al massimo un'ora) si conserva in
+  // locale fino alla scadenza e si riusa al caricamento.
+  const LS_SESSIONE = 'dm_gdrive_sessione';
+  const _salvaSessione = () => {
+    try { localStorage.setItem(LS_SESSIONE, JSON.stringify({ t: _token, exp: _scadenza, u: _userInfo })); } catch(e) {}
+  };
+  const _cancellaSessione = () => { try { localStorage.removeItem(LS_SESSIONE); } catch(e) {} };
+  try {
+    const s = JSON.parse(localStorage.getItem(LS_SESSIONE) || 'null');
+    if (s && s.t && s.exp > Date.now() + 60 * 1000 && localStorage.getItem('dm_drive_connected') === 'true') {
+      _token = s.t; _scadenza = s.exp; _userInfo = s.u || null; _loggedIn = true;
+    } else if (s) _cancellaSessione();
+  } catch(e) {}
+
   // Chiamata quando Google rifiuta il token (401): conta come scaduto
-  const segnaScaduto = () => { _scadenza = 0; try { DriveBackup._aggiornaStato?.(); } catch(e) {} };
+  const segnaScaduto = () => { _scadenza = 0; _cancellaSessione(); try { DriveBackup._aggiornaStato?.(); } catch(e) {} };
 
   // Rinnovo automatico: il browser apre la finestra di Google solo se nasce da un tocco
   // dell'utente, per questo il rinnovo all'avvio spesso falliva. Quando il token sta per scadere
@@ -12072,6 +12091,7 @@ const GDrive = (() => {
             const info = await r.json();
             _userInfo = { name: info.name, email: info.email, picture: info.picture };
           } catch(e) {}
+          _salvaSessione();
           _updateBtn();
           if (!silenzioso) Toast.show('Connesso come ' + (_userInfo?.name || 'Drive'), 'success', 2000);
           const cbs = _onConnectCbs; _onConnectCbs = [];
@@ -12090,7 +12110,17 @@ const GDrive = (() => {
   // DriveBackup.init). Richiede lo script GIS come il login normale, poi
   // tenta un token silenzioso.
   const silentReconnect = () => {
-    if (!CLIENT_ID || _valido()) return;
+    if (!CLIENT_ID) return;
+    // Token ripreso dal salvataggio locale: niente login, ma la libreria di Google serve
+    // comunque per il rinnovo al tocco quando il token sta per scadere.
+    if (_valido()) {
+      if (!window.google?.accounts?.oauth2 && !document.querySelector('script[src*="accounts.google.com/gsi/client"]')) {
+        const s = document.createElement('script');
+        s.src = 'https://accounts.google.com/gsi/client';
+        document.head.appendChild(s);
+      }
+      return;
+    }
     if (!window.google?.accounts?.oauth2) {
       const s = document.createElement('script');
       s.src = 'https://accounts.google.com/gsi/client';
@@ -12107,6 +12137,7 @@ const GDrive = (() => {
     _token    = null;
     _userInfo = null;
     _fileId   = null;
+    _cancellaSessione();
     localStorage.removeItem('dm_gdrive_fileid');
     _updateBtn();
     Toast.show('Disconnesso da Drive', 'info');
@@ -15915,6 +15946,7 @@ const DriveBackup = (() => {
       _imagesFolderPromise = null;
       localStorage.removeItem(LS_KEY);
       localStorage.removeItem(LS_LAST);
+      localStorage.removeItem('dm_gdrive_sessione'); // il token salvato non deve sopravvivere allo scollegamento
       _updateUI();
       Toast.show('Google Drive scollegato', 'info');
     }, 'Scollega', false);
