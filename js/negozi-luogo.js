@@ -111,7 +111,7 @@ const NegoziLuogo = (() => {
           '<span style="font-size:0.75rem;color:var(--text-muted);">' + n.oggetti.length + ' oggetti</span>' +
           '<button type="button" class="btn btn-ghost btn-sm" style="font-size:0.72rem;" onclick="event.preventDefault();NegoziLuogo.rimuovi(\'' + locId + '\',\'' + n.id + '\')">Rimuovi</button></summary>' +
         '<table style="width:100%;border-collapse:collapse;font-size:0.82rem;margin-top:6px;">' +
-          n.oggetti.map(o => '<tr><td style="padding:3px 0;border-bottom:1px solid var(--border);"><span style="cursor:pointer;color:var(--accent-secondary);" data-nome="' + _esc(o.nome) + '" onclick="CompendioCache.openItem(this.dataset.nome)" title="Apri nel Compendio">' + _esc(o.nome) + '</span></td>' +
+          n.oggetti.map(o => '<tr><td style="padding:3px 0;border-bottom:1px solid var(--border);"><span style="cursor:pointer;color:var(--accent-secondary-text);" data-nome="' + _esc(o.nome) + '" onclick="CompendioCache.openItem(this.dataset.nome)" title="Apri nel Compendio">' + _esc(o.nome) + '</span></td>' +
             '<td style="padding:3px 6px;border-bottom:1px solid var(--border);text-align:center;color:var(--text-muted);font-family:var(--font-mono);">' + _esc(o.qta) + '</td>' +
             '<td style="padding:3px 0;border-bottom:1px solid var(--border);text-align:right;font-family:var(--font-mono);color:var(--text-secondary);">' + _esc(o.prezzo) + '</td></tr>').join('') +
         '</table></details>').join('') +

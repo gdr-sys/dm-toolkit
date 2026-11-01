@@ -20,7 +20,7 @@ const GeneratoriExtra = (() => {
   const riquadro = (html) => '<div style="background:var(--bg-secondary);border-left:3px solid var(--accent-secondary);border-radius:0 var(--radius-sm) var(--radius-sm) 0;padding:10px 12px;margin-bottom:8px;font-size:0.88rem;line-height:1.65;">' + html + '</div>';
   const riga = (etichetta, testo) => '<div style="margin-top:4px;"><span style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted);">' + etichetta + '</span><div>' + testo + '</div></div>';
   const titolo = (t) => '<div style="font-family:var(--font-display);font-size:0.98rem;color:var(--text-primary);margin-bottom:4px;">' + t + '</div>';
-  const segreto = (etichetta, testo) => '<details style="margin-top:6px;"><summary style="cursor:pointer;font-size:0.8rem;color:var(--accent-secondary);">' + etichetta + '</summary><div style="margin-top:4px;font-size:0.85rem;">' + testo + '</div></details>';
+  const segreto = (etichetta, testo) => '<details style="margin-top:6px;"><summary style="cursor:pointer;font-size:0.8rem;color:var(--accent-secondary-text);">' + etichetta + '</summary><div style="margin-top:4px;font-size:0.85rem;">' + testo + '</div></details>';
 
   // ════════════════════════════════════════════
   // 1. TRAPPOLE, ENIGMI, INDOVINELLI

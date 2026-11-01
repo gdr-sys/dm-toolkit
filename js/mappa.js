@@ -496,7 +496,7 @@ const MappaUI = (() => {
           '</div>' +
         '</div>' +
         '<div class="modal-footer" style="justify-content:space-between;">' +
-          '<button class="btn btn-ghost" id="mappa-set-elimina" style="color:var(--accent-danger);" onclick="MappaUI.eliminaMappaCorrente()">Elimina mappa</button>' +
+          '<button class="btn btn-ghost" id="mappa-set-elimina" style="color:var(--danger-text);" onclick="MappaUI.eliminaMappaCorrente()">Elimina mappa</button>' +
           '<div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;">' +
             '<button class="btn btn-ghost" onclick="Modal.close(\'mappa-settings\')">Annulla</button>' +
             '<button class="btn btn-primary" onclick="MappaUI.salvaImpostazioni()">Salva</button>' +
@@ -915,7 +915,7 @@ const MappaUI = (() => {
         (mappaCollegata ? '<button class="btn btn-secondary btn-sm" onclick="MappaUI.entraInMappa(\'' + mappaCollegata.id + '\')">Apri questa mappa</button>' : '') +
         '<button class="btn btn-ghost btn-sm" onclick="MappaUI.modificaPin(\'' + pinId + '\')">Modifica pin</button>' +
         '<button class="btn btn-ghost btn-sm" onclick="MappaUI.iniziaMisuraDaPin(\'' + pinId + '\')">Misura distanza da qui</button>' +
-        '<button class="btn btn-ghost btn-sm" style="color:var(--accent-danger);" onclick="MappaUI.rimuoviPin(\'' + pinId + '\')">Rimuovi pin</button>' +
+        '<button class="btn btn-ghost btn-sm" style="color:var(--danger-text);" onclick="MappaUI.rimuoviPin(\'' + pinId + '\')">Rimuovi pin</button>' +
       '</div>';
     const rect = ev.target.closest('.mappa-pin').getBoundingClientRect();
     pop.style.left = Math.min(rect.left, window.innerWidth - 220) + 'px';
@@ -977,7 +977,7 @@ const MappaUI = (() => {
             '<button class="btn btn-ghost btn-icon-sm" onclick="Modal.close(\'mappa-distanza\')" aria-label="Chiudi"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>' +
           '</div>' +
           '<div class="modal-body">' +
-            '<div id="mappa-dist-km" style="font-family:var(--font-mono);font-size:1.3rem;color:var(--accent-primary);margin-bottom:12px;"></div>' +
+            '<div id="mappa-dist-km" style="font-family:var(--font-mono);font-size:1.3rem;color:var(--accent-text);margin-bottom:12px;"></div>' +
             '<div class="form-group"><label class="form-label">Terreno</label><select id="mappa-dist-terreno" class="form-select" onchange="MappaUI._ricalcolaMisura()"></select></div>' +
             '<div id="mappa-dist-tabella"></div>' +
           '</div>' +

@@ -45,7 +45,7 @@ const WikiTrashUI = (() => {
           '<div id="wiki-trash-list"></div>' +
         '</div>' +
         '<div class="modal-footer" style="justify-content:space-between;">' +
-          '<button class="btn btn-ghost" style="color:var(--accent-danger);" onclick="WikiTrashUI.svuota()">Svuota cestino</button>' +
+          '<button class="btn btn-ghost" style="color:var(--danger-text);" onclick="WikiTrashUI.svuota()">Svuota cestino</button>' +
           '<button class="btn btn-primary" onclick="Modal.close(\'wiki-trash\')">Chiudi</button>' +
         '</div>' +
       '</div>';
@@ -71,7 +71,7 @@ const WikiTrashUI = (() => {
           '</div>' +
           '<div style="display:flex;gap:4px;flex-shrink:0;">' +
             '<button class="btn btn-ghost btn-sm" onclick="WikiTrashUI.ripristina(\'' + v.id + '\')">Ripristina</button>' +
-            '<button class="btn btn-ghost btn-icon-sm" title="Elimina definitivamente" aria-label="Elimina definitivamente" style="color:var(--accent-danger);" onclick="WikiTrashUI.eliminaDefinitivamente(\'' + v.id + '\')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg></button>' +
+            '<button class="btn btn-ghost btn-icon-sm" title="Elimina definitivamente" aria-label="Elimina definitivamente" style="color:var(--danger-text);" onclick="WikiTrashUI.eliminaDefinitivamente(\'' + v.id + '\')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg></button>' +
           '</div>' +
         '</div>'
       );

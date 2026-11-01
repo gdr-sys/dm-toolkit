@@ -35,7 +35,7 @@ const Onboarding = (() => {
         '<div class="modal-body" style="display:flex;flex-direction:column;gap:16px;">' +
           SEZIONI.map(s =>
             '<div>' +
-              '<div style="font-family:var(--font-display);font-weight:700;font-size:0.9rem;color:var(--accent-primary);margin-bottom:4px;">' + s.titolo + '</div>' +
+              '<div style="font-family:var(--font-display);font-weight:700;font-size:0.9rem;color:var(--accent-text);margin-bottom:4px;">' + s.titolo + '</div>' +
               '<div style="font-size:0.85rem;line-height:1.6;color:var(--text-secondary);">' + s.testo + '</div>' +
             '</div>'
           ).join('') +

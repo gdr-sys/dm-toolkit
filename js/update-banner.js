@@ -75,7 +75,7 @@ const UpdateBanner = (() => {
   };
 
   const _iconaSvg =
-    '<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;color:var(--accent-secondary);">' +
+    '<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;color:var(--accent-secondary-text);">' +
       '<path d="M21 12a9 9 0 1 1-3-6.7"/><polyline points="21 3 21 9 15 9"/>' +
     '</svg>';
 
@@ -129,7 +129,28 @@ const UpdateBanner = (() => {
     if (Date.now() - _ultimoControllo > MIN_TRA_CONTROLLI_MS) controlla(true);
   };
 
+  // Data di pubblicazione della versione che sta girando (GitHub Pages la manda come
+  // Last-Modified di index.html): in Impostazioni, per controllare se un dispositivo e' aggiornato.
+  const _mostraVersione = () => {
+    const modale = document.querySelector('#modal-settings .modal-body');
+    if (!modale) return;
+    let el = document.getElementById('versione-app');
+    if (!el) {
+      el = document.createElement('div');
+      el.id = 'versione-app';
+      el.style.cssText = 'font-size:0.75rem;color:var(--text-muted);border-top:1px solid var(--border);padding-top:10px;margin-top:14px;';
+      modale.appendChild(el);
+    }
+    const d = new Date(document.lastModified);
+    el.textContent = 'Versione in uso: pubblicata il ' + (isNaN(d) ? '—' : d.toLocaleString('it-IT', { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' })) +
+      '. Se un altro dispositivo mostra una data più vecchia, chiudi del tutto l’app e riaprila.';
+  };
+
   const init = () => {
+    if (typeof Settings !== 'undefined' && Settings.open) {
+      const so = Settings.open;
+      Settings.open = function () { const r = so.apply(Settings, arguments); setTimeout(_mostraVersione, 50); return r; };
+    }
     setTimeout(controlla, 5000);
     setInterval(controlla, INTERVALLO_MS);
     // Riaprendo l'app dal multitasking del tablet non c'e' nessun caricamento di pagina:

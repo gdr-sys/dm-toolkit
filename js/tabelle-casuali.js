@@ -163,7 +163,7 @@ const TabelleCasuali = (() => {
       '<span style="font-family:var(--font-mono);font-size:0.78rem;color:var(--text-muted);margin-right:8px;">d' + t.dado + ' → ' + r.numero + '</span>';
     return tiro + (r.testo
       ? '<span style="color:var(--text-primary);">' + _esc(r.testo) + '</span>'
-      : '<span style="color:var(--accent-warning);">Nessuna voce per ' + r.numero + '</span>');
+      : '<span style="color:var(--warning-text);">Nessuna voce per ' + r.numero + '</span>');
   };
 
   // Lo stesso risultato puo' essere visibile in piu' punti (Generatori e scheda Luogo)
@@ -301,7 +301,7 @@ const TabelleCasuali = (() => {
             '<div id="tc-luoghi" style="display:flex;flex-wrap:wrap;gap:6px 14px;max-height:120px;overflow-y:auto;font-size:0.85rem;"></div></div>' +
         '</div>' +
         '<div class="modal-footer" style="justify-content:space-between;">' +
-          '<button type="button" class="btn btn-ghost" id="tc-elimina" style="color:var(--accent-danger);" onclick="TabelleCasuali._elimina()">Elimina</button>' +
+          '<button type="button" class="btn btn-ghost" id="tc-elimina" style="color:var(--danger-text);" onclick="TabelleCasuali._elimina()">Elimina</button>' +
           '<div style="display:flex;gap:8px;margin-left:auto;">' +
             '<button type="button" class="btn btn-ghost" onclick="Modal.close(\'tabella-casuale\')">Annulla</button>' +
             '<button type="button" class="btn btn-primary" onclick="TabelleCasuali._salvaEditor()">Salva</button>' +
@@ -332,7 +332,7 @@ const TabelleCasuali = (() => {
           '<span style="font-family:var(--font-mono);color:var(--text-muted);min-width:52px;">' + etichetta(v) + '</span>' +
           '<span style="color:var(--text-primary);">' + _esc(v.testo) + '</span></div>').join('') +
       '</div>' +
-      avvisi.map(a => '<div style="font-size:0.78rem;color:var(--accent-warning);margin-top:6px;line-height:1.45;">' + _esc(a) + '</div>').join('');
+      avvisi.map(a => '<div style="font-size:0.78rem;color:var(--warning-text);margin-top:6px;line-height:1.45;">' + _esc(a) + '</div>').join('');
   };
 
   const apriEditor = (id, bozza) => {

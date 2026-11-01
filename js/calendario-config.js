@@ -71,7 +71,7 @@ const CalendarioConfig = (() => {
         '<input class="form-input ccfg-m-nome" value="' + _esc(m.nome) + '" placeholder="Nome" style="flex:1;font-size:0.8rem;min-width:80px;">' +
         '<input class="form-input ccfg-m-it" value="' + _esc(m.it) + '" placeholder="Nome esteso (opzionale)" style="flex:1;font-size:0.8rem;min-width:80px;">' +
         '<input class="form-input ccfg-m-giorni" type="number" min="1" max="99" value="' + (m.giorni || 30) + '" title="Giorni del mese" style="width:64px;font-size:0.8rem;">' +
-        '<button onclick="CalendarioConfig.rimuoviMese(' + i + ')" title="Rimuovi mese" style="background:none;border:none;cursor:pointer;color:var(--accent-danger);flex-shrink:0;padding:2px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>' +
+        '<button onclick="CalendarioConfig.rimuoviMese(' + i + ')" title="Rimuovi mese" style="background:none;border:none;cursor:pointer;color:var(--danger-text);flex-shrink:0;padding:2px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>' +
       '</div>'
     ).join('');
 
@@ -83,7 +83,7 @@ const CalendarioConfig = (() => {
         '<input class="form-input ccfg-f-nome" value="' + _esc(f.nome) + '" placeholder="Nome festivita\'" style="flex:1;font-size:0.8rem;min-width:80px;">' +
         '<select class="form-select ccfg-f-mese" style="width:auto;font-size:0.8rem;">' + opts + '</select>' +
         '<input class="form-input ccfg-f-giorno" type="number" min="1" max="99" value="' + (f.giorno || 1) + '" title="Giorno" style="width:64px;font-size:0.8rem;">' +
-        '<button onclick="CalendarioConfig.rimuoviFest(' + i + ')" title="Rimuovi" style="background:none;border:none;cursor:pointer;color:var(--accent-danger);flex-shrink:0;padding:2px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>' +
+        '<button onclick="CalendarioConfig.rimuoviFest(' + i + ')" title="Rimuovi" style="background:none;border:none;cursor:pointer;color:var(--danger-text);flex-shrink:0;padding:2px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>' +
       '</div>';
     }).join('');
 

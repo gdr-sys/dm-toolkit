@@ -61,7 +61,7 @@ const Musica = (() => {
           '<input type="text" class="form-input" autocomplete="off" value="' + _esc(p.nome) + '" aria-label="Nome della playlist" style="font-family:var(--font-display);font-size:1rem;background:transparent;border-color:transparent;padding:2px 4px;" onchange="Musica._campo(\'' + p.id + '\',\'nome\',this.value)">' +
           '<input type="text" class="form-input" autocomplete="off" value="' + _esc(p.descrizione || '') + '" placeholder="Quando usarla (es. combattimenti contro i Custodi)" aria-label="Descrizione" style="font-size:0.8rem;background:transparent;border-color:transparent;padding:2px 4px;color:var(--text-muted);" onchange="Musica._campo(\'' + p.id + '\',\'descrizione\',this.value)">' +
         '</div>' +
-        '<button type="button" class="btn btn-ghost btn-sm" style="color:var(--accent-danger);" onclick="Musica._elimina(\'' + p.id + '\')">Elimina</button>' +
+        '<button type="button" class="btn btn-ghost btn-sm" style="color:var(--danger-text);" onclick="Musica._elimina(\'' + p.id + '\')">Elimina</button>' +
       '</div>' +
       ((p.tracce || []).length
         ? (p.tracce || []).map(t => {

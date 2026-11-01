@@ -139,7 +139,7 @@ const MostriMod = (() => {
           '<option value="">Originale</option>' + TIPI_DANNO.map(t => '<option value="' + t + '"' + (varianti.tipoDanno === t ? ' selected' : '') + '>' + t.replace(/^da /, '') + '</option>').join('') +
         '</select></label>' +
       (modificato ? '<button type="button" class="btn btn-ghost btn-sm" onclick="MostriMod._ripristina(\'' + id + '\')">Ripristina</button>' : '') +
-      (modificato ? '<div style="flex-basis:100%;font-size:0.76rem;color:var(--accent-secondary);">Variante: i valori sono ricalcolati con la tabella della Guida del DM. Controlla le capacità speciali, che non vengono adattate.</div>' : '') +
+      (modificato ? '<div style="flex-basis:100%;font-size:0.76rem;color:var(--accent-secondary-text);">Variante: i valori sono ricalcolati con la tabella della Guida del DM. Controlla le capacità speciali, che non vengono adattate.</div>' : '') +
     '</div>';
   };
 

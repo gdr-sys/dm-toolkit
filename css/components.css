@@ -73,7 +73,7 @@
 
 .btn-danger {
   background: transparent;
-  color: var(--accent-danger);
+  color: var(--danger-text);
   border: 1px solid var(--accent-danger);
 }
 .btn-danger:hover:not(:disabled) {

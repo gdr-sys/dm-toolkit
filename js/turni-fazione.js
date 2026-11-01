@@ -112,7 +112,7 @@ const TurniFazione = (() => {
       '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:4px;">' +
         '<div style="flex:1;min-width:160px;"><span style="font-family:var(--font-display);font-size:0.95rem;">' + _esc(_nome(f)) + '</span>' +
           (f.tipo ? ' <span style="font-size:0.75rem;color:var(--text-muted);">' + _esc(f.tipo) + '</span>' : '') +
-          (t.compiuto ? ' <span style="font-size:0.72rem;color:var(--accent-primary);">Obiettivo raggiunto</span>' : '') + '</div>' +
+          (t.compiuto ? ' <span style="font-size:0.72rem;color:var(--accent-text);">Obiettivo raggiunto</span>' : '') + '</div>' +
         _orologio(t, f.id, true) +
       '</div>' +
       (ob ? '<div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:6px;">Obiettivo: ' + _esc(ob.length > 160 ? ob.slice(0, 160) + '…' : ob) + '</div>' : '') +
@@ -191,7 +191,7 @@ const TurniFazione = (() => {
       '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:6px;">' +
         '<div style="font-family:var(--font-display);font-size:0.85rem;color:var(--text-secondary);">Mosse fuori scena</div>' + _orologio(t, id, false) + '</div>' +
       (t.storia.slice(-6).reverse().map(m => '<div style="font-size:0.85rem;line-height:1.5;padding:4px 0;border-top:1px solid var(--border);">' +
-        (m.sessione ? '<span style="color:var(--text-muted);">Dopo S' + m.sessione + ':</span> ' : '') + _esc(m.testo) + (m.avanza ? ' <span style="color:var(--accent-primary);font-size:0.75rem;">+1</span>' : '') + '</div>').join('')) +
+        (m.sessione ? '<span style="color:var(--text-muted);">Dopo S' + m.sessione + ':</span> ' : '') + _esc(m.testo) + (m.avanza ? ' <span style="color:var(--accent-text);font-size:0.75rem;">+1</span>' : '') + '</div>').join('')) +
     '</div>';
   };
 

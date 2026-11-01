@@ -38,7 +38,7 @@ const Segreti = (() => {
               '<input type="checkbox" style="margin-top:3px;"' + (i.trovato ? ' checked' : '') + ' onchange="Segreti.trovato(\'' + s.id + '\',\'' + i.id + '\',this.checked)">' +
               '<span style="flex:1;min-width:0;">' +
                 '<span style="font-size:0.9rem;color:var(--text-primary);' + (i.trovato ? 'text-decoration:line-through;opacity:0.7;' : '') + '">' + _esc(i.testo) + '</span>' +
-                (i.condizione ? '<br><span style="font-size:0.78rem;color:var(--accent-secondary);">Come ottenerlo: ' + _esc(i.condizione) + '</span>' : '') +
+                (i.condizione ? '<br><span style="font-size:0.78rem;color:var(--accent-secondary-text);">Come ottenerlo: ' + _esc(i.condizione) + '</span>' : '') +
                 '<br><span style="font-size:0.74rem;color:var(--text-muted);">Indizio di: ' + _esc(s.titolo) + (s.scoperto ? ' (già rivelato)' : '') + '</span>' +
               '</span>' +
             '</label>').join('')
@@ -69,7 +69,7 @@ const Segreti = (() => {
             return '<div onclick="Segreti.apri(\'' + s.id + '\')" style="padding:6px 0;border-bottom:1px solid var(--border);cursor:pointer;">' +
               '<div style="display:flex;justify-content:space-between;gap:8px;font-size:0.84rem;"><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + _esc(s.titolo || 'Senza titolo') + '</span>' +
               '<span style="flex-shrink:0;font-size:0.72rem;color:var(--text-muted);">' + trovati + '/' + tot + ' indizi</span></div>' +
-              (tot < 3 ? '<div style="font-size:0.72rem;color:var(--accent-warning);">Meno di tre indizi: rischia di non essere mai scoperto</div>' : '') +
+              (tot < 3 ? '<div style="font-size:0.72rem;color:var(--warning-text);">Meno di tre indizi: rischia di non essere mai scoperto</div>' : '') +
             '</div>';
           }).join('')
         : '<div style="font-size:0.82rem;color:var(--text-muted);">' + (_lista().length ? 'Tutti i segreti sono stati rivelati.' : 'Annota i segreti della campagna e dove si trovano gli indizi per scoprirli.') + '</div>');
@@ -110,7 +110,7 @@ const Segreti = (() => {
               '<textarea class="form-textarea" rows="2" style="margin-top:6px;font-size:0.85rem;" placeholder="La verità completa, solo per te" onchange="Segreti._campo(\'' + s.id + '\',\'descrizione\',this.value)">' + _esc(s.descrizione || '') + '</textarea>' +
               '<label style="display:flex;align-items:center;gap:8px;margin-top:6px;font-size:0.84rem;cursor:pointer;"><input type="checkbox"' + (s.scoperto ? ' checked' : '') + ' onchange="Segreti._campo(\'' + s.id + '\',\'scoperto\',this.checked)"> I giocatori l\'hanno scoperto</label>' +
               '<div style="font-size:0.74rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted);margin-top:12px;">Indizi</div>' +
-              (indizi.length < 3 ? '<div style="font-size:0.78rem;color:var(--accent-warning);margin-top:2px;">Ne servono almeno tre: ' + (3 - indizi.length) + ' ancora.</div>' : '') +
+              (indizi.length < 3 ? '<div style="font-size:0.78rem;color:var(--warning-text);margin-top:2px;">Ne servono almeno tre: ' + (3 - indizi.length) + ' ancora.</div>' : '') +
               indizi.map(i =>
                 '<div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);">' +
                   '<input type="checkbox" title="Trovato"' + (i.trovato ? ' checked' : '') + ' onchange="Segreti.trovato(\'' + s.id + '\',\'' + i.id + '\',this.checked)">' +
@@ -121,7 +121,7 @@ const Segreti = (() => {
                 '</div>').join('') +
               '<div style="display:flex;justify-content:space-between;margin-top:8px;">' +
                 '<button type="button" class="btn btn-secondary btn-sm" onclick="Segreti._nuovoIndizio(\'' + s.id + '\')">+ Indizio</button>' +
-                '<button type="button" class="btn btn-ghost btn-sm" style="color:var(--accent-danger);" onclick="Segreti._elimina(\'' + s.id + '\')">Elimina segreto</button>' +
+                '<button type="button" class="btn btn-ghost btn-sm" style="color:var(--danger-text);" onclick="Segreti._elimina(\'' + s.id + '\')">Elimina segreto</button>' +
               '</div>' +
             '</div>' : '') +
         '</div>';

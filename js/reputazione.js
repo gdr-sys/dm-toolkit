@@ -37,7 +37,7 @@ const Reputazione = (() => {
     return '<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);padding:12px 16px;margin-bottom:16px;">' +
       '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:8px;">' +
         '<div><div style="font-family:var(--font-display);font-size:0.85rem;color:var(--text-secondary);">Reputazione del party</div>' +
-          '<div style="font-size:1rem;font-weight:600;color:' + COLORI[p] + ';">' + LIVELLI[p] + ' <span style="font-family:var(--font-mono);font-size:0.8rem;color:var(--text-muted);">(' + (p > 0 ? '+' : '') + p + ')</span></div></div>' +
+          '<div style="font-size:1rem;font-weight:600;color:color-mix(in srgb, ' + COLORI[p] + ' 50%, var(--text-primary));">' + LIVELLI[p] + ' <span style="font-family:var(--font-mono);font-size:0.8rem;color:var(--text-muted);">(' + (p > 0 ? '+' : '') + p + ')</span></div></div>' +
         '<div style="display:flex;gap:6px;">' +
           '<button type="button" class="btn btn-ghost btn-sm"' + (p <= -3 ? ' disabled' : '') + ' onclick="Reputazione.cambia(\'' + id + '\',-1)">Peggiora</button>' +
           '<button type="button" class="btn btn-secondary btn-sm"' + (p >= 3 ? ' disabled' : '') + ' onclick="Reputazione.cambia(\'' + id + '\',1)">Migliora</button>' +

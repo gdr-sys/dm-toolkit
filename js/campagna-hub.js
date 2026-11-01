@@ -47,7 +47,7 @@ const CampagnaHub = (() => {
       '.hub-griglia{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,260px),1fr));gap:10px;}' +
       '.hub-card{cursor:pointer;display:flex;align-items:center;gap:14px;padding:14px 16px;margin:0;}' +
       '.hub-card:hover,.hub-card:focus-visible{border-color:var(--border-strong);outline:none;}' +
-      '.hub-card-icona{flex-shrink:0;width:40px;height:40px;border-radius:var(--radius-md);background:var(--bg-secondary);color:var(--accent-primary);display:flex;align-items:center;justify-content:center;}' +
+      '.hub-card-icona{flex-shrink:0;width:40px;height:40px;border-radius:var(--radius-md);background:var(--bg-secondary);color:var(--accent-text);display:flex;align-items:center;justify-content:center;}' +
       '.hub-card-icona > span{display:flex;}' +
       '.hub-card-testo{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;}' +
       '.hub-card-nome{font-weight:600;font-size:0.95rem;color:var(--text-primary);}' +
@@ -76,7 +76,8 @@ const CampagnaHub = (() => {
       '<div class="hub-testa"><span class="hub-tipo">' + tipo + ' · ' + _esc(camp.system || '5e') + (sessioni ? ' · ' + sessioni + (sessioni === 1 ? ' sessione' : ' sessioni') : '') + '</span>' +
         '<button type="button" class="btn btn-ghost btn-sm" onclick="App.editCampaign(\'' + camp.id + '\')">Modifica</button></div>' +
       '<h2 class="hub-nome">' + _esc(camp.name) + '</h2>' +
-      (camp.description ? '<p class="hub-desc">' + _esc(camp.description) + '</p>' : '') +
+      // Testi incollati da PDF hanno un a capo a fine riga: si uniscono, restano solo i paragrafi
+      (camp.description ? '<p class="hub-desc">' + _esc(String(camp.description).replace(/([^\n])\n(?!\n)/g, '$1 ')) + '</p>' : '') +
       _gruppo('Al tavolo', [
         _card(_iconaMenu('campagna'), 'Dashboard', 'Ultima sessione, scadenze, clock e quest', go('campagna')),
         _card(_iconaMenu('sessione'), 'Sessione Live', 'Iniziativa, combattimento e note', go('sessione')),

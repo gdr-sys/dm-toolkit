@@ -66,9 +66,9 @@
 .nc-tb:hover { background: var(--bg-tertiary); border-color: var(--border-strong); }
 .nc-tb:active { background: var(--accent-primary); border-color: var(--accent-primary); color: #fff; }
 /* Contenuto formattato negli editor rich-text (Wiki, Note libere, Trame, campi mini) */
-[contenteditable] h1 { font-family:var(--font-display); font-size:1.4rem; font-weight:700; color:var(--accent-primary); margin:0.6em 0 0.3em; border-bottom:1px solid var(--border); padding-bottom:4px; }
+[contenteditable] h1 { font-family:var(--font-display); font-size:1.4rem; font-weight:700; color:var(--accent-text); margin:0.6em 0 0.3em; border-bottom:1px solid var(--border); padding-bottom:4px; }
 [contenteditable] h2 { font-family:var(--font-display); font-size:1.1rem; font-weight:700; color:var(--text-primary); margin:0.5em 0 0.2em; }
-[contenteditable] h3 { font-family:var(--font-display); font-size:0.95rem; font-weight:600; color:var(--accent-secondary); margin:0.4em 0 0.2em; }
+[contenteditable] h3 { font-family:var(--font-display); font-size:0.95rem; font-weight:600; color:var(--accent-secondary-text); margin:0.4em 0 0.2em; }
 [contenteditable] p { margin: 0.3em 0; }
 [contenteditable] ul { padding-left: 1.4em; margin: 0.3em 0; }
 [contenteditable] ol { padding-left: 1.4em; margin: 0.3em 0; }
@@ -89,7 +89,7 @@
 .wiki-callout-label { font-size:0.65rem; font-family:var(--font-display); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:4px; display:block; opacity:0.8; }
 /* Wiki subnav */
 .nav-subitem { font-size:0.78rem !important; padding:5px 8px !important; }
-.nav-subitem.active { background:var(--bg-secondary); color:var(--accent-primary) !important; }
+.nav-subitem.active { background:var(--bg-secondary); color:var(--accent-text) !important; }
 .nav-subitem:hover { background:var(--bg-secondary); }
 /* Scene planner */
 .scene-beat { transition: opacity 0.15s; }
@@ -109,7 +109,7 @@
 #wiki-tag-bar .nc-tb-tag {
   padding: 2px 8px;
   background: rgba(93,164,90,0.12);
-  color: var(--accent-secondary);
+  color: var(--accent-secondary-text);
   border-radius: var(--radius-full);
   cursor: pointer;
   font-weight: 600;
@@ -585,7 +585,7 @@
           <div class="card-header" style="flex-wrap:wrap;gap:6px;">
             <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0;">
               <h3 class="card-title" style="margin:0;">Scene Planner</h3>
-              <span id="scene-sess-badge" style="display:none;font-size:0.68rem;color:var(--accent-secondary);background:rgba(93,164,90,0.1);padding:2px 8px;border-radius:var(--radius-full);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></span>
+              <span id="scene-sess-badge" style="display:none;font-size:0.68rem;color:var(--accent-secondary-text);background:rgba(93,164,90,0.1);padding:2px 8px;border-radius:var(--radius-full);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></span>
             </div>
             <div style="display:flex;gap:4px;align-items:center;">
               <button class="btn btn-ghost btn-sm" onclick="SessioniLog.showTab('storico')" style="font-size:0.72rem;color:var(--text-muted);">Storico →</button>
@@ -938,7 +938,7 @@
 
               <!-- Categorie -->
               <div>
-                <div style="font-size:0.7rem;color:var(--text-muted);margin-bottom:6px;font-family:var(--font-display);text-transform:uppercase;letter-spacing:0.05em;">Tipo Nemico <span id="rng-cat-hint" style="color:var(--accent-secondary);font-family:var(--font-body);text-transform:none;letter-spacing:0;font-size:0.68rem;"></span></div>
+                <div style="font-size:0.7rem;color:var(--text-muted);margin-bottom:6px;font-family:var(--font-display);text-transform:uppercase;letter-spacing:0.05em;">Tipo Nemico <span id="rng-cat-hint" style="color:var(--accent-secondary-text);font-family:var(--font-body);text-transform:none;letter-spacing:0;font-size:0.68rem;"></span></div>
                 <div id="rng-cat-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:3px;max-height:220px;overflow-y:auto;"></div>
               </div>
 
@@ -1241,7 +1241,7 @@
 
       <!-- Loading -->
       <div id="comp-loading" style="display:none;align-items:center;justify-content:center;min-height:200px;flex-direction:column;gap:var(--space-md);">
-        <div style="animation:pulse 1.5s infinite;color:var(--accent-primary);">
+        <div style="animation:pulse 1.5s infinite;color:var(--accent-text);">
           <svg aria-hidden="true" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
         </div>
         <div class="text-muted text-sm">Caricamento dati in corso...</div>
@@ -1514,7 +1514,7 @@
             <button class="nc-tb" onclick="wikiFB('blockquote')">❝</button>
             <div style="width:1px;background:var(--border);margin:2px 3px;"></div>
             <button class="nc-tb" onclick="wikiInsertImage()" title="Inserisci immagine via URL" style="color:#f5a623;">🖼</button>
-            <button class="nc-tb" onclick="wikiInsertTag()" style="color:var(--accent-secondary);">#tag</button>
+            <button class="nc-tb" onclick="wikiInsertTag()" style="color:var(--accent-secondary-text);">#tag</button>
             <button class="nc-tb" onclick="wikiInsertLink()" style="color:#5ba4f5;">[[link]]</button>
             <div style="width:1px;background:var(--border);margin:2px 3px;"></div>
             <button class="nc-tb" onclick="wikiF('removeFormat')" style="font-size:0.7rem;color:var(--text-muted);"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
@@ -1537,7 +1537,7 @@
             <button class="nc-tb" onclick="wikiCallout('loot')" title="Loot" style="color:#f5a623;font-size:0.68rem;">💰</button>
             <button class="nc-tb" onclick="wikiCallout('clue')" title="Indizio" style="color:#5ba4f5;font-size:0.68rem;">🔍</button>
             <button class="nc-tb" onclick="wikiCallout('trap')" title="Trappola" style="color:#ff6b6b;font-size:0.68rem;">⚠️</button>
-            <button class="nc-tb" onclick="wikiCallout('improv')" title="Improv — idea al volo" style="color:var(--accent-secondary);font-size:0.68rem;">💡</button>
+            <button class="nc-tb" onclick="wikiCallout('improv')" title="Improv — idea al volo" style="color:var(--accent-secondary-text);font-size:0.68rem;">💡</button>
           </div>
           <!-- Editor -->
           <div id="wiki-note-content"
@@ -1664,7 +1664,7 @@
 
           <div class="card" style="cursor:pointer;padding:16px;" onclick="WikiSections.gotoTrame()">
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
-              <span style="color:var(--accent-primary);"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></span>
+              <span style="color:var(--accent-text);"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></span>
               <span id="wiki-hub-cnt-trame" style="font-size:0.72rem;background:var(--bg-tertiary);padding:2px 8px;border-radius:var(--radius-full);color:var(--text-muted);">0</span>
             </div>
             <div style="font-weight:600;font-size:0.9rem;">Trame</div>
@@ -2346,7 +2346,7 @@
   <button type="button" class="nc-tb" onclick="miniFmt('nm-trait','underline')" title="Sottolineato"><u>S</u></button>
   <div style="width:1px;background:var(--border);margin:0 2px;height:18px;"></div>
   <button type="button" class="nc-tb" onclick="miniFmt('nm-trait','link')" title="[[Link]]" style="color:#5ba4f5;font-size:0.68rem;">[[]]</button>
-  <button type="button" class="nc-tb" onclick="miniFmt('nm-trait','tag')" title="#tag" style="color:var(--accent-secondary);font-size:0.68rem;">#</button>
+  <button type="button" class="nc-tb" onclick="miniFmt('nm-trait','tag')" title="#tag" style="color:var(--accent-secondary-text);font-size:0.68rem;">#</button>
   <button type="button" class="nc-tb" onclick="miniFmt('nm-trait','secret')" title="🔒 Segreto DM" style="color:#c97bea;font-size:0.65rem;">🔒</button>
   <button type="button" class="nc-tb" onclick="miniFmt('nm-trait','clue')" title="🔍 Indizio" style="color:#5ba4f5;font-size:0.65rem;">🔍</button>
   <div style="width:1px;background:var(--border);margin:0 2px;height:18px;"></div>
@@ -2359,7 +2359,7 @@
   <button type="button" class="nc-tb" onclick="miniFmt('nm-secret','underline')" title="Sottolineato"><u>S</u></button>
   <div style="width:1px;background:var(--border);margin:0 2px;height:18px;"></div>
   <button type="button" class="nc-tb" onclick="miniFmt('nm-secret','link')" title="[[Link]]" style="color:#5ba4f5;font-size:0.68rem;">[[]]</button>
-  <button type="button" class="nc-tb" onclick="miniFmt('nm-secret','tag')" title="#tag" style="color:var(--accent-secondary);font-size:0.68rem;">#</button>
+  <button type="button" class="nc-tb" onclick="miniFmt('nm-secret','tag')" title="#tag" style="color:var(--accent-secondary-text);font-size:0.68rem;">#</button>
   <button type="button" class="nc-tb" onclick="miniFmt('nm-secret','secret')" title="🔒 Segreto DM" style="color:#c97bea;font-size:0.65rem;">🔒</button>
   <button type="button" class="nc-tb" onclick="miniFmt('nm-secret','clue')" title="🔍 Indizio" style="color:#5ba4f5;font-size:0.65rem;">🔍</button>
   <div style="width:1px;background:var(--border);margin:0 2px;height:18px;"></div>
@@ -2376,7 +2376,7 @@
         </div>
         <div class="form-group"><label class="form-label">Legami e relazioni</label><input type="text" id="nm-links" class="form-input" placeholder="es. Dipendente di: Locanda del Drago | Nemico di: Alaric"></div>
         <div style="margin-top:var(--space-md);">
-          <label class="form-label">Relazione col Party — <span id="nm-rel-label" style="color:var(--accent-secondary);">Neutrale</span> (<span id="nm-rel-val">50</span>)</label>
+          <label class="form-label">Relazione col Party — <span id="nm-rel-label" style="color:var(--accent-secondary-text);">Neutrale</span> (<span id="nm-rel-val">50</span>)</label>
           <div style="display:flex;align-items:center;gap:var(--space-sm);">
             <span class="text-xs text-muted" style="flex-shrink:0;width:52px;">😡 Ostile</span>
             <input type="range" id="nm-relation" min="0" max="100" value="50" style="flex:1;" oninput="NPC.updateRelationPreview(this.value)">
@@ -4059,7 +4059,7 @@ const App = (() => {
           <div class="cc-actions">
             <button class="btn btn-ghost btn-icon-sm" title="Modifica" aria-label="Modifica campagna" onclick="event.stopPropagation();App.editCampaign('${camp.id}')">${svgPencil}</button>
             <button class="btn btn-ghost btn-icon-sm" title="Esporta" aria-label="Esporta campagna" onclick="event.stopPropagation();Storage.exportCampaign('${camp.id}')">${svgExport}</button>
-            <button class="btn btn-ghost btn-icon-sm" title="Elimina" aria-label="Elimina campagna" style="color:var(--accent-danger);" onclick="event.stopPropagation();App.confirmDeleteCampaign('${camp.id}')">${svgTrash}</button>
+            <button class="btn btn-ghost btn-icon-sm" title="Elimina" aria-label="Elimina campagna" style="color:var(--danger-text);" onclick="event.stopPropagation();App.confirmDeleteCampaign('${camp.id}')">${svgTrash}</button>
           </div>
         </div>
       `;
@@ -4163,7 +4163,7 @@ const openCampaign = (id) => {
         return `
         <div class="timeline-item">
           <div class="timeline-day">
-            <span style="font-family:var(--font-mono);font-size:0.7rem;color:var(--accent-secondary);">G${e.day}</span>
+            <span style="font-family:var(--font-mono);font-size:0.7rem;color:var(--accent-secondary-text);">G${e.day}</span>
           </div>
           <div class="timeline-track">
             <div class="timeline-dot" style="background:${tc.dot};border-color:${tc.dot};"></div>
@@ -5228,7 +5228,7 @@ const Sessione = (() => {
       const hpAttuali = pg.hpAttuali ?? pg.hpMax ?? 0;
       const hpMax = pg.hpMax || 1;
       const hpPct = Math.max(0, Math.round(hpAttuali / hpMax * 100));
-      const hpCol = hpPct > 66 ? 'var(--accent-success)' : hpPct > 33 ? 'var(--accent-warning)' : 'var(--accent-danger)';
+      const hpCol = hpPct > 66 ? 'var(--success-text)' : hpPct > 33 ? 'var(--warning-text)' : 'var(--danger-text)';
       return `
       <div class="party-card" style="padding:var(--space-sm);border-radius:var(--radius-md);background:var(--bg-secondary);border:1px solid var(--border);">
         <!-- Riga 1: nome + classe/livello + azioni -->
@@ -5239,7 +5239,7 @@ const Sessione = (() => {
           </div>
           <div style="display:flex;gap:1px;flex-shrink:0;">
             <button class="btn btn-ghost btn-icon-sm" onclick="Sessione.editPG('${pg.id}')" title="Modifica" style="width:22px;height:22px;font-size:0.6rem;">✏️</button>
-            <button class="btn btn-ghost btn-icon-sm" onclick="Sessione.deletePG('${pg.id}')" title="Rimuovi" style="width:22px;height:22px;font-size:0.6rem;color:var(--accent-danger);">🗑️</button>
+            <button class="btn btn-ghost btn-icon-sm" onclick="Sessione.deletePG('${pg.id}')" title="Rimuovi" style="width:22px;height:22px;font-size:0.6rem;color:var(--danger-text);">🗑️</button>
           </div>
         </div>
 
@@ -5520,7 +5520,7 @@ const Sessione = (() => {
           <div class="combat-round-badge">Round ${round}</div>
           <div>
             <div style="font-family:var(--font-display);font-size:1rem;">${_combat.nome}</div>
-            ${activeCombatant ? `<div class="text-xs text-muted">Turno di: <strong style="color:var(--accent-secondary);">${activeCombatant.nome}</strong></div>` : ''}
+            ${activeCombatant ? `<div class="text-xs text-muted">Turno di: <strong style="color:var(--accent-secondary-text);">${activeCombatant.nome}</strong></div>` : ''}
           </div>
         </div>
         <div style="display:flex;gap:var(--space-sm);">
@@ -5549,10 +5549,10 @@ const Sessione = (() => {
 
   const renderCombatant = (c, isActive) => {
     const hpPct = c.maxHp > 0 ? Math.max(0, Math.round((c.hp / c.maxHp) * 100)) : 100;
-    const hpColor = hpPct > 66 ? 'var(--accent-success)' : hpPct > 33 ? 'var(--accent-warning)' : 'var(--accent-danger)';
+    const hpColor = hpPct > 66 ? 'var(--success-text)' : hpPct > 33 ? 'var(--warning-text)' : 'var(--danger-text)';
     const isDead = c.hp <= 0;
     const effectsHTML = (c.effects || []).map(ef =>
-        `<span style="display:inline-flex;align-items:center;gap:2px;padding:1px 6px;background:rgba(93,164,90,0.12);border:1px solid var(--accent-secondary);border-radius:var(--radius-full);font-size:0.62rem;color:var(--accent-secondary);" title="${ef.nome} — ${ef.round} round rimasti">
+        `<span style="display:inline-flex;align-items:center;gap:2px;padding:1px 6px;background:rgba(93,164,90,0.12);border:1px solid var(--accent-secondary);border-radius:var(--radius-full);font-size:0.62rem;color:var(--accent-secondary-text);" title="${ef.nome} — ${ef.round} round rimasti">
           ⏱${ef.nome} <strong>${ef.round}r</strong>
         </span>`
       ).join('');
@@ -5617,7 +5617,7 @@ const Sessione = (() => {
           <button class="btn btn-ghost btn-icon-sm" title="Aggiungi condizione" onclick="Sessione.openCondizioneModal('${c.id}')"><span style="color:#e74c3c;"><svg aria-hidden="true" width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="8"/></svg></span></button>
           <button class="btn btn-ghost btn-icon-sm" title="Concentrazione" onclick="Sessione.toggleConcentrazione('${c.id}')" style="${c.concentrazione ? 'color:var(--accent-tertiary);' : ''}"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></button>
           <button class="btn btn-ghost btn-icon-sm" title="Danno rapido" onclick="Sessione.quickDamage('${c.id}')"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></button>
-          <button class="btn btn-ghost btn-icon-sm" title="Note" onclick="Sessione.openNote('${c.id}')" style="${c.note ? 'color:var(--accent-secondary);' : ''}"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></button>
+          <button class="btn btn-ghost btn-icon-sm" title="Note" onclick="Sessione.openNote('${c.id}')" style="${c.note ? 'color:var(--accent-secondary-text);' : ''}"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></button>
           <button class="btn btn-ghost btn-icon-sm" title="Rimuovi" onclick="Sessione.removeCombatant('${c.id}')"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>
         </div>
       </div>`;
@@ -5724,7 +5724,7 @@ const Sessione = (() => {
     _pushPgLive(c);
     const bar = document.querySelector(`#combatant-${id} .combat-hp-fill`);
     const pct = c.maxHp > 0 ? Math.round((c.hp / c.maxHp) * 100) : 100;
-    const col = pct > 66 ? 'var(--accent-success)' : pct > 33 ? 'var(--accent-warning)' : 'var(--accent-danger)';
+    const col = pct > 66 ? 'var(--success-text)' : pct > 33 ? 'var(--warning-text)' : 'var(--danger-text)';
     if (bar) { bar.style.width = pct + '%'; bar.style.background = col; }
   };
 
@@ -5949,7 +5949,7 @@ const Sessione = (() => {
     const div = document.createElement('div');
     div.className = 'action-roll-result';
     div.style.cssText = 'margin-top:4px;padding:4px 8px;background:var(--bg-tertiary);border-radius:var(--radius-sm);font-family:var(--font-mono);font-size:0.85rem;display:flex;align-items:center;gap:8px;';
-    div.innerHTML = `<span style="color:var(--accent-secondary);font-weight:700;font-size:1.1rem;">${result.total}</span><span style="color:var(--text-muted);font-size:0.72rem;">${result.detail}</span><span style="color:var(--text-muted);font-size:0.7rem;">${nome}</span>`;
+    div.innerHTML = `<span style="color:var(--accent-secondary-text);font-weight:700;font-size:1.1rem;">${result.total}</span><span style="color:var(--text-muted);font-size:0.72rem;">${result.detail}</span><span style="color:var(--text-muted);font-size:0.7rem;">${nome}</span>`;
     el.appendChild(div);
 
     div.style.animation = 'diceResult 0.3s ease';
@@ -6666,7 +6666,7 @@ const Compendio = (() => {
       return `
         <div class="comp-row comp-row-fav" onclick="Compendio.${fn}('${f.id}')">
           <div class="comp-row-main">
-            <span class="comp-row-name">${f.nome}${isHb ? ' <span style="font-size:0.6rem;color:var(--accent-secondary);">HB</span>' : ''}</span>
+            <span class="comp-row-name">${f.nome}${isHb ? ' <span style="font-size:0.6rem;color:var(--accent-secondary-text);">HB</span>' : ''}</span>
           </div>
           <div class="comp-row-stats">
             ${favBtn(f.id, f.nome, f.tipo)}
@@ -6676,7 +6676,7 @@ const Compendio = (() => {
 
     const hasContent = favRows;
     if (!hasContent) return '';
-    return `<div class="comp-cat-header" style="color:var(--accent-secondary);">⭐ Preferiti</div>` +
+    return `<div class="comp-cat-header" style="color:var(--accent-secondary-text);">⭐ Preferiti</div>` +
       favRows +
       `<div style="height:1px;background:var(--border);margin:6px 0 8px;"></div>`;
   };
@@ -6750,7 +6750,7 @@ const Compendio = (() => {
       return `
         <div class="comp-row" onclick="${openFn}">
           <div class="comp-row-main">
-            <span class="comp-row-name">${highlight(m.nome, f.q)}${m._hb ? ' <span style="font-size:0.6rem;color:var(--accent-secondary);">HB</span>' : ''}</span>
+            <span class="comp-row-name">${highlight(m.nome, f.q)}${m._hb ? ' <span style="font-size:0.6rem;color:var(--accent-secondary-text);">HB</span>' : ''}</span>
             <span class="comp-row-meta">${highlight(m.tipo, f.q)} · ${m.dimensione}</span>
           </div>
           <div class="comp-row-stats">
@@ -6812,7 +6812,7 @@ const Compendio = (() => {
       const openFn = i._hb ? 'Compendio.openHomebrew(\'' + i.id + '\')' : 'Compendio.openMagicItem(\'' + i.id + '\')';
       return '<div class="comp-row" onclick="' + openFn + '">' +
         '<div class="comp-row-main">' +
-          '<span class="comp-row-name">' + highlight(i.nome, f.q) + (i._hb ? ' <span style="font-size:0.6rem;color:var(--accent-secondary);">HB</span>' : '') + '</span>' +
+          '<span class="comp-row-name">' + highlight(i.nome, f.q) + (i._hb ? ' <span style="font-size:0.6rem;color:var(--accent-secondary-text);">HB</span>' : '') + '</span>' +
           '<span class="comp-row-meta">' + (i.tipo_base||'') + (i.richiede_sintonia ? ' · <em>richiede sintonia</em>' : '') + '</span>' +
         '</div>' +
         '<div class="comp-row-stats">' +
@@ -6858,7 +6858,7 @@ const Compendio = (() => {
     el.innerHTML = renderFavoritiSection('equipment') + allEquip.map(e => `
       <div class="comp-row" onclick="${e._hb ? `Compendio.openHomebrew('${e.id}')` : `Compendio.openEquipment('${e.id}')`}">
         <div class="comp-row-main">
-          <span class="comp-row-name">${highlight(e.nome, f.q)}${e._hb ? ' <span style="font-size:0.6rem;color:var(--accent-secondary);">HB</span>' : ''}</span>
+          <span class="comp-row-name">${highlight(e.nome, f.q)}${e._hb ? ' <span style="font-size:0.6rem;color:var(--accent-secondary-text);">HB</span>' : ''}</span>
           <span class="comp-row-meta">${highlight(e.categoria || '', f.q)}</span>
         </div>
         <div class="comp-row-stats">
@@ -7284,7 +7284,7 @@ const Compendio = (() => {
           stats +
           favBtn(h.id, h.nome, 'homebrew') +
           '<button class="btn btn-ghost btn-icon-sm" style="font-size:0.7rem;" onclick="event.stopPropagation();Compendio.editHomebrew(\'' + h.id + '\')">✏️</button>' +
-          '<button class="btn btn-ghost btn-icon-sm" style="font-size:0.7rem;color:var(--accent-danger);" onclick="event.stopPropagation();Compendio.deleteHomebrew(\'' + h.id + '\')">🗑️</button>' +
+          '<button class="btn btn-ghost btn-icon-sm" style="font-size:0.7rem;color:var(--danger-text);" onclick="event.stopPropagation();Compendio.deleteHomebrew(\'' + h.id + '\')">🗑️</button>' +
         '</div>' +
       '</div>';
     }).join('');
@@ -7324,9 +7324,9 @@ const Compendio = (() => {
             row('Immunità danni', h.immunitaDanni) +
             row('Immunità cond.', h.immunitaCond) +
           '</table>' +
-          (h.tratti ? '<div style="font-family:var(--font-display);font-size:0.7rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--accent-primary);margin:8px 0 4px;">Tratti</div><div style="font-size:0.85rem;white-space:pre-wrap;line-height:1.6;">' + h.tratti + '</div>' : '') +
-          (h.azioni ? '<div style="font-family:var(--font-display);font-size:0.7rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--accent-primary);margin:8px 0 4px;">Azioni</div><div style="font-size:0.85rem;white-space:pre-wrap;line-height:1.6;">' + h.azioni + '</div>' : '') +
-          (h.legact ? '<div style="font-family:var(--font-display);font-size:0.7rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--accent-primary);margin:8px 0 4px;">Azioni Leggendarie</div><div style="font-size:0.85rem;white-space:pre-wrap;line-height:1.6;">' + h.legact + '</div>' : '') +
+          (h.tratti ? '<div style="font-family:var(--font-display);font-size:0.7rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--accent-text);margin:8px 0 4px;">Tratti</div><div style="font-size:0.85rem;white-space:pre-wrap;line-height:1.6;">' + h.tratti + '</div>' : '') +
+          (h.azioni ? '<div style="font-family:var(--font-display);font-size:0.7rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--accent-text);margin:8px 0 4px;">Azioni</div><div style="font-size:0.85rem;white-space:pre-wrap;line-height:1.6;">' + h.azioni + '</div>' : '') +
+          (h.legact ? '<div style="font-family:var(--font-display);font-size:0.7rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--accent-text);margin:8px 0 4px;">Azioni Leggendarie</div><div style="font-size:0.85rem;white-space:pre-wrap;line-height:1.6;">' + h.legact + '</div>' : '') +
           '<div style="margin-top:12px;padding-top:8px;border-top:1px solid var(--border);">' +
             '<button class="btn btn-primary btn-sm" onclick="Sessione.addHomebrewMonster(\''+id+'\');this.closest(\'.modal-overlay\').remove()">Aggiungi al Combat Tracker</button>' +
           '</div>' +
@@ -8026,7 +8026,7 @@ const Schermo = (() => {
         html = copia ? copia.innerHTML : '';
       }
     } catch (e) {
-      html = '<span style="color:var(--accent-danger);">Errore: ' + _escGen(e.message) + '</span>';
+      html = '<span style="color:var(--danger-text);">Errore: ' + _escGen(e.message) + '</span>';
     }
     el.innerHTML = html;
     block.ultimo = html; // resta visibile se lo schermo si ridisegna mentre la pagina e' aperta
@@ -8213,7 +8213,7 @@ const Schermo = (() => {
         '</div>' +
         items.map(f =>
           '<div style="display:flex;align-items:center;justify-content:space-between;padding:3px 0;border-bottom:1px solid var(--border);font-size:0.82rem;">' +
-            '<span style="cursor:pointer;color:var(--accent-secondary);text-decoration:underline dotted;" ' +
+            '<span style="cursor:pointer;color:var(--accent-secondary-text);text-decoration:underline dotted;" ' +
               'onclick="apriFavoritoSchermo(\'' + tipo + '\',\'' + f.id + '\')">'  +
               f.nome +
             '</span>' +
@@ -8269,7 +8269,7 @@ const Schermo = (() => {
 
     return party.map(pg => {
       const hpPct = pg.hpMax > 0 ? Math.max(0, Math.round((pg.hpAttuali ?? pg.hpMax) / pg.hpMax * 100)) : 100;
-      const hpCol = hpPct > 66 ? 'var(--accent-success)' : hpPct > 33 ? 'var(--accent-warning)' : 'var(--accent-danger)';
+      const hpCol = hpPct > 66 ? 'var(--success-text)' : hpPct > 33 ? 'var(--warning-text)' : 'var(--danger-text)';
       return '<div style="background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-md);padding:8px;margin-bottom:6px;">' +
         '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">' +
           '<div>' +
@@ -8301,7 +8301,7 @@ const Schermo = (() => {
         <button class="btn btn-secondary btn-sm" style="padding:4px 8px;font-size:0.7rem;"
           onclick="Schermo.rollDie(${d},'${blockId}')">d${d}</button>`).join('')}
     </div>
-    <div id="schermo-dice-result-${blockId}" style="font-family:var(--font-mono);font-size:1.4rem;font-weight:700;color:var(--accent-primary);text-align:center;min-height:36px;">—</div>
+    <div id="schermo-dice-result-${blockId}" style="font-family:var(--font-mono);font-size:1.4rem;font-weight:700;color:var(--accent-text);text-align:center;min-height:36px;">—</div>
     <div id="schermo-dice-formula-${blockId}" style="font-size:0.7rem;color:var(--text-muted);text-align:center;"></div>`;
 
   const rollDie = (faces, blockId) => {
@@ -8366,7 +8366,7 @@ const Schermo = (() => {
     const rows = sorted.map((c, i) => {
       const isActive = i === activeIdx;
       const hpPct = c.maxHp > 0 ? Math.max(0, Math.round((c.hp / c.maxHp) * 100)) : 100;
-      const hpCol = hpPct > 66 ? 'var(--accent-success)' : hpPct > 33 ? 'var(--accent-warning)' : 'var(--accent-danger)';
+      const hpCol = hpPct > 66 ? 'var(--success-text)' : hpPct > 33 ? 'var(--warning-text)' : 'var(--danger-text)';
       const condBadges = (c.condizioni || []).map(cond =>
         `<span class="badge badge-primary" style="font-size:0.6rem;padding:1px 4px;">${cond.slice(0,6)}</span>`
       ).join('');
@@ -8416,7 +8416,7 @@ const Schermo = (() => {
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:6px;">
         <div>
           <span style="font-family:var(--font-display);font-size:0.95rem;font-weight:700;">Round ${combat.round || 1}</span>
-          <span style="color:var(--accent-secondary);margin-left:8px;font-size:0.85rem;">🎯 ${sorted[activeIdx]?.nome || '—'}</span>
+          <span style="color:var(--accent-secondary-text);margin-left:8px;font-size:0.85rem;">🎯 ${sorted[activeIdx]?.nome || '—'}</span>
         </div>
         <div style="display:flex;gap:6px;flex-wrap:wrap;">
           <button class="btn btn-ghost btn-sm" onclick="Sessione.rollAllInitiative();setTimeout(()=>Schermo._refreshCombat(),200)">🎲 Init tutti</button>
@@ -8448,7 +8448,7 @@ const Schermo = (() => {
 
     return '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">' +
         '<div style="font-family:var(--font-display);font-size:0.85rem;">Round ' + (combat.round||1) + ' · ' +
-          '<span style="color:var(--accent-secondary);">' + (sorted[activeIdx]?.nome||'') + '</span></div>' +
+          '<span style="color:var(--accent-secondary-text);">' + (sorted[activeIdx]?.nome||'') + '</span></div>' +
         '<div style="display:flex;gap:4px;">' +
           '<button class="btn btn-primary btn-sm" onclick="Sessione.nextTurn();Schermo._refreshCombat()">▶ Avanti</button>' +
           '<button class="btn btn-secondary btn-sm" onclick="Sessione.rollAllInitiative();Schermo._refreshCombat()" title="Init tutti">Init</button>' +
@@ -8458,13 +8458,13 @@ const Schermo = (() => {
       sorted.map((c, i) => {
         const isActive = i === activeIdx;
         const hpPct = c.maxHp > 0 ? Math.max(0, Math.round((c.hp/c.maxHp)*100)) : 100;
-        const hpCol = hpPct > 66 ? 'var(--accent-success)' : hpPct > 33 ? 'var(--accent-warning)' : 'var(--accent-danger)';
+        const hpCol = hpPct > 66 ? 'var(--success-text)' : hpPct > 33 ? 'var(--warning-text)' : 'var(--danger-text)';
         const cond = (c.condizioni||[]).map(x => '<span style="font-size:0.55rem;background:var(--accent-primary);color:#fff;border-radius:2px;padding:0 3px;">' + x.slice(0,4) + '</span>').join('');
         return '<div style="display:flex;align-items:center;gap:4px;padding:4px 6px;border-radius:var(--radius-sm);' +
             'background:' + (isActive ? 'rgba(139,38,53,0.15)' : 'transparent') + ';' +
             'border-left:2px solid ' + (isActive ? 'var(--accent-primary)' : 'transparent') + ';' +
             (c.hp <= 0 ? 'opacity:0.4;' : '') + '">' +
-          '<span style="font-family:var(--font-mono);font-size:0.72rem;width:22px;text-align:right;color:var(--accent-secondary);">' + c.iniziativa + '</span>' +
+          '<span style="font-family:var(--font-mono);font-size:0.72rem;width:22px;text-align:right;color:var(--accent-secondary-text);">' + c.iniziativa + '</span>' +
           '<span style="flex:1;font-size:0.8rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' +
             (c.tipo==='pg'?'👤':c.tipo==='mostro'?'🐉':'⚔️') + ' ' + c.nome +
             (c.concentrazione ? ' 🔮' : '') +
@@ -8618,7 +8618,7 @@ const Schermo = (() => {
       return hdr + '<table style="width:100%;border-collapse:collapse;font-size:0.75rem;">' +
         rows.map(([n,v]) =>
           '<tr><td style="padding:2px 0;border-bottom:1px solid var(--border);">' + n + '</td>' +
-          '<td style="padding:2px 0;text-align:right;font-family:var(--font-mono);color:var(--accent-secondary);border-bottom:1px solid var(--border);">' + v + '</td></tr>'
+          '<td style="padding:2px 0;text-align:right;font-family:var(--font-mono);color:var(--accent-secondary-text);border-bottom:1px solid var(--border);">' + v + '</td></tr>'
         ).join('') + '</table>';
     };
 
@@ -8723,7 +8723,7 @@ const Schermo = (() => {
     return `<div style="display:grid;grid-template-columns:1fr auto;gap:3px 12px;">` +
       dcs.map(([d, v]) => `
         <span style="font-size:0.82rem;">${d}</span>
-        <span style="font-family:var(--font-mono);font-size:0.82rem;font-weight:700;color:var(--accent-primary);">${v}</span>`).join('') +
+        <span style="font-family:var(--font-mono);font-size:0.82rem;font-weight:700;color:var(--accent-text);">${v}</span>`).join('') +
       `</div>`;
   };
 
@@ -8742,9 +8742,9 @@ const Schermo = (() => {
 
     return `
       <div style="text-align:center;margin-bottom:10px;">
-        <div style="font-family:var(--font-mono);font-size:2rem;font-weight:700;color:var(--accent-primary);">${timeStr}</div>
+        <div style="font-family:var(--font-mono);font-size:2rem;font-weight:700;color:var(--accent-text);">${timeStr}</div>
         <div style="font-size:0.82rem;color:var(--text-secondary);margin-top:2px;font-family:var(--font-display);">${dateStr}</div>
-        ${festivita ? `<div style="font-size:0.72rem;color:var(--accent-secondary);margin-top:3px;">🎉 ${festivita.nome}</div>` : ''}
+        ${festivita ? `<div style="font-size:0.72rem;color:var(--accent-secondary-text);margin-top:3px;">🎉 ${festivita.nome}</div>` : ''}
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:6px;">
         <button class="btn btn-secondary btn-sm" style="font-size:0.72rem;" onclick="Schermo._avanzaTempo('minuti',10)">+10 min</button>
@@ -9360,7 +9360,7 @@ const Generatori = {
           <div class="text-sm" style="margin-bottom:4px;"><strong>Desiderio dai PG:</strong> ${desiderio}</div>
           ${espansoHTML}
           <div class="card card-gold" style="padding:6px 10px;margin-top:6px;">
-            <div class="text-xs" style="color:var(--accent-secondary);"><strong>🔒 Segreto:</strong> ${segreto}</div>
+            <div class="text-xs" style="color:var(--accent-secondary-text);"><strong>🔒 Segreto:</strong> ${segreto}</div>
           </div>
         </div>
 
@@ -9868,7 +9868,7 @@ const Generatori = {
     const nomiNomi = { piccola:['Archivio di Fratel Aldric','Scriptorium del Borgo','La Biblioteca Impolverata'], grande:['Accademia delle Arti Arcane','Biblioteca Civica di Valmoore','Il Gran Scriptorium'], enorme:['Archivio dei Mille Nomi','La Biblioteca dell\'Oracolo','Il Vault dei Segreti'] };
     const nome = rnd(nomiNomi[size]);
 
-    el.innerHTML = '<div style="font-family:var(--font-display);font-size:0.8rem;color:var(--accent-secondary);margin-bottom:4px;">' + nome + '</div>' +
+    el.innerHTML = '<div style="font-family:var(--font-display);font-size:0.8rem;color:var(--accent-secondary-text);margin-bottom:4px;">' + nome + '</div>' +
       '<div class="text-muted text-sm" style="margin-bottom:8px;">' + cfg.desc + '</div>' +
       '<table style="width:100%;border-collapse:collapse;font-size:0.78rem;">' +
         '<thead><tr>' +
@@ -9879,7 +9879,7 @@ const Generatori = {
         shuffled.map(s =>
           '<tr><td style="padding:3px 0;border-bottom:1px solid var(--border);">📜 ' + s.nome + '</td>' +
           '<td style="padding:3px 4px;border-bottom:1px solid var(--border);text-align:center;font-family:var(--font-mono);color:var(--text-muted);">' + s.livello + '</td>' +
-          '<td style="padding:3px 0;border-bottom:1px solid var(--border);text-align:right;font-family:var(--font-mono);color:var(--accent-secondary);">' + (cfg.prezzi[s.livello]||'—') + ' mo</td></tr>'
+          '<td style="padding:3px 0;border-bottom:1px solid var(--border);text-align:right;font-family:var(--font-mono);color:var(--accent-secondary-text);">' + (cfg.prezzi[s.livello]||'—') + ' mo</td></tr>'
         ).join('') +
         '</tbody></table>';
     Debug.log('Biblioteca: ' + nome + ' (' + shuffled.length + ' pergamene)');
@@ -9945,7 +9945,7 @@ const Generatori = {
       '<div style="display:flex;gap:var(--space-sm);align-items:flex-start;">' +
         '<span style="font-size:1.8rem;">' + tipo.split(' ')[0] + '</span>' +
         '<div>' +
-          '<div style="font-family:var(--font-display);font-size:0.8rem;color:var(--accent-secondary);">' + tipo.slice(tipo.indexOf(' ')+1) + ' — ' + stagione.charAt(0).toUpperCase()+stagione.slice(1) + '</div>' +
+          '<div style="font-family:var(--font-display);font-size:0.8rem;color:var(--accent-secondary-text);">' + tipo.slice(tipo.indexOf(' ')+1) + ' — ' + stagione.charAt(0).toUpperCase()+stagione.slice(1) + '</div>' +
           '<div class="text-sm" style="margin-top:2px;">' + desc + '</div>' +
           (temp ? '<div style="font-size:0.7rem;color:var(--text-muted);margin-top:4px;">🌡️ ' + temp + '</div>' : '') +
         '</div>' +
@@ -10037,7 +10037,7 @@ const Generatori = {
     if (rame > 0)    rolls.push(`<span>🟤 ${rame.toLocaleString('it-IT')} mr</span>`);
     if (argento > 0) rolls.push(`<span>⚪ ${argento.toLocaleString('it-IT')} ma</span>`);
     if (elettro > 0) rolls.push(`<span>🔵 ${elettro.toLocaleString('it-IT')} me</span>`);
-    if (oro > 0)     rolls.push(`<span style="color:var(--accent-secondary)">🟡 ${oro.toLocaleString('it-IT')} mo</span>`);
+    if (oro > 0)     rolls.push(`<span style="color:var(--accent-secondary-text)">🟡 ${oro.toLocaleString('it-IT')} mo</span>`);
     if (platino > 0) rolls.push(`<span style="color:var(--accent-info)">🔷 ${platino.toLocaleString('it-IT')} mp</span>`);
 
     el.innerHTML = `
@@ -10133,7 +10133,7 @@ const Generatori = {
       const prezziScroll = { basso:{0:10,1:60}, medio:{0:10,1:60,2:120,3:200,4:320}, alto:{0:10,1:60,2:120,3:200,4:320,5:640,6:1280} };
       const scrollLv = prezziScroll[livello] || prezziScroll.medio;
       const nomeNeg = rnd(['Archivio di Fratel Aldric','Scriptorium del Borgo','La Libreria Arcana']);
-      el.innerHTML = `<div style="font-family:var(--font-display);font-size:0.8rem;color:var(--accent-secondary);margin-bottom:6px;">${nomeNeg} <span class="badge badge-muted" style="font-size:0.6rem;">${lvLabel}</span></div>` +
+      el.innerHTML = `<div style="font-family:var(--font-display);font-size:0.8rem;color:var(--accent-secondary-text);margin-bottom:6px;">${nomeNeg} <span class="badge badge-muted" style="font-size:0.6rem;">${lvLabel}</span></div>` +
         '<table style="width:100%;border-collapse:collapse;font-size:0.78rem;"><thead><tr>' +
         '<th style="text-align:left;padding:3px 0;border-bottom:1px solid var(--border);font-family:var(--font-display);font-size:0.62rem;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-muted);">Pergamena</th>' +
         '<th style="text-align:right;padding:3px 0;border-bottom:1px solid var(--border);font-family:var(--font-display);font-size:0.62rem;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-muted);">Prezzo</th>' +
@@ -10141,7 +10141,7 @@ const Generatori = {
         Object.entries(scrollLv).map(([lv, p]) => {
           const prezFin = Math.round(p * mult);
           return `<tr><td style="padding:3px 0;border-bottom:1px solid var(--border);">📜 Pergamena magica (${lv}° livello)</td>` +
-            `<td style="padding:3px 0;border-bottom:1px solid var(--border);text-align:right;font-family:var(--font-mono);color:var(--accent-secondary);">${prezFin} mo</td></tr>`;
+            `<td style="padding:3px 0;border-bottom:1px solid var(--border);text-align:right;font-family:var(--font-mono);color:var(--accent-secondary-text);">${prezFin} mo</td></tr>`;
         }).join('') +
         '</tbody></table>' +
         '<div class="text-muted text-sm" style="margin-top:6px;">Livelli disponibili variano per dimensione biblioteca. Usa il generatore 📚 per la lista completa.</div>';
@@ -10250,7 +10250,7 @@ const Generatori = {
     const edLabel = sistema === '5e2014' ? '2014' : '2024';
 
     el.innerHTML = `
-      <div style="font-family:var(--font-display);font-size:0.8rem;color:var(--accent-secondary);margin-bottom:6px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px;">
+      <div style="font-family:var(--font-display);font-size:0.8rem;color:var(--accent-secondary-text);margin-bottom:6px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:4px;">
         <span>${nomeNeg}${sconto ? ` <span class="badge badge-muted">${sconto}</span>` : ''}</span>
         <span style="display:flex;gap:4px;">
           <span class="badge badge-muted" style="font-size:0.6rem;">${lvLabel}</span>
@@ -10266,11 +10266,11 @@ const Generatori = {
         <tbody>${selected.map(item => {
           const prezzoFin = Math.round(item.p * mult * 10) / 10;
           const mostra = item.raro ? '<span class="badge badge-gold" style="font-size:0.58rem;">magico</span> ' : '';
-          const nomeCell = `<span style="cursor:pointer;color:var(--accent-secondary);text-decoration:underline dotted;" onclick="CompendioCache.openItem(this.dataset.nome)" data-nome="${item.n.replace(/"/g,'&quot;')}" title="Apri nel Compendio">${mostra}${item.n} 🔗</span>`;
+          const nomeCell = `<span style="cursor:pointer;color:var(--accent-secondary-text);text-decoration:underline dotted;" onclick="CompendioCache.openItem(this.dataset.nome)" data-nome="${item.n.replace(/"/g,'&quot;')}" title="Apri nel Compendio">${mostra}${item.n} 🔗</span>`;
           return `<tr>
             <td style="padding:3px 0;border-bottom:1px solid var(--border);">${nomeCell}</td>
             <td style="padding:3px 4px;border-bottom:1px solid var(--border);text-align:center;font-family:var(--font-mono);color:var(--text-muted);">×${item.qty}</td>
-            <td style="padding:3px 0;border-bottom:1px solid var(--border);text-align:right;font-family:var(--font-mono);color:var(--accent-secondary);">${prezzoFin.toLocaleString('it-IT')} ${item.u}</td>
+            <td style="padding:3px 0;border-bottom:1px solid var(--border);text-align:right;font-family:var(--font-mono);color:var(--accent-secondary-text);">${prezzoFin.toLocaleString('it-IT')} ${item.u}</td>
           </tr>`;
         }).join('')}</tbody>
       </table>`;
@@ -10358,7 +10358,7 @@ const Generatori = {
     const linkItem = (testo) => {
       if (!testo.startsWith('✨')) return `<span>${testo}</span>`;
       const nomePulito = testo.replace('✨ ', '').replace(/ \(.*\)$/, '').trim();
-      return `<span style="cursor:pointer;color:var(--accent-secondary);text-decoration:underline dotted;"
+      return `<span style="cursor:pointer;color:var(--accent-secondary-text);text-decoration:underline dotted;"
         onclick="CompendioCache.openItem('${nomePulito.replace(/'/g,"\'")}')" title="Cerca nel Compendio">✨ ${nomePulito} 🔗</span>`;
     };
 
@@ -10368,7 +10368,7 @@ const Generatori = {
       </div>`).join('') || '<div class="text-muted text-sm">Nessun oggetto speciale (sfortuna!)</div>';
 
     el.innerHTML = `
-      ${monete ? `<div style="font-family:var(--font-mono);font-size:0.82rem;color:var(--accent-secondary);margin-bottom:8px;padding-bottom:6px;border-bottom:2px solid var(--border);">${monete}</div>` : ''}
+      ${monete ? `<div style="font-family:var(--font-mono);font-size:0.82rem;color:var(--accent-secondary-text);margin-bottom:8px;padding-bottom:6px;border-bottom:2px solid var(--border);">${monete}</div>` : ''}
       ${rows}
       <div class="text-xs text-muted" style="margin-top:6px;">${tipo === 'mostro' || tipo === 'scrigno' ? `CR ${cr}` : tipo}</div>`;
     Debug.log(`Loot generato: tipo=${tipo}, CR=${cr}, extras=${extras.length}`);
@@ -10412,7 +10412,7 @@ const Generatori = {
     el.innerHTML = `
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 12px;font-size:0.82rem;">
         <div class="text-muted">Distanza totale</div>
-        <div style="font-family:var(--font-mono);font-weight:700;color:var(--accent-primary);">${kmTotali} km</div>
+        <div style="font-family:var(--font-mono);font-weight:700;color:var(--accent-text);">${kmTotali} km</div>
         <div class="text-muted">Velocità/giorno</div>
         <div style="font-family:var(--font-mono);">${Math.round(vel)} km</div>
         <div class="text-muted">Razioni (per PG)</div>
@@ -10420,7 +10420,7 @@ const Generatori = {
         <div class="text-muted">Turni di guardia</div>
         <div style="font-family:var(--font-mono);">${turniGuardia}</div>
         <div class="text-muted">Prob. incontri</div>
-        <div style="font-family:var(--font-mono);color:${probIncontro > 50 ? 'var(--accent-danger)' : 'var(--accent-secondary)'};">${probIncontro}% / notte</div>
+        <div style="font-family:var(--font-mono);color:color-mix(in srgb, ${probIncontro > 50 ? 'var(--accent-danger)' : 'var(--accent-secondary)'} 50%, var(--text-primary));">${probIncontro}% / notte</div>
         <div class="text-muted">Percezione</div>
         <div style="font-size:0.75rem;">${percMod}</div>
         <div class="text-muted">Perdersi</div>
@@ -10831,7 +10831,7 @@ const WikiDM = (() => {
         <span style="font-size:0.82rem;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;${n.pinned?'font-weight:600;':''}">${n.titolo || 'Senza titolo'}</span>
         <div style="display:flex;gap:2px;flex-shrink:0;opacity:0.5;" onclick="event.stopPropagation();">
           <button title="${n.pinned?'Rimuovi pin':'Fissa in cima'}"
-            style="width:18px;height:18px;background:none;border:none;cursor:pointer;font-size:0.65rem;padding:0;color:${n.pinned?'var(--accent-secondary)':'var(--text-muted)'};"
+            style="width:18px;height:18px;background:none;border:none;cursor:pointer;font-size:0.65rem;padding:0;color:color-mix(in srgb, ${n.pinned?'var(--accent-secondary)':'var(--text-muted)'} 50%, var(--text-primary));"
             onclick="WikiDM.togglePin('${n.id}')">📌</button>
         </div>
       </div>`;
@@ -10873,7 +10873,7 @@ const WikiDM = (() => {
 
     if (actionsEl) {
       actionsEl.innerHTML = nota
-        ? `<button class="btn btn-ghost btn-icon-sm" onclick="WikiDM.deleteNote()" title="Elimina" style="color:var(--accent-danger);">🗑️</button>`
+        ? `<button class="btn btn-ghost btn-icon-sm" onclick="WikiDM.deleteNote()" title="Elimina" style="color:var(--danger-text);">🗑️</button>`
         : '';
     }
 
@@ -10924,7 +10924,7 @@ const WikiDM = (() => {
           <span style="font-size:1.4rem;">${t.icona}</span>
           <div>
             <div style="font-family:var(--font-display);font-size:0.88rem;">${t.nome}</div>
-            ${t.builtin ? '<div style="font-size:0.68rem;color:var(--text-muted);">Predefinito</div>' : '<div style="font-size:0.68rem;color:var(--accent-secondary);">Personalizzato</div>'}
+            ${t.builtin ? '<div style="font-size:0.68rem;color:var(--text-muted);">Predefinito</div>' : '<div style="font-size:0.68rem;color:var(--accent-secondary-text);">Personalizzato</div>'}
           </div>
         </div>`
       ).join('');
@@ -11192,7 +11192,7 @@ const WikiDM = (() => {
     const tpl = (w.templates||_builtinTemplates()).find(t => t.id === _noteId);
     if (actionsEl) {
       actionsEl.innerHTML = (tpl && !tpl.builtin)
-        ? `<button class="btn btn-ghost btn-icon-sm" onclick="WikiDM.deleteTemplate('${tpl.id}')" style="color:var(--accent-danger);">🗑️</button>`
+        ? `<button class="btn btn-ghost btn-icon-sm" onclick="WikiDM.deleteTemplate('${tpl.id}')" style="color:var(--danger-text);">🗑️</button>`
         : '';
     }
     if (!tpl) {
@@ -11704,15 +11704,15 @@ const Clocks = (() => {
           '<span style="font-family:var(--font-display);font-size:0.82rem;font-weight:600;">' + c.nome + '</span>' +
           '<div style="display:flex;gap:2px;">' +
             '<span style="font-size:0.68rem;color:var(--text-muted);">' + c.current + '/' + c.max + '</span>' +
-            '<button onclick="Clocks.tick('+i+')" style="background:none;border:none;cursor:pointer;color:var(--accent-secondary);font-size:0.8rem;padding:0 3px;" title="Avanza">+</button>' +
+            '<button onclick="Clocks.tick('+i+')" style="background:none;border:none;cursor:pointer;color:var(--accent-secondary-text);font-size:0.8rem;padding:0 3px;" title="Avanza">+</button>' +
             '<button onclick="Clocks.untick('+i+')" style="background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:0.8rem;padding:0 3px;" title="Indietro">−</button>' +
-            '<button onclick="Clocks.remove('+i+')" style="background:none;border:none;cursor:pointer;color:var(--accent-danger);font-size:0.8rem;padding:0 3px;" title="Rimuovi"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>' +
+            '<button onclick="Clocks.remove('+i+')" style="background:none;border:none;cursor:pointer;color:var(--danger-text);font-size:0.8rem;padding:0 3px;" title="Rimuovi"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>' +
           '</div>' +
         '</div>' +
         '<div style="display:flex;height:14px;border-radius:4px;overflow:hidden;gap:1px;">' + segs + '</div>' +
         // I clock sono salvati con 'nota' (vedi add): qui si leggeva 'note' e la nota non compariva mai
         ((c.nota || c.note) ? '<div style="font-size:0.72rem;color:' + (pct >= 100 ? 'var(--text-primary)' : 'var(--text-muted)') + ';margin-top:4px;">' + (pct >= 100 ? 'È successo: ' : 'Quando si riempie: ') + String(c.nota || c.note).replace(/</g,'&lt;') + '</div>' : '') +
-        (pct >= 100 ? '<div style="font-size:0.7rem;color:var(--accent-danger);margin-top:4px;font-weight:600;">⚡ COMPLETATO</div>' : '') +
+        (pct >= 100 ? '<div style="font-size:0.7rem;color:var(--danger-text);margin-top:4px;font-weight:600;">⚡ COMPLETATO</div>' : '') +
       '</div>';
     }).join('');
   };
@@ -11797,7 +11797,7 @@ const _renderDashRecenti = () => {
         const color = pct>=100?'var(--accent-danger)':pct>=66?'#f5a623':'var(--accent-secondary)';
         return '<div style="margin-bottom:8px;">' +
           '<div style="display:flex;justify-content:space-between;font-size:0.8rem;margin-bottom:3px;">' +
-            '<span>' + c.nome + '</span><span style="color:'+color+';">' + c.current+'/'+c.max + '</span>' +
+            '<span>' + c.nome + '</span><span style="color:color-mix(in srgb, ' + color + ' 50%, var(--text-primary));">' + c.current+'/'+c.max + '</span>' +
           '</div>' +
           '<div style="height:6px;background:var(--bg-tertiary);border-radius:3px;overflow:hidden;">' +
             '<div style="height:100%;width:'+pct+'%;background:'+color+';border-radius:3px;transition:width 0.3s;"></div>' +
@@ -11976,10 +11976,30 @@ const GDrive = (() => {
   let _fileId    = null;
   let _userInfo  = null;
   let _token     = null;
+  // Il token di Google dura circa un'ora (limite di Google per le app senza server): prima non se
+  // ne teneva conto, e dopo la scadenza l'app si credeva collegata mentre ogni salvataggio su
+  // Drive falliva in silenzio.
+  let _scadenza  = 0;
   let _tokenClient = null;
   let _onConnectCbs = [];
+  const _valido = () => _loggedIn && !!_token && Date.now() < _scadenza;
+  // Chiamata quando Google rifiuta il token (401): conta come scaduto
+  const segnaScaduto = () => { _scadenza = 0; try { DriveBackup._aggiornaStato?.(); } catch(e) {} };
 
-  const onConnect = (cb) => { if (_loggedIn && _token) cb(); else _onConnectCbs.push(cb); };
+  // Rinnovo automatico: il browser apre la finestra di Google solo se nasce da un tocco
+  // dell'utente, per questo il rinnovo all'avvio spesso falliva. Quando il token sta per scadere
+  // (o e' scaduto) e Drive era collegato, al primo tocco nell'app si chiede un token nuovo senza
+  // domande (prompt:'none'): al massimo compare per un attimo la finestra di Google.
+  let _ultimoRinnovo = 0;
+  document.addEventListener('pointerdown', () => {
+    if (localStorage.getItem('dm_drive_connected') !== 'true' || !CLIENT_ID) return;
+    if (_loggedIn && _token && Date.now() < _scadenza - 5 * 60 * 1000) return;
+    if (Date.now() - _ultimoRinnovo < 2 * 60 * 1000 || !window.google?.accounts?.oauth2) return;
+    _ultimoRinnovo = Date.now();
+    _doLogin(true);
+  }, true);
+
+  const onConnect = (cb) => { if (_valido()) cb(); else _onConnectCbs.push(cb); };
 
   const init = () => {
     const btn = document.getElementById('gdrive-btn');
@@ -11997,7 +12017,7 @@ const GDrive = (() => {
     if (_loggedIn && _userInfo) {
       btn.innerHTML = SVG + ' ' + (_userInfo.name?.split(' ')[0] || 'Drive');
       btn.title  = 'Connesso come ' + _userInfo.email;
-      btn.style.color = 'var(--accent-secondary)';
+      btn.style.color = 'var(--accent-secondary-text)';
     } else {
       btn.innerHTML = SVG + ' Drive';
       btn.title = 'Connetti Google Drive';
@@ -12007,7 +12027,7 @@ const GDrive = (() => {
 
   const toggleLogin = () => {
     if (!CLIENT_ID) { Modal.open('gdrive-setup'); return; }
-    if (_loggedIn) { Modal.open('gdrive-options'); }
+    if (_valido()) { Modal.open('gdrive-options'); }
     else { _login(); }
   };
 
@@ -12042,6 +12062,7 @@ const GDrive = (() => {
             return;
           }
           _token = resp.access_token;
+          _scadenza = Date.now() + ((parseInt(resp.expires_in, 10) || 3600) - 120) * 1000;
           _loggedIn = true;
           // Recupera info utente
           try {
@@ -12055,6 +12076,8 @@ const GDrive = (() => {
           if (!silenzioso) Toast.show('Connesso come ' + (_userInfo?.name || 'Drive'), 'success', 2000);
           const cbs = _onConnectCbs; _onConnectCbs = [];
           cbs.forEach(cb => { try { cb(); } catch(e) {} });
+          // Rinnovo riuscito (anche quello automatico al primo tocco): stato aggiornato e salvataggio
+          try { DriveBackup._aggiornaStato?.(); } catch(e) {}
         },
       });
       _tokenClient.requestAccessToken(silenzioso ? { prompt: 'none' } : {});
@@ -12067,7 +12090,7 @@ const GDrive = (() => {
   // DriveBackup.init). Richiede lo script GIS come il login normale, poi
   // tenta un token silenzioso.
   const silentReconnect = () => {
-    if (!CLIENT_ID || _loggedIn) return;
+    if (!CLIENT_ID || _valido()) return;
     if (!window.google?.accounts?.oauth2) {
       const s = document.createElement('script');
       s.src = 'https://accounts.google.com/gsi/client';
@@ -12102,8 +12125,9 @@ const GDrive = (() => {
 
   return { init, toggleLogin, logout, setClientId, onConnect, silentReconnect,
            showWelcomeIfNeeded, _updateBtn,
-           get loggedIn() { return _loggedIn; },
-           get token() { return _token; } };
+           segnaScaduto,
+           get loggedIn() { return _valido(); },
+           get token() { return _valido() ? _token : null; } };
 })();
 
 let _wikiViewMode = 'view';
@@ -12118,7 +12142,7 @@ const _applyViewMode = () => {
     if (content) { content.contentEditable = 'false'; content.style.cursor = 'default'; }
     if (toolbar)  toolbar.classList.add('view-mode');
     if (titleEl)  titleEl.disabled = true;
-    if (btn) { btn.textContent = '✏️ Modifica'; btn.title = 'Passa in modalità modifica'; btn.style.color = 'var(--accent-secondary)'; }
+    if (btn) { btn.textContent = '✏️ Modifica'; btn.title = 'Passa in modalità modifica'; btn.style.color = 'var(--accent-secondary-text)'; }
   } else {
     if (content) { content.contentEditable = 'true'; content.style.cursor = ''; content.focus(); }
     if (toolbar)  toolbar.classList.remove('view-mode');
@@ -13367,7 +13391,7 @@ const FirebaseSync = (() => {
       if (icon) icon.innerHTML = ICON_KEY;
       if (label) label.textContent = (_user.displayName||_user.email||'').split(' ')[0];
       btn.style.borderColor = 'var(--accent-secondary)';
-      btn.style.color = 'var(--accent-secondary)';
+      btn.style.color = 'var(--accent-secondary-text)';
     } else {
       if (icon) icon.innerHTML = ICON_CLOUD;
       if (label) label.textContent = 'Accedi';
@@ -13757,6 +13781,10 @@ const FirebaseSync = (() => {
 
   const _mergeCampagne = (local, remote, remoteNewer) => {
     remote = _ripristinaPesanti(remote, local);
+    // Anche al contrario: se qui c'e' solo il segnaposto e l'altro dispositivo ha l'immagine vera
+    // (es. un link rimesso a mano), vince l'immagine vera anche se la voce locale risulta piu'
+    // recente. Prima il segnaposto poteva "vincere" e tornare nel cloud.
+    local = _ripristinaPesanti(local, remote);
     const merged = { ...local };
 
     Object.keys(remote).forEach(k => {
@@ -14234,7 +14262,7 @@ const MentionPicker = (() => {
     document.execCommand('insertHTML', false,
       '<span class="nc-wikilink" data-link="'+r.key+'" '+
       'onclick="wikiNavigateLink(\''+r.key.replace(/'/g,"\\'")+'\')" '+
-      'style="cursor:pointer;color:'+r.color+';">@'+icon+titolo+'</span>&nbsp;'
+      'style="cursor:pointer;color:color-mix(in srgb, ' + r.color + ' 50%, var(--text-primary));">@'+icon+titolo+'</span>&nbsp;'
     );
 
     _hide();
@@ -14377,7 +14405,7 @@ const ScenePlanner = (() => {
             '<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">' +
               '<select onchange="ScenePlanner.setTipo('+i+',this.value)" '+
               'style="font-size:0.72rem;background:var(--bg-tertiary);border:1px solid var(--border);'+
-              'border-radius:var(--radius-sm);padding:2px 4px;color:'+tipo.color+';">' +
+              'border-radius:var(--radius-sm);padding:2px 4px;color:color-mix(in srgb, ' + tipo.color + ' 50%, var(--text-primary));">' +
               BEAT_TYPES.map(t =>
                 '<option value="'+t.value+'"'+(t.value===b.tipo?' selected':'')+'>'+t.label+'</option>'
               ).join('') +
@@ -14409,7 +14437,7 @@ const ScenePlanner = (() => {
             '<button onclick="ScenePlanner.moveDown('+i+')" title="Sposta giù" '+
             'style="background:none;border:none;cursor:pointer;font-size:0.7rem;color:var(--text-muted);">▼</button>' +
             '<button onclick="ScenePlanner.remove('+i+')" title="Rimuovi" '+
-            'style="background:none;border:none;cursor:pointer;font-size:0.8rem;color:var(--accent-danger);"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>' +
+            'style="background:none;border:none;cursor:pointer;font-size:0.8rem;color:var(--danger-text);"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>' +
           '</div>' +
 
         '</div>'
@@ -14601,7 +14629,7 @@ const SessioniLog = (() => {
                 '<div style="font-family:var(--font-display);font-size:0.95rem;font-weight:600;">'+( s.titolo||'Senza titolo')+'</div>' +
                 (s.data ? '<div style="font-size:0.72rem;color:var(--text-muted);">'+s.data+'</div>' : '') +
               '</div>' +
-              '<span style="font-size:0.68rem;padding:2px 8px;background:'+color+'22;color:'+color+';border:1px solid '+color+'44;border-radius:var(--radius-full);">'+label+'</span>' +
+              '<span style="font-size:0.68rem;padding:2px 8px;background:'+color+'22;color:color-mix(in srgb, ' + color + ' 50%, var(--text-primary));border:1px solid '+color+'44;border-radius:var(--radius-full);">'+label+'</span>' +
             '</div>' +
             '<div style="display:flex;gap:6px;">' +
               (wikiNota ?
@@ -14611,7 +14639,7 @@ const SessioniLog = (() => {
               '<button class="btn btn-ghost btn-sm" onclick="SessioniLog.edit(\''+s.id+'\')" style="font-size:0.72rem;">✏️ Modifica</button>' +
               (s.stato !== 'giocata' ?
                 '<button class="btn btn-primary btn-sm" onclick="SessioniLog.setInCorso(\''+s.id+'\')" style="font-size:0.72rem;">▶ In corso</button>' : '') +
-              '<button class="btn btn-ghost btn-sm" onclick="SessioniLog.remove(\''+s.id+'\')" style="font-size:0.72rem;color:var(--accent-danger);"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>' +
+              '<button class="btn btn-ghost btn-sm" onclick="SessioniLog.remove(\''+s.id+'\')" style="font-size:0.72rem;color:var(--danger-text);"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>' +
             '</div>' +
           '</div>' +
 
@@ -14623,7 +14651,7 @@ const SessioniLog = (() => {
             (s.beats||[]).map(b => {
               const BEAT_COLORS = {apertura:'#5ba4f5',sociale:'#69cc85',esplorazione:'#f5a623',combattimento:'#ff6b6b',rivelazione:'#c97bea',cliffhanger:'#ff9f43',riposo:'#aaa',libero:'#888'};
               const bc = BEAT_COLORS[b.tipo]||'#888';
-              return '<span style="font-size:0.68rem;padding:1px 8px;background:'+bc+'22;border:1px solid '+bc+'44;color:'+bc+';border-radius:var(--radius-full);">'+(b.principale?'★ ':'')+( b.titolo||b.tipo)+'</span>';
+              return '<span style="font-size:0.68rem;padding:1px 8px;background:'+bc+'22;border:1px solid '+bc+'44;color:color-mix(in srgb, ' + bc + ' 50%, var(--text-primary));border-radius:var(--radius-full);">'+(b.principale?'★ ':'')+( b.titolo||b.tipo)+'</span>';
             }).join('') +
           '</div>' : '') +
 
@@ -15190,24 +15218,43 @@ const Settings = (() => {
   // corrente, non un tema alternativo indipendente. Cosi' "Grigio medio" resta riconoscibile
   // sia in chiaro che in scuro, e il toggle tema ha sempre effetto invece di essere ignorato.
   // La sidebar (--nav-*) segue la stessa tonalita', leggermente piu' satura del contenuto.
+  // Ogni sfondo e' una TINTA (tonalita' e saturazione) applicata a luminosita' fisse, diverse
+  // per tema chiaro e scuro e scelte per tenere leggibili i testi. Prima i colori si ottenevano
+  // scurendo o schiarendo il colore scelto di una quantita' fissa: con il tema scuro uno sfondo
+  // chiaro come "Pergamena" diventava un grigio medio (#6e6c68) su cui i testi chiari sparivano.
+  // d/l = luminosita' (%) dello sfondo pagina nel tema scuro / chiaro.
+  const BG_TINTE = {
+    'gray-900':  { h: 30,  s: 4,  d: 5,  l: 96 },
+    'gray-800':  { h: 215, s: 14, d: 8,  l: 95 },
+    'gray-700':  { h: 215, s: 10, d: 11, l: 93 },
+    'slate':     { h: 217, s: 28, d: 9,  l: 95 },
+    'parchment': { h: 38,  s: 38, d: 8,  l: 94 },
+  };
+  const _hsl = (h, s, l) => {
+    l = Math.max(0, Math.min(100, l)) / 100; s /= 100;
+    const k = (n) => (n + h / 30) % 12, a = s * Math.min(l, 1 - l);
+    const f = (n) => l - a * Math.max(-1, Math.min(k(n) - 3, 9 - k(n), 1));
+    return _rgbToHex(f(0) * 255, f(8) * 255, f(4) * 255);
+  };
+  const TESTI = { scuro: ['#f0ebe4', '#c8c0b6', '#a59d94'], chiaro: ['#1a1714', '#4a4540', '#655e57'] };
+
   const _applyBgPalette = (baseHex) => {
     const root = document.documentElement.style;
     const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    const chiave = Object.keys(BG_COLORS).find(k => BG_COLORS[k] === baseHex);
+    const t = BG_TINTE[chiave];
+    if (!t) return;
+    const L = isDark ? t.d : t.l;
+    const piu = isDark ? 1 : -1; // gli strati si staccano verso il chiaro (scuro) o verso lo scuro (chiaro)
+    const strati = isDark ? [L, L + 3, L + 6, L + 4, L + 7] : [L, L - 3, L - 6, Math.min(100, L + 5), Math.min(99, L + 3)];
+    BG_VARS.forEach((v, i) => root.setProperty(v, _hsl(t.h, t.s, strati[i])));
 
-    const shades = isDark
-      ? [_mix(baseHex,'#000000',0.55), _mix(baseHex,'#000000',0.45), _mix(baseHex,'#000000',0.35), _mix(baseHex,'#000000',0.50), _mix(baseHex,'#000000',0.40)]
-      : [_mix(baseHex,'#ffffff',0.88), _mix(baseHex,'#ffffff',0.82), _mix(baseHex,'#ffffff',0.76), _mix(baseHex,'#ffffff',0.94), _mix(baseHex,'#ffffff',0.88)];
-    BG_VARS.forEach((v, i) => root.setProperty(v, shades[i]));
-
-    const text = isDark ? ['#f0ebe4','#c0b8ae','#9a9088'] : ['#1a1714','#4a4540','#7a736b'];
+    const text = isDark ? TESTI.scuro : TESTI.chiaro;
     TEXT_VARS.forEach((v, i) => root.setProperty(v, text[i]));
 
-    const borders = isDark ? [_mix(baseHex,'#000000',0.25), _mix(baseHex,'#000000',0.15)] : [_mix(baseHex,'#000000',0.12), _mix(baseHex,'#000000',0.22)];
-    BORDER_VARS.forEach((v, i) => root.setProperty(v, borders[i]));
+    BORDER_VARS.forEach((v, i) => root.setProperty(v, _hsl(t.h, t.s, L + piu * (i ? 18 : 10))));
 
-    const nav = isDark
-      ? [_mix(baseHex,'#000000',0.60), text[2], text[0]]
-      : [_mix(baseHex,'#ffffff',0.80), text[1], text[0]];
+    const nav = [_hsl(t.h, Math.min(40, t.s + 4), isDark ? Math.max(2, L - 3) : L - 4), text[isDark ? 2 : 1], text[0]];
     NAV_VARS.forEach((v, i) => root.setProperty(v, nav[i]));
   };
 
@@ -15263,14 +15310,23 @@ const DriveBackup = (() => {
     _initStarted = true;
     _connected = localStorage.getItem(LS_KEY) === 'true';
     if (_connected) {
+      _inAttesa = true; // fino all'esito del rinnovo all'avvio non si mostra "da ricollegare"
       _updateUI();
       // Il token OAuth non sopravvive a un reload (solo questo flag lo fa):
       // senza un tentativo di riconnessione, l'app risultava "collegata" in
       // locale ma ogni upload falliva silenziosamente sul fallback offline.
+      _inAttesa = true;
       try { GDrive.silentReconnect(); } catch(e) {}
-      GDrive.onConnect(() => _onConnected());
+      GDrive.onConnect(() => { _inAttesa = false; _onConnected(true); });
+      setTimeout(() => { _inAttesa = false; _updateUI(); }, 8000);
     }
+    // Ogni minuto: la scadenza del token cambia lo stato senza che succeda altro
+    setInterval(() => { if (_connected) { _updateUI(); if (isConnected()) _rinnovato(); } }, 60000);
   };
+  // Dopo un rinnovo (anche automatico al primo tocco) si salva subito su Drive cio' che e'
+  // rimasto indietro mentre l'accesso era scaduto
+  let _eraScaduto = false;
+  const _rinnovato = () => { if (_eraScaduto) { _eraScaduto = false; setTimeout(() => backupNow(), 500); } };
 
   // Autenticazione delegata a GDrive (stesso Client ID OAuth usato per la collaborazione),
   // cosi l'utente configura un solo Client ID e i due moduli condividono il token.
@@ -15283,12 +15339,12 @@ const DriveBackup = (() => {
     GDrive.toggleLogin();
   };
 
-  const _onConnected = () => {
+  const _onConnected = (silenzioso) => {
     _connected = true;
     _warnedThisSession = false;
     localStorage.setItem(LS_KEY, 'true');
     _updateUI();
-    Toast.show('Google Drive collegato — backup automatico attivo', 'success', 3000);
+    if (!silenzioso) Toast.show('Google Drive collegato — backup automatico attivo', 'success', 3000);
     Modal.close('drive-welcome');
     setTimeout(() => backupNow(), 1000);
   };
@@ -15309,7 +15365,7 @@ const DriveBackup = (() => {
   const _driveFetch = (path, opts = {}) => fetch('https://www.googleapis.com/' + path, {
     ...opts,
     headers: { Authorization: 'Bearer ' + GDrive.token, ...(opts.headers || {}) },
-  });
+  }).then(res => { if (res.status === 401) GDrive.segnaScaduto(); return res; });
 
   const isConnected = () => _connected && !!(GDrive.loggedIn && GDrive.token);
 
@@ -15752,22 +15808,54 @@ const DriveBackup = (() => {
     const disconnectBtn = document.getElementById('drive-disconnect-btn');
     const lastBackup = document.getElementById('drive-last-backup');
 
-    if (_connected) {
-      if (label) { label.textContent = 'Collegato — cartella "DM Toolkit" su Google Drive'; label.style.color = 'var(--accent-secondary)'; }
-      if (connectBtn) connectBtn.style.display = 'none';
+    // "Da ricollegare": era collegato, ma l'accesso a Google e' scaduto e il rinnovo automatico non
+    // e' riuscito. Prima qui si leggeva "Collegato" anche in questo caso.
+    const daRicollegare = _connected && !isConnected() && !_inAttesa;
+    _aggiornaAvviso(daRicollegare);
+    if (daRicollegare) {
+      _eraScaduto = true;
+      if (label) { label.textContent = 'Da ricollegare: l’accesso a Google è scaduto. Le modifiche intanto vanno su Firebase e non si perdono; ricollegando, le immagini nuove vengono salvate su Drive.'; label.style.color = 'var(--warning-text)'; }
+      if (connectBtn) { connectBtn.style.display = ''; connectBtn.textContent = 'Ricollega Drive'; }
+      if (backupBtn) backupBtn.style.display = 'none';
+      if (restoreBtn) restoreBtn.style.display = 'none';
+      if (disconnectBtn) disconnectBtn.style.display = '';
+      _updateLastBackup(localStorage.getItem(LS_LAST));
+    } else if (_connected) {
+      if (label) { label.textContent = 'Collegato — cartella "DM Toolkit" su Google Drive'; label.style.color = 'var(--accent-secondary-text)'; }
+      if (connectBtn) { connectBtn.style.display = 'none'; connectBtn.textContent = 'Collega Drive'; }
       if (backupBtn) backupBtn.style.display = '';
       if (restoreBtn) restoreBtn.style.display = '';
       if (disconnectBtn) disconnectBtn.style.display = '';
       _updateLastBackup(localStorage.getItem(LS_LAST));
     } else {
       if (label) { label.textContent = 'Non collegato'; label.style.color = 'var(--text-muted)'; }
-      if (connectBtn) connectBtn.style.display = '';
+      if (connectBtn) { connectBtn.style.display = ''; connectBtn.textContent = 'Collega Drive'; }
       if (backupBtn) backupBtn.style.display = 'none';
       if (restoreBtn) restoreBtn.style.display = 'none';
       if (disconnectBtn) disconnectBtn.style.display = 'none';
       if (lastBackup) lastBackup.textContent = '';
     }
   };
+
+  // Avviso sempre visibile nella barra in alto quando Drive va ricollegato
+  const _aggiornaAvviso = (mostra) => {
+    let b = document.getElementById('drive-ricollega-btn');
+    if (!mostra) { b?.remove(); return; }
+    if (b) return;
+    const auth = document.getElementById('fb-auth-btn');
+    if (!auth) return;
+    b = document.createElement('button');
+    b.id = 'drive-ricollega-btn';
+    b.type = 'button';
+    b.className = 'btn btn-sm';
+    b.style.cssText = 'font-size:0.75rem;border:1px solid var(--accent-warning);color:var(--warning-text);background:none;';
+    b.title = 'L’accesso a Google Drive è scaduto: tocca per ricollegarlo';
+    b.textContent = 'Drive da ricollegare';
+    b.onclick = () => connect();
+    auth.insertAdjacentElement('beforebegin', b);
+  };
+  let _inAttesa = false;
+  const _aggiornaStato = () => { _updateUI(); if (isConnected()) _rinnovato(); };
 
   const _updateLastBackup = (time) => {
     const el = document.getElementById('drive-last-backup');
@@ -15798,7 +15886,7 @@ const DriveBackup = (() => {
   return {
     init, connect, connectFromWelcome, dismissWelcome, backupNow, disconnect, showWelcomeIfNeeded, _updateUI,
     listBackups, openRestoreModal, restoreBackup,
-    isConnected, ready, syncToDrive, downloadFromDrive, deleteFromDrive, uploadImage, replaceImagesWithDriveLinks, toEmbeddableUrl,
+    isConnected, ready, syncToDrive, downloadFromDrive, deleteFromDrive, _aggiornaStato, uploadImage, replaceImagesWithDriveLinks, toEmbeddableUrl,
     generateInvite, acceptInvite,
   };
 })();
@@ -16357,7 +16445,7 @@ const WikiSections = (() => {
       const statusColor = STATUS_COLORS[item.stato || item.attitudine] || cfg.color;
       const sub = item.ruolo || item.tipo || item.categoria || item.stato || item.numero || '';
       const tags = (item.tags || []).slice(0, 3).map(t =>
-        '<span style="font-size:0.62rem;padding:1px 6px;background:' + cfg.color + '22;color:' + cfg.color + ';border-radius:var(--radius-full);">' + t + '</span>'
+        '<span style="font-size:0.62rem;padding:1px 6px;background:' + cfg.color + '22;color:color-mix(in srgb, ' + cfg.color + ' 50%, var(--text-primary));border-radius:var(--radius-full);">' + t + '</span>'
       ).join('');
 
       return '<div onclick="WikiSections.openCard(\'' + type + '\',\'' + item.id + '\')" ' +
@@ -16420,7 +16508,7 @@ const WikiSections = (() => {
         const isPost = f.label.toLowerCase().includes('post');
         const color = isPrep ? '#f5a623' : isPost ? '#69cc85' : 'var(--accent-secondary)';
         return '<div style="grid-column:1/-1;margin:14px 0 6px;padding:8px 14px;background:' + color + '18;border-left:4px solid ' + color + ';border-radius:0 var(--radius-md) var(--radius-md) 0;">' +
-          '<div style="font-size:0.8rem;font-family:var(--font-display);font-weight:700;color:' + color + ';letter-spacing:0.05em;">' + f.label.replace(/^[—–]/,'').replace(/[—–]$/,'').trim() + '</div>' +
+          '<div style="font-size:0.8rem;font-family:var(--font-display);font-weight:700;color:color-mix(in srgb, ' + color + ' 50%, var(--text-primary));letter-spacing:0.05em;">' + f.label.replace(/^[—–]/,'').replace(/[—–]$/,'').trim() + '</div>' +
           '</div>';
       }
       if (!val && val !== 0) return '';
@@ -16443,7 +16531,7 @@ const WikiSections = (() => {
         content = '<div style="font-size:0.85rem;line-height:1.7;white-space:pre-wrap;">' + _parseLinks(_escHtml(String(val))) + '</div>';
       } else if (f.type === 'select') {
         const sc = STATUS_COLORS[val] || cfg.color;
-        content = '<span style="padding:2px 10px;background:' + sc + '22;color:' + sc + ';border:1px solid ' + sc + '44;border-radius:var(--radius-full);font-size:0.78rem;">' + _escHtml(String(val)) + '</span>';
+        content = '<span style="padding:2px 10px;background:' + sc + '22;color:color-mix(in srgb, ' + sc + ' 50%, var(--text-primary));border:1px solid ' + sc + '44;border-radius:var(--radius-full);font-size:0.78rem;">' + _escHtml(String(val)) + '</span>';
       } else {
         content = '<span style="font-size:0.88rem;">' + _escHtml(String(val)) + '</span>';
       }
@@ -16463,7 +16551,7 @@ const WikiSections = (() => {
         const isPost = f.label.toLowerCase().includes('post');
         const color = isPrep ? '#f5a623' : isPost ? '#69cc85' : 'var(--accent-secondary)';
         return '<div style="grid-column:1/-1;margin:16px 0 8px;padding:10px 14px;background:' + color + '18;border-left:4px solid ' + color + ';border-radius:0 var(--radius-md) var(--radius-md) 0;">' +
-          '<div style="font-size:0.8rem;font-family:var(--font-display);font-weight:700;color:' + color + ';letter-spacing:0.05em;">' + f.label.replace(/^[—–]/,'').replace(/[—–]$/,'').trim() + '</div>' +
+          '<div style="font-size:0.8rem;font-family:var(--font-display);font-weight:700;color:color-mix(in srgb, ' + color + ' 50%, var(--text-primary));letter-spacing:0.05em;">' + f.label.replace(/^[—–]/,'').replace(/[—–]$/,'').trim() + '</div>' +
           '</div>';
       }
       const val = item[f.key] || '';
@@ -16494,7 +16582,7 @@ const WikiSections = (() => {
 
       '<div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap;">' +
         '<button onclick="WikiSections.closeDetail(\'' + type + '\')" ' +
-          'style="background:none;border:none;cursor:pointer;color:var(--accent-primary);font-size:0.85rem;display:flex;align-items:center;gap:4px;">' +
+          'style="background:none;border:none;cursor:pointer;color:var(--accent-text);font-size:0.85rem;display:flex;align-items:center;gap:4px;">' +
           '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg> Torna</button>' +
         '<div style="flex:1;min-width:0;">' +
           (isEdit ?
@@ -16515,7 +16603,7 @@ const WikiSections = (() => {
           ) +
           (isEdit ?
             '<button onclick="WikiSections.deleteCard(\'' + type + '\',\'' + item.id + '\')" ' +
-              'style="background:none;border:1px solid var(--accent-danger);border-radius:var(--radius-md);cursor:pointer;color:var(--accent-danger);font-size:0.72rem;padding:4px 10px;">Elimina</button>' : ''
+              'style="background:none;border:1px solid var(--accent-danger);border-radius:var(--radius-md);cursor:pointer;color:var(--danger-text);font-size:0.72rem;padding:4px 10px;">Elimina</button>' : ''
           ) +
         '</div>' +
       '</div>' +
@@ -16542,7 +16630,7 @@ const WikiSections = (() => {
           '</div>' +
           '<div style="flex:1;min-width:200px;display:flex;flex-direction:column;gap:6px;">' +
             '<input id="wsf-immagine" type="text" class="form-input" style="font-size:0.82rem;" value="' + _escHtml(item.immagine || '') + '" placeholder="https://..." oninput="WikiSections._fieldChange(\'' + type + '\',\'immagine\',this.value);WikiSections._refreshImgFieldPreview()">' +
-            '<div id="wsf-immagine-avviso" style="display:none;font-size:0.78rem;line-height:1.45;color:var(--accent-warning);"></div>' +
+            '<div id="wsf-immagine-avviso" style="display:none;font-size:0.78rem;line-height:1.45;color:var(--warning-text);"></div>' +
             '<label class="btn btn-ghost btn-sm" style="display:inline-flex;align-items:center;gap:6px;cursor:pointer;width:fit-content;">' +
               '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>' +
               'Carica dal dispositivo' +
@@ -16576,7 +16664,7 @@ const WikiSections = (() => {
         if (!isEdit && !custom.length) return '';
         let html = '<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);padding:16px;margin-bottom:16px;">';
         html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">';
-        html += '<div style="font-size:0.68rem;font-family:var(--font-display);text-transform:uppercase;letter-spacing:0.08em;color:var(--accent-secondary);">Campi personalizzati</div>';
+        html += '<div style="font-size:0.68rem;font-family:var(--font-display);text-transform:uppercase;letter-spacing:0.08em;color:var(--accent-secondary-text);">Campi personalizzati</div>';
         if (isEdit) html += '<button onclick="WikiSections._addCustomField(\'' + type + '\')" style="font-size:0.72rem;padding:3px 8px;background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;color:var(--text-primary);">+ Campo</button>';
         html += '</div>';
         if (custom.length) {
@@ -16591,12 +16679,12 @@ const WikiSections = (() => {
                   ? '<select class="form-select ws-custom-val" data-fi="' + fi + '" style="flex:1;font-size:0.78rem;"><option value="si"' + (f.valore==='si'?' selected':'') + '>Sì</option><option value="no"' + (f.valore==='no'?' selected':'') + '>No</option></select>'
                   : '<input class="form-input ws-custom-val" data-fi="' + fi + '" value="' + _escHtml(f.valore||'') + '" placeholder="Valore" style="flex:1;font-size:0.78rem;">'
                 ) +
-                '<button onclick="WikiSections._removeCustomField(\'' + type + '\',' + fi + ')" style="background:none;border:none;cursor:pointer;color:var(--accent-danger);font-size:0.9rem;padding:0 4px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>' +
+                '<button onclick="WikiSections._removeCustomField(\'' + type + '\',' + fi + ')" style="background:none;border:none;cursor:pointer;color:var(--danger-text);font-size:0.9rem;padding:0 4px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>' +
               '</div>';
             } else {
               if (!f.valore && f.valore !== 0) return '';
               var valDisplay = f.tipo === 'si_no' ? (f.valore === 'si' ? '● Sì' : '○ No')
-                : f.tipo === 'link' ? '<span style="color:var(--accent-primary);cursor:pointer;" onclick="WikiSections._jumpToEntity(&#39;' + (f.valore||'').replace(/^@/,'') + '&#39;, event)">@' + _escHtml((f.valore||'').replace(/^@/,'')) + '</span>'
+                : f.tipo === 'link' ? '<span style="color:var(--accent-text);cursor:pointer;" onclick="WikiSections._jumpToEntity(&#39;' + (f.valore||'').replace(/^@/,'') + '&#39;, event)">@' + _escHtml((f.valore||'').replace(/^@/,'')) + '</span>'
                 : _escHtml(String(f.valore));
               return '<div style="display:flex;gap:8px;align-items:baseline;padding:4px 0;border-bottom:1px solid var(--border);">' +
                 '<span style="font-size:0.72rem;color:var(--text-muted);min-width:120px;flex-shrink:0;">' + _escHtml(f.chiave||'') + '</span>' +
@@ -16618,7 +16706,7 @@ const WikiSections = (() => {
           'oninput="WikiSections._fieldChange(\'' + type + '\',\'tags\',this.value.split(\',\').map(t=>t.trim()).filter(Boolean))"></div>' :
           (item.tags?.length ?
             '<div style="display:flex;flex-wrap:wrap;gap:4px;">' +
-            item.tags.map(t => '<span style="font-size:0.72rem;padding:2px 8px;background:' + cfg.color + '22;color:' + cfg.color + ';border-radius:var(--radius-full);">#' + t + '</span>').join('') +
+            item.tags.map(t => '<span style="font-size:0.72rem;padding:2px 8px;background:' + cfg.color + '22;color:color-mix(in srgb, ' + cfg.color + ' 50%, var(--text-primary));border-radius:var(--radius-full);">#' + t + '</span>').join('') +
             '</div>' : '')
         ) +
       '</div>' +
@@ -16631,8 +16719,8 @@ const WikiSections = (() => {
         return '<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);padding:12px 16px;margin-bottom:16px;">' +
           '<div style="font-size:0.68rem;font-family:var(--font-display);text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin-bottom:10px;">Apparso in</div>' +
           apparso.map(s => '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">' +
-            '<span style="font-size:0.7rem;padding:1px 7px;background:' + (s.stato==='giocata'?'#69cc8522':'#5ba4f522') + ';color:' + (s.stato==='giocata'?'#69cc85':'#5ba4f5') + ';border-radius:var(--radius-full);">' + (s.stato==='giocata'?'Giocata':'Pianificata') + '</span>' +
-            '<span style="font-size:0.82rem;cursor:pointer;color:var(--accent-primary);" onclick="WikiSections.goto(\'sessioni\');setTimeout(()=>WikiSections.openCard(\'sessioni\',\''+s.id+'\'),150)">S' + s.numero + (s.titolo?' — '+s.titolo:'') + '</span>' +
+            '<span style="font-size:0.7rem;padding:1px 7px;background:' + (s.stato==='giocata'?'#69cc8522':'#5ba4f522') + ';color:color-mix(in srgb, ' + (s.stato==='giocata'?'#69cc85':'#5ba4f5') + ' 50%, var(--text-primary));border-radius:var(--radius-full);">' + (s.stato==='giocata'?'Giocata':'Pianificata') + '</span>' +
+            '<span style="font-size:0.82rem;cursor:pointer;color:var(--accent-text);" onclick="WikiSections.goto(\'sessioni\');setTimeout(()=>WikiSections.openCard(\'sessioni\',\''+s.id+'\'),150)">S' + s.numero + (s.titolo?' — '+s.titolo:'') + '</span>' +
             (s.data?'<span style="font-size:0.72rem;color:var(--text-muted);">'+s.data+'</span>':'') +
             '</div>'
           ).join('') +
@@ -16653,8 +16741,8 @@ const WikiSections = (() => {
               '<span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:' + cfg.color + ';margin-top:6px;flex-shrink:0;"></span>' +
               '<div style="flex:1;min-width:0;">' +
                 '<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:2px;">' +
-                  '<span style="font-size:0.82rem;cursor:pointer;color:var(--accent-primary);" onclick="WikiSections.goto(\'' + m._entType + '\');setTimeout(()=>WikiSections.openCard(\'' + m._entType + '\',\'' + m._entId + '\'),150)">' + _escHtml(m._entNome) + '</span>' +
-                  '<span style="font-size:0.7rem;font-weight:700;color:' + cfg.color + ';">' + _escHtml(cfg.label) + '</span>' +
+                  '<span style="font-size:0.82rem;cursor:pointer;color:var(--accent-text);" onclick="WikiSections.goto(\'' + m._entType + '\');setTimeout(()=>WikiSections.openCard(\'' + m._entType + '\',\'' + m._entId + '\'),150)">' + _escHtml(m._entNome) + '</span>' +
+                  '<span style="font-size:0.7rem;font-weight:700;color:color-mix(in srgb, ' + cfg.color + ' 50%, var(--text-primary));">' + _escHtml(cfg.label) + '</span>' +
                 '</div>' +
                 '<div style="font-size:0.85rem;">' + _escHtml(m.testo || '') + '</div>' +
               '</div>' +
@@ -16946,8 +17034,8 @@ const WikiSections = (() => {
             '<span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:' + cfg.color + ';margin-top:6px;flex-shrink:0;"></span>' +
             '<div style="flex:1;min-width:0;">' +
               '<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:2px;">' +
-                '<span style="font-size:0.7rem;font-weight:700;color:' + cfg.color + ';">' + _escHtml(cfg.label) + '</span>' +
-                (label ? '<span style="font-size:0.7rem;color:var(--accent-primary);cursor:pointer;" onclick="WikiSections.goto(\'sessioni\');setTimeout(()=>WikiSections.openCard(\'sessioni\',\'' + m.sessioneId + '\'),150)">' + _escHtml(label) + '</span>' : '') +
+                '<span style="font-size:0.7rem;font-weight:700;color:color-mix(in srgb, ' + cfg.color + ' 50%, var(--text-primary));">' + _escHtml(cfg.label) + '</span>' +
+                (label ? '<span style="font-size:0.7rem;color:var(--accent-text);cursor:pointer;" onclick="WikiSections.goto(\'sessioni\');setTimeout(()=>WikiSections.openCard(\'sessioni\',\'' + m.sessioneId + '\'),150)">' + _escHtml(label) + '</span>' : '') +
               '</div>' +
               '<div style="font-size:0.85rem;">' + _escHtml(m.testo || '') + '</div>' +
             '</div>' +
@@ -17046,7 +17134,7 @@ const WikiSections = (() => {
     text = text.replace(/\[\[([^\]]+)\]\]/g, function(_, name) {
       var clean = name.trim();
       var safe = clean.replace(/&/g, '&amp;').replace(/"/g, '&quot;');
-      return '<span class="ws-link" data-name="' + safe + '" onclick="WikiSections._jumpToEntity(this.dataset.name, event)" style="cursor:pointer;color:var(--accent-primary);text-decoration:underline dotted;padding:0 2px;" title="Ctrl/Cmd+click per vedere senza spostarti — Vai a ' + safe + '">' + clean + '</span>';
+      return '<span class="ws-link" data-name="' + safe + '" onclick="WikiSections._jumpToEntity(this.dataset.name, event)" style="cursor:pointer;color:var(--accent-text);text-decoration:underline dotted;padding:0 2px;" title="Ctrl/Cmd+click per vedere senza spostarti — Vai a ' + safe + '">' + clean + '</span>';
     });
     const knownNames = _knownEntityNames();
     text = text.replace(/@([^\s@][\wÀ-ÿ'\s]{0,60})/g, function(full, rest) {
@@ -17065,7 +17153,7 @@ const WikiSections = (() => {
       const remainder = rest.slice(nameLen);
       const clean = name.trim();
       const safe = clean.replace(/&/g, '&amp;').replace(/"/g, '&quot;');
-      return '<span class="ws-link" data-name="' + safe + '" onclick="WikiSections._jumpToEntity(this.dataset.name, event)" style="cursor:pointer;color:var(--accent-secondary);font-weight:600;" title="Ctrl/Cmd+click per vedere senza spostarti — Vai a ' + safe + '">@' + clean + '</span>' + remainder;
+      return '<span class="ws-link" data-name="' + safe + '" onclick="WikiSections._jumpToEntity(this.dataset.name, event)" style="cursor:pointer;color:var(--accent-secondary-text);font-weight:600;" title="Ctrl/Cmd+click per vedere senza spostarti — Vai a ' + safe + '">@' + clean + '</span>' + remainder;
     });
 
     text = text.replace(/#([\w\u00C0-\u00FF]+)/g, function(_, tag) {
@@ -17942,7 +18030,7 @@ const Trame = (() => {
       const color = CAT_COLORS[cat] || 'var(--accent-primary)';
       html2 += '<div style="margin-bottom:24px;">' +
         '<div style="font-size:0.72rem;font-family:var(--font-display);text-transform:uppercase;' +
-        'letter-spacing:0.1em;color:' + color + ';font-weight:700;margin-bottom:10px;' +
+        'letter-spacing:0.1em;color:color-mix(in srgb, ' + color + ' 50%, var(--text-primary));font-weight:700;margin-bottom:10px;' +
         'padding-bottom:4px;border-bottom:2px solid ' + color + '40;">' + cat + '</div>' +
         '<div style="display:flex;flex-direction:column;gap:8px;">' +
         items.map(function(t) {
@@ -17958,7 +18046,7 @@ const Trame = (() => {
               (t.corpo ? '<div style="font-size:0.75rem;color:var(--text-muted);margin-top:2px;' +
               'overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + _esc(t.corpo.replace(/<[^>]*>/g,'').slice(0,80)) + '</div>' : '') +
             '</div>' +
-            '<span style="padding:2px 8px;background:' + sc + '22;color:' + sc + ';' +
+            '<span style="padding:2px 8px;background:' + sc + '22;color:color-mix(in srgb, ' + sc + ' 50%, var(--text-primary));' +
             'border-radius:var(--radius-full);font-size:0.7rem;white-space:nowrap;">' + (t.stato||'In corso') + '</span>' +
             '<button class="trama-del-btn" data-id="' + t.id + '" ' +
             'style="background:none;border:none;cursor:pointer;color:var(--text-muted);padding:4px;font-size:0.85rem;flex-shrink:0;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>' +
@@ -18021,8 +18109,8 @@ const Trame = (() => {
         '<div style="width:1px;height:16px;background:var(--border);"></div>' +
         '<h2 style="font-family:var(--font-display);font-size:1.2rem;font-weight:700;margin:0;flex:1;min-width:200px;' +
         'color:var(--text-primary);border-bottom:2px solid ' + color + ';padding-bottom:2px;">' + _esc(t.titolo||'Senza titolo') + '</h2>' +
-        (t.categoria ? '<span style="font-size:0.72rem;padding:3px 10px;background:' + color + '22;color:' + color + ';border:1px solid ' + color + '44;border-radius:var(--radius-full);">' + _esc(t.categoria) + '</span>' : '') +
-        (t.stato ? '<span style="font-size:0.72rem;padding:3px 10px;background:' + statoColor + '22;color:' + statoColor + ';border:1px solid ' + statoColor + '44;border-radius:var(--radius-full);">' + _esc(t.stato) + '</span>' : '') +
+        (t.categoria ? '<span style="font-size:0.72rem;padding:3px 10px;background:' + color + '22;color:color-mix(in srgb, ' + color + ' 50%, var(--text-primary));border:1px solid ' + color + '44;border-radius:var(--radius-full);">' + _esc(t.categoria) + '</span>' : '') +
+        (t.stato ? '<span style="font-size:0.72rem;padding:3px 10px;background:' + statoColor + '22;color:color-mix(in srgb, ' + statoColor + ' 50%, var(--text-primary));border:1px solid ' + statoColor + '44;border-radius:var(--radius-full);">' + _esc(t.stato) + '</span>' : '') +
       '</div>' +
 
       (t.corpo ? '<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);padding:14px;margin-bottom:16px;font-size:0.88rem;line-height:1.8;">' + t.corpo + '</div>'
@@ -18037,7 +18125,7 @@ const Trame = (() => {
         '<button class="btn btn-primary btn-sm" onclick="Trame.edit(\'' + t.id + '\')" style="display:flex;align-items:center;gap:4px;">' +
           '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Modifica' +
         '</button>' +
-        '<button class="btn btn-ghost btn-sm" style="color:var(--accent-danger);" onclick="Trame.deleteTrama(\'' + t.id + '\')">Elimina</button>' +
+        '<button class="btn btn-ghost btn-sm" style="color:var(--danger-text);" onclick="Trame.deleteTrama(\'' + t.id + '\')">Elimina</button>' +
       '</div>' +
     '</div>';
   };
@@ -18202,7 +18290,7 @@ const renderDashboard = () => {
       var sc2 = ultima.stato==='giocata'?'#69cc85':ultima.stato==='in_corso'?'#f5a623':'#5ba4f5';
       var sl = ultima.stato==='giocata'?'Giocata':ultima.stato==='in_corso'?'In corso':'Pianificata';
       dashUlt.innerHTML =
-        '<div style="margin-bottom:8px;"><span style="padding:2px 8px;background:'+sc2+'22;color:'+sc2+';border-radius:var(--radius-full);font-size:0.72rem;">'+sl+'</span>' +
+        '<div style="margin-bottom:8px;"><span style="padding:2px 8px;background:'+sc2+'22;color:color-mix(in srgb, '+sc2+' 50%, var(--text-primary));border-radius:var(--radius-full);font-size:0.72rem;">'+sl+'</span>' +
         '<span style="font-family:var(--font-display);font-size:0.95rem;font-weight:600;margin-left:8px;">S'+(ultima.numero||'?')+(ultima.titolo?' — '+ultima.titolo:'')+'</span></div>' +
         (ultima.data?'<div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:6px;">'+ultima.data+'</div>':'') +
         (ultima.recap?'<div style="font-size:0.82rem;line-height:1.6;color:var(--text-secondary);overflow:hidden;">'+ultima.recap+'</div>':'') +
@@ -18313,7 +18401,7 @@ const renderDashboard = () => {
           return '<div class="dash-note-item" data-tipo="' + n.tipo.toLowerCase() + '" data-id="' + n.id + '" ' +
             'style="display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--bg-secondary);border:1px solid var(--border);border-left:3px solid ' + n.color + ';border-radius:var(--radius-md);cursor:pointer;min-width:140px;flex:1;">' +
             '<div style="min-width:0;">' +
-              '<div style="font-size:0.68rem;color:' + n.color + ';text-transform:uppercase;letter-spacing:0.05em;margin-bottom:2px;">' + n.tipo + '</div>' +
+              '<div style="font-size:0.68rem;color:color-mix(in srgb, ' + n.color + ' 50%, var(--text-primary));text-transform:uppercase;letter-spacing:0.05em;margin-bottom:2px;">' + n.tipo + '</div>' +
               '<div style="font-size:0.82rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + (n.titolo||'Senza titolo') + '</div>' +
             '</div>' +
           '</div>';
@@ -18445,7 +18533,7 @@ const _renderLuoghiTree = () => {
       'padding:6px 8px 6px ' + (indent+8) + 'px;display:flex;align-items:center;gap:8px;border-left:' + (depth>0?'2px solid var(--border)':'none') + ';margin-left:' + (depth>0?'20px':'0') + ';cursor:pointer;border-radius:var(--radius-sm);">' +
       (children.length ? '<span style="font-size:0.7rem;color:var(--text-muted);width:12px;">▶</span>' : '<span style="width:12px;"></span>') +
       (l.immagine ? '<img src="' + l.immagine + '" style="width:20px;height:20px;border-radius:50%;object-fit:cover;">' : '') +
-      '<span style="font-size:0.7rem;padding:1px 6px;background:' + color + '22;color:' + color + ';border-radius:var(--radius-full);">' + (l.tipo||'Luogo') + '</span>' +
+      '<span style="font-size:0.7rem;padding:1px 6px;background:' + color + '22;color:color-mix(in srgb, ' + color + ' 50%, var(--text-primary));border-radius:var(--radius-full);">' + (l.tipo||'Luogo') + '</span>' +
       '<span style="font-size:0.88rem;">' + l.nome + '</span>' +
       '</div>';
     children.forEach(function(child) { html2 += renderNode(child, depth+1); });
@@ -18848,7 +18936,7 @@ const EncounterBuilder = (() => {
           <td style="padding:4px 0;border-bottom:1px solid var(--border);text-align:center;font-family:var(--font-mono);color:var(--text-muted);">GS ${e.cr}</td>
           <td style="padding:4px 0;border-bottom:1px solid var(--border);text-align:center;font-family:var(--font-mono);">${e.hp}</td>
           <td style="padding:4px 0;border-bottom:1px solid var(--border);text-align:center;font-family:var(--font-mono);">${e.ca}</td>
-          <td style="padding:4px 0;border-bottom:1px solid var(--border);text-align:right;font-family:var(--font-mono);color:var(--accent-secondary);">${XP_PER_CR[e.cr] * e.qty}</td>
+          <td style="padding:4px 0;border-bottom:1px solid var(--border);text-align:right;font-family:var(--font-mono);color:var(--accent-secondary-text);">${XP_PER_CR[e.cr] * e.qty}</td>
         </tr>`
       ).join('') +
       `</tbody></table>` +
@@ -18926,7 +19014,7 @@ const EncounterBuilder = (() => {
         `<tr>
           <td style="padding:3px 0;border-bottom:1px solid var(--border);">${r.nome}</td>
           <td style="padding:3px 4px;border-bottom:1px solid var(--border);text-align:center;font-size:0.7rem;color:var(--text-muted);">${r.rango}</td>
-          <td style="padding:3px 0;border-bottom:1px solid var(--border);color:${coloreRarita[r.rarita] || 'inherit'};">
+          <td style="padding:3px 0;border-bottom:1px solid var(--border);color:color-mix(in srgb, ${coloreRarita[r.rarita] || 'inherit'} 50%, var(--text-primary));">
             ${r.item}${r.lucky ? ' ✨' : ''}
           </td>
         </tr>`
@@ -19259,7 +19347,7 @@ const DescrizioneGen = (() => {
 
     el.innerHTML =
       `<div style="margin-bottom:10px;">
-        <div style="font-family:var(--font-display);font-size:1.1rem;color:var(--accent-secondary);margin-bottom:3px;">${nome}</div>
+        <div style="font-family:var(--font-display);font-size:1.1rem;color:var(--accent-secondary-text);margin-bottom:3px;">${nome}</div>
         <div style="display:flex;gap:6px;">
           <span class="badge badge-muted">${tipoLabel}</span>
           <span class="badge badge-muted">${qualLabel}</span>
@@ -19353,7 +19441,7 @@ const NomiLuoghiGen = (() => {
       '<div style="font-size:0.72rem;color:var(--text-muted);margin-bottom:8px;font-family:var(--font-display);text-transform:uppercase;letter-spacing:0.05em;">' + tipoLabel + '</div>' +
       nomi.map((n, i) =>
         '<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);">' +
-          '<span style="font-family:var(--font-display);font-size:' + (i===0?'1rem':'0.88rem') + ';' + (i===0?'color:var(--accent-secondary);':'') + '">' + n + '</span>' +
+          '<span style="font-family:var(--font-display);font-size:' + (i===0?'1rem':'0.88rem') + ';' + (i===0?'color:var(--accent-secondary-text);':'') + '">' + n + '</span>' +
           (i===0 ? '<span class="badge badge-muted" style="font-size:0.6rem;">suggerito</span>' : '') +
         '</div>'
       ).join('') +
@@ -19524,7 +19612,7 @@ const OracoloGen = (() => {
     el.innerHTML =
       '<div style="text-align:center;padding:8px 0;">' +
         '<div style="font-size:2rem;margin-bottom:4px;">' + emoji + '</div>' +
-        '<div style="font-family:var(--font-display);font-size:1.4rem;font-weight:700;color:' + colore + ';margin-bottom:4px;">' + risposta + '</div>' +
+        '<div style="font-family:var(--font-display);font-size:1.4rem;font-weight:700;color:color-mix(in srgb, ' + colore + ' 50%, var(--text-primary));margin-bottom:4px;">' + risposta + '</div>' +
         (twistTesto ? '<div style="font-size:0.8rem;color:var(--text-muted);font-style:italic;">' + twistTesto + '</div>' : '') +
         '<div style="font-size:0.65rem;color:var(--text-muted);margin-top:6px;">d100: ' + d100 + '</div>' +
       '</div>';
@@ -19744,7 +19832,7 @@ const MissioniGen = (() => {
 
     el.innerHTML =
       `<div style="margin-bottom:10px;display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
-        <span style="font-family:var(--font-display);font-size:1.05rem;color:var(--accent-secondary);">${missione.titolo}</span>
+        <span style="font-family:var(--font-display);font-size:1.05rem;color:var(--accent-secondary-text);">${missione.titolo}</span>
         <span class="badge badge-muted">${tipoLabel}</span>
         <span class="badge badge-muted">${livLabel}</span>
       </div>
@@ -19769,8 +19857,8 @@ const MissioniGen = (() => {
             <div>${missione.nemico}</div>
           </div>
           <div style="background:var(--bg-secondary);border-radius:var(--radius-sm);padding:8px 10px;">
-            <div style="font-family:var(--font-display);font-size:0.65rem;color:var(--accent-secondary);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:3px;">🎁 Ricompensa</div>
-            <div style="color:var(--accent-secondary);">${ricompensa}</div>
+            <div style="font-family:var(--font-display);font-size:0.65rem;color:var(--accent-secondary-text);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:3px;">🎁 Ricompensa</div>
+            <div style="color:var(--accent-secondary-text);">${ricompensa}</div>
           </div>
         </div>
         <div style="background:var(--bg-secondary);border-left:3px solid #e07b39;border-radius:0 var(--radius-sm) var(--radius-sm) 0;padding:8px 10px;">
@@ -19778,7 +19866,7 @@ const MissioniGen = (() => {
           <div style="color:var(--text-secondary);font-style:italic;">${missione.dettaglio}</div>
         </div>
         <div style="background:var(--bg-secondary);border-left:3px solid var(--accent-danger);border-radius:0 var(--radius-sm) var(--radius-sm) 0;padding:8px 10px;">
-          <div style="font-family:var(--font-display);font-size:0.65rem;color:var(--accent-danger);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:3px;">⚡ Complicazione</div>
+          <div style="font-family:var(--font-display);font-size:0.65rem;color:var(--danger-text);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:3px;">⚡ Complicazione</div>
           <div style="color:var(--text-secondary);">${complicazione}</div>
         </div>
       </div>
@@ -20022,7 +20110,7 @@ const RNGLoot = (() => {
     const withLoot = results.filter(r => r.rarity !== 'Niente').length;
     const summary = ['Comune','Non Comune','Raro','Epico','Leggendario'].map(r => {
       const cnt = results.filter(x => x.rarity === r).length;
-      return cnt ? `<span style="color:${RARITY_COLOR[r]}">${cnt}× ${r}</span>` : '';
+      return cnt ? `<span style="color:color-mix(in srgb, ${RARITY_COLOR[r]} 50%, var(--text-primary))">${cnt}× ${r}</span>` : '';
     }).filter(Boolean).join('  ');
 
     el.innerHTML =
@@ -20040,7 +20128,7 @@ const RNGLoot = (() => {
               <div style="min-width:0;flex:1;">
                 <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
                   <span style="font-size:0.68rem;color:var(--text-muted);">d100:${r.d100}</span>
-                  <span style="font-size:0.72rem;color:${RARITY_COLOR[r.rarity]};font-weight:600;">${r.rarity}${r.lucky ? ' ✨' : ''}</span>
+                  <span style="font-size:0.72rem;color:color-mix(in srgb, ${RARITY_COLOR[r.rarity]} 50%, var(--text-primary));font-weight:600;">${r.rarity}${r.lucky ? ' ✨' : ''}</span>
                   <span style="font-size:0.65rem;color:var(--text-muted);">${n > 1 && _selectedCats.length > 1 ? r.catName : ''}</span>
                 </div>
                 <div style="font-size:0.82rem;margin-top:2px;">🎁 ${r.item}${r.condLabel ? ` <span style="font-size:0.68rem;color:var(--text-muted);">(${r.condLabel})</span>` : ''}</div>
@@ -20108,8 +20196,8 @@ const TimerBlock = (() => {
 
     container.innerHTML =
       '<div style="text-align:center;">' +
-        '<div id="td-' + blockId + '" style="font-family:var(--font-mono);font-size:2.4rem;font-weight:900;color:' + color + ';letter-spacing:2px;margin-bottom:6px;">' + display + '</div>' +
-        (isAlarm ? '<div style="font-size:0.78rem;color:var(--accent-danger);font-weight:700;margin-bottom:6px;">⏰ TEMPO SCADUTO!</div>' : '') +
+        '<div id="td-' + blockId + '" style="font-family:var(--font-mono);font-size:2.4rem;font-weight:900;color:color-mix(in srgb, ' + color + ' 50%, var(--text-primary));letter-spacing:2px;margin-bottom:6px;">' + display + '</div>' +
+        (isAlarm ? '<div style="font-size:0.78rem;color:var(--danger-text);font-weight:700;margin-bottom:6px;">⏰ TEMPO SCADUTO!</div>' : '') +
         '<div style="display:flex;gap:4px;justify-content:center;margin-bottom:6px;">' +
           (t.running
             ? '<button class="btn btn-secondary btn-sm" onclick="TimerBlock.pause(\'' + blockId + '\')">⏸ Pausa</button>'
@@ -20139,7 +20227,7 @@ const TimerBlock = (() => {
       if (disp) {
         const m = Math.floor(t.remaining / 60), s = t.remaining % 60;
         disp.textContent = String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
-        if (t.remaining <= 10) disp.style.color = 'var(--accent-danger)';
+        if (t.remaining <= 10) disp.style.color = 'var(--danger-text)';
         if (t.remaining <= 0) { clearInterval(t.interval); t.running = false; _render(blockId, null); if(navigator.vibrate) navigator.vibrate([500,200,500,200,500]); }
       }
     }, 1000);
@@ -20503,8 +20591,8 @@ const CalendarioUI = (() => {
       celle += '<div id="cal-day-' + g + '" style="min-height:92px;border:' + (isOggi ? '2px solid var(--accent-primary)' : isSelected ? '2px solid var(--accent-secondary)' : '1px solid var(--border)') + ';border-radius:var(--radius-sm);padding:5px;cursor:pointer;' +
         (isOggi ? 'background:var(--bg-tertiary);' : '') + '" onclick="CalendarioUI.openDay(' + g + ')">' +
         '<div style="display:flex;align-items:center;justify-content:space-between;">' +
-          '<span style="font-size:0.82rem;font-weight:700;' + (isOggi ? 'color:var(--accent-primary);' : '') + '">' + g + '</span>' +
-          (isOggi ? '<span style="font-size:0.55rem;font-weight:700;letter-spacing:0.04em;color:var(--accent-primary);">OGGI</span>' : '') +
+          '<span style="font-size:0.82rem;font-weight:700;' + (isOggi ? 'color:var(--accent-text);' : '') + '">' + g + '</span>' +
+          (isOggi ? '<span style="font-size:0.55rem;font-weight:700;letter-spacing:0.04em;color:var(--accent-text);">OGGI</span>' : '') +
         '</div>' +
         (festa ? '<div style="font-size:0.62rem;color:var(--text-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="' + _esc(festa.nome) + '">' + _esc(festa.nome) + '</div>' : '') +
         pills + extra +
@@ -21302,7 +21390,13 @@ const BackupSystem = (() => {
     const now = Date.now();
 
     if (now - last > 7 * 24 * 60 * 60 * 1000) {
-      setTimeout(() => Toast.show('Nessun backup da 7+ giorni — considera di farne uno', 'info', 6000), 5000);
+      // Con l'accesso Google (Firebase) o Drive i dati sono gia' salvati nel cloud: l'avviso
+      // serve solo a chi usa l'app in locale, dove un browser svuotato fa perdere tutto.
+      setTimeout(() => {
+        const nelCloud = localStorage.getItem('dm_drive_connected') === 'true' ||
+          (typeof firebase !== 'undefined' && firebase.apps?.length && firebase.auth().currentUser && !firebase.auth().currentUser.isAnonymous);
+        if (!nelCloud) Toast.show('Nessun backup da 7+ giorni — considera di farne uno', 'info', 6000);
+      }, 5000);
     }
   };
 
@@ -21540,7 +21634,7 @@ document.addEventListener('DOMContentLoaded', initMobileNav);
 
       <!-- Disconnect -->
       <div style="border-top:1px solid var(--border);padding-top:12px;">
-        <button class="btn btn-ghost btn-sm" onclick="GDrive.logout()" style="color:var(--accent-danger);">Disconnetti Google Drive</button>
+        <button class="btn btn-ghost btn-sm" onclick="GDrive.logout()" style="color:var(--danger-text);">Disconnetti Google Drive</button>
       </div>
     </div>
   </div>
@@ -21649,7 +21743,7 @@ document.addEventListener('DOMContentLoaded', initMobileNav);
             <button type="button" class="btn btn-primary" style="flex:1;font-size:0.82rem;" onclick="FirebaseSync.loginEmail()">Accedi</button>
             <button type="button" class="btn btn-ghost" style="flex:1;font-size:0.82rem;" onclick="FirebaseSync.registerEmail()">Registrati</button>
           </div>
-          <div id="auth-email-error" style="font-size:0.72rem;color:var(--accent-danger);display:none;"></div>
+          <div id="auth-email-error" style="font-size:0.72rem;color:var(--danger-text);display:none;"></div>
         </form>
       </div>
 
@@ -21722,7 +21816,7 @@ document.addEventListener('DOMContentLoaded', initMobileNav);
 
       <!-- Logout -->
       <div style="margin-top:12px;display:flex;gap:8px;align-items:center;">
-        <button class="btn btn-ghost btn-sm" onclick="FirebaseSync.logout()" style="color:var(--accent-danger);font-size:0.75rem;">Esci</button>
+        <button class="btn btn-ghost btn-sm" onclick="FirebaseSync.logout()" style="color:var(--danger-text);font-size:0.75rem;">Esci</button>
         <button class="btn btn-ghost btn-sm" onclick="FirebaseSync.switchMode()" style="font-size:0.75rem;">Cambia modalità</button>
       </div>
     </div>
@@ -21875,7 +21969,7 @@ document.addEventListener('DOMContentLoaded', initMobileNav);
     </div>
     <div class="modal-footer">
       <div id="cev-edit-footer" style="display:contents;">
-        <button class="btn btn-ghost" id="cev-delete-btn" onclick="CalendarioUI.deleteEventoCorrente()" style="margin-right:auto;color:var(--accent-danger);">Elimina</button>
+        <button class="btn btn-ghost" id="cev-delete-btn" onclick="CalendarioUI.deleteEventoCorrente()" style="margin-right:auto;color:var(--danger-text);">Elimina</button>
         <button class="btn btn-ghost" onclick="Modal.close('calendario-evento')">Annulla</button>
         <button class="btn btn-primary" onclick="CalendarioUI.saveEvento()">Salva</button>
       </div>
@@ -21936,7 +22030,7 @@ document.addEventListener('DOMContentLoaded', initMobileNav);
               <div style="font-size:0.88rem;font-weight:600;">Dimensione testo</div>
               <div style="font-size:0.72rem;color:var(--text-muted);">Scala il testo dell'interfaccia</div>
             </div>
-            <span id="font-size-label" style="font-size:0.82rem;color:var(--accent-secondary);font-weight:600;">100%</span>
+            <span id="font-size-label" style="font-size:0.82rem;color:var(--accent-secondary-text);font-weight:600;">100%</span>
           </div>
           <div style="display:flex;gap:6px;flex-wrap:wrap;">
             <button onclick="Settings.setFontSize(85)"  class="btn btn-ghost btn-sm settings-font-btn" data-size="85"  style="font-size:0.72rem;">85%</button>
@@ -21954,7 +22048,7 @@ document.addEventListener('DOMContentLoaded', initMobileNav);
               <div style="font-size:0.88rem;font-weight:600;">Densità interfaccia</div>
               <div style="font-size:0.72rem;color:var(--text-muted);">Spazio tra elementi, larghezza contenuto</div>
             </div>
-            <span id="ui-density-label" style="font-size:0.82rem;color:var(--accent-secondary);font-weight:600;">Normale</span>
+            <span id="ui-density-label" style="font-size:0.82rem;color:var(--accent-secondary-text);font-weight:600;">Normale</span>
           </div>
           <div style="display:flex;gap:6px;flex-wrap:wrap;">
             <button onclick="Settings.setDensity('compact')"  class="btn btn-ghost btn-sm settings-density-btn" data-density="compact"  style="font-size:0.72rem;">Compatto</button>
@@ -22010,7 +22104,7 @@ document.addEventListener('DOMContentLoaded', initMobileNav);
           <button id="drive-connect-btn" class="btn btn-primary btn-sm" onclick="DriveBackup.connect()">Collega Drive</button>
           <button id="drive-backup-now-btn" class="btn btn-ghost btn-sm" style="display:none;" onclick="DriveBackup.backupNow()">Salva ora su Drive</button>
           <button id="drive-restore-btn" class="btn btn-ghost btn-sm" style="display:none;" onclick="DriveBackup.openRestoreModal()">Ripristina da Drive</button>
-          <button id="drive-disconnect-btn" class="btn btn-ghost btn-sm" style="display:none;color:var(--accent-danger);" onclick="DriveBackup.disconnect()">Scollega</button>
+          <button id="drive-disconnect-btn" class="btn btn-ghost btn-sm" style="display:none;color:var(--danger-text);" onclick="DriveBackup.disconnect()">Scollega</button>
         </div>
         <div style="font-size:0.72rem;color:var(--text-muted);margin-top:8px;" id="drive-last-backup"></div>
       </section>
@@ -22037,7 +22131,7 @@ document.addEventListener('DOMContentLoaded', initMobileNav);
           <a href="https://gdr-toolbox.noemi-marcolini.workers.dev/" target="_blank" rel="noopener"
             style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-md);text-decoration:none;color:var(--text-primary);"
             onmouseenter="this.style.borderColor='var(--accent-primary)'" onmouseleave="this.style.borderColor='var(--border)'">
-            <span style="color:var(--accent-primary);flex-shrink:0;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></span>
+            <span style="color:var(--accent-text);flex-shrink:0;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></span>
             <div>
               <div style="font-size:0.85rem;font-weight:600;">GDR Toolbox</div>
               <div style="font-size:0.72rem;color:var(--text-muted);">Tutte le webapp per il gioco di ruolo in un posto</div>
@@ -22059,7 +22153,7 @@ document.addEventListener('DOMContentLoaded', initMobileNav);
           <a href="https://gdr-sys.github.io/The-Hungry-Dragon/" target="_blank" rel="noopener"
             style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-md);text-decoration:none;color:var(--text-primary);"
             onmouseenter="this.style.borderColor='var(--accent-primary)'" onmouseleave="this.style.borderColor='var(--border)'">
-            <span style="color:var(--accent-danger);flex-shrink:0;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/><path d="M8 12s1.5-2 4-2 4 2 4 2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg></span>
+            <span style="color:var(--danger-text);flex-shrink:0;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/><path d="M8 12s1.5-2 4-2 4 2 4 2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg></span>
             <div>
               <div style="font-size:0.85rem;font-weight:600;">The Hungry Dragon</div>
               <div style="font-size:0.72rem;color:var(--text-muted);">Gestione taverna e negozio per il tuo party</div>
@@ -22088,9 +22182,9 @@ document.addEventListener('DOMContentLoaded', initMobileNav);
           <div>DM Toolkit — versione 2.0</div>
           <div>Dati SRD D&D 5e — OGL/ORC — Wizards of the Coast</div>
           <div style="margin-top:4px;">
-            <a href="https://github.com/gdr-sys/dm-toolkit" target="_blank" style="color:var(--accent-primary);text-decoration:none;display:inline-flex;align-items:center;gap:4px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg> GitHub</a>
+            <a href="https://github.com/gdr-sys/dm-toolkit" target="_blank" style="color:var(--accent-text);text-decoration:none;display:inline-flex;align-items:center;gap:4px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg> GitHub</a>
             &nbsp;·&nbsp;
-            <a href="https://ko-fi.com/noemimarcolini" target="_blank" style="color:var(--accent-primary);text-decoration:none;">Ko-fi</a>
+            <a href="https://ko-fi.com/noemimarcolini" target="_blank" style="color:var(--accent-text);text-decoration:none;">Ko-fi</a>
           </div>
         </div>
       </section>
