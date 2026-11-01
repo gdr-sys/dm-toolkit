@@ -88,6 +88,7 @@ Carica un'immagine come mappa interattiva. Puoi spostarla trascinando e ingrandi
 - **Diario delle sessioni** — numero, titolo, date reale e in-world, stato, PNG coinvolti, preparazione e riassunto. Ogni sessione può avere la sua nota nella Wiki.
 - **Chiudi la sessione in 5 domande** — cosa è successo, XP e bottino, fili rimasti aperti, gancio per la prossima volta, momento migliore. Dalle risposte l'app compila da sola il diario della sessione, i ganci in Dashboard, la prossima sessione pianificata, un Momento del PG e il "Previously On…".
 - **Avvio guidato della sessione** (facoltativo, si attiva da Impostazioni) — prima di iniziare, in un colpo d'occhio: il "Previously On…" da leggere, la sessione pianificata, clock e ganci aperti, segreti da far emergere, linee e veli della Sessione Zero.
+- **Il mondo si muove** — dopo ogni sessione ogni fazione fa una mossa fuori scena (con un pulsante Idea che usa i nomi della tua campagna) e avanza sul suo orologio verso l'obiettivo. Le mosse restano nella scheda della fazione e compaiono in Dashboard e nell'avvio guidato.
 - **"Previously On…"** — il riassunto dell'ultima sessione, pronto da leggere al tavolo.
 - **Party** — i PG con classe, livello, PF, CA, punteggi passivi e ispirazione, sincronizzati con la sezione PG della Wiki.
 - **Clock** — per rituali, inseguimenti, pressione delle fazioni.

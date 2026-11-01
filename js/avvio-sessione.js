@@ -118,8 +118,10 @@ const AvvioSessione = (() => {
       const pieni = c.current != null ? c.current : (c.progresso || 0), tot = c.max || c.totale || 8;
       return '<div>' + _esc(c.nome || c.name || 'Clock') + ' <span style="color:var(--text-muted);">' + pieni + '/' + tot + '</span>' + (c.nota ? ' — ' + _esc(c.nota) : '') + '</div>';
     }).join('');
+    const mosse = typeof TurniFazione !== 'undefined' ? TurniFazione.ultimeMosse() : '';
     const s3 = (clocks ? '<div style="margin-bottom:6px;">' + clocks + '</div>' : '') +
-      (ultima?.ganci ? _riga('Ganci rimasti aperti', ultima.ganci) : '') ||
+      (ultima?.ganci ? _riga('Ganci rimasti aperti', ultima.ganci) : '') +
+      (mosse ? '<div style="margin-top:6px;"><span style="color:var(--text-muted);">Il mondo si è mosso:</span>' + mosse + '</div>' : '') ||
       _vuoto('Nessun clock attivo e nessun gancio aperto.');
 
     // 4. Segreti

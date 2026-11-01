@@ -3973,6 +3973,10 @@ const App = (() => {
         <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
         Ripristina backup
       </button>
+      <button class="btn btn-ghost btn-sm" onclick="CampagnaDemo.crea()" title="Le Ceneri di Valmora: una campagna già compilata per vedere tutte le funzioni">
+        <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+        ${campaigns.some(c => c.demo || c.name === 'Le Ceneri di Valmora') ? 'Apri la campagna di esempio' : 'Campagna di esempio'}
+      </button>
     `;
 
     grid.innerHTML = '';
@@ -16562,7 +16566,9 @@ const WikiSections = (() => {
       ((type === 'png' || type === 'pg') ? _renderMomenti(item, type, isEdit) : '') +
       (type === 'luoghi' && !isEdit && typeof EntraInScena !== 'undefined' ? EntraInScena.pulsante(item.id) : '') +
       (type === 'luoghi' && !isEdit && typeof TabelleCasuali !== 'undefined' ? TabelleCasuali.bloccoLuogo(item.id) : '') +
+      (type === 'luoghi' && !isEdit && typeof NegoziLuogo !== 'undefined' ? NegoziLuogo.blocco(item.id) : '') +
       (type === 'fazioni' && !isEdit && typeof Reputazione !== 'undefined' ? Reputazione.blocco(item.id) : '') +
+      (type === 'fazioni' && !isEdit && typeof TurniFazione !== 'undefined' ? TurniFazione.blocco(item.id) : '') +
       (['png', 'luoghi', 'quest'].includes(type) && !isEdit && typeof Segreti !== 'undefined' ? Segreti.blocco(type, item.id) : '') +
 
       (() => {
@@ -22224,6 +22230,8 @@ document.addEventListener('DOMContentLoaded', initMobileNav);
 <script src="js/dashboard-mia.js"></script>
 <script src="js/campagna-hub.js"></script>
 <script src="js/avvio-sessione.js"></script>
+<script src="js/turni-fazione.js"></script>
+<script src="js/negozi-luogo.js"></script>
 <script src="js/schermo-acceso.js"></script>
 <script src="js/wiki-import.js"></script>
 <script src="js/wiki-trash-ui.js"></script>
