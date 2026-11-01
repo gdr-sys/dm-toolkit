@@ -20,25 +20,48 @@ const CampagnaHub = (() => {
     try { return WikiSections._getCfg(tipo).getData(camp).length; } catch (e) { return null; }
   };
 
+  // Card orizzontali: icona a sinistra, testo al centro, conteggio a destra. Larghe almeno
+  // 260px e quante ne stanno per riga: si adattano alla larghezza dello schermo senza
+  // diventare colonne strette e lunghe.
   const _card = (icona, nome, sotto, azione, n) =>
-    '<div class="card" role="button" tabindex="0" style="cursor:pointer;padding:16px;" onclick="' + azione + '" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();' + azione + '}">' +
-      '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;min-height:22px;">' +
-        '<span style="color:var(--accent-primary);display:flex;">' + icona + '</span>' +
-        (n != null ? '<span style="font-size:0.72rem;background:var(--bg-tertiary);padding:2px 8px;border-radius:var(--radius-full);color:var(--text-muted);">' + n + '</span>' : '') +
-      '</div>' +
-      '<div style="font-weight:600;font-size:0.9rem;">' + nome + '</div>' +
-      '<div style="font-size:0.72rem;color:var(--text-muted);margin-top:2px;line-height:1.4;">' + sotto + '</div>' +
+    '<div class="card hub-card" role="button" tabindex="0" onclick="' + azione + '" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();' + azione + '}">' +
+      '<span class="hub-card-icona">' + icona + '</span>' +
+      '<span class="hub-card-testo"><span class="hub-card-nome">' + nome + '</span><span class="hub-card-sotto">' + sotto + '</span></span>' +
+      (n != null ? '<span class="hub-card-num">' + n + '</span>' : '') +
     '</div>';
   const _gruppo = (titolo, carte) =>
-    '<div style="margin-top:22px;">' +
-      '<div style="font-size:0.72rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px;">' + titolo + '</div>' +
-      '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:12px;">' + carte.join('') + '</div>' +
-    '</div>';
+    '<section class="hub-gruppo"><h3 class="hub-gruppo-titolo">' + titolo + '</h3><div class="hub-griglia">' + carte.join('') + '</div></section>';
+
+  const _stile = () => {
+    if (document.getElementById('hub-stile')) return;
+    const st = document.createElement('style');
+    st.id = 'hub-stile';
+    st.textContent =
+      '#campagna-hub-body{padding-bottom:80px;}' +
+      '.hub-testa{display:flex;align-items:center;justify-content:space-between;gap:12px;}' +
+      '.hub-tipo{font-size:0.72rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;}' +
+      '.hub-nome{font-family:var(--font-display);font-size:clamp(1.3rem,2.2vw,1.8rem);margin:2px 0 8px;overflow-wrap:anywhere;}' +
+      '.hub-desc{font-size:0.95rem;color:var(--text-secondary);line-height:1.65;margin:0;max-width:120ch;white-space:pre-line;}' +
+      '.hub-gruppo{margin-top:26px;}' +
+      '.hub-gruppo-titolo{font-family:var(--font-body);font-size:0.72rem;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;margin:0 0 10px;}' +
+      '.hub-griglia{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,260px),1fr));gap:10px;}' +
+      '.hub-card{cursor:pointer;display:flex;align-items:center;gap:14px;padding:14px 16px;margin:0;}' +
+      '.hub-card:hover,.hub-card:focus-visible{border-color:var(--border-strong);outline:none;}' +
+      '.hub-card-icona{flex-shrink:0;width:40px;height:40px;border-radius:var(--radius-md);background:var(--bg-secondary);color:var(--accent-primary);display:flex;align-items:center;justify-content:center;}' +
+      '.hub-card-icona > span{display:flex;}' +
+      '.hub-card-testo{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;}' +
+      '.hub-card-nome{font-weight:600;font-size:0.95rem;color:var(--text-primary);}' +
+      '.hub-card-sotto{font-size:0.78rem;color:var(--text-muted);line-height:1.4;}' +
+      '.hub-card-num{flex-shrink:0;font-size:0.78rem;background:var(--bg-tertiary);padding:2px 10px;border-radius:var(--radius-full);color:var(--text-secondary);}' +
+      '@media (max-width:600px){.hub-card{padding:11px 12px;gap:12px;}.hub-card-icona{width:34px;height:34px;}}';
+    document.head.appendChild(st);
+  };
 
   const render = () => {
     const el = document.getElementById('campagna-hub-body');
     const camp = _camp();
     if (!el || !camp) return;
+    _stile();
     const tipo = camp.type === 'oneshot' ? 'One shot' : 'Campagna';
     const sessioni = _numWiki('sessioni', camp);
     const mappe = (camp.mappe || []).length;
@@ -49,14 +72,11 @@ const CampagnaHub = (() => {
     const wiki = (t) => 'WikiSections.goto(\'' + t + '\')';
 
     el.innerHTML =
-      '<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;">' +
-        '<div style="min-width:0;flex:1;">' +
-          '<div style="font-size:0.72rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;">' + tipo + ' · ' + _esc(camp.system || '5e') + (sessioni ? ' · ' + sessioni + (sessioni === 1 ? ' sessione' : ' sessioni') : '') + '</div>' +
-          '<h2 style="font-family:var(--font-display);font-size:1.5rem;margin:2px 0 6px;overflow-wrap:anywhere;">' + _esc(camp.name) + '</h2>' +
-          (camp.description ? '<p style="font-size:0.9rem;color:var(--text-secondary);line-height:1.6;margin:0;max-width:760px;white-space:pre-line;">' + _esc(camp.description) + '</p>' : '') +
-        '</div>' +
-        '<button type="button" class="btn btn-ghost btn-sm" onclick="App.editCampaign(\'' + camp.id + '\')">Modifica</button>' +
-      '</div>' +
+      // "Modifica" sta sulla riga del tipo: cosi' nome e descrizione usano tutta la larghezza
+      '<div class="hub-testa"><span class="hub-tipo">' + tipo + ' · ' + _esc(camp.system || '5e') + (sessioni ? ' · ' + sessioni + (sessioni === 1 ? ' sessione' : ' sessioni') : '') + '</span>' +
+        '<button type="button" class="btn btn-ghost btn-sm" onclick="App.editCampaign(\'' + camp.id + '\')">Modifica</button></div>' +
+      '<h2 class="hub-nome">' + _esc(camp.name) + '</h2>' +
+      (camp.description ? '<p class="hub-desc">' + _esc(camp.description) + '</p>' : '') +
       _gruppo('Al tavolo', [
         _card(_iconaMenu('campagna'), 'Dashboard', 'Ultima sessione, scadenze, clock e quest', go('campagna')),
         _card(_iconaMenu('sessione'), 'Sessione Live', 'Iniziativa, combattimento e note', go('sessione')),
