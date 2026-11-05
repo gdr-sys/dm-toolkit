@@ -149,6 +149,7 @@ const MappaUI = (() => {
             '<button class="btn btn-ghost btn-sm" onclick="MappaUI.zoomReset()" id="mappa-zoom-label" style="min-width:48px;">100%</button>' +
             '<button class="btn btn-ghost btn-icon-sm" onclick="MappaUI.zoom(0.2)" title="Ingrandisci">+</button>' +
             '<button class="btn btn-secondary btn-sm" onclick="MappaUI.apriImpostazioni()">Modifica mappa</button>' +
+            '<button class="btn btn-secondary btn-sm" onclick="App.navigateTo(\'cartografo\')">Genera una mappa</button>' +
           '</div>' +
         '</div>' +
         '<p class="page-subtitle" style="margin:0;padding:0 var(--space-lg) var(--space-sm);">Click su uno spazio vuoto per aggiungere un pin, click su un pin per aprirlo. Un pin puo\' anche aprire un\'altra mappa (es. la mappa di una citta\' o di un dungeon).</p>' +
@@ -156,7 +157,10 @@ const MappaUI = (() => {
           '<div id="mappa-vuota" style="display:none;position:absolute;inset:0;flex-direction:column;align-items:center;justify-content:center;gap:12px;text-align:center;padding:24px;">' +
             '<div style="opacity:0.4;"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 6v16l7-4 8 4 7-4V2l-7 4-8-4-7 4z"/><path d="M8 2v16"/><path d="M16 6v16"/></svg></div>' +
             '<div><h3 id="mappa-vuota-titolo" style="margin:0 0 4px;">Nessuna mappa ancora</h3><p id="mappa-vuota-testo" class="text-sm text-muted" style="margin:0 auto;max-width:420px;line-height:1.55;">Carica un’immagine (un disegno, una scansione, una mappa fatta altrove) e inizia a segnare luoghi e PNG sopra.</p></div>' +
-            '<button class="btn btn-primary btn-sm" onclick="MappaUI.apriImpostazioni()">Carica una mappa</button>' +
+            '<div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;">' +
+              '<button class="btn btn-primary btn-sm" onclick="MappaUI.apriImpostazioni()">Carica una mappa</button>' +
+              '<button class="btn btn-secondary btn-sm" onclick="App.navigateTo(\'cartografo\')">Genera una mappa</button>' +
+            '</div>' +
           '</div>' +
           '<div id="mappa-inner" style="position:absolute;left:0;top:0;transform-origin:0 0;">' +
             '<img id="mappa-img" src="" alt="Mappa" draggable="false" style="display:block;max-width:none;user-select:none;-webkit-user-drag:none;">' +
@@ -259,6 +263,19 @@ const MappaUI = (() => {
       if (inner) inner.style.display = 'none';
     };
     zoomReset();
+    // Le mappe del Cartografo sono grandi: si aprono intere, adattate allo spazio disponibile
+    if (mappa.adatta) {
+      const adatta = () => {
+        const c = document.getElementById('mappa-canvas');
+        if (!c || !img.naturalWidth || !c.clientWidth) return;
+        _scale = Math.min(c.clientWidth / img.naturalWidth, c.clientHeight / img.naturalHeight);
+        _panX = (c.clientWidth - img.naturalWidth * _scale) / 2;
+        _panY = (c.clientHeight - img.naturalHeight * _scale) / 2;
+        _applyTransform();
+      };
+      if (img.complete && img.naturalWidth) requestAnimationFrame(adatta);
+      else img.onload = () => { img.onload = null; adatta(); };
+    }
     _renderPins();
   };
 
@@ -290,6 +307,14 @@ const MappaUI = (() => {
     _navStack.push(nuova.id);
     _render();
     apriImpostazioni();
+  };
+
+  // Mappa gia' pronta, con immagine, scala e pin (dal Cartografo): la si apre subito
+  const aggiungiDaImmagine = ({ nome, immagine, scalaKm, pins }) => {
+    const nuova = { id: 'mappa_' + Date.now() + '_' + Math.random().toString(36).slice(2, 5), nome, immagine, scalaKm: scalaKm || 0, pins: pins || [], adatta: true };
+    _saveMappe([..._getMappe(), nuova]);
+    _navStack = [nuova.id];
+    return nuova.id;
   };
 
   const _renderPins = () => {
@@ -491,7 +516,7 @@ const MappaUI = (() => {
           '<div id="mappa-set-preview" style="display:none;margin-bottom:12px;border-radius:var(--radius-md);overflow:hidden;border:1px solid var(--border);"><img style="width:100%;display:block;"></div>' +
           '<div class="form-group">' +
             '<label class="form-label">Larghezza reale della mappa (km)</label>' +
-            '<input type="number" id="mappa-set-scala" class="form-input" min="0.1" step="0.1" placeholder="es. 300">' +
+            '<input type="number" id="mappa-set-scala" class="form-input" min="0" step="any" placeholder="es. 300">' +
             '<div class="form-hint">Quanti km copre l’immagine da un bordo all’altro — serve per calcolare le distanze tra i pin.</div>' +
           '</div>' +
         '</div>' +
@@ -989,7 +1014,10 @@ const MappaUI = (() => {
     }
     _misuraCorrente = { p1, p2, distanzaKm };
     document.getElementById('mappa-dist-titolo').textContent = _nomePin(p1) + ' → ' + _nomePin(p2);
-    document.getElementById('mappa-dist-km').textContent = Math.round(distanzaKm * 10) / 10 + ' km in linea d’aria';
+    // Le mappe di citta', dungeon e case misurano pochi metri: in km sarebbero "0.1"
+    document.getElementById('mappa-dist-km').textContent = (distanzaKm < 1
+      ? Math.round(distanzaKm * 1000) + ' metri'
+      : Math.round(distanzaKm * 10) / 10 + ' km') + ' in linea d’aria';
     _ricalcolaMisura();
     Modal.open('mappa-distanza');
   };
@@ -1003,7 +1031,8 @@ const MappaUI = (() => {
     const righe = Object.keys(VEL_BASE).map(mezzo => {
       const kmGiorno = VEL_BASE[mezzo].normale * mult;
       const giorni = _misuraCorrente.distanzaKm / kmGiorno;
-      const giorniStr = giorni < 1 ? Math.round(giorni * 24 * 10) / 10 + ' ore' : Math.round(giorni * 10) / 10 + ' giorni';
+      const ore = giorni * 24;
+      const giorniStr = ore < 1 ? Math.max(1, Math.round(ore * 60)) + ' min' : giorni < 1 ? Math.round(ore * 10) / 10 + ' ore' : Math.round(giorni * 10) / 10 + ' giorni';
       return '<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border);font-size:0.85rem;">' +
         '<span>' + MEZZO_LABEL[mezzo] + '</span>' +
         '<span style="font-family:var(--font-mono);color:var(--text-secondary);">' + giorniStr + ' <span class="text-muted" style="font-size:0.75rem;">(' + Math.round(kmGiorno) + ' km/g)</span></span>' +
@@ -1023,7 +1052,7 @@ const MappaUI = (() => {
 
   return {
     init, zoom, zoomReset,
-    vaiAMappa, tornaIndietro, entraInMappa, nuovaMappa, eliminaMappaCorrente,
+    vaiAMappa, tornaIndietro, entraInMappa, nuovaMappa, eliminaMappaCorrente, aggiungiDaImmagine,
     apriImpostazioni, salvaImpostazioni, _onFilePicked,
     apriModalNuovoPin, confermaNuovoPin, modificaPin, _onPinTipoChange, _onPinEntitaChange, _pickColore,
     onPinClick, rimuoviPin, iniziaMisuraDaPin, _ricalcolaMisura,

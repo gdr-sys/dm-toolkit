@@ -21,6 +21,7 @@ Per vederla in azione: apri l'app e, nella Home vuota, scegli **"Prova con una c
 | Wiki | Editor completo, [[collegamenti]], @menzioni, tag, grafo, modelli, import da foglio di calcolo |
 | Mondo | PNG, Luoghi, Fazioni, Quest, PG, Trame, Incontri |
 | Mappe | Mappe interattive con segnaposto, mappe annidate, misura distanze, zoom con due dita |
+| Cartografo | Genera mappe di regni, città, villaggi, caverne, dungeon ed edifici e le mette nelle tue mappe |
 | Calendario | Calendario in-world personalizzabile, eventi, scadenze, timeline |
 | Sessioni | Combat tracker, scene planner, diario delle sessioni, clock |
 | Generatori | 22 generatori pronti + **le tue tabelle casuali** |
@@ -71,6 +72,22 @@ Carica un'immagine come mappa interattiva. Puoi spostarla trascinando e ingrandi
 - **Segnaposto** collegabili a PNG, luoghi, fazioni o note; le coordinate sono in percentuale, quindi restano giuste su ogni schermo.
 - **Mappe annidate** — un segnaposto può aprire un'altra mappa (regione → città → taverna), con il pulsante per tornare indietro.
 - **Misura distanze** tra due segnaposto, in base alla scala della mappa.
+
+### Cartografo
+
+![I sei tipi di mappa del Cartografo: regno, città, villaggio, caverna, dungeon e abitazione](docs/img/cartografo-mappe.jpg)
+
+Crea una mappa da zero, senza caricare nulla: **regno** (isola, continente, arcipelago o costa, con strade, rotte via mare e distanze), **città**, **villaggio**, **caverna o radura**, **dungeon** (con le stanze descritte) e **abitazione** (un disegno per ogni piano, più il tetto).
+
+![La pagina del Cartografo](docs/img/cartografo.png)
+
+- Scegli forma, dimensione, colori e cosa mostrare, oppure lascia fare al caso con **A caso**: resta nel tipo di mappa scelto e, con **Tieni i miei colori**, non cambia il tuo stile. **Mappa precedente** ti riporta a quella di prima.
+- **Metti nelle mappe** la porta nella pagina Mappa con la scala già impostata e i luoghi segnati dai pin con le loro note. A richiesta crea anche le schede Luogo nella Wiki.
+- **Scarica PNG o SVG** per stamparla o usarla altrove. Il codice della mappa, con le stesse opzioni, ridà la stessa mappa.
+
+![Un regno generato nella pagina Mappa, con i luoghi già segnati dai pin](docs/img/cartografo-mappa.png)
+
+I generatori sono scritti apposta per il toolkit e funzionano senza servizi esterni. Senza Google Drive collegato, l'immagine messa nelle mappe resta solo sul dispositivo.
 
 ### Calendario e Timeline
 
