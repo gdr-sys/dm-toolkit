@@ -1,0 +1,455 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-06T08:57:50.055Z",
+  "title": "Design System: DM Toolkit, sito di presentazione",
+  "scope": "Solo scopri/. Non descrive e non governa l'app (index.html alla radice, css/, js/).",
+  "extensions": {
+    "colorMeta": {
+      "ambra": {
+        "role": "primary",
+        "displayName": "Ambra di lampada",
+        "canonical": "#e9b84f",
+        "tonalRamp": [
+          "#180600",
+          "#411c00",
+          "#663a00",
+          "#8a5d00",
+          "#af8000",
+          "#cfa855",
+          "#e5cea3",
+          "#f6eede"
+        ]
+      },
+      "ambra-forte": {
+        "role": "primary",
+        "displayName": "Ambra accesa",
+        "canonical": "#f6cd6e",
+        "tonalRamp": [
+          "#160700",
+          "#3d1e00",
+          "#613d00",
+          "#855f00",
+          "#aa8317",
+          "#caaa5e",
+          "#e2cfa7",
+          "#f4eedf"
+        ]
+      },
+      "cinabro": {
+        "role": "secondary",
+        "displayName": "Cinabro da segnaposto",
+        "canonical": "#e0523f",
+        "tonalRamp": [
+          "#260000",
+          "#5f0000",
+          "#8d0000",
+          "#b72919",
+          "#e15340",
+          "#ff8672",
+          "#ffbdb0",
+          "#ffe8e3"
+        ]
+      },
+      "cinabro-chiaro": {
+        "role": "secondary",
+        "displayName": "Cinabro chiaro",
+        "canonical": "#ffb4a6",
+        "tonalRamp": [
+          "#260000",
+          "#5f0000",
+          "#8d0000",
+          "#b72919",
+          "#e15340",
+          "#ff8672",
+          "#ffbdb0",
+          "#ffe8e3"
+        ]
+      },
+      "stanza": {
+        "role": "neutral",
+        "displayName": "Stanza",
+        "canonical": "#122a35",
+        "tonalRamp": [
+          "#040d11",
+          "#142933",
+          "#304955",
+          "#516a77",
+          "#738e9b",
+          "#9bb2be",
+          "#c6d3da",
+          "#ebeff2"
+        ]
+      },
+      "fondo": {
+        "role": "neutral",
+        "displayName": "Fondo",
+        "canonical": "#0c1f28",
+        "tonalRamp": [
+          "#050c10",
+          "#182931",
+          "#344852",
+          "#556a74",
+          "#778d98",
+          "#9fb1bb",
+          "#c8d3d9",
+          "#ebeff1"
+        ]
+      },
+      "petrolio": {
+        "role": "neutral",
+        "displayName": "Petrolio",
+        "canonical": "#123a4a",
+        "tonalRamp": [
+          "#010d14",
+          "#062b38",
+          "#244a5b",
+          "#456c7e",
+          "#6890a2",
+          "#92b4c4",
+          "#c1d5de",
+          "#e9f0f3"
+        ]
+      },
+      "foglio": {
+        "role": "neutral",
+        "displayName": "Foglio",
+        "canonical": "#18343f",
+        "tonalRamp": [
+          "#030d11",
+          "#112a34",
+          "#2d4a55",
+          "#4e6b77",
+          "#708f9b",
+          "#99b3be",
+          "#c5d4da",
+          "#eaeff2"
+        ]
+      },
+      "carta": {
+        "role": "neutral",
+        "displayName": "Carta",
+        "canonical": "#f2ecd8",
+        "tonalRamp": [
+          "#0d0b05",
+          "#2a2619",
+          "#4a4534",
+          "#6b6655",
+          "#8f8977",
+          "#b3ae9e",
+          "#d4d1c8",
+          "#efeeeb"
+        ]
+      },
+      "nebbia": {
+        "role": "neutral",
+        "displayName": "Nebbia",
+        "canonical": "#c0d0d5",
+        "tonalRamp": [
+          "#070c0e",
+          "#1d292c",
+          "#3a484c",
+          "#5b696d",
+          "#7d8c91",
+          "#a4b1b5",
+          "#cbd2d5",
+          "#eceff0"
+        ]
+      },
+      "inchiostro": {
+        "role": "neutral",
+        "displayName": "Inchiostro",
+        "canonical": "#0f2029",
+        "tonalRamp": [
+          "#060c10",
+          "#192931",
+          "#364852",
+          "#566974",
+          "#798d98",
+          "#a0b1bb",
+          "#c9d3d8",
+          "#ebeff1"
+        ]
+      },
+      "filo": {
+        "role": "neutral",
+        "displayName": "Filo",
+        "canonical": "#f2ecd82e",
+        "tonalRamp": [
+          "#0d0b05",
+          "#2a2619",
+          "#4a4534",
+          "#6b6655",
+          "#8f8977",
+          "#b3ae9e",
+          "#d4d1c8",
+          "#efeeeb"
+        ]
+      },
+      "filo-forte": {
+        "role": "neutral",
+        "displayName": "Filo forte",
+        "canonical": "#f2ecd84d",
+        "tonalRamp": [
+          "#0d0b05",
+          "#2a2619",
+          "#4a4534",
+          "#6b6655",
+          "#8f8977",
+          "#b3ae9e",
+          "#d4d1c8",
+          "#efeeeb"
+        ]
+      },
+      "filo-bottone": {
+        "role": "neutral",
+        "displayName": "Filo da bottone",
+        "canonical": "#f2ecd880",
+        "tonalRamp": [
+          "#0d0b05",
+          "#2a2619",
+          "#4a4534",
+          "#6b6655",
+          "#8f8977",
+          "#b3ae9e",
+          "#d4d1c8",
+          "#efeeeb"
+        ]
+      },
+      "velo": {
+        "role": "neutral",
+        "displayName": "Velo",
+        "canonical": "#0c1f28d9",
+        "tonalRamp": [
+          "#050c10",
+          "#182931",
+          "#344852",
+          "#556a74",
+          "#778d98",
+          "#9fb1bb",
+          "#c8d3d9",
+          "#ebeff1"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Un solo h1 per pagina."
+      },
+      "closing": {
+        "displayName": "Closing",
+        "purpose": "La frase di chiusura nel piede della home."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Titolo di sezione."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "h3 generico."
+      },
+      "item-title": {
+        "displayName": "Item title",
+        "purpose": "Passi, domande e garanzie."
+      },
+      "lead": {
+        "displayName": "Lead",
+        "purpose": "Frase sotto un titolo, in Nebbia, larga al massimo 34rem."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Testo corrente."
+      },
+      "support": {
+        "displayName": "Support",
+        "purpose": "Riga di testo dei passi, fatti dell'apertura e stato del generatore, in Nebbia."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Pulsanti."
+      },
+      "small": {
+        "displayName": "Small",
+        "purpose": "La nota legale del piede e, su telefono, i fatti dell'apertura."
+      }
+    },
+    "shadows": [
+      {
+        "name": "luce-foglio",
+        "value": "0 30px 80px -24px #e9b84f66, 0 12px 28px -12px #000c",
+        "purpose": "Luce calda sotto i fogli: schermata dell'apertura, fogli con i passi, nota, mappa della chiusura, schermate delle pagine interne."
+      },
+      {
+        "name": "segnaposto",
+        "value": "drop-shadow(0 3px 4px #000a)",
+        "purpose": "Filter: stacca il segnaposto dal foglio sotto."
+      },
+      {
+        "name": "etichetta-segnaposto",
+        "value": "0 4px 10px #0008",
+        "purpose": "Stacca l'etichetta ambra dal foglio sotto."
+      }
+    ],
+    "motion": [
+      {
+        "name": "curva",
+        "value": "cubic-bezier(.16, 1, .3, 1)",
+        "purpose": "Curva degli spostamenti e degli zoom."
+      },
+      {
+        "name": "stato",
+        "value": ".18s",
+        "purpose": "Colori e bordi al passaggio del mouse."
+      },
+      {
+        "name": "discesa",
+        "value": ".8s cubic-bezier(.16, 1, .3, 1)",
+        "purpose": "Il segnaposto ingrandisce il foglio fino al passo dopo."
+      },
+      {
+        "name": "discesa-dissolvenza",
+        "value": ".5s ease",
+        "purpose": "Dissolvenza tra i fogli durante la discesa."
+      },
+      {
+        "name": "accendi",
+        "value": ".9s cubic-bezier(.16, 1, .3, 1)",
+        "purpose": "La schermata dell'apertura si accende una volta, salendo di 14px."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "telefono",
+        "value": "639px"
+      },
+      {
+        "name": "tablet",
+        "value": "1023px"
+      },
+      {
+        "name": "portatile-basso",
+        "value": "1180px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Pulsante pieno",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Azione principale.",
+      "html": "<button class=\"ds-btn-piena\">Prova la campagna di esempio</button>",
+      "css": ".ds-btn-piena{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:.55em 1.35em;border:1px solid transparent;border-radius:6px;font:500 1.0625rem/1.15 'Alegreya Sans','Segoe UI',sans-serif;cursor:pointer;transition:background-color .18s,border-color .18s,transform .18s cubic-bezier(.16,1,.3,1);background:#e9b84f;color:#0f2029}.ds-btn-piena:hover{background:#f6cd6e}.ds-btn-piena:active{transform:translateY(1px) scale(.985)}.ds-btn-piena:focus-visible{outline:3px solid #f6cd6e;outline-offset:3px;}"
+    },
+    {
+      "name": "Pulsante a filo",
+      "kind": "button",
+      "refersTo": "button-outline",
+      "description": "Azione pari per misura; anche per i generatori dal vivo.",
+      "html": "<button class=\"ds-btn-filo\">Apri il toolkit</button>",
+      "css": ".ds-btn-filo{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:.55em 1.35em;border:1px solid transparent;border-radius:6px;font:500 1.0625rem/1.15 'Alegreya Sans','Segoe UI',sans-serif;cursor:pointer;transition:background-color .18s,border-color .18s,transform .18s cubic-bezier(.16,1,.3,1);background:#0c1f28d9;color:#f2ecd8;border-color:#f2ecd880}.ds-btn-filo:hover{border-color:#f2ecd8;background:#f2ecd814}.ds-btn-filo:active{transform:translateY(1px) scale(.985)}.ds-btn-filo:focus-visible{outline:3px solid #f6cd6e;outline-offset:3px;}"
+    },
+    {
+      "name": "Testata",
+      "kind": "nav",
+      "description": "Testata piena, con collegamento attivo sottolineato in ambra. Nel sito il marchio porta anche icons/icon-192.png a 32px, e sotto 640px resta solo l'icona, con collegamenti e pulsante al loro posto.",
+      "html": "<header class=\"ds-nav\"><a class=\"ds-nav-marchio\" href=\"#\">DM Toolkit</a><nav class=\"ds-nav-menu\"><a href=\"#\" aria-current=\"page\">Funzioni</a><a href=\"#\">Domande</a></nav></header>",
+      "css": ".ds-nav{display:flex;align-items:center;justify-content:space-between;gap:16px;height:72px;padding:0 24px;background:#0c1f28f5;border-bottom:1px solid #f2ecd82e;color:#f2ecd8}.ds-nav-marchio{font:500 1.375rem Alegreya,Georgia,serif;color:inherit;text-decoration:none}.ds-nav-menu{display:flex;gap:1.75rem}.ds-nav-menu a{display:inline-flex;align-items:center;min-height:44px;color:inherit;text-decoration:none;font-family:'Alegreya Sans','Segoe UI',sans-serif;background:linear-gradient(#e9b84f,#e9b84f) 0 calc(100% - 8px)/0 2px no-repeat;transition:background-size .25s cubic-bezier(.16,1,.3,1)}.ds-nav-menu a:hover,.ds-nav-menu a[aria-current]{background-size:100% 2px}.ds-nav-menu a:focus-visible{outline:3px solid #f6cd6e;outline-offset:3px;}"
+    },
+    {
+      "name": "Passi, foglio e segnaposto",
+      "kind": "custom",
+      "refersTo": "step-selected",
+      "description": "La firma del sito, uguale in ogni funzione della home: passi a sinistra, foglio a destra, un segnaposto che ingrandisce il foglio fino al passo dopo.",
+      "html": "<div class=\"ds-discesa\"><div class=\"ds-tappe\" role=\"tablist\" aria-label=\"Passi\"><button class=\"ds-tappa\" role=\"tab\" aria-selected=\"true\"><strong>Il combattimento</strong><span>Iniziativa, punti ferita e condizioni.</span></button><button class=\"ds-tappa\" role=\"tab\" aria-selected=\"false\"><strong>Cinque domande</strong><span>Le risposte compilano il diario.</span></button></div><div class=\"ds-lastra\"><button class=\"ds-segno\"><svg viewBox=\"0 0 44 44\" aria-hidden=\"true\" width=\"44\" height=\"44\"><path fill=\"#e0523f\" d=\"M22 42S8 27 8 16a14 14 0 1 1 28 0c0 11-14 26-14 26Z\"/><circle cx=\"22\" cy=\"16\" r=\"5\" fill=\"#f2ecd8\"/></svg><span>Chiudi la sessione</span></button></div></div>",
+      "css": ".ds-discesa{display:grid;grid-template-columns:minmax(0,4fr) minmax(0,8fr);gap:28px;align-items:start;padding:24px 24px 48px;background:#122a35}.ds-tappe{display:grid;gap:4px}.ds-tappa{display:block;width:100%;padding:12px 14px 12px 44px;background:none;border:1px solid transparent;border-radius:6px;color:#c0d0d5;text-align:left;font:400 1rem/1.4 'Alegreya Sans','Segoe UI',sans-serif;cursor:pointer;transition:background-color .18s,border-color .18s}.ds-tappa strong{display:block;font:500 1.3125rem/1.2 Alegreya,Georgia,serif;color:#f2ecd8}.ds-tappa span{display:block;margin-top:2px}.ds-tappa:hover{background:#f2ecd80f}.ds-tappa:focus-visible{outline:3px solid #f6cd6e;outline-offset:3px;}.ds-tappa[aria-selected=\"true\"]{background:url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 44'%3E%3Cpath fill='%23e0523f' d='M22 42S8 27 8 16a14 14 0 1 1 28 0c0 11-14 26-14 26Z'/%3E%3Ccircle cx='22' cy='16' r='5' fill='%23f2ecd8'/%3E%3C/svg%3E\") 12px 14px/22px 22px no-repeat,#18343f;border-color:#f2ecd82e}.ds-tappa[aria-selected=\"true\"] strong{color:#f6cd6e}.ds-lastra{position:relative;aspect-ratio:1.44;border-radius:8px;border:1px solid #f2ecd82e;background:#18343f;box-shadow:0 30px 80px -24px #e9b84f66,0 12px 28px -12px #000c}.ds-lastra .ds-segno{position:absolute;left:30%;top:40%}.ds-segno{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 12px 0 0;background:none;border:0;color:#0f2029;font:500 1rem 'Alegreya Sans','Segoe UI',sans-serif;cursor:pointer}.ds-segno svg{flex:none;filter:drop-shadow(0 3px 4px #000a);transition:transform .2s cubic-bezier(.16,1,.3,1);transform-origin:50% 100%}.ds-segno:hover svg{transform:translateY(-3px)}.ds-segno span{padding:.32em .75em;background:#e9b84f;border-radius:5px;white-space:nowrap;box-shadow:0 4px 10px #0008;transition:background-color .18s}.ds-segno:hover span{background:#f6cd6e}.ds-segno:focus-visible{outline:3px solid #f6cd6e;outline-offset:3px;}"
+    },
+    {
+      "name": "Segnaposto con etichetta",
+      "kind": "custom",
+      "refersTo": "pin-label",
+      "description": "Il segno ricorrente: indica il punto del foglio da cui si scende al passo dopo.",
+      "html": "<button class=\"ds-segno\"><svg viewBox=\"0 0 44 44\" aria-hidden=\"true\" width=\"44\" height=\"44\"><path fill=\"#e0523f\" d=\"M22 42S8 27 8 16a14 14 0 1 1 28 0c0 11-14 26-14 26Z\"/><circle cx=\"22\" cy=\"16\" r=\"5\" fill=\"#f2ecd8\"/></svg><span>Scendi a Borgoalta</span></button>",
+      "css": ".ds-segno{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 12px 0 0;background:none;border:0;color:#0f2029;font:500 1rem 'Alegreya Sans','Segoe UI',sans-serif;cursor:pointer}.ds-segno svg{flex:none;filter:drop-shadow(0 3px 4px #000a);transition:transform .2s cubic-bezier(.16,1,.3,1);transform-origin:50% 100%}.ds-segno:hover svg{transform:translateY(-3px)}.ds-segno span{padding:.32em .75em;background:#e9b84f;border-radius:5px;white-space:nowrap;box-shadow:0 4px 10px #0008;transition:background-color .18s}.ds-segno:hover span{background:#f6cd6e}.ds-segno:focus-visible{outline:3px solid #f6cd6e;outline-offset:3px;}"
+    },
+    {
+      "name": "Nota con vista giocatori",
+      "kind": "card",
+      "refersTo": "note",
+      "description": "Foglio illuminato con interruttore e riquadro Segreto DM.",
+      "html": "<article class=\"ds-nota\"><div class=\"ds-nota-testa\"><h3>Madre Cinerea</h3><div class=\"ds-interruttore\" role=\"group\" aria-label=\"Scegli la vista\"><button aria-pressed=\"true\">Vista DM</button><button aria-pressed=\"false\">Vista giocatori</button></div></div><p>Guida i Custodi della Cenere dal monastero sopra Valmora.</p><div class=\"ds-riquadro\"><strong>Segreto DM</strong>È lei ad aver appiccato l’incendio delle vigne.</div></article>",
+      "css": ".ds-nota{padding:clamp(20px,2.6vw,32px);background:#18343f;border:1px solid #f2ecd82e;border-radius:10px;box-shadow:0 30px 80px -24px #e9b84f66,0 12px 28px -12px #000c;color:#f2ecd8;font:400 1.1875rem/1.55 'Alegreya Sans','Segoe UI',sans-serif}.ds-nota p{margin:0}.ds-nota-testa{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}.ds-nota h3{margin:0;font:500 2rem/1.2 Alegreya,Georgia,serif}.ds-interruttore{display:inline-flex;padding:3px;border:1px solid #f2ecd82e;border-radius:7px}.ds-interruttore button{min-height:44px;padding:0 1em;background:none;border:0;border-radius:5px;color:#c0d0d5;font:500 1rem 'Alegreya Sans','Segoe UI',sans-serif;cursor:pointer;transition:background-color .18s,color .18s}.ds-interruttore button:hover{color:#f2ecd8}.ds-interruttore button:focus-visible{outline:3px solid #f6cd6e;outline-offset:3px;}.ds-interruttore button[aria-pressed=\"true\"]{background:#e9b84f;color:#0f2029}.ds-riquadro{margin-top:16px;padding:14px 16px;background:#e0523f1f;border:1px solid #e0523f80;border-radius:6px}.ds-riquadro strong{display:block;margin-bottom:4px;color:#ffb4a6;font-weight:500}"
+    },
+    {
+      "name": "Domanda espandibile",
+      "kind": "custom",
+      "description": "Voce con un più in SVG che ruota all’apertura.",
+      "html": "<details class=\"ds-domanda\" open><summary>Quanto costa?<svg viewBox=\"0 0 18 18\" width=\"18\" height=\"18\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" aria-hidden=\"true\"><path d=\"M9 2v14M2 9h14\"/></svg></summary><p>Niente. DM Toolkit è gratuito e lo resterà.</p></details>",
+      "css": ".ds-domanda{border-top:1px solid #f2ecd82e;color:#f2ecd8}.ds-domanda summary{display:flex;justify-content:space-between;align-items:center;gap:16px;min-height:60px;padding:12px 0;font:500 1.3125rem/1.25 Alegreya,Georgia,serif;cursor:pointer;list-style:none}.ds-domanda summary::-webkit-details-marker{display:none}.ds-domanda summary:hover{color:#f6cd6e}.ds-domanda summary:focus-visible{outline:3px solid #f6cd6e;outline-offset:3px;}.ds-domanda svg{flex:none;color:#e9b84f;transition:transform .25s cubic-bezier(.16,1,.3,1)}.ds-domanda[open] svg{transform:rotate(45deg)}.ds-domanda p{margin:0;padding:0 0 18px;color:#c0d0d5;max-width:38rem;font:400 1.125rem/1.55 'Alegreya Sans','Segoe UI',sans-serif}"
+    }
+  ],
+  "narrative": {
+    "northStar": "Il tavolo luminoso",
+    "overview": "Il sito è il tavolo del Dungeon Master in una stanza buia, e il foglio acceso sul tavolo è l'app. La stanza è un blu petrolio profondo, fatta delle mappe stesse: nell'apertura un regno sta dietro a tutto, scurito da una velatura, e davanti c'è la schermata vera del combattimento. La luce viene dai fogli, e tutto il resto si ritira. Schermate, mappe e documenti generati portano quasi tutto il colore e il carattere; l'interfaccia resta sobria per lasciarli parlare.\n\nLa densità è bassa sulla home, con una sezione per schermo a partire da 1024px, e media nelle pagine interne, dove la lunghezza è libera e le sezioni alternano due tinte. Ogni funzione della home si presenta allo stesso modo: passi a sinistra, foglio a destra, e un segnaposto che ingrandisce il foglio fino al passo dopo. Il sito rifiuta il titolo centrato sopra una griglia di card e il fantasy dorato con ornamenti nell'interfaccia.",
+    "keyCharacteristics": [
+      "L'app in primo piano, le mappe come ambiente e come una funzione tra le altre.",
+      "Un solo componente per tutte le funzioni: passi, foglio e segnaposto.",
+      "Un segno ricorrente: il segnaposto cinabro indica il passo attivo e il luogo in cui sei.",
+      "Fogli illuminati da una luce calda che sta sotto di loro.",
+      "Tinte a tutta sezione al posto di divisori e riquadri.",
+      "Solo tema scuro, senza variante chiara.",
+      "Prova vera: schermate, mappe e stemmi reali al posto di illustrazioni."
+    ],
+    "rules": [
+      {
+        "name": "The Segnaposto Rule",
+        "body": "Il segnaposto cinabro indica sempre il passo attivo o il luogo corrente, cioè il punto del foglio da cui si scende. Non è decorazione.",
+        "section": "colors"
+      },
+      {
+        "name": "The Due Accenti Rule",
+        "body": "L'ambra agisce, il cinabro segna. Un pulsante non è mai cinabro e la goccia del segnaposto non è mai ambra; la sua etichetta è ambra perché è l'azione.",
+        "section": "colors"
+      },
+      {
+        "name": "The Lettura al Tavolo Rule",
+        "body": "Il testo corrente non scende sotto 1.0625rem, le righe brevi di supporto non scendono sotto 0.9375rem e il testo di supporto resta in Nebbia, mai più tenue: il sito si legge anche su iPad con poca luce.",
+        "section": "typography"
+      },
+      {
+        "name": "The Niente Maiuscoletto Rule",
+        "body": "I titoli restano in maiuscole e minuscole normali, in Alegreya 500. Cinzel, Crimson Pro e IM Fell caricati dalla home servono solo a stemmi e mappe generati dal vivo, e restano dentro i loro SVG.",
+        "section": "typography"
+      },
+      {
+        "name": "The Una Sezione per Schermo Rule",
+        "body": "Sulla home ogni sezione dice una cosa sola e riempie lo schermo a partire da 1024px. Le pagine interne non seguono questa regola: la loro altezza dipende dal contenuto.",
+        "section": "layout"
+      },
+      {
+        "name": "The Foglio Acceso Rule",
+        "body": "Ogni foglio che mostra una cosa vera prende la stessa luce sotto, e nessun'altra ombra. Sta fermo: al passaggio del mouse non si solleva. Stemmi e documenti dello Scrittoio stanno senza foglio e senza luce, perché hanno già la propria sagoma.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do mostrare cose vere e provabili: schermate reali da `scopri/img/`, mappe generate, stemmi disegnati dal vivo.",
+      "Do catturare le schermate nuove come le altre: campagna di esempio, tema scuro, sfondo Grigio chiaro, testo al 125%.",
+      "Do presentare ogni funzione della home con passi, foglio e segnaposto.",
+      "Do tenere le due azioni con la stessa misura (altezza 48px, stesso peso), una piena e una a filo.",
+      "Do usare per il movimento la curva `cubic-bezier(.16, 1, .3, 1)` e tempi di .18s per gli stati, e rispettare `prefers-reduced-motion`.",
+      "Do garantire aree di tocco di almeno 44px, come in testata, passi, piede e interruttore.",
+      "Do separare le sezioni con il cambio di tinta tra Stanza, Fondo e Petrolio."
+    ],
+    "donts": [
+      "Don't applicare questo sistema all'app alla radice, né portare qui i temi e i colori dell'app.",
+      "Don't usare il titolo centrato sopra una griglia di card.",
+      "Don't rimettere la mappa in primo piano nell'apertura: lì il soggetto è l'app, e la mappa resta velata dietro.",
+      "Don't aggiungere ornamenti dorati, cornici o pergamena all'interfaccia del sito. Il limite vale per l'interfaccia: bussole dorate, pergamene e sigilli restano ammessi dentro mappe e documenti generati, che sono il prodotto.",
+      "Don't aggiungere illustrazioni dipinte: se servono, si chiedono all'utente, che le fa generare.",
+      "Don't usare emoji, loghi o personaggi ufficiali di D&D.",
+      "Don't usare il cinabro pieno per il testo o per i pulsanti.",
+      "Don't ripetere l'animazione di apertura a ogni scorrimento: la schermata si accende una volta sola."
+    ]
+  }
+}

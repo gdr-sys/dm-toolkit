@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DM Toolkit: l’app gratuita per Dungeon Master di D&amp;D 5e</title>
+<meta name="description" content="Prepari la sessione, disegni il mondo e gestisci il combattimento nello stesso posto. Gratuita, nel browser, senza installare nulla.">
+<meta property="og:title" content="DM Toolkit: l'app gratuita per Dungeon Master di D&amp;D 5e">
+<meta property="og:description" content="Prepari la sessione, disegni il mondo e gestisci il combattimento nello stesso posto. Gratuita, nel browser, senza installare nulla.">
+<meta property="og:image" content="https://gdr-sys.github.io/dm-toolkit/scopri/img/app-sessione.jpg">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#122a35">
+<link rel="icon" type="image/png" href="../icons/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alegreya:wght@500&family=Alegreya+Sans:ital,wght@0,400;0,500;0,700;1,400&family=Cinzel:wght@400;600;700&family=Crimson+Pro:ital,wght@0,400;0,600;1,400;1,600&family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&display=swap">
+<link rel="preload" as="image" href="img/app-sessione.jpg" fetchpriority="high">
+<link rel="stylesheet" href="sito.css">
+</head>
+<body>
+<a class="salto" href="#contenuto">Vai al contenuto</a>
+<header class="nav">
+  <div class="wrap">
+    <a class="marchio" href="index.html"><img src="../icons/icon-192.png" alt="" width="32" height="32"> <span class="marchio__testo">DM Toolkit</span></a>
+    <nav aria-label="Menu del sito">
+      <a href="funzioni.html">Funzioni</a>
+      <a href="domande.html">Domande</a>
+      <a class="bott bott--filo" href="../">Apri il toolkit</a>
+    </nav>
+  </div>
+</header>
+
+<main id="contenuto">
+  <section class="hero">
+    <div class="tavolo" aria-hidden="true">
+      <div class="tavolo__foglio"><img class="tavolo__base" src="img/regno-1200.jpg" alt="" width="1200" height="857"></div>
+    </div>
+    <div class="wrap hero__griglia">
+      <div class="hero__testo">
+        <h1>L’app gratuita per Dungeon Master di D&amp;D 5e</h1>
+        <p class="lead">DM Toolkit l’ho creato per il mio tavolo: prepari la sessione, la giochi e ne tieni traccia nello stesso posto. Si apre nel browser, senza installare nulla.</p>
+        <div class="azioni">
+          <a class="bott bott--piena" href="../?demo=1">Prova la campagna di esempio</a>
+          <a class="bott bott--filo" href="../">Apri il toolkit</a>
+        </div>
+        <ul class="fatti">
+          <li><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="m3 8.5 3.2 3.2L13 4.8"/></svg>Gratis, e lo resterà</li>
+          <li><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="m3 8.5 3.2 3.2L13 4.8"/></svg>Senza account</li>
+          <li><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="m3 8.5 3.2 3.2L13 4.8"/></svg>Anche offline</li>
+        </ul>
+      </div>
+      <div class="hero__app"><img src="img/app-sessione.jpg" alt="DM Toolkit durante un combattimento: ordine di iniziativa, punti ferita e classe armatura." width="1800" height="1250" fetchpriority="high"></div>
+    </div>
+  </section>
+
+  <section class="discesa" id="wiki">
+    <div class="wrap due">
+      <div>
+        <h2>Prima della sessione, la Wiki del tuo mondo</h2>
+        <p class="lead">Tutto ciò che scrivi resta collegato. Segui il segnaposto: dalla nota alla scheda, dalla scheda alla scena.</p>
+        <div class="tappe" role="tablist" aria-label="Passi: Prima della sessione, la Wiki del tuo mondo">
+          <button class="tappa" role="tab" type="button" aria-controls="lastra-wiki"><strong>La nota</strong><span>Scrivi [[Nome]] e la nota porta alla sua scheda.</span></button>
+          <button class="tappa" role="tab" type="button" aria-controls="lastra-wiki"><strong>La scheda</strong><span>Luoghi, PNG e fazioni, con i riquadri Segreto DM.</span></button>
+          <button class="tappa" role="tab" type="button" aria-controls="lastra-wiki"><strong>La scena</strong><span>Un clic compone tempo, rumori, PNG e voci di corridoio.</span></button>
+        </div>
+      </div>
+      <div class="lastra" id="lastra-wiki" role="tabpanel" style="--r:1.44">
+        <img class="lastra__strato" data-fuoco="69.2% 23%" src="img/app-wiki.jpg" loading="lazy" alt="Una nota della Wiki con i collegamenti a luoghi e personaggi." width="1800" height="1250">
+        <img class="lastra__strato" data-fuoco="38.4% 51.6%" src="img/app-luogo.jpg" loading="lazy" alt="La scheda del luogo Monte Ardegna, con il riquadro Segreto DM e la sua tabella casuale." width="1800" height="1250">
+        <img class="lastra__strato" src="img/app-scena.jpg" loading="lazy" alt="La scena del Monte Ardegna composta dalla scheda: tempo, rumori, personaggi e voci." width="1800" height="1250">
+        <button class="segno segno--sx-telefono" type="button" data-da="0" style="--x:69.2%;--y:23%"><svg viewBox="0 0 44 44" aria-hidden="true"><path fill="currentColor" d="M22 42S8 27 8 16a14 14 0 1 1 28 0c0 11-14 26-14 26Z"/><circle cx="22" cy="16" r="5" fill="#f2ecd8"/></svg><span>Apri il Monte Ardegna</span></button>
+        <button class="segno" type="button" data-da="1" hidden style="--x:38.4%;--y:51.6%"><svg viewBox="0 0 44 44" aria-hidden="true"><path fill="currentColor" d="M22 42S8 27 8 16a14 14 0 1 1 28 0c0 11-14 26-14 26Z"/><circle cx="22" cy="16" r="5" fill="#f2ecd8"/></svg><span>Entra in scena</span></button>
+      </div>
+    </div>
+  </section>
+
+  <section class="discesa fondo" id="tavolo">
+    <div class="wrap due">
+      <div>
+        <h2>Al tavolo, dal combattimento al diario</h2>
+        <p class="lead">La sessione resta in una sola schermata, e alla fine si scrive quasi da sola.</p>
+        <div class="tappe" role="tablist" aria-label="Passi: Al tavolo, dal combattimento al diario">
+          <button class="tappa" role="tab" type="button" aria-controls="lastra-tavolo"><strong>Il combattimento</strong><span>Iniziativa, punti ferita, CA e condizioni a portata di tocco.</span></button>
+          <button class="tappa" role="tab" type="button" aria-controls="lastra-tavolo"><strong>Cinque domande</strong><span>Le risposte compilano diario, ganci e riassunto.</span></button>
+          <button class="tappa" role="tab" type="button" aria-controls="lastra-tavolo"><strong>La volta dopo</strong><span>Riparti da riassunto, fili in sospeso e scadenze.</span></button>
+        </div>
+      </div>
+      <div class="lastra" id="lastra-tavolo" role="tabpanel" style="--r:1.44">
+        <img class="lastra__strato" data-fuoco="54% 12.4%" src="img/app-sessione.jpg" loading="lazy" alt="La Sessione Live con l’ordine di iniziativa e i punti ferita." width="1800" height="1250">
+        <img class="lastra__strato" data-fuoco="60% 91%" src="img/app-chiusura.jpg" loading="lazy" alt="La chiusura della sessione con cinque domande." width="1800" height="1250">
+        <img class="lastra__strato" src="img/app-dashboard.jpg" loading="lazy" alt="La Dashboard con l’ultima sessione, i fili in sospeso e le scadenze." width="1800" height="1250">
+        <button class="segno segno--sx" type="button" data-da="0" style="--x:54%;--y:12.4%"><svg viewBox="0 0 44 44" aria-hidden="true"><path fill="currentColor" d="M22 42S8 27 8 16a14 14 0 1 1 28 0c0 11-14 26-14 26Z"/><circle cx="22" cy="16" r="5" fill="#f2ecd8"/></svg><span>Chiudi la sessione</span></button>
+        <button class="segno segno--sx" type="button" data-da="1" hidden style="--x:60%;--y:91%"><svg viewBox="0 0 44 44" aria-hidden="true"><path fill="currentColor" d="M22 42S8 27 8 16a14 14 0 1 1 28 0c0 11-14 26-14 26Z"/><circle cx="22" cy="16" r="5" fill="#f2ecd8"/></svg><span>Vai alla Dashboard</span></button>
+      </div>
+    </div>
+  </section>
+
+  <section class="discesa" id="mappe">
+    <div class="wrap due">
+      <div>
+        <h2>Mappe generate, dal regno alla locanda</h2>
+        <p class="lead">Scegli un segnaposto e scendi di livello. La mappa nuova nasce già collegata a quella sopra, con nomi e distanze.</p>
+        <div class="tappe" role="tablist" aria-label="Passi: Mappe generate, dal regno alla locanda">
+          <button class="tappa" role="tab" type="button" aria-controls="lastra-mappe"><strong>Regno</strong><span>Isole, coste e continenti, con strade e rotte.</span></button>
+          <button class="tappa" role="tab" type="button" aria-controls="lastra-mappe"><strong>Città</strong><span>Rioni, mura e porti: anche villaggi e caverne.</span></button>
+          <button class="tappa" role="tab" type="button" aria-controls="lastra-mappe"><strong>Locanda</strong><span>Ogni piano arredato: anche dungeon con le stanze.</span></button>
+        </div>
+        <div class="banco">
+          <button class="bott bott--filo" type="button" id="altro-regno">Disegna un altro regno</button>
+          <p class="banco__stato" id="stato-regno" aria-live="polite">Regno di Montealta, codice <code>tavolo1</code></p>
+        </div>
+      </div>
+      <div class="lastra" id="lastra-mappe" role="tabpanel" style="--r:1.4">
+        <img class="lastra__strato" data-fuoco="60.4% 21.6%" src="img/regno-1200.jpg" loading="lazy" alt="Un regno generato, con le città, le strade e le distanze." width="1200" height="857">
+        <img class="lastra__strato" data-fuoco="39.1% 76%" src="img/citta.jpg" loading="lazy" alt="La città di Borgoalta generata, con mura, rioni e porto." width="1400" height="1000">
+        <img class="lastra__strato" src="img/locanda.jpg" loading="lazy" alt="La pianta su due piani della locanda Il Gatto Nero." width="1400" height="1000">
+        <button class="segno segno--sx" type="button" data-da="0" style="--x:60.4%;--y:21.6%"><svg viewBox="0 0 44 44" aria-hidden="true"><path fill="currentColor" d="M22 42S8 27 8 16a14 14 0 1 1 28 0c0 11-14 26-14 26Z"/><circle cx="22" cy="16" r="5" fill="#f2ecd8"/></svg><span>Scendi a Borgoalta</span></button>
+        <button class="segno" type="button" data-da="1" hidden style="--x:39.1%;--y:76%"><svg viewBox="0 0 44 44" aria-hidden="true"><path fill="currentColor" d="M22 42S8 27 8 16a14 14 0 1 1 28 0c0 11-14 26-14 26Z"/><circle cx="22" cy="16" r="5" fill="#f2ecd8"/></svg><span>Scendi alla locanda</span></button>
+      </div>
+    </div>
+  </section>
+
+  <section class="discesa fondo" id="generatori">
+    <div class="wrap due">
+      <div>
+        <h2>Generatori e Compendio per improvvisare</h2>
+        <p class="lead">Quando i giocatori vanno dove non avevi previsto, la risposta è a un tocco.</p>
+        <div class="tappe" role="tablist" aria-label="Passi: Generatori e Compendio per improvvisare">
+          <button class="tappa" role="tab" type="button" aria-controls="lastra-generatori"><strong>Le tue tabelle</strong><span>22 generatori, più le tabelle del tuo mondo.</span></button>
+          <button class="tappa" role="tab" type="button" aria-controls="lastra-generatori"><strong>Il risultato</strong><span>Dado e voce estratta, pronti da leggere al tavolo.</span></button>
+          <button class="tappa" role="tab" type="button" aria-controls="lastra-generatori"><strong>Il mostro</strong><span>Dagli SRD 5.1 e 5.2.1: cambi il Grado di Sfida e lo mandi in combattimento.</span></button>
+        </div>
+      </div>
+      <div class="lastra" id="lastra-generatori" role="tabpanel" style="--r:1.44">
+        <img class="lastra__strato" data-fuoco="93.8% 42.9%" src="img/app-generatori.jpg" loading="lazy" alt="La pagina dei Generatori con le tabelle personali." width="1800" height="1250">
+        <img class="lastra__strato" data-fuoco="8.9% 66.1%" src="img/app-tiro.jpg" loading="lazy" alt="Il risultato di un tiro su una tabella personale." width="1800" height="1250">
+        <img class="lastra__strato" src="img/app-mostro.jpg" loading="lazy" alt="La scheda di un mostro nel Compendio, con il pulsante per aggiungerlo al combattimento." width="1800" height="1250">
+        <button class="segno segno--sx" type="button" data-da="0" style="--x:93.8%;--y:42.9%"><svg viewBox="0 0 44 44" aria-hidden="true"><path fill="currentColor" d="M22 42S8 27 8 16a14 14 0 1 1 28 0c0 11-14 26-14 26Z"/><circle cx="22" cy="16" r="5" fill="#f2ecd8"/></svg><span>Tira</span></button>
+        <button class="segno" type="button" data-da="1" hidden style="--x:8.9%;--y:66.1%"><svg viewBox="0 0 44 44" aria-hidden="true"><path fill="currentColor" d="M22 42S8 27 8 16a14 14 0 1 1 28 0c0 11-14 26-14 26Z"/><circle cx="22" cy="16" r="5" fill="#f2ecd8"/></svg><span>Apri il Compendio</span></button>
+      </div>
+    </div>
+  </section>
+
+  <section class="petrolio scrittoio" id="scrittoio">
+    <div class="wrap">
+      <div class="testa-due">
+        <h2>Stemmi e documenti per i tuoi giocatori</h2>
+        <div>
+          <p class="lead">Lettere sigillate, taglie, editti e mappe del tesoro, scritti con i nomi della tua campagna. Se hai già uno stemma, caricalo nella scheda della fazione.</p>
+          <button class="bott bott--filo" type="button" id="altro-stemma">Disegna un altro stemma</button>
+        </div>
+      </div>
+      <div class="tavolino">
+        <div class="stemma" id="stemma" role="img" aria-label="Uno stemma generato dallo Scrittoio."></div>
+        <img src="img/taglia.jpg" loading="lazy" alt="Un avviso di taglia generato, con ricompensa in monete d'oro." width="760" height="1000">
+        <img src="img/lettera.jpg" loading="lazy" alt="Una lettera generata, con i bordi bruciati." width="760" height="1000">
+      </div>
+    </div>
+  </section>
+
+  <section class="fondo" id="segreti">
+    <div class="wrap">
+      <div class="testa-due">
+        <h2>I segreti e i dati restano tuoi</h2>
+        <p class="lead">I giocatori ricevono una copia separata con quello che scegli tu, senza segreti e motivazioni dei PNG. Prova a cambiare vista.</p>
+      </div>
+      <article class="nota" data-vista="dm">
+        <div class="nota__testa">
+          <h3>Madre Cinerea</h3>
+          <div class="interruttore" role="group" aria-label="Scegli la vista">
+            <button type="button" data-vista="dm" aria-pressed="true">Vista DM</button>
+            <button type="button" data-vista="giocatori" aria-pressed="false">Vista giocatori</button>
+          </div>
+        </div>
+        <p>Tiefling, guida dei Custodi della Cenere.</p>
+        <div class="nota__segreto"><div><p class="nota__dm">Calma, gentile, convincente: non alza mai la voce. Vuole l’eruzione.</p><div class="nota__riquadro"><strong>Segreto DM</strong>È stata lei a guidare i Custodi nella cripta e a spezzare il primo dei tre anelli del sigillo.</div></div></div>
+      </article>
+      <ul class="garanzie">
+        <li><strong>Sul tuo Google Drive</strong>Con Drive collegato, campagna e immagini stanno nella tua cartella. Senza, restano sul dispositivo.</li>
+        <li><strong>Al tavolo, anche senza rete</strong>Le modifiche fatte offline si sincronizzano quando torna internet.</li>
+        <li><strong>Con un altro DM</strong>Un codice invito e lavorate alla stessa campagna in tempo reale.</li>
+      </ul>
+    </div>
+  </section>
+</main>
+
+<footer class="closing">
+  <div class="wrap">
+    <div class="chiusura">
+      <div>
+      <h2>L’ho creato per il mio tavolo. Ora è anche per il tuo.</h2>
+      <p>DM Toolkit è gratuito e lo resterà. Apri la campagna di esempio per vederlo già pieno, oppure inizia subito la tua.</p>
+      <div class="azioni">
+        <a class="bott bott--piena" href="../?demo=1">Prova la campagna di esempio</a>
+        <a class="bott bott--filo" href="../">Apri il toolkit</a>
+      </div>
+      </div>
+      <div class="chiusura__foglio" aria-hidden="true"><img src="img/citta.jpg" loading="lazy" alt="" width="1400" height="1000"><svg viewBox="0 0 44 44"><path fill="currentColor" d="M22 42S8 27 8 16a14 14 0 1 1 28 0c0 11-14 26-14 26Z"/><circle cx="22" cy="16" r="5" fill="#f2ecd8"/></svg></div>
+    </div>
+    <div class="piede">
+      <ul>
+        <li><a href="funzioni.html">Funzioni</a></li>
+        <li><a href="domande.html">Domande</a></li>
+        <li><a href="https://bda22242.sibforms.com/serve/MUIFANQD-R-fXZOh55Ed_3xjzfpFK5BftmRd_W_tvi687quPt8riLssWxvWLak7RyGwBbQmqxfGrRDskOgm4b80p_Ozpkp2IngdHuwIm-XMEbR5YW_5vgLwU3ElgBbuqzpyAjaFhw9hCjBbc1g0bg5R3cjwthicVm7uBTiF8Uykh5LE7_1HqGnSKaiFhgrWNlJvevQopjtyEVXRK2Q==" rel="noopener">Newsletter</a></li>
+        <li><a href="https://github.com/gdr-sys/dm-toolkit" rel="noopener">GitHub</a></li>
+      </ul>
+      <p>Questo sito e l’app includono materiale dal System Reference Document 5.1 e 5.2.1 di Wizards of the Coast LLC, <a href="https://www.dndbeyond.com/srd" rel="noopener">disponibile qui</a>, con licenza <a href="https://creativecommons.org/licenses/by/4.0/legalcode" rel="noopener">Creative Commons Attribution 4.0</a> (SRD 5.1 anche con OGL 1.0a). DM Toolkit è un progetto indipendente, non affiliato a Wizards of the Coast né da essa approvato.</p>
+    </div>
+  </div>
+</footer>
+
+<script src="../js/cartografo-motore.js"></script>
+<script src="../js/araldica.js"></script>
+<script src="sito.js"></script>
+</body>
+</html>

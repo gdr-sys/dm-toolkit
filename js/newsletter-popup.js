@@ -46,6 +46,8 @@ const NewsletterPopup = (() => {
 
   const _tryShow = () => {
     if (localStorage.getItem(STORAGE_KEY)) return;
+    // Chi arriva dal sito per provare la campagna di esempio deve vederla subito: l'invito aspetta la visita dopo
+    if (new URLSearchParams(location.search).has('demo')) return;
     setTimeout(() => {
       // Segnato come visto all'apertura, non alla chiusura: cosi' il
       // popup non si ripropone qualunque sia il modo in cui viene

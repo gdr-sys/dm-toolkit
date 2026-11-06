@@ -4,11 +4,13 @@
 [![D&D 5e](https://img.shields.io/badge/D%26D-5e%202014%20%2F%202024-8B2635?style=flat-square)](https://gdr-sys.github.io/dm-toolkit/)
 [![Vanilla JS](https://img.shields.io/badge/stack-Vanilla%20JS-F7DF1E?style=flat-square&logo=javascript&logoColor=black)](https://gdr-sys.github.io/dm-toolkit/)
 [![Firebase](https://img.shields.io/badge/sync-Firebase-FFCA28?style=flat-square&logo=firebase&logoColor=black)](https://firebase.google.com/)
-[![License](https://img.shields.io/badge/game%20data-SRD%20OGL%2FORC-lightgrey?style=flat-square)](https://www.dndbeyond.com/srd)
+[![License](https://img.shields.io/badge/game%20data-SRD%20CC--BY--4.0-lightgrey?style=flat-square)](https://www.dndbeyond.com/srd)
 
 Web app per Dungeon Master di D&D 5e (edizioni 2014 e 2024) per gestire una campagna dalla preparazione della sessione al combattimento al tavolo, da qualsiasi dispositivo e senza installare nulla.
 
 ![La Dashboard della campagna di esempio](docs/img/dashboard.png)
+
+**[Scopri DM Toolkit](https://gdr-sys.github.io/dm-toolkit/scopri/)**: il sito di presentazione, con le funzioni mostrate passo per passo.
 
 Per vederla in azione: apri l'app e, nella Home vuota, scegli **"Prova con una campagna di esempio"**. Si crea *Le Ceneri di Valmora*, già piena di PNG, luoghi, sessioni, tabelle e calendario.
 
@@ -249,4 +251,4 @@ Il cuore dell'app è un unico file HTML: niente framework, niente bundler, nessu
 
 ## Licenza
 
-I dati di gioco provengono dal System Reference Document (SRD) di D&D 5e, pubblicato da Wizards of the Coast con licenze OGL e ORC.
+I dati di gioco provengono dal System Reference Document (SRD) di D&D 5e di Wizards of the Coast LLC, [disponibile qui](https://www.dndbeyond.com/srd): SRD 5.1 con licenze OGL 1.0a e [CC-BY-4.0](https://creativecommons.org/licenses/by/4.0/legalcode), SRD 5.2.1 con licenza CC-BY-4.0.

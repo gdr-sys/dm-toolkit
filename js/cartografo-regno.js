@@ -695,7 +695,7 @@ const CartoRegno = (() => {
     const titoloX = rx > W / 2 ? 66 : W - 66, ancora = rx > W / 2 ? 'start' : 'end';
     if (o.titolo !== false) cornice += M.etichetta(titoloX, 88, nome, t, { size: 44, ancora, colore: t.testo, alone: t.testoAlone, aloneW: 5, peso: 600 });
     const bx = rx > W / 2 ? 66 : W - 66 - 266 - 50;
-    const scala = M.scala(bx, H - 62, 133.3, { valore: 100, nome: 'km' }, 2, { ...M.PALETTE.pergamena, carta: t.margine, inchiostro: t.ink });
+    const scala = M.scala(bx, H - 62, 133.3, { valore: 100, nome: 'km' }, 2, { ...M.PALETTE.pergamena, carta: t.margine, inchiostro: o.palette === 'notte' ? t.testo : t.ink });
 
     const pin = citta.map((c) => {
       const ruolo = c.rango === 2 ? 'Capoluogo' : c.rango === 1 ? 'Cittadina' : 'Villaggio';
