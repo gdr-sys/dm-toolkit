@@ -1,6 +1,7 @@
 # DM Toolkit
 
-[![Live](https://img.shields.io/badge/live-gdr--sys.github.io%2Fdm--toolkit-crimson?style=flat-square)](https://gdr-sys.github.io/dm-toolkit/)
+[![Scopri](https://img.shields.io/badge/scopri-il%20sito%20di%20presentazione-8B2635?style=flat-square)](https://gdr-sys.github.io/dm-toolkit/scopri/)
+[![Live](https://img.shields.io/badge/apri-l'app-crimson?style=flat-square)](https://gdr-sys.github.io/dm-toolkit/)
 [![D&D 5e](https://img.shields.io/badge/D%26D-5e%202014%20%2F%202024-8B2635?style=flat-square)](https://gdr-sys.github.io/dm-toolkit/)
 [![Vanilla JS](https://img.shields.io/badge/stack-Vanilla%20JS-F7DF1E?style=flat-square&logo=javascript&logoColor=black)](https://gdr-sys.github.io/dm-toolkit/)
 [![Firebase](https://img.shields.io/badge/sync-Firebase-FFCA28?style=flat-square&logo=firebase&logoColor=black)](https://firebase.google.com/)
@@ -8,11 +9,28 @@
 
 Web app per Dungeon Master di D&D 5e (edizioni 2014 e 2024) per gestire una campagna dalla preparazione della sessione al combattimento al tavolo, da qualsiasi dispositivo e senza installare nulla.
 
-![La Dashboard della campagna di esempio](docs/img/dashboard.png)
+![Il combat tracker durante uno scontro della campagna di esempio](scopri/img/app-sessione.jpg)
 
-**[Scopri DM Toolkit](https://gdr-sys.github.io/dm-toolkit/scopri/)**: il sito di presentazione, con le funzioni mostrate passo per passo.
+### [Scopri DM Toolkit](https://gdr-sys.github.io/dm-toolkit/scopri/)
+
+Il sito di presentazione, con le funzioni mostrate passo per passo. Se vuoi andare subito al sodo, [apri l'app](https://gdr-sys.github.io/dm-toolkit/).
 
 Per vederla in azione: apri l'app e, nella Home vuota, scegli **"Prova con una campagna di esempio"**. Si crea *Le Ceneri di Valmora*, già piena di PNG, luoghi, sessioni, tabelle e calendario.
+
+<table>
+  <tr>
+    <td width="50%"><img src="scopri/img/app-dashboard.jpg" alt="La Dashboard della campagna"><br><b>Dashboard</b>: l'ultima sessione, i fili in sospeso, le scadenze</td>
+    <td width="50%"><img src="docs/img/png.jpg" alt="La scheda di un PNG con il segreto del DM e cosa sa"><br><b>Scheda di un PNG</b>: segreto del DM e cosa può rivelare</td>
+  </tr>
+  <tr>
+    <td><img src="docs/img/schermo.jpg" alt="Lo Schermo del DM con party, dadi, tempo e condizioni"><br><b>Schermo del DM</b>: i blocchi che ti servono al tavolo</td>
+    <td><img src="docs/img/mappa.jpg" alt="Un regno generato nella pagina Mappa, con i luoghi segnati dai pin"><br><b>Mappa</b>: un regno generato, con i luoghi già segnati</td>
+  </tr>
+  <tr>
+    <td><img src="scopri/img/app-tiro.jpg" alt="Una tabella casuale tirata nella pagina Generatori"><br><b>Generatori</b>: le tue tabelle casuali, a un clic</td>
+    <td><img src="docs/img/scrittoio.jpg" alt="Uno stemma creato nello Scrittoio"><br><b>Scrittoio</b>: stemmi e documenti per i giocatori</td>
+  </tr>
+</table>
 
 ---
 
@@ -66,7 +84,9 @@ PNG, Luoghi, Fazioni, Quest, PG, Trame e Incontri hanno ciascuno la propria sezi
 - **Importa da un'altra campagna** — copia luoghi, fazioni, PNG, note Lore e tabelle da un'altra campagna, per una one shot o un secondo gruppo nello stesso mondo.
 - Una nota creata da un modello PNG o Luogo crea anche l'elemento corrispondente e resta collegata. Salvare un elemento invece **non** crea più note doppie nella Lore.
 
-![Scheda di un luogo con la sua tabella casuale](docs/img/luogo.png)
+![La scheda di un luogo](scopri/img/app-luogo.jpg)
+
+![Entra in scena: la scena composta con quello che hai già scritto](scopri/img/app-scena.jpg)
 
 ### Mappe
 
@@ -82,29 +102,26 @@ Carica un'immagine come mappa interattiva. Puoi spostarla trascinando e ingrandi
 
 Crea una mappa da zero, senza caricare nulla: **regno** (isola, continente, arcipelago o costa, con strade, rotte via mare e distanze), **città**, **villaggio**, **caverna o radura**, **dungeon** (con le stanze descritte) e **abitazione** (un disegno per ogni piano, più il tetto).
 
-![La pagina del Cartografo](docs/img/cartografo.png)
+![La pagina del Cartografo](scopri/img/app-cartografo.jpg)
 
 - Scegli forma, dimensione, colori e cosa mostrare, oppure lascia fare al caso con **A caso**: resta nel tipo di mappa scelto e, con **Tieni i miei colori**, non cambia il tuo stile. **Mappa precedente** ti riporta a quella di prima.
 - **Metti nelle mappe** la porta nella pagina Mappa con la scala già impostata e i luoghi segnati dai pin con le loro note. A richiesta crea anche le schede Luogo nella Wiki.
 - **Genera la sua mappa**: clicca un pin e crea la mappa di quel luogo, già collegata. La città nata da un regno eredita ciò che lì si vede, come il mare e il fiume. Così si scende dal regno alla città fino alla locanda, e si torna indietro.
 - **Scarica PNG o SVG** per stamparla o usarla altrove. Il codice della mappa, con le stesse opzioni, ridà la stessa mappa.
 
-![Un regno generato nella pagina Mappa, con i luoghi già segnati dai pin](docs/img/cartografo-mappa.png)
-
 I generatori sono scritti apposta per il toolkit e funzionano senza servizi esterni. Senza Google Drive collegato, l'immagine messa nelle mappe resta solo sul dispositivo.
 
 ### Scrittoio
 
-![Uno stemma e i documenti che si possono creare: lettera, taglia, editto, avviso e mappa del tesoro](docs/img/scrittoio-documenti.png)
+![Uno stemma e i documenti che si possono creare: lettera, taglia, editto, avviso e mappa del tesoro](scopri/img/scrittoio-documenti.jpg)
 
 - **Stemmi** con forma, colori, simbolo, corona, mantello e motto. Assegnato a una Fazione o a un Luogo, diventa l'immagine della sua scheda; quello di una Fazione diventa anche il sigillo dei suoi documenti. Se hai già uno stemma tuo, caricalo come immagine nella scheda della Fazione: finisce su editti e lettere.
 - **Documenti da consegnare ai giocatori**: lettere sigillate, taglie, editti, avvisi da bacheca e mappe del tesoro. Il testo nasce con i nomi di PNG, luoghi e fazioni della campagna e si può sempre modificare, così come la carta e il suo stato.
 - **Salva nella Wiki** lo mette tra le schede Lore, da cui la **Vista giocatori** può condividerlo. L'immagine si salva nella scheda solo con Google Drive collegato; altrimenti resta il testo e puoi scaricare il PNG.
 
-![La pagina dello Scrittoio](docs/img/scrittoio.png)
-
 ### Calendario e Timeline
 
+![Il calendario della campagna di esempio](docs/img/calendario.jpg)
 
 - Calendario in-world con preset (Forgotten Realms, Greyhawk…) o **completamente personalizzato**: mesi, giorni della settimana, festività, data e ora di oggi.
 - **Eventi e scadenze** con promemoria; le scadenze vicine compaiono nella Dashboard.
@@ -113,7 +130,7 @@ I generatori sono scritti apposta per il toolkit e funzionano senza servizi este
 
 ### Sessioni
 
-![Il combat tracker durante uno scontro](docs/img/sessione.png)
+![Chiudi la sessione in 5 domande](scopri/img/app-chiusura.jpg)
 
 - **Combat tracker** — iniziativa, PF, CA, condizioni, concentrazione con CD automatica, effetti con conto alla rovescia dei round, riposi brevi e lunghi.
 - **Schermo sempre acceso** — su tablet e telefono lo schermo non si spegne durante uno scontro (oppure sempre, o mai: si sceglie nelle Impostazioni).
@@ -128,7 +145,7 @@ I generatori sono scritti apposta per il toolkit e funzionano senza servizi este
 
 ### Generatori
 
-![Le mie tabelle e i generatori](docs/img/generatori.png)
+![Le mie tabelle e i generatori](scopri/img/app-generatori.jpg)
 
 
 22 generatori per improvvisare: PNG completo, meteo, rumori e odori, descrizione di luoghi, nomi di luoghi, negozio (con i prezzi degli oggetti magici), biblioteca, bottino, viaggio, incontri, incontro bilanciato, voci di corridoio, accenti, nomi, follia, ganci, oracolo, missioni. Sono divisi in **schede per categoria** (PNG, ambiente, negozio, bottino, viaggio, strumenti narrativi, dungeon) con una **ricerca per nome**, così vedi solo quello che ti serve. Tutti, comprese "Le mie tabelle", si possono nascondere da **Personalizza** e riordinare. Il **Generatore Nomi** non propone nomi già usati dai tuoi PNG, e le **Voci di corridoio** aggiungono due voci costruite con PNG, luoghi e fazioni della tua campagna, cliccabili.
@@ -150,7 +167,7 @@ I generatori sono scritti apposta per il toolkit e funzionano senza servizi este
 
 ### Compendio
 
-![Il Compendio](docs/img/compendio.png)
+![Il Compendio](scopri/img/app-compendio.jpg)
 
 
 Mostri SRD 5.1 e 5.2.1 con GS normalizzato (comprese le frazioni 1/8, 1/4, 1/2), oggetti magici, equipaggiamento, incantesimi, regole, velocità di cavalcature e veicoli. Homebrew integrato: le note Wiki con tag `#oggetto` o `#mostro` finiscono nel Compendio. Preferiti per campagna, ricerca, filtri per tipo e GS.
@@ -159,7 +176,7 @@ Mostri SRD 5.1 e 5.2.1 con GS normalizzato (comprese le frazioni 1/8, 1/4, 1/2),
 
 ### Sessione Zero e sicurezza
 
-![Sessione Zero](docs/img/sessione-zero.png)
+![Sessione Zero](scopri/img/app-sessione-zero.jpg)
 
 - **Aspettative del tavolo** — tono, morte dei personaggi, conflitto tra PG, quanto combattimento, esplorazione e dialoghi, regole della casa.
 - **Linee e veli** — cosa non comparirà mai e cosa resterà fuori scena, con gli spunti più comuni da aggiungere in un clic.
@@ -230,6 +247,11 @@ Un account anonimo si può trasformare in account Google in qualsiasi momento se
 ## App installabile e offline
 
 DM Toolkit si installa come un'app: "Installa app" in Chrome o Edge su PC, "Aggiungi alla schermata Home" su iPad, iPhone e Android.
+
+<p>
+  <img src="docs/img/telefono-dashboard.jpg" width="260" alt="La Dashboard su telefono">
+  <img src="docs/img/telefono-png.jpg" width="260" alt="La scheda di un PNG su telefono">
+</p>
 
 - **Funziona offline** in tutte le sue parti: al primo avvio con internet scarica dati, Compendio, generatori, font e librerie. Le immagini delle mappe già viste si vedono anche senza connessione. Le modifiche fatte offline si sincronizzano al ritorno della rete.
 - **Aggiornamenti** — all'apertura arriva sempre la versione più recente. Se l'app resta aperta a lungo (succede spesso su tablet) e nel frattempo esce un aggiornamento, compare un banner "È disponibile una nuova versione" con il pulsante Aggiorna, che prima aspetta la fine dei salvataggi in corso.
