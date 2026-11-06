@@ -3812,10 +3812,9 @@ const App = (() => {
     // tema, ma va ricalcolato: la sua luminosita' segue il tema chiaro/scuro appena scelto,
     // il colore scelto resta solo la tonalita'. Cosi' il toggle ha sempre un effetto visibile
     // invece di essere ignorato o di azzerare la scelta dell'utente.
-    const bgColor = Storage.getSettings()?.bgColor;
-    if (bgColor && bgColor !== 'default') {
-      try { Settings.reapplyBg(); } catch(e) {}
-    }
+    // Lo sfondo scelto sta nelle impostazioni di Settings (dm_settings), non in quelle di Storage:
+    // e' reapplyBg a leggerlo, e non fa nulla se lo sfondo e' quello predefinito.
+    try { Settings.reapplyBg(); } catch(e) {}
 
     Debug.log(`Tema: ${theme}`);
   };
@@ -11854,7 +11853,11 @@ const WikiGrafo = (() => {
       if (!map[id]) { const n={id,label,tipo,ref,deg:0}; nodes.push(n); map[id]=n; }
       return map[id];
     };
-    const link = (s,t) => { if(map[s]&&map[t]&&s!==t){ links.push({source:s,target:t}); map[s].deg++; map[t].deg++; } };
+    const visti = new Set();
+    const link = (s,t) => {
+      const chiave = s < t ? s+'|'+t : t+'|'+s;
+      if(map[s]&&map[t]&&s!==t&&!visti.has(chiave)){ visti.add(chiave); links.push({source:s,target:t}); map[s].deg++; map[t].deg++; }
+    };
 
     if (showWiki) ['lore','sessioni'].forEach(sec => (wiki[sec]||[]).forEach(n => add('w_'+n.id, n.titolo||'—', sec==='sessioni'?'sessione':'wiki', {sec,id:n.id})));
     if (showPng)  (camp?.npcs||[]).forEach(n => add('p_'+n.id, n.name||n.nome||'', 'png', {id:n.id}));
@@ -11873,6 +11876,20 @@ const WikiGrafo = (() => {
       });
     }));
     if (showPng&&showFaz) (camp?.npcs||[]).forEach(n=>{ if(n.factionId)link('p_'+n.id,'f_'+n.factionId); });
+
+    // I campi @menzione delle schede (sede, fazione, regione, leader) sono legami veri quanto i link nelle note
+    const nomi = (v) => String(v||'').split(/[,;]/).map(s=>s.trim().replace(/^@/,'').toLowerCase()).filter(Boolean);
+    const cerca = (lista, nome, pref) => { const x=(lista||[]).find(e=>(e.nome||e.name||'').trim().toLowerCase()===nome); return x ? pref+x.id : null; };
+    const lega = (src, valore, lista, pref) => nomi(valore).forEach(nome => { const t=cerca(lista,nome,pref); if(t)link(src,t); });
+    (camp?.npcs||[]).forEach(n => {
+      lega('p_'+n.id, n.sede||n.location, camp?.locations, 'l_');
+      lega('p_'+n.id, n.fazione, camp?.factions, 'f_');
+    });
+    (camp?.locations||[]).forEach(l => lega('l_'+l.id, l.regione, camp?.locations, 'l_'));
+    (camp?.factions||[]).forEach(f => {
+      lega('f_'+f.id, f.sede, camp?.locations, 'l_');
+      lega('f_'+f.id, f.leader, camp?.npcs, 'p_');
+    });
     return {nodes,links};
   };
 
@@ -11924,10 +11941,10 @@ const WikiGrafo = (() => {
     const defs=d3svg.append('defs');
     defs.append('marker').attr('id','arr').attr('viewBox','0 -5 10 10').attr('refX',22).attr('refY',0)
       .attr('markerWidth',5).attr('markerHeight',5).attr('orient','auto')
-      .append('path').attr('d','M0,-5L10,0L0,5').attr('fill','#444');
+      .append('path').attr('d','M0,-5L10,0L0,5').style('fill','var(--text-muted)');
 
     const lnk=g.append('g').selectAll('line').data(links).enter().append('line')
-      .attr('stroke','#444').attr('stroke-width',1.5).attr('marker-end','url(#arr)').attr('opacity',0.5);
+      .style('stroke','var(--text-muted)').attr('stroke-width',1.5).attr('marker-end','url(#arr)').attr('opacity',0.7);
 
     const nd=g.append('g').selectAll('g').data(nodes).enter().append('g').attr('cursor','pointer')
       .call(d3.drag()
@@ -11938,16 +11955,18 @@ const WikiGrafo = (() => {
 
     nd.append('circle').attr('r',d=>Math.max(16,12+d.deg*3))
       .attr('fill',d=>C[d.tipo]||'#888').attr('fill-opacity',0.85)
-      .attr('stroke','#1a1a1a').attr('stroke-width',2);
+      .style('stroke','var(--bg-primary)').attr('stroke-width',2);
     nd.append('text').attr('text-anchor','middle').attr('dy','0.35em').attr('font-size','12').text(d=>I[d.tipo]||'📄');
     nd.append('text').attr('text-anchor','middle').attr('dy',d=>Math.max(16,12+d.deg*3)+13)
-      .attr('fill','#ccc').attr('font-size','10').text(d=>d.label.length>16?d.label.slice(0,14)+'…':d.label);
+      .style('fill','var(--text-secondary)').attr('font-size','10').text(d=>d.label.length>16?d.label.slice(0,14)+'…':d.label);
 
     _sim=d3.forceSimulation(nodes)
-      .force('link',d3.forceLink(links).id(d=>d.id).distance(110).strength(0.8))
-      .force('charge',d3.forceManyBody().strength(-280))
+      .force('link',d3.forceLink(links).id(d=>d.id).distance(150).strength(0.5))
+      .force('charge',d3.forceManyBody().strength(-620))
       .force('center',d3.forceCenter(W/2,H/2))
-      .force('collision',d3.forceCollide(35))
+      .force('x',d3.forceX(W/2).strength(0.04))   // i nodi senza legami non scappano fuori dalla vista
+      .force('y',d3.forceY(H/2).strength(0.07))
+      .force('collision',d3.forceCollide(48))
       .on('tick',()=>{
         lnk.attr('x1',d=>d.source.x).attr('y1',d=>d.source.y).attr('x2',d=>d.target.x).attr('y2',d=>d.target.y);
         nd.attr('transform',d=>'translate('+d.x+','+d.y+')');

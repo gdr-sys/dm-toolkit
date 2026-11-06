@@ -62,8 +62,10 @@ const Araldica = (() => {
     const col = ['rosso', 'azzurro', 'verde', 'nero', 'porpora'], met = ['oro', 'argento'];
     const metalloSotto = r.chance(0.3), a = metalloSotto ? r.pick(met) : r.pick(col), b = metalloSotto ? r.pick(col) : r.pick(met);
     const partizione = r.chance(0.3) ? 'pieno' : r.pick(Object.keys(PARTIZIONI));
+    // Un sole a raggi nero ricorda il "sole nero" neonazista: il caso non lo propone. A mano resta possibile.
+    const simboloDalCaso = (s) => (s === 'sole' && (a === 'nero' || b === 'nero') ? 'luna' : s);
     return {
-      forma: r.pick(Object.keys(FORME)), partizione, smalto1: a, smalto2: b, simbolo: r.pick(Object.keys(SIMBOLI)), motto: r.pick(MOTTI),
+      forma: r.pick(Object.keys(FORME)), partizione, smalto1: a, smalto2: b, simbolo: simboloDalCaso(r.pick(Object.keys(SIMBOLI))), motto: r.pick(MOTTI),
       disposizione: partizione === 'pieno' && r.chance(0.3) ? 'tre' : 'uno', bordura: r.chance(0.3), ornamento: r.pick(Object.keys(ORNAMENTI)),
     };
   };

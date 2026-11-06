@@ -57,18 +57,22 @@ Per vederla in azione: apri l'app e, nella Home vuota, scegli **"Prova con una c
 
 ### Wiki
 
+![Una nota della Wiki con i collegamenti a luoghi, personaggi e fazioni](scopri/img/app-wiki.jpg)
+
 Editor con barra di formattazione (titoli, grassetto, corsivo, colori, evidenziatore) e riquadri speciali: Da leggere ad alta voce, Segreto DM, Bottino, Indizio, Trappola, Idea al volo. Le note supportano:
 
 - **Collegamenti** — `[[Nome PNG]]`, `[[location:Castello]]`, `[[faction:Gilda]]`, con navigazione diretta all'elemento collegato
 - **@menzioni** — scrivi `@` in qualsiasi editor per scegliere un elemento della campagna, o crearne uno nuovo al volo
 - **Tag** — `#tag` colorati, con barra e filtro
 - **Collegamenti inversi** — ogni nota sa chi la cita
-- **Grafo** — tutti i collegamenti tra gli elementi della campagna, cliccabili
+- **Grafo** — tutti i legami della campagna, cliccabili: i collegamenti nelle note e i campi delle schede, come la sede di un PNG o la sua fazione
 - **Modelli** — Sessione, Lore, PNG, Luogo, Oggetto magico, Dungeon/Stanza, Evento/Segreto, Negozio, più i tuoi
 - **Import da foglio di calcolo** — PNG, luoghi e altro da CSV (compatibile con Excel in italiano)
 - **Cestino** — le voci eliminate si possono recuperare
 
 La ricerca globale `Ctrl+K` cerca in note, PNG, luoghi, fazioni e Compendio, anche nel contenuto dei campi.
+
+![Il grafo della campagna di esempio](docs/img/grafo.jpg)
 
 ### Mondo
 
@@ -127,6 +131,8 @@ I generatori sono scritti apposta per il toolkit e funzionano senza servizi este
 - **Eventi e scadenze** con promemoria; le scadenze vicine compaiono nella Dashboard.
 - **Conseguenze programmate** — una scadenza può dire cosa succede se il party non interviene: prima della data compare come "Se scade…", dopo come "È successo…". Anche un clock pieno mostra la sua conseguenza.
 - **Timeline** di eventi e sessioni: gli eventi vicini nel tempo vanno su righe diverse, così i nomi non si sovrappongono mai. Lo zoom allarga solo il tempo, le scritte restano leggibili.
+
+![La timeline della campagna di esempio](docs/img/timeline.jpg)
 
 ### Sessioni
 
@@ -251,6 +257,7 @@ DM Toolkit si installa come un'app: "Installa app" in Chrome o Edge su PC, "Aggi
 <p>
   <img src="docs/img/telefono-dashboard.jpg" width="260" alt="La Dashboard su telefono">
   <img src="docs/img/telefono-png.jpg" width="260" alt="La scheda di un PNG su telefono">
+  <img src="docs/img/telefono-combat.jpg" width="260" alt="Il combat tracker su telefono">
 </p>
 
 - **Funziona offline** in tutte le sue parti: al primo avvio con internet scarica dati, Compendio, generatori, font e librerie. Le immagini delle mappe già viste si vedono anche senza connessione. Le modifiche fatte offline si sincronizzano al ritorno della rete.

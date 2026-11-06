@@ -797,3 +797,30 @@
   }
   #quick-view-panel.qv-visible { transform: translateY(0); }
 }
+
+
+/* Combat tracker fino ai 768px: la riga si divide su due righe, cosi' iniziativa, nome e CA
+   stanno sopra, PF e azioni sotto. Non si nasconde piu' niente e i bottoni restano toccabili,
+   anche con il testo ingrandito dalle Impostazioni. */
+@media (max-width: 768px) {
+  .combat-header > div:last-child, .combat-footer { flex-wrap:wrap; }
+  .combat-list .combat-row {
+    display:grid; grid-template-columns:52px 72px minmax(0,1fr) auto;
+    grid-template-areas:"init name name ca" "hp hp actions actions";
+    align-items:center; gap:6px 10px; padding:10px var(--space-sm);
+  }
+  .combat-list .combat-init-col { grid-area:init; width:auto; }
+  .combat-round-badge { white-space:nowrap; }
+  .combat-list .combat-init-input { width:52px; padding:4px 0; appearance:textfield; -moz-appearance:textfield; }
+  .combat-list .combat-init-input::-webkit-inner-spin-button, .combat-list .combat-init-input::-webkit-outer-spin-button { appearance:none; margin:0; }
+  .combat-list .combat-name-col { grid-area:name; overflow-wrap:anywhere; }
+  .combat-list .combat-ca-col { grid-area:ca; display:block; }
+  .combat-list .combat-hp-col { grid-area:hp; width:auto; }
+  .combat-list .combat-actions-col { grid-area:actions; flex-wrap:wrap; justify-content:flex-end; gap:2px; }
+  .combat-list .combat-actions-col .btn-icon-sm { width:34px !important; height:34px !important; }
+  .combat-list .combat-actions-col .btn-icon-sm:nth-child(n+5) { display:inline-flex; }
+}
+@media (max-width: 430px) {
+  .combat-list .combat-actions-col { gap:0; }
+  .combat-list .combat-actions-col .btn-icon-sm { width:30px !important; }
+}
