@@ -26,6 +26,7 @@ const Cartografo = (() => {
   let _turno = 0;          // una generazione superata da una piu' recente non si mostra
   let _timer = null;
   let _montata = false;
+  let _contesto = null;    // { mappaId, mappaNome, pinId, nome }: la mappa che si sta creando nasce da un pin
 
   /* ── Stato ── */
   const _opzioniValide = (tipo, salvate) => {
@@ -53,15 +54,16 @@ const Cartografo = (() => {
   };
   const _salva = () => { try { localStorage.setItem(KEY, JSON.stringify(_stato)); } catch (e) {} };
   const _attuale = () => _stato.perTipo[_stato.tipo];
+  const _nomeEffettivo = () => _attuale().nome || (_contesto ? _contesto.nome : '');
   const _fotografia = () => ({ tipo: _stato.tipo, ...JSON.parse(JSON.stringify(_attuale())) });
 
   /* ── Font dentro l'immagine: un SVG usato come immagine non vede i font della pagina ── */
-  let _fontPromessa = null;
-  const _font = () => {
-    if (_fontPromessa) return _fontPromessa;
-    _fontPromessa = (async () => {
+  const _fontCache = new Map();
+  const _fontDa = (indirizzo) => {
+    if (_fontCache.has(indirizzo)) return _fontCache.get(indirizzo);
+    const promessa = (async () => {
       try {
-        const css = await (await fetch(FONT_CSS)).text();
+        const css = await (await fetch(indirizzo)).text();
         const blocchi = css.match(/\/\*\s*latin\s*\*\/\s*@font-face\s*\{[^}]*\}/g) || [];
         const dati = new Map();
         const leggi = async (url) => {
@@ -79,19 +81,21 @@ const Cartografo = (() => {
         }));
         return out.join('');
       } catch (e) {
-        _fontPromessa = null; // senza rete si riprova la prossima volta; intanto i font di riserva
+        _fontCache.delete(indirizzo); // senza rete si riprova la prossima volta; intanto i font di riserva
         return '';
       }
     })();
-    return _fontPromessa;
+    _fontCache.set(indirizzo, promessa);
+    return promessa;
   };
+  const _font = () => _fontDa(FONT_CSS);
   const _conFont = (svg, css) => (css ? svg.replace('<defs>', '<defs><style>' + css + '</style>') : svg);
-  const _inCanvas = (svg, W, H) => new Promise((ok, no) => {
+  const _inCanvas = (svg, W, H, scala = SCALA_IMMAGINE) => new Promise((ok, no) => {
     const img = new Image();
     img.onload = () => {
       try {
         const c = document.createElement('canvas');
-        c.width = W * SCALA_IMMAGINE; c.height = H * SCALA_IMMAGINE;
+        c.width = W * scala; c.height = H * scala;
         c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
         ok(c);
       } catch (e) { no(e); }
@@ -111,7 +115,7 @@ const Cartografo = (() => {
       if (turno !== _turno) return;
       const a = _attuale(), tipo = _stato.tipo;
       try {
-        const m = K().genera(tipo, { ...a.opzioni, seme: a.seme, nome: a.nome });
+        const m = K().genera(tipo, { ...a.opzioni, seme: a.seme, nome: _nomeEffettivo() });
         const css = await _font();
         if (turno !== _turno) return;
         m.svgCompleto = _conFont(m.svg, css);
@@ -183,7 +187,7 @@ const Cartografo = (() => {
     const scelte = T.opzioni.filter((x) => !x.c), spunte = T.opzioni.filter((x) => x.c);
     $('carto-controlli').innerHTML =
       '<div class="form-group"><label class="form-label" for="carto-nome">Nome sulla mappa</label>' +
-        '<input type="text" id="carto-nome" class="form-input" autocomplete="off" value="' + _esc(a.nome) + '" placeholder="Casuale" onchange="Cartografo._nome(this.value)"></div>' +
+        '<input type="text" id="carto-nome" class="form-input" autocomplete="off" value="' + _esc(_nomeEffettivo()) + '" placeholder="Casuale" onchange="Cartografo._nome(this.value)"></div>' +
       '<div class="carto-griglia">' +
         scelte.map((x) => sel('carto-op-' + x.k, x.l, x.v, a.opzioni[x.k], 'Cartografo._opzione(\'' + x.k + '\',this.value)')).join('') +
         sel('carto-colori', 'Colori', T.colori, a.opzioni.palette, 'Cartografo._opzione(\'palette\',this.value)') +
@@ -199,6 +203,33 @@ const Cartografo = (() => {
     const prec = $('carto-precedente');
     if (prec) prec.disabled = !_storia.length;
   };
+
+  /* ── La mappa nasce da un pin: tipo e opzioni suggeriti, nome gia' deciso ── */
+  const DA_LUOGO = {
+    'Città': { tipo: 'citta', opzioni: { taglia: 'media' } }, Porto: { tipo: 'citta', opzioni: { taglia: 'media', costa: true } },
+    Villaggio: { tipo: 'villaggio', opzioni: {} }, Paese: { tipo: 'villaggio', opzioni: { taglia: 'grande' } },
+    Dungeon: { tipo: 'dungeon', opzioni: {} }, Tempio: { tipo: 'dungeon', opzioni: { tema: 'tempio' } }, Castello: { tipo: 'dungeon', opzioni: { tema: 'fortezza' } },
+    Taverna: { tipo: 'abitazione', opzioni: { edificio: 'taverna' } }, Torre: { tipo: 'abitazione', opzioni: { edificio: 'torre' } },
+    Foresta: { tipo: 'caverna', opzioni: { ambiente: 'radura' } }, Regione: { tipo: 'regno', opzioni: { forma: 'continente' } },
+  };
+  const _bannerContesto = () => {
+    const el = $('carto-contesto');
+    if (!el) return;
+    el.hidden = !_contesto;
+    if (_contesto) $('carto-contesto-testo').innerHTML = 'Stai creando la mappa di <strong>' + _esc(_contesto.nome) + '</strong>. Si aprirà dal suo pin su “' + _esc(_contesto.mappaNome) + '”.';
+  };
+  const perPin = (ctx) => {
+    _monta();
+    _ricordaPrecedente();
+    const g = ctx.genera || DA_LUOGO[ctx.tipoLuogo] || { tipo: _stato.tipo, opzioni: {} };
+    _contesto = ctx;
+    _stato.tipo = K().TIPI[g.tipo] ? g.tipo : _stato.tipo;
+    const a = _attuale();
+    a.opzioni = _opzioniValide(_stato.tipo, { ...a.opzioni, ...g.opzioni });
+    a.seme = K().seme(); a.nome = '';
+    _aggiornaControlli(); _bannerContesto(); genera();
+  };
+  const annullaContesto = () => { _contesto = null; _bannerContesto(); _aggiornaControlli(); genera(); };
 
   /* ── Anteprima: spostamento e zoom ── */
   const V = { s: 1, fit: 1, x: 0, y: 0, W: 1400, H: 1000 };
@@ -346,6 +377,7 @@ const Cartografo = (() => {
     const drive = typeof DriveBackup !== 'undefined' && DriveBackup.isConnected();
     corpo.innerHTML =
       '<div class="form-group"><label class="form-label" for="carto-mappe-nome">Nome della mappa</label><input type="text" id="carto-mappe-nome" class="form-input" autocomplete="off" value="' + _esc(_mappa.nome) + '"></div>' +
+      (_contesto ? '<div class="carto-nota" style="margin:0 0 10px;">Il pin di <strong>' + _esc(_contesto.nome) + '</strong> su “' + _esc(_contesto.mappaNome) + '” aprirà questa mappa, e potrai tornare indietro.</div>' : '') +
       '<label class="carto-spunta" for="carto-mappe-pin"><input type="checkbox" id="carto-mappe-pin" checked onchange="var s=document.getElementById(\'carto-mappe-schede\');if(s){s.disabled=!this.checked;if(!this.checked)s.checked=false;}"><span>Segna i luoghi con i pin (' + n + '), con le loro note</span></label>' +
       (schede ? '<label class="carto-spunta" for="carto-mappe-schede"><input type="checkbox" id="carto-mappe-schede"><span>Crea anche le schede nella Wiki (' + schede + (schede === 1 ? ' Luogo' : ' Luoghi') + ')</span></label><div class="form-hint" style="margin:0 0 10px 26px;">Ogni pin aprirà la sua scheda. Se un Luogo con lo stesso nome esiste già, si collega a quello.</div>' : '') +
       '<div class="carto-nota"><strong>Distanze pronte:</strong> la scala è già impostata (' + _esc(_scala(_mappa.larghezzaKm)) + ' da un lato all’altro), quindi puoi misurare subito tra due pin.</div>' +
@@ -401,13 +433,15 @@ const Cartografo = (() => {
           x: Math.max(0, Math.min(1, p.x / m.W)), y: Math.max(0, Math.min(1, p.y / m.H)),
           tipo: entita ? 'luoghi' : null, entitaId: entita, label: entita ? '' : p.label,
           sottotipo: entita ? '' : (p.sottotipo || ''), note: entita ? '' : (p.note || ''), colore: '#8b2635',
+          ...(p.genera ? { genera: p.genera } : {}),
         };
       }) : [];
-      const id = MappaUI.aggiungiDaImmagine({ nome, immagine, scalaKm: Math.round(m.larghezzaKm * 1000) / 1000, pins: pin });
+      const id = MappaUI.aggiungiDaImmagine({ nome, immagine, scalaKm: Math.round(m.larghezzaKm * 1000) / 1000, pins: pin, daPin: _contesto ? { mappaId: _contesto.mappaId, pinId: _contesto.pinId } : null });
       const salvata = (App.getActiveCampaign().mappe || []).some((x) => x.id === id);
       if (!salvata) throw new Error('spazio esaurito');
       if (conSchede) { try { WikiSections.renderCounters(); } catch (e) {} }
       Modal.close('carto-mappe');
+      _contesto = null; _bannerContesto();
       App.navigateTo('mappa');
       Toast.show('“' + nome + '” è nelle tue mappe', 'success', 3000);
     } catch (e) {
@@ -426,7 +460,7 @@ const Cartografo = (() => {
     const stretto =
       '.carto-corpo { grid-template-columns:minmax(0,1fr); }' +
       '.carto-anteprima { order:-1; }' +
-      '#carto-stage { height:auto; aspect-ratio:var(--carto-ar, 7/5); }' +
+      '#carto-stage, #carto-contesto:not([hidden]) ~ .carto-corpo #carto-stage { height:auto; aspect-ratio:var(--carto-ar, 7/5); }' +
       // Sulla mappa intera in alto c'e' il titolo: lo zoom non lo deve coprire
       '.carto-zoom { top:auto; bottom:8px; right:8px; }';
     const telefono =
@@ -435,6 +469,8 @@ const Cartografo = (() => {
     st.textContent =
       '#page-cartografo { container-type:inline-size; }' +
       '#carto-tipi { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:var(--space-sm); }' +
+      '#carto-contesto { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:6px 12px; padding:8px 12px; margin-bottom:var(--space-sm); background:var(--bg-tertiary); border:1px solid var(--border-strong); border-radius:var(--radius-md); color:var(--text-primary); font-size:0.92rem; }' +
+      '#carto-contesto[hidden] { display:none; }' +
       '.carto-comandi { display:flex; flex-wrap:wrap; gap:6px; align-items:center; margin-bottom:var(--space-md); }' +
       '.carto-corpo { display:grid; grid-template-columns:minmax(280px,320px) minmax(0,1fr); gap:var(--space-md); align-items:start; }' +
       '.carto-pannello { margin:0; }' +
@@ -452,6 +488,7 @@ const Cartografo = (() => {
       '#carto-info { font-size:0.85rem; color:var(--text-muted); }' +
       '.carto-azioni { display:flex; flex-wrap:wrap; gap:6px; align-items:center; }' +
       '#carto-stage { position:relative; overflow:hidden; height:max(440px, calc(100vh - 300px)); height:max(440px, calc(100dvh - 300px)); background:var(--bg-tertiary); border:1px solid var(--border); border-radius:var(--radius-lg); user-select:none; -webkit-user-select:none; }' +
+      '#carto-contesto:not([hidden]) ~ .carto-corpo #carto-stage { height:max(440px, calc(100vh - 352px)); height:max(440px, calc(100dvh - 352px)); }' +
       '#carto-vista { position:absolute; left:0; top:0; transform-origin:0 0; }' +
       '#carto-vista svg { display:block; width:100%; height:100%; }' +
       '#carto-attesa { position:absolute; left:50%; top:14px; transform:translateX(-50%); padding:6px 14px; background:var(--bg-card); color:var(--text-primary); border:1px solid var(--border); border-radius:var(--radius-full); font-size:0.88rem; box-shadow:var(--shadow-md); z-index:2; white-space:nowrap; }' +
@@ -474,6 +511,7 @@ const Cartografo = (() => {
       '<div class="page-header"><div><h1 class="page-title">Cartografo</h1>' +
         '<p class="page-subtitle">Crea mappe di regni, città, villaggi, caverne, dungeon ed edifici. Scaricale o mettile nelle tue mappe, con i luoghi già segnati.</p></div></div>' +
       '<div id="carto-tipi" role="tablist" aria-label="Tipo di mappa"></div>' +
+      '<div id="carto-contesto" hidden role="status"><span id="carto-contesto-testo"></span><button type="button" class="btn btn-ghost btn-sm" onclick="Cartografo.annullaContesto()">Non collegarla</button></div>' +
       '<div class="carto-comandi">' +
         '<button type="button" class="btn btn-gold btn-sm" onclick="Cartografo.nuova()" title="Una mappa diversa, con le stesse opzioni">Nuova mappa</button>' +
         '<button type="button" class="btn btn-secondary btn-sm" onclick="Cartografo.aCaso()" title="Stesso tipo di mappa, con forma, dimensione e opzioni scelte a caso">A caso</button>' +
@@ -518,5 +556,6 @@ const Cartografo = (() => {
   };
   document.addEventListener('DOMContentLoaded', () => setTimeout(() => { _aggancia(); if ($('page-cartografo')?.classList.contains('active')) apri(); }, 200));
 
-  return { apri, nuova, aCaso, _tieniColori, precedente, scegliTipo, zoom, zoomReset, scaricaPng, scaricaSvg, apriMettiNelleMappe, _confermaMappe, _opzione, _nome, _seme };
+  const strumenti = { fontDa: _fontDa, conFont: _conFont, inCanvas: _inCanvas, scarica: _scarica, stile: _stile };
+  return { strumenti, perPin, annullaContesto, apri, nuova, aCaso, _tieniColori, precedente, scegliTipo, zoom, zoomReset, scaricaPng, scaricaSvg, apriMettiNelleMappe, _confermaMappe, _opzione, _nome, _seme };
 })();

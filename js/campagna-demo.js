@@ -139,5 +139,14 @@ const CampagnaDemo = (() => {
     App.navigateTo('campagna');
   };
 
+  // Dalla pagina di presentazione (?demo=1) si arriva direttamente nella campagna di esempio
+  document.addEventListener('DOMContentLoaded', () => {
+    if (!new URLSearchParams(location.search).has('demo')) return;
+    setTimeout(() => {
+      try { crea(); } catch (e) {}
+      history.replaceState(null, '', location.pathname);
+    }, 700);
+  });
+
   return { crea, NOME };
 })();

@@ -22,6 +22,7 @@ Per vederla in azione: apri l'app e, nella Home vuota, scegli **"Prova con una c
 | Mondo | PNG, Luoghi, Fazioni, Quest, PG, Trame, Incontri |
 | Mappe | Mappe interattive con segnaposto, mappe annidate, misura distanze, zoom con due dita |
 | Cartografo | Genera mappe di regni, città, villaggi, caverne, dungeon ed edifici e le mette nelle tue mappe |
+| Scrittoio | Stemmi per fazioni e luoghi; lettere, taglie, editti, avvisi e mappe del tesoro scritti con i nomi della campagna |
 | Calendario | Calendario in-world personalizzabile, eventi, scadenze, timeline |
 | Sessioni | Combat tracker, scene planner, diario delle sessioni, clock |
 | Generatori | 22 generatori pronti + **le tue tabelle casuali** |
@@ -83,11 +84,22 @@ Crea una mappa da zero, senza caricare nulla: **regno** (isola, continente, arci
 
 - Scegli forma, dimensione, colori e cosa mostrare, oppure lascia fare al caso con **A caso**: resta nel tipo di mappa scelto e, con **Tieni i miei colori**, non cambia il tuo stile. **Mappa precedente** ti riporta a quella di prima.
 - **Metti nelle mappe** la porta nella pagina Mappa con la scala già impostata e i luoghi segnati dai pin con le loro note. A richiesta crea anche le schede Luogo nella Wiki.
+- **Genera la sua mappa**: clicca un pin e crea la mappa di quel luogo, già collegata. La città nata da un regno eredita ciò che lì si vede, come il mare e il fiume. Così si scende dal regno alla città fino alla locanda, e si torna indietro.
 - **Scarica PNG o SVG** per stamparla o usarla altrove. Il codice della mappa, con le stesse opzioni, ridà la stessa mappa.
 
 ![Un regno generato nella pagina Mappa, con i luoghi già segnati dai pin](docs/img/cartografo-mappa.png)
 
 I generatori sono scritti apposta per il toolkit e funzionano senza servizi esterni. Senza Google Drive collegato, l'immagine messa nelle mappe resta solo sul dispositivo.
+
+### Scrittoio
+
+![Uno stemma e i documenti che si possono creare: lettera, taglia, editto, avviso e mappa del tesoro](docs/img/scrittoio-documenti.png)
+
+- **Stemmi** con forma, colori, simbolo, corona, mantello e motto. Assegnato a una Fazione o a un Luogo, diventa l'immagine della sua scheda; quello di una Fazione diventa anche il sigillo dei suoi documenti. Se hai già uno stemma tuo, caricalo come immagine nella scheda della Fazione: finisce su editti e lettere.
+- **Documenti da consegnare ai giocatori**: lettere sigillate, taglie, editti, avvisi da bacheca e mappe del tesoro. Il testo nasce con i nomi di PNG, luoghi e fazioni della campagna e si può sempre modificare, così come la carta e il suo stato.
+- **Salva nella Wiki** lo mette tra le schede Lore, da cui la **Vista giocatori** può condividerlo. L'immagine si salva nella scheda solo con Google Drive collegato; altrimenti resta il testo e puoi scaricare il PNG.
+
+![La pagina dello Scrittoio](docs/img/scrittoio.png)
 
 ### Calendario e Timeline
 
@@ -98,6 +110,8 @@ I generatori sono scritti apposta per il toolkit e funzionano senza servizi este
 - **Timeline** di eventi e sessioni: gli eventi vicini nel tempo vanno su righe diverse, così i nomi non si sovrappongono mai. Lo zoom allarga solo il tempo, le scritte restano leggibili.
 
 ### Sessioni
+
+![Il combat tracker durante uno scontro](docs/img/sessione.png)
 
 - **Combat tracker** — iniziativa, PF, CA, condizioni, concentrazione con CD automatica, effetti con conto alla rovescia dei round, riposi brevi e lunghi.
 - **Schermo sempre acceso** — su tablet e telefono lo schermo non si spegne durante uno scontro (oppure sempre, o mai: si sceglie nelle Impostazioni).

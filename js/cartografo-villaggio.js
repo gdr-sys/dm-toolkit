@@ -394,7 +394,7 @@ const CartoVillaggio = (() => {
     }
     speciali.forEach((e) => {
       testi += M.etichetta(e.x, e.y + Math.max(e.lung, e.larg) * 0.6 + 16, e.nome, t, { size: 17, peso: 600, colore: t.testo, alone: t.testoAlone, aloneW: 3.5 });
-      pin.push({ x: e.x, y: e.y, label: e.nome, note: e.nota, sottotipo: '', tipoLuogo: /^Chiesa/.test(e.nome) ? 'Tempio' : /^Locanda/.test(e.nome) ? 'Taverna' : '' });
+      pin.push({ x: e.x, y: e.y, label: e.nome, note: e.nota, sottotipo: '', tipoLuogo: /^Chiesa/.test(e.nome) ? 'Tempio' : /^Locanda/.test(e.nome) ? 'Taverna' : '', genera: /^Chiesa/.test(e.nome) ? { tipo: 'dungeon', opzioni: { tema: 'cripta' } } : { tipo: 'abitazione', opzioni: { edificio: /^Locanda/.test(e.nome) ? 'taverna' : 'casa' } } });
     });
 
     const abitanti = Math.round((fatte + 3) * r.range(5.2, 7.4) / 10) * 10;

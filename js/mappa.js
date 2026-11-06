@@ -310,11 +310,26 @@ const MappaUI = (() => {
   };
 
   // Mappa gia' pronta, con immagine, scala e pin (dal Cartografo): la si apre subito
-  const aggiungiDaImmagine = ({ nome, immagine, scalaKm, pins }) => {
+  const aggiungiDaImmagine = ({ nome, immagine, scalaKm, pins, daPin }) => {
     const nuova = { id: 'mappa_' + Date.now() + '_' + Math.random().toString(36).slice(2, 5), nome, immagine, scalaKm: scalaKm || 0, pins: pins || [], adatta: true };
-    _saveMappe([..._getMappe(), nuova]);
-    _navStack = [nuova.id];
+    // Nata da un pin: quel pin la apre (e resta collegato alla sua scheda), e si puo' tornare indietro
+    const tutte = _getMappe().map((m) => (daPin && m.id === daPin.mappaId
+      ? { ...m, pins: (m.pins || []).map((p) => (p.id === daPin.pinId ? { ...p, apreMappa: nuova.id } : p)) }
+      : m));
+    _saveMappe([...tutte, nuova]);
+    _navStack = daPin ? [daPin.mappaId, nuova.id] : [nuova.id];
     return nuova.id;
+  };
+
+  // Dal pin al Cartografo: apre il generatore gia' impostato su quel luogo
+  const generaDaPin = (pinId) => {
+    const pin = _trovaPin(pinId), mappa = _getMappaAttiva();
+    if (!pin || !mappa) return;
+    document.getElementById('mappa-pin-popover').style.display = 'none';
+    let tipoLuogo = null;
+    if (pin.tipo === 'luoghi') tipoLuogo = (WikiSections._getCfg('luoghi').getData(_getCamp()) || []).find((x) => x.id === pin.entitaId)?.tipo || null;
+    App.navigateTo('cartografo');
+    Cartografo.perPin({ mappaId: mappa.id, mappaNome: mappa.nome, pinId, nome: _nomePin(pin).replace(/^\d+\.\s*/, ''), genera: pin.genera || null, tipoLuogo });
   };
 
   const _renderPins = () => {
@@ -345,6 +360,7 @@ const MappaUI = (() => {
       } else {
         centro = ICONA_LIBERO[p.sottotipo || ''] || ICONA_DEFAULT;
       }
+      if (p.apreMappa && mappe.some((m) => m.id === p.apreMappa)) centro = ICONA_MAPPA;
       const colore = p.colore || COLORI[0];
       // Il titolo al passaggio del mouse anticipa anche l'inizio della nota,
       // cosi' non serve aprire il pin solo per ricordarsi cosa c'e' scritto.
@@ -711,7 +727,7 @@ const MappaUI = (() => {
         ...m,
         pins: (m.pins || []).map(p => p.tipo === 'mappa' && p.entitaId === mappa.id
           ? { ...p, tipo: null, entitaId: null, label: p.label || '(mappa eliminata)' }
-          : p),
+          : (p.apreMappa === mappa.id ? { ...p, apreMappa: null } : p)),
       }));
       _saveMappe(pulite);
       _navStack = _navStack.filter(id => id !== mappa.id);
@@ -938,6 +954,9 @@ const MappaUI = (() => {
       '<div style="display:flex;flex-direction:column;gap:4px;">' +
         (item ? '<button class="btn btn-secondary btn-sm" onclick="QuickView.open(\'' + pin.tipo + '\',\'' + pin.entitaId + '\');document.getElementById(\'mappa-pin-popover\').style.display=\'none\';">Apri scheda</button>' : '') +
         (mappaCollegata ? '<button class="btn btn-secondary btn-sm" onclick="MappaUI.entraInMappa(\'' + mappaCollegata.id + '\')">Apri questa mappa</button>' : '') +
+        (pin.tipo === 'mappa' ? '' : (_getMappe().some((m) => m.id === pin.apreMappa)
+          ? '<button class="btn btn-primary btn-sm" onclick="MappaUI.entraInMappa(\'' + pin.apreMappa + '\')">Apri la sua mappa</button>'
+          : '<button class="btn btn-secondary btn-sm" onclick="MappaUI.generaDaPin(\'' + pinId + '\')">Genera la sua mappa</button>')) +
         '<button class="btn btn-ghost btn-sm" onclick="MappaUI.modificaPin(\'' + pinId + '\')">Modifica pin</button>' +
         '<button class="btn btn-ghost btn-sm" onclick="MappaUI.iniziaMisuraDaPin(\'' + pinId + '\')">Misura distanza da qui</button>' +
         '<button class="btn btn-ghost btn-sm" style="color:var(--danger-text);" onclick="MappaUI.rimuoviPin(\'' + pinId + '\')">Rimuovi pin</button>' +
@@ -1052,7 +1071,7 @@ const MappaUI = (() => {
 
   return {
     init, zoom, zoomReset,
-    vaiAMappa, tornaIndietro, entraInMappa, nuovaMappa, eliminaMappaCorrente, aggiungiDaImmagine,
+    vaiAMappa, tornaIndietro, entraInMappa, nuovaMappa, eliminaMappaCorrente, aggiungiDaImmagine, generaDaPin,
     apriImpostazioni, salvaImpostazioni, _onFilePicked,
     apriModalNuovoPin, confermaNuovoPin, modificaPin, _onPinTipoChange, _onPinEntitaChange, _pickColore,
     onPinClick, rimuoviPin, iniziaMisuraDaPin, _ricalcolaMisura,

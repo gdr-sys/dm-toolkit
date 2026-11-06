@@ -558,6 +558,8 @@ const CartoRegno = (() => {
         g += casetta(x - 28, y + 5, 9, t) + casetta(x + 2, y + 9, 9, t) + casetta(x + 18, y + 8, 7.5, t) + anello.davanti;
         if (r.chance(0.7)) g += mulino(x + 52, y + 2, 10, t);
         g += casetta(x - 62, y + 12, 8.5, t) + casetta(x + 44, y + 22, 8, t);
+        // Ogni capoluogo ha il suo stemma, sempre lo stesso per lo stesso nome
+        if (o.stemmi !== false && typeof Araldica !== 'undefined') g += Araldica.scudo(Araldica.casuale(c.nome), x - 64, y - 42, 42, true);
       } else if (c.rango === 1) {
         const anello = cinta(x, y + 2, 25, 10.5, t);
         g += anello.dietro + torre(x + r.range(-5, 5), y - 2, 10, 25, t, true) + casetta(x - 18, y + 4, 7.5, t) + casetta(x + 3, y + 6, 7.5, t) + anello.davanti;
@@ -700,8 +702,16 @@ const CartoRegno = (() => {
       const km5 = (km) => (km >= 10 ? Math.round(km / 5) * 5 : Math.round(km)) + ' km';
       const vie = c.legami.filter((q) => !q[2]).map(([n, km]) => n + ': ' + km5(km) + ' (' + Math.max(1, Math.round(km / 32)) + ' g a piedi)').join('; ');
       const mare = c.legami.filter((q) => q[2]).map(([n, km]) => n + ': ' + km5(km) + ' (' + Math.max(1, Math.round(km / 80)) + ' g in nave)').join('; ');
-      return { x: c.x, y: c.y, label: c.nome, sottotipo: '', tipoLuogo: c.rango >= 1 ? 'Città' : 'Villaggio', note: ruolo + '.' + (vie ? ' Strade per ' + vie + '.' : '') + (mare ? ' Via mare per ' + mare + '.' : '') };
-    }).concat(notevoli.map((c) => ({ x: c.x, y: c.y, label: c.nome, sottotipo: 'pericolo', tipoLuogo: 'Dungeon', note: 'Luogo misterioso, tutto da riempire.' })));
+      // La mappa figlia eredita cio' che qui si vede gia': il mare accanto, il fiume che passa
+      const ci = c.k % cw, cj = (c.k - ci) / cw;
+      let sulMare = false;
+      for (let a = -4; a <= 4; a++) for (let b = -4; b <= 4; b++) { const u = ci + a, v = cj + b; if (u >= 0 && v >= 0 && u < cw && v < ch && eg[id(u, v)] <= 0) sulMare = true; }
+      const conFiume = !!piuFiume[c.k];
+      const genera = c.rango === 0
+        ? { tipo: 'villaggio', opzioni: { taglia: 'medio', fiume: conFiume } }
+        : { tipo: 'citta', opzioni: { taglia: c.rango === 2 ? 'grande' : 'media', costa: sulMare, fiume: conFiume, mura: true, castello: c.rango === 2 } };
+      return { x: c.x, y: c.y, label: c.nome, sottotipo: '', genera, tipoLuogo: c.rango >= 1 ? 'Città' : 'Villaggio', note: ruolo + '.' + (vie ? ' Strade per ' + vie + '.' : '') + (mare ? ' Via mare per ' + mare + '.' : '') };
+    }).concat(notevoli.map((c) => ({ x: c.x, y: c.y, label: c.nome, sottotipo: 'pericolo', tipoLuogo: 'Dungeon', genera: { tipo: 'dungeon', opzioni: {} }, note: 'Luogo misterioso, tutto da riempire.' })));
 
     const svg = M.apri(W, H, M.PALETTE.pergamena, o.seme) + s + (o.nomi === false ? '' : testi) + rosaOro(rx, ry, 92, t) + cornice + scala + '</svg>';
     return { nome, pin, W, H, larghezzaKm: W * kmPx, svg };

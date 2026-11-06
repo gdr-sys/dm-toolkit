@@ -16,7 +16,7 @@ const CartoCatalogo = (() => {
         S('forma', 'Forma', [['isola', 'Isola'], ['continente', 'Continente'], ['arcipelago', 'Arcipelago'], ['costa', 'Costa']], 'isola'),
         S('clima', 'Clima', [['temperato', 'Temperato'], ['freddo', 'Freddo'], ['arido', 'Arido']], 'temperato'),
         S('taglia', 'Insediamenti', [['pochi', 'Pochi'], ['normali', 'Normali'], ['molti', 'Molti']], 'normali'),
-        C('distanze', 'Distanze', true, 0.8), C('confini', 'Confini', false, 0.3),
+        C('distanze', 'Distanze', true, 0.8), C('confini', 'Confini', false, 0.3), C('stemmi', 'Stemmi', true, 0.7),
       ],
     },
     citta: {

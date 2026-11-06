@@ -533,9 +533,9 @@ const CartoInsediamenti = (() => {
     // Il pin punta al luogo vero, non alla scritta: cosi' non copre il nome
     Object.assign(pin[pin.length - 1], { x: piazza.centro[0], y: piazza.centro[1] });
     if (tempio) metti(tempio.centro[0], tempio.centro[1] + (tempioSotto ? 38 : -30), 'Tempio di ' + r.pick(SANTI), { size: 16, peso: 600, corsivo: true }, 'Il tempio principale, accanto alla piazza.');
-    if (tempio) Object.assign(pin[pin.length - 1], { x: tempio.centro[0], y: tempio.centro[1], tipoLuogo: 'Tempio' });
+    if (tempio) Object.assign(pin[pin.length - 1], { x: tempio.centro[0], y: tempio.centro[1], tipoLuogo: 'Tempio', genera: { tipo: 'dungeon', opzioni: { tema: 'tempio' } } });
     if (castello) metti(castello.centro[0], castello.centro[1] + 6, 'Castello', { size: 18, font: M.FONT_TITOLO, peso: 700 }, 'Sede del potere cittadino, con cinta muraria propria.');
-    if (castello) Object.assign(pin[pin.length - 1], { tipoLuogo: 'Castello', y: castello.centro[1] - 12 });
+    if (castello) Object.assign(pin[pin.length - 1], { tipoLuogo: 'Castello', y: castello.centro[1] - 12, genera: { tipo: 'dungeon', opzioni: { tema: 'fortezza' } } });
     if (o.mura) porte.forEach((t) => usate.push(vertici[t]));
     // Nomi dei rioni: grandi, spaziati, curvi sulla forma del quartiere
     const RIONI = ['Conciatori', 'Tintori', 'Fabbri', 'Pescatori', 'Vasai', 'Tessitori', 'Mercanti', 'Falegnami', 'Sellai', 'Corvi', 'Cordai', 'Speziali', 'Candelai', 'Bottai', 'Vecchia Porta', 'Pozzo Nero', 'Tre Ponti', 'Colle Alto'];
@@ -560,7 +560,7 @@ const CartoInsediamenti = (() => {
         break;
       }
       const c = M.centro(punti.length > 2 ? punti : [punti[0], punti[1], [punti[0][0] + 1, punti[0][1] + 1]]);
-      pin.push({ x: primaLettera ? primaLettera[0] : c[0], y: primaLettera ? primaLettera[1] : c[1], label: 'Rione ' + eti, note: nota, sottotipo: '' });
+      pin.push({ x: primaLettera ? primaLettera[0] : c[0], y: primaLettera ? primaLettera[1] : c[1], label: 'Rione ' + eti, note: nota, sottotipo: '', genera: { tipo: 'abitazione', opzioni: { edificio: q.carattere === 'nobile' ? 'casa' : 'bottega' } } });
     });
     if (o.mura) {
       // Nome per direzione; se due porte guardano dalla stessa parte la seconda prende un nome proprio
@@ -573,7 +573,7 @@ const CartoInsediamenti = (() => {
         giaUsate.add(lab);
         const x = Math.max(78, Math.min(W - 78, v[0] + dx / l * 46)), y = Math.max(46, Math.min(H - 42, v[1] + dy / l * 34 + 4));
         if (!(x < 340 && y > H - 110)) testi += M.etichetta(x, y, lab, p, { size: 15, corsivo: true, peso: 600 });
-        pin.push({ x: v[0], y: v[1], label: lab, note: 'Porta nelle mura, con la strada che esce verso la campagna.', sottotipo: '' });
+        pin.push({ x: v[0], y: v[1], label: lab, note: 'Porta nelle mura, con la strada che esce verso la campagna.', sottotipo: '', genera: { tipo: 'abitazione', opzioni: { edificio: 'torre' } } });
       });
     }
     if (fiume) {

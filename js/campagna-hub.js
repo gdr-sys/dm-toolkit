@@ -100,6 +100,7 @@ const CampagnaHub = (() => {
       _gruppo('Prepara', [
         _card(_iconaMenu('mappa'), 'Mappe', 'Mappe con i luoghi segnati', go('mappa'), mappe || null),
         _card(_iconaMenu('cartografo'), 'Cartografo', 'Genera regni, città, dungeon ed edifici', go('cartografo')),
+        _card(_iconaMenu('scrittoio'), 'Scrittoio', 'Stemmi, lettere, taglie e altri documenti', go('scrittoio')),
         _card(_iconaMenu('calendario'), 'Calendario', 'Data del mondo ed eventi', go('calendario')),
         _card(_iconaMenu('generatori'), 'Le mie tabelle', 'Tabelle casuali del tuo mondo', go('generatori') + ';setTimeout(function(){GeneratoriSchede.scegli(\'le mie tabelle\')},250)', tabelle || null),
         typeof VistaGiocatori !== 'undefined' ? _card('<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>', 'Vista giocatori', vg ? 'Attiva: cosa vedono i giocatori' : 'Un link con ciò che scegli tu', 'VistaGiocatori.apri()') : '',
