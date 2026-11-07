@@ -88,7 +88,7 @@ const MappaUI = (() => {
   let _scale = 1, _panX = 0, _panY = 0;
   let _dragging = false, _dragMoved = false, _lastClientX = 0, _lastClientY = 0;
   let _pendingPin = null;   // {x,y} in attesa di conferma dal modal "Nuovo pin"
-  let _misuraDa = null;     // id del primo pin scelto per la misura distanza
+  let _percorso = null;     // percorso in corso: { mappaId, punti: [{ x, y, pinId? }] } (coordinate 0..1)
   let _pinColoreScelto = COLORI[0];
   let _navStack = [];       // pila di id mappa: [0]=radice di questa sessione di navigazione, ultimo=mappa attuale
   let _pendingUploadDataUri = null; // immagine scelta dal dispositivo, in attesa di "Salva"
@@ -148,11 +148,12 @@ const MappaUI = (() => {
             '<button class="btn btn-ghost btn-icon-sm" onclick="MappaUI.zoom(-0.2)" title="Riduci">−</button>' +
             '<button class="btn btn-ghost btn-sm" onclick="MappaUI.zoomReset()" id="mappa-zoom-label" style="min-width:48px;">100%</button>' +
             '<button class="btn btn-ghost btn-icon-sm" onclick="MappaUI.zoom(0.2)" title="Ingrandisci">+</button>' +
+            '<button class="btn btn-secondary btn-sm" onclick="MappaUI.iniziaPercorso()" title="Misura un percorso a tappe e i tempi di viaggio">Percorso</button>' +
             '<button class="btn btn-secondary btn-sm" onclick="MappaUI.apriImpostazioni()">Modifica mappa</button>' +
             '<button class="btn btn-secondary btn-sm" onclick="App.navigateTo(\'cartografo\')">Genera una mappa</button>' +
           '</div>' +
         '</div>' +
-        '<p class="page-subtitle" style="margin:0;padding:0 var(--space-lg) var(--space-sm);">Click su uno spazio vuoto per aggiungere un pin, click su un pin per aprirlo. Un pin puo\' anche aprire un\'altra mappa (es. la mappa di una citta\' o di un dungeon).</p>' +
+        '<p class="page-subtitle" style="margin:0;padding:0 var(--space-lg) var(--space-sm);">Click su uno spazio vuoto per aggiungere un pin, click su un pin per aprirlo. Un pin puo\' anche aprire un\'altra mappa (es. la mappa di una citta\' o di un dungeon). Con Percorso misuri un viaggio a tappe.</p>' +
         '<div id="mappa-canvas" style="flex:1;position:relative;overflow:hidden;background:var(--bg-tertiary);cursor:grab;touch-action:none;">' +
           '<div id="mappa-vuota" style="display:none;position:absolute;inset:0;flex-direction:column;align-items:center;justify-content:center;gap:12px;text-align:center;padding:24px;">' +
             '<div style="opacity:0.4;"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 6v16l7-4 8 4 7-4V2l-7 4-8-4-7 4z"/><path d="M8 2v16"/><path d="M16 6v16"/></svg></div>' +
@@ -164,8 +165,13 @@ const MappaUI = (() => {
           '</div>' +
           '<div id="mappa-inner" style="position:absolute;left:0;top:0;transform-origin:0 0;">' +
             '<img id="mappa-img" src="" alt="Mappa" draggable="false" style="display:block;max-width:none;user-select:none;-webkit-user-drag:none;">' +
+            // Sotto i pin e trasparente ai click: i pin restano cliccabili anche sopra la linea
+            '<svg id="mappa-percorso" aria-hidden="true" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible;"></svg>' +
             '<div id="mappa-pins"></div>' +
           '</div>' +
+          // I suoi click non arrivano alla mappa: premere un pulsante non aggiunge una tappa
+          '<div id="mappa-percorso-pannello" role="status" aria-live="polite" onclick="event.stopPropagation()" onmousedown="event.stopPropagation()" ontouchstart="event.stopPropagation()" ' +
+            'style="display:none;position:absolute;left:50%;bottom:12px;transform:translateX(-50%);z-index:5;width:max-content;max-width:calc(100% - 24px);background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);box-shadow:var(--shadow-lg);padding:10px 12px;cursor:default;"></div>' +
         '</div>' +
       '</div>';
 
@@ -220,6 +226,8 @@ const MappaUI = (() => {
     }
     _renderSelettore();
     const mappa = _getMappaAttiva();
+    // Un percorso appartiene alla sua mappa: cambiandola si chiude
+    if (_percorso && (!mappa || mappa.id !== _percorso.mappaId)) fermaPercorso();
     const vuota = document.getElementById('mappa-vuota');
     const inner = document.getElementById('mappa-inner');
     const img = document.getElementById('mappa-img');
@@ -383,6 +391,7 @@ const MappaUI = (() => {
     if (inner) inner.style.transform = 'translate(' + _panX + 'px,' + _panY + 'px) scale(' + _scale + ')';
     const lbl = document.getElementById('mappa-zoom-label');
     if (lbl) lbl.textContent = Math.round(_scale * 100) + '%';
+    if (_percorso) _disegnaPercorso(); // spessori e scritte restano uguali a ogni zoom
   };
 
   const zoom = (delta) => { _scale = Math.max(0.2, Math.min(5, _scale + delta)); _applyTransform(); };
@@ -484,7 +493,7 @@ const MappaUI = (() => {
     const fy = (e.clientY - rect.top) / rect.height;
     if (fx < 0 || fx > 1 || fy < 0 || fy > 1) return;
 
-    if (_misuraDa) { Toast.show('Stavi misurando una distanza: scegli un pin, non uno spazio vuoto. Click destro/Esc per annullare.', 'info', 3500); return; }
+    if (_percorso) { _aggiungiTappa({ x: fx, y: fy }); return; }
     apriModalNuovoPin(fx, fy);
   };
 
@@ -614,8 +623,12 @@ const MappaUI = (() => {
       if (!popover.contains(e.target) && !e.target.closest('.mappa-pin')) popover.style.display = 'none';
     });
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && _misuraDa) { _misuraDa = null; Toast.show('Misura annullata', 'info', 1500); }
-    });
+      if (e.key !== 'Escape' || !_percorso) return;
+      // Con una finestra aperta (i tempi, o un'altra) Esc chiude solo quella, ci pensa Modal: il
+      // percorso resta. Il controllo avviene in cattura, prima che Modal la chiuda.
+      if ([...document.querySelectorAll('.modal-overlay')].some(m => m.style.display === 'flex')) return;
+      fermaPercorso();
+    }, true);
   };
 
   const apriImpostazioni = () => {
@@ -922,10 +935,9 @@ const MappaUI = (() => {
 
   const onPinClick = (pinId, ev) => {
     ev.stopPropagation();
-    if (_misuraDa) {
-      if (_misuraDa === pinId) { _misuraDa = null; return; }
-      _completaMisura(_misuraDa, pinId);
-      _misuraDa = null;
+    if (_percorso) {
+      const pin = _trovaPin(pinId);
+      if (pin) _aggiungiTappa({ x: pin.x, y: pin.y, pinId });
       return;
     }
     _apriPopoverPin(pinId, ev);
@@ -958,7 +970,7 @@ const MappaUI = (() => {
           ? '<button class="btn btn-primary btn-sm" onclick="MappaUI.entraInMappa(\'' + pin.apreMappa + '\')">Apri la sua mappa</button>'
           : '<button class="btn btn-secondary btn-sm" onclick="MappaUI.generaDaPin(\'' + pinId + '\')">Genera la sua mappa</button>')) +
         '<button class="btn btn-ghost btn-sm" onclick="MappaUI.modificaPin(\'' + pinId + '\')">Modifica pin</button>' +
-        '<button class="btn btn-ghost btn-sm" onclick="MappaUI.iniziaMisuraDaPin(\'' + pinId + '\')">Misura distanza da qui</button>' +
+        '<button class="btn btn-ghost btn-sm" onclick="MappaUI.iniziaPercorso(\'' + pinId + '\')">Misura o percorso da qui</button>' +
         '<button class="btn btn-ghost btn-sm" style="color:var(--danger-text);" onclick="MappaUI.rimuoviPin(\'' + pinId + '\')">Rimuovi pin</button>' +
       '</div>';
     const rect = ev.target.closest('.mappa-pin').getBoundingClientRect();
@@ -978,26 +990,93 @@ const MappaUI = (() => {
 
   /* ── Distanza e tempo di viaggio ── */
 
-  const iniziaMisuraDaPin = (pinId) => {
-    document.getElementById('mappa-pin-popover').style.display = 'none';
-    _misuraDa = pinId;
-    Toast.show('Ora clicca un secondo pin per misurare la distanza (Esc per annullare)', 'info', 3500);
+  // Un percorso e' una serie di tappe: segnaposto o punti qualsiasi della mappa (una curva della
+  // strada, un passo di montagna). Con due tappe e' la vecchia misura in linea d'aria.
+  const iniziaPercorso = (pinId) => {
+    const pop = document.getElementById('mappa-pin-popover');
+    if (pop) pop.style.display = 'none';
+    const mappa = _getMappaAttiva();
+    if (!mappa || !mappa.immagine) return;
+    if (!mappa.scalaKm) { Toast.show('Imposta prima la larghezza reale della mappa in "Modifica mappa"', 'warning', 3500); return; }
+    _percorso = { mappaId: mappa.id, punti: [] };
+    const pin = pinId ? _trovaPin(pinId) : null;
+    if (pin) _percorso.punti.push({ x: pin.x, y: pin.y, pinId });
+    _disegnaPercorso();
   };
 
-  const _completaMisura = (id1, id2) => {
-    const mappa = _getMappaAttiva();
-    const p1 = _trovaPin(id1), p2 = _trovaPin(id2);
-    if (!mappa || !p1 || !p2) return;
-    const scalaKm = mappa.scalaKm || 0;
-    if (!scalaKm) { Toast.show('Imposta prima la larghezza reale della mappa in "Modifica mappa"', 'warning', 3500); return; }
+  const _aggiungiTappa = (pt) => {
+    const ultimo = _percorso.punti[_percorso.punti.length - 1];
+    if (ultimo && Math.abs(ultimo.x - pt.x) < 1e-4 && Math.abs(ultimo.y - pt.y) < 1e-4) return; // doppio clic sullo stesso punto
+    _percorso.punti.push(pt);
+    _disegnaPercorso();
+  };
 
+  const annullaTappa = () => { if (_percorso) { _percorso.punti.pop(); _disegnaPercorso(); } };
+  const fermaPercorso = () => { _percorso = null; _disegnaPercorso(); };
+
+  const _kmTra = (a, b) => {
+    const mappa = _getMappaAttiva();
+    const img = document.getElementById('mappa-img');
+    const w = img?.naturalWidth || 1, h = img?.naturalHeight || 1;
+    const scalaKm = mappa?.scalaKm || 0;
+    const dx = (b.x - a.x) * scalaKm, dy = (b.y - a.y) * scalaKm * (h / w);
+    return Math.sqrt(dx * dx + dy * dy);
+  };
+  const _kmPercorso = () => (_percorso?.punti || []).reduce((tot, p, i, arr) => i ? tot + _kmTra(arr[i - 1], p) : 0, 0);
+  // Le mappe di citta', dungeon e case misurano pochi metri: in km sarebbero "0.1"
+  const _fmtDist = (km) => km < 1 ? Math.round(km * 1000) + ' metri' : (Math.round(km * 10) / 10).toLocaleString('it-IT') + ' km';
+  const _nomeTappa = (p) => { const pin = p.pinId && _trovaPin(p.pinId); return pin ? _nomePin(pin) : 'un punto della mappa'; };
+
+  const _disegnaPercorso = () => {
+    const svg = document.getElementById('mappa-percorso');
+    const pannello = document.getElementById('mappa-percorso-pannello');
+    if (!svg || !pannello) return;
+    if (!_percorso) { svg.innerHTML = ''; pannello.style.display = 'none'; return; }
     const img = document.getElementById('mappa-img');
     const w = img.naturalWidth || 1, h = img.naturalHeight || 1;
-    const dxKm = (p2.x - p1.x) * scalaKm;
-    const dyKm = (p2.y - p1.y) * scalaKm * (h / w);
-    const distanzaKm = Math.sqrt(dxKm * dxKm + dyKm * dyKm);
+    svg.setAttribute('viewBox', '0 0 ' + w + ' ' + h);
+    // Misure in pixel dello schermo, divise per lo zoom: la linea non diventa un nastro ingrandendo
+    const s = 1 / (_scale || 1);
+    const pts = _percorso.punti.map(p => [p.x * w, p.y * h]);
+    const linea = pts.map(p => p[0].toFixed(1) + ',' + p[1].toFixed(1)).join(' ');
+    let disegno = '';
+    if (pts.length > 1) {
+      disegno += '<polyline points="' + linea + '" fill="none" stroke="#000" stroke-opacity="0.55" stroke-width="' + (6 * s) + '" stroke-linecap="round" stroke-linejoin="round"/>' +
+        '<polyline points="' + linea + '" fill="none" stroke="#f2c14e" stroke-width="' + (3 * s) + '" stroke-dasharray="' + (10 * s) + ' ' + (6 * s) + '" stroke-linecap="round" stroke-linejoin="round"/>';
+      // La lunghezza di ogni tratto, a meta' del tratto
+      for (let i = 1; i < pts.length; i++) {
+        const mx = (pts[i - 1][0] + pts[i][0]) / 2, my = (pts[i - 1][1] + pts[i][1]) / 2;
+        disegno += '<text x="' + mx + '" y="' + (my - 8 * s) + '" text-anchor="middle" font-size="' + (13 * s) + '" font-family="var(--font-mono, monospace)" fill="#fff" stroke="#000" stroke-width="' + (3 * s) + '" stroke-opacity="0.75" paint-order="stroke">' + _fmtDist(_kmTra(_percorso.punti[i - 1], _percorso.punti[i])) + '</text>';
+      }
+    }
+    pts.forEach((p, i) => {
+      const estremo = i === 0 || i === pts.length - 1;
+      disegno += '<circle cx="' + p[0] + '" cy="' + p[1] + '" r="' + ((estremo ? 6 : 4.5) * s) + '" fill="' + (estremo ? '#f2c14e' : '#fff') + '" stroke="#000" stroke-opacity="0.7" stroke-width="' + (1.5 * s) + '"/>';
+    });
+    svg.innerHTML = disegno;
 
-    _mostraRisultatoMisura(p1, p2, distanzaKm);
+    const n = _percorso.punti.length;
+    const tratti = n - 1;
+    pannello.style.display = 'block';
+    pannello.innerHTML =
+      '<div style="font-size:0.85rem;line-height:1.4;margin-bottom:8px;">' +
+        (n < 2
+          ? '<strong>Percorso</strong>: ' + (n ? 'ora clicca la tappa successiva' : 'clicca un segnaposto o un punto della mappa per partire')
+          : '<strong>' + _fmtDist(_kmPercorso()) + '</strong> in ' + tratti + (tratti === 1 ? ' tratto' : ' tratti') + ' <span class="text-muted">· continua a cliccare per aggiungere tappe</span>') +
+      '</div>' +
+      '<div style="display:flex;flex-wrap:wrap;gap:6px;">' +
+        (n ? '<button type="button" class="btn btn-ghost btn-sm" onclick="MappaUI.annullaTappa()">Annulla ultima tappa</button>' : '') +
+        (n > 1 ? '<button type="button" class="btn btn-primary btn-sm" onclick="MappaUI.mostraTempiPercorso()">Tempi di viaggio</button>' : '') +
+        '<button type="button" class="btn btn-secondary btn-sm" onclick="MappaUI.fermaPercorso()">Fine</button>' +
+      '</div>';
+  };
+
+  const mostraTempiPercorso = () => {
+    if (!_percorso || _percorso.punti.length < 2) return;
+    const punti = _percorso.punti;
+    const intermedie = punti.length - 2;
+    const titolo = _nomeTappa(punti[0]) + ' → ' + _nomeTappa(punti[punti.length - 1]) + (intermedie ? ' (' + intermedie + (intermedie === 1 ? ' tappa' : ' tappe') + ' in mezzo)' : '');
+    _mostraRisultatoMisura(titolo, _kmPercorso(), intermedie ? 'lungo il percorso' : 'in linea d’aria');
   };
 
   const _nomePin = (p) => {
@@ -1008,7 +1087,7 @@ const MappaUI = (() => {
     return item ? item.nome : (p.label || '(senza nome)');
   };
 
-  const _mostraRisultatoMisura = (p1, p2, distanzaKm) => {
+  const _mostraRisultatoMisura = (titolo, distanzaKm, come) => {
     if (!document.getElementById('modal-mappa-distanza')) {
       const m = document.createElement('div');
       m.className = 'modal-overlay hidden';
@@ -1031,12 +1110,9 @@ const MappaUI = (() => {
       const sel = m.querySelector('#mappa-dist-terreno');
       sel.innerHTML = Object.keys(TERRENO_LABEL).map(t => '<option value="' + t + '"' + (t === 'strada' ? ' selected' : '') + '>' + TERRENO_LABEL[t] + '</option>').join('');
     }
-    _misuraCorrente = { p1, p2, distanzaKm };
-    document.getElementById('mappa-dist-titolo').textContent = _nomePin(p1) + ' → ' + _nomePin(p2);
-    // Le mappe di citta', dungeon e case misurano pochi metri: in km sarebbero "0.1"
-    document.getElementById('mappa-dist-km').textContent = (distanzaKm < 1
-      ? Math.round(distanzaKm * 1000) + ' metri'
-      : Math.round(distanzaKm * 10) / 10 + ' km') + ' in linea d’aria';
+    _misuraCorrente = { distanzaKm };
+    document.getElementById('mappa-dist-titolo').textContent = titolo;
+    document.getElementById('mappa-dist-km').textContent = _fmtDist(distanzaKm) + ' ' + come;
     _ricalcolaMisura();
     Modal.open('mappa-distanza');
   };
@@ -1074,6 +1150,8 @@ const MappaUI = (() => {
     vaiAMappa, tornaIndietro, entraInMappa, nuovaMappa, eliminaMappaCorrente, aggiungiDaImmagine, generaDaPin,
     apriImpostazioni, salvaImpostazioni, _onFilePicked,
     apriModalNuovoPin, confermaNuovoPin, modificaPin, _onPinTipoChange, _onPinEntitaChange, _pickColore,
-    onPinClick, rimuoviPin, iniziaMisuraDaPin, _ricalcolaMisura,
+    onPinClick, rimuoviPin, _ricalcolaMisura,
+    iniziaPercorso, annullaTappa, fermaPercorso, mostraTempiPercorso,
+    iniziaMisuraDaPin: iniziaPercorso, // nome vecchio, se qualcosa lo chiama ancora
   };
 })();

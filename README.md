@@ -98,7 +98,7 @@ Carica un'immagine come mappa interattiva. Puoi spostarla trascinando e ingrandi
 
 - **Segnaposto** collegabili a PNG, luoghi, fazioni o note; le coordinate sono in percentuale, quindi restano giuste su ogni schermo.
 - **Mappe annidate** — un segnaposto può aprire un'altra mappa (regione → città → taverna), con il pulsante per tornare indietro.
-- **Misura distanze** tra due segnaposto, in base alla scala della mappa.
+- **Distanze e percorsi** — con **Percorso** clicchi una tappa dopo l'altra, segnaposto o punti qualsiasi della mappa: la linea si disegna sulla mappa con i km di ogni tratto e il totale. **Tempi di viaggio** dice quanto ci vuole a piedi, a cavallo, in barca o in nave, secondo il terreno.
 
 ### Cartografo
 
