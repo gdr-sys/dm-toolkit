@@ -1025,7 +1025,7 @@ const MappaUI = (() => {
   const _kmPercorso = () => (_percorso?.punti || []).reduce((tot, p, i, arr) => i ? tot + _kmTra(arr[i - 1], p) : 0, 0);
   // Le mappe di citta', dungeon e case misurano pochi metri: in km sarebbero "0.1"
   const _fmtDist = (km) => km < 1 ? Math.round(km * 1000) + ' metri' : (Math.round(km * 10) / 10).toLocaleString('it-IT') + ' km';
-  const _nomeTappa = (p) => { const pin = p.pinId && _trovaPin(p.pinId); return pin ? _nomePin(pin) : 'un punto della mappa'; };
+  const _nomeTappa = (p, senzaNome) => { const pin = p.pinId && _trovaPin(p.pinId); return pin ? _nomePin(pin) : senzaNome; };
 
   const _disegnaPercorso = () => {
     const svg = document.getElementById('mappa-percorso');
@@ -1041,8 +1041,12 @@ const MappaUI = (() => {
     const linea = pts.map(p => p[0].toFixed(1) + ',' + p[1].toFixed(1)).join(' ');
     let disegno = '';
     if (pts.length > 1) {
-      disegno += '<polyline points="' + linea + '" fill="none" stroke="#000" stroke-opacity="0.55" stroke-width="' + (6 * s) + '" stroke-linecap="round" stroke-linejoin="round"/>' +
-        '<polyline points="' + linea + '" fill="none" stroke="#f2c14e" stroke-width="' + (3 * s) + '" stroke-dasharray="' + (10 * s) + ' ' + (6 * s) + '" stroke-linecap="round" stroke-linejoin="round"/>';
+      disegno += '<polyline points="' + linea + '" fill="none" stroke="#000" stroke-opacity="0.55" stroke-width="' + (6 * s) + '" stroke-linecap="round" stroke-linejoin="round"/>';
+      // Un tratto alla volta: quelli in mare sono azzurri, gli altri dorati
+      for (let i = 1; i < pts.length; i++) {
+        const mare = _percorso.punti[i].terreno === 'mare';
+        disegno += '<line x1="' + pts[i - 1][0] + '" y1="' + pts[i - 1][1] + '" x2="' + pts[i][0] + '" y2="' + pts[i][1] + '" stroke="' + (mare ? '#7cc4f5' : '#f2c14e') + '" stroke-width="' + (3 * s) + '" stroke-dasharray="' + (10 * s) + ' ' + (6 * s) + '" stroke-linecap="round"/>';
+      }
       // La lunghezza di ogni tratto, a meta' del tratto
       for (let i = 1; i < pts.length; i++) {
         const mx = (pts[i - 1][0] + pts[i][0]) / 2, my = (pts[i - 1][1] + pts[i][1]) / 2;
@@ -1075,7 +1079,7 @@ const MappaUI = (() => {
     if (!_percorso || _percorso.punti.length < 2) return;
     const punti = _percorso.punti;
     const intermedie = punti.length - 2;
-    const titolo = _nomeTappa(punti[0]) + ' → ' + _nomeTappa(punti[punti.length - 1]) + (intermedie ? ' (' + intermedie + (intermedie === 1 ? ' tappa' : ' tappe') + ' in mezzo)' : '');
+    const titolo = _nomeTappa(punti[0], 'Partenza') + ' → ' + _nomeTappa(punti[punti.length - 1], 'Arrivo') + (intermedie ? ' (' + intermedie + (intermedie === 1 ? ' tappa' : ' tappe') + ' in mezzo)' : '');
     _mostraRisultatoMisura(titolo, _kmPercorso(), intermedie ? 'lungo il percorso' : 'in linea d’aria');
   };
 
@@ -1101,40 +1105,82 @@ const MappaUI = (() => {
           '</div>' +
           '<div class="modal-body">' +
             '<div id="mappa-dist-km" style="font-family:var(--font-mono);font-size:1.3rem;color:var(--accent-text);margin-bottom:12px;"></div>' +
-            '<div class="form-group"><label class="form-label">Terreno</label><select id="mappa-dist-terreno" class="form-select" onchange="MappaUI._ricalcolaMisura()"></select></div>' +
-            '<div id="mappa-dist-tabella"></div>' +
+            '<div id="mappa-dist-corpo"></div>' +
           '</div>' +
           '<div class="modal-footer"><button class="btn btn-primary" style="width:100%;" onclick="Modal.close(\'mappa-distanza\')">Chiudi</button></div>' +
         '</div>';
       document.body.appendChild(m);
-      const sel = m.querySelector('#mappa-dist-terreno');
-      sel.innerHTML = Object.keys(TERRENO_LABEL).map(t => '<option value="' + t + '"' + (t === 'strada' ? ' selected' : '') + '>' + TERRENO_LABEL[t] + '</option>').join('');
     }
-    _misuraCorrente = { distanzaKm };
     document.getElementById('mappa-dist-titolo').textContent = titolo;
     document.getElementById('mappa-dist-km').textContent = _fmtDist(distanzaKm) + ' ' + come;
     _ricalcolaMisura();
     Modal.open('mappa-distanza');
   };
 
-  let _misuraCorrente = null;
+  // Mezzi e passo scelti nella finestra dei tempi: restano per i percorsi successivi
+  const _viaggio = { terra: 'piedi', mare: 'nave', ritmo: 'normale' };
+  const RITMO_LABEL = { lento: 'Lento', normale: 'Normale', veloce: 'Veloce' };
 
-  const _ricalcolaMisura = () => {
-    if (!_misuraCorrente) return;
-    const terreno = document.getElementById('mappa-dist-terreno')?.value || 'strada';
-    const mult = TERRENO_MULT[terreno] || 1;
-    const righe = Object.keys(VEL_BASE).map(mezzo => {
-      const kmGiorno = VEL_BASE[mezzo].normale * mult;
-      const giorni = _misuraCorrente.distanzaKm / kmGiorno;
-      const ore = giorni * 24;
-      const giorniStr = ore < 1 ? Math.max(1, Math.round(ore * 60)) + ' min' : giorni < 1 ? Math.round(ore * 10) / 10 + ' ore' : Math.round(giorni * 10) / 10 + ' giorni';
-      return '<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border);font-size:0.85rem;">' +
-        '<span>' + MEZZO_LABEL[mezzo] + '</span>' +
-        '<span style="font-family:var(--font-mono);color:var(--text-secondary);">' + giorniStr + ' <span class="text-muted" style="font-size:0.75rem;">(' + Math.round(kmGiorno) + ' km/g)</span></span>' +
-      '</div>';
-    }).join('');
-    document.getElementById('mappa-dist-tabella').innerHTML = righe;
+  // Una giornata di viaggio e' di 8 ore (SRD). Prima le frazioni di giorno si contavano su 24 ore:
+  // 16 km a piedi risultavano 12 ore invece di 4.
+  const _fmtTempo = (giorni) => {
+    const ore = giorni * 8;
+    if (ore < 1) return Math.max(1, Math.round(ore * 60)) + ' min';
+    if (giorni < 1) return (Math.round(ore * 10) / 10).toLocaleString('it-IT') + ' ore';
+    let g = Math.floor(giorni), h = Math.round((giorni - g) * 8);
+    if (h === 8) { g++; h = 0; }
+    return g + (g === 1 ? ' giorno' : ' giorni') + (h ? ' e ' + h + (h === 1 ? ' ora' : ' ore') : '');
   };
+
+  const _scelta = (etichetta, opzioni, valore, onchange) =>
+    '<div class="form-group" style="margin:0;"><label class="form-label">' + etichetta + '</label>' +
+      '<select class="form-select" onchange="' + onchange + '">' +
+        Object.entries(opzioni).map(([k, v]) => '<option value="' + k + '"' + (k === valore ? ' selected' : '') + '>' + v + '</option>').join('') +
+      '</select></div>';
+
+  // Ogni tratto ha il suo terreno (sta sulla tappa d'arrivo): in mare si va in barca o in nave,
+  // sulla terraferma a piedi o a cavallo.
+  const _ricalcolaMisura = () => {
+    const corpo = document.getElementById('mappa-dist-corpo');
+    if (!corpo || !_percorso || _percorso.punti.length < 2) return;
+    const punti = _percorso.punti;
+    const tratti = punti.slice(1).map((p, i) => {
+      const terreno = p.terreno || 'strada';
+      const mezzo = terreno === 'mare' ? _viaggio.mare : _viaggio.terra;
+      const kmGiorno = VEL_BASE[mezzo][_viaggio.ritmo] * (TERRENO_MULT[terreno] || 1);
+      const km = _kmTra(punti[i], p);
+      return { n: i + 1, km, terreno, mezzo, giorni: km / kmGiorno };
+    });
+    const haMare = tratti.some(t => t.terreno === 'mare'), haTerra = tratti.some(t => t.terreno !== 'mare');
+    const totale = tratti.reduce((s, t) => s + t.giorni, 0);
+    corpo.innerHTML =
+      '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px;margin-bottom:14px;">' +
+        (haTerra ? _scelta('Via terra', { piedi: MEZZO_LABEL.piedi, cavallo: MEZZO_LABEL.cavallo }, _viaggio.terra, "MappaUI._sceltaViaggio('terra',this.value)") : '') +
+        (haMare ? _scelta('Via mare', { barca: MEZZO_LABEL.barca, nave: MEZZO_LABEL.nave }, _viaggio.mare, "MappaUI._sceltaViaggio('mare',this.value)") : '') +
+        _scelta('Passo', RITMO_LABEL, _viaggio.ritmo, "MappaUI._sceltaViaggio('ritmo',this.value)") +
+      '</div>' +
+      '<div class="form-label">' + (tratti.length > 1 ? 'Il terreno di ogni tratto' : 'Terreno') + '</div>' +
+      tratti.map(t =>
+        '<div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;padding:7px 0;border-bottom:1px solid var(--border);font-size:0.85rem;">' +
+          '<span style="flex:1 1 110px;">' + (tratti.length > 1 ? 'Tratto ' + t.n + ' · ' : '') + _fmtDist(t.km) + '</span>' +
+          '<select class="form-select" aria-label="Terreno del tratto ' + t.n + '" style="width:auto;flex:0 1 150px;font-size:0.82rem;padding:4px 8px;" onchange="MappaUI._terrenoTratto(' + t.n + ',this.value)">' +
+            Object.keys(TERRENO_LABEL).map(k => '<option value="' + k + '"' + (k === t.terreno ? ' selected' : '') + '>' + TERRENO_LABEL[k] + '</option>').join('') +
+          '</select>' +
+          '<span style="flex:0 0 auto;min-width:96px;text-align:right;font-family:var(--font-mono);color:var(--text-secondary);" title="' + MEZZO_LABEL[t.mezzo] + '">' + _fmtTempo(t.giorni) + '</span>' +
+        '</div>').join('') +
+      '<div style="display:flex;justify-content:space-between;align-items:baseline;padding-top:10px;font-size:0.95rem;">' +
+        '<strong>Totale</strong><strong style="font-family:var(--font-mono);color:var(--accent-text);">' + _fmtTempo(totale) + '</strong>' +
+      '</div>' +
+      '<p class="text-muted" style="font-size:0.72rem;line-height:1.5;margin:8px 0 0;">Una giornata di viaggio è di 8 ore, con le velocità del passo di viaggio delle regole.</p>';
+  };
+
+  const _terrenoTratto = (n, terreno) => {
+    if (!_percorso || !_percorso.punti[n] || !TERRENO_LABEL[terreno]) return;
+    _percorso.punti[n].terreno = terreno;
+    _ricalcolaMisura();
+    _disegnaPercorso(); // i tratti in mare si vedono azzurri sulla mappa
+  };
+  const _sceltaViaggio = (chiave, valore) => { _viaggio[chiave] = valore; _ricalcolaMisura(); };
 
   const init = () => {
     _injectModals();
@@ -1150,7 +1196,7 @@ const MappaUI = (() => {
     vaiAMappa, tornaIndietro, entraInMappa, nuovaMappa, eliminaMappaCorrente, aggiungiDaImmagine, generaDaPin,
     apriImpostazioni, salvaImpostazioni, _onFilePicked,
     apriModalNuovoPin, confermaNuovoPin, modificaPin, _onPinTipoChange, _onPinEntitaChange, _pickColore,
-    onPinClick, rimuoviPin, _ricalcolaMisura,
+    onPinClick, rimuoviPin, _ricalcolaMisura, _terrenoTratto, _sceltaViaggio,
     iniziaPercorso, annullaTappa, fermaPercorso, mostraTempiPercorso,
     iniziaMisuraDaPin: iniziaPercorso, // nome vecchio, se qualcosa lo chiama ancora
   };

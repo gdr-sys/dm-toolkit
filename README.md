@@ -98,7 +98,7 @@ Carica un'immagine come mappa interattiva. Puoi spostarla trascinando e ingrandi
 
 - **Segnaposto** collegabili a PNG, luoghi, fazioni o note; le coordinate sono in percentuale, quindi restano giuste su ogni schermo.
 - **Mappe annidate** — un segnaposto può aprire un'altra mappa (regione → città → taverna), con il pulsante per tornare indietro.
-- **Distanze e percorsi** — con **Percorso** clicchi una tappa dopo l'altra, segnaposto o punti qualsiasi della mappa: la linea si disegna sulla mappa con i km di ogni tratto e il totale. **Tempi di viaggio** dice quanto ci vuole a piedi, a cavallo, in barca o in nave, secondo il terreno.
+- **Distanze e percorsi** — con **Percorso** clicchi una tappa dopo l'altra, segnaposto o punti qualsiasi della mappa: la linea si disegna sulla mappa con i km di ogni tratto e il totale. In **Tempi di viaggio** ogni tratto ha il suo terreno (strada, colline, montagna, mare aperto…): sulla terraferma si va a piedi o a cavallo, in mare in barca o in nave, con il passo lento, normale o veloce. I tratti in mare si vedono azzurri sulla mappa. Una giornata di viaggio è di 8 ore.
 
 ### Cartografo
 
