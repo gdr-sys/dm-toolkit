@@ -117,7 +117,7 @@ I generatori sono scritti apposta per il toolkit e funzionano senza servizi este
 
 ### Scrittoio
 
-![Uno stemma e i documenti che si possono creare: lettera, taglia, editto, avviso e mappa del tesoro](scopri/img/scrittoio-documenti.jpg)
+![Lo Scrittoio crea stemmi, poi una lettera, una taglia, un editto e una mappa del tesoro con i nomi della campagna](docs/img/demo-scrittoio.gif)
 
 - **Stemmi** con forma, colori, simbolo, corona, mantello e motto. Assegnato a una Fazione o a un Luogo, diventa l'immagine della sua scheda; quello di una Fazione diventa anche il sigillo dei suoi documenti. Se hai già uno stemma tuo, caricalo come immagine nella scheda della Fazione: finisce su editti e lettere.
 - **Documenti da consegnare ai giocatori**: lettere sigillate, taglie, editti, avvisi da bacheca e mappe del tesoro. Il testo nasce con i nomi di PNG, luoghi e fazioni della campagna e si può sempre modificare, così come la carta e il suo stato.
@@ -173,7 +173,7 @@ I generatori sono scritti apposta per il toolkit e funzionano senza servizi este
 
 ### Compendio
 
-![Il Compendio](scopri/img/app-compendio.jpg)
+![Nel Compendio un lupo feroce diventa un lupo di cenere a GS 5 con danni da fuoco](docs/img/demo-compendio.gif)
 
 
 Mostri SRD 5.1 e 5.2.1 con GS normalizzato (comprese le frazioni 1/8, 1/4, 1/2), oggetti magici, equipaggiamento, incantesimi, regole, velocità di cavalcature e veicoli. Homebrew integrato: le note Wiki con tag `#oggetto` o `#mostro` finiscono nel Compendio. Preferiti per campagna, ricerca, filtri per tipo e GS.
@@ -182,7 +182,7 @@ Mostri SRD 5.1 e 5.2.1 con GS normalizzato (comprese le frazioni 1/8, 1/4, 1/2),
 
 ### Sessione Zero e sicurezza
 
-![Sessione Zero](scopri/img/app-sessione-zero.jpg)
+![Sessione Zero: aspettative del tavolo, linee e veli dagli spunti, strumenti di sicurezza](docs/img/demo-sessionezero.gif)
 
 - **Aspettative del tavolo** — tono, morte dei personaggi, conflitto tra PG, quanto combattimento, esplorazione e dialoghi, regole della casa.
 - **Linee e veli** — cosa non comparirà mai e cosa resterà fuori scena, con gli spunti più comuni da aggiungere in un clic.
@@ -221,6 +221,8 @@ Una pagina per preparare **più playlist** — Battaglia, Taverna, Esplorazione,
 ---
 
 ## Vista giocatori
+
+![Il DM sceglie cosa condividere e apre l'anteprima della pagina dei giocatori, con l'iniziativa in diretta](docs/img/demo-giocatori.gif)
 
 Un link da mandare ai giocatori, che apre una pagina di sola lettura con **solo ciò che scegli tu**: il "Previously On…", i riassunti delle sessioni, l'**ordine di iniziativa in diretta** durante gli scontri, e i luoghi, i PNG, i documenti della Wiki e le mappe che selezioni. Si aggiorna da sola mentre giochi.
 
