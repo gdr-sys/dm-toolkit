@@ -12192,6 +12192,7 @@ const GDrive = (() => {
   return { init, toggleLogin, logout, setClientId, onConnect, silentReconnect,
            showWelcomeIfNeeded, _updateBtn,
            segnaScaduto,
+           get numeroProgetto() { return (CLIENT_ID || '').split('-')[0]; },
            get loggedIn() { return _valido(); },
            get token() { return _valido() ? _token : null; } };
 })();
@@ -12990,6 +12991,16 @@ const GDriveUI = (() => {
     const hint = document.getElementById('gdrive-invite-hint');
     if (!camp) { if (hint) hint.textContent = '✗ Apri prima una campagna.'; return; }
     if (inp) inp.value = 'Generazione...';
+    // Con l'accesso fatto c'e' un solo codice, quello breve della campagna: porta al puntatore
+    // Firebase e da li' al file Drive. L'id del file resta il codice solo per chi non ha l'accesso.
+    if (FirebaseSync.puoInvitare()) {
+      const pronto = await FirebaseSync.preparaInvito();
+      const codice = pronto ? FirebaseSync.getCampCode() : '';
+      if (inp) inp.value = codice;
+      if (hint) hint.textContent = pronto ? '✓ Codice pronto — mandalo al co-autore.' : '✗ Errore — riprova.';
+      if (pronto) { try { await navigator.clipboard.writeText(codice); if (hint) hint.textContent += ' (copiato!)'; } catch(e) {} }
+      return;
+    }
     const result = await DriveBackup.generateInvite(camp);
     if (result) {
       if (inp) inp.value = result.code;
@@ -13002,11 +13013,12 @@ const GDriveUI = (() => {
     }
   };
 
-  const joinCampaign = async () => {
+  const joinCampaign = async (codiceDato) => {
     // L'id file Drive e' case-sensitive: a differenza dei codici Firebase, qui non va
     // forzato in maiuscolo altrimenti il codice non corrisponde piu' a nessun file.
-    const code = document.getElementById('gdrive-join-code')?.value?.trim();
+    const code = (typeof codiceDato === 'string' ? codiceDato : document.getElementById('gdrive-join-code')?.value)?.trim();
     if (!code) { Toast.show('Inserisci un codice', 'warning'); return; }
+    if (code.length <= 12) return FirebaseSync.joinCampaign(code); // codice breve della campagna
     Toast.show('Accesso alla campagna...', 'info', 2000);
     const campagna = await DriveBackup.acceptInvite(code);
     if (!campagna) return;
@@ -13694,14 +13706,19 @@ const FirebaseSync = (() => {
 
   // Risolve un valore letto da campagne/{key}/data: se e' un puntatore, scarica i dati veri da
   // Drive; altrimenti (modalita' senza Drive) e' gia' la campagna completa.
-  const _resolveRemote = async (remote) => {
+  // conConferma: solo quando il co-autore entra con il codice, puo' chiedergli di confermare il
+  // file a Google. Le letture in sottofondo non devono mai aprire finestre.
+  const _resolveRemote = async (remote, conConferma = false) => {
     if (!remote) return null;
     if (remote.__pointer && remote.driveFileId) {
       try { await DriveBackup.ready(); } catch(e) {}
       if (!DriveBackup.isConnected()) {
         throw new Error('la riconnessione automatica a Google Drive non è riuscita — apri Impostazioni, clicca su "Drive" per ricollegarti, poi riprova (i dati si aggiornano da soli appena ricollegata, senza bisogno di ricaricare la pagina)');
       }
-      const full = await DriveBackup.downloadFromDrive(remote.driveFileId);
+      const full = conConferma
+        ? await DriveBackup.scaricaCondiviso(remote.driveFileId)
+        : await DriveBackup.downloadFromDrive(remote.driveFileId);
+      if (!full) return null;
       // Il file letto e' quello giusto: i salvataggi di questo dispositivo vanno li', invece di
       // cercarne (o crearne) un altro.
       if (full && full.id) { try { DriveBackup.adottaFileSync(full.id, remote.driveFileId); } catch(e) {} }
@@ -13938,15 +13955,44 @@ const FirebaseSync = (() => {
     return camp.shareCode;
   };
 
-  const copyCode = () => {
-    const code = getCampCode();
-    if (!code) return;
-    navigator.clipboard?.writeText(code).then(() => Toast.show('Codice copiato!', 'success', 1500));
+  const puoInvitare = () => !!(_db && _user && !_user.isAnonymous && App.getActiveCampaign());
+
+  // Rende la campagna raggiungibile con il suo codice: sul cloud c'e' subito la versione aggiornata
+  // e, se sta su Drive, il file diventa accessibile a chi ha il codice. Parte solo dal gesto di
+  // invitare, mai da sola: per questo non sta nel salvataggio automatico.
+  const preparaInvito = async () => {
+    const camp = App.getActiveCampaign();
+    if (!puoInvitare()) return false;
+    getCampCode();
+    try { await DriveBackup.ready(); } catch(e) {} // nei primi secondi la riconnessione puo' essere in corso
+    if (DriveBackup.isConnected()) {
+      const invito = await DriveBackup.generateInvite(camp);
+      if (!invito) return false;
+    } else if (localStorage.getItem('dm_drive_connected') === 'true') {
+      // I dati veri stanno su Drive: con il token scaduto il co-autore troverebbe un file non condiviso.
+      Toast.show('Google Drive è scollegato: ricollegalo e copia di nuovo il codice', 'warning', 6000);
+      return false;
+    }
+    await _writeCampaign(camp);
+    return true;
   };
 
-  const joinCampaign = async () => {
-    const raw = document.getElementById('collab-join-code')?.value?.trim().toUpperCase();
-    const code = raw?.replace(/[^A-Z0-9]/g,'');
+  const copyCode = async () => {
+    if (_user?.isAnonymous) { Toast.show('Accedi con Google o email per invitare un co-autore', 'warning'); return; }
+    const code = getCampCode();
+    if (!code) return;
+    // Prima gli appunti: dopo un'attesa di rete il browser puo' non considerarlo piu' un gesto dell'utente.
+    try { await navigator.clipboard?.writeText(code); } catch(e) {}
+    Toast.show('Codice copiato, preparo l\'invito...', 'info', 1500);
+    if (await preparaInvito()) Toast.show('Invito pronto: manda il codice al co-autore', 'success', 3000);
+  };
+
+  let _ingressoInAttesa = false;
+
+  const joinCampaign = async (codiceDato) => {
+    const digitato = (typeof codiceDato === 'string' ? codiceDato : document.getElementById('collab-join-code')?.value)?.trim() || '';
+    if (digitato.length > 12) return GDriveUI.joinCampaign(digitato); // id di un file Drive
+    const code = digitato.toUpperCase().replace(/[^A-Z0-9]/g,'');
     if (!code || code.length < 4) { Toast.show('Inserisci il codice a 6 caratteri', 'warning'); return; }
     if (!_user) { Toast.show('Accedi prima con Google o email', 'warning'); return; }
     if (!_db) { Toast.show('Firebase non disponibile', 'error'); return; }
@@ -13959,7 +14005,23 @@ const FirebaseSync = (() => {
         Toast.show('Codice non trovato — verifica le maiuscole e riprova', 'error', 3000);
         return;
       }
-      const remote = await _resolveRemote(pointer);
+      if (pointer.__pointer && pointer.driveFileId) {
+        // La campagna sta su Drive: il co-autore deve collegare il proprio account, poi si riparte da qui.
+        try { await DriveBackup.ready(); } catch(e) {}
+        if (!DriveBackup.isConnected()) DriveBackup.connect();
+        if (!DriveBackup.isConnected()) {
+          Modal.close('collab');
+          Modal.close('gdrive-options');
+          Toast.show('Questa campagna sta su Google Drive: collega il tuo account. Se la finestra non si apre, premi Drive in alto.', 'warning', 8000);
+          if (!_ingressoInAttesa) {
+            _ingressoInAttesa = true;
+            GDrive.onConnect(() => { _ingressoInAttesa = false; joinCampaign(code); });
+          }
+          return;
+        }
+      }
+      const remote = await _resolveRemote(pointer, true);
+      if (!remote && pointer.__pointer) return; // conferma annullata: il motivo e' gia' stato mostrato
       if (!remote || !remote.id) {
         Toast.show('Codice non trovato — verifica le maiuscole e riprova', 'error', 3000);
         return;
@@ -13970,7 +14032,9 @@ const FirebaseSync = (() => {
         // saveCampaign (non App.saveActiveCampaign) perche' la campagna esistente potrebbe
         // non essere quella aperta al momento — aggiornare "l'attiva" avrebbe silenziosamente
         // sovrascritto una campagna diversa con questi dati.
-        Storage.saveCampaign({ ...remote, id: existing.id });
+        const aggiornata = { ...remote, id: existing.id, shareCode: code };
+        Storage.saveCampaign(aggiornata);
+        App.setActiveCampaign(aggiornata);
         Toast.show('Campagna sincronizzata: ' + (remote.name||''), 'success');
         setTimeout(() => App.init?.(), 300);
       } else {
@@ -13979,11 +14043,14 @@ const FirebaseSync = (() => {
         // saveCampaign (non createCampaign, che si aspetta un nome stringa e ne crea una
         // vuota da zero) — qui la campagna arriva gia' completa dal cloud, va solo salvata.
         Storage.saveCampaign(newCamp);
+        // Aprendola, la sync si aggancia al suo codice: _startSync legge la chiave dalla campagna
+        // attiva, quindi senza questo ascoltava quella aperta prima, o una chiave che non esiste.
+        App.setActiveCampaign(newCamp);
         Toast.show('Campagna aggiunta: ' + (remote.name||code), 'success');
         setTimeout(() => App.init?.(), 300);
       }
       Modal.close('collab');
-      _startSync(remote.id || code);
+      Modal.close('gdrive-options');
     } catch(e) {
       Toast.show('Errore: ' + (e.message||'Riprova'), 'error');
     }
@@ -14116,7 +14183,7 @@ const FirebaseSync = (() => {
     loginAnonymous, loginGoogle, loginEmail, registerEmail,
     useLocal, upgradeToGoogle, switchMode,
     syncNow, push, pushNow, flush, flushAndWait, onCampagnaSaved, onCampagnaActivated,
-    getCampCode, copyCode, joinCampaign, deleteCampaign,
+    getCampCode, copyCode, joinCampaign, deleteCampaign, puoInvitare, preparaInvito,
   };
 })();
 
@@ -15582,10 +15649,16 @@ const DriveBackup = (() => {
     return fileId;
   };
 
+  const _accessoNegato = (messaggio) => { const e = new Error(messaggio); e.accessoNegato = true; return e; };
+
   const downloadFromDrive = async (fileId) => {
     const res = await _driveFetch('drive/v3/files/' + fileId + '?alt=media');
     if (res.status === 404) {
-      throw new Error('file non trovato su Drive — probabilmente è stato creato da un altro account Google (controlla di aver collegato lo stesso account usato sugli altri dispositivi) oppure è stato cancellato manualmente da Drive');
+      throw _accessoNegato('file non trovato su Drive — probabilmente è stato creato da un altro account Google (controlla di aver collegato lo stesso account usato sugli altri dispositivi) oppure è stato cancellato manualmente da Drive');
+    }
+    if (res.status === 403) {
+      const motivo = (await res.clone().json().catch(() => null))?.error?.errors?.[0]?.reason || '';
+      if (!/rateLimit/i.test(motivo)) throw _accessoNegato('Google non permette a questo account di aprire il file (' + (motivo || '403') + ')');
     }
     if (!res.ok) throw new Error('errore download da Drive (' + res.status + ')');
     const camp = await res.json();
@@ -15629,16 +15702,76 @@ const DriveBackup = (() => {
     }
   };
 
+  // Il permesso drive.file copre solo i file che l'utente apre con l'app: al co-autore non basta
+  // il link pubblico, Google vuole che scelga il file nel suo selettore. Si apre solo se il
+  // download viene rifiutato, e il permesso poi resta valido per quell'account.
+  // Chiave del progetto Google Cloud di DEFAULT_CLIENT_ID: e' pubblica come il Client ID, e va
+  // limitata a gdr-sys.github.io e alle API Picker e Drive.
+  const PICKER_API_KEY = 'AIzaSyC-TkSBCslT5Z-rru8q80qwSoavS6J0zy0';
+
+  const _caricaPicker = () => new Promise((resolve, reject) => {
+    const avvia = () => gapi.load('picker', { callback: resolve, onerror: () => reject(new Error('selettore di Google non disponibile')) });
+    if (window.gapi?.load) { avvia(); return; }
+    const s = document.createElement('script');
+    s.src = 'https://apis.google.com/js/api.js';
+    s.onload = avvia;
+    s.onerror = () => reject(new Error('selettore di Google non raggiungibile'));
+    document.head.appendChild(s);
+  });
+
+  const _chiediAccessoFile = async (fileId) => {
+    if (!PICKER_API_KEY) throw new Error('il selettore di Google non è ancora configurato in questa versione dell\'app');
+    await _caricaPicker();
+    // Le finestre dell'app potrebbero coprire quella di Google
+    Modal.close('collab');
+    Modal.close('gdrive-options');
+    return new Promise((resolve) => {
+      const p = google.picker;
+      const vista = new p.DocsView(p.ViewId.DOCS).setFileIds(fileId).setMode(p.DocsViewMode.LIST);
+      new p.PickerBuilder()
+        .addView(vista)
+        .setOAuthToken(GDrive.token)
+        .setDeveloperKey(PICKER_API_KEY)
+        .setAppId(GDrive.numeroProgetto)
+        .setLocale('it')
+        .setTitle('Seleziona la campagna condivisa e conferma')
+        .setCallback((dati) => {
+          const azione = dati[p.Response.ACTION];
+          if (azione === p.Action.PICKED) resolve((dati[p.Response.DOCUMENTS] || []).some(d => d[p.Document.ID] === fileId));
+          else if (azione === p.Action.CANCEL) resolve(false);
+        })
+        .build()
+        .setVisible(true);
+    });
+  };
+
+  // Scarica un file condiviso da un altro DM, chiedendo la conferma a Google solo se serve.
+  // Restituisce null se la conferma non arriva: il motivo viene mostrato qui.
+  const scaricaCondiviso = async (fileId) => {
+    try {
+      return await downloadFromDrive(fileId);
+    } catch(e) {
+      if (!e.accessoNegato) throw e;
+    }
+    if (!await _chiediAccessoFile(fileId)) {
+      Toast.show('Accesso annullato. Se Google non mostrava nessun file, chiedi al DM di copiare di nuovo il codice.', 'warning', 7000);
+      return null;
+    }
+    return downloadFromDrive(fileId);
+  };
+
   // Importa la campagna condivisa tramite un codice invito (l'id del file Drive generato da
   // generateInvite) e la collega per il sync automatico futuro, cosi' le modifiche di entrambi
   // i collaboratori continuano ad andare sullo stesso file.
   const acceptInvite = async (code) => {
+    try { await ready(); } catch(e) {} // nei primi secondi la riconnessione puo' essere in corso
     if (!isConnected()) { Toast.show('Collega prima Google Drive', 'warning'); return null; }
     const fileId = (code || '').trim();
     if (!fileId) return null;
     try {
-      const camp = await downloadFromDrive(fileId);
-      if (!camp || !camp.id) { Toast.show('Codice non valido', 'error'); return null; }
+      const camp = await scaricaCondiviso(fileId);
+      if (!camp) return null;
+      if (!camp.id) { Toast.show('Codice non valido', 'error'); return null; }
       _setSyncFileId(camp.id, fileId);
       Storage.saveCampaign(camp);
       return camp;
@@ -15999,7 +16132,7 @@ const DriveBackup = (() => {
     init, connect, connectFromWelcome, dismissWelcome, backupNow, disconnect, showWelcomeIfNeeded, _updateUI,
     listBackups, openRestoreModal, restoreBackup,
     isConnected, ready, syncToDrive, downloadFromDrive, deleteFromDrive, _aggiornaStato, uploadImage, replaceImagesWithDriveLinks, toEmbeddableUrl,
-    generateInvite, acceptInvite, adottaFileSync,
+    generateInvite, acceptInvite, adottaFileSync, scaricaCondiviso,
   };
 })();
 
@@ -21726,7 +21859,7 @@ document.addEventListener('DOMContentLoaded', initMobileNav);
       <!-- Invita collaboratore -->
       <div style="border-top:1px solid var(--border);padding-top:12px;margin-bottom:12px;">
         <div style="font-family:var(--font-display);font-size:0.82rem;font-weight:600;margin-bottom:8px;display:flex;align-items:center;gap:6px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> Invita collaboratore</div>
-        <p style="font-size:0.78rem;color:var(--text-muted);margin-bottom:8px;">Genera un codice da condividere con il co-autore.</p>
+        <p style="font-size:0.78rem;color:var(--text-muted);margin-bottom:8px;">Genera un codice per il co-autore. Chi ha il codice può leggere e modificare questa campagna.</p>
         <div style="display:flex;gap:8px;">
           <input id="gdrive-invite-code" type="text" class="form-input" placeholder="Codice generato qui..." readonly style="flex:1;font-family:var(--font-mono);font-size:0.9rem;letter-spacing:0.1em;" onclick="this.select()">
           <button class="btn btn-secondary" onclick="GDriveUI.generateInvite()">Genera</button>
@@ -21739,7 +21872,7 @@ document.addEventListener('DOMContentLoaded', initMobileNav);
         <div style="font-family:var(--font-display);font-size:0.82rem;font-weight:600;margin-bottom:8px;display:flex;align-items:center;gap:6px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="15.5" r="5.5"/><path d="m21 2-9.6 9.6"/><path d="m15.5 7.5 3 3L22 7l-3-3"/></svg> Unisciti a una campagna</div>
         <p style="font-size:0.78rem;color:var(--text-muted);margin-bottom:8px;">Hai un codice invito? Inseriscilo per accedere alla campagna condivisa.</p>
         <div style="display:flex;gap:8px;">
-          <input id="gdrive-join-code" type="text" class="form-input" placeholder="Inserisci codice..." style="flex:1;font-family:var(--font-mono);text-transform:uppercase;" maxlength="20">
+          <input id="gdrive-join-code" type="text" class="form-input" placeholder="Inserisci codice..." style="flex:1;font-family:var(--font-mono);" autocapitalize="off" autocorrect="off" spellcheck="false">
           <button class="btn btn-primary" onclick="GDriveUI.joinCampaign()">Accedi</button>
         </div>
       </div>
@@ -21893,7 +22026,7 @@ document.addEventListener('DOMContentLoaded', initMobileNav);
       <!-- Invita -->
       <div style="border-top:1px solid var(--border);padding-top:14px;margin-bottom:14px;">
         <div style="font-family:var(--font-display);font-size:0.85rem;font-weight:600;margin-bottom:6px;display:flex;align-items:center;gap:6px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg> Invita co-autore</div>
-        <p style="font-size:0.78rem;color:var(--text-muted);margin-bottom:8px;">Condividi il codice campagna — il co-autore lo inserisce per accedere.</p>
+        <p style="font-size:0.78rem;color:var(--text-muted);margin-bottom:8px;">Copia il codice e mandalo al co-autore. Chi ha il codice può leggere e modificare questa campagna.</p>
         <div style="display:flex;gap:8px;align-items:center;">
           <code id="collab-camp-code" style="flex:1;background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-md);padding:8px 12px;font-size:0.9rem;letter-spacing:0.12em;text-align:center;cursor:pointer;" onclick="FirebaseSync.copyCode()" title="Clicca per copiare">—</code>
           <button class="btn btn-ghost btn-sm" onclick="FirebaseSync.copyCode()" style="display:flex;align-items:center;gap:6px;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copia</button>
@@ -21905,7 +22038,7 @@ document.addEventListener('DOMContentLoaded', initMobileNav);
       <div style="border-top:1px solid var(--border);padding-top:14px;margin-bottom:14px;">
         <div style="font-family:var(--font-display);font-size:0.85rem;font-weight:600;margin-bottom:6px;display:flex;align-items:center;gap:6px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="15.5" r="5.5"/><path d="m21 2-9.6 9.6"/><path d="m15.5 7.5 3 3L22 7l-3-3"/></svg> Unisciti a una campagna</div>
         <div style="display:flex;gap:8px;">
-          <input id="collab-join-code" type="text" class="form-input" placeholder="Codice campagna..." style="flex:1;font-family:var(--font-mono);text-transform:uppercase;" oninput="this.value=this.value.toUpperCase()">
+          <input id="collab-join-code" type="text" class="form-input" placeholder="Codice campagna..." style="flex:1;font-family:var(--font-mono);" autocapitalize="off" autocorrect="off" spellcheck="false">
           <button class="btn btn-primary btn-sm" onclick="FirebaseSync.joinCampaign()">Accedi</button>
         </div>
       </div>
