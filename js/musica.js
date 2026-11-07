@@ -67,12 +67,16 @@ const Musica = (() => {
         ? (p.tracce || []).map(t => {
             const yt = _youtube(t.url);
             return '<div style="border-bottom:1px solid var(--border);padding:8px 0;">' +
-              '<div style="display:flex;align-items:center;gap:8px;">' +
-                '<div style="flex:1;min-width:0;"><div style="font-size:0.9rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + _esc(t.nome) + '</div>' +
+              // Il nome ha la sua larghezza e va a capo per parole; se lo spazio non basta, sono i
+              // pulsanti a scendere sotto, invece di stringere il nome fino a spezzarlo.
+              '<div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;">' +
+                '<div style="flex:1 1 170px;min-width:0;"><div style="font-size:0.9rem;line-height:1.3;overflow-wrap:break-word;">' + _esc(t.nome) + '</div>' +
                   '<div style="font-size:0.72rem;color:var(--text-muted);">' + _esc(_fonte(t.url)) + '</div></div>' +
+                '<div style="display:flex;align-items:center;gap:8px;margin-left:auto;">' +
                 (yt ? '<button type="button" class="btn ' + (_inAscolto === t.id ? 'btn-primary' : 'btn-secondary') + ' btn-sm" style="display:inline-flex;gap:5px;align-items:center;" onclick="Musica.ascolta(\'' + t.id + '\')">' + _iconaPlay + (_inAscolto === t.id ? 'In ascolto' : 'Ascolta qui') + '</button>' : '') +
                 '<a class="btn btn-ghost btn-sm" style="display:inline-flex;gap:5px;align-items:center;" href="' + _esc(t.url) + '" target="_blank" rel="noopener">' + _iconaApri + 'Apri</a>' +
                 '<button type="button" class="btn btn-ghost btn-icon-sm" aria-label="Rimuovi brano" onclick="Musica._togliTraccia(\'' + p.id + '\',\'' + t.id + '\')">' + _iconaX + '</button>' +
+                '</div>' +
               '</div>' +
               (yt && _inAscolto === t.id ? '<div style="max-width:420px;margin-top:8px;"><div style="position:relative;padding-top:56.25%;border-radius:var(--radius-sm);overflow:hidden;background:#000;"><iframe src="' + _esc(yt) + '" title="' + _esc(t.nome) + '" allow="autoplay; encrypted-media" allowfullscreen style="position:absolute;inset:0;width:100%;height:100%;border:0;"></iframe></div></div>' : '') +
             '</div>';

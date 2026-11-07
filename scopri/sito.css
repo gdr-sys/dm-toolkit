@@ -66,6 +66,7 @@ main > section, footer.closing { position: relative; min-height: 100svh; padding
 .fondo { background: radial-gradient(ellipse 60% 62% at 66% 62%, #e9b84f12, transparent 72%), var(--fondo); }
 .discesa:not(.fondo) { background: radial-gradient(ellipse 60% 62% at 66% 62%, #e9b84f12, transparent 72%), var(--stanza); }
 .petrolio { background: var(--petrolio); }
+.stanza { background: radial-gradient(ellipse 60% 62% at 66% 62%, #e9b84f12, transparent 72%), var(--stanza); }
 .due { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); gap: clamp(28px, 4vw, 56px); align-items: start; }
 .due > :first-child > h2 + p { margin-top: 16px; }
 

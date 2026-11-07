@@ -133,6 +133,22 @@ const CampagnaDemo = (() => {
         linee: ['Violenza su bambini'], veli: ['Tortura esplicita'], strumenti: ['cartaX', 'linee', 'porta', 'stelle'], aggiornatoAt: ora },
       clocks: [{ nome: 'Eruzione dell\'Ardegna', max: 8, current: 3, nota: 'L\'Ardegna erutta: la cenere copre la valle e Valmora va evacuata (avanza di 1 per ogni anello spezzato o settimana passata)' },
                { nome: 'Pazienza della guardia di Corvara', max: 6, current: 1, nota: 'La guardia chiude la valle: nessuno entra o esce senza un lasciapassare' }],
+      // Video verificati il 2026-11-07 (oEmbed di YouTube): musica e ambienti pensati per il gioco di ruolo
+      playlist: [
+        { id: 'pl_demo1', nome: 'Taverna', descrizione: 'Serate alla locanda di Valmora', tracce: [
+          { id: 'tr_demo1', nome: 'Locanda affollata, con musica', url: 'https://www.youtube.com/watch?v=RUn1dJY6syc' },
+          { id: 'tr_demo2', nome: 'Taverna medievale', url: 'https://www.youtube.com/watch?v=vyg5jJrZ42s' } ] },
+        { id: 'pl_demo2', nome: 'Battaglia', descrizione: 'Scontri con i Custodi della Cenere', tracce: [
+          { id: 'tr_demo3', nome: 'Combattimento, un\'ora', url: 'https://www.youtube.com/watch?v=t3B802PIuB0' },
+          { id: 'tr_demo4', nome: 'Scontro teso', url: 'https://www.youtube.com/watch?v=378jfMSW8V4' } ] },
+        { id: 'pl_demo3', nome: 'Esplorazione', descrizione: 'In viaggio sui fianchi dell\'Ardegna', tracce: [
+          { id: 'tr_demo5', nome: 'Foresta misteriosa', url: 'https://www.youtube.com/watch?v=4Y6n-1XQSfE' },
+          { id: 'tr_demo6', nome: 'Terre selvagge', url: 'https://www.youtube.com/watch?v=RQJiDxIiWAc' },
+          { id: 'tr_demo7', nome: 'Ambienti di Tabletop Audio', url: 'https://tabletopaudio.com/' } ] },
+        { id: 'pl_demo4', nome: 'La cripta', descrizione: 'Il rituale di Madre Cinerea', tracce: [
+          { id: 'tr_demo8', nome: 'Rituale oscuro', url: 'https://www.youtube.com/watch?v=5Y7oXb_Vmsc' },
+          { id: 'tr_demo9', nome: 'Sotterraneo', url: 'https://www.youtube.com/watch?v=wScEFaoqwPM' } ] },
+      ],
       wiki: { ...(App.getActiveCampaign().wiki || {}), lore: [
         { id: 'n_demo1', titolo: 'L\'Ordine della Fiamma Quieta', categoria: 'Storia', tags: ['storia', 'ordine'], creatoAt: ora, aggiornatoAt: ora,
           contenuto: '<p>Tre secoli fa i monaci dell\'Ordine incatenarono il fuoco del ' + link('luogo:Monte Ardegna', 'Monte Ardegna') + ' con un sigillo di tre anelli, nascosto nella ' + link('luogo:Cripta della Fiamma Quieta', 'Cripta della Fiamma Quieta') + '.</p>' +
