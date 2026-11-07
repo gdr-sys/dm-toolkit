@@ -1161,12 +1161,13 @@ const MappaUI = (() => {
       '</div>' +
       '<div class="form-label">' + (tratti.length > 1 ? 'Il terreno di ogni tratto' : 'Terreno') + '</div>' +
       tratti.map(t =>
-        '<div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;padding:7px 0;border-bottom:1px solid var(--border);font-size:0.85rem;">' +
-          '<span style="flex:1 1 110px;">' + (tratti.length > 1 ? 'Tratto ' + t.n + ' · ' : '') + _fmtDist(t.km) + '</span>' +
-          '<select class="form-select" aria-label="Terreno del tratto ' + t.n + '" style="width:auto;flex:0 1 150px;font-size:0.82rem;padding:4px 8px;" onchange="MappaUI._terrenoTratto(' + t.n + ',this.value)">' +
+        // Tre colonne fisse: nome, terreno, tempo restano allineati in ogni riga
+        '<div style="display:grid;grid-template-columns:minmax(0,1fr) 108px 134px;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border);font-size:0.85rem;">' +
+          '<span style="line-height:1.3;">' + (tratti.length > 1 ? 'Tratto ' + t.n + ' · ' : '') + _fmtDist(t.km) + '</span>' +
+          '<select class="form-select" aria-label="Terreno del tratto ' + t.n + '" style="width:100%;font-size:0.82rem;padding:4px 8px;" onchange="MappaUI._terrenoTratto(' + t.n + ',this.value)">' +
             Object.keys(TERRENO_LABEL).map(k => '<option value="' + k + '"' + (k === t.terreno ? ' selected' : '') + '>' + TERRENO_LABEL[k] + '</option>').join('') +
           '</select>' +
-          '<span style="flex:0 0 auto;min-width:96px;text-align:right;font-family:var(--font-mono);color:var(--text-secondary);" title="' + MEZZO_LABEL[t.mezzo] + '">' + _fmtTempo(t.giorni) + '</span>' +
+          '<span style="text-align:right;white-space:nowrap;font-size:0.8rem;font-family:var(--font-mono);color:var(--text-secondary);" title="' + MEZZO_LABEL[t.mezzo] + '">' + _fmtTempo(t.giorni) + '</span>' +
         '</div>').join('') +
       '<div style="display:flex;justify-content:space-between;align-items:baseline;padding-top:10px;font-size:0.95rem;">' +
         '<strong>Totale</strong><strong style="font-family:var(--font-mono);color:var(--accent-text);">' + _fmtTempo(totale) + '</strong>' +

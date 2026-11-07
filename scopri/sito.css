@@ -23,7 +23,7 @@
 }
 *, *::before, *::after { box-sizing: border-box; }
 html { background: var(--stanza); -webkit-text-size-adjust: 100%; scrollbar-color: #40586a var(--fondo); }
-body { margin: 0; background: var(--stanza); color: var(--carta); font: 400 1.125rem/1.55 var(--testo); }
+body { margin: 0; background: var(--stanza); color: var(--carta); font: 400 1.25rem/1.55 var(--testo); }
 img, svg { display: block; max-width: 100%; }
 ::selection { background: var(--ambra); color: var(--inchiostro); }
 :focus-visible { outline: 3px solid var(--ambra-forte); outline-offset: 3px; border-radius: 3px; }
@@ -35,7 +35,7 @@ h3 { font-size: clamp(1.25rem, 1.6vw, 1.5rem); line-height: 1.2; }
 p { margin: 0; }
 ul { margin: 0; padding: 0; list-style: none; }
 .wrap { width: min(100% - 2 * var(--gut), 1280px); margin-inline: auto; position: relative; z-index: 1; }
-.lead { color: var(--nebbia); max-width: 34rem; font-size: 1.1875rem; }
+.lead { color: var(--nebbia); max-width: 36rem; font-size: 1.3125rem; }
 .salto { position: absolute; left: 12px; top: -80px; z-index: 30; padding: .6em 1em; background: var(--ambra); color: var(--inchiostro); border-radius: 4px; }
 .salto:focus { top: 12px; }
 
@@ -80,13 +80,13 @@ main > section, footer.closing { position: relative; min-height: 100svh; padding
 .hero__testo .lead { margin-top: 20px; }
 .hero__testo .azioni { margin-top: 28px; }
 .hero__testo .azioni .bott { flex: 1 1 100%; }
-.fatti { display: flex; flex-wrap: wrap; gap: 6px 20px; margin-top: 22px; color: var(--nebbia); font-size: 1rem; }
+.fatti { display: flex; flex-wrap: wrap; gap: 6px 20px; margin-top: 22px; color: var(--nebbia); font-size: 1.0625rem; }
 .fatti li { display: inline-flex; align-items: center; gap: .45em; }
 .fatti svg { width: 15px; height: 15px; color: var(--ambra); flex: none; }
 .hero__app img { width: 100%; height: auto; border-radius: 10px; border: 1px solid #f2ecd84d; box-shadow: var(--luce-foglio); animation: accendi .9s var(--curva) both; }
 @keyframes accendi { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
 .banco { margin-top: 18px; display: grid; gap: 10px; justify-items: start; }
-.banco__stato { color: var(--nebbia); font-size: 1rem; }
+.banco__stato { color: var(--nebbia); font-size: 1.0625rem; }
 .banco__stato.errore { color: #ffb4a6; }
 .banco__stato code { font: 500 .9375rem var(--testo); font-variant-numeric: tabular-nums; color: var(--ambra-forte); }
 .lastra__nuovo { position: absolute; inset: 0; z-index: 1; }
@@ -96,7 +96,7 @@ main > section, footer.closing { position: relative; min-height: 100svh; padding
 .tappe { margin-top: 24px; display: grid; gap: 4px; }
 .tappa { display: block; width: 100%; padding: 12px 14px 12px 44px; background: none; border: 1px solid transparent; border-radius: 6px; color: var(--nebbia); text-align: left; font: inherit; cursor: pointer; transition: background-color .18s, border-color .18s, color .18s; }
 .tappa strong { display: block; font: 500 1.3125rem/1.2 var(--display); color: var(--carta); }
-.tappa span { display: block; font-size: 1rem; line-height: 1.4; margin-top: 2px; }
+.tappa span { display: block; font-size: 1.125rem; line-height: 1.4; margin-top: 2px; }
 .tappa:hover { background: #f2ecd80f; }
 .tappa[aria-selected="true"] { background: var(--pin) 12px 14px / 22px 22px no-repeat, var(--foglio); border-color: var(--filo); }
 .tappa[aria-selected="true"] strong { color: var(--ambra-forte); }
@@ -127,7 +127,7 @@ main > section, footer.closing { position: relative; min-height: 100svh; padding
 .stemma svg { width: 100%; height: 100%; }
 
 /* Segreti */
-.nota { margin-top: 32px; padding: clamp(20px, 2.6vw, 32px); background: var(--foglio); border: 1px solid var(--filo); border-radius: 10px; box-shadow: var(--luce-foglio); font-size: 1.1875rem; }
+.nota { margin-top: 32px; padding: clamp(20px, 2.6vw, 32px); background: var(--foglio); border: 1px solid var(--filo); border-radius: 10px; box-shadow: var(--luce-foglio); font-size: 1.3125rem; }
 .nota__testa { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
 .nota h3 { font-size: clamp(1.5rem, 2.2vw, 2rem); }
 .interruttore { display: inline-flex; padding: 3px; border: 1px solid var(--filo); border-radius: 7px; }
@@ -142,7 +142,7 @@ main > section, footer.closing { position: relative; min-height: 100svh; padding
 .nota[data-vista="giocatori"] .nota__segreto { grid-template-rows: 0fr; opacity: 0; margin-top: 0; visibility: hidden; }
 @media (min-width: 1024px) and (min-height: 760px) {
   #segreti > .wrap { display: flex; flex-direction: column; justify-content: space-between; min-height: calc(100svh - clamp(96px, 13.3svh, 120px) - clamp(48px, 8svh, 72px)); }
-  #segreti .nota { font-size: 1.3125rem; padding: clamp(28px, 3vw, 40px); }
+  #segreti .nota { font-size: 1.4375rem; padding: clamp(28px, 3vw, 40px); }
   #segreti .nota h3 { font-size: 2.25rem; }
   #segreti .testa-due, #segreti .nota, #segreti .garanzie { margin-top: 0; }
 }
@@ -157,13 +157,13 @@ footer.closing > .wrap { display: flex; flex-direction: column; justify-content:
 .chiusura__foglio img { width: 100%; height: auto; border-radius: 8px; border: 1px solid var(--filo); box-shadow: var(--luce-foglio); }
 .chiusura__foglio svg { position: absolute; left: 39.1%; top: 76%; width: 44px; height: 44px; transform: translate(-22px, -44px); color: var(--cinabro); filter: drop-shadow(0 3px 4px #000a); }
 .chiusura h2 { font-size: clamp(2.25rem, 4vw, 3.75rem); line-height: 1.05; }
-.chiusura p { margin-top: 18px; max-width: 36rem; color: var(--nebbia); font-size: 1.1875rem; }
+.chiusura p { margin-top: 18px; max-width: 38rem; color: var(--nebbia); font-size: 1.3125rem; }
 .chiusura .azioni { margin-top: 28px; }
 .chiusura .azioni .bott { flex: 0 1 19rem; }
 .piede ul { display: flex; flex-wrap: wrap; gap: 0 1.6rem; }
 .piede li a { display: inline-flex; align-items: center; min-height: 44px; }
 .piede li a:hover { color: var(--ambra-forte); }
-.piede p { margin-top: 10px; color: var(--nebbia); font-size: .9375rem; max-width: 62rem; }
+.piede p { margin-top: 10px; color: var(--nebbia); font-size: 1rem; max-width: 62rem; }
 
 /* Pagine interne */
 .testa-pagina { padding-top: calc(var(--testata) + clamp(40px, 8vw, 88px)); padding-bottom: clamp(32px, 5vw, 56px); }
@@ -209,21 +209,21 @@ footer.closing > .wrap { display: flex; flex-direction: column; justify-content:
   .hero__griglia { grid-template-columns: minmax(0, 1fr); padding: calc(var(--testata) + 20px) 0 40px; gap: 28px; }
   .hero__testo .azioni .bott { flex: 1 1 15rem; }
   h1 { font-size: clamp(2.375rem, 7vw, 3.75rem); }
-  .hero__testo .lead { font-size: 1.3125rem; max-width: none; }
+  .hero__testo .lead { font-size: 1.4375rem; max-width: none; }
   .tappe { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-  .lead { max-width: 40rem; }
+  .lead { max-width: 42rem; }
   .domande { grid-template-columns: minmax(0, 1fr); }
 }
 @media (max-width: 639px) {
-  body { font-size: 1.0625rem; }
+  body { font-size: 1.1875rem; }
   h1 { font-size: 2.375rem; }
   .marchio__testo { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
   .nav nav { gap: .9rem; }
   .nav nav .bott { padding-inline: .8em; }
-  .hero__testo .lead { margin-top: 12px; font-size: 1.0625rem; }
+  .hero__testo .lead { margin-top: 12px; font-size: 1.1875rem; }
   .hero__testo .azioni { margin-top: 16px; gap: 8px; }
   .hero__testo .azioni .bott, .chiusura .azioni .bott { flex: 1 1 100%; }
-  .fatti { margin-top: 12px; font-size: .9375rem; gap: 2px 14px; }
+  .fatti { margin-top: 12px; font-size: 1rem; gap: 2px 14px; }
   .tappe { grid-template-columns: minmax(0, 1fr); }
   .segno { top: max(var(--y), 34px); min-height: 32px; font-size: .875rem; transform: translate(-16px, -32px); }
   .segno svg { width: 32px; height: 32px; }
@@ -233,7 +233,7 @@ footer.closing > .wrap { display: flex; flex-direction: column; justify-content:
   .tavolino { grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 20px; }
   .tavolino .stemma { grid-column: 1 / -1; max-width: 220px; margin-inline: auto; }
   .garanzie { grid-template-columns: minmax(0, 1fr); gap: 14px; margin-top: 20px; }
-  .nota { margin-top: 20px; font-size: 1.0625rem; }
+  .nota { margin-top: 20px; font-size: 1.1875rem; }
   main > section:not(.hero), footer.closing { padding: 56px 0; }
 }
 @media (prefers-reduced-motion: reduce) {
