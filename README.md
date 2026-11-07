@@ -9,7 +9,7 @@
 
 Web app per Dungeon Master di D&D 5e (edizioni 2014 e 2024) per gestire una campagna dalla preparazione della sessione al combattimento al tavolo, da qualsiasi dispositivo e senza installare nulla.
 
-![Il combat tracker durante uno scontro della campagna di esempio](scopri/img/app-sessione.jpg)
+![DM Toolkit in azione: Dashboard, percorso a tappe sulla mappa, tempi di viaggio, combat tracker e musica](docs/img/demo.gif)
 
 ### [Scopri DM Toolkit](https://gdr-sys.github.io/dm-toolkit/scopri/)
 
@@ -57,7 +57,7 @@ Per vederla in azione: apri l'app e, nella Home vuota, scegli **"Prova con una c
 
 ### Wiki
 
-![Una nota della Wiki con i collegamenti a luoghi, personaggi e fazioni](scopri/img/app-wiki.jpg)
+![Dalla nota della Wiki alla scheda del luogo, poi Entra in scena e il grafo dei legami](docs/img/demo-wiki.gif)
 
 Editor con barra di formattazione (titoli, grassetto, corsivo, colori, evidenziatore) e riquadri speciali: Da leggere ad alta voce, Segreto DM, Bottino, Indizio, Trappola, Idea al volo. Le note supportano:
 
@@ -106,7 +106,7 @@ Carica un'immagine come mappa interattiva. Puoi spostarla trascinando e ingrandi
 
 Crea una mappa da zero, senza caricare nulla: **regno** (isola, continente, arcipelago o costa, con strade, rotte via mare e distanze), **città**, **villaggio**, **caverna o radura**, **dungeon** (con le stanze descritte) e **abitazione** (un disegno per ogni piano, più il tetto).
 
-![La pagina del Cartografo](scopri/img/app-cartografo.jpg)
+![Il Cartografo genera un regno, poi una città, un dungeon e una casa su più piani](docs/img/demo-cartografo.gif)
 
 - Scegli forma, dimensione, colori e cosa mostrare, oppure lascia fare al caso con **A caso**: resta nel tipo di mappa scelto e, con **Tieni i miei colori**, non cambia il tuo stile. **Mappa precedente** ti riporta a quella di prima.
 - **Metti nelle mappe** la porta nella pagina Mappa con la scala già impostata e i luoghi segnati dai pin con le loro note. A richiesta crea anche le schede Luogo nella Wiki.
@@ -151,7 +151,7 @@ I generatori sono scritti apposta per il toolkit e funzionano senza servizi este
 
 ### Generatori
 
-![Le mie tabelle e i generatori](scopri/img/app-generatori.jpg)
+![Una tabella personale tirata, un PNG generato e le voci di corridoio con i nomi della campagna](docs/img/demo-generatori.gif)
 
 
 22 generatori per improvvisare: PNG completo, meteo, rumori e odori, descrizione di luoghi, nomi di luoghi, negozio (con i prezzi degli oggetti magici), biblioteca, bottino, viaggio, incontri, incontro bilanciato, voci di corridoio, accenti, nomi, follia, ganci, oracolo, missioni. Sono divisi in **schede per categoria** (PNG, ambiente, negozio, bottino, viaggio, strumenti narrativi, dungeon) con una **ricerca per nome**, così vedi solo quello che ti serve. Tutti, comprese "Le mie tabelle", si possono nascondere da **Personalizza** e riordinare. Il **Generatore Nomi** non propone nomi già usati dai tuoi PNG, e le **Voci di corridoio** aggiungono due voci costruite con PNG, luoghi e fazioni della tua campagna, cliccabili.
