@@ -17,7 +17,7 @@ const CartoRegno = (() => {
       font: "'IM Fell English', Georgia, serif", fontCurvo: "'IM Fell English SC', Georgia, serif",
     },
     notte: {
-      mare: "#0b1820", terra: "#13303b", terraAlta: "#1d4150", terra2: "#1d4150", ink: "#0b1820", gesso: "#e8e1cf", gessoTenue: "#b9b4a6", batimetria: "#78afc4", fiume: "#7ebad8",
+      carta: "#0b1820", mare: "#0b1820", terra: "#13303b", terraAlta: "#1d4150", terra2: "#1d4150", ink: "#0b1820", gesso: "#e8e1cf", gessoTenue: "#b9b4a6", batimetria: "#78afc4", fiume: "#7ebad8",
       bosco: "#7eb696", ambra: "#e9b84f", muro: "#c9c3b2", tetto: "#e9b84f", oro: "#e9b84f", testo: "#e8e1cf", testoAlone: "#0d1d26", mareTesto: "#8cbacc", margine: "#0b1820", peso: 600,
       font: "'Cormorant SC', Georgia, serif", fontCurvo: "'Cormorant SC', Georgia, serif",
     },
@@ -714,7 +714,7 @@ const CartoRegno = (() => {
       return { x: c.x, y: c.y, label: c.nome, sottotipo: '', genera, tipoLuogo: c.rango >= 1 ? 'Città' : 'Villaggio', note: ruolo + '.' + (vie ? ' Strade per ' + vie + '.' : '') + (mare ? ' Via mare per ' + mare + '.' : '') };
     }).concat(notevoli.map((c) => ({ x: c.x, y: c.y, label: c.nome, sottotipo: 'pericolo', tipoLuogo: 'Dungeon', genera: { tipo: 'dungeon', opzioni: {} }, note: 'Luogo misterioso, tutto da riempire.' })));
 
-    const svg = M.apri(W, H, A ? M.PALETTE.atlante : M.PALETTE.notte, o.seme) + s + (o.nomi === false ? '' : testi) + rosa + cornice + scala + '</svg>';
+    const svg = M.apri(W, H, A ? M.PALETTE.atlante : M.PALETTE.cartografo, o.seme) + s + (o.nomi === false ? '' : testi) + rosa + cornice + scala + '</svg>';
     return { nome, pin, W, H, larghezzaKm: W * kmPx, svg };
   };
 

@@ -57,7 +57,7 @@ const CartoCatalogo = (() => {
     },
     abitazione: {
       nome: 'Abitazione', genera: (o) => CartoAbitazione.abitazione(o),
-      colori: [['calda', 'Lume di candela'], ['pietra', 'Pietra'], ['pergamena', 'Pergamena'], ['notte', 'Notturna']],
+      colori: [['atlante', 'Atlante'], ['notte', 'Notte']],
       opzioni: [
         S('edificio', 'Edificio', [['casa', 'Casa'], ['taverna', 'Taverna'], ['bottega', 'Bottega'], ['torre', 'Torre']], 'casa'),
         S('piani', 'Piani', [['1', '1'], ['2', '2'], ['3', '3']], '2'),

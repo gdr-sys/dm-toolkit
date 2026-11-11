@@ -241,32 +241,7 @@ const CartoMotore = (() => {
   };
   const esc = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
-  const PALETTE = {
-    pergamena: {
-      nome: 'Pergamena', carta: '#efe2c4', carta2: '#e4d3ae', macchia: '#7a5a2e', inchiostro: '#35281b', tenue: '#75603f',
-      acqua: '#a7c5c2', acquaInk: '#4f7c7a', erba: '#c5c690', erba2: '#a9b071', chioma: '#7d8c52', chioma2: '#66753f',
-      strada: '#f3e9cf', stradaBordo: '#a48d66', terra: '#dcc9a0', tetti: ['#b4744c', '#a9663f', '#bf8859', '#9c6a48'], tettoNobile: '#6f6a70',
-      campi: ['#d6cc94', '#c9c98c', '#dbc98a', '#bfc488'], neve: '#f8f4e8', pavimento: '#f6efdc', roccia: '#c9b48e',
-    },
-    acquerello: {
-      nome: 'Acquerello', carta: '#f6f0e1', carta2: '#ece2cc', macchia: '#8a7a5a', inchiostro: '#2c2a2b', tenue: '#6b6660',
-      acqua: '#92c6d9', acquaInk: '#3f7d98', erba: '#b4d195', erba2: '#90b873', chioma: '#5f9a58', chioma2: '#467c47',
-      strada: '#fbf5e4', stradaBordo: '#a39274', terra: '#e6d7b5', tetti: ['#c8593f', '#d0694a', '#b84f3a', '#d98258'], tettoNobile: '#4f6780',
-      campi: ['#e3d98c', '#c8d68b', '#ead193', '#b7d28e'], neve: '#ffffff', pavimento: '#fbf7ea', roccia: '#c7bda9',
-    },
-    inchiostro: {
-      nome: 'Inchiostro', carta: '#f8f6f0', carta2: '#efece4', macchia: '#55524b', inchiostro: '#1b1a18', tenue: '#5c5a55',
-      acqua: '#dfe5e6', acquaInk: '#5d6a6d', erba: '#f1f0e6', erba2: '#e4e3d8', chioma: '#d3d2c6', chioma2: '#a9a89c',
-      strada: '#ffffff', stradaBordo: '#6e6c66', terra: '#ebe8df', tetti: ['#f4f2ec', '#e6e3da', '#d9d6cc', '#efece4'], tettoNobile: '#bdbab0',
-      campi: ['#eeece1', '#e6e4d8', '#f3f1e8', '#dfddd1'], neve: '#ffffff', pavimento: '#ffffff', roccia: '#dcd9d0',
-    },
-    notte: {
-      nome: 'Notturna', carta: '#1d2733', carta2: '#25313f', macchia: '#000000', inchiostro: '#e6dfc9', tenue: '#a3acb5',
-      acqua: '#101a27', acquaInk: '#5a8aa8', erba: '#26393a', erba2: '#2e4442', chioma: '#3a5a4e', chioma2: '#2a4439',
-      strada: '#3d4a59', stradaBordo: '#14191f', terra: '#2c3845', tetti: ['#54606f', '#4a5564', '#606b7a', '#46505e'], tettoNobile: '#7f6f9a',
-      campi: ['#2c4040', '#324646', '#2a3c42', '#35493f'], neve: '#dfe7ee', pavimento: '#364454', roccia: '#2a3440',
-    },
-  };
+  const PALETTE = {};
 
   /* I due stili del Cartografo: Atlante inciso (di giorno) e Notte del cartografo (scuro).
      Hanno "stile" e i propri caratteri: le parti comuni qui sotto (cornice, titolo, rosa, scala,
@@ -287,20 +262,8 @@ const CartoMotore = (() => {
     campi: ['#152d36', '#183238', '#132a33', '#1a3439'], neve: '#dfe7ee', pavimento: '#1f3846', roccia: '#24343f', parete: '#06100a',
   };
 
-  // Monocromatica da incisione: edifici importanti in nero pieno, mura come un tratto deciso
-  PALETTE.seppia = {
-    nome: 'Seppia', carta: '#d2cab9', carta2: '#cbc3b1', macchia: '#6b6350', inchiostro: '#191815', tenue: '#5f5a4d',
-    acqua: '#7d786c', acquaInk: '#3b382f', erba: '#d2cab9', erba2: '#c6beac', chioma: '#aaa290', chioma2: '#958d7b',
-    strada: '#dcd5c6', stradaBordo: '#7f7a6b', terra: '#cbc3b1', tetti: ['#9d998c', '#a5a194', '#95918a', '#a09c8f'], tettoNobile: '#191815',
-    campi: ['#cfc7b6', '#cbc3b2', '#d3cbba', '#c8c0af'], neve: '#ece7da', pavimento: '#d9d2c3', roccia: '#b3ac9c', muroPieno: true, senzaCornice: true,
-  };
-
-  // Tinte di caverne e dungeon: fondo piatto, muri neri decisi, roccia tratteggiata
+  // Tinte di caverne, dungeon ed edifici nei due stili: fondo, pavimento, roccia tratteggiata
   const TONI_INTERNI = {
-    pergamena: { sfondo: '#ecdfce', pavimento: '#f6eddd', roccia: '#a9a191', ink: '#161310', tenue: '#6d6355', acqua: '#a9b9b4', acquaInk: '#4d6661', legno: '#b98a5c', pietra: '#c9c1b1', metallo: '#8b867b' },
-    seppia: { sfondo: '#d2cab9', pavimento: '#e6dfcf', roccia: '#8d8676', ink: '#161510', tenue: '#5f5a4d', acqua: '#a8a393', acquaInk: '#4a463a', legno: '#9d9483', pietra: '#bab2a1', metallo: '#7d786b' },
-    pietra: { sfondo: '#d8dcdc', pavimento: '#eff1ee', roccia: '#8e9699', ink: '#14181a', tenue: '#59646a', acqua: '#9dbccb', acquaInk: '#3f6c82', legno: '#a88a6a', pietra: '#bcc3c4', metallo: '#7c8689' },
-    // I due stili del Cartografo
     atlante: { stile: 'atlante', sfondo: '#efe5cc', pavimento: '#f8f2e3', roccia: '#e3d6b6', ink: '#33261a', tenue: '#6e5a40', ombra: '#33261a', numero: '#a8382a', acqua: '#dccfae', acquaInk: '#33261a', legno: '#cfae80', pietra: '#e6dabd', metallo: '#9a8f7c' },
     notte: { stile: 'notte', sfondo: '#0e1d26', pavimento: '#1d3543', roccia: '#122530', ink: '#e8e1cf', tenue: '#9fb0b4', ombra: '#03090b', numero: '#e9b84f', acqua: '#0f3a52', acquaInk: '#7ebad8', legno: '#6b5a44', pietra: '#3a5563', metallo: '#8a95a0' },
   };
@@ -312,7 +275,7 @@ const CartoMotore = (() => {
 
   const apri = (W, H, p, seme) => {
     const s = _hash(String(seme)) % 1000;
-    const scuro = p === PALETTE.notte || p.stile === 'notte';
+    const scuro = p.stile === 'notte';
     const sfocature = [4, 12, 40].map((b) => `<filter id="carto-b${b}" filterUnits="userSpaceOnUse" x="-200" y="-200" width="${W + 400}" height="${H + 400}"><feGaussianBlur stdDeviation="${b}"/></filter>`).join('');
     return `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img">` +
       `<defs>${sfocature}<filter id="carto-carta" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.018 0.024" numOctaves="5" seed="${s}"/>` +

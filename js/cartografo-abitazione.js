@@ -8,28 +8,22 @@
 const CartoAbitazione = (() => {
   const M = CartoMotore, n1 = M.n1;
 
+  // I due stili del Cartografo: pianta incisa su carta (atlante) e pianta notturna con le finestre accese (notte)
   const TONI = {
-    calda: {
-      sfondo: '#f3ecdf', muro: '#b2b0ac', finestra: '#8c8a87', ink: '#14110e', luce: '#ecc98c', mezza: '#b5926f', ombra: '#65503f', griglia: '#5e4733', testo: '#efe2c4', testoInk: '#3c2c1f',
-      mobile: '#e7c79a', mobileInk: '#775a41', scala: '#9c7f65', tegola: '#c07e5d', tegolaInk: '#6e3f2b', cantina: ['#a39680', '#807460', '#4b4337'],
-    },
-    pietra: {
-      sfondo: '#e6e6e2', muro: '#8f9398', finestra: '#6d7277', ink: '#101215', luce: '#e6dfcf', mezza: '#aaa89f', ombra: '#5b5c5c', griglia: '#45484c', testo: '#f2efe4', testoInk: '#2a2c2f',
-      mobile: '#d7d2c4', mobileInk: '#5f6063', scala: '#8d8e8c', tegola: '#6f7a86', tegolaInk: '#333b44', cantina: ['#8e918f', '#6e7171', '#3f4243'],
-    },
-    pergamena: {
-      sfondo: '#efe2c4', muro: '#a8967a', finestra: '#7f6f57', ink: '#231a10', luce: '#f6e7c4', mezza: '#d6bf95', ombra: '#957c5a', griglia: '#6d5638', testo: '#fbf2da', testoInk: '#3b2c1a',
-      mobile: '#e4cf9f', mobileInk: '#7a6240', scala: '#b39b73', tegola: '#a9623f', tegolaInk: '#5f3722', cantina: ['#bcaa89', '#9a8868', '#685a43'],
+    atlante: {
+      stile: 'atlante', sfondo: '#efe5cc', muro: '#d9c9a3', finestra: '#dccfae', ink: '#33261a', luce: '#faf5e8', mezza: '#f3ead3', ombra: '#e3d4b0', griglia: '#8a7454', testo: '#33261a', testoInk: '#f6efdc', titolo: '#33261a',
+      mobile: '#e8d6b0', mobileInk: '#5e4a32', scala: '#cdb991', tegola: '#c27b5e', tegolaInk: '#5e2f20', cantina: ['#ece2c8', '#ddd0b0', '#c6b68f'],
     },
     notte: {
-      sfondo: '#11151a', muro: '#3f4750', finestra: '#2b4a63', ink: '#000000', luce: '#c79a55', mezza: '#6f5a42', ombra: '#2b2622', griglia: '#0f0d0a', testo: '#f3e6c7', testoInk: '#0c0a08',
-      mobile: '#8a7052', mobileInk: '#1c1712', scala: '#54473a', tegola: '#6b4438', tegolaInk: '#2a1a15', cantina: ['#4c5258', '#343a3f', '#181c20'],
+      stile: 'notte', sfondo: '#0e1d26', muro: '#2f4856', finestra: '#e9b84f', ink: '#c3ced1', luce: '#3b5a6a', mezza: '#264151', ombra: '#132a36', griglia: '#5f7f8c', testo: '#e8e1cf', testoInk: '#0d1d26', titolo: '#e8e1cf',
+      mobile: '#4a6372', mobileInk: '#0b161c', scala: '#35505e', tegola: '#2c4856', tegolaInk: '#08131a', cantina: ['#22343e', '#18282f', '#0c161b'],
     },
   };
 
   const abitazione = (o) => {
     const r = M.rng('abitazione:' + o.seme);
-    const t = TONI[o.palette] || TONI.calda;
+    const t = o.palette === 'notte' ? TONI.notte : TONI.atlante;
+    const carta = { ...(t.stile === 'notte' ? M.PALETTE.cartografo : M.PALETTE.atlante), carta: t.sfondo, carta2: t.sfondo, inchiostro: t.titolo, tenue: t.griglia };
     const tipo = CartoTesti.TIPI_CASA[o.edificio] ? o.edificio : 'casa', T = CartoTesti.TIPI_CASA[tipo];
     const nPiani = Math.max(1, Math.min(3, parseInt(o.piani, 10) || 2));
     const cantina = o.cantina !== false, conLegenda = o.legenda === true, conTetto = o.tetto !== false;
@@ -205,7 +199,7 @@ const CartoAbitazione = (() => {
     /* Disegna i corpi come un'unica sagoma: prima il contorno, poi il riempimento sopra */
     const sagoma = (lista) => {
       const rects = lista.map((c) => `<rect x="${n1(c.x * S - SP)}" y="${n1(c.y * S - SP)}" width="${n1(c.w * S + SP * 2)}" height="${n1(c.h * S + SP * 2)}"`);
-      return rects.map((q) => `${q} fill="${I}" stroke="${I}" stroke-width="3"/>`).join('') + rects.map((q) => `${q} fill="${t.muro}"/>`).join('');
+      return rects.map((q) => `${q} fill="${I}" stroke="${I}" stroke-width="3"/>`).join('') + rects.map((q) => `${q} fill="${t.muro}"/>`).join('') + (t.stile === 'atlante' ? rects.map((q) => `${q} fill="url(#carto-tratt)"/>`).join('') : '');
     };
 
     /* Tetto a padiglione di un corpo: quattro falde, scandole, displuvi con i coppi */
@@ -241,7 +235,7 @@ const CartoAbitazione = (() => {
     piani.forEach((pi, indice) => {
       const [ox, oy] = origine(indice);
       const fondoStanza = pi.interrato ? 'url(#carto-cantina)' : 'url(#carto-stanza)';
-      testi += M.etichetta(ox + fw * S / 2, oy - 14, NOME(pi.livello), { carta: t.sfondo, inchiostro: I }, { size: Math.max(20, Math.min(30, S * 0.6)), font: M.FONT_TITOLO, peso: 700, colore: t.testoInk, alone: t.sfondo, aloneW: 3 });
+      testi += M.etichetta(ox + fw * S / 2, oy - 14, NOME(pi.livello), carta, { size: Math.max(22, Math.min(32, S * 0.64)), font: carta.fontTitolo, peso: t.stile === 'notte' ? 600 : 400, spazio: 2, colore: t.titolo, alone: t.sfondo, aloneW: 3 });
       let g = `<g transform="translate(${n1(ox)} ${n1(oy)})">`;
 
       // Sotto: i tetti dei corpi che a questo piano non ci sono piu'
@@ -355,7 +349,7 @@ const CartoAbitazione = (() => {
         }
         dim = Math.max(11.5, dim);
         righe.forEach((rg, i) => {
-          testi += M.etichetta(cx, cy + dim * 0.34 + (i - (righe.length - 1) / 2) * dim * 1.02, rg, { carta: t.sfondo, inchiostro: I }, { size: n1(dim), peso: 700, colore: t.testo, alone: t.testoInk, aloneW: Math.max(2.4, dim * 0.13) });
+          testi += M.etichetta(cx, cy + dim * 0.34 + (i - (righe.length - 1) / 2) * dim * 1.02, rg, carta, { size: n1(dim), font: carta.fontCorpo || carta.font, peso: 600, colore: t.testo, alone: t.testoInk, aloneW: Math.max(2.4, dim * 0.13) });
         });
         voci.push({ n: numero, titolo: s.etichetta, testo: s.nota });
         pin.push({ x: cx, y: cy - dim * (righe.length * 0.62), label: (conLegenda ? numero + '. ' : '') + s.etichetta, note: NOME(pi.livello) + '. ' + s.nota, sottotipo: 'nota' });
@@ -369,7 +363,7 @@ const CartoAbitazione = (() => {
     /* ── Il tetto ── */
     if (conTetto) {
       const [ox, oy] = origine(piani.length);
-      testi += M.etichetta(ox + fw * S / 2, oy - 14, 'Tetto', { carta: t.sfondo, inchiostro: I }, { size: Math.max(20, Math.min(30, S * 0.6)), font: M.FONT_TITOLO, peso: 700, colore: t.testoInk, alone: t.sfondo, aloneW: 3 });
+      testi += M.etichetta(ox + fw * S / 2, oy - 14, 'Tetto', carta, { size: Math.max(22, Math.min(32, S * 0.64)), font: carta.fontTitolo, peso: t.stile === 'notte' ? 600 : 400, spazio: 2, colore: t.titolo, alone: t.sfondo, aloneW: 3 });
       let g = `<g transform="translate(${n1(ox)} ${n1(oy)})">`;
       const ordine = corpi.slice().sort((a, b) => (a.base ? 1 : 0) - (b.base ? 1 : 0));
       ordine.forEach((c) => { g += tettoCorpo(c, 0.22); });
@@ -382,13 +376,12 @@ const CartoAbitazione = (() => {
     }
 
     /* ── Composizione ── */
-    const carta = { ...M.PALETTE.pergamena, carta: t.sfondo, carta2: t.sfondo, inchiostro: I, tenue: t.griglia, senzaCornice: true };
     let svg = M.apri(W, H, carta, o.seme) + s0;
     if (o.nomi !== false) svg += testi;
     if (conLegenda) svg += M.legenda(W - 348, 36, 316, H - 72, 'Le stanze', voci, carta);
     const cx = conLegenda ? (W - 372) / 2 : W / 2;
-    if (o.titolo !== false) svg += `<text x="${n1(cx)}" y="64" font-family="${M.FONT_TITOLO}" font-size="38" font-weight="700" text-anchor="middle" fill="${t.testoInk}">${M.esc(nome)}</text>`;
-    svg += M.scala(46, H - 40, S * 4, { valore: 6, nome: 'metri' }, 2, carta) + '</svg>';
+    if (o.titolo !== false) svg += M.etichetta(cx, 66, t.stile === 'notte' ? nome.toUpperCase() : nome, carta, { size: t.stile === 'notte' ? 34 : 40, font: carta.fontTitolo, peso: t.stile === 'notte' ? 600 : 400, spazio: t.stile === 'notte' ? 6 : 1.5, aloneW: 6 });
+    svg += M.scala(50, H - 48, S * 4, { valore: 6, nome: 'metri' }, 2, carta) + M.chiudi(W, H, carta);
     return { nome, pin, W, H, larghezzaKm: W / S * 1.5 / 1000, svg };
   };
 
