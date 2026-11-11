@@ -10,22 +10,6 @@ const CartoVillaggio = (() => {
   const n1 = M.n1;
 
   const TONI = {
-    naturale: {
-      prato: '#7fa877', pratoScuro: '#2f5a4a', luce: '#e9f7cf', chioma: ['#3f6f62', '#35635a', '#4a7d6d'], chiomaL: '#5e9682', bosco: '#264d47', boscoProfondo: '#163530', ink: '#10211e',
-      campo: ['#8f6f66', '#9c7a6e', '#85665f', '#a58478'], solco: '#4d3a36', strada: '#d2c9ae', stradaBordo: '#8c8a70', piazza: '#d9d0b6', tetti: ['#a8694e', '#9a5f47', '#b57658', '#8f5a48'], ardesia: ['#6d8396', '#607689'], acqua: '#8db8c9', acquaInk: '#3f6f80', testo: '#f6f2df', testoAlone: '#10211e',
-    },
-    pergamena: {
-      prato: '#c3bf88', pratoScuro: '#7e7a48', luce: '#f6f0cf', chioma: ['#7d8a52', '#6d7b47', '#8c9a5e'], chiomaL: '#a4b072', bosco: '#5f6c3e', boscoProfondo: '#465230', ink: '#2c2619',
-      campo: ['#c9a874', '#bb9a68', '#d4b57f', '#b08f60'], solco: '#6e5534', strada: '#efe6c9', stradaBordo: '#9a8a62', piazza: '#efe6c9', tetti: ['#ab6a45', '#9c5f3e', '#ba7a52', '#8f5a3c'], ardesia: ['#737680', '#676a75'], acqua: '#a4c4bf', acquaInk: '#4f7c7a', testo: '#2c2619', testoAlone: '#f3ead0',
-    },
-    autunno: {
-      prato: '#a8a266', pratoScuro: '#5a5a30', luce: '#f6e7b6', chioma: ['#b5683a', '#c28a3c', '#8f4f33'], chiomaL: '#dcae58', bosco: '#6e4326', boscoProfondo: '#46301c', ink: '#22170e',
-      campo: ['#a98a55', '#937748', '#bd9c62', '#7f6840'], solco: '#4a3820', strada: '#e0d5b2', stradaBordo: '#8a7c58', piazza: '#e0d5b2', tetti: ['#9c5a3e', '#8c5238', '#a8664a', '#7e4a33'], ardesia: ['#646f78', '#58626b'], acqua: '#8fb0b5', acquaInk: '#456c74', testo: '#fbf1d8', testoAlone: '#22170e',
-    },
-    inverno: {
-      prato: '#e4ebee', pratoScuro: '#9db0bd', luce: '#ffffff', chioma: ['#4f6b6a', '#5a7675', '#44605f'], chiomaL: '#dfeaec', bosco: '#3e5655', boscoProfondo: '#2c403f', ink: '#1a2729',
-      campo: ['#d2dade', '#c8d1d6', '#dae1e4', '#bfc9ce'], solco: '#7f909a', strada: '#b8b6a8', stradaBordo: '#7f7f76', piazza: '#c9c7ba', tetti: ['#e8ecee', '#dfe5e8', '#f0f3f4', '#d6dde0'], ardesia: ['#c6d0d6', '#bcc7ce'], acqua: '#9cc0d2', acquaInk: '#4f7a90', testo: '#1a2729', testoAlone: '#f4f7f8',
-    },
     // I due stili del Cartografo
     atlante: {
       stile: 'atlante', prato: '#e8dec2', pratoScuro: '#c9b991', luce: '#fbf6e6', chioma: ['#f3ebd4', '#efe6cc', '#f6efdc'], chiomaL: '#ffffff', bosco: '#e4d8b8', boscoProfondo: '#cdbd96', ink: '#33261a',

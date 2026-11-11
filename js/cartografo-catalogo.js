@@ -38,7 +38,7 @@ const CartoCatalogo = (() => {
     },
     caverna: {
       nome: 'Caverna o radura', genera: (o) => CartoCaverna.caverna(o),
-      colori: [['pergamena', 'Pergamena'], ['pietra', 'Pietra'], ['seppia', 'Seppia'], ['notte', 'Notturna']],
+      colori: [['atlante', 'Atlante'], ['notte', 'Notte']],
       opzioni: [
         S('ambiente', 'Ambiente', [['caverna', 'Caverna'], ['radura', 'Radura']], 'caverna'),
         S('taglia', 'Dimensione', [['piccola', 'Piccola'], ['media', 'Media'], ['grande', 'Grande']], 'media'),
@@ -47,7 +47,7 @@ const CartoCatalogo = (() => {
     },
     dungeon: {
       nome: 'Dungeon', genera: (o) => CartoDungeon.dungeon(o),
-      colori: [['pergamena', 'Pergamena'], ['pietra', 'Pietra'], ['seppia', 'Seppia'], ['notte', 'Notturna']],
+      colori: [['atlante', 'Atlante'], ['notte', 'Notte']],
       opzioni: [
         S('tema', 'Tema', [['cripta', 'Cripta'], ['fortezza', 'Fortezza'], ['tempio', 'Tempio'], ['miniera', 'Miniera']], 'cripta'),
         S('taglia', 'Dimensione', [['piccolo', 'Piccolo'], ['medio', 'Medio'], ['grande', 'Grande']], 'medio'),

@@ -11,11 +11,10 @@ const CartoCaverna = (() => {
   const caverna = (o) => {
     const r = M.rng('caverna:' + o.seme), rn = M.rumore(r);
     const radura = o.ambiente === 'radura';
-    const t = M.TONI_INTERNI[o.palette] || M.TONI_INTERNI.pergamena;
-    const v = CartoVillaggio.TONI[{ pergamena: 'naturale', seppia: 'autunno', pietra: 'inverno', notte: 'notte' }[o.palette] || 'naturale'];
-    const carta = radura
-      ? { ...M.PALETTE.pergamena, carta: v.prato, inchiostro: v.ink, tenue: v.ink, senzaCornice: true }
-      : { ...M.PALETTE.pergamena, carta: t.sfondo, carta2: t.sfondo, inchiostro: t.ink, tenue: t.tenue, senzaCornice: true };
+    const notte = o.palette === 'notte';
+    const t = notte ? M.TONI_INTERNI.notte : M.TONI_INTERNI.atlante;
+    const v = notte ? CartoVillaggio.TONI.notte : CartoVillaggio.TONI.atlante;
+    const carta = radura ? { ...M.cartaInterni(t), carta: notte ? v.prato : M.PALETTE.atlante.carta, inchiostro: notte ? v.testo : v.ink } : M.cartaInterni(t);
     const W = 1400, H = 1000, G = 14, w = Math.ceil(W / G) + 1, h = Math.ceil(H / G) + 1;
     const nome = o.nome || (radura ? 'Radura di ' : r.pick(['Grotta di ', 'Caverne di ', 'Antro di '])) + M.nomeLuogo(r);
     const maschera = { piccola: 0.6, media: 0.8, grande: 0.97 }[o.taglia] || 0.8;
@@ -165,10 +164,10 @@ const CartoCaverna = (() => {
           }
         }
       });
-      s += `<path d="${tr}" fill="none" stroke="${t.ink}" stroke-width="1.35" stroke-linecap="round"/>`;
+      s += `<path d="${dFondo}" fill="none" stroke="url(#carto-tratt)" stroke-width="64" stroke-linejoin="round"/>`;
       s += `<path d="${dFondo}" fill="${t.pavimento}" fill-rule="evenodd"/>`;
       // Ombra interna: il buio si appoggia alle pareti
-      s += `<g clip-path="url(#carto-fondo)"><path d="${dFondo}" fill="none" stroke="${t.ink}" stroke-width="15" filter="url(#carto-b4)" opacity="0.42"/>`;
+      s += `<g clip-path="url(#carto-fondo)"><path d="${dFondo}" fill="none" stroke="${t.ombra}" stroke-width="15" filter="url(#carto-b4)" opacity="${notte ? 0.6 : 0.3}"/>`;
       if (o.griglia !== false) {
         let gr = '';
         for (let x = Q; x < W; x += Q) gr += `M${x} 0V${H}`;
@@ -247,7 +246,7 @@ const CartoCaverna = (() => {
     const inkT = radura ? v.ink : t.ink;
     camere.forEach((c, i) => {
       const [tit, d] = c === cameraAcqua ? (radura ? ['Sorgente', 'Acqua limpida e impronte di animali.'] : ['Lago sotterraneo', 'Acqua nera e immobile, profondità ignota.']) : i === 0 ? prime : altre[i % altre.length];
-      testi += M.etichetta(c[0], c[1] + 9, String(i + 1), carta, { size: 26, peso: 700, colore: inkT, alone: radura ? v.luce : t.pavimento, aloneW: 4.5 });
+      testi += M.etichetta(c[0], c[1] + 9, String(i + 1), carta, { size: 28, font: carta.fontTitolo, peso: 600, colore: radura && !notte ? inkT : t.numero, alone: radura ? (notte ? v.testoAlone : v.luce) : t.pavimento, aloneW: 4.5 });
       voci.push({ n: i + 1, titolo: tit, testo: d });
       pin.push({ x: c[0], y: c[1] - 14, label: (i + 1) + '. ' + tit, note: d, sottotipo: 'nota' });
     });
@@ -255,8 +254,8 @@ const CartoCaverna = (() => {
     let svg = M.apri(W, H, carta, o.seme) + s;
     if (o.nomi !== false) svg += testi;
     if (conLegenda) svg += M.legenda(W - 368, 36, 336, 520, 'Legenda', voci, { ...carta, carta: radura ? v.piazza : t.pavimento });
-    if (o.titolo !== false) svg += M.etichetta(areaTit / 2, 68, nome, carta, { size: 44, peso: 700, colore: radura ? v.testo : t.ink, alone: radura ? v.testoAlone : t.sfondo, aloneW: 6 });
-    svg += M.scala(46, H - 44, Q * 5, { valore: 7.5, nome: 'metri' }, 2, radura ? { ...carta, carta: v.piazza } : { ...carta, carta: t.pavimento }) + '</svg>';
+    if (o.titolo !== false) svg += M.etichetta(areaTit / 2, 70, notte ? nome.toUpperCase() : nome, carta, { size: notte ? 36 : 44, font: carta.fontTitolo, peso: notte ? 600 : 400, spazio: notte ? 6 : 1.5, colore: radura ? v.testo : t.ink, alone: radura ? v.testoAlone : t.sfondo, aloneW: 6 });
+    svg += M.scala(50, H - 48, Q * 5, { valore: 7.5, nome: 'metri' }, 2, radura ? { ...carta, carta: v.piazza } : { ...carta, carta: t.pavimento }) + M.chiudi(W, H, carta);
     return { nome, pin, W, H, larghezzaKm: W / Q * 1.5 / 1000, svg }; // un quadretto = 1,5 metri
   };
 

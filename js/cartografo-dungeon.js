@@ -10,8 +10,8 @@ const CartoDungeon = (() => {
 
   const dungeon = (o) => {
     const r = M.rng('dungeon:' + o.seme);
-    const t = M.TONI_INTERNI[o.palette] || M.TONI_INTERNI.pergamena;
-    const carta = { ...M.PALETTE.pergamena, carta: t.sfondo, carta2: t.sfondo, inchiostro: t.ink, tenue: t.tenue, senzaCornice: true };
+    const t = o.palette === 'notte' ? M.TONI_INTERNI.notte : M.TONI_INTERNI.atlante;
+    const carta = M.cartaInterni(t);
     const tema = CartoTesti.TEMI_DUNGEON[o.tema] || CartoTesti.TEMI_DUNGEON.cripta;
     const conLegenda = o.legenda !== false;
     const quante = { piccolo: 6, medio: 10, grande: 15 }[o.taglia] || 10;
@@ -163,7 +163,7 @@ const CartoDungeon = (() => {
         tratti += gruppo(cx + Math.cos(a) * (rr + 0.42), cy + Math.sin(a) * (rr + 0.42), a + r.range(-0.6, 0.6), 2, 0.28, 0.13);
       }
     });
-    let g0 = `<path d="${fondo}" fill="${t.roccia}" filter="url(#carto-b4)" opacity="0.95"/><path d="${tratti}${tratti2}" fill="none" stroke="${I}" stroke-width="${n1(Math.max(0.9, S * 0.05))}" stroke-linecap="round"/>`;
+    let g0 = `<path d="${fondo}" fill="${t.roccia}" stroke="${t.roccia}" stroke-width="${n1(S * 0.7)}" stroke-linejoin="round"/><path d="${fondo}" fill="url(#carto-tratt)" stroke="url(#carto-tratt)" stroke-width="${n1(S * 0.7)}" stroke-linejoin="round"/>`;
 
     /* ── Pavimenti, ombra interna, griglia ── */
     let pav = '', muri = '';
@@ -184,7 +184,7 @@ const CartoDungeon = (() => {
       for (let x = minX; x <= maxX; x++) griglia += `M${px(x)} ${py(minY)}V${py(maxY)}`;
       for (let y = minY; y <= maxY; y++) griglia += `M${px(minX)} ${py(y)}H${px(maxX)}`;
     }
-    g0 += `<g clip-path="url(#carto-pav)"><path d="${muri}${circoli}" fill="none" stroke="${I}" stroke-width="${n1(S * 0.34)}" filter="url(#carto-b4)" opacity="0.34"/><path d="${griglia}" fill="none" stroke="${I}" stroke-width="${n1(Math.max(1.3, S * 0.055))}" stroke-dasharray="0.1 ${n1(S / 5)}" stroke-linecap="round"/></g>`;
+    g0 += `<g clip-path="url(#carto-pav)"><path d="${muri}${circoli}" fill="none" stroke="${t.ombra}" stroke-width="${n1(S * 0.34)}" filter="url(#carto-b4)" opacity="${t.stile === 'notte' ? 0.6 : 0.3}"/><path d="${griglia}" fill="none" stroke="${I}" stroke-width="${n1(Math.max(1.3, S * 0.055))}" stroke-dasharray="0.1 ${n1(S / 5)}" stroke-linecap="round"/></g>`;
 
     /* ── Arredi ── */
     const elenco = r.shuffle(tema.stanze);
@@ -299,7 +299,7 @@ const CartoDungeon = (() => {
     const voci = [], pin = [];
     // Di traverso la scritta resta orizzontale: va piu' lontana, per non toccare le scale
     const pIng = schermo(ingX + 0.5, prima.y + prima.h + (ang ? 3.1 : 2.2));
-    testi += M.etichetta(pIng[0], pIng[1], 'Ingresso', carta, { size: 15, corsivo: true, peso: 600, colore: I, alone: t.sfondo, aloneW: 3 });
+    testi += M.etichetta(pIng[0], pIng[1], 'Ingresso', carta, { size: 17, corsivo: t.stile !== 'notte', colore: I, alone: t.sfondo, aloneW: 3.5 });
     stanze.forEach((s, i) => {
       // Il numero sta dove non c'e' l'arredo: le colonne corrono lungo i muri, il resto sta al centro
       const arr = dati[i][2];
@@ -311,7 +311,7 @@ const CartoDungeon = (() => {
       else if (s.w >= s.h) { quartoX = s.x + 0.6; quartoY = s.y + s.h / 2; }
       else { quartoX = s.x + s.w / 2; quartoY = s.y + 0.6; }
       const [x, y] = schermo(quartoX, quartoY);
-      testi += M.etichetta(x, y + 7, String(i + 1), carta, { size: Math.max(17, S * 0.72), font: M.FONT_TESTO, peso: 700, colore: I, alone: t.pavimento, aloneW: 4 });
+      testi += M.etichetta(x, y + 7, String(i + 1), carta, { size: Math.max(22, S * 0.95), font: carta.fontTitolo, peso: 600, colore: t.numero, alone: t.pavimento, aloneW: 4 });
       const trappola = o.trappole !== false && i > 0 && r.chance(0.26) ? ' ' + r.pick(CartoTesti.TRAPPOLE) : '';
       const titolo = i === 0 ? 'Ingresso: ' + dati[i][0].toLowerCase() : dati[i][0];
       voci.push({ n: i + 1, titolo, testo: dati[i][1] + trappola });
@@ -325,10 +325,10 @@ const CartoDungeon = (() => {
     if (o.nomi !== false) svg += testi;
     if (conLegenda) svg += M.legenda(W - 348, 36, 316, H - 72, 'Le stanze', voci, { ...carta, carta: t.pavimento });
     if (o.titolo !== false) {
-      svg += `<text x="${n1(cxM)}" y="66" font-family="${M.FONT_TESTO}" font-size="44" font-weight="700" text-anchor="middle" fill="${I}">${M.esc(nome)}</text>`;
-      M.righe(storia, 86).forEach((riga, i) => { svg += `<text x="${n1(cxM)}" y="${100 + i * 24}" font-family="${M.FONT_TESTO}" font-size="19" font-style="italic" text-anchor="middle" fill="${I}">${M.esc(riga)}</text>`; });
+      svg += M.etichetta(cxM, 68, t.stile === 'notte' ? nome.toUpperCase() : nome, carta, { size: t.stile === 'notte' ? 36 : 44, font: carta.fontTitolo, peso: t.stile === 'notte' ? 600 : 400, spazio: t.stile === 'notte' ? 6 : 1.5, aloneW: 6 });
+      M.righe(storia, 86).forEach((riga, i) => { svg += M.etichetta(cxM, 102 + i * 24, riga, carta, { size: 19, corsivo: t.stile !== 'notte', colore: t.stile === 'notte' ? carta.ambra : I, aloneW: 4 }); });
     }
-    svg += M.scala(46, H - 48, S * 5, { valore: 7.5, nome: 'metri' }, 2, carta) + '</svg>';
+    svg += M.scala(50, H - 48, S * 5, { valore: 7.5, nome: 'metri' }, 2, carta) + M.chiudi(W, H, carta);
     return { nome, pin, W, H, larghezzaKm: W / S * 1.5 / 1000, svg }; // un quadretto = 1,5 metri
   };
 

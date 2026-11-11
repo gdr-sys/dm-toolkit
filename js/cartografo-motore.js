@@ -280,7 +280,7 @@ const CartoMotore = (() => {
     campi: ['#e8ddc0', '#e3d7b6', '#ede3c8', '#ddd1ae'], neve: '#fbf7ec', pavimento: '#f3ead3', roccia: '#d6c7a3', parete: '#33261a',
   };
   PALETTE.cartografo = {
-    nome: 'Notte', stile: 'notte', font: FONT_NOTTE, fontTitolo: FONT_NOTTE, rosso: '#e9b84f', ambra: '#e9b84f',
+    nome: 'Notte', stile: 'notte', font: FONT_NOTTE, fontTitolo: FONT_NOTTE, fontCorpo: "'Cormorant Garamond', Georgia, serif", rosso: '#e9b84f', ambra: '#e9b84f',
     carta: '#0e1d26', carta2: '#132631', macchia: '#000000', inchiostro: '#e8e1cf', tenue: '#9fb0b4',
     acqua: '#0a1720', acquaInk: '#7ebad8', erba: '#12262f', erba2: '#173240', chioma: '#7eb696', chioma2: '#7eb696',
     strada: '#1f3846', stradaBordo: '#08131a', terra: '#183140', tetti: ['#2a4553', '#2f4b5a', '#263f4c', '#2c4856'], tettoNobile: '#e9b84f',
@@ -300,8 +300,12 @@ const CartoMotore = (() => {
     pergamena: { sfondo: '#ecdfce', pavimento: '#f6eddd', roccia: '#a9a191', ink: '#161310', tenue: '#6d6355', acqua: '#a9b9b4', acquaInk: '#4d6661', legno: '#b98a5c', pietra: '#c9c1b1', metallo: '#8b867b' },
     seppia: { sfondo: '#d2cab9', pavimento: '#e6dfcf', roccia: '#8d8676', ink: '#161510', tenue: '#5f5a4d', acqua: '#a8a393', acquaInk: '#4a463a', legno: '#9d9483', pietra: '#bab2a1', metallo: '#7d786b' },
     pietra: { sfondo: '#d8dcdc', pavimento: '#eff1ee', roccia: '#8e9699', ink: '#14181a', tenue: '#59646a', acqua: '#9dbccb', acquaInk: '#3f6c82', legno: '#a88a6a', pietra: '#bcc3c4', metallo: '#7c8689' },
-    notte: { sfondo: '#14191f', pavimento: '#3a4552', roccia: '#232b33', ink: '#e4dfcd', tenue: '#a3acb5', acqua: '#1e4257', acquaInk: '#7fb1cd', legno: '#7a6048', pietra: '#59646f', metallo: '#8a95a0' },
+    // I due stili del Cartografo
+    atlante: { stile: 'atlante', sfondo: '#efe5cc', pavimento: '#f8f2e3', roccia: '#e3d6b6', ink: '#33261a', tenue: '#6e5a40', ombra: '#33261a', numero: '#a8382a', acqua: '#dccfae', acquaInk: '#33261a', legno: '#cfae80', pietra: '#e6dabd', metallo: '#9a8f7c' },
+    notte: { stile: 'notte', sfondo: '#0e1d26', pavimento: '#1d3543', roccia: '#122530', ink: '#e8e1cf', tenue: '#9fb0b4', ombra: '#03090b', numero: '#e9b84f', acqua: '#0f3a52', acquaInk: '#7ebad8', legno: '#6b5a44', pietra: '#3a5563', metallo: '#8a95a0' },
   };
+
+  const cartaInterni = (t) => ({ ...(t.stile === 'notte' ? PALETTE.cartografo : PALETTE.atlante), carta: t.sfondo, carta2: t.sfondo, inchiostro: t.ink, tenue: t.tenue });
 
   const FONT_TITOLO = "Cinzel, 'Times New Roman', serif";
   const FONT_TESTO = "'Crimson Pro', Georgia, serif";
@@ -313,7 +317,7 @@ const CartoMotore = (() => {
     return `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img">` +
       `<defs>${sfocature}<filter id="carto-carta" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.018 0.024" numOctaves="5" seed="${s}"/>` +
       `<feColorMatrix type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 ${scuro ? 0.7 : 0.42} ${scuro ? -0.26 : -0.17}"/></filter>` +
-      `${p.stile === 'atlante' ? `<pattern id="carto-tratt" width="3.2" height="3.2" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><path d="M0 1.6H3.2" stroke="${p.inchiostro}" stroke-width="0.55" opacity="0.5"/></pattern>` : ''}<radialGradient id="carto-vignetta" cx="50%" cy="50%" r="72%"><stop offset="62%" stop-color="${p.macchia}" stop-opacity="0"/><stop offset="100%" stop-color="${p.macchia}" stop-opacity="${scuro ? 0.5 : 0.3}"/></radialGradient></defs>` +
+      `${p.stile ? `<pattern id="carto-tratt" width="3.2" height="3.2" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><path d="M0 1.6H3.2" stroke="${p.inchiostro}" stroke-width="0.55" opacity="${p.stile === 'notte' ? 0.3 : 0.5}"/></pattern>` : ''}<radialGradient id="carto-vignetta" cx="50%" cy="50%" r="72%"><stop offset="62%" stop-color="${p.macchia}" stop-opacity="0"/><stop offset="100%" stop-color="${p.macchia}" stop-opacity="${scuro ? 0.5 : 0.3}"/></radialGradient></defs>` +
       `<rect width="${W}" height="${H}" fill="${p.carta}"/>` + (p.senzaCornice ? '' : `<rect width="${W}" height="${H}" fill="${p.carta2}" filter="url(#carto-carta)"/>`);
   };
 
@@ -438,14 +442,14 @@ const CartoMotore = (() => {
       for (const v of voci) {
         const testa = _righe((v.n ? v.n + '. ' : '') + v.titolo, Math.floor(max * 0.92));
         const resto = v.testo ? _righe(v.testo, max) : [];
-        testa.forEach((t) => { h += riga; corpo += `<text x="${x + 13}" y="${n1(y + h)}" font-family="${FONT_TESTO}" font-size="${size}" font-weight="700" fill="${p.inchiostro}">${esc(t)}</text>`; });
-        resto.forEach((t) => { h += riga; corpo += `<text x="${x + 13}" y="${n1(y + h)}" font-family="${FONT_TESTO}" font-size="${size}" fill="${p.inchiostro}">${esc(t)}</text>`; });
+        testa.forEach((t) => { h += riga; corpo += `<text x="${x + 13}" y="${n1(y + h)}" font-family="${p.fontCorpo || p.font || FONT_TESTO}" font-size="${size}" font-weight="${p.stile ? 600 : 700}" fill="${p.inchiostro}">${esc(t)}</text>`; });
+        resto.forEach((t) => { h += riga; corpo += `<text x="${x + 13}" y="${n1(y + h)}" font-family="${p.fontCorpo || p.font || FONT_TESTO}" font-size="${size}" fill="${p.inchiostro}">${esc(t)}</text>`; });
         h += size * 0.5;
       }
       if (h + 10 <= altMax || size === 10) {
         return `<g><rect x="${x}" y="${y}" width="${larg}" height="${n1(Math.min(altMax, h + 10))}" fill="${p.carta}" stroke="${p.inchiostro}" stroke-width="1.6"/>` +
           `<rect x="${x + 4}" y="${y + 4}" width="${larg - 8}" height="${n1(Math.min(altMax, h + 10) - 8)}" fill="none" stroke="${p.inchiostro}" stroke-width="0.6"/>` +
-          `<text x="${x + larg / 2}" y="${y + 31}" font-family="${FONT_TITOLO}" font-size="18" font-weight="700" text-anchor="middle" fill="${p.inchiostro}">${esc(intestazione)}</text>${corpo}</g>`;
+          `<text x="${x + larg / 2}" y="${y + 31}" font-family="${p.fontTitolo || FONT_TITOLO}" font-size="${p.stile ? 21 : 18}" font-weight="${p.stile ? 600 : 700}" text-anchor="middle" fill="${p.inchiostro}">${esc(intestazione)}</text>${corpo}</g>`;
       }
     }
     return '';
@@ -635,6 +639,6 @@ const CartoMotore = (() => {
   return {
     campoDistanze, rng, rumore, dist, lerp, area, centro, dentro, taglia, rientra, distSeg, distLinea, incrocio, celle, morbida, contorni,
     n1, via, esc, PALETTE, FONT_TITOLO, FONT_TESTO, FONT_ATLANTE, FONT_ATLANTE_SC, FONT_NOTTE, apri, chiudi, areaMappa, etichetta, titolo, rosa, scala,
-    alberi, edifici, rettangolo, campo, fiumeSvg, nomeLuogo, legenda, componi, tratteggio, testoCurvo, curvaSuPunti, TONI_INTERNI, righe: _righe,
+    alberi, edifici, rettangolo, campo, fiumeSvg, nomeLuogo, legenda, componi, cartaInterni, tratteggio, testoCurvo, curvaSuPunti, TONI_INTERNI, righe: _righe,
   };
 })();
