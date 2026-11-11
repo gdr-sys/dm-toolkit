@@ -445,11 +445,27 @@ const CartoInsediamenti = (() => {
         const du = lungo / arco / 2;
         const curva = [];
         for (let t = -1; t <= 1.001; t += 0.125) curva.push(P(k + 0.5 + t * du, vv));
+        // Sui fianchi della citta' l'anello e' quasi verticale: li' la scritta non si leggerebbe
+        const inclinata = Math.abs(Math.atan2(curva[curva.length - 1][1] - curva[0][1], curva[curva.length - 1][0] - curva[0][0]));
+        if (Math.min(inclinata, Math.PI - inclinata) > 0.6) continue;
         if (curva.some(([x, y]) => x < 60 || x > W - 60 || y < 110 || y > H - 40 || (x < 340 && y > H - 110) || (x > W - 190 && y > H - 190) || usate.some((u) => Math.hypot(u[0] - x, u[1] - y) < 40) || inAcqua([x, y], 4))) continue;
         testi += M.testoCurvo(curva, p.stile ? eti : eti.toUpperCase(), p, { size, spazio: sp, colore: p.inchiostro, alone: p.carta, aloneW: 4.5, peso: 500, font: p.fontTitolo || M.FONT_TESTO });
         curva.forEach((u) => usate.push(u));
         messa = centro;
         break;
+      }
+      if (!messa) {
+        // Nessun tratto adatto: il nome si scrive dritto in mezzo al rione, se c'e' posto
+        for (const vv of [0.62, 0.5, 0.75]) {
+          const [x, y] = P(k + 0.5, vv), mezza = eti.length * size * 0.33;
+          if (x - mezza < 60 || x + mezza > W - 60 || y < 110 || y > H - 50 || inAcqua([x, y], 4)) continue;
+          const tratto = [-1, -0.5, 0, 0.5, 1].map((f) => [x + f * mezza, y - 6]);
+          if (tratto.some((u) => usate.some((w) => Math.hypot(w[0] - u[0], w[1] - u[1]) < 40))) continue;
+          testi += M.etichetta(x, y, eti, p, { size: size * 0.85, font: p.fontTitolo, spazio: 4, aloneW: 4.5 });
+          tratto.forEach((u) => usate.push(u));
+          messa = [x, y];
+          break;
+        }
       }
       const c = messa || q.centro;
       pin.push({ x: c[0], y: c[1] - 22, label: 'Rione ' + eti, note: nota, sottotipo: '', genera: { tipo: 'abitazione', opzioni: { edificio: q.carattere === 'nobile' ? 'casa' : 'bottega' } } });

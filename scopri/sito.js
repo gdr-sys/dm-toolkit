@@ -73,7 +73,7 @@
       const forme = ['costa', 'isola', 'continente', 'arcipelago'];
       worker.postMessage({ seme: seme(), forma: forme[Math.floor(Math.random() * forme.length)] });
     });
-    // Il segnaposto porta a Borgoalta: su un regno nuovo non c'e'. Scendendo si torna al regno collegato alla citta' e alla locanda.
+    // Il segnaposto porta a Valcenere: su un regno nuovo non c'e'. Scendendo si torna al regno collegato alla citta' e alla locanda.
     dati.dopo = (n) => {
       if (!foglio) return;
       if (n === 0) { segni.forEach((s) => { if (s.dataset.da === '0') s.hidden = true; }); return; }
