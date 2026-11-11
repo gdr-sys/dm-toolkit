@@ -34,7 +34,7 @@ const CartoAbitazione = (() => {
     const W = 1400, H = 1000;
     const nome = o.nome || (tipo === 'taverna'
       ? r.pick(T.nomi) + ' ' + r.pick(['Cinghiale Zoppo', 'Corvo Bianco', 'Barile Rotto', 'Lupo Grigio', 'Gatto Nero', 'Viandante'])
-      : tipo === 'torre' ? r.pick(T.nomi) + ' ' + M.nomeLuogo(r) : r.pick(T.nomi) + ' ' + r.pick(['Aldighieri', 'dei Marangoni', 'Bellandi', 'dei Cordari', 'Ferrante', 'Vespri']));
+      : tipo === 'torre' ? r.pick(T.nomi) + ' ' + M.nomeLuogo(r, o.popolo) : r.pick(T.nomi) + ' ' + (() => { const f = r.pick(['Aldighieri', 'dei Marangoni', 'Bellandi', 'dei Cordari', 'Ferrante', 'Vespri']); return o.popolo && o.popolo !== 'italiano' ? M.nomeLuogo(M.rng('casato:' + o.seme), o.popolo) : f; })());
 
     /* ── Corpi dell'edificio: uno principale e fino a due ali ── */
     const bw = T.dim[0] - 3 + r.int(-1, 1), bh = T.dim[1] - 2 + r.int(-1, 1);

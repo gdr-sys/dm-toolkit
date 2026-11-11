@@ -606,11 +606,19 @@ const CartoMotore = (() => {
   /* ── Nomi ── */
   const NOME_A = ['Rocca', 'Porto', 'Monte', 'Val', 'Castel', 'Borgo', 'Pietra', 'Acqua', 'Torre', 'Selva', 'Fonte', 'Corte', 'Serra', 'Fiume'];
   const NOME_B = ['nera', 'vento', 'alta', 'ombra', 'ferro', 'grigia', 'lupo', 'chiara', 'fredda', 'corvo', 'sale', 'lunga', 'spina', 'argento', 'rovo', 'quercia', 'stella', 'cenere'];
-  const nomeLuogo = (r) => r.pick(NOME_A) + r.pick(NOME_B);
+  // Sillabe per popolo: due pezzi per nome, sempre due estrazioni (cambiare popolo non cambia il resto della mappa)
+  const POPOLI = {
+    elfico: [['Ael', 'Lor', 'Sil', 'Ith', 'Cael', 'Fae', 'Ela', 'Myr', 'Thal', 'Yl', 'Ilm', 'Nim', 'Ser', 'Aen'], ['wen', 'dor', 'lith', 'iel', 'andor', 'esse', 'thas', 'ion', 'ara', 'ethil', 'nore', 'valon', 'rien', 'lis', 'anor', 'enya', 'mir', 'ost']],
+    nanico: [['Kar', 'Dur', 'Grim', 'Bar', 'Thor', 'Khaz', 'Dun', 'Mor', 'Bal', 'Gor', 'Brun', 'Hald', 'Thra', 'Kel'], ['ak', 'dum', 'grund', 'heim', 'buk', 'zar', 'dok', 'mund', 'rak', 'gol', 'thar', 'borg', 'dar', 'um', 'hold', 'drin', 'kor', 'nar']],
+    orchesco: [['Gash', 'Mug', 'Ruk', 'Zug', 'Grak', 'Ugh', 'Nar', 'Bol', 'Skar', 'Lug', 'Durz', 'Krag', 'Shag', 'Gor'], ['nak', 'gul', 'tar', 'ash', 'rot', 'muk', 'gor', 'zug', 'dush', 'bur', 'krak', 'tuk', 'mag', 'ruk', 'gash', 'lok', 'zog', 'thak']],
+    nordico: [['Skal', 'Hrafn', 'Ulf', 'Bjorn', 'Ey', 'Sig', 'Frost', 'Hel', 'Isa', 'Vald', 'Ran', 'Tor', 'Grim', 'Ask'], ['vik', 'heim', 'fjord', 'stad', 'by', 'holm', 'gard', 'nes', 'dal', 'vang', 'berg', 'sund', 'havn', 'rud', 'mark', 'fell', 'ey', 'vin']],
+  };
+  const nomeLuogo = (r, popolo) => { const P = POPOLI[popolo]; return P ? r.pick(P[0]) + r.pick(P[1]) : r.pick(NOME_A) + r.pick(NOME_B); };
+  const POPOLO_OPZIONI = [['italiano', "All'italiana"], ['elfico', 'Elfici'], ['nanico', 'Nanici'], ['orchesco', 'Orcheschi'], ['nordico', 'Nordici']];
 
   return {
     campoDistanze, rng, rumore, dist, lerp, area, centro, dentro, taglia, rientra, distSeg, distLinea, incrocio, celle, morbida, contorni,
     n1, via, esc, PALETTE, FONT_TITOLO, FONT_TESTO, FONT_ATLANTE, FONT_ATLANTE_SC, FONT_NOTTE, apri, chiudi, areaMappa, etichetta, titolo, rosa, scala,
-    alberi, edifici, rettangolo, campo, fiumeSvg, nomeLuogo, legenda, componi, cartaInterni, stileDi, tratteggio, testoCurvo, curvaSuPunti, TONI_INTERNI, righe: _righe,
+    alberi, edifici, rettangolo, campo, fiumeSvg, nomeLuogo, POPOLO_OPZIONI, legenda, componi, cartaInterni, stileDi, tratteggio, testoCurvo, curvaSuPunti, TONI_INTERNI, righe: _righe,
   };
 })();

@@ -16,7 +16,7 @@ const CartoCaverna = (() => {
     const v = CartoVillaggio.TONI[M.stileDi(o.palette)];
     const carta = radura ? { ...M.cartaInterni(t), carta: notte ? v.prato : M.PALETTE.atlante.carta, inchiostro: notte ? v.testo : v.ink } : M.cartaInterni(t);
     const W = 1400, H = 1000, G = 14, w = Math.ceil(W / G) + 1, h = Math.ceil(H / G) + 1;
-    const nome = o.nome || (radura ? 'Radura di ' : r.pick(['Grotta di ', 'Caverne di ', 'Antro di '])) + M.nomeLuogo(r);
+    const nome = o.nome || (radura ? 'Radura di ' : r.pick(['Grotta di ', 'Caverne di ', 'Antro di '])) + M.nomeLuogo(r, o.popolo);
     const maschera = { piccola: 0.6, media: 0.8, grande: 0.97 }[o.taglia] || 0.8;
     const conLegenda = o.legenda !== false;
 

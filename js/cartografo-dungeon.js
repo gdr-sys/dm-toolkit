@@ -15,7 +15,7 @@ const CartoDungeon = (() => {
     const tema = CartoTesti.TEMI_DUNGEON[o.tema] || CartoTesti.TEMI_DUNGEON.cripta;
     const conLegenda = o.legenda !== false;
     const quante = { piccolo: 6, medio: 10, grande: 15 }[o.taglia] || 10;
-    const nome = o.nome || r.pick(tema.nome) + ' ' + M.nomeLuogo(r);
+    const nome = o.nome || r.pick(tema.nome) + ' ' + M.nomeLuogo(r, o.popolo);
     const storia = r.pick(CartoTesti.STORIE[o.tema] || CartoTesti.STORIE.cripta);
     const W = conLegenda ? 1400 : 1200, H = 1000, largoMappa = conLegenda ? 1020 : W;
 

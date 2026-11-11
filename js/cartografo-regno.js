@@ -68,7 +68,7 @@ const CartoRegno = (() => {
     const t = TONI[M.stileDi(o.palette)];
     const W = 1400, H = 1000, G = 6, w = Math.ceil(W / G) + 1, h = Math.ceil(H / G) + 1;
     const forma = o.forma || 'isola', clima = o.clima || 'temperato';
-    const nome = o.nome || M.nomeLuogo(r);
+    const nome = o.nome || M.nomeLuogo(r, o.popolo);
     const kmPx = 0.75;
 
     /* Altitudine */
@@ -198,7 +198,7 @@ const CartoRegno = (() => {
       }
     }
     const usati = new Set();
-    const nomeNuovo = () => { let n = M.nomeLuogo(r); while (usati.has(n)) n = M.nomeLuogo(r); usati.add(n); return n; };
+    const nomeNuovo = () => { let n = M.nomeLuogo(r, o.popolo); while (usati.has(n)) n = M.nomeLuogo(r, o.popolo); usati.add(n); return n; };
     citta.forEach((c, i) => {
       c.nome = nomeNuovo();
       c.rango = i < 2 ? 2 : i < Math.ceil(citta.length * 0.45) ? 1 : 0;

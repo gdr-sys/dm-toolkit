@@ -48,7 +48,7 @@ const CartoInsediamenti = (() => {
     const nInterne = { piccola: 34, media: 68, grande: 108 }[taglia];
     const N0 = { piccola: 4, media: 5, grande: 6 }[taglia];                                   // vie maestre
     const BANDE = { piccola: [0.2, 0.56, 1], media: [0.17, 0.43, 0.71, 1], grande: [0.14, 0.36, 0.58, 0.8, 1] }[taglia];
-    const nome = o.nome || M.nomeLuogo(r);
+    const nome = o.nome || M.nomeLuogo(r, o.popolo);
 
     const angMare = r.range(0, Math.PI * 2);
     const mx = Math.cos(angMare), my = Math.sin(angMare);
@@ -423,7 +423,7 @@ const CartoInsediamenti = (() => {
     const tempioSotto = tempio && tempio.centro[1] > piazza.centro[1];
     metti(piazza.centro[0], piazza.centro[1] + (tempioSotto ? -26 : 36), 'Piazza del Mercato', { size: 17, peso: 600 }, 'Il cuore della città: mercato e fontana. Tutte le vie maestre partono da qui.');
     Object.assign(pin[pin.length - 1], { x: piazza.centro[0], y: piazza.centro[1] });
-    if (tempio) metti(tempio.centro[0], tempio.centro[1] + (tempioSotto ? 40 : -32), 'Tempio di ' + r.pick(SANTI), { size: 16, peso: 600, corsivo: true }, 'Il tempio principale, accanto alla piazza.');
+    if (tempio) metti(tempio.centro[0], tempio.centro[1] + (tempioSotto ? 40 : -32), 'Tempio di ' + (() => { const s = r.pick(SANTI); return o.popolo && o.popolo !== 'italiano' ? M.nomeLuogo(M.rng('dio:' + o.seme), o.popolo) : s; })(), { size: 16, peso: 600, corsivo: true }, 'Il tempio principale, accanto alla piazza.');
     if (tempio) Object.assign(pin[pin.length - 1], { x: tempio.centro[0], y: tempio.centro[1], tipoLuogo: 'Tempio', genera: { tipo: 'dungeon', opzioni: { tema: 'tempio' } } });
     if (castello) metti(castello.centro[0], castello.centro[1] + 6, 'Castello', { size: 18, font: p.fontTitolo, peso: 600 }, 'Sede del potere cittadino, con cinta muraria propria.');
     if (castello) Object.assign(pin[pin.length - 1], { tipoLuogo: 'Castello', y: castello.centro[1] - 12, genera: { tipo: 'dungeon', opzioni: { tema: 'fortezza' } } });
@@ -473,12 +473,12 @@ const CartoInsediamenti = (() => {
       fiume.forEach((q) => { if (adatto(q)) { corrente.push(q); if (corrente.length > fuoriCitta.length) fuoriCitta = corrente; } else corrente = []; });
       if (fuoriCitta.length > 30) {
         const inizio = Math.floor((fuoriCitta.length - Math.min(34, fuoriCitta.length)) / 2), tratto = fuoriCitta.slice(inizio, inizio + 34);
-        testi += M.testoCurvo(tratto, 'Fiume ' + M.nomeLuogo(r), p, { size: 17, spazio: 2, corsivo: true, colore: p.acquaInk, alone: p.carta, aloneW: 2.5, peso: 500 });
+        testi += M.testoCurvo(tratto, 'Fiume ' + M.nomeLuogo(r, o.popolo), p, { size: 17, spazio: 2, corsivo: true, colore: p.acquaInk, alone: p.carta, aloneW: 2.5, peso: 500 });
       }
     }
     if (o.costa) {
       const sx = Math.max(150, Math.min(W - 150, 700 + mx * 500)), sy = Math.max(150, Math.min(H - 110, 500 + my * 370));
-      if (mare([sx, sy]) > 30) testi += M.etichetta(sx, sy, 'Mare di ' + M.nomeLuogo(r), p, { size: 21, corsivo: true, colore: p.acquaInk, spazio: 3, alone: p.acqua, aloneW: 3 });
+      if (mare([sx, sy]) > 30) testi += M.etichetta(sx, sy, 'Mare di ' + M.nomeLuogo(r, o.popolo), p, { size: 21, corsivo: true, colore: p.acquaInk, spazio: 3, alone: p.acqua, aloneW: 3 });
     }
 
     // Reticolo leggero, come sulle piante catastali antiche (un quadrato = 200 metri)

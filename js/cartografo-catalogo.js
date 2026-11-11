@@ -8,11 +8,13 @@
 const CartoCatalogo = (() => {
   const S = (k, l, v, d) => ({ k, l, v, d });
   const C = (k, l, d = true, pCaso = 0.5) => ({ k, l, c: true, d, pCaso });
+  const POPOLO = () => S('popolo', 'Nomi', CartoMotore.POPOLO_OPZIONI, 'italiano');
   const TIPI = {
     regno: {
       nome: 'Regno', genera: (o) => CartoRegno.regno(o),
       colori: [['atlante', 'Atlante'], ['colori', 'Atlante a colori'], ['notte', 'Notte']],
       opzioni: [
+        POPOLO(),
         S('forma', 'Forma', [['isola', 'Isola'], ['continente', 'Continente'], ['arcipelago', 'Arcipelago'], ['costa', 'Costa']], 'isola'),
         S('clima', 'Clima', [['temperato', 'Temperato'], ['freddo', 'Freddo'], ['arido', 'Arido']], 'temperato'),
         S('taglia', 'Insediamenti', [['pochi', 'Pochi'], ['normali', 'Normali'], ['molti', 'Molti']], 'normali'),
@@ -23,6 +25,7 @@ const CartoCatalogo = (() => {
       nome: 'Città', genera: (o) => CartoInsediamenti.citta(o),
       colori: [['atlante', 'Atlante'], ['colori', 'Atlante a colori'], ['notte', 'Notte']],
       opzioni: [
+        POPOLO(),
         S('taglia', 'Dimensione', [['piccola', 'Piccola'], ['media', 'Media'], ['grande', 'Grande']], 'media'),
         C('mura', 'Mura', true, 0.85), C('castello', 'Castello', true, 0.7), C('fiume', 'Fiume', true, 0.6), C('costa', 'Mare', false, 0.35), C('griglia', 'Griglia', true, 0.6),
       ],
@@ -31,6 +34,7 @@ const CartoCatalogo = (() => {
       nome: 'Villaggio', genera: (o) => CartoVillaggio.villaggio(o),
       colori: [['atlante', 'Atlante'], ['colori', 'Atlante a colori'], ['notte', 'Notte']],
       opzioni: [
+        POPOLO(),
         S('taglia', 'Dimensione', [['piccolo', 'Piccolo'], ['medio', 'Medio'], ['grande', 'Grande']], 'medio'),
         S('pianta', 'Pianta', [['caso', 'A caso'], ['piazza', 'Con piazza'], ['lungo', 'Lungo la strada']], 'caso'),
         C('fiume', 'Fiume', false, 0.4),
@@ -40,6 +44,7 @@ const CartoCatalogo = (() => {
       nome: 'Caverna o radura', genera: (o) => CartoCaverna.caverna(o),
       colori: [['atlante', 'Atlante'], ['colori', 'Atlante a colori'], ['notte', 'Notte']],
       opzioni: [
+        POPOLO(),
         S('ambiente', 'Ambiente', [['caverna', 'Caverna'], ['radura', 'Radura']], 'caverna'),
         S('taglia', 'Dimensione', [['piccola', 'Piccola'], ['media', 'Media'], ['grande', 'Grande']], 'media'),
         C('acqua', 'Acqua', true, 0.6), C('griglia', 'Griglia', true, 0.7), C('legenda', 'Legenda', true, 0.7),
@@ -49,6 +54,7 @@ const CartoCatalogo = (() => {
       nome: 'Dungeon', genera: (o) => CartoDungeon.dungeon(o),
       colori: [['atlante', 'Atlante'], ['colori', 'Atlante a colori'], ['notte', 'Notte']],
       opzioni: [
+        POPOLO(),
         S('tema', 'Tema', [['cripta', 'Cripta'], ['fortezza', 'Fortezza'], ['tempio', 'Tempio'], ['miniera', 'Miniera']], 'cripta'),
         S('taglia', 'Dimensione', [['piccolo', 'Piccolo'], ['medio', 'Medio'], ['grande', 'Grande']], 'medio'),
         S('rotazione', 'Orientamento', [['caso', 'A caso'], ['dritto', 'Dritto'], ['traverso', 'Di traverso']], 'caso'),
@@ -59,6 +65,7 @@ const CartoCatalogo = (() => {
       nome: 'Abitazione', genera: (o) => CartoAbitazione.abitazione(o),
       colori: [['atlante', 'Atlante'], ['colori', 'Atlante a colori'], ['notte', 'Notte']],
       opzioni: [
+        POPOLO(),
         S('edificio', 'Edificio', [['casa', 'Casa'], ['taverna', 'Taverna'], ['bottega', 'Bottega'], ['torre', 'Torre']], 'casa'),
         S('piani', 'Piani', [['1', '1'], ['2', '2'], ['3', '3']], '2'),
         C('cantina', 'Cantina', true, 0.5), C('tetto', 'Tetto', true, 0.7), C('arredi', 'Arredi', true, 0.85), C('griglia', 'Griglia', true, 0.6), C('legenda', 'Legenda', false, 0.25),
@@ -76,7 +83,7 @@ const CartoCatalogo = (() => {
   const aCaso = (tipo) => {
     const pick = (l) => l[Math.floor(Math.random() * l.length)];
     const o = { palette: pick(TIPI[tipo].colori)[0], nomi: true, titolo: true };
-    TIPI[tipo].opzioni.forEach((x) => { o[x.k] = x.c ? Math.random() < x.pCaso : pick(x.v)[0]; });
+    TIPI[tipo].opzioni.forEach((x) => { o[x.k] = x.c ? Math.random() < x.pCaso : x.k === 'popolo' ? (Math.random() < 0.7 ? 'italiano' : pick(x.v)[0]) : pick(x.v)[0]; });
     return o;
   };
   const genera = (tipo, o) => TIPI[tipo].genera(o);

@@ -433,7 +433,7 @@ const Cartografo = (() => {
           x: Math.max(0, Math.min(1, p.x / m.W)), y: Math.max(0, Math.min(1, p.y / m.H)),
           tipo: entita ? 'luoghi' : null, entitaId: entita, label: entita ? '' : p.label,
           sottotipo: entita ? '' : (p.sottotipo || ''), note: entita ? '' : (p.note || ''), colore: '#8b2635',
-          ...(p.genera ? { genera: p.genera } : {}),
+          ...(p.genera ? { genera: { ...p.genera, opzioni: { popolo: _attuale().opzioni.popolo, ...p.genera.opzioni } } } : {}),
         };
       }) : [];
       const id = MappaUI.aggiungiDaImmagine({ nome, immagine, scalaKm: Math.round(m.larghezzaKm * 1000) / 1000, pins: pin, daPin: _contesto ? { mappaId: _contesto.mappaId, pinId: _contesto.pinId } : null });

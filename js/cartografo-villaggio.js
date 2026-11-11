@@ -108,7 +108,7 @@ const CartoVillaggio = (() => {
     const t = TONI[M.stileDi(o.palette)];
     const carta = t.stile === 'notte' ? M.PALETTE.cartografo : t.colore ? M.PALETTE.colori : M.PALETTE.atlante;
     const W = 1600, H = 900;
-    const nome = o.nome || M.nomeLuogo(r);
+    const nome = o.nome || M.nomeLuogo(r, o.popolo);
     const nCase = { piccolo: 28, medio: 50, grande: 80 }[o.taglia] || 50;
     const raggioB = { piccolo: 200, medio: 270, grande: 340 }[o.taglia] || 270;
     const pianta = o.pianta && o.pianta !== 'caso' ? o.pianta : (r.chance(0.5) ? 'piazza' : 'lungo');
