@@ -11,6 +11,12 @@ const CartoRegno = (() => {
   const n1 = M.n1;
 
   const TONI = {
+    colori: {
+      colore: true, carta: "#efe5cc", mare: "#9fc0ca", terra: "#ece0bc", terra2: "#e0d0a8", ink: "#33261a", chioma: "#c3d09a", chiomaPino: "#a9bc8a", monte: "#ebe1cb", muro: "#f3ebd4", tetto: "#a8382a",
+      oro: "#e3c26a", testo: "#33261a", testoAlone: "#f3ead3", margine: "#e9dfc4", peso: 400,
+      boschi: "#8faa6c", boschiLatif: "#a9bc75", rilievo: "#b59c78", steppa: "#e2c784", palude: "#93a67c",
+      font: "'IM Fell English', Georgia, serif", fontCurvo: "'IM Fell English SC', Georgia, serif",
+    },
     atlante: {
       carta: "#efe5cc", mare: "#ddd0ad", terra: "#f6efdb", terra2: "#e4d6b5", ink: "#33261a", chioma: "#f3ebd4", monte: "#f3ebd4", muro: "#f3ebd4", tetto: "#a8382a",
       oro: "#e3c26a", testo: "#33261a", testoAlone: "#f3ead3", margine: "#e9dfc4", peso: 400,
@@ -59,7 +65,7 @@ const CartoRegno = (() => {
   /* ═══════════════ GENERATORE ═══════════════ */
   const regno = (o) => {
     const r = M.rng('regno:' + o.seme), rn = M.rumore(r), rm = M.rumore(r);
-    const t = TONI[o.palette] || TONI.atlante;
+    const t = TONI[M.stileDi(o.palette)];
     const W = 1400, H = 1000, G = 6, w = Math.ceil(W / G) + 1, h = Math.ceil(H / G) + 1;
     const forma = o.forma || 'isola', clima = o.clima || 'temperato';
     const nome = o.nome || M.nomeLuogo(r);
@@ -337,14 +343,14 @@ const CartoRegno = (() => {
     let s = '<defs>' +
       (A
         ? `<symbol id="carto-al" overflow="visible"><path d="M0 0V-4.6" stroke="${t.ink}" stroke-width="1"/><circle cx="0" cy="-8.4" r="4.7" fill="${t.chioma}" stroke="${t.ink}" stroke-width="0.85"/><path d="M1.4 -11.2a3.4 3.4 0 0 1 1 5.2" fill="none" stroke="${t.ink}" stroke-width="0.65"/></symbol>` +
-          `<symbol id="carto-pn" overflow="visible"><path d="M0 -15L3.9 -5.4H1.9L5.3 0H-5.3L-1.9 -5.4H-3.9Z" fill="${t.chioma}" stroke="${t.ink}" stroke-width="0.85" stroke-linejoin="round"/><path d="M0.7 -12.4L3.4 -1.2" stroke="${t.ink}" stroke-width="0.55"/></symbol>` +
+          `<symbol id="carto-pn" overflow="visible"><path d="M0 -15L3.9 -5.4H1.9L5.3 0H-5.3L-1.9 -5.4H-3.9Z" fill="${t.chiomaPino || t.chioma}" stroke="${t.ink}" stroke-width="0.85" stroke-linejoin="round"/><path d="M0.7 -12.4L3.4 -1.2" stroke="${t.ink}" stroke-width="0.55"/></symbol>` +
           `<pattern id="carto-righe" width="12" height="4.4" patternUnits="userSpaceOnUse"><path d="M0 2.2H12" stroke="${t.ink}" stroke-width="0.6" opacity="0.12"/></pattern>`
         : `<pattern id="carto-puntini" width="7" height="7" patternUnits="userSpaceOnUse"><circle cx="1.6" cy="1.8" r="1.05" fill="${t.bosco}"/><circle cx="5.2" cy="5.3" r="1.05" fill="${t.bosco}"/></pattern>`) +
       '</defs>';
 
     /* Mare */
     if (A) {
-      s += `<rect width="${W}" height="${H}" fill="${t.mare}" opacity="0.55"/><rect width="${W}" height="${H}" fill="url(#carto-righe)"/>`;
+      s += `<rect width="${W}" height="${H}" fill="${t.mare}" opacity="${t.colore ? 0.75 : 0.55}"/><rect width="${W}" height="${H}" fill="url(#carto-righe)"/>`;
       [[5, 0.55], [10, 0.45], [16, 0.35], [23, 0.26], [32, 0.18], [44, 0.1]].forEach(([d, op]) => { s += tratto(anelliMare(d), t.ink, 0.8, ` opacity="${op}"`); });
     } else {
       s += `<rect width="${W}" height="${H}" fill="${t.mare}"/>`;
@@ -357,12 +363,16 @@ const CartoRegno = (() => {
 
     /* Terra */
     s += `<clipPath id="carto-terra"><path d="${tracciaTerra}" clip-rule="evenodd"/></clipPath>`;
-    s += `<path d="${tracciaTerra}" fill="${t.terra}" fill-rule="evenodd"${A ? ' opacity="0.6"' : ''}/>`;
+    s += `<path d="${tracciaTerra}" fill="${t.terra}" fill-rule="evenodd"${A ? ` opacity="${t.colore ? 0.85 : 0.6}"` : ''}/>`;
     let dentro = '';
     const chiazza = (f, col, op) => {
       const d = M.contorni(w, h, f, 0, G).map((l) => M.via(l)).join('');
       return d ? `<path d="${d}" fill="${col}" fill-rule="evenodd" opacity="${op}" filter="url(#carto-b12)"/>` : '';
     };
+    if (t.colore) {
+      dentro += chiazza((i, j) => e(i, j) - 0.66, t.rilievo, 0.35) + chiazza((i, j) => e(i, j) - 0.8, t.rilievo, 0.35);
+      dentro += chiazza(fConifera, t.boschi, 0.55) + chiazza(fLatifoglia, t.boschiLatif, 0.55) + chiazza(fSteppa, t.steppa, 0.55) + chiazza(fPalude, t.palude, 0.5);
+    }
     if (A) {
       // Puntinato lungo la riva, come nelle tavole incise
       dentro += `<path d="${tracciaTerra}" fill="none" stroke="${t.ink}" stroke-width="9" stroke-dasharray="0.1 3.2" stroke-linecap="round" opacity="0.32"/>`;

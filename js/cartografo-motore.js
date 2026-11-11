@@ -254,6 +254,13 @@ const CartoMotore = (() => {
     strada: '#f6efdc', stradaBordo: '#8a7454', terra: '#e7dbbd', tetti: ['#e3d2a8', '#ddcb9f', '#e8d9b3', '#d8c69a'], tettoNobile: '#a8382a',
     campi: ['#e8ddc0', '#e3d7b6', '#ede3c8', '#ddd1ae'], neve: '#fbf7ec', pavimento: '#f3ead3', roccia: '#d6c7a3', parete: '#33261a',
   };
+  // Atlante a colori: stessi segni dell'atlante, con le velature delle tavole colorate a mano
+  PALETTE.colori = {
+    ...PALETTE.atlante, nome: 'Atlante a colori', colore: true,
+    acqua: '#a9c6cf', erba: '#e2e3b9', erba2: '#d3d9a8', chioma: '#bccb94', chioma2: '#aebf86',
+    strada: '#f4ead2', terra: '#ebdfbd', tetti: ['#cf9070', '#c68163', '#d6a07e', '#bd785c'], tettoNobile: '#5d7392',
+    campi: ['#e4d797', '#d7d899', '#ead7a0', '#ccd39b'], pavimento: '#efe4c8', roccia: '#cfc4ab',
+  };
   PALETTE.cartografo = {
     nome: 'Notte', stile: 'notte', font: FONT_NOTTE, fontTitolo: FONT_NOTTE, fontCorpo: "'Cormorant Garamond', Georgia, serif", rosso: '#e9b84f', ambra: '#e9b84f',
     carta: '#0e1d26', carta2: '#132631', macchia: '#000000', inchiostro: '#e8e1cf', tenue: '#9fb0b4',
@@ -265,10 +272,12 @@ const CartoMotore = (() => {
   // Tinte di caverne, dungeon ed edifici nei due stili: fondo, pavimento, roccia tratteggiata
   const TONI_INTERNI = {
     atlante: { stile: 'atlante', sfondo: '#efe5cc', pavimento: '#f8f2e3', roccia: '#e3d6b6', ink: '#33261a', tenue: '#6e5a40', ombra: '#33261a', numero: '#a8382a', acqua: '#dccfae', acquaInk: '#33261a', legno: '#cfae80', pietra: '#e6dabd', metallo: '#9a8f7c' },
+    colori: { stile: 'atlante', colore: true, sfondo: '#efe5cc', pavimento: '#f6e8c2', roccia: '#b3a994', ink: '#33261a', tenue: '#6e5a40', ombra: '#33261a', numero: '#a8382a', acqua: '#a9c6cf', acquaInk: '#33261a', legno: '#c8935f', pietra: '#d3cab6', metallo: '#8d97a0' },
     notte: { stile: 'notte', sfondo: '#0e1d26', pavimento: '#1d3543', roccia: '#122530', ink: '#e8e1cf', tenue: '#9fb0b4', ombra: '#03090b', numero: '#e9b84f', acqua: '#0f3a52', acquaInk: '#7ebad8', legno: '#6b5a44', pietra: '#3a5563', metallo: '#8a95a0' },
   };
 
-  const cartaInterni = (t) => ({ ...(t.stile === 'notte' ? PALETTE.cartografo : PALETTE.atlante), carta: t.sfondo, carta2: t.sfondo, inchiostro: t.ink, tenue: t.tenue });
+  const stileDi = (palette) => (palette === 'notte' || palette === 'colori' ? palette : 'atlante');
+  const cartaInterni = (t) => ({ ...(t.stile === 'notte' ? PALETTE.cartografo : t.colore ? PALETTE.colori : PALETTE.atlante), carta: t.sfondo, carta2: t.sfondo, inchiostro: t.ink, tenue: t.tenue });
 
   const FONT_TITOLO = "Cinzel, 'Times New Roman', serif";
   const FONT_TESTO = "'Crimson Pro', Georgia, serif";
@@ -602,6 +611,6 @@ const CartoMotore = (() => {
   return {
     campoDistanze, rng, rumore, dist, lerp, area, centro, dentro, taglia, rientra, distSeg, distLinea, incrocio, celle, morbida, contorni,
     n1, via, esc, PALETTE, FONT_TITOLO, FONT_TESTO, FONT_ATLANTE, FONT_ATLANTE_SC, FONT_NOTTE, apri, chiudi, areaMappa, etichetta, titolo, rosa, scala,
-    alberi, edifici, rettangolo, campo, fiumeSvg, nomeLuogo, legenda, componi, cartaInterni, tratteggio, testoCurvo, curvaSuPunti, TONI_INTERNI, righe: _righe,
+    alberi, edifici, rettangolo, campo, fiumeSvg, nomeLuogo, legenda, componi, cartaInterni, stileDi, tratteggio, testoCurvo, curvaSuPunti, TONI_INTERNI, righe: _righe,
   };
 })();

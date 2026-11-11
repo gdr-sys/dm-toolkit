@@ -10,7 +10,7 @@ const CartoDungeon = (() => {
 
   const dungeon = (o) => {
     const r = M.rng('dungeon:' + o.seme);
-    const t = o.palette === 'notte' ? M.TONI_INTERNI.notte : M.TONI_INTERNI.atlante;
+    const t = M.TONI_INTERNI[M.stileDi(o.palette)];
     const carta = M.cartaInterni(t);
     const tema = CartoTesti.TEMI_DUNGEON[o.tema] || CartoTesti.TEMI_DUNGEON.cripta;
     const conLegenda = o.legenda !== false;

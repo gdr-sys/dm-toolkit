@@ -12,8 +12,8 @@ const CartoCaverna = (() => {
     const r = M.rng('caverna:' + o.seme), rn = M.rumore(r);
     const radura = o.ambiente === 'radura';
     const notte = o.palette === 'notte';
-    const t = notte ? M.TONI_INTERNI.notte : M.TONI_INTERNI.atlante;
-    const v = notte ? CartoVillaggio.TONI.notte : CartoVillaggio.TONI.atlante;
+    const t = M.TONI_INTERNI[M.stileDi(o.palette)];
+    const v = CartoVillaggio.TONI[M.stileDi(o.palette)];
     const carta = radura ? { ...M.cartaInterni(t), carta: notte ? v.prato : M.PALETTE.atlante.carta, inchiostro: notte ? v.testo : v.ink } : M.cartaInterni(t);
     const W = 1400, H = 1000, G = 14, w = Math.ceil(W / G) + 1, h = Math.ceil(H / G) + 1;
     const nome = o.nome || (radura ? 'Radura di ' : r.pick(['Grotta di ', 'Caverne di ', 'Antro di '])) + M.nomeLuogo(r);

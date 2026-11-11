@@ -14,6 +14,10 @@ const CartoAbitazione = (() => {
       stile: 'atlante', sfondo: '#efe5cc', muro: '#d9c9a3', finestra: '#dccfae', ink: '#33261a', luce: '#faf5e8', mezza: '#f3ead3', ombra: '#e3d4b0', griglia: '#8a7454', testo: '#33261a', testoInk: '#f6efdc', titolo: '#33261a',
       mobile: '#e8d6b0', mobileInk: '#5e4a32', scala: '#cdb991', tegola: '#c27b5e', tegolaInk: '#5e2f20', cantina: ['#ece2c8', '#ddd0b0', '#c6b68f'],
     },
+    colori: {
+      stile: 'atlante', colore: true, sfondo: '#efe5cc', muro: '#cdbfa3', finestra: '#a9c6cf', ink: '#33261a', luce: '#f8eed6', mezza: '#efdfbd', ombra: '#dcc59a', griglia: '#8a7454', testo: '#33261a', testoInk: '#f6efdc', titolo: '#33261a',
+      mobile: '#d9b585', mobileInk: '#5e4a32', scala: '#c9ad82', tegola: '#c97f5f', tegolaInk: '#5e2f20', cantina: ['#e6dcc4', '#d6cbb0', '#bfb293'],
+    },
     notte: {
       stile: 'notte', sfondo: '#0e1d26', muro: '#2f4856', finestra: '#e9b84f', ink: '#c3ced1', luce: '#3b5a6a', mezza: '#264151', ombra: '#132a36', griglia: '#5f7f8c', testo: '#e8e1cf', testoInk: '#0d1d26', titolo: '#e8e1cf',
       mobile: '#4a6372', mobileInk: '#0b161c', scala: '#35505e', tegola: '#2c4856', tegolaInk: '#08131a', cantina: ['#22343e', '#18282f', '#0c161b'],
@@ -22,8 +26,8 @@ const CartoAbitazione = (() => {
 
   const abitazione = (o) => {
     const r = M.rng('abitazione:' + o.seme);
-    const t = o.palette === 'notte' ? TONI.notte : TONI.atlante;
-    const carta = { ...(t.stile === 'notte' ? M.PALETTE.cartografo : M.PALETTE.atlante), carta: t.sfondo, carta2: t.sfondo, inchiostro: t.titolo, tenue: t.griglia };
+    const t = TONI[M.stileDi(o.palette)];
+    const carta = { ...(t.stile === 'notte' ? M.PALETTE.cartografo : t.colore ? M.PALETTE.colori : M.PALETTE.atlante), carta: t.sfondo, carta2: t.sfondo, inchiostro: t.titolo, tenue: t.griglia };
     const tipo = CartoTesti.TIPI_CASA[o.edificio] ? o.edificio : 'casa', T = CartoTesti.TIPI_CASA[tipo];
     const nPiani = Math.max(1, Math.min(3, parseInt(o.piani, 10) || 2));
     const cantina = o.cantina !== false, conLegenda = o.legenda === true, conTetto = o.tetto !== false;

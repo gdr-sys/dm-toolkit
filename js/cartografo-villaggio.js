@@ -16,6 +16,11 @@ const CartoVillaggio = (() => {
       campo: ['#e9dec2', '#e2d5b4', '#ede4cb', '#dccfac'], solco: '#6e5a40', strada: '#f6efdc', stradaBordo: '#8a7454', piazza: '#f3ead3', tetti: ['#e3d2a8', '#ddcb9f', '#e8d9b3', '#d8c69a'], ardesia: ['#a8382a', '#93301f'],
       acqua: '#dccfae', acquaInk: '#33261a', riflesso: '#33261a', testo: '#33261a', testoAlone: '#f3ead3', ombraOp: 0.26, font: M.FONT_ATLANTE, fontTitolo: M.FONT_ATLANTE_SC,
     },
+    colori: {
+      stile: 'atlante', colore: true, prato: '#d6dca8', pratoScuro: '#b4bf86', luce: '#f6f3dc', chioma: ['#bccb94', '#b2c48a', '#c6d29e'], chiomaL: '#ffffff', bosco: '#adbd85', boscoProfondo: '#93a56d', ink: '#33261a',
+      campo: ['#e4d48f', '#d9d08c', '#ead59a', '#cfcb8a'], solco: '#6e5a40', strada: '#f4ead2', stradaBordo: '#8a7454', piazza: '#efe4c8', tetti: ['#cf9070', '#c68163', '#d6a07e', '#bd785c'], ardesia: ['#5d7392', '#4f6382'],
+      acqua: '#a9c6cf', acquaInk: '#33261a', riflesso: '#33261a', testo: '#33261a', testoAlone: '#f3ead3', ombraOp: 0.26, font: M.FONT_ATLANTE, fontTitolo: M.FONT_ATLANTE_SC,
+    },
     notte: {
       stile: 'notte', prato: '#12262f', pratoScuro: '#0a1820', luce: '#2b4a56', chioma: ['#1d3a3d', '#22424a', '#1a3436'], chiomaL: '#7eb696', bosco: '#0f2629', boscoProfondo: '#08191b', ink: '#03090b',
       campo: ['#173039', '#1b343c', '#152c34', '#1e383f'], solco: '#4f7078', strada: '#29475a', stradaBordo: '#08131a', piazza: '#2f4e60', tetti: ['#2a4553', '#2f4b5a', '#263f4c', '#2c4856'], ardesia: ['#e9b84f', '#d9a63f'],
@@ -100,8 +105,8 @@ const CartoVillaggio = (() => {
 
   const villaggio = (o) => {
     const r = M.rng('villaggio:' + o.seme), rn = M.rumore(r), rf = M.rumore(r);
-    const t = o.palette === 'notte' ? TONI.notte : TONI.atlante;
-    const carta = t.stile === 'notte' ? M.PALETTE.cartografo : M.PALETTE.atlante;
+    const t = TONI[M.stileDi(o.palette)];
+    const carta = t.stile === 'notte' ? M.PALETTE.cartografo : t.colore ? M.PALETTE.colori : M.PALETTE.atlante;
     const W = 1600, H = 900;
     const nome = o.nome || M.nomeLuogo(r);
     const nCase = { piccolo: 28, medio: 50, grande: 80 }[o.taglia] || 50;
