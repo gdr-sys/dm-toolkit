@@ -69,8 +69,11 @@ const BarraAlta = (() => {
     _segnaAttiva();
   };
 
+  let _ultimaPagina = '';
   const _segnaAttiva = () => {
     const pag = _paginaAttiva();
+    // Cambiando pagina, in qualunque modo, i menu aperti si chiudono
+    if (pag !== _ultimaPagina) { _ultimaPagina = pag; chiudi(); }
     document.querySelectorAll('#ba-barra [data-pagina]').forEach((b) => {
       const pre = b.dataset.prefisso;
       const attiva = pag === 'page-' + b.dataset.pagina || (pre && pag.startsWith(pre));

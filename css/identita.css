@@ -221,3 +221,9 @@ button.dn-row:hover .dn-t, a.dn-row:hover .dn-t { color: var(--accent-text); }
   .ba-icona:hover { background: var(--bg-tertiary); color: var(--text-primary); }
 }
 @media (min-width: 900px) and (max-width: 1180px) { .ba-logo span { display: none; } .ba-campagna { max-width: 170px; } }
+
+/* ── Colori di categoria: un filo, non una barra ── */
+[style*="border-top:3px solid"], [style*="border-top: 3px solid"] { border-top-width: 1px !important; }
+[style*="border-left:3px solid"], [style*="border-left: 3px solid"], [style*="border-left:4px solid"], [style*="border-left: 4px solid"] { border-left-width: 1px !important; }
+/* ── Pagine della Wiki: stessa larghezza massima della Dashboard ── */
+.page[id^="page-wiki"] > * { max-width: 1240px; margin-left: auto; margin-right: auto; }
