@@ -268,6 +268,9 @@ const CartoMotore = (() => {
     },
   };
 
+  // Atlante inciso: carta avorio e inchiostro seppia, lo stile di giorno del Cartografo
+  PALETTE.atlante = { ...PALETTE.pergamena, nome: 'Atlante', carta: '#efe5cc', carta2: '#e3d6b6', macchia: '#6b5233', inchiostro: '#33261a', tenue: '#6e5a40' };
+
   // Monocromatica da incisione: edifici importanti in nero pieno, mura come un tratto deciso
   PALETTE.seppia = {
     nome: 'Seppia', carta: '#d2cab9', carta2: '#cbc3b1', macchia: '#6b6350', inchiostro: '#191815', tenue: '#5f5a4d',

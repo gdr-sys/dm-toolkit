@@ -14,7 +14,7 @@
 
 const Cartografo = (() => {
   const KEY = 'dm_cartografo';
-  const FONT_CSS = 'https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap';
+  const FONT_CSS = 'https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&family=Cormorant+SC:wght@500;600&display=swap';
   const SCALA_IMMAGINE = 2;
   const _esc = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   const $ = (id) => document.getElementById(id);

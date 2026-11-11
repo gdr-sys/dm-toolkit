@@ -11,30 +11,15 @@ const CartoRegno = (() => {
   const n1 = M.n1;
 
   const TONI = {
-    pergamena: {
-      mare: '#6e86a2', alone: '#bfd5e4', terra: '#a8a56c', terra2: '#8f8c58', riva: '#7d7a4c', ink: '#3b382a', conifera: '#565a4b', coniferaL: '#70755f', latifoglia: '#8a8253', latifogliaL: '#a59c68',
-      monte: '#e8e4cc', monteOmbra: '#55544a', arido: '#d9caa4', palude: '#7f8058', fiume: '#a9c3d8', strada: '#a02b20', testo: '#fbf8ea', testoAlone: '#38352a', margine: '#d9dcc2', oro: '#e9c25f', oroInk: '#6a5524',
-      muro: '#e6e2d2', tetto: '#b9603b', bandiera: '#b3261e', linee: '#2c3644',
-    },
-    acquerello: {
-      mare: '#5f9cc0', alone: '#cfeaf5', terra: '#b5c98a', terra2: '#94ad6c', riva: '#6f8a50', ink: '#2f3a2c', conifera: '#3f6a54', coniferaL: '#5b8a70', latifoglia: '#6f9a58', latifogliaL: '#8fb873',
-      monte: '#f2eee0', monteOmbra: '#5c6660', arido: '#ecd9a8', palude: '#7f9a6e', fiume: '#b4e0f0', strada: '#b5301f', testo: '#ffffff', testoAlone: '#2b3a34', margine: '#eef0e0', oro: '#efc24a', oroInk: '#6f5518',
-      muro: '#f0ece0', tetto: '#c9583b', bandiera: '#c0261c', linee: '#1f4a63',
-    },
-    seppia: {
-      mare: '#8d8778', alone: '#c6bfae', terra: '#d2c9b4', terra2: '#bdb49e', riva: '#55503f', ink: '#25221b', conifera: '#6a6555', coniferaL: '#8a8473', latifoglia: '#9a9380', latifogliaL: '#b0a994',
-      monte: '#efe9da', monteOmbra: '#3f3b30', arido: '#e2d9c4', palude: '#a59e8a', fiume: '#c6bfae', strada: '#3c372b', testo: '#1d1b15', testoAlone: '#efe9da', margine: '#e4dece', oro: '#d8cfb8', oroInk: '#25221b',
-      muro: '#efe9da', tetto: '#57513f', bandiera: '#25221b', linee: '#3a362b',
-    },
-    inchiostro: {
-      mare: '#e6e8e6', alone: '#ffffff', terra: '#f8f6ee', terra2: '#ece9df', riva: '#1b1a18', ink: '#1b1a18', conifera: '#b5b3aa', coniferaL: '#dad8cf', latifoglia: '#cfcdc3', latifogliaL: '#e8e6dc',
-      monte: '#ffffff', monteOmbra: '#1b1a18', arido: '#f3f0e4', palude: '#dddbd0', fiume: '#e6e8e6', strada: '#1b1a18', testo: '#111111', testoAlone: '#ffffff', margine: '#f8f6f0', oro: '#ffffff', oroInk: '#1b1a18',
-      muro: '#ffffff', tetto: '#8d8b84', bandiera: '#1b1a18', linee: '#55534d',
+    atlante: {
+      carta: "#efe5cc", mare: "#ddd0ad", terra: "#f6efdb", terra2: "#e4d6b5", ink: "#33261a", chioma: "#f3ebd4", monte: "#f3ebd4", muro: "#f3ebd4", tetto: "#a8382a",
+      oro: "#e3c26a", testo: "#33261a", testoAlone: "#f3ead3", margine: "#e9dfc4", peso: 400,
+      font: "'IM Fell English', Georgia, serif", fontCurvo: "'IM Fell English SC', Georgia, serif",
     },
     notte: {
-      mare: '#15222f', alone: '#3f6078', terra: '#39493f', terra2: '#2d3b34', riva: '#0c1116', ink: '#0c1116', conifera: '#1c2a26', coniferaL: '#31453c', latifoglia: '#2a3f35', latifogliaL: '#40584a',
-      monte: '#a9b4bb', monteOmbra: '#141c22', arido: '#544f3f', palude: '#2c3d36', fiume: '#6d9dbd', strada: '#e0725a', testo: '#f2ecd8', testoAlone: '#0a0f14', margine: '#222b35', oro: '#d7b45a', oroInk: '#2f2610',
-      muro: '#b9bfbf', tetto: '#a55236', bandiera: '#e0523f', linee: '#88a6bd',
+      mare: "#0b1820", terra: "#13303b", terraAlta: "#1d4150", terra2: "#1d4150", ink: "#0b1820", gesso: "#e8e1cf", gessoTenue: "#b9b4a6", batimetria: "#78afc4", fiume: "#7ebad8",
+      bosco: "#7eb696", ambra: "#e9b84f", muro: "#c9c3b2", tetto: "#e9b84f", oro: "#e9b84f", testo: "#e8e1cf", testoAlone: "#0d1d26", mareTesto: "#8cbacc", margine: "#0b1820", peso: 600,
+      font: "'Cormorant SC', Georgia, serif", fontCurvo: "'Cormorant SC', Georgia, serif",
     },
   };
 
@@ -62,85 +47,6 @@ const CartoRegno = (() => {
   };
 
   /* ── Glifi ── */
-  const montagna = (x, y, s, t, r, innevata) => {
-    // Profilo: si sale a sinistra, si scende a destra con la cresta seghettata in mezzo
-    const alta = s * r.range(1.05, 1.5), cimaX = x + r.range(-0.2, 0.2) * s;
-    const sx = [x - s * r.range(0.95, 1.2), y], dx = [x + s * r.range(1.0, 1.25), y], cima = [cimaX, y - alta];
-    const sin = [sx, [x - s * 0.62, y - alta * 0.26 + r.range(-2, 2)], [x - s * 0.3, y - alta * 0.62 + r.range(-2, 2)], cima];
-    const des = [cima, [x + s * 0.3, y - alta * 0.6 + r.range(-2, 2)], [x + s * 0.68, y - alta * 0.24 + r.range(-2, 2)], dx];
-    const cresta = [cima, [cimaX + s * 0.12, y - alta * 0.72], [cimaX - s * 0.04, y - alta * 0.52], [cimaX + s * 0.18, y - alta * 0.33], [cimaX + s * 0.03, y - alta * 0.15], [cimaX + s * 0.22, y]];
-    const ombra = cresta.concat(des.slice().reverse().slice(0, -1));
-    const corpo = sin.concat(des.slice(1));
-    let g = `<path d="${M.via(corpo)}" fill="url(#carto-monte)"/>`;
-    g += `<path d="${M.tratteggio(ombra, -0.9, Math.max(1.9, s * 0.075))}" fill="none" stroke="${t.monteOmbra}" stroke-width="0.75"/>`;
-    g += `<path d="${M.via(cresta, false)}" fill="none" stroke="${t.monteOmbra}" stroke-width="${Math.max(0.9, s * 0.04)}" stroke-linejoin="round"/>`;
-    // Contrafforte chiaro sul lato al sole
-    g += `<path d="M${n1(cimaX - s * 0.12)} ${n1(y - alta * 0.62)}L${n1(x - s * 0.34)} ${n1(y - alta * 0.28)}L${n1(x - s * 0.22)} ${n1(y - alta * 0.08)}" fill="none" stroke="${t.monteOmbra}" stroke-width="0.8" opacity="0.7"/>`;
-    g += `<path d="${M.via(sin, false)}" fill="none" stroke="${t.ink}" stroke-width="${Math.max(1.1, s * 0.055)}" stroke-linejoin="round" stroke-linecap="round"/>` +
-      `<path d="${M.via(des, false)}" fill="none" stroke="${t.ink}" stroke-width="${Math.max(1.3, s * 0.065)}" stroke-linejoin="round" stroke-linecap="round"/>`;
-    if (innevata) g += `<path d="${M.via([cima, M.lerp(cima, sin[2], 0.55), [cimaX - s * 0.06, y - alta * 0.76], [cimaX + s * 0.08, y - alta * 0.86], M.lerp(cima, des[1], 0.55)])}" fill="#fff" opacity="0.92"/>`;
-    return g;
-  };
-
-  const pino = (x, y, h, t, r) => {
-    const w = h * 0.34;
-    const pts = [[x, y - h], [x + w * 0.42, y - h * 0.62], [x + w * 0.24, y - h * 0.62], [x + w * 0.74, y - h * 0.3], [x + w * 0.4, y - h * 0.3], [x + w, y], [x - w, y], [x - w * 0.4, y - h * 0.3], [x - w * 0.74, y - h * 0.3], [x - w * 0.24, y - h * 0.62], [x - w * 0.42, y - h * 0.62]];
-    return `<path d="${M.via(pts)}" fill="${t.conifera}" stroke="${t.ink}" stroke-width="0.85" stroke-linejoin="round"/><path d="M${n1(x + w * 0.1)} ${n1(y - h * 0.8)}L${n1(x + w * 0.5)} ${n1(y - h * 0.08)}" stroke="${t.coniferaL}" stroke-width="${n1(w * 0.3)}" opacity="${r.range(0.45, 0.8)}"/>`;
-  };
-
-  const tondo = (x, y, s, t) =>
-    `<path d="M${n1(x)} ${n1(y)}V${n1(y - s * 0.7)}" stroke="${t.ink}" stroke-width="1.1"/><ellipse cx="${n1(x)}" cy="${n1(y - s)}" rx="${n1(s * 0.62)}" ry="${n1(s * 0.78)}" fill="${t.latifoglia}" stroke="${t.ink}" stroke-width="0.95"/>` +
-    `<path d="M${n1(x + s * 0.28)} ${n1(y - s * 1.35)}q${n1(s * 0.28)} ${n1(s * 0.3)} ${n1(s * 0.05)} ${n1(s * 0.75)}" fill="none" stroke="${t.ink}" stroke-width="0.6" opacity="0.65"/>`;
-
-  // Casetta vista da tre quarti: facciata a capanna e falda del tetto col tratteggio
-  const casetta = (x, y, s, t) => {
-    const w = s, h = s * 0.72, tetto = s * 0.62, prof = s * 0.72;
-    const facciata = [[x, y], [x + w, y], [x + w, y - h], [x + w / 2, y - h - tetto], [x, y - h]];
-    const falda = [[x + w / 2, y - h - tetto], [x + w / 2 + prof, y - h - tetto - prof * 0.26], [x + w + prof, y - h - prof * 0.26], [x + w, y - h]];
-    const fianco = [[x + w, y], [x + w + prof, y - prof * 0.26], [x + w + prof, y - h - prof * 0.26], [x + w, y - h]];
-    return `<path d="${M.via(fianco)}" fill="${t.muro}" stroke="${t.ink}" stroke-width="0.9"/><path d="${M.tratteggio(fianco, 1.57, 1.7)}" stroke="${t.ink}" stroke-width="0.45"/>` +
-      `<path d="${M.via(facciata)}" fill="${t.muro}" stroke="${t.ink}" stroke-width="1"/>` +
-      `<path d="${M.via(falda)}" fill="${t.tetto}" stroke="${t.ink}" stroke-width="1"/><path d="${M.tratteggio(falda, -0.26, 1.9)}" stroke="${t.ink}" stroke-width="0.5" opacity="0.8"/>` +
-      `<rect x="${n1(x + w * 0.38)}" y="${n1(y - h * 0.5)}" width="${n1(w * 0.24)}" height="${n1(h * 0.5)}" fill="${t.ink}"/>`;
-  };
-
-  const torre = (x, y, s, h, t, bandiera) => {
-    const w = s;
-    let g = `<path d="M${n1(x - w / 2)} ${n1(y)}V${n1(y - h)}H${n1(x + w / 2)}V${n1(y)}Z" fill="${t.muro}" stroke="${t.ink}" stroke-width="1.1"/>`;
-    g += `<path d="${M.tratteggio([[x + w * 0.12, y], [x + w / 2, y], [x + w / 2, y - h], [x + w * 0.12, y - h]], 0, 2)}" stroke="${t.ink}" stroke-width="0.45"/>`;
-    const punta = y - h - w * 1.05;
-    g += `<path d="M${n1(x - w * 0.68)} ${n1(y - h)}L${n1(x)} ${n1(punta)}L${n1(x + w * 0.68)} ${n1(y - h)}Z" fill="${t.tetto}" stroke="${t.ink}" stroke-width="1.05"/>` +
-      `<path d="${M.tratteggio([[x, punta], [x + w * 0.68, y - h], [x + w * 0.05, y - h]], 1.2, 1.8)}" stroke="${t.ink}" stroke-width="0.45"/>`;
-    if (bandiera) g += `<path d="M${n1(x)} ${n1(punta)}V${n1(punta - s * 1.05)}" stroke="${t.ink}" stroke-width="1"/><path d="M${n1(x)} ${n1(punta - s * 1.05)}q${n1(s * 0.5)} ${n1(-s * 0.2)} ${n1(s)} ${n1(s * 0.12)}l${n1(-s * 0.26)} ${n1(s * 0.2)}l${n1(s * 0.26)} ${n1(s * 0.2)}q${n1(-s * 0.5)} ${n1(-s * 0.26)} ${n1(-s)} ${n1(-s * 0.02)}Z" fill="${t.bandiera}" stroke="${t.ink}" stroke-width="0.7"/>`;
-    return g;
-  };
-
-  // Cinta di mura vista dall'alto a tre quarti: un anello con la merlatura e il tratteggio
-  const cinta = (x, y, rx, ry, t) => {
-    const alta = ry * 0.68;
-    let g = `<path d="M${n1(x - rx)} ${n1(y)}A${n1(rx)} ${n1(ry)} 0 0 1 ${n1(x + rx)} ${n1(y)}" fill="none" stroke="${t.ink}" stroke-width="1"/>`;
-    g += `<ellipse cx="${n1(x)}" cy="${n1(y)}" rx="${n1(rx)}" ry="${n1(ry)}" fill="${t.terra2}" opacity="0.65"/>`;
-    return { dietro: g, davanti:
-      `<path d="M${n1(x - rx)} ${n1(y)}A${n1(rx)} ${n1(ry)} 0 0 0 ${n1(x + rx)} ${n1(y)}V${n1(y + alta)}A${n1(rx)} ${n1(ry)} 0 0 1 ${n1(x - rx)} ${n1(y + alta)}Z" fill="${t.muro}" stroke="${t.ink}" stroke-width="1.15"/>` +
-      Array.from({ length: Math.floor(rx * 2 / 3.1) }, (_, i) => {
-        const u = -1 + (i + 0.5) * 2 / Math.floor(rx * 2 / 3.1), px = x + u * rx, py = y + Math.sqrt(1 - u * u) * ry;
-        return u > 0 ? `<path d="M${n1(px)} ${n1(py)}v${n1(alta)}" stroke="${t.ink}" stroke-width="0.5"/>` : '';
-      }).join('') +
-      `<path d="M${n1(x - 4)} ${n1(y + ry + alta)}v${n1(-alta * 0.75)}a4 4 0 0 1 8 0v${n1(alta * 0.75)}Z" fill="${t.ink}"/>`,
-    };
-  };
-
-  const mulino = (x, y, s, t) => {
-    const a = 0.5;
-    let g = `<path d="M${n1(x - s * 0.5)} ${n1(y)}L${n1(x - s * 0.32)} ${n1(y - s * 1.3)}H${n1(x + s * 0.32)}L${n1(x + s * 0.5)} ${n1(y)}Z" fill="${t.muro}" stroke="${t.ink}" stroke-width="1"/>`;
-    const cy = y - s * 1.38;
-    for (let i = 0; i < 4; i++) {
-      const b = a + i * Math.PI / 2, c = Math.cos(b), d = Math.sin(b), q = [[x + c * s * 0.1 - d * s * 0.16, cy + d * s * 0.1 + c * s * 0.16], [x + c * s * 1.25 - d * s * 0.16, cy + d * s * 1.25 + c * s * 0.16], [x + c * s * 1.25 + d * s * 0.16, cy + d * s * 1.25 - c * s * 0.16], [x + c * s * 0.1 + d * s * 0.16, cy + d * s * 0.1 - c * s * 0.16]];
-      g += `<path d="${M.via(q)}" fill="${t.tetto}" stroke="${t.ink}" stroke-width="0.85"/><path d="${M.tratteggio(q, b + 1.57, 2.3)}" stroke="${t.ink}" stroke-width="0.5"/>`;
-    }
-    return g;
-  };
-
   const rovina = (x, y, s, t) =>
     `<path d="M${n1(x - s)} ${n1(y)}V${n1(y - s * 1.1)}L${n1(x - s * 0.62)} ${n1(y - s * 1.45)}L${n1(x - s * 0.3)} ${n1(y - s * 1.2)}V${n1(y - s * 0.55)}A${n1(s * 0.32)} ${n1(s * 0.32)} 0 0 1 ${n1(x + s * 0.3)} ${n1(y - s * 0.55)}V${n1(y - s * 0.9)}L${n1(x + s * 0.62)} ${n1(y - s * 0.7)}L${n1(x + s)} ${n1(y - s * 0.95)}V${n1(y)}H${n1(x + s * 0.3)}V${n1(y - s * 0.3)}H${n1(x - s * 0.3)}V${n1(y)}Z" fill="${t.muro}" stroke="${t.ink}" stroke-width="1.1" stroke-linejoin="round"/>` +
     `<path d="M${n1(x - s * 1.25)} ${n1(y + 1)}H${n1(x + s * 1.25)}" stroke="${t.ink}" stroke-width="1.3" stroke-linecap="round"/>`;
@@ -150,22 +56,10 @@ const CartoRegno = (() => {
     `<path d="M${n1(x - s * 0.34)} ${n1(y - s * 0.55)}H${n1(x + s * 0.34)}M${n1(x - s * 0.3)} ${n1(y - s * 1.05)}H${n1(x + s * 0.3)}" stroke="${t.ink}" stroke-width="1.8"/>` +
     `<rect x="${n1(x - s * 0.3)}" y="${n1(y - s * 1.92)}" width="${n1(s * 0.6)}" height="${n1(s * 0.38)}" fill="${t.oro}" stroke="${t.ink}" stroke-width="0.9"/><path d="M${n1(x - s * 0.36)} ${n1(y - s * 1.92)}L${n1(x)} ${n1(y - s * 2.3)}L${n1(x + s * 0.36)} ${n1(y - s * 1.92)}Z" fill="${t.tetto}" stroke="${t.ink}" stroke-width="0.9"/>`;
 
-  const rosaOro = (x, y, r, t) => {
-    let g = `<circle cx="${x}" cy="${y}" r="${n1(r * 0.62)}" fill="none" stroke="${t.oroInk}" stroke-width="3"/><circle cx="${x}" cy="${y}" r="${n1(r * 0.54)}" fill="none" stroke="${t.oroInk}" stroke-width="1"/>`;
-    const punta = (a, l, w) => {
-      const c = Math.sin(a), d = -Math.cos(a), px = -d * w, py = c * w, tx = x + c * l, ty = y + d * l;
-      const sx = [[tx, ty], [x + px, y + py], [x, y]], dx = [[tx, ty], [x - px, y - py], [x, y]];
-      return `<path d="${M.via(sx)}" fill="${t.oro}" stroke="${t.oroInk}" stroke-width="1"/><path d="${M.via(dx)}" fill="${t.oro}" stroke="${t.oroInk}" stroke-width="1"/><path d="${M.tratteggio(dx, a + 1.57, 1.9)}" stroke="${t.oroInk}" stroke-width="0.7"/>`;
-    };
-    for (let i = 0; i < 4; i++) g += punta(Math.PI / 4 + i * Math.PI / 2, r * 0.6, r * 0.1);
-    for (let i = 0; i < 4; i++) g += punta(i * Math.PI / 2, r, r * 0.12);
-    return g + `<circle cx="${x}" cy="${y}" r="${n1(r * 0.09)}" fill="${t.oro}" stroke="${t.oroInk}" stroke-width="2"/><circle cx="${x}" cy="${y}" r="${n1(r * 0.03)}" fill="${t.oroInk}"/>`;
-  };
-
   /* ═══════════════ GENERATORE ═══════════════ */
   const regno = (o) => {
     const r = M.rng('regno:' + o.seme), rn = M.rumore(r), rm = M.rumore(r);
-    const t = TONI[o.palette] || TONI.pergamena;
+    const t = TONI[o.palette] || TONI.atlante;
     const W = 1400, H = 1000, G = 6, w = Math.ceil(W / G) + 1, h = Math.ceil(H / G) + 1;
     const forma = o.forma || 'isola', clima = o.clima || 'temperato';
     const nome = o.nome || M.nomeLuogo(r);
@@ -399,10 +293,10 @@ const CartoRegno = (() => {
     });
 
     /* ─── Disegno ─── */
-    let s = `<defs><linearGradient id="carto-monte" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="${t.monte}"/><stop offset="62%" stop-color="${t.monte}"/><stop offset="100%" stop-color="${t.monte}" stop-opacity="0"/></linearGradient></defs>`;
-    s += `<rect width="${W}" height="${H}" fill="${t.mare}"/>`;
+    // Due stili: "atlante" (carta e inchiostro, di giorno) e "notte" (gesso e ambra su blu notte)
+    const A = o.palette !== 'notte';
 
-    // Macchie nel mare e linee di rotta dalla rosa dei venti
+    // L'angolo di mare piu' aperto ospita la rosa dei venti
     const spazi = [[W - 140, 150], [150, 150], [W - 150, H - 150], [150, H - 150], [W * 0.5, 170], [W * 0.5, H - 170], [160, H * 0.5], [W - 170, H * 0.5]];
     const spazio = spazi.map((q) => {
       let min = 1;
@@ -410,180 +304,219 @@ const CartoRegno = (() => {
       return [q, min, -eIn(q[0], q[1])];
     }).sort((a, b) => (b[1] - a[1]) || (b[2] - a[2]));
     const [rx, ry] = spazio[0][0];
-    let rotte = '';
-    for (let i = 0; i < 32; i++) {
-      const a = i * Math.PI / 16;
-      if (i % 4 !== 0 && r.chance(0.3)) continue;
-      rotte += `M${n1(rx + Math.cos(a) * 64)} ${n1(ry + Math.sin(a) * 64)}L${n1(rx + Math.cos(a) * 2400)} ${n1(ry + Math.sin(a) * 2400)}`;
-    }
-    s += `<path d="${rotte}" fill="none" stroke="${t.linee}" stroke-width="0.8" opacity="0.7"/>`;
 
-    // Alone chiaro attorno alle coste, che copre anche le linee di rotta
-    s += `<path d="${tracciaTerra}" fill="${t.alone}" stroke="${t.alone}" stroke-width="30" stroke-linejoin="round" filter="url(#carto-b12)" opacity="0.95"/>`;
-
-    // Terra: base, bordo interno, chiazze morbide
-    s += `<clipPath id="carto-terra"><path d="${tracciaTerra}" clip-rule="evenodd"/></clipPath>`;
-    s += `<path d="${tracciaTerra}" fill="${t.terra}" fill-rule="evenodd"/>`;
-    let dentro = '';
-    const chiazza = (f, col, op, filtro = 'carto-b12') => {
-      const d = M.contorni(w, h, f, 0, G).map((l) => M.via(l)).join('');
-      return d ? `<path d="${d}" fill="${col}" fill-rule="evenodd" opacity="${op}" filter="url(#${filtro})"/>` : '';
+    const tratto = (d, col, sw, extra = '') => (d ? `<path d="${d}" fill="none" stroke="${col}" stroke-width="${sw}" stroke-linejoin="round" stroke-linecap="round"${extra}/>` : '');
+    // Linee parallele alla costa, a distanze crescenti: increspature (atlante) o batimetria (notte)
+    const dCosta = M.campoDistanze(costa, W, H, G);
+    const anelliMare = (d) => M.contorni(w, h, (i, j) => d - (e(i, j) > 0 ? 0 : dCosta(i * G, j * G)), 0, G).map((l) => M.via(M.morbida(l, 1, true))).join('');
+    // Il fiume si allarga verso la foce
+    const fiumeAffusolato = (f, col, w0, w1) => {
+      let g = '';
+      const n = f.length, pezzi = 5;
+      for (let k = 0; k < pezzi; k++) {
+        const a = Math.floor(k * n / pezzi), b = Math.min(n, Math.floor((k + 1) * n / pezzi) + 1);
+        if (b - a > 1) g += tratto(M.via(f.slice(a, b), false), col, n1(w0 + (w1 - w0) * k / (pezzi - 1)));
+      }
+      return g;
     };
-    dentro += chiazza((i, j) => rm(i * G * 0.0065 + 700, j * G * 0.0065 + 90, 3) - 0.54, t.terra2, 0.55);
-    dentro += chiazza((i, j) => e(i, j) - 0.74, t.terra2, 0.5);
-    dentro += steppe.length ? `<path d="${steppe_(steppe)}" fill="${t.arido}" fill-rule="evenodd" filter="url(#carto-b12)"/>` : '';
-    dentro += paludi.length ? `<path d="${steppe_(paludi)}" fill="${t.palude}" fill-rule="evenodd" filter="url(#carto-b12)" opacity="0.9"/>` : '';
 
-    // Segni del terreno: ciuffi d'erba in piano, canne e trattini in palude, onde di sabbia in steppa
+    // Alberi uno per uno dentro i boschi (atlante); nella notte i boschi sono puntinati
+    const alberi = [];
+    if (A) {
+      for (let y = 8; y < H; y += 10) for (let x = 8; x < W; x += 10) {
+        const qx = x + r.range(-4, 4), qy = y + r.range(-4, 4);
+        if (eIn(qx, qy) < 0.02) continue;
+        const c = inB(fConifera, qx, qy) > 0, l = !c && inB(fLatifoglia, qx, qy) > 0;
+        if ((!c && !l) || !lontanoCitta(qx, qy, 30) || !lontanoStrade(qx, qy, 7)) continue;
+        alberi.push([qx, qy, c]);
+      }
+    }
+
+    let s = '<defs>' +
+      (A
+        ? `<symbol id="carto-al" overflow="visible"><path d="M0 0V-4.6" stroke="${t.ink}" stroke-width="1"/><circle cx="0" cy="-8.4" r="4.7" fill="${t.chioma}" stroke="${t.ink}" stroke-width="0.85"/><path d="M1.4 -11.2a3.4 3.4 0 0 1 1 5.2" fill="none" stroke="${t.ink}" stroke-width="0.65"/></symbol>` +
+          `<symbol id="carto-pn" overflow="visible"><path d="M0 -15L3.9 -5.4H1.9L5.3 0H-5.3L-1.9 -5.4H-3.9Z" fill="${t.chioma}" stroke="${t.ink}" stroke-width="0.85" stroke-linejoin="round"/><path d="M0.7 -12.4L3.4 -1.2" stroke="${t.ink}" stroke-width="0.55"/></symbol>` +
+          `<pattern id="carto-righe" width="12" height="4.4" patternUnits="userSpaceOnUse"><path d="M0 2.2H12" stroke="${t.ink}" stroke-width="0.6" opacity="0.12"/></pattern>`
+        : `<pattern id="carto-puntini" width="7" height="7" patternUnits="userSpaceOnUse"><circle cx="1.6" cy="1.8" r="1.05" fill="${t.bosco}"/><circle cx="5.2" cy="5.3" r="1.05" fill="${t.bosco}"/></pattern>`) +
+      '</defs>';
+
+    /* Mare */
+    if (A) {
+      s += `<rect width="${W}" height="${H}" fill="${t.mare}" opacity="0.55"/><rect width="${W}" height="${H}" fill="url(#carto-righe)"/>`;
+      [[5, 0.55], [10, 0.45], [16, 0.35], [23, 0.26], [32, 0.18], [44, 0.1]].forEach(([d, op]) => { s += tratto(anelliMare(d), t.ink, 0.8, ` opacity="${op}"`); });
+    } else {
+      s += `<rect width="${W}" height="${H}" fill="${t.mare}"/>`;
+      [[8, 0.24], [20, 0.16], [36, 0.11], [58, 0.07]].forEach(([d, op]) => { s += tratto(anelliMare(d), t.batimetria, 0.8, ` opacity="${op}"`); });
+      let ret = '';
+      for (let x = 200; x < W; x += 200) ret += `M${x} 0V${H}`;
+      for (let y = 200; y < H; y += 200) ret += `M0 ${y}H${W}`;
+      s += tratto(ret, t.gesso, 0.8, ' opacity="0.07"');
+    }
+
+    /* Terra */
+    s += `<clipPath id="carto-terra"><path d="${tracciaTerra}" clip-rule="evenodd"/></clipPath>`;
+    s += `<path d="${tracciaTerra}" fill="${t.terra}" fill-rule="evenodd"${A ? ' opacity="0.6"' : ''}/>`;
+    let dentro = '';
+    const chiazza = (f, col, op) => {
+      const d = M.contorni(w, h, f, 0, G).map((l) => M.via(l)).join('');
+      return d ? `<path d="${d}" fill="${col}" fill-rule="evenodd" opacity="${op}" filter="url(#carto-b12)"/>` : '';
+    };
+    if (A) {
+      // Puntinato lungo la riva, come nelle tavole incise
+      dentro += `<path d="${tracciaTerra}" fill="none" stroke="${t.ink}" stroke-width="9" stroke-dasharray="0.1 3.2" stroke-linecap="round" opacity="0.32"/>`;
+      dentro += `<path d="${tracciaTerra}" fill="none" stroke="${t.ink}" stroke-width="20" stroke-dasharray="0.1 5.5" stroke-linecap="round" opacity="0.16"/>`;
+    } else {
+      dentro += chiazza((i, j) => e(i, j) - 0.45, t.terraAlta, 0.7);
+      dentro += chiazza((i, j) => e(i, j) - 0.75, t.terraAlta, 0.6);
+      // Curve di livello: una ogni quattro piu' marcata
+      for (let k = 1; k < 14; k++) {
+        const d = M.contorni(w, h, e, k / 14, G).filter((l) => l.length > 6).map((l) => M.via(M.morbida(l, 1, true))).join('');
+        dentro += tratto(d, t.gesso, k % 4 === 0 ? 1.1 : 0.6, ` opacity="${k % 4 === 0 ? 0.48 : 0.2}"`);
+      }
+      const dBoschi = steppe_(conifere) + steppe_(latifoglie);
+      if (dBoschi) dentro += `<path d="${dBoschi}" fill="url(#carto-puntini)" fill-rule="evenodd" opacity="0.75"/>`;
+    }
+
+    // Segni del terreno: ciuffi d'erba in piano, canne in palude, onde di sabbia in steppa
     let ciuffi = '', palu = '', dune = '';
     for (let y = 26; y < H - 10; y += 34) for (let x = 20; x < W - 10; x += 42) {
       const qx = x + r.range(-16, 16), qy = y + r.range(-13, 13), q = eIn(qx, qy);
       if (q < 0.03 || q > 0.72 || inB(fConifera, qx, qy) > -0.01 || inB(fLatifoglia, qx, qy) > -0.01) continue;
-      if (inB(fSteppa, qx, qy) > 0) {
-        dune += `M${n1(qx - 13)} ${n1(qy)}q${n1(7)} ${n1(-6)} ${n1(13)} ${n1(-1)}q${n1(6)} ${n1(4)} ${n1(14)} ${n1(1)}`;
-      } else if (inB(fPalude, qx, qy) > 0) {
-        palu += `M${n1(qx - 9)} ${n1(qy)}h18M${n1(qx - 2)} ${n1(qy)}l-3 -9M${n1(qx)} ${n1(qy)}v-12M${n1(qx + 2)} ${n1(qy)}l3 -9M${n1(qx + 16)} ${n1(qy + 13)}h13`;
-      } else if (r.chance(0.42)) {
-        ciuffi += `M${n1(qx - 2.5)} ${n1(qy)}l-1.4 -4.5M${n1(qx)} ${n1(qy)}v-6M${n1(qx + 2.5)} ${n1(qy)}l1.4 -4.5`;
-      }
+      if (inB(fSteppa, qx, qy) > 0) dune += `M${n1(qx - 13)} ${n1(qy)}q7 -6 13 -1q6 4 14 1`;
+      else if (inB(fPalude, qx, qy) > 0) palu += `M${n1(qx - 9)} ${n1(qy)}h18M${n1(qx - 2)} ${n1(qy)}l-3 -9M${n1(qx)} ${n1(qy)}v-12M${n1(qx + 2)} ${n1(qy)}l3 -9M${n1(qx + 16)} ${n1(qy + 13)}h13`;
+      else if (A && r.chance(0.42)) ciuffi += `M${n1(qx - 2.5)} ${n1(qy)}l-1.4 -4.5M${n1(qx)} ${n1(qy)}v-6M${n1(qx + 2.5)} ${n1(qy)}l1.4 -4.5`;
     }
-    dentro += `<path d="${ciuffi}" fill="none" stroke="${t.ink}" stroke-width="0.8" opacity="0.72"/><path d="${palu}" fill="none" stroke="${t.ink}" stroke-width="0.95" opacity="0.82"/><path d="${dune}" fill="none" stroke="${t.ink}" stroke-width="0.8" opacity="0.6"/>`;
+    const segno = A ? t.ink : t.gesso;
+    dentro += tratto(ciuffi, segno, 0.8, ' opacity="0.6"') + tratto(palu, segno, 0.95, ` opacity="${A ? 0.75 : 0.4}"`) + tratto(dune, segno, 0.8, ` opacity="${A ? 0.55 : 0.35}"`);
 
-    // Campi attorno agli insediamenti: blocchi di righe alternate
-    let campi = '';
-    citta.forEach((c) => {
-      const raggio = c.rango === 2 ? 58 : c.rango === 1 ? 44 : 32, nB = c.rango === 2 ? 8 : c.rango === 1 ? 6 : 3;
-      for (let i = 0; i < nB; i++) {
-        const a = r.range(0, 6.28), d = r.range(raggio * 0.55, raggio), x = c.x + Math.cos(a) * d * 1.2, y = c.y + Math.sin(a) * d * 0.8 + 6;
-        const bw = r.range(16, 30), bh = r.range(14, 24), or = r.chance(0.5);
-        if (eIn(x, y) < 0.03 || inB(fConifera, x, y) > 0 || inB(fLatifoglia, x, y) > 0) continue;
-        campi += M.tratteggio([[x - bw / 2, y - bh / 2], [x + bw / 2, y - bh / 2], [x + bw / 2, y + bh / 2], [x - bw / 2, y + bh / 2]], or ? 0 : 1.5708, 3.1);
-      }
-    });
-    dentro += `<path d="${campi}" fill="none" stroke="${t.ink}" stroke-width="0.8" opacity="0.62"/>`;
-
-    // Masse dei boschi
-    const dConif = steppe_(conifere), dLatif = steppe_(latifoglie);
-    if (dLatif) dentro += `<path d="${dLatif}" fill="${t.latifoglia}" fill-rule="evenodd"/>`;
-    if (dConif) dentro += `<path d="${dConif}" fill="${t.conifera}" fill-rule="evenodd"/>`;
-
-    // Bordo interno della costa: una fascia piu' scura che segue la riva
-    dentro += `<path d="${tracciaTerra}" fill="none" stroke="${t.riva}" stroke-width="13" opacity="0.5" stroke-linejoin="round"/>`;
-    s += `<g clip-path="url(#carto-terra)">${dentro}</g>`;
-
-    // Fiumi: filo scuro sotto, acqua chiara sopra
-    if (fiumi.length) {
-      const d = fiumi.map((f) => M.via(f, false)).join('');
-      s += `<g clip-path="url(#carto-terra)"><path d="${d}" fill="none" stroke="${t.terra}" stroke-width="10" stroke-linejoin="round" stroke-linecap="round" opacity="0.65"/>` +
-        `<path d="${d}" fill="none" stroke="${t.ink}" stroke-width="5.6" stroke-linejoin="round" stroke-linecap="round"/><path d="${d}" fill="none" stroke="${t.fiume}" stroke-width="3.3" stroke-linejoin="round" stroke-linecap="round"/></g>`;
+    // Campi attorno agli insediamenti (solo di giorno: di notte non si vedono)
+    if (A) {
+      let campi = '';
+      citta.forEach((c) => {
+        const raggio = c.rango === 2 ? 58 : c.rango === 1 ? 44 : 32, nB = c.rango === 2 ? 8 : c.rango === 1 ? 6 : 3;
+        for (let i = 0; i < nB; i++) {
+          const a = r.range(0, 6.28), d = r.range(raggio * 0.55, raggio), x = c.x + Math.cos(a) * d * 1.2, y = c.y + Math.sin(a) * d * 0.8 + 6;
+          const bw = r.range(16, 30), bh = r.range(14, 24);
+          if (eIn(x, y) < 0.03 || inB(fConifera, x, y) > 0 || inB(fLatifoglia, x, y) > 0) continue;
+          campi += M.tratteggio([[x - bw / 2, y - bh / 2], [x + bw / 2, y - bh / 2], [x + bw / 2, y + bh / 2], [x - bw / 2, y + bh / 2]], r.chance(0.5) ? 0 : 1.5708, 3.1);
+        }
+      });
+      dentro += tratto(campi, t.ink, 0.7, ' opacity="0.45"');
     }
+    s += `<g clip-path="url(#carto-terra)">${dentro}`;
+    fiumi.forEach((f) => { s += fiumeAffusolato(f, A ? t.ink : t.fiume, A ? 0.9 : 0.7, A ? 2.8 : 2.2); });
+    s += '</g>';
 
-    // Linea di costa
-    s += `<path d="${tracciaTerra}" fill="none" stroke="${t.ink}" stroke-width="3.6" stroke-linejoin="round"/>`;
+    // Costa
+    s += tratto(tracciaTerra, A ? t.ink : t.gesso, A ? 2.3 : 1.6, A ? '' : ' opacity="0.95"');
 
-    // Strade a puntini
-    if (strade.length) s += `<path d="${strade.map((q) => M.via(q.linea, false)).join('')}" fill="none" stroke="${t.strada}" stroke-width="3.1" stroke-dasharray="0.1 7.4" stroke-linecap="round"/>`;
+    // Strade e rotte via mare
+    if (strade.length) s += tratto(strade.map((q) => M.via(q.linea, false)).join(''), A ? t.ink : t.ambra, 1.2, A ? ' stroke-dasharray="6 4" stroke-linecap="butt" opacity="0.75"' : ' stroke-dasharray="5 5" stroke-linecap="butt" opacity="0.65"');
+    if (rotteMare.length) s += tratto(rotteMare.map((q) => M.via(q.linea, false)).join(''), A ? t.ink : t.gesso, 1.2, ' stroke-dasharray="1.5 6" opacity="0.5"');
 
-    // Rotte via mare, tratteggiate lunghe per distinguerle dalle strade
-    if (rotteMare.length) s += `<path d="${rotteMare.map((q) => M.via(q.linea, false)).join('')}" fill="none" stroke="${t.testo}" stroke-width="2.3" stroke-dasharray="11 8" stroke-linecap="round" opacity="0.9"/>`;
-
-    // Tutto cio' che ha un'altezza si disegna dall'alto verso il basso, cosi' si sovrappone bene
+    /* Rilievo, alberi, insediamenti: dall'alto verso il basso, cosi' si sovrappongono bene */
     const scena = [];
     const aggiungi = (y, svg) => scena.push([y, svg]);
-    const chevron = (x, y, q) => `M${n1(x - q)} ${n1(y)}q${n1(q * 0.35)} ${n1(-q * 1.15)} ${n1(q * 0.65)} ${n1(-q * 0.32)}q${n1(q * 0.2)} ${n1(-q * 0.9)} ${n1(q * 0.55)} ${n1(-q * 0.1)}q${n1(q * 0.25)} ${n1(-q * 0.5)} ${n1(q * 0.8)} ${n1(q * 0.42)}`;
-
-    // Bordi alberati dei boschi, fitti: e' la cosa che li fa sembrare boschi
-    conifere.forEach((l) => {
-      let passo = 0;
-      for (let i = 0; i < l.length; i++) {
-        const q = l[i], z = l[(i + 1) % l.length];
-        passo += M.dist(q, z);
-        if (passo < 9.5) continue;
-        passo = r.range(-1, 1.5);
-        if (eIn(q[0], q[1]) < 0.012) continue;
-        const hh = r.range(15, 25);
-        aggiungi(q[1] + r.range(2, 6), pino(q[0] + r.range(-2, 2), q[1] + r.range(2, 6), hh, t, r));
+    if (A) {
+      alberi.forEach(([x, y, c]) => aggiungi(y, `<use href="#carto-${c ? 'pn' : 'al'}" xlink:href="#carto-${c ? 'pn' : 'al'}" x="${n1(x)}" y="${n1(y)}"/>`));
+      // Alberi isolati in pianura
+      for (let i = 0; i < 70; i++) {
+        const qx = r.range(40, W - 40), qy = r.range(40, H - 40), q = eIn(qx, qy);
+        if (q < 0.06 || q > 0.68 || inB(fConifera, qx, qy) > -0.012 || inB(fLatifoglia, qx, qy) > -0.012 || !lontanoCitta(qx, qy, 34) || !lontanoStrade(qx, qy, 8) || inB(fSteppa, qx, qy) > 0) continue;
+        const c = r.chance(0.5);
+        aggiungi(qy, `<use href="#carto-${c ? 'pn' : 'al'}" xlink:href="#carto-${c ? 'pn' : 'al'}" x="${n1(qx)}" y="${n1(qy)}"/>`);
       }
-    });
-    latifoglie.forEach((l) => {
-      let passo = 0;
-      for (let i = 0; i < l.length; i++) {
-        const q = l[i], z = l[(i + 1) % l.length];
-        passo += M.dist(q, z);
-        if (passo < 12.5) continue;
-        passo = r.range(-1, 2);
-        if (eIn(q[0], q[1]) < 0.012) continue;
-        aggiungi(q[1] + 4, tondo(q[0], q[1] + 4, r.range(8.5, 12), t));
+      // Montagne a profilo morbido con l'ombra tratteggiata sul lato destro
+      for (let y = 14; y < H; y += 27) for (let x = 10; x < W; x += 40) {
+        const qx = x + (Math.floor(y / 27) % 2 ? 20 : 0) + r.range(-16, 16), qy = y + r.range(-10, 10), q = eIn(qx, qy);
+        if (q < 0.78 || !r.chance(0.88) || !lontanoCitta(qx, qy + 10, 34) || !lontanoStrade(qx, qy, 10)) continue;
+        const m = 13 + Math.pow((q - 0.78) / 0.22, 1.2) * 26 + r.range(-3, 5);
+        const pk = [qx + r.range(-0.17, 0.17) * m, qy - m * 1.2], lb = [qx - m * 0.95, qy], rb = [qx + m * 0.95, qy];
+        const c1 = [lb[0] + m * 0.4, pk[1] + m * 0.5], c2 = [rb[0] - m * 0.45, pk[1] + m * 0.55];
+        const profilo = `M${n1(lb[0])} ${n1(lb[1])}Q${n1(c1[0])} ${n1(c1[1])} ${n1(pk[0])} ${n1(pk[1])}Q${n1(c2[0])} ${n1(c2[1])} ${n1(rb[0])} ${n1(rb[1])}`;
+        const ombra = [pk];
+        for (let u = 0.125; u <= 1.001; u += 0.125) ombra.push([(1 - u) * (1 - u) * pk[0] + 2 * (1 - u) * u * c2[0] + u * u * rb[0], (1 - u) * (1 - u) * pk[1] + 2 * (1 - u) * u * c2[1] + u * u * rb[1]]);
+        ombra.push([pk[0] + m * 0.15, qy]);
+        const neve = clima === 'freddo' || q > 0.95;
+        aggiungi(qy, `<path d="${profilo}Z" fill="${t.monte}"/>` +
+          `<path d="${M.tratteggio(ombra, 1.23, Math.max(1.6, m * 0.065))}" stroke="${t.ink}" stroke-width="0.6"/>` +
+          (neve ? `<path d="M${n1(pk[0])} ${n1(pk[1])}L${n1(pk[0] - m * 0.22)} ${n1(pk[1] + m * 0.3)}L${n1(pk[0] - m * 0.05)} ${n1(pk[1] + m * 0.24)}L${n1(pk[0] + m * 0.1)} ${n1(pk[1] + m * 0.34)}L${n1(pk[0] + m * 0.2)} ${n1(pk[1] + m * 0.22)}Z" fill="${t.monte}"/>` : '') +
+          `<path d="${profilo}" fill="none" stroke="${t.ink}" stroke-width="${n1(Math.max(1.1, m * 0.05))}" stroke-linejoin="round"/>` +
+          `<path d="M${n1(pk[0])} ${n1(pk[1])}Q${n1(pk[0] - m * 0.1)} ${n1(qy - m * 0.6)} ${n1(qx - m * 0.2)} ${n1(qy - m * 0.15)}" fill="none" stroke="${t.ink}" stroke-width="0.65"/>`);
       }
-    });
-    // Dentro le masse: pochi segni, per dare profondita' senza sporcare
-    let segniC = '', segniL = '';
-    for (let y = 20; y < H; y += 46) for (let x = 20; x < W; x += 58) {
-      const qx = x + r.range(-22, 22), qy = y + r.range(-18, 18);
-      if (inB(fConifera, qx, qy) > 0.035 && r.chance(0.5)) segniC += chevron(qx, qy, r.range(7, 12));
-      else if (inB(fLatifoglia, qx, qy) > 0.03 && r.chance(0.5)) segniL += `M${n1(qx - 11)} ${n1(qy)}q${n1(2)} ${n1(-8)} ${n1(7)} ${n1(-5)}q${n1(4)} ${n1(-6)} ${n1(9)} ${n1(-1)}q${n1(5)} ${n1(-2)} ${n1(6)} ${n1(5)}`;
-    }
-    s += `<path d="${segniC}" fill="none" stroke="${t.ink}" stroke-width="1.15" stroke-linecap="round" opacity="0.8"/><path d="${segniL}" fill="none" stroke="${t.ink}" stroke-width="1.05" stroke-linecap="round" opacity="0.72"/>`;
-    // Alberi isolati nella pianura
-    for (let i = 0; i < 90; i++) {
-      const qx = r.range(40, W - 40), qy = r.range(40, H - 40), q = eIn(qx, qy);
-      if (q < 0.06 || q > 0.68 || inB(fConifera, qx, qy) > -0.012 || inB(fLatifoglia, qx, qy) > -0.012 || !lontanoCitta(qx, qy, 34) || !lontanoStrade(qx, qy, 8) || inB(fSteppa, qx, qy) > 0) continue;
-      if (r.chance(0.5)) aggiungi(qy, r.chance(0.5) ? pino(qx, qy, r.range(14, 20), t, r) : tondo(qx, qy, r.range(8, 11), t));
+      // Colline ai piedi delle catene
+      for (let y = 14; y < H; y += 24) for (let x = 12; x < W; x += 34) {
+        const qx = x + r.range(-11, 11), qy = y + r.range(-9, 9), q = eIn(qx, qy);
+        if (q < 0.66 || q > 0.78 || !r.chance(0.42) || !lontanoCitta(qx, qy, 26) || !lontanoStrade(qx, qy, 7) || inB(fConifera, qx, qy) > -0.01 || inB(fLatifoglia, qx, qy) > -0.01) continue;
+        const m = r.range(8, 12);
+        aggiungi(qy, `<path d="M${n1(qx - m)} ${n1(qy)}Q${n1(qx)} ${n1(qy - m * 1.15)} ${n1(qx + m)} ${n1(qy)}" fill="${t.monte}" stroke="${t.ink}" stroke-width="0.95"/>` +
+          tratto([0, 1, 2].map((k) => `M${n1(qx + m * (0.15 + k * 0.22))} ${n1(qy - m * (0.45 - k * 0.12))}L${n1(qx + m * (0.3 + k * 0.22))} ${n1(qy - 0.6)}`).join(''), t.ink, 0.6));
+      }
     }
 
-    // Montagne: le piu' grandi nel cuore delle catene, le piccole ai bordi
-    const monti = [];
-    for (let y = 14; y < H; y += 27) for (let x = 10; x < W; x += 42) {
-      const qx = x + (Math.floor(y / 27) % 2 ? 21 : 0) + r.range(-18, 18), qy = y + r.range(-11, 11), q = eIn(qx, qy);
-      if (q < 0.78 || !r.chance(0.86) || !lontanoCitta(qx, qy + 10, 34) || !lontanoStrade(qx, qy, 10)) continue;
-      const scala = 15 + Math.pow((q - 0.78) / 0.22, 1.2) * 50 + r.range(-4, 9);
-      monti.push({ x: qx, y: qy, s: scala });
-      aggiungi(qy, montagna(qx, qy, scala, t, r, clima === 'freddo' ? true : q > 0.94));
-    }
-    // Colline ai piedi delle catene
-    for (let y = 14; y < H; y += 24) for (let x = 12; x < W; x += 34) {
-      const qx = x + r.range(-11, 11), qy = y + r.range(-9, 9), q = eIn(qx, qy);
-      if (q < 0.66 || q > 0.78 || !r.chance(0.4) || !lontanoCitta(qx, qy, 26) || !lontanoStrade(qx, qy, 7) || inB(fConifera, qx, qy) > -0.01 || inB(fLatifoglia, qx, qy) > -0.01) continue;
-      const m = r.range(11, 19);
-      aggiungi(qy, `<path d="M${n1(qx - m)} ${n1(qy)}q${n1(m * 0.55)} ${n1(-m * 1.0)} ${n1(m)} ${n1(-m * 0.72)}q${n1(m * 0.5)} ${n1(m * 0.1)} ${n1(m)} ${n1(m * 0.72)}" fill="${t.monte}" fill-opacity="0.5" stroke="${t.ink}" stroke-width="1.05" stroke-linecap="round"/><path d="M${n1(qx + m * 0.1)} ${n1(qy - m * 0.56)}q${n1(m * 0.26)} ${n1(m * 0.32)} ${n1(m * 0.36)} ${n1(m * 0.55)}" fill="none" stroke="${t.ink}" stroke-width="0.7"/>`);
+    // Vette con la quota (notte): le cime piu' alte, ben distanziate
+    if (!A) {
+      const vette = [];
+      for (let j = 4; j < h - 4; j += 2) for (let i = 4; i < w - 4; i += 2) {
+        const q = e(i, j);
+        if (q < 0.86) continue;
+        let max = true;
+        for (let b = -4; b <= 4 && max; b += 2) for (let a = -4; a <= 4; a += 2) if ((a || b) && e(i + a, j + b) > q) { max = false; break; }
+        if (max) vette.push([i * G, j * G, q]);
+      }
+      vette.sort((a, b) => b[2] - a[2]);
+      const scelte = [];
+      for (const v of vette) { if (scelte.length >= 5) break; if (lontanoCitta(v[0], v[1], 60) && scelte.every((q) => M.dist(q, v) > 160)) scelte.push(v); }
+      scelte.forEach(([x, y, q]) => {
+        const m = Math.round(q * 3000 / 10) * 10, quota = m >= 1000 ? Math.floor(m / 1000) + '.' + String(m % 1000).padStart(3, '0') : String(m);
+        aggiungi(y, `<path d="M${n1(x)} ${n1(y - 7)}L${n1(x + 6)} ${n1(y + 4)}H${n1(x - 6)}Z" fill="${t.gesso}"/>` +
+          M.etichetta(x + 11, y + 4, quota + ' m', t, { size: 14, font: t.font, peso: 500, spazio: 1, ancora: 'start', colore: t.gessoTenue, alone: t.testoAlone, aloneW: 3 }));
+      });
     }
 
-    // Insediamenti
+    // Castello visto di fronte: mura, tre torri coi tetti a punta, porta
+    const castello = (x, y, k) => {
+      let g = `<rect x="${n1(x - 9 * k)}" y="${n1(y - 7 * k)}" width="${n1(18 * k)}" height="${n1(7 * k)}" fill="${t.muro}" stroke="${t.ink}" stroke-width="1"/>`;
+      [[-10, -5, 13], [-3, 3, 18], [5, 10, 13]].forEach(([a, b, hh]) => {
+        g += `<rect x="${n1(x + a * k)}" y="${n1(y - hh * k)}" width="${n1((b - a) * k)}" height="${n1(hh * k)}" fill="${t.muro}" stroke="${t.ink}" stroke-width="1"/>` +
+          `<path d="M${n1(x + (a - 1) * k)} ${n1(y - hh * k)}L${n1(x + (a + b) / 2 * k)} ${n1(y - (hh + 6) * k)}L${n1(x + (b + 1) * k)} ${n1(y - hh * k)}Z" fill="${t.tetto}" stroke="${t.ink}" stroke-width="1" stroke-linejoin="round"/>`;
+      });
+      return g + `<path d="M${n1(x - 2 * k)} ${n1(y)}V${n1(y - 3 * k)}A${n1(2 * k)} ${n1(2 * k)} 0 0 1 ${n1(x + 2 * k)} ${n1(y - 3 * k)}V${n1(y)}Z" fill="${t.ink}"/>`;
+    };
     citta.forEach((c) => {
       const x = c.x, y = c.y;
       let g = '';
-      if (c.rango === 2) {
-        const anello = cinta(x, y + 2, 36, 15, t);
-        g += anello.dietro + torre(x - 7, y - 3, 12, 36, t, true) + torre(x + 15, y - 2, 9, 24, t, r.chance(0.6));
-        g += casetta(x - 28, y + 5, 9, t) + casetta(x + 2, y + 9, 9, t) + casetta(x + 18, y + 8, 7.5, t) + anello.davanti;
-        if (r.chance(0.7)) g += mulino(x + 52, y + 2, 10, t);
-        g += casetta(x - 62, y + 12, 8.5, t) + casetta(x + 44, y + 22, 8, t);
-        // Ogni capoluogo ha il suo stemma, sempre lo stesso per lo stesso nome
-        if (o.stemmi !== false && typeof Araldica !== 'undefined') g += Araldica.scudo(Araldica.casuale(c.nome), x - 64, y - 42, 42, true);
-      } else if (c.rango === 1) {
-        const anello = cinta(x, y + 2, 25, 10.5, t);
-        g += anello.dietro + torre(x + r.range(-5, 5), y - 2, 10, 25, t, true) + casetta(x - 18, y + 4, 7.5, t) + casetta(x + 3, y + 6, 7.5, t) + anello.davanti;
-        if (r.chance(0.45)) g += mulino(x + 36, y + 2, 9, t); else g += casetta(x + 31, y + 8, 7.5, t);
+      if (A) {
+        if (c.rango === 2) g += castello(x, y + 6, 1.35);
+        else if (c.rango === 1) g += castello(x, y + 5, 0.95);
+        else g += `<circle cx="${x}" cy="${y}" r="5.5" fill="${t.muro}" stroke="${t.ink}" stroke-width="1.2"/><circle cx="${x}" cy="${y}" r="2.6" fill="${t.tetto}"/>`;
       } else {
-        g += casetta(x - 13, y + 5, 9, t) + casetta(x - 1, y + 9, 10, t);
-        if (r.chance(0.4)) g += casetta(x + 12, y + 3, 7.5, t);
+        const rr = c.rango === 2 ? 5.5 : c.rango === 1 ? 4.5 : 3.6;
+        g += `<circle cx="${x}" cy="${y}" r="${rr * 2.4}" fill="${t.ambra}" opacity="0.45" filter="url(#carto-b4)"/><circle cx="${x}" cy="${y}" r="${rr}" fill="${t.ambra}"/>`;
+        if (c.rango === 2) g += `<circle cx="${x}" cy="${y}" r="11" fill="none" stroke="${t.ambra}" stroke-width="1.3"/>`;
       }
+      if (c.rango === 2 && o.stemmi !== false && typeof Araldica !== 'undefined') g += Araldica.scudo(Araldica.casuale(c.nome), x - 64, y - 42, 42, true);
       aggiungi(y + 22, g);
     });
-    notevoli.forEach((c) => aggiungi(c.y + 2, rovina(c.x, c.y, 11, t)));
-    // Una barchetta a meta' di ogni rotta
-    rotteMare.forEach((q) => {
-      const m = q.linea[q.linea.length >> 1], x = m[0], y = m[1];
-      aggiungi(y, `<path d="M${n1(x - 11)} ${n1(y)}H${n1(x + 11)}L${n1(x + 7)} ${n1(y + 6)}H${n1(x - 7)}Z" fill="${t.tetto}" stroke="${t.ink}" stroke-width="1"/><path d="M${n1(x)} ${n1(y)}V${n1(y - 15)}" stroke="${t.ink}" stroke-width="1.1"/><path d="M${n1(x + 1)} ${n1(y - 14)}Q${n1(x + 11)} ${n1(y - 7)} ${n1(x + 1)} ${n1(y - 2)}Z" fill="${t.muro}" stroke="${t.ink}" stroke-width="0.9"/>`);
-    });
-    fari.forEach(([x, y]) => aggiungi(y, `<ellipse cx="${n1(x)}" cy="${n1(y)}" rx="9" ry="4.5" fill="${t.terra2}" stroke="${t.ink}" stroke-width="1.5"/>` + faro(x, y, 11, t)));
+    notevoli.forEach((c) => aggiungi(c.y + 2, A ? rovina(c.x, c.y, 11, t)
+      : `<path d="M${c.x} ${c.y - 7}L${c.x + 6} ${c.y}L${c.x} ${c.y + 7}L${c.x - 6} ${c.y}Z" fill="none" stroke="${t.gesso}" stroke-width="1.4"/>`));
+    if (A) {
+      rotteMare.forEach((q) => {
+        const m = q.linea[q.linea.length >> 1], x = m[0], y = m[1];
+        aggiungi(y, `<path d="M${n1(x - 11)} ${n1(y)}H${n1(x + 11)}L${n1(x + 7)} ${n1(y + 6)}H${n1(x - 7)}Z" fill="${t.muro}" stroke="${t.ink}" stroke-width="1"/><path d="M${n1(x)} ${n1(y)}V${n1(y - 15)}" stroke="${t.ink}" stroke-width="1.1"/><path d="M${n1(x + 1)} ${n1(y - 14)}Q${n1(x + 11)} ${n1(y - 7)} ${n1(x + 1)} ${n1(y - 2)}Z" fill="${t.muro}" stroke="${t.ink}" stroke-width="0.9"/>`);
+      });
+    }
+    fari.forEach(([x, y]) => aggiungi(y, A
+      ? `<ellipse cx="${n1(x)}" cy="${n1(y)}" rx="9" ry="4.5" fill="${t.terra}" stroke="${t.ink}" stroke-width="1.3"/>` + faro(x, y, 11, t)
+      : `<circle cx="${n1(x)}" cy="${n1(y)}" r="8" fill="${t.ambra}" opacity="0.5" filter="url(#carto-b4)"/><circle cx="${n1(x)}" cy="${n1(y)}" r="2.6" fill="${t.ambra}"/>` +
+        tratto([0, 1, 2, 3].map((k) => { const a = k * Math.PI / 4; return `M${n1(x + Math.cos(a) * 5)} ${n1(y + Math.sin(a) * 5)}L${n1(x + Math.cos(a) * 9)} ${n1(y + Math.sin(a) * 9)}M${n1(x - Math.cos(a) * 5)} ${n1(y - Math.sin(a) * 5)}L${n1(x - Math.cos(a) * 9)} ${n1(y - Math.sin(a) * 9)}`; }).join(''), t.ambra, 1)));
 
     scena.sort((a, b) => a[0] - b[0]);
     s += scena.map((q) => q[1]).join('');
 
     if (o.confini) {
       const cap = citta.filter((c) => c.rango === 2).map((c) => [c.x, c.y]);
-      if (cap.length > 1) s += `<g clip-path="url(#carto-terra)"><path d="${M.celle(cap, -50, -50, W + 50, H + 50).map((q) => M.via(q)).join('')}" fill="none" stroke="${t.testo}" stroke-width="3.4" stroke-dasharray="12 6 2 6" opacity="0.55"/></g>`;
+      if (cap.length > 1) s += `<g clip-path="url(#carto-terra)"><path d="${M.celle(cap, -50, -50, W + 50, H + 50).map((q) => M.via(q)).join('')}" fill="none" stroke="${A ? t.tetto : t.ambra}" stroke-width="2.6" stroke-dasharray="12 6 2 6" opacity="0.6"/></g>`;
     }
 
     /* ─── Scritte ─── */
@@ -591,7 +524,7 @@ const CartoRegno = (() => {
     const riquadri = [];
     const urta = (a, b, c, d) => riquadri.some(([x0, y0, x1, y1]) => a < x1 && c > x0 && b < y1 && d > y0);
     const larghezza = (txt, size, sp = 0) => txt.length * (size * 0.5 + sp);
-    const stile = (size, extra = {}) => ({ size, colore: t.testo, alone: t.testoAlone, aloneW: Math.max(3, size * 0.22), peso: 600, ...extra });
+    const stile = (size, extra = {}) => ({ size, font: t.font, colore: t.testo, alone: t.testoAlone, aloneW: Math.max(3, size * 0.22), peso: t.peso, ...extra });
     const posa = (x, y, txt, st, passi) => {
       const size = st.size, l = larghezza(txt, size);
       for (const [dx, dy] of passi) {
@@ -605,7 +538,8 @@ const CartoRegno = (() => {
     };
     citta.forEach((c) => riquadri.push([c.x - 22, c.y - 22, c.x + 22, c.y + 18]));
     riquadri.push([rx - 95, ry - 100, rx + 95, ry + 95]);
-    riquadri.push([rx > W / 2 ? 50 : W - 400, H - 100, rx > W / 2 ? 400 : W - 50, H - 30]); // la scala, prima di ogni nome
+    riquadri.push([rx > W / 2 ? 50 : W - 400, H - 100, rx > W / 2 ? 400 : W - 50, H - 30]);
+    riquadri.push([rx > W / 2 ? 40 : W - 520, 40, rx > W / 2 ? 520 : W - 40, 160]); // il titolo // la scala, prima di ogni nome
 
     // Citta' per prime: sono i nomi che non devono mancare
     citta.slice().sort((a, b) => b.rango - a.rango).forEach((c) => {
@@ -651,7 +585,7 @@ const CartoRegno = (() => {
           if (sopra < curva.length * 0.6) continue;
         }
         pezzi.forEach((b) => riquadri.push(b));
-        testi += M.testoCurvo(curva, nomeG, t, { size, spazio: sp, colore: t.testo, alone: t.testoAlone, aloneW: Math.max(3.5, size * 0.2), peso: 600 });
+        testi += M.testoCurvo(curva, nomeG, t, { size, spazio: sp, font: t.fontCurvo, colore: t.testo, alone: t.testoAlone, aloneW: Math.max(3.5, size * 0.2), peso: t.peso });
         return true;
       }
       return false;
@@ -671,14 +605,14 @@ const CartoRegno = (() => {
         if (q.km < 45) return;
         const m = q.linea[Math.floor(q.linea.length / 2)];
         const txt = (q.km >= 10 ? Math.round(q.km / 5) * 5 : Math.round(q.km)) + ' km';
-        posa(m[0], m[1], txt, { size: 14, corsivo: true, peso: 600, colore: t.testo, alone: t.testoAlone, aloneW: 3 }, [[0, -6], [0, 16], [26, 5], [-26, 5]]);
+        posa(m[0], m[1], txt, { size: 15, font: t.font, corsivo: A, peso: t.peso, colore: t.testo, alone: t.testoAlone, aloneW: 3 }, [[0, -6], [0, 16], [26, 5], [-26, 5]]);
       });
     }
 
     // Il mare ha un nome, nel tratto piu' aperto
     let mareP = null, mareD = 0;
-    const nomeMare = 'Mare di ' + nomeNuovo(), mezzoMare = nomeMare.length * 9.5;
-    for (let y = 150; y < H - 110; y += 34) for (let x = 200; x < W - 200; x += 34) {
+    const nomeMare = 'Mare di ' + nomeNuovo(), mezzoMare = nomeMare.length * (A ? 10.5 : 11.5);
+    for (let y = 150; y < H - 110; y += 34) for (let x = mezzoMare + 60; x < W - mezzoMare - 60; x += 34) {
       const q = eIn(x, y);
       if (q > -0.05 || urta(x - mezzoMare, y - 25, x + mezzoMare, y + 10)) continue;
       // Tutta la scritta deve stare sull'acqua, non solo il suo centro
@@ -686,16 +620,81 @@ const CartoRegno = (() => {
       for (let u = -1; u <= 1; u += 0.25) if (eIn(x + u * mezzoMare, y) > -0.005 || eIn(x + u * mezzoMare, y - 16) > -0.005) tuttoMare = false;
       if (tuttoMare && -q > mareD) { mareD = -q; mareP = [x, y]; }
     }
-    if (mareP) testi += M.etichetta(mareP[0], mareP[1], nomeMare, t, { size: 26, corsivo: true, peso: 400, spazio: 5, colore: t.testo, alone: t.testoAlone, aloneW: 3.5 });
+    if (mareP) testi += A ? M.etichetta(mareP[0], mareP[1], nomeMare, t, { size: 30, font: t.font, corsivo: true, peso: 400, spazio: 6, colore: t.ink, alone: t.testoAlone, aloneW: 5 })
+      : M.etichetta(mareP[0], mareP[1], nomeMare.toUpperCase(), t, { size: 26, font: t.font, peso: 500, spazio: 10, colore: t.mareTesto, aloneW: 0 });
 
-    /* ─── Cornice ─── */
-    const M0 = 30;
-    let cornice = `<path d="M0 0H${W}V${H}H0ZM${M0} ${M0}V${H - M0}H${W - M0}V${M0}Z" fill="${t.margine}" fill-rule="evenodd"/>` +
-      `<rect x="${M0}" y="${M0}" width="${W - M0 * 2}" height="${H - M0 * 2}" fill="none" stroke="${t.ink}" stroke-width="6"/><rect x="${M0 - 8}" y="${M0 - 8}" width="${W - (M0 - 8) * 2}" height="${H - (M0 - 8) * 2}" fill="none" stroke="${t.ink}" stroke-width="1"/>`;
-    const titoloX = rx > W / 2 ? 66 : W - 66, ancora = rx > W / 2 ? 'start' : 'end';
-    if (o.titolo !== false) cornice += M.etichetta(titoloX, 88, nome, t, { size: 44, ancora, colore: t.testo, alone: t.testoAlone, aloneW: 5, peso: 600 });
-    const bx = rx > W / 2 ? 66 : W - 66 - 266 - 50;
-    const scala = M.scala(bx, H - 62, 133.3, { valore: 100, nome: 'km' }, 2, { ...M.PALETTE.pergamena, carta: t.margine, inchiostro: o.palette === 'notte' ? t.testo : t.ink });
+    /* ─── Cornice, titolo, rosa dei venti, scala ─── */
+    const M0 = 30, destra = rx > W / 2; // con la rosa a destra, titolo e scala vanno a sinistra
+    const rett = (x, y, l, a, extra) => `<rect x="${n1(x)}" y="${n1(y)}" width="${n1(l)}" height="${n1(a)}" ${extra}/>`;
+    let cornice = `<path d="M0 0H${W}V${H}H0ZM${M0} ${M0}V${H - M0}H${W - M0}V${M0}Z" fill="${t.margine}" fill-rule="evenodd"/>`;
+    if (A) {
+      // Fascia graduata a tacche alterne, come i gradi di un atlante
+      let tacche = '';
+      for (let x = M0, k = 0; x < W - M0; x += 60, k++) if (k % 2) { const l = Math.min(60, W - M0 - x); tacche += `M${x} 15h${l}v6h${-l}ZM${x} ${H - 21}h${l}v6h${-l}Z`; }
+      for (let y = M0, k = 0; y < H - M0; y += 60, k++) if (k % 2) { const l = Math.min(60, H - M0 - y); tacche += `M15 ${y}v${l}h6v${-l}ZM${W - 21} ${y}v${l}h6v${-l}Z`; }
+      cornice += `<path d="${tacche}" fill="${t.ink}"/>` +
+        rett(11, 11, W - 22, H - 22, `fill="none" stroke="${t.ink}" stroke-width="1.6"`) + rett(15, 15, W - 30, H - 30, `fill="none" stroke="${t.ink}" stroke-width="0.7"`) +
+        rett(21, 21, W - 42, H - 42, `fill="none" stroke="${t.ink}" stroke-width="0.7"`) + rett(M0, M0, W - M0 * 2, H - M0 * 2, `fill="none" stroke="${t.ink}" stroke-width="1.8"`);
+      if (o.titolo !== false) {
+        const larg = Math.max(340, nome.length * 18 + 100), x0 = destra ? 56 : W - 56 - larg, y0 = 52;
+        cornice += rett(x0, y0, larg, 94, `fill="${t.carta}" stroke="${t.ink}" stroke-width="1.8"`) + rett(x0 + 6, y0 + 6, larg - 12, 82, `fill="none" stroke="${t.ink}" stroke-width="0.7"`) +
+          M.etichetta(x0 + larg / 2, y0 + 47, nome, t, { size: 34, font: t.fontCurvo, spazio: 2, colore: t.ink, aloneW: 0 }) +
+          M.etichetta(x0 + larg / 2, y0 + 75, 'con le terre e i mari che lo circondano', t, { size: 17, font: t.font, corsivo: true, colore: t.ink, aloneW: 0 });
+      }
+    } else {
+      cornice += rett(M0, M0, W - M0 * 2, H - M0 * 2, `fill="none" stroke="${t.gesso}" stroke-width="0.9" opacity="0.4"`);
+      // Gradi del reticolo nel margine
+      const lat = 38 + (r.int(0, 9)), lon = 8 + r.int(0, 9);
+      for (let x = 200, k = 0; x < W; x += 200, k++) cornice += M.etichetta(x, 21, `${lon + (k >> 1)}°${k % 2 ? '30' : '00'}′`, t, { size: 12, font: t.font, peso: 500, colore: t.gessoTenue, aloneW: 0 });
+      for (let y = 200, k = 0; y < H; y += 200, k++) cornice += M.etichetta(15, y + 4, `${lat - (k >> 1)}°${k % 2 ? '30' : '00'}′`, t, { size: 12, font: t.font, peso: 500, colore: t.gessoTenue, aloneW: 0, ruota: -90 });
+      if (o.titolo !== false) {
+        const tx = destra ? 66 : W - 66, ancora = destra ? 'start' : 'end';
+        cornice += M.etichetta(tx, 94, nome.toUpperCase(), t, { size: 36, font: t.font, peso: 600, spazio: 8, ancora, colore: t.gesso, alone: t.testoAlone, aloneW: 5 }) +
+          M.etichetta(tx, 126, `${lat}°${r.int(10, 59)}′ N  ·  ${lon}°${r.int(10, 59)}′ E`, t, { size: 16, font: t.font, peso: 500, spazio: 1.5, ancora, colore: t.ambra, alone: t.testoAlone, aloneW: 4 });
+      }
+    }
+
+    // Rosa dei venti
+    let rosa = '';
+    const R0 = 82;
+    if (A) {
+      rosa += `<circle cx="${rx}" cy="${ry}" r="${n1(R0 * 0.78)}" fill="${t.carta}" fill-opacity="0.6" stroke="${t.ink}" stroke-width="0.9"/><circle cx="${rx}" cy="${ry}" r="${n1(R0 * 0.7)}" fill="none" stroke="${t.ink}" stroke-width="0.8"/>`;
+      let tic = '';
+      for (let k = 0; k < 64; k++) {
+        const a = k / 64 * Math.PI * 2, r1 = R0 * 0.7, r2 = R0 * (k % 4 ? 0.74 : 0.78);
+        tic += `M${n1(rx + Math.sin(a) * r1)} ${n1(ry - Math.cos(a) * r1)}L${n1(rx + Math.sin(a) * r2)} ${n1(ry - Math.cos(a) * r2)}`;
+      }
+      rosa += tratto(tic, t.ink, 0.7);
+      const punta = (ang, len, larg) => {
+        const tx = rx + Math.sin(ang) * len, ty = ry - Math.cos(ang) * len;
+        const lx = rx + Math.sin(ang - Math.PI / 2) * larg, ly = ry - Math.cos(ang - Math.PI / 2) * larg;
+        const qx = rx + Math.sin(ang + Math.PI / 2) * larg, qy = ry - Math.cos(ang + Math.PI / 2) * larg;
+        return `<path d="M${rx} ${ry}L${n1(tx)} ${n1(ty)}L${n1(lx)} ${n1(ly)}Z" fill="${t.ink}"/><path d="M${rx} ${ry}L${n1(tx)} ${n1(ty)}L${n1(qx)} ${n1(qy)}Z" fill="${t.carta}"/>` +
+          `<path d="M${n1(lx)} ${n1(ly)}L${n1(tx)} ${n1(ty)}L${n1(qx)} ${n1(qy)}L${rx} ${ry}Z" fill="none" stroke="${t.ink}" stroke-width="0.8" stroke-linejoin="round"/>`;
+      };
+      for (let k = 0; k < 8; k++) rosa += punta(Math.PI / 8 + k * Math.PI / 4, R0 * 0.45, R0 * 0.05);
+      for (let k = 0; k < 4; k++) rosa += punta(Math.PI / 4 + k * Math.PI / 2, R0 * 0.62, R0 * 0.09);
+      for (let k = 0; k < 4; k++) rosa += punta(k * Math.PI / 2, R0, R0 * 0.13);
+      rosa += `<circle cx="${rx}" cy="${ry}" r="${n1(R0 * 0.07)}" fill="${t.tetto}" stroke="${t.ink}" stroke-width="0.8"/>` +
+        M.etichetta(rx, ry - R0 - 12, 'N', t, { size: 26, font: t.fontCurvo, colore: t.ink, aloneW: 4 });
+    } else {
+      let lin = `M${rx - 76} ${ry}H${rx + 76}M${rx} ${ry + 76}V${ry - 52}`;
+      for (let k = 0; k < 36; k++) {
+        const a = k / 36 * Math.PI * 2, r2 = k % 9 ? 57 : 62;
+        lin += `M${n1(rx + Math.sin(a) * 52)} ${n1(ry - Math.cos(a) * 52)}L${n1(rx + Math.sin(a) * r2)} ${n1(ry - Math.cos(a) * r2)}`;
+      }
+      rosa += `<circle cx="${rx}" cy="${ry}" r="52" fill="none" stroke="${t.gesso}" stroke-width="0.9" opacity="0.6"/>` + tratto(lin, t.gesso, 0.9, ' opacity="0.6"') +
+        `<path d="M${rx} ${ry - 84}L${rx + 8} ${ry - 52}H${rx - 8}Z" fill="${t.ambra}"/>` +
+        M.etichetta(rx, ry - 94, 'N', t, { size: 22, font: t.font, peso: 600, colore: t.ambra, aloneW: 0 });
+    }
+
+    // Scala: 200 km in cinque tratti
+    const bx = destra ? 66 : W - 66 - 266 - 50, by = H - 64, tr = 266.6 / 5;
+    let scala = '';
+    for (let k = 0; k < 5; k++) scala += rett(bx + k * tr, by, tr, A ? 6 : 4, `fill="${k % 2 ? (A ? t.carta : t.mare) : (A ? t.ink : t.gesso)}"`);
+    scala += rett(bx, by, 266.6, A ? 6 : 4, `fill="none" stroke="${A ? t.ink : t.gesso}" stroke-width="0.9"`);
+    for (let k = 0; k <= 5; k++) scala += M.etichetta(bx + k * tr, by - 8, String(k * 40), t, { size: 14, font: t.font, peso: A ? 400 : 500, colore: A ? t.ink : t.gesso, alone: A ? t.carta : t.testoAlone, aloneW: 3 });
+    scala += M.etichetta(bx + 266.6 + 12, by + 6, 'km', t, { size: 15, font: t.font, peso: A ? 400 : 500, ancora: 'start', colore: A ? t.ink : t.gesso, alone: A ? t.carta : t.testoAlone, aloneW: 3 });
 
     const pin = citta.map((c) => {
       const ruolo = c.rango === 2 ? 'Capoluogo' : c.rango === 1 ? 'Cittadina' : 'Villaggio';
@@ -713,7 +712,7 @@ const CartoRegno = (() => {
       return { x: c.x, y: c.y, label: c.nome, sottotipo: '', genera, tipoLuogo: c.rango >= 1 ? 'Città' : 'Villaggio', note: ruolo + '.' + (vie ? ' Strade per ' + vie + '.' : '') + (mare ? ' Via mare per ' + mare + '.' : '') };
     }).concat(notevoli.map((c) => ({ x: c.x, y: c.y, label: c.nome, sottotipo: 'pericolo', tipoLuogo: 'Dungeon', genera: { tipo: 'dungeon', opzioni: {} }, note: 'Luogo misterioso, tutto da riempire.' })));
 
-    const svg = M.apri(W, H, M.PALETTE.pergamena, o.seme) + s + (o.nomi === false ? '' : testi) + rosaOro(rx, ry, 92, t) + cornice + scala + '</svg>';
+    const svg = M.apri(W, H, A ? M.PALETTE.atlante : M.PALETTE.notte, o.seme) + s + (o.nomi === false ? '' : testi) + rosa + cornice + scala + '</svg>';
     return { nome, pin, W, H, larghezzaKm: W * kmPx, svg };
   };
 

@@ -11,7 +11,7 @@ const CartoCatalogo = (() => {
   const TIPI = {
     regno: {
       nome: 'Regno', genera: (o) => CartoRegno.regno(o),
-      colori: [['pergamena', 'Nautica'], ['acquerello', 'Acquerello'], ['seppia', 'Seppia'], ['inchiostro', 'Inchiostro'], ['notte', 'Notturna']],
+      colori: [['atlante', 'Atlante'], ['notte', 'Notte']],
       opzioni: [
         S('forma', 'Forma', [['isola', 'Isola'], ['continente', 'Continente'], ['arcipelago', 'Arcipelago'], ['costa', 'Costa']], 'isola'),
         S('clima', 'Clima', [['temperato', 'Temperato'], ['freddo', 'Freddo'], ['arido', 'Arido']], 'temperato'),
