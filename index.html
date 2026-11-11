@@ -403,7 +403,7 @@
     <!-- ════════════════════════
          PAGINA: HOME
     ════════════════════════ -->
-    <section class="page active" id="page-home" aria-labelledby="home-title">
+    <section class="page active" id="page-home" aria-labelledby="home-title-lista">
       <div class="home-hero" role="banner">
         <p class="hero-eyebrow" aria-hidden="true">D&amp;D 5e · Dungeon Master Toolkit</p>
         <h1 class="home-hero-title" id="home-title">DM Toolkit</h1>
@@ -415,19 +415,19 @@
         </div>
       </div>
       <div class="campaign-grid-section">
-        <div class="campaign-grid-header">
-          <span class="campaign-grid-label" id="campaign-grid-count"></span>
-          <button class="btn btn-primary btn-sm" onclick="openNewCampaignModal()" aria-label="Crea nuova campagna">
-            <svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
-            </svg>
-            Nuova Campagna
-          </button>
+        <div class="hn-head">
+          <h1 id="home-title-lista">Le tue campagne</h1><span class="hn-n" id="campaign-grid-count"></span>
+          <div class="hn-azioni">
+            <button type="button" class="btn" id="hn-menu-btn" aria-haspopup="menu" aria-expanded="false" aria-controls="campaign-grid-actions" onclick="HomeMenu.apri(this)">Importa e backup
+              <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg></button>
+            <button type="button" class="btn btn-primary" onclick="openNewCampaignModal()">Nuova campagna</button>
+            <div class="hn-menu" id="campaign-grid-actions" role="menu" hidden></div>
+          </div>
         </div>
         <div class="campaign-grid" id="campaign-grid" aria-label="Le tue campagne">
           <!-- Popolato da JS -->
         </div>
-        <div class="campaign-grid-actions" id="campaign-grid-actions"></div>
+        <div class="hn-piede" id="hn-piede"></div>
       </div>
     </section>
 
@@ -3973,27 +3973,19 @@ const App = (() => {
     Debug.log(`renderHomePage: ${campaigns.length} campagne`);
 
     const countEl = document.getElementById('campaign-grid-count');
-    if (countEl) countEl.textContent = campaigns.length > 0 ? `${campaigns.length} campagn${campaigns.length === 1 ? 'a' : 'e'}` : '';
+    if (countEl) countEl.textContent = campaigns.length > 0 ? String(campaigns.length) : '';
 
     const actionsEl = document.getElementById('campaign-grid-actions');
+    // Importa, backup ed esempio: azioni di servizio, raccolte nel menu "Importa e backup"
     if (actionsEl) actionsEl.innerHTML = `
-      <button class="btn btn-ghost btn-sm" onclick="importCampaignFromFile()" title="Importa da file">
-        <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        Importa
-      </button>
-      <button class="btn btn-ghost btn-sm" onclick="BackupSystem.exportAll()" title="Backup">
-        <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-        Backup
-      </button>
-      <button class="btn btn-ghost btn-sm" onclick="BackupSystem.openImport()" title="Ripristina un backup completo">
-        <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        Ripristina backup
-      </button>
-      <button class="btn btn-ghost btn-sm" onclick="CampagnaDemo.crea()" title="Le Ceneri di Valmora: una campagna già compilata per vedere tutte le funzioni">
-        <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
-        ${campaigns.some(c => c.demo || c.name === 'Le Ceneri di Valmora') ? 'Apri la campagna di esempio' : 'Campagna di esempio'}
-      </button>
+      <button type="button" role="menuitem" onclick="HomeMenu.chiudi();importCampaignFromFile()">Importa una campagna da file</button>
+      <button type="button" role="menuitem" onclick="HomeMenu.chiudi();BackupSystem.exportAll()">Scarica un backup di tutto</button>
+      <button type="button" role="menuitem" onclick="HomeMenu.chiudi();BackupSystem.openImport()">Ripristina un backup</button>
+      <hr>
+      <button type="button" role="menuitem" onclick="HomeMenu.chiudi();CampagnaDemo.crea()">${campaigns.some(c => c.demo || c.name === 'Le Ceneri di Valmora') ? 'Apri la campagna di esempio' : 'Crea la campagna di esempio'}</button>
     `;
+    const piede = document.getElementById('hn-piede');
+    if (piede) piede.innerHTML = campaigns.length ? `<span>Vuoi vedere cosa sa fare l'app?</span><button type="button" onclick="CampagnaDemo.crea()">${campaigns.some(c => c.demo || c.name === 'Le Ceneri di Valmora') ? 'Apri la campagna di esempio' : 'Crea la campagna di esempio'}</button><span>I dati restano sul tuo dispositivo o sul tuo Drive.</span>` : '';
 
     grid.innerHTML = '';
 
@@ -4047,55 +4039,36 @@ const App = (() => {
       });
       const typeLabel = camp.type === 'oneshot' ? 'One Shot' : 'Campagna';
 
+      const _esc = (t) => String(t || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
       const card = document.createElement('article');
-      card.className = 'campaign-card' + (isActive ? ' is-active' : '');
-      card.setAttribute('role', 'button');
-      card.setAttribute('tabindex', '0');
-      card.setAttribute('aria-label', `Apri campagna ${camp.name}`);
-
+      card.className = 'hn-card' + (isActive ? ' attiva' : '');
+      card.setAttribute('aria-label', camp.name);
+      // Cosa serve sapere prima di aprirla: ultima sessione giocata, quante, quando e' stata toccata
+      const giocate = (camp.sessioni_log || []).filter(s => s.stato === 'giocata').sort((x, y) => (y.numero || 0) - (x.numero || 0));
+      const ultimaS = giocate[0];
+      const ultimaTesto = ultimaS ? _esc(ultimaS.titolo || ('Sessione ' + (ultimaS.numero || ''))) + (ultimaS.data ? ' · ' + new Date(ultimaS.data).toLocaleDateString('it-IT', { day: 'numeric', month: 'short' }) : '') : 'Nessuna, per ora';
+      const sistema = camp.system === '5e2014' ? 'D&amp;D 5e 2014' : 'D&amp;D 5e 2024';
       card.innerHTML = `
-        ${isActive ? '<div class="cc-active-tag"><span class="cc-active-dot"></span> Attiva</div>' : ''}
-        <div class="cc-body">
-          <div class="cc-top">
-            <div class="cc-icon">
-              <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
-            </div>
-            <div style="min-width:0;flex:1;">
-              <span class="cc-type">${typeLabel} · ${camp.system || '5e'}</span>
-              <span class="cc-name" title="${camp.name}">${camp.name}</span>
-            </div>
+        <div class="hn-main">
+          <div class="hn-stato">${isActive ? '<span class="dn-chip acqua">In uso</span>' : ''}<span>${typeLabel} · ${sistema}</span></div>
+          <h2>${_esc(camp.name)}</h2>
+          ${camp.description ? '<p>' + camp.description + '</p>' : ''}
+          <div class="hn-azioni-c">
+            <button type="button" class="btn btn-primary btn-lg" onclick="App.openCampaign('${camp.id}')">Apri la dashboard</button>
+            <button type="button" class="btn btn-ghost btn-lg" style="border-color:transparent;color:var(--text-muted);" onclick="App.editCampaign('${camp.id}')">Modifica</button>
+            <button type="button" class="btn btn-ghost btn-lg" style="border-color:transparent;color:var(--text-muted);" onclick="Storage.exportCampaign('${camp.id}')">Esporta</button>
+            <button type="button" class="btn btn-ghost btn-lg" style="border-color:transparent;color:var(--danger-text);" onclick="App.confirmDeleteCampaign('${camp.id}')">Elimina</button>
           </div>
-          <div class="cc-desc${camp.description ? '' : ' cc-desc-vuota'}">${camp.description || 'Nessuna descrizione.'}</div>
-          <button type="button" class="cc-desc-toggle" hidden onclick="event.stopPropagation();const d=this.previousElementSibling;const a=d.classList.toggle('is-open');this.textContent=a?'Mostra meno':'Leggi tutto';this.setAttribute('aria-expanded',a)" aria-expanded="false">Leggi tutto</button>
         </div>
-        <div class="cc-footer">
-          <div class="cc-footer-meta">
-            <span class="cc-date">${date}</span>
-          </div>
-          <div class="cc-actions">
-            <button class="btn btn-ghost btn-icon-sm" title="Modifica" aria-label="Modifica campagna" onclick="event.stopPropagation();App.editCampaign('${camp.id}')">${svgPencil}</button>
-            <button class="btn btn-ghost btn-icon-sm" title="Esporta" aria-label="Esporta campagna" onclick="event.stopPropagation();Storage.exportCampaign('${camp.id}')">${svgExport}</button>
-            <button class="btn btn-ghost btn-icon-sm" title="Elimina" aria-label="Elimina campagna" style="color:var(--danger-text);" onclick="event.stopPropagation();App.confirmDeleteCampaign('${camp.id}')">${svgTrash}</button>
-          </div>
+        <div class="hn-fatti">
+          <div><span>Ultima sessione</span><b>${ultimaTesto}</b></div>
+          <div><span>Sessioni giocate</span><b class="num">${giocate.length}</b></div>
+          <div><span>Modificata</span><b class="num">${date}</b></div>
         </div>
       `;
-
-      card.onclick = () => App.openCampaign(camp.id);
-      card.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); App.openCampaign(camp.id); } };
       grid.appendChild(card);
     });
 
-    const newCard = document.createElement('button');
-    newCard.className = 'campaign-card campaign-card-new';
-    newCard.setAttribute('aria-label', 'Crea nuova campagna o One Shot');
-    newCard.onclick = openNewCampaignModal;
-    newCard.innerHTML = `
-      <div class="cc-new-icon">
-        <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-      </div>
-      <span style="font-family:var(--font-display);font-size:0.75rem;letter-spacing:0.06em;color:inherit;">Nuova Campagna</span>
-    `;
-    grid.appendChild(newCard);
 
     // "Leggi tutto" solo dove la descrizione e' davvero piu' lunga dello spazio della card
     requestAnimationFrame(() => grid.querySelectorAll('.cc-desc').forEach(d => {
@@ -22577,6 +22550,7 @@ document.addEventListener('DOMContentLoaded', initMobileNav);
 <script src="js/generatori-schede.js"></script>
 <script src="js/dashboard-mia.js"></script>
 <script src="js/dashboard-nuova.js"></script>
+<script src="js/home-menu.js"></script>
 <script src="js/campagna-hub.js"></script>
 <script src="js/avvio-sessione.js"></script>
 <script src="js/turni-fazione.js"></script>
