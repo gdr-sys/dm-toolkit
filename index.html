@@ -13367,7 +13367,7 @@ const FirebaseSync = (() => {
           localStorage.setItem('dm_last_share_code', key);
         } catch(e) {
           Debug.warn('Push campagna locale:', e.message);
-          Toast.show('Errore invio "' + (camp.name||'campagna') + '" a Firebase: ' + e.message, 'error', 5000);
+          Toast.show('Sincronizzazione di "' + (camp.name||'campagna') + '" non riuscita: ' + e.message, 'error', 5000);
         }
       }
 
@@ -13995,7 +13995,7 @@ const FirebaseSync = (() => {
     const code = digitato.toUpperCase().replace(/[^A-Z0-9]/g,'');
     if (!code || code.length < 4) { Toast.show('Inserisci il codice a 6 caratteri', 'warning'); return; }
     if (!_user) { Toast.show('Accedi prima con Google o email', 'warning'); return; }
-    if (!_db) { Toast.show('Firebase non disponibile', 'error'); return; }
+    if (!_db) { Toast.show('Sincronizzazione non disponibile in questo momento', 'error'); return; }
     try {
       Toast.show('Ricerca campagna...', 'info', 1500);
 
@@ -16058,7 +16058,7 @@ const DriveBackup = (() => {
     _aggiornaAvviso(daRicollegare);
     if (daRicollegare) {
       _eraScaduto = true;
-      if (label) { label.textContent = 'Da ricollegare: l’accesso a Google è scaduto. Le modifiche intanto vanno su Firebase e non si perdono; ricollegando, le immagini nuove vengono salvate su Drive.'; label.style.color = 'var(--warning-text)'; }
+      if (label) { label.textContent = 'Da ricollegare: l’accesso a Google è scaduto. Le modifiche intanto non si perdono; ricollegando, le immagini nuove tornano a essere salvate su Drive.'; label.style.color = 'var(--warning-text)'; }
       if (connectBtn) { connectBtn.style.display = ''; connectBtn.textContent = 'Ricollega Drive'; }
       if (backupBtn) backupBtn.style.display = 'none';
       if (restoreBtn) restoreBtn.style.display = 'none';
@@ -22031,7 +22031,7 @@ document.addEventListener('DOMContentLoaded', initMobileNav);
           <code id="collab-camp-code" style="flex:1;background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-md);padding:8px 12px;font-size:0.9rem;letter-spacing:0.12em;text-align:center;cursor:pointer;" onclick="FirebaseSync.copyCode()" title="Clicca per copiare">—</code>
           <button class="btn btn-ghost btn-sm" onclick="FirebaseSync.copyCode()" style="display:flex;align-items:center;gap:6px;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copia</button>
         </div>
-        <div style="font-size:0.7rem;color:var(--text-muted);margin-top:4px;">Codice di 6 caratteri — condividilo con il co-autore. Valido finché la campagna esiste su Firebase.</div>
+        <div style="font-size:0.7rem;color:var(--text-muted);margin-top:4px;">Codice di 6 caratteri. Resta valido finché non elimini la campagna.</div>
       </div>
 
       <!-- Unisciti -->
@@ -22337,7 +22337,7 @@ document.addEventListener('DOMContentLoaded', initMobileNav);
       <section style="border-top:1px solid var(--border);padding-top:16px;">
         <h4 style="font-family:var(--font-display);font-size:0.82rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted);margin:0 0 12px;">Google Drive</h4>
         <p style="font-size:0.75rem;color:var(--text-muted);line-height:1.5;margin:0 0 10px;">
-          Se sei entrata con Google, i dati sincronizzano già tra dispositivi tramite Firebase. Collegando anche Drive, i contenuti e le immagini vengono salvati lì (sul tuo Drive personale) invece che su Firebase — che resta solo il segnale di "c'è qualcosa di nuovo", restando così sempre nel piano gratuito.
+          Collega il tuo Google Drive: la campagna e le immagini vengono salvate lì, sul tuo account, e le ritrovi su ogni dispositivo.
         </p>
         <div style="background:var(--bg-secondary);border-radius:var(--radius-md);padding:12px;margin-bottom:10px;font-size:0.82rem;">
           <div style="display:flex;align-items:center;gap:8px;">
@@ -22470,7 +22470,7 @@ document.addEventListener('DOMContentLoaded', initMobileNav);
 
       <h3 style="font-family:var(--font-display);font-size:1.2rem;margin:0 0 8px;">Ritrova la tua campagna su ogni dispositivo</h3>
       <p style="font-size:0.85rem;color:var(--text-muted);line-height:1.6;margin:0 0 20px;">
-        Sei entrata con Google, quindi le modifiche si sincronizzano già in automatico. Collegando anche <strong>Google Drive</strong>, i dati veri e le immagini vengono salvati lì (sul tuo Drive, privato) invece che occupare il piano gratuito di Firebase — Firebase resta solo il segnale che avvisa gli altri dispositivi che c'è qualcosa di nuovo da scaricare.
+        Le modifiche si sincronizzano già da sole. Collegando anche <strong>Google Drive</strong>, la campagna e le immagini vengono salvate sul tuo Drive, dove restano private e sotto il tuo controllo.
       </p>
 
       <div style="background:var(--bg-secondary);border-radius:var(--radius-md);padding:12px 16px;margin-bottom:20px;text-align:left;">
@@ -22485,12 +22485,12 @@ document.addEventListener('DOMContentLoaded', initMobileNav);
           </div>
           <div style="display:flex;align-items:center;gap:10px;font-size:0.82rem;">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent-secondary)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-            <span>Dati sul tuo Drive personale — Firebase riceve solo un piccolo segnale, non i contenuti</span>
+            <span>La campagna resta sul tuo Drive personale, privata</span>
           </div>
         </div>
       </div>
       <p style="font-size:0.72rem;color:var(--text-muted);margin:-12px 0 20px;">
-        Senza Drive collegato, i dati continuano a sincronizzarsi comunque tramite Firebase — solo che restano lì anche i contenuti pesanti, non solo il segnale.
+        Anche senza Drive la campagna si sincronizza tra i tuoi dispositivi. Puoi collegarlo quando vuoi dalle impostazioni.
       </p>
 
       <div style="display:flex;flex-direction:column;gap:8px;">
