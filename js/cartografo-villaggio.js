@@ -26,9 +26,16 @@ const CartoVillaggio = (() => {
       prato: '#e4ebee', pratoScuro: '#9db0bd', luce: '#ffffff', chioma: ['#4f6b6a', '#5a7675', '#44605f'], chiomaL: '#dfeaec', bosco: '#3e5655', boscoProfondo: '#2c403f', ink: '#1a2729',
       campo: ['#d2dade', '#c8d1d6', '#dae1e4', '#bfc9ce'], solco: '#7f909a', strada: '#b8b6a8', stradaBordo: '#7f7f76', piazza: '#c9c7ba', tetti: ['#e8ecee', '#dfe5e8', '#f0f3f4', '#d6dde0'], ardesia: ['#c6d0d6', '#bcc7ce'], acqua: '#9cc0d2', acquaInk: '#4f7a90', testo: '#1a2729', testoAlone: '#f4f7f8',
     },
+    // I due stili del Cartografo
+    atlante: {
+      stile: 'atlante', prato: '#e8dec2', pratoScuro: '#c9b991', luce: '#fbf6e6', chioma: ['#f3ebd4', '#efe6cc', '#f6efdc'], chiomaL: '#ffffff', bosco: '#e4d8b8', boscoProfondo: '#cdbd96', ink: '#33261a',
+      campo: ['#e9dec2', '#e2d5b4', '#ede4cb', '#dccfac'], solco: '#6e5a40', strada: '#f6efdc', stradaBordo: '#8a7454', piazza: '#f3ead3', tetti: ['#e3d2a8', '#ddcb9f', '#e8d9b3', '#d8c69a'], ardesia: ['#a8382a', '#93301f'],
+      acqua: '#dccfae', acquaInk: '#33261a', riflesso: '#33261a', testo: '#33261a', testoAlone: '#f3ead3', ombraOp: 0.26, font: M.FONT_ATLANTE, fontTitolo: M.FONT_ATLANTE_SC,
+    },
     notte: {
-      prato: '#2e4a4b', pratoScuro: '#122729', luce: '#7fa6a6', chioma: ['#1f3f40', '#25494a', '#183435'], chiomaL: '#3d6a69', bosco: '#112a2c', boscoProfondo: '#0a1c1e', ink: '#040b0c',
-      campo: ['#40464a', '#4a4f50', '#383e42', '#535757'], solco: '#1c2022', strada: '#6f7670', stradaBordo: '#2c3230', piazza: '#7a817a', tetti: ['#6e5048', '#604640', '#7a5a50', '#553f3a'], ardesia: ['#4f6073', '#465668'], acqua: '#203f55', acquaInk: '#6d9dbd', testo: '#f0ead2', testoAlone: '#040b0c',
+      stile: 'notte', prato: '#12262f', pratoScuro: '#0a1820', luce: '#2b4a56', chioma: ['#1d3a3d', '#22424a', '#1a3436'], chiomaL: '#7eb696', bosco: '#0f2629', boscoProfondo: '#08191b', ink: '#03090b',
+      campo: ['#173039', '#1b343c', '#152c34', '#1e383f'], solco: '#4f7078', strada: '#29475a', stradaBordo: '#08131a', piazza: '#2f4e60', tetti: ['#2a4553', '#2f4b5a', '#263f4c', '#2c4856'], ardesia: ['#e9b84f', '#d9a63f'],
+      acqua: '#0a1720', acquaInk: '#7ebad8', riflesso: '#7ebad8', testo: '#e8e1cf', testoAlone: '#0d1d26', ambra: '#e9b84f', ombraOp: 0.5, font: M.FONT_NOTTE, fontTitolo: M.FONT_NOTTE,
     },
   };
 
@@ -74,7 +81,7 @@ const CartoVillaggio = (() => {
       scandole += M.tratteggio(falda1, ang + Math.PI / 2, 2.5, 0.6) + M.tratteggio(falda2, ang + Math.PI / 2, 2.5, 0.6);
       colmi += `M${n1(a[0])} ${n1(a[1])}L${n1(b[0])} ${n1(b[1])}`;
     });
-    let out = `<path d="${ombre}" fill="${t.ink}" opacity="0.42" fill-rule="nonzero"/>`;
+    let out = `<path d="${ombre}" fill="${t.ink}" opacity="${t.ombraOp || 0.42}" fill-rule="nonzero"/>`;
     perColore.forEach((d, col) => { out += `<path d="${d}" fill="${col}" stroke="${t.ink}" stroke-width="1.05" stroke-linejoin="round"/>`; });
     return out + `<path d="${scure}" fill="${t.ink}" opacity="0.2"/><path d="${scandole}" fill="none" stroke="${t.ink}" stroke-width="0.55" opacity="0.5"/><path d="${colmi}" fill="none" stroke="${t.ink}" stroke-width="1.15"/>`;
   };
@@ -102,14 +109,15 @@ const CartoVillaggio = (() => {
       const a = r.range(0.4, 1.4);
       segni += `M${n1(x + Math.cos(a) * q * 0.5)} ${n1(y + Math.sin(a) * q * 0.5)}a${n1(q * 0.5)} ${n1(q * 0.5)} 0 0 1 ${n1(-q * 0.42)} ${n1(q * 0.18)}`;
     });
-    let out = `<path d="${ombre}" fill="${t.ink}" opacity="0.38"/>`;
+    let out = `<path d="${ombre}" fill="${t.ink}" opacity="${t.ombraOp ? t.ombraOp * 0.9 : 0.38}"/>`;
     strati.forEach((d, i) => { if (d) out += `<path d="${d}" fill="${t.chioma[i]}" stroke="${t.ink}" stroke-width="1.05"/>`; });
     return out + `<path d="${luci}" fill="${t.chiomaL}" opacity="0.28"/><path d="${segni}" fill="none" stroke="${t.ink}" stroke-width="0.8" opacity="0.45"/>`;
   };
 
   const villaggio = (o) => {
     const r = M.rng('villaggio:' + o.seme), rn = M.rumore(r), rf = M.rumore(r);
-    const t = TONI[o.palette] || TONI.naturale;
+    const t = o.palette === 'notte' ? TONI.notte : TONI.atlante;
+    const carta = t.stile === 'notte' ? M.PALETTE.cartografo : M.PALETTE.atlante;
     const W = 1600, H = 900;
     const nome = o.nome || M.nomeLuogo(r);
     const nCase = { piccolo: 28, medio: 50, grande: 80 }[o.taglia] || 50;
@@ -274,7 +282,7 @@ const CartoVillaggio = (() => {
     // Luci e ombre del terreno: colline ampie, molto sfumate
     const G = 40, gw = Math.ceil((W + 400) / G), gh = Math.ceil((H + 400) / G);
     const colle = (i, j) => rn((i * G - 200) * 0.0021 + 200, (j * G - 200) * 0.0021 + 300, 3);
-    let s = `<rect width="${W}" height="${H}" fill="${t.prato}"/>`;
+    let s = `<rect width="${W}" height="${H}" fill="${t.prato}"${t.stile === 'atlante' ? ' opacity="0.55"' : ''}/>`;
     const fascia = (livello, col, op, sopra) => {
       const f = sopra ? (i, j) => colle(i, j) - livello : (i, j) => livello - colle(i, j);
       const d = M.contorni(gw, gh, f, 0, G, -200, -200).map((l) => M.via(M.morbida(l, 2, true))).join('');
@@ -299,7 +307,7 @@ const CartoVillaggio = (() => {
     // Fiume sotto le strade, i ponti sopra
     if (fiume) {
       const d = M.via(fiume, false);
-      s += `<path d="${d}" fill="none" stroke="${t.ink}" stroke-width="${largF + 8}" opacity="0.25" stroke-linejoin="round" filter="url(#carto-b4)"/><path d="${d}" fill="none" stroke="${t.acquaInk}" stroke-width="${largF + 2.5}" stroke-linejoin="round"/><path d="${d}" fill="none" stroke="${t.acqua}" stroke-width="${largF}" stroke-linejoin="round"/><path d="${d}" fill="none" stroke="#fff" stroke-width="1" stroke-dasharray="40 70" opacity="0.5" stroke-linejoin="round"/>`;
+      s += `<path d="${d}" fill="none" stroke="${t.ink}" stroke-width="${largF + 8}" opacity="0.25" stroke-linejoin="round" filter="url(#carto-b4)"/><path d="${d}" fill="none" stroke="${t.acquaInk}" stroke-width="${largF + 2.5}" stroke-linejoin="round"/><path d="${d}" fill="none" stroke="${t.acqua}" stroke-width="${largF}" stroke-linejoin="round"/><path d="${d}" fill="none" stroke="${t.riflesso}" stroke-width="1" stroke-dasharray="40 70" opacity="0.5" stroke-linejoin="round"/>`;
     }
 
     // Stradine di accesso alle case: una riga corta fino alla via piu' vicina
@@ -373,7 +381,7 @@ const CartoVillaggio = (() => {
     const contFor = M.contorni(gw, gh, (i, j) => { const x = i * G - 200, y = j * G - 200; return fForesta(x, y) - (SOGLIA + 0.02); }, 0, G, -200, -200).map((l) => M.morbida(l, 2, true));
     const dFor = contFor.map((l) => M.via(l)).join('');
     if (dFor) {
-      s += `<path d="${dFor}" fill="${t.ink}" transform="translate(14 17)" opacity="0.32" fill-rule="evenodd" filter="url(#carto-b12)"/><path d="${dFor}" fill="${t.bosco}" fill-rule="evenodd"/>`;
+      s += `<path d="${dFor}" fill="${t.ink}" transform="translate(14 17)" opacity="0.32" fill-rule="evenodd" filter="url(#carto-b12)"/><path d="${dFor}" fill="${t.bosco}" fill-rule="evenodd"/>` + (t.stile === 'atlante' ? `<path d="${dFor}" fill="url(#carto-tratt)" fill-rule="evenodd"/>` : '');
       const prof = M.contorni(gw, gh, (i, j) => fForesta(i * G - 200, j * G - 200) - (SOGLIA + 0.12), 0, G, -200, -200).map((l) => M.via(M.morbida(l, 2, true))).join('');
       if (prof) s += `<path d="${prof}" fill="${t.boscoProfondo}" fill-rule="evenodd" filter="url(#carto-b40)" opacity="0.85"/>`;
     }
@@ -389,22 +397,25 @@ const CartoVillaggio = (() => {
     let testi = '';
     const pin = [];
     if (raggioPiazza) {
-      testi += M.etichetta(cx, cy + raggioPiazza + 22, 'Piazza', t, { size: 17, peso: 600, colore: t.testo, alone: t.testoAlone, aloneW: 3.5, corsivo: true });
+      testi += M.etichetta(cx, cy + raggioPiazza + 22, 'Piazza', t, { size: 18, font: t.font, peso: t.stile === 'notte' ? 600 : 400, colore: t.testo, alone: t.testoAlone, aloneW: 3.5, corsivo: true });
       pin.push({ x: cx, y: cy, label: 'Piazza', note: 'Il cuore del villaggio, con il grande albero al centro.', sottotipo: '' });
     }
     speciali.forEach((e) => {
-      testi += M.etichetta(e.x, e.y + Math.max(e.lung, e.larg) * 0.6 + 16, e.nome, t, { size: 17, peso: 600, colore: t.testo, alone: t.testoAlone, aloneW: 3.5 });
+      testi += M.etichetta(e.x, e.y + Math.max(e.lung, e.larg) * 0.6 + 16, e.nome, t, { size: 18, font: t.font, peso: t.stile === 'notte' ? 600 : 400, colore: t.testo, alone: t.testoAlone, aloneW: 3.5 });
       pin.push({ x: e.x, y: e.y, label: e.nome, note: e.nota, sottotipo: '', tipoLuogo: /^Chiesa/.test(e.nome) ? 'Tempio' : /^Locanda/.test(e.nome) ? 'Taverna' : '', genera: /^Chiesa/.test(e.nome) ? { tipo: 'dungeon', opzioni: { tema: 'cripta' } } : { tipo: 'abitazione', opzioni: { edificio: /^Locanda/.test(e.nome) ? 'taverna' : 'casa' } } });
     });
 
     const abitanti = Math.round((fatte + 3) * r.range(5.2, 7.4) / 10) * 10;
     let titolo = '';
     if (o.titolo !== false) {
-      titolo = M.etichetta(30, 52, nome, t, { size: 38, ancora: 'start', font: M.FONT_TITOLO, peso: 700, colore: t.testo, alone: t.testoAlone, aloneW: 5, spazio: 1 }) +
-        M.etichetta(32, 78, abitanti + ' abitanti', t, { size: 18, ancora: 'start', colore: t.testo, alone: t.testoAlone, aloneW: 3.5, corsivo: true });
+      titolo = t.stile === 'notte'
+        ? M.etichetta(48, 66, nome.toUpperCase(), t, { size: 36, ancora: 'start', font: t.fontTitolo, peso: 600, colore: t.testo, alone: t.testoAlone, aloneW: 5, spazio: 7 }) +
+          M.etichetta(50, 94, abitanti + ' abitanti', t, { size: 17, ancora: 'start', font: t.font, peso: 500, spazio: 1.5, colore: t.ambra, alone: t.testoAlone, aloneW: 3.5 })
+        : M.etichetta(48, 68, nome, t, { size: 42, ancora: 'start', font: t.fontTitolo, colore: t.testo, alone: t.testoAlone, aloneW: 6, spazio: 1.5 }) +
+          M.etichetta(50, 96, abitanti + ' abitanti', t, { size: 19, ancora: 'start', font: t.font, colore: t.testo, alone: t.testoAlone, aloneW: 4, corsivo: true });
     }
-    const svg = M.apri(W, H, M.PALETTE.pergamena, o.seme) + s + (o.nomi === false ? '' : testi) + titolo +
-      M.scala(40, H - 34, 100, { valore: 50, nome: 'metri' }, 3, { ...M.PALETTE.pergamena, carta: '#f5f0dc', inchiostro: '#1c1a14' }) + '</svg>';
+    const svg = M.apri(W, H, carta, o.seme) + s + (o.nomi === false ? '' : testi) + titolo +
+      M.scala(52, H - 48, 100, { valore: 50, nome: 'metri' }, 3, carta) + M.chiudi(W, H, carta);
     return { nome, pin, W, H, larghezzaKm: W * 0.5 / 1000, svg };
   };
 

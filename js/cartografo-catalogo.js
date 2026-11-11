@@ -29,7 +29,7 @@ const CartoCatalogo = (() => {
     },
     villaggio: {
       nome: 'Villaggio', genera: (o) => CartoVillaggio.villaggio(o),
-      colori: [['naturale', 'Estate'], ['autunno', 'Autunno'], ['inverno', 'Inverno'], ['pergamena', 'Pergamena'], ['notte', 'Notturna']],
+      colori: [['atlante', 'Atlante'], ['notte', 'Notte']],
       opzioni: [
         S('taglia', 'Dimensione', [['piccolo', 'Piccolo'], ['medio', 'Medio'], ['grande', 'Grande']], 'medio'),
         S('pianta', 'Pianta', [['caso', 'A caso'], ['piazza', 'Con piazza'], ['lungo', 'Lungo la strada']], 'caso'),
