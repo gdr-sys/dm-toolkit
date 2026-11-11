@@ -413,7 +413,7 @@ const CartoRegno = (() => {
     s += tratto(tracciaTerra, A ? t.ink : t.gesso, A ? 2.3 : 1.6, A ? '' : ' opacity="0.95"');
 
     // Strade e rotte via mare
-    if (strade.length) s += tratto(strade.map((q) => M.via(q.linea, false)).join(''), A ? t.ink : t.ambra, 1.2, A ? ' stroke-dasharray="6 4" stroke-linecap="butt" opacity="0.75"' : ' stroke-dasharray="5 5" stroke-linecap="butt" opacity="0.65"');
+    if (strade.length) s += tratto(strade.map((q) => M.via(q.linea, false)).join(''), A ? t.ink : t.ambra, 1.2, A ? ' stroke-dasharray="6 4" opacity="0.75"' : ' stroke-dasharray="5 5" opacity="0.65"');
     if (rotteMare.length) s += tratto(rotteMare.map((q) => M.via(q.linea, false)).join(''), A ? t.ink : t.gesso, 1.2, ' stroke-dasharray="1.5 6" opacity="0.5"');
 
     /* Rilievo, alberi, insediamenti: dall'alto verso il basso, cosi' si sovrappongono bene */
