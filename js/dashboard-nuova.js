@@ -125,8 +125,12 @@ const DashboardNuova = (() => {
     if (!g) return;
     _osservatore = new MutationObserver(_programma);
     _osservatore.observe(g, { childList: true, subtree: true });
-    // Il cambio Panoramica / La mia dashboard non tocca la griglia: si ascolta il clic sulle linguette
-    document.addEventListener('click', (e) => { if (e.target.closest && e.target.closest('#dash-mia-barra')) setTimeout(organizza, 0); });
+    // Il cambio Panoramica / La mia dashboard non tocca la griglia: si riordina subito dopo ogni cambio di vista
+    if (typeof DashboardMia !== 'undefined' && DashboardMia.vista && !DashboardMia.vista._dn) {
+      const vistaOriginale = DashboardMia.vista;
+      DashboardMia.vista = (v) => { vistaOriginale(v); organizza(); };
+      DashboardMia.vista._dn = true;
+    }
     _programma();
   };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', avvia); else avvia();
