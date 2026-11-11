@@ -190,3 +190,34 @@ button.dn-row:hover .dn-t, a.dn-row:hover .dn-t { color: var(--accent-text); }
 #page-home #campaign-grid .home-empty-v2 { background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; }
 @media (max-width: 760px) { #page-home .campaign-grid-section { padding: 16px 14px 96px; } }
 #page-home #campaign-grid { padding: 0 !important; margin: 0 !important; }
+
+/* ── Barra in alto da 900px (js/barra-alta.js) ── */
+.ba-barra { display: none; }
+@media (min-width: 900px) {
+  body.barra-alta #sidebar { display: none !important; }
+  body.barra-alta #main-content, body.barra-alta #main-content.expanded { margin-left: 0 !important; }
+  body.barra-alta #topbar { min-height: 60px; padding: env(safe-area-inset-top, 0px) 20px 0; gap: 12px; background: color-mix(in srgb, var(--bg-primary) 92%, transparent); backdrop-filter: blur(10px); }
+  body.barra-alta .topbar-title { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  body.barra-alta .ba-barra { display: flex; align-items: center; gap: 14px; flex: 1; min-width: 0; height: 60px; }
+  .ba-logo { display: flex; align-items: center; gap: 10px; background: none; border: 0; padding: 4px; cursor: pointer; color: var(--text-primary); font: 700 1rem var(--font-body); letter-spacing: -0.01em; border-radius: 8px; }
+  .ba-logo img { width: 26px; height: 26px; }
+  .ba-campagna { display: flex; align-items: center; gap: 8px; max-width: 240px; height: 36px; padding: 0 12px; border: 1px solid var(--border); border-radius: 10px; background: var(--bg-card); color: var(--text-secondary); font: 500 0.9rem var(--font-body); cursor: pointer; }
+  .ba-campagna span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .ba-campagna i { width: 7px; height: 7px; border-radius: 50%; background: var(--success-text); flex: none; }
+  .ba-campagna:hover { border-color: var(--border-strong); color: var(--text-primary); }
+  .ba-nav { display: flex; align-items: stretch; height: 60px; gap: 2px; margin-left: 6px; }
+  .ba-voce { display: flex; align-items: center; gap: 4px; padding: 0 11px; background: none; border: 0; color: var(--text-muted); font: 500 0.93rem var(--font-body); cursor: pointer; box-shadow: inset 0 -2px 0 transparent; height: 60px; }
+  .ba-voce:hover { color: var(--text-primary); }
+  .ba-voce[aria-current="page"], .ba-voce[data-dentro] { color: var(--text-primary); box-shadow: inset 0 -2px 0 var(--accent-text); }
+  .ba-voce[aria-disabled="true"] { opacity: 0.45; cursor: not-allowed; }
+  .ba-gruppo { position: relative; display: flex; align-items: center; }
+  .ba-menu { position: absolute; top: calc(100% - 4px); left: 0; min-width: 220px; padding: 6px; background: var(--bg-tertiary); border: 1px solid var(--border-strong); border-radius: 10px; box-shadow: 0 12px 32px rgba(0,0,0,.35), 0 2px 6px rgba(0,0,0,.2); z-index: 300; }
+  .ba-menu-destra { left: auto; right: 0; top: calc(100% + 8px); }
+  .ba-menu button { display: flex; width: 100%; align-items: center; min-height: 38px; padding: 0 10px; border: 0; border-radius: 6px; background: none; color: var(--text-secondary); font: 0.93rem var(--font-body); text-align: left; cursor: pointer; }
+  .ba-menu button:hover, .ba-menu button[aria-current="page"] { background: var(--bg-card-hover); color: var(--text-primary); }
+  .ba-menu button[aria-disabled="true"] { opacity: 0.45; cursor: not-allowed; }
+  .ba-destra { margin-left: auto; display: flex; align-items: center; gap: 4px; }
+  .ba-icona { width: 36px; height: 36px; display: grid; place-items: center; border-radius: 10px; border: 0; background: none; color: var(--text-muted); cursor: pointer; }
+  .ba-icona:hover { background: var(--bg-tertiary); color: var(--text-primary); }
+}
+@media (min-width: 900px) and (max-width: 1180px) { .ba-logo span { display: none; } .ba-campagna { max-width: 170px; } }
