@@ -2,22 +2,24 @@
    BASE.CSS — Variabili, reset, tipografia
    ============================================================ */
 
-@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&family=JetBrains+Mono:wght@400;500&display=swap');
+/* Un solo carattere per tutta l'interfaccia: Atkinson Hyperlegible, disegnato per la leggibilita'
+   (al tavolo, con poca luce, I l 1 e O 0 non si confondono). Il mono resta per codici e numeri tecnici. */
+@import url('https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500&display=swap');
 
 /* ── Variabili Tema Chiaro ── */
 :root {
   /* Colori principali */
-  --bg-primary:    #f5f2ee;
-  --bg-secondary:  #ede9e3;
-  --bg-tertiary:   #e2ddd7;
+  --bg-primary:    #f4f4f2;
+  --bg-secondary:  #ebebe8;
+  --bg-tertiary:   #e1e1dd;
   --bg-card:       #ffffff;
-  --bg-card-hover: #faf8f5;
+  --bg-card-hover: #f9f9f7;
 
   /* Testo */
-  --text-primary:   #1a1714;
-  --text-secondary: #4a4540;
-  --text-muted:     #655e57;   /* era #7a736b: sotto 4.5:1 sugli sfondi beige */
-  --text-inverse:   #f5f2ee;
+  --text-primary:   #1b1c1e;
+  --text-secondary: #45474b;
+  --text-muted:     #5f6266;
+  --text-inverse:   #f4f4f2;
 
   /* Accenti */
   --accent-primary:   #8b2635;   /* rosso vinaccia */
@@ -37,20 +39,20 @@
   --success-text:          #2f6b38;
 
   /* Bordi */
-  --border:        #d4cfc8;
-  --border-strong: #b5aea5;
+  --border:        #dcdcd8;
+  --border-strong: #bdbdb8;
   --border-accent: #8b2635;
 
   /* Ombre */
-  --shadow-sm:  0 1px 3px rgba(0,0,0,0.08);
+  --shadow-sm:  0 1px 2px rgba(20,22,26,0.06);
   --shadow-md:  0 4px 12px rgba(0,0,0,0.10);
   --shadow-lg:  0 8px 24px rgba(0,0,0,0.12);
   --shadow-xl:  0 16px 40px rgba(0,0,0,0.14);
 
   /* Navbar — chiara nel tema chiaro, coerente col resto dell'interfaccia */
-  --nav-bg:      #ede9e3;
-  --nav-text:    #4a4540;
-  --nav-active:  #1a1714;
+  --nav-bg:      #ffffff;
+  --nav-text:    #45474b;
+  --nav-active:  #1b1c1e;
   --nav-accent:  #8b2635;
   --nav-overlay-weak:   rgba(0,0,0,0.05);
   --nav-overlay-mid:    rgba(0,0,0,0.08);
@@ -58,8 +60,8 @@
   --nav-label-color:    rgba(0,0,0,0.62);
 
   /* Tipografia */
-  --font-display: 'Cinzel', serif;
-  --font-body:    'Crimson Pro', serif;
+  --font-display: 'Atkinson Hyperlegible Next', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-body:    'Atkinson Hyperlegible Next', system-ui, -apple-system, 'Segoe UI', sans-serif;
   --font-mono:    'JetBrains Mono', monospace;
 
   /* Spacing */
@@ -75,7 +77,7 @@
   --radius-sm:  4px;
   --radius-md:  8px;
   --radius-lg:  12px;
-  --radius-xl:  16px;
+  --radius-xl:  14px;
   --radius-full: 9999px;
 
   /* Transizioni */
@@ -92,28 +94,28 @@
 
 /* ── Variabili Tema Scuro ── */
 [data-theme="dark"] {
-  --bg-primary:    #12100e;
-  --bg-secondary:  #1c1916;
-  --bg-tertiary:   #252118;
-  --bg-card:       #1e1b17;
-  --bg-card-hover: #252118;
+  --bg-primary:    #111214;
+  --bg-secondary:  #17181b;
+  --bg-tertiary:   #202226;
+  --bg-card:       #191a1d;
+  --bg-card-hover: #202226;
 
-  --text-primary:   #f0ebe4;
-  --text-secondary: #c8c0b6;
-  --text-muted:     #a59d94;   /* era #9a9088: al limite sugli sfondi delle card e dei badge */
+  --text-primary:   #ecebe7;
+  --text-secondary: #c9c8c3;
+  --text-muted:     #9fa1a3;
 
-  --accent-text:           #e8909b;
+  --accent-text:           #ef8d99;
   --accent-secondary-text: #d39a55;
   --warning-text:          #d9a35f;
   --danger-text:           #e8909b;
   --success-text:          #6cbf78;
 
-  --border:        #2e2a24;
-  --border-strong: #3e3830;
+  --border:        #2a2d32;
+  --border-strong: #383c42;
 
-  --nav-bg:      #0e0c0a;
-  --nav-text:    #9a9088;
-  --nav-active:  #f0ebe4;
+  --nav-bg:      #111214;
+  --nav-text:    #9fa1a3;
+  --nav-active:  #ecebe7;
   --nav-overlay-weak:   rgba(255,255,255,0.04);
   --nav-overlay-mid:    rgba(255,255,255,0.08);
   --nav-overlay-strong: rgba(255,255,255,0.15);
@@ -124,7 +126,7 @@
   --shadow-lg:  0 8px 24px rgba(0,0,0,0.40);
   --shadow-xl:  0 16px 40px rgba(0,0,0,0.50);
 
-  --bg-card: #1e1b17;
+  --bg-card: #191a1d;
 }
 
 /* ── Reset ── */
@@ -139,7 +141,8 @@ html {
 body {
   font-family: var(--font-body);
   font-size: 1rem;
-  line-height: 1.6;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
   color: var(--text-primary);
   background-color: var(--bg-primary);
   transition: background-color var(--transition-normal), color var(--transition-normal);
@@ -151,6 +154,7 @@ h1, h2, h3, h4, h5 {
   font-family: var(--font-display);
   font-weight: 600;
   line-height: 1.2;
+  letter-spacing: -0.01em;
   color: var(--text-primary);
 }
 
@@ -220,10 +224,9 @@ a:hover { color: var(--accent-secondary-text); }
   padding: 2px 8px;
   border-radius: var(--radius-full);
   font-size: 0.7rem;
-  font-family: var(--font-display);
+  font-family: var(--font-body);
   font-weight: 600;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
+  letter-spacing: 0;
 }
 .badge-primary  { background: var(--accent-primary);   color: #fff; }
 .badge-gold     { background: var(--accent-secondary);  color: #fff; }
@@ -243,8 +246,8 @@ a:hover { color: var(--accent-secondary-text); }
 
 /* ── Selezione testo ── */
 ::selection {
-  background: var(--accent-primary);
-  color: #fff;
+  background: color-mix(in srgb, var(--accent-primary) 45%, transparent);
+  color: var(--text-primary);
 }
 
 /* ── Reduced Motion ── */

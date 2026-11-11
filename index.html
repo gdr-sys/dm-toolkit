@@ -149,6 +149,7 @@
   }
 }
 </style>
+<link rel="stylesheet" href="css/identita.css">
 </head>
 <body>
 
@@ -18534,12 +18535,20 @@ const renderDashboard = () => {
     if (ultima) {
       var sc2 = ultima.stato==='giocata'?'#69cc85':ultima.stato==='in_corso'?'#f5a623':'#5ba4f5';
       var sl = ultima.stato==='giocata'?'Giocata':ultima.stato==='in_corso'?'In corso':'Pianificata';
+      // Nuova grafica: l'ultima sessione guida la Panoramica (stili in css/identita.css)
+      var chip = ultima.stato==='giocata'?'acqua':ultima.stato==='in_corso'?'ambra':'';
+      var dataBella = ultima.data ? (function(d){ var x=new Date(d); return isNaN(x) ? d : x.toLocaleDateString('it-IT',{day:'numeric',month:'long',year:'numeric'}); })(ultima.data) : '';
       dashUlt.innerHTML =
-        '<div style="margin-bottom:8px;"><span style="padding:2px 8px;background:'+sc2+'22;color:color-mix(in srgb, '+sc2+' 50%, var(--text-primary));border-radius:var(--radius-full);font-size:0.72rem;">'+sl+'</span>' +
-        '<span style="font-family:var(--font-display);font-size:0.95rem;font-weight:600;margin-left:8px;">S'+(ultima.numero||'?')+(ultima.titolo?' — '+ultima.titolo:'')+'</span></div>' +
-        (ultima.data?'<div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:6px;">'+ultima.data+'</div>':'') +
-        (ultima.recap?'<div style="font-size:0.82rem;line-height:1.6;color:var(--text-secondary);overflow:hidden;">'+ultima.recap+'</div>':'') +
-        '<button class="btn btn-ghost btn-sm dash-sess-open" data-id="'+ultima.id+'" style="margin-top:8px;font-size:0.72rem;">Apri scheda</button>';
+        '<div class="dn-lead" style="padding:0;">' +
+          '<div class="dn-quando"><span class="dn-chip '+chip+'">'+sl+'</span><span class="num">Sessione '+(ultima.numero||'?')+(dataBella?' · '+dataBella:'')+'</span></div>' +
+          '<h2>'+(ultima.titolo||('Sessione '+(ultima.numero||'')))+'</h2>' +
+          (ultima.recap?'<p>'+ultima.recap+'</p>':'<p style="color:var(--text-muted);">Nessun riassunto: aprila per scriverlo.</p>') +
+          '<div class="dn-azioni-s">' +
+            '<button class="btn dash-sess-open" data-id="'+ultima.id+'">Apri la scheda</button>' +
+            (typeof PreviouslyOn!=='undefined'?'<button class="btn" onclick="PreviouslyOn.open()">Riassunto per il gruppo</button>':'') +
+            '<button class="btn btn-ghost" style="border-color:transparent;color:var(--text-muted);" onclick="WikiSections.goto(\x27sessioni\x27)">Tutte le sessioni</button>' +
+          '</div>' +
+        '</div>';
       var sub = document.getElementById('dash-ultima-sess-sub');
       if (sub) sub.textContent = 'S'+(ultima.numero||'?')+(ultima.titolo?' — '+ultima.titolo:'')+(ultima.data?' · '+ultima.data:'');
     } else {
@@ -22567,6 +22576,7 @@ document.addEventListener('DOMContentLoaded', initMobileNav);
 <script src="js/suggerisci.js"></script>
 <script src="js/generatori-schede.js"></script>
 <script src="js/dashboard-mia.js"></script>
+<script src="js/dashboard-nuova.js"></script>
 <script src="js/campagna-hub.js"></script>
 <script src="js/avvio-sessione.js"></script>
 <script src="js/turni-fazione.js"></script>

@@ -15,7 +15,8 @@ const DashboardMia = (() => {
   const _griglia = () => document.querySelector('#page-campagna .dash-grid');
   const _carte = () => _camp()?.dashboardMia?.carte || [];
   const _chiave = (card) => (card.querySelector('.card-title')?.textContent || '').trim();
-  const _tutteLeCard = () => [...(_griglia()?.children || [])].filter(c => c.classList.contains('card') && _chiave(c));
+  // Anche le card che la Panoramica raccoglie in colonne (js/dashboard-nuova.js)
+  const _tutteLeCard = () => [...(_griglia()?.querySelectorAll(':scope > .card, :scope > .dn-col > .card, :scope > .dn-col > .dn-split > .card') || [])].filter(c => _chiave(c));
 
   const _chiaveVista = () => 'dm_dash_vista_' + (_camp()?.id || '');
   const _vista = () => { try { return localStorage.getItem(_chiaveVista()) === 'mia' ? 'mia' : 'tutto'; } catch (e) { return 'tutto'; } };
@@ -147,7 +148,7 @@ const DashboardMia = (() => {
 
   const _aggancia = () => {
     const st = document.createElement('style');
-    st.textContent = '#page-campagna .dash-grid > .dash-mia-fuori { display:none !important; }';
+    st.textContent = '#page-campagna .dash-grid .dash-mia-fuori { display:none !important; }';
     document.head.appendChild(st);
     if (typeof App !== 'undefined') {
       const nav = App.navigateTo;
