@@ -61,7 +61,7 @@ const CartoInsediamenti = (() => {
 
   /* ═══════════════ CITTA' ═══════════════ */
   const citta = (o) => {
-    const r = M.rng('citta:' + o.seme), rn = M.rumore(r), p = M.PALETTE[o.palette] || M.PALETTE.pergamena;
+    const r = M.rng('citta:' + o.seme), rn = M.rumore(r), p = o.palette === 'notte' ? M.PALETTE.cartografo : M.PALETTE.atlante;
     // Tante celle piccole: ognuna e' un isolato, e sono le strade di rango diverso a disegnare i quartieri
     const dati = { piccola: [34, 245], media: [68, 335], grande: [108, 385] }[o.taglia] || [68, 335];
     const [nInterne, R] = dati;
@@ -552,7 +552,7 @@ const CartoInsediamenti = (() => {
       for (const [dx, dy] of [[0, 0], [0, -30], [0, 30], [-36, 0], [36, 0], [-30, -30], [30, 30], [30, -30], [-30, 30], [0, -60], [0, 60]]) {
         const curva = base.map(([x, y]) => [x + dx, y + dy]);
         if (curva.some(([x, y]) => x < 60 || x > W - 60 || y < 110 || y > H - 40 || (x < 340 && y > H - 110) || (x > W - 190 && y > H - 190) || usate.some((u) => Math.hypot(u[0] - x, u[1] - y) < 42))) continue;
-        testi += M.testoCurvo(curva, eti.toUpperCase(), p, { size, spazio: sp, colore: p.inchiostro, alone: p.carta, aloneW: 4.5, peso: 500, font: M.FONT_TESTO });
+        testi += M.testoCurvo(curva, eti.toUpperCase(), p, { size, spazio: sp, colore: p.inchiostro, alone: p.carta, aloneW: 4.5, peso: 500, font: p.fontTitolo || M.FONT_TESTO });
         curva.forEach((u) => usate.push(u));
         // Il pin sta subito prima della scritta, cosi' non ne copre le lettere
         const [a0, a1] = [curva[0], curva[1]], lg = M.dist(a0, a1) || 1;

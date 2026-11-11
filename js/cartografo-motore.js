@@ -268,8 +268,24 @@ const CartoMotore = (() => {
     },
   };
 
-  // Atlante inciso: carta avorio e inchiostro seppia, lo stile di giorno del Cartografo
-  PALETTE.atlante = { ...PALETTE.pergamena, nome: 'Atlante', carta: '#efe5cc', carta2: '#e3d6b6', macchia: '#6b5233', inchiostro: '#33261a', tenue: '#6e5a40' };
+  /* I due stili del Cartografo: Atlante inciso (di giorno) e Notte del cartografo (scuro).
+     Hanno "stile" e i propri caratteri: le parti comuni qui sotto (cornice, titolo, rosa, scala,
+     edifici, alberi) cambiano disegno in base a questo campo. */
+  const FONT_ATLANTE = "'IM Fell English', Georgia, serif", FONT_ATLANTE_SC = "'IM Fell English SC', Georgia, serif", FONT_NOTTE = "'Cormorant SC', Georgia, serif";
+  PALETTE.atlante = {
+    nome: 'Atlante', stile: 'atlante', font: FONT_ATLANTE, fontTitolo: FONT_ATLANTE_SC, rosso: '#a8382a',
+    carta: '#efe5cc', carta2: '#e3d6b6', macchia: '#6b5233', inchiostro: '#33261a', tenue: '#6e5a40',
+    acqua: '#dccfae', acquaInk: '#33261a', erba: '#ece2c6', erba2: '#e2d6b4', chioma: '#f3ebd4', chioma2: '#f3ebd4',
+    strada: '#f6efdc', stradaBordo: '#8a7454', terra: '#e7dbbd', tetti: ['#e3d2a8', '#ddcb9f', '#e8d9b3', '#d8c69a'], tettoNobile: '#a8382a',
+    campi: ['#e8ddc0', '#e3d7b6', '#ede3c8', '#ddd1ae'], neve: '#fbf7ec', pavimento: '#f3ead3', roccia: '#d6c7a3', parete: '#33261a',
+  };
+  PALETTE.cartografo = {
+    nome: 'Notte', stile: 'notte', font: FONT_NOTTE, fontTitolo: FONT_NOTTE, rosso: '#e9b84f', ambra: '#e9b84f',
+    carta: '#0e1d26', carta2: '#132631', macchia: '#000000', inchiostro: '#e8e1cf', tenue: '#9fb0b4',
+    acqua: '#0a1720', acquaInk: '#7ebad8', erba: '#12262f', erba2: '#173240', chioma: '#7eb696', chioma2: '#7eb696',
+    strada: '#1f3846', stradaBordo: '#08131a', terra: '#183140', tetti: ['#2a4553', '#2f4b5a', '#263f4c', '#2c4856'], tettoNobile: '#e9b84f',
+    campi: ['#152d36', '#183238', '#132a33', '#1a3439'], neve: '#dfe7ee', pavimento: '#1f3846', roccia: '#24343f', parete: '#06100a',
+  };
 
   // Monocromatica da incisione: edifici importanti in nero pieno, mura come un tratto deciso
   PALETTE.seppia = {
@@ -292,22 +308,33 @@ const CartoMotore = (() => {
 
   const apri = (W, H, p, seme) => {
     const s = _hash(String(seme)) % 1000;
-    const scuro = p === PALETTE.notte;
+    const scuro = p === PALETTE.notte || p.stile === 'notte';
     const sfocature = [4, 12, 40].map((b) => `<filter id="carto-b${b}" filterUnits="userSpaceOnUse" x="-200" y="-200" width="${W + 400}" height="${H + 400}"><feGaussianBlur stdDeviation="${b}"/></filter>`).join('');
     return `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img">` +
       `<defs>${sfocature}<filter id="carto-carta" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.018 0.024" numOctaves="5" seed="${s}"/>` +
       `<feColorMatrix type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 ${scuro ? 0.7 : 0.42} ${scuro ? -0.26 : -0.17}"/></filter>` +
-      `<radialGradient id="carto-vignetta" cx="50%" cy="50%" r="72%"><stop offset="62%" stop-color="${p.macchia}" stop-opacity="0"/><stop offset="100%" stop-color="${p.macchia}" stop-opacity="${scuro ? 0.5 : 0.3}"/></radialGradient></defs>` +
+      `${p.stile === 'atlante' ? `<pattern id="carto-tratt" width="3.2" height="3.2" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><path d="M0 1.6H3.2" stroke="${p.inchiostro}" stroke-width="0.55" opacity="0.5"/></pattern>` : ''}<radialGradient id="carto-vignetta" cx="50%" cy="50%" r="72%"><stop offset="62%" stop-color="${p.macchia}" stop-opacity="0"/><stop offset="100%" stop-color="${p.macchia}" stop-opacity="${scuro ? 0.5 : 0.3}"/></radialGradient></defs>` +
       `<rect width="${W}" height="${H}" fill="${p.carta}"/>` + (p.senzaCornice ? '' : `<rect width="${W}" height="${H}" fill="${p.carta2}" filter="url(#carto-carta)"/>`);
   };
 
-  const chiudi = (W, H, p) => p.senzaCornice ? '</svg>' :
+  const chiudi = (W, H, p) => p.senzaCornice ? '</svg>' : p.stile ? _cornice(W, H, p) + '</svg>' :
     `<rect width="${W}" height="${H}" fill="url(#carto-vignetta)" pointer-events="none"/>` +
     `<rect x="16" y="16" width="${W - 32}" height="${H - 32}" fill="none" stroke="${p.inchiostro}" stroke-width="3"/>` +
     `<rect x="23" y="23" width="${W - 46}" height="${H - 46}" fill="none" stroke="${p.inchiostro}" stroke-width="0.9"/>` +
     [[16, 16], [W - 16, 16], [16, H - 16], [W - 16, H - 16]].map(([x, y]) =>
       `<path d="M${x - 9} ${y}L${x} ${y - 9}L${x + 9} ${y}L${x} ${y + 9}Z" fill="${p.carta}" stroke="${p.inchiostro}" stroke-width="1.6"/>`).join('') +
     '</svg>';
+
+  // Cornici dei due stili: fascia a tacche alterne (atlante), filo di gesso (notte)
+  const _cornice = (W, H, p) => {
+    const bordo = `<path d="M0 0H${W}V${H}H0ZM20 20V${H - 20}H${W - 20}V20Z" fill="${p.carta}" fill-rule="evenodd"/>`;
+    if (p.stile === 'notte') return `<rect width="${W}" height="${H}" fill="url(#carto-vignetta)" pointer-events="none"/>` + bordo + `<rect x="20" y="20" width="${W - 40}" height="${H - 40}" fill="none" stroke="${p.inchiostro}" stroke-width="0.9" opacity="0.45"/>`;
+    let t = '';
+    for (let x = 20, k = 0; x < W - 20; x += 50, k++) if (k % 2) { const l = Math.min(50, W - 20 - x); t += `M${x} 9h${l}v5h${-l}ZM${x} ${H - 14}h${l}v5h${-l}Z`; }
+    for (let y = 20, k = 0; y < H - 20; y += 50, k++) if (k % 2) { const l = Math.min(50, H - 20 - y); t += `M9 ${y}v${l}h5v${-l}ZM${W - 14} ${y}v${l}h5v${-l}Z`; }
+    const r = (d, sw) => `<rect x="${d}" y="${d}" width="${W - d * 2}" height="${H - d * 2}" fill="none" stroke="${p.inchiostro}" stroke-width="${sw}"/>`;
+    return `<rect width="${W}" height="${H}" fill="url(#carto-vignetta)" pointer-events="none"/>` + bordo + `<path d="${t}" fill="${p.inchiostro}"/>` + r(6, 1.4) + r(9, 0.6) + r(14, 0.6) + r(20, 1.8);
+  };
 
   // Fuori dalla cornice non si disegna nulla (ritaglio di tutto il contenuto della mappa)
   const areaMappa = (W, H, contenuto) =>
@@ -318,7 +345,7 @@ const CartoMotore = (() => {
 
   const etichetta = (x, y, testo, p, o = {}) => {
     const {
-      size = 15, font = FONT_TESTO, peso = 400, corsivo = false, spazio = 0, ancora = 'middle', colore = p.inchiostro, alone = p.carta, aloneW = 3.5, ruota = 0,
+      size = 15, font = p.font || FONT_TESTO, peso = p.stile === 'notte' ? 500 : 400, corsivo = false, spazio = 0, ancora = 'middle', colore = p.inchiostro, alone = p.carta, aloneW = 3.5, ruota = 0,
     } = o;
     return `<text x="${n1(x)}" y="${n1(y)}" font-family="${font}" font-size="${size}" font-weight="${peso}"${corsivo ? ' font-style="italic"' : ''}` +
       `${spazio ? ` letter-spacing="${spazio}"` : ''} text-anchor="${ancora}"${ruota ? ` transform="rotate(${n1(ruota)} ${n1(x)} ${n1(y)})"` : ''}` +
@@ -326,6 +353,17 @@ const CartoMotore = (() => {
   };
 
   const titolo = (W, testo, sotto, p) => {
+    if (p.stile === 'notte') {
+      return etichetta(W / 2, 74, String(testo).toUpperCase(), p, { size: 34, font: p.fontTitolo, peso: 600, spazio: 8, aloneW: 5 }) +
+        (sotto ? etichetta(W / 2, 100, sotto, p, { size: 17, peso: 500, spazio: 2, colore: p.ambra, aloneW: 4 }) : '');
+    }
+    if (p.stile === 'atlante') {
+      const larg = Math.max(300, String(testo).length * 19 + 90), x = W / 2 - larg / 2, y = 34, h = sotto ? 82 : 60;
+      return `<g><rect x="${x}" y="${y}" width="${larg}" height="${h}" fill="${p.carta}" stroke="${p.inchiostro}" stroke-width="1.8"/>` +
+        `<rect x="${x + 6}" y="${y + 6}" width="${larg - 12}" height="${h - 12}" fill="none" stroke="${p.inchiostro}" stroke-width="0.7"/>` +
+        etichetta(W / 2, y + 40, testo, p, { size: 32, font: p.fontTitolo, spazio: 2, aloneW: 0 }) +
+        (sotto ? etichetta(W / 2, y + 66, sotto, p, { size: 17, corsivo: true, aloneW: 0 }) : '') + '</g>';
+    }
     const larg = Math.max(300, String(testo).length * 21 + 90), x = W / 2 - larg / 2, y = 34, h = sotto ? 76 : 58;
     return `<g><path d="M${x - 26} ${y + 14}L${x + 6} ${y + 14}L${x + 6} ${y + h + 8}L${x - 26} ${y + h + 8}L${x - 12} ${y + 11 + h / 2}Z" fill="${p.carta2}" stroke="${p.inchiostro}" stroke-width="1.4"/>` +
       `<path d="M${x + larg + 26} ${y + 14}L${x + larg - 6} ${y + 14}L${x + larg - 6} ${y + h + 8}L${x + larg + 26} ${y + h + 8}L${x + larg + 12} ${y + 11 + h / 2}Z" fill="${p.carta2}" stroke="${p.inchiostro}" stroke-width="1.4"/>` +
@@ -336,6 +374,28 @@ const CartoMotore = (() => {
   };
 
   const rosa = (x, y, r, p) => {
+    if (p.stile === 'notte') {
+      let l = `M${n1(x - r * 1.45)} ${y}H${n1(x + r * 1.45)}M${x} ${n1(y + r * 1.45)}V${n1(y - r)}`;
+      for (let k = 0; k < 36; k++) { const a = k / 36 * Math.PI * 2, r2 = r * (k % 9 ? 1.1 : 1.2); l += `M${n1(x + Math.sin(a) * r)} ${n1(y - Math.cos(a) * r)}L${n1(x + Math.sin(a) * r2)} ${n1(y - Math.cos(a) * r2)}`; }
+      return `<g opacity="0.85"><circle cx="${x}" cy="${y}" r="${r}" fill="none" stroke="${p.inchiostro}" stroke-width="0.9" opacity="0.6"/><path d="${l}" fill="none" stroke="${p.inchiostro}" stroke-width="0.9" opacity="0.6"/>` +
+        `<path d="M${x} ${n1(y - r * 1.62)}L${n1(x + r * 0.15)} ${n1(y - r)}H${n1(x - r * 0.15)}Z" fill="${p.ambra}"/></g>` + etichetta(x, y - r * 1.8, 'N', p, { size: r * 0.42, font: p.fontTitolo, peso: 600, colore: p.ambra, aloneW: 0 });
+    }
+    if (p.stile === 'atlante') {
+      let g = `<g><circle cx="${x}" cy="${y}" r="${n1(r * 0.78)}" fill="${p.carta}" fill-opacity="0.75" stroke="${p.inchiostro}" stroke-width="0.9"/><circle cx="${x}" cy="${y}" r="${n1(r * 0.7)}" fill="none" stroke="${p.inchiostro}" stroke-width="0.8"/>`;
+      let tic = '';
+      for (let k = 0; k < 64; k++) { const a = k / 64 * Math.PI * 2, r1 = r * 0.7, r2 = r * (k % 4 ? 0.74 : 0.78); tic += `M${n1(x + Math.sin(a) * r1)} ${n1(y - Math.cos(a) * r1)}L${n1(x + Math.sin(a) * r2)} ${n1(y - Math.cos(a) * r2)}`; }
+      g += `<path d="${tic}" fill="none" stroke="${p.inchiostro}" stroke-width="0.7"/>`;
+      const punta = (ang, len, larg) => {
+        const tx = x + Math.sin(ang) * len, ty = y - Math.cos(ang) * len;
+        const lx = x + Math.sin(ang - Math.PI / 2) * larg, ly = y - Math.cos(ang - Math.PI / 2) * larg, qx = x + Math.sin(ang + Math.PI / 2) * larg, qy = y - Math.cos(ang + Math.PI / 2) * larg;
+        return `<path d="M${x} ${y}L${n1(tx)} ${n1(ty)}L${n1(lx)} ${n1(ly)}Z" fill="${p.inchiostro}"/><path d="M${x} ${y}L${n1(tx)} ${n1(ty)}L${n1(qx)} ${n1(qy)}Z" fill="${p.carta}"/>` +
+          `<path d="M${n1(lx)} ${n1(ly)}L${n1(tx)} ${n1(ty)}L${n1(qx)} ${n1(qy)}L${x} ${y}Z" fill="none" stroke="${p.inchiostro}" stroke-width="0.8" stroke-linejoin="round"/>`;
+      };
+      for (let k = 0; k < 8; k++) g += punta(Math.PI / 8 + k * Math.PI / 4, r * 0.45, r * 0.05);
+      for (let k = 0; k < 4; k++) g += punta(Math.PI / 4 + k * Math.PI / 2, r * 0.62, r * 0.09);
+      for (let k = 0; k < 4; k++) g += punta(k * Math.PI / 2, r, r * 0.13);
+      return g + `<circle cx="${x}" cy="${y}" r="${n1(r * 0.07)}" fill="${p.rosso}" stroke="${p.inchiostro}" stroke-width="0.8"/></g>` + etichetta(x, y - r - 9, 'N', p, { size: r * 0.36, font: p.fontTitolo, aloneW: 4 });
+    }
     let s = `<g><circle cx="${x}" cy="${y}" r="${r * 1.04}" fill="${p.carta}" opacity="0.82"/><circle cx="${x}" cy="${y}" r="${r * 0.62}" fill="none" stroke="${p.inchiostro}" stroke-width="1"/><circle cx="${x}" cy="${y}" r="${r * 0.56}" fill="none" stroke="${p.inchiostro}" stroke-width="0.5"/>`;
     for (let i = 0; i < 16; i++) {
       const a = i * Math.PI / 8, m = i % 4 === 0 ? 1 : i % 2 === 0 ? 0.66 : 0.42, l = r * m, w = r * 0.11 * (i % 4 === 0 ? 1.15 : 0.85);
@@ -346,6 +406,14 @@ const CartoMotore = (() => {
   };
 
   const scala = (x, y, pxUnita, unita, passi, p) => {
+    if (p.stile) {
+      const tr = pxUnita / 2, n = passi * 2, alta = p.stile === 'notte' ? 4 : 6;
+      let s = '<g>';
+      for (let i = 0; i < n; i++) s += `<rect x="${n1(x + i * tr)}" y="${y}" width="${n1(tr)}" height="${alta}" fill="${i % 2 ? p.carta : p.inchiostro}"/>`;
+      s += `<rect x="${x}" y="${y}" width="${n1(n * tr)}" height="${alta}" fill="none" stroke="${p.inchiostro}" stroke-width="0.9"/>`;
+      for (let i = 0; i <= passi; i++) s += etichetta(x + i * pxUnita, y - 7, String(i * unita.valore), p, { size: 13, aloneW: 3 });
+      return s + etichetta(x + n * tr + 10, y + 6, unita.nome, p, { size: 14, ancora: 'start', aloneW: 3 }) + '</g>';
+    }
     let s = `<g><rect x="${n1(x - 16)}" y="${y - 26}" width="${n1(passi * pxUnita + 66)}" height="42" rx="3" fill="${p.carta}" opacity="0.82"/>`;
     for (let i = 0; i < passi; i++) s += `<rect x="${n1(x + i * pxUnita)}" y="${y}" width="${n1(pxUnita)}" height="7" fill="${i % 2 ? p.carta : p.inchiostro}" stroke="${p.inchiostro}" stroke-width="1"/>`;
     return s + etichetta(x, y - 6, '0', p, { size: 13, aloneW: 2.5 }) + etichetta(x + passi * pxUnita, y - 6, passi * unita.valore + ' ' + unita.nome, p, { size: 13, aloneW: 2.5 }) + '</g>';
@@ -392,7 +460,24 @@ const CartoMotore = (() => {
     chiudi(W, H, p);
 
   /* ── Alberi ed edifici: tutto raccolto in pochi tracciati, per tenere leggero il file ── */
+  // Variazione legata al punto e non alla sequenza casuale: cosi' cambiare stile non cambia il resto della mappa
+  const _caso = (x, y, k) => { const v = Math.sin(x * 12.9898 + y * 78.233 + k * 37.719) * 43758.5453; return v - Math.floor(v); };
   const alberi = (lista, p, r) => {
+    if (p.stile === 'notte') {
+      let d = '';
+      for (const [x, y, s = 1] of lista) { const q = 6 * s; for (let k = 0; k < 3; k++) { const a = _caso(x, y, k) * 6.28, m = q * (0.1 + _caso(y, x, k) * 0.45), c = 1.1 * s; d += `M${n1(x + Math.cos(a) * m - c)} ${n1(y + Math.sin(a) * m)}a${n1(c)} ${n1(c)} 0 1 0 ${n1(c * 2)} 0a${n1(c)} ${n1(c)} 0 1 0 ${n1(-c * 2)} 0`; } }
+      return `<path d="${d}" fill="${p.chioma}" opacity="0.7"/>`;
+    }
+    if (p.stile === 'atlante') {
+      // Chiome viste dall'alto, una per una (le piu' in basso coprono quelle dietro): cerchio, ombra a lunetta
+      let g = '';
+      for (const [x, y, s = 1] of lista.slice().sort((a, b) => a[1] - b[1])) {
+        const q = 5.6 * s * (0.85 + _caso(x, y, 0) * 0.25);
+        g += `<circle cx="${n1(x)}" cy="${n1(y)}" r="${n1(q)}" fill="${p.chioma}" stroke="${p.inchiostro}" stroke-width="0.8"/>` +
+          `<path d="M${n1(x + q * 0.7)} ${n1(y - q * 0.35)}A${n1(q * 0.78)} ${n1(q * 0.78)} 0 0 1 ${n1(x - q * 0.35)} ${n1(y + q * 0.7)}" fill="none" stroke="${p.inchiostro}" stroke-width="0.6"/>`;
+      }
+      return g;
+    }
     let ombra = '', a = '', b = '', luce = '';
     for (const [x, y, s = 1] of lista) {
       const q = 6 * s, lati = 8, punti = [];
@@ -408,6 +493,7 @@ const CartoMotore = (() => {
 
   // Edificio con tetto a due falde: falda in ombra + linea di colmo lungo il lato piu' lungo
   const edifici = (lista, p, ombraDist = 2.2) => {
+    if (p.stile) return _edificiStile(lista, p, ombraDist);
     const perColore = new Map();
     let ombre = '', falde = '', colmi = '', pareti = '';
     for (const e of lista) {
@@ -438,6 +524,27 @@ const CartoMotore = (() => {
     perColore.forEach((d, col) => { s += `<path d="${d}" fill="${col}" stroke="${p.inchiostro}" stroke-width="0.8" stroke-linejoin="round"/>`; });
     if (p.muroPieno) return s; // incisione: tetti piatti, solo il volume delle pareti
     return s + `<path d="${falde}" fill="#000" opacity="0.17"/><path d="${colmi}" fill="none" stroke="${p.inchiostro}" stroke-width="0.6" opacity="0.75"/>`;
+  };
+
+  // Edifici dei due stili: pianta con il fianco in ombra; l'atlante tratteggia i tetti come una stampa
+  const _edificiStile = (lista, p, ombraDist) => {
+    const perColore = new Map();
+    let pareti = '', tutti = '';
+    for (const e of lista) {
+      const q = e.poly, d = via(q);
+      perColore.set(e.colore, (perColore.get(e.colore) || '') + d);
+      tutti += d;
+      const verso = area(q) > 0 ? 1 : -1;
+      for (let i = 0; i < q.length; i++) {
+        const a = q[i], b = q[(i + 1) % q.length], nx = (b[1] - a[1]) * verso, ny = -(b[0] - a[0]) * verso;
+        if (nx * ombraDist + ny * ombraDist * 1.15 > 0) pareti += via([a, b, [b[0] + ombraDist, b[1] + ombraDist * 1.15], [a[0] + ombraDist, a[1] + ombraDist * 1.15]]);
+      }
+    }
+    const notte = p.stile === 'notte';
+    let s = `<path d="${pareti}" fill="${p.parete}" stroke="${p.parete}" stroke-width="0.6" stroke-linejoin="round"${notte ? ' opacity="0.8"' : ''}/>`;
+    perColore.forEach((d, col) => { s += `<path d="${d}" fill="${col}" stroke="${notte ? (col === p.tettoNobile ? p.tettoNobile : p.tenue) : p.inchiostro}" stroke-width="${notte ? 0.7 : 0.85}" stroke-linejoin="round"/>`; });
+    if (!notte) s += `<path d="${tutti}" fill="url(#carto-tratt)"/>`;
+    return s;
   };
 
   // Rettangolo ruotato attorno a un centro
@@ -500,7 +607,7 @@ const CartoMotore = (() => {
   let _idArco = 0;
   const testoCurvo = (punti, testo, p, o = {}) => {
     const {
-      size = 22, font = FONT_TESTO, peso = 600, corsivo = false, spazio = 3, colore = p.inchiostro, alone = p.carta, aloneW = 4,
+      size = 22, font = p.fontTitolo || FONT_TESTO, peso = p.stile ? 500 : 600, corsivo = false, spazio = 3, colore = p.inchiostro, alone = p.carta, aloneW = 4,
     } = o;
     const pts = punti[0][0] > punti[punti.length - 1][0] ? punti.slice().reverse() : punti;
     const id = 'carto-arco-' + (++_idArco);
@@ -527,7 +634,7 @@ const CartoMotore = (() => {
 
   return {
     campoDistanze, rng, rumore, dist, lerp, area, centro, dentro, taglia, rientra, distSeg, distLinea, incrocio, celle, morbida, contorni,
-    n1, via, esc, PALETTE, FONT_TITOLO, FONT_TESTO, apri, chiudi, areaMappa, etichetta, titolo, rosa, scala,
+    n1, via, esc, PALETTE, FONT_TITOLO, FONT_TESTO, FONT_ATLANTE, FONT_ATLANTE_SC, FONT_NOTTE, apri, chiudi, areaMappa, etichetta, titolo, rosa, scala,
     alberi, edifici, rettangolo, campo, fiumeSvg, nomeLuogo, legenda, componi, tratteggio, testoCurvo, curvaSuPunti, TONI_INTERNI, righe: _righe,
   };
 })();

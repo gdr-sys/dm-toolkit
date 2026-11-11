@@ -295,6 +295,8 @@ const CartoRegno = (() => {
     /* ─── Disegno ─── */
     // Due stili: "atlante" (carta e inchiostro, di giorno) e "notte" (gesso e ambra su blu notte)
     const A = o.palette !== 'notte';
+    // Il disegno ha la sua sequenza casuale: cambiare stile non cambia nomi e luoghi
+    const rd = M.rng('regno-disegno:' + o.seme);
 
     // L'angolo di mare piu' aperto ospita la rosa dei venti
     const spazi = [[W - 140, 150], [150, 150], [W - 150, H - 150], [150, H - 150], [W * 0.5, 170], [W * 0.5, H - 170], [160, H * 0.5], [W - 170, H * 0.5]];
@@ -324,7 +326,7 @@ const CartoRegno = (() => {
     const alberi = [];
     if (A) {
       for (let y = 8; y < H; y += 10) for (let x = 8; x < W; x += 10) {
-        const qx = x + r.range(-4, 4), qy = y + r.range(-4, 4);
+        const qx = x + rd.range(-4, 4), qy = y + rd.range(-4, 4);
         if (eIn(qx, qy) < 0.02) continue;
         const c = inB(fConifera, qx, qy) > 0, l = !c && inB(fLatifoglia, qx, qy) > 0;
         if ((!c && !l) || !lontanoCitta(qx, qy, 30) || !lontanoStrade(qx, qy, 7)) continue;
@@ -380,11 +382,11 @@ const CartoRegno = (() => {
     // Segni del terreno: ciuffi d'erba in piano, canne in palude, onde di sabbia in steppa
     let ciuffi = '', palu = '', dune = '';
     for (let y = 26; y < H - 10; y += 34) for (let x = 20; x < W - 10; x += 42) {
-      const qx = x + r.range(-16, 16), qy = y + r.range(-13, 13), q = eIn(qx, qy);
+      const qx = x + rd.range(-16, 16), qy = y + rd.range(-13, 13), q = eIn(qx, qy);
       if (q < 0.03 || q > 0.72 || inB(fConifera, qx, qy) > -0.01 || inB(fLatifoglia, qx, qy) > -0.01) continue;
       if (inB(fSteppa, qx, qy) > 0) dune += `M${n1(qx - 13)} ${n1(qy)}q7 -6 13 -1q6 4 14 1`;
       else if (inB(fPalude, qx, qy) > 0) palu += `M${n1(qx - 9)} ${n1(qy)}h18M${n1(qx - 2)} ${n1(qy)}l-3 -9M${n1(qx)} ${n1(qy)}v-12M${n1(qx + 2)} ${n1(qy)}l3 -9M${n1(qx + 16)} ${n1(qy + 13)}h13`;
-      else if (A && r.chance(0.42)) ciuffi += `M${n1(qx - 2.5)} ${n1(qy)}l-1.4 -4.5M${n1(qx)} ${n1(qy)}v-6M${n1(qx + 2.5)} ${n1(qy)}l1.4 -4.5`;
+      else if (A && rd.chance(0.42)) ciuffi += `M${n1(qx - 2.5)} ${n1(qy)}l-1.4 -4.5M${n1(qx)} ${n1(qy)}v-6M${n1(qx + 2.5)} ${n1(qy)}l1.4 -4.5`;
     }
     const segno = A ? t.ink : t.gesso;
     dentro += tratto(ciuffi, segno, 0.8, ' opacity="0.6"') + tratto(palu, segno, 0.95, ` opacity="${A ? 0.75 : 0.4}"`) + tratto(dune, segno, 0.8, ` opacity="${A ? 0.55 : 0.35}"`);
@@ -395,10 +397,10 @@ const CartoRegno = (() => {
       citta.forEach((c) => {
         const raggio = c.rango === 2 ? 58 : c.rango === 1 ? 44 : 32, nB = c.rango === 2 ? 8 : c.rango === 1 ? 6 : 3;
         for (let i = 0; i < nB; i++) {
-          const a = r.range(0, 6.28), d = r.range(raggio * 0.55, raggio), x = c.x + Math.cos(a) * d * 1.2, y = c.y + Math.sin(a) * d * 0.8 + 6;
-          const bw = r.range(16, 30), bh = r.range(14, 24);
+          const a = rd.range(0, 6.28), d = rd.range(raggio * 0.55, raggio), x = c.x + Math.cos(a) * d * 1.2, y = c.y + Math.sin(a) * d * 0.8 + 6;
+          const bw = rd.range(16, 30), bh = rd.range(14, 24);
           if (eIn(x, y) < 0.03 || inB(fConifera, x, y) > 0 || inB(fLatifoglia, x, y) > 0) continue;
-          campi += M.tratteggio([[x - bw / 2, y - bh / 2], [x + bw / 2, y - bh / 2], [x + bw / 2, y + bh / 2], [x - bw / 2, y + bh / 2]], r.chance(0.5) ? 0 : 1.5708, 3.1);
+          campi += M.tratteggio([[x - bw / 2, y - bh / 2], [x + bw / 2, y - bh / 2], [x + bw / 2, y + bh / 2], [x - bw / 2, y + bh / 2]], rd.chance(0.5) ? 0 : 1.5708, 3.1);
         }
       });
       dentro += tratto(campi, t.ink, 0.7, ' opacity="0.45"');
@@ -421,17 +423,17 @@ const CartoRegno = (() => {
       alberi.forEach(([x, y, c]) => aggiungi(y, `<use href="#carto-${c ? 'pn' : 'al'}" xlink:href="#carto-${c ? 'pn' : 'al'}" x="${n1(x)}" y="${n1(y)}"/>`));
       // Alberi isolati in pianura
       for (let i = 0; i < 70; i++) {
-        const qx = r.range(40, W - 40), qy = r.range(40, H - 40), q = eIn(qx, qy);
+        const qx = rd.range(40, W - 40), qy = rd.range(40, H - 40), q = eIn(qx, qy);
         if (q < 0.06 || q > 0.68 || inB(fConifera, qx, qy) > -0.012 || inB(fLatifoglia, qx, qy) > -0.012 || !lontanoCitta(qx, qy, 34) || !lontanoStrade(qx, qy, 8) || inB(fSteppa, qx, qy) > 0) continue;
-        const c = r.chance(0.5);
+        const c = rd.chance(0.5);
         aggiungi(qy, `<use href="#carto-${c ? 'pn' : 'al'}" xlink:href="#carto-${c ? 'pn' : 'al'}" x="${n1(qx)}" y="${n1(qy)}"/>`);
       }
       // Montagne a profilo morbido con l'ombra tratteggiata sul lato destro
       for (let y = 14; y < H; y += 27) for (let x = 10; x < W; x += 40) {
-        const qx = x + (Math.floor(y / 27) % 2 ? 20 : 0) + r.range(-16, 16), qy = y + r.range(-10, 10), q = eIn(qx, qy);
-        if (q < 0.78 || !r.chance(0.88) || !lontanoCitta(qx, qy + 10, 34) || !lontanoStrade(qx, qy, 10)) continue;
-        const m = 13 + Math.pow((q - 0.78) / 0.22, 1.2) * 26 + r.range(-3, 5);
-        const pk = [qx + r.range(-0.17, 0.17) * m, qy - m * 1.2], lb = [qx - m * 0.95, qy], rb = [qx + m * 0.95, qy];
+        const qx = x + (Math.floor(y / 27) % 2 ? 20 : 0) + rd.range(-16, 16), qy = y + rd.range(-10, 10), q = eIn(qx, qy);
+        if (q < 0.78 || !rd.chance(0.88) || !lontanoCitta(qx, qy + 10, 34) || !lontanoStrade(qx, qy, 10)) continue;
+        const m = 13 + Math.pow((q - 0.78) / 0.22, 1.2) * 26 + rd.range(-3, 5);
+        const pk = [qx + rd.range(-0.17, 0.17) * m, qy - m * 1.2], lb = [qx - m * 0.95, qy], rb = [qx + m * 0.95, qy];
         const c1 = [lb[0] + m * 0.4, pk[1] + m * 0.5], c2 = [rb[0] - m * 0.45, pk[1] + m * 0.55];
         const profilo = `M${n1(lb[0])} ${n1(lb[1])}Q${n1(c1[0])} ${n1(c1[1])} ${n1(pk[0])} ${n1(pk[1])}Q${n1(c2[0])} ${n1(c2[1])} ${n1(rb[0])} ${n1(rb[1])}`;
         const ombra = [pk];
@@ -446,9 +448,9 @@ const CartoRegno = (() => {
       }
       // Colline ai piedi delle catene
       for (let y = 14; y < H; y += 24) for (let x = 12; x < W; x += 34) {
-        const qx = x + r.range(-11, 11), qy = y + r.range(-9, 9), q = eIn(qx, qy);
-        if (q < 0.66 || q > 0.78 || !r.chance(0.42) || !lontanoCitta(qx, qy, 26) || !lontanoStrade(qx, qy, 7) || inB(fConifera, qx, qy) > -0.01 || inB(fLatifoglia, qx, qy) > -0.01) continue;
-        const m = r.range(8, 12);
+        const qx = x + rd.range(-11, 11), qy = y + rd.range(-9, 9), q = eIn(qx, qy);
+        if (q < 0.66 || q > 0.78 || !rd.chance(0.42) || !lontanoCitta(qx, qy, 26) || !lontanoStrade(qx, qy, 7) || inB(fConifera, qx, qy) > -0.01 || inB(fLatifoglia, qx, qy) > -0.01) continue;
+        const m = rd.range(8, 12);
         aggiungi(qy, `<path d="M${n1(qx - m)} ${n1(qy)}Q${n1(qx)} ${n1(qy - m * 1.15)} ${n1(qx + m)} ${n1(qy)}" fill="${t.monte}" stroke="${t.ink}" stroke-width="0.95"/>` +
           tratto([0, 1, 2].map((k) => `M${n1(qx + m * (0.15 + k * 0.22))} ${n1(qy - m * (0.45 - k * 0.12))}L${n1(qx + m * (0.3 + k * 0.22))} ${n1(qy - 0.6)}`).join(''), t.ink, 0.6));
       }

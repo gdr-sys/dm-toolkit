@@ -21,7 +21,7 @@ const CartoCatalogo = (() => {
     },
     citta: {
       nome: 'Città', genera: (o) => CartoInsediamenti.citta(o),
-      colori: [['seppia', 'Incisione'], ['pergamena', 'A colori'], ['acquerello', 'Acquerello'], ['inchiostro', 'Inchiostro'], ['notte', 'Notturna']],
+      colori: [['atlante', 'Atlante'], ['notte', 'Notte']],
       opzioni: [
         S('taglia', 'Dimensione', [['piccola', 'Piccola'], ['media', 'Media'], ['grande', 'Grande']], 'media'),
         C('mura', 'Mura', true, 0.85), C('castello', 'Castello', true, 0.7), C('fiume', 'Fiume', true, 0.6), C('costa', 'Mare', false, 0.35), C('griglia', 'Griglia', true, 0.6),
