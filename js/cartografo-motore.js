@@ -247,19 +247,20 @@ const CartoMotore = (() => {
      Hanno "stile" e i propri caratteri: le parti comuni qui sotto (cornice, titolo, rosa, scala,
      edifici, alberi) cambiano disegno in base a questo campo. */
   const FONT_ATLANTE = "'IM Fell English', Georgia, serif", FONT_ATLANTE_SC = "'IM Fell English SC', Georgia, serif", FONT_NOTTE = "'Cormorant SC', Georgia, serif";
+  // Carta e Colori usano lo stesso disegno di Notte (stile 'notte'): curve di livello, foreste a puntini,
+  // insediamenti come punti, linee sottili. "chiaro" indica i fondi chiari, dove i bagliori non servono.
   PALETTE.atlante = {
-    nome: 'Atlante', stile: 'atlante', font: FONT_ATLANTE, fontTitolo: FONT_ATLANTE_SC, rosso: '#a8382a',
-    carta: '#efe5cc', carta2: '#e3d6b6', macchia: '#6b5233', inchiostro: '#33261a', tenue: '#6e5a40',
-    acqua: '#dccfae', acquaInk: '#33261a', erba: '#ece2c6', erba2: '#e2d6b4', chioma: '#f3ebd4', chioma2: '#f3ebd4',
-    strada: '#f6efdc', stradaBordo: '#8a7454', terra: '#e7dbbd', tetti: ['#e3d2a8', '#ddcb9f', '#e8d9b3', '#d8c69a'], tettoNobile: '#a8382a',
-    campi: ['#e8ddc0', '#e3d7b6', '#ede3c8', '#ddd1ae'], neve: '#fbf7ec', pavimento: '#f3ead3', roccia: '#d6c7a3', parete: '#33261a',
+    nome: 'Carta', stile: 'notte', chiaro: true, font: FONT_NOTTE, fontTitolo: FONT_NOTTE, fontCorpo: "'Cormorant Garamond', Georgia, serif", rosso: '#a8452a', ambra: '#a8452a',
+    carta: '#ece5d3', carta2: '#e3dac4', macchia: '#4a3e30', inchiostro: '#3a3128', tenue: '#6c6252',
+    acqua: '#d9ddd2', acquaInk: '#3d6c82', erba: '#e6dec8', erba2: '#dcd2b8', chioma: '#5c7f63', chioma2: '#5c7f63',
+    strada: '#f5f0e3', stradaBordo: '#a3927a', terra: '#e0d6bf', tetti: ['#d6cbb4', '#cfc3aa', '#dcd2bc', '#c9bca2'], tettoNobile: '#a8452a',
+    campi: ['#e3dac2', '#ddd4ba', '#e8dfc9', '#d8ceb3'], neve: '#ffffff', pavimento: '#f3eee1', roccia: '#d8ccb2', parete: '#3a3128',
   };
-  // Atlante a colori: stessi segni dell'atlante, con le velature delle tavole colorate a mano
   PALETTE.colori = {
-    ...PALETTE.atlante, nome: 'Atlante a colori', colore: true,
-    acqua: '#a9c6cf', erba: '#e2e3b9', erba2: '#d3d9a8', chioma: '#bccb94', chioma2: '#aebf86',
-    strada: '#f4ead2', terra: '#ebdfbd', tetti: ['#cf9070', '#c68163', '#d6a07e', '#bd785c'], tettoNobile: '#5d7392',
-    campi: ['#e4d797', '#d7d899', '#ead7a0', '#ccd39b'], pavimento: '#efe4c8', roccia: '#cfc4ab',
+    ...PALETTE.atlante, nome: 'Colori',
+    carta: '#eae6d6', carta2: '#e0dcc8', acqua: '#b9d2d9', acquaInk: '#2f6680', erba: '#dde3c1', erba2: '#ccd6ab', chioma: '#4d8257', chioma2: '#4d8257',
+    strada: '#f4efe0', terra: '#e4dcc0', tetti: ['#c98f70', '#bf8265', '#cf9c7c', '#b5775b'], tettoNobile: '#2f6680',
+    campi: ['#e2d696', '#d4d797', '#e8d69f', '#c9d199'], pavimento: '#f1eadb', roccia: '#cbc2a8',
   };
   PALETTE.cartografo = {
     nome: 'Notte', stile: 'notte', font: FONT_NOTTE, fontTitolo: FONT_NOTTE, fontCorpo: "'Cormorant Garamond', Georgia, serif", rosso: '#e9b84f', ambra: '#e9b84f',
@@ -271,26 +272,26 @@ const CartoMotore = (() => {
 
   // Tinte di caverne, dungeon ed edifici nei due stili: fondo, pavimento, roccia tratteggiata
   const TONI_INTERNI = {
-    atlante: { stile: 'atlante', sfondo: '#efe5cc', pavimento: '#f8f2e3', roccia: '#e3d6b6', ink: '#33261a', tenue: '#6e5a40', ombra: '#33261a', numero: '#a8382a', acqua: '#dccfae', acquaInk: '#33261a', legno: '#cfae80', pietra: '#e6dabd', metallo: '#9a8f7c' },
-    colori: { stile: 'atlante', colore: true, sfondo: '#efe5cc', pavimento: '#f6e8c2', roccia: '#b3a994', ink: '#33261a', tenue: '#6e5a40', ombra: '#33261a', numero: '#a8382a', acqua: '#a9c6cf', acquaInk: '#33261a', legno: '#c8935f', pietra: '#d3cab6', metallo: '#8d97a0' },
+    atlante: { stile: 'notte', chiaro: true, sfondo: '#ece5d3', pavimento: '#f6f2e7', roccia: '#d9cdb3', ink: '#3a3128', tenue: '#6c6252', ombra: '#4a3e30', numero: '#a8452a', acqua: '#ccdade', acquaInk: '#3d6c82', legno: '#b89a72', pietra: '#d8d0bf', metallo: '#8d97a0' },
+    colori: { stile: 'notte', chiaro: true, colore: true, sfondo: '#eae6d6', pavimento: '#f3ecd9', roccia: '#c9bea4', ink: '#3a3128', tenue: '#6c6252', ombra: '#4a3e30', numero: '#a8452a', acqua: '#a9c9d4', acquaInk: '#2f6680', legno: '#c8935f', pietra: '#d3cab6', metallo: '#8d97a0' },
     notte: { stile: 'notte', sfondo: '#0e1d26', pavimento: '#1d3543', roccia: '#122530', ink: '#e8e1cf', tenue: '#9fb0b4', ombra: '#03090b', numero: '#e9b84f', acqua: '#0f3a52', acquaInk: '#7ebad8', legno: '#6b5a44', pietra: '#3a5563', metallo: '#8a95a0' },
   };
 
   const stileDi = (palette) => (palette === 'notte' || palette === 'colori' ? palette : 'atlante');
-  const cartaInterni = (t) => ({ ...(t.stile === 'notte' ? PALETTE.cartografo : t.colore ? PALETTE.colori : PALETTE.atlante), carta: t.sfondo, carta2: t.sfondo, inchiostro: t.ink, tenue: t.tenue });
+  const cartaInterni = (t) => ({ ...(t.chiaro ? (t.colore ? PALETTE.colori : PALETTE.atlante) : t.stile === 'notte' ? PALETTE.cartografo : t.colore ? PALETTE.colori : PALETTE.atlante), carta: t.sfondo, carta2: t.sfondo, inchiostro: t.ink, tenue: t.tenue });
 
   const FONT_TITOLO = "Cinzel, 'Times New Roman', serif";
   const FONT_TESTO = "'Crimson Pro', Georgia, serif";
 
   const apri = (W, H, p, seme) => {
     const s = _hash(String(seme)) % 1000;
-    const scuro = p.stile === 'notte';
+    const scuro = p.stile === 'notte' && !p.chiaro;
     const sfocature = [4, 12, 40].map((b) => `<filter id="carto-b${b}" filterUnits="userSpaceOnUse" x="-200" y="-200" width="${W + 400}" height="${H + 400}"><feGaussianBlur stdDeviation="${b}"/></filter>`).join('');
     return `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" role="img">` +
       `<defs>${sfocature}<filter id="carto-carta" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.018 0.024" numOctaves="5" seed="${s}"/>` +
-      `<feColorMatrix type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 ${scuro ? 0.7 : 0.42} ${scuro ? -0.26 : -0.17}"/></filter>` +
-      `${p.stile ? `<pattern id="carto-tratt" width="3.2" height="3.2" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><path d="M0 1.6H3.2" stroke="${p.inchiostro}" stroke-width="0.55" opacity="${p.stile === 'notte' ? 0.3 : 0.5}"/></pattern>` : ''}<radialGradient id="carto-vignetta" cx="50%" cy="50%" r="72%"><stop offset="62%" stop-color="${p.macchia}" stop-opacity="0"/><stop offset="100%" stop-color="${p.macchia}" stop-opacity="${scuro ? 0.5 : 0.3}"/></radialGradient></defs>` +
-      `<rect width="${W}" height="${H}" fill="${p.carta}"/>` + (p.senzaCornice ? '' : `<rect width="${W}" height="${H}" fill="${p.carta2}" filter="url(#carto-carta)"/>`);
+      `<feColorMatrix type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 ${scuro ? 0.7 : p.chiaro ? 0.12 : 0.42} ${scuro ? -0.26 : p.chiaro ? -0.05 : -0.17}"/></filter>` +
+      `${p.stile ? `<pattern id="carto-tratt" width="3.2" height="3.2" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><path d="M0 1.6H3.2" stroke="${p.inchiostro}" stroke-width="0.55" opacity="${p.stile === 'notte' ? 0.3 : 0.5}"/></pattern>` : ''}<pattern id="carto-sassi" width="7" height="7" patternUnits="userSpaceOnUse"><circle cx="1.7" cy="2" r="0.95" fill="${p.inchiostro}" opacity="0.34"/><circle cx="5.1" cy="5.4" r="0.7" fill="${p.inchiostro}" opacity="0.26"/><circle cx="5.7" cy="1.3" r="0.45" fill="${p.inchiostro}" opacity="0.22"/></pattern><radialGradient id="carto-vignetta" cx="50%" cy="50%" r="72%"><stop offset="62%" stop-color="${p.macchia}" stop-opacity="0"/><stop offset="100%" stop-color="${p.macchia}" stop-opacity="${scuro ? 0.5 : 0.3}"/></radialGradient></defs>` +
+      `<rect width="${W}" height="${H}" fill="${p.carta}"/>` + (p.senzaCornice ? '' : p.chiaro ? `<rect width="${W}" height="${H}" fill="${p.carta2}" filter="url(#carto-carta)" opacity="0.35"/>` : `<rect width="${W}" height="${H}" fill="${p.carta2}" filter="url(#carto-carta)"/>`);
   };
 
   const chiudi = (W, H, p) => p.senzaCornice ? '</svg>' : p.stile ? _cornice(W, H, p) + '</svg>' :
@@ -542,7 +543,10 @@ const CartoMotore = (() => {
       for (let i = 0; i < poly.length; i++) { const t = incrocio(a, b, poly[i], poly[(i + 1) % poly.length]); if (t) tocchi.push(t); }
       if (tocchi.length >= 2) solchi += `M${n1(tocchi[0][0])} ${n1(tocchi[0][1])}L${n1(tocchi[1][0])} ${n1(tocchi[1][1])}`;
     }
-    return `<path d="${via(poly)}" fill="${colore}" stroke="${p.tenue}" stroke-width="0.7"/><path d="${solchi}" fill="none" stroke="${p.tenue}" stroke-width="0.5" opacity="0.55"/>`;
+    // Campo: colore pieno, siepe puntinata lungo il bordo e file di piantine a puntini (non righe continue)
+    return `<path d="${via(poly)}" fill="${colore}"/>` +
+      `<path d="${via(poly)}" fill="none" stroke="${p.chioma}" stroke-width="2.4" stroke-dasharray="0.1 3.6" stroke-linecap="round" opacity="0.7"/>` +
+      `<path d="${solchi}" fill="none" stroke="${p.tenue}" stroke-width="1.3" stroke-dasharray="0.1 ${n1(passo * 0.75)}" stroke-linecap="round" opacity="0.45"/>`;
   };
 
   // Corso d'acqua che attraversa la mappa, con riflessi lungo la riva

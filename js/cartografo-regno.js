@@ -11,16 +11,17 @@ const CartoRegno = (() => {
   const n1 = M.n1;
 
   const TONI = {
+    // Carta e Colori: stesso disegno di Notte (curve di livello, foreste a puntini, citta' come punti), colori chiari
     colori: {
-      colore: true, carta: "#efe5cc", mare: "#9fc0ca", terra: "#ece0bc", terra2: "#e0d0a8", ink: "#33261a", chioma: "#c3d09a", chiomaPino: "#a9bc8a", monte: "#ebe1cb", muro: "#f3ebd4", tetto: "#a8382a",
-      oro: "#e3c26a", testo: "#33261a", testoAlone: "#f3ead3", margine: "#e9dfc4", peso: 400,
-      boschi: "#8faa6c", boschiLatif: "#a9bc75", rilievo: "#b59c78", steppa: "#e2c784", palude: "#93a67c",
-      font: "'IM Fell English', Georgia, serif", fontCurvo: "'IM Fell English SC', Georgia, serif",
+      colore: true, chiaro: true, carta: "#eae6d6", mare: "#b9d2d9", terra: "#dfe5c3", terraAlta: "#d5c9a0", terra2: "#d5c9a0", ink: "#3a3128", gesso: "#3a3128", gessoTenue: "#6c6252", batimetria: "#2f6680", fiume: "#2f6680",
+      bosco: "#4d8257", ambra: "#a8452a", muro: "#cfc3aa", tetto: "#a8452a", oro: "#a8452a", testo: "#2f2820", testoAlone: "#eae6d6", mareTesto: "#2f6680", margine: "#eae6d6", peso: 600,
+      boschi: "#9fbe8b", boschiLatif: "#b3c995", rilievo: "#c8b48c", steppa: "#e6d39a", palude: "#a6b98f",
+      font: "'Cormorant SC', Georgia, serif", fontCurvo: "'Cormorant SC', Georgia, serif",
     },
     atlante: {
-      carta: "#efe5cc", mare: "#ddd0ad", terra: "#f6efdb", terra2: "#e4d6b5", ink: "#33261a", chioma: "#f3ebd4", monte: "#f3ebd4", muro: "#f3ebd4", tetto: "#a8382a",
-      oro: "#e3c26a", testo: "#33261a", testoAlone: "#f3ead3", margine: "#e9dfc4", peso: 400,
-      font: "'IM Fell English', Georgia, serif", fontCurvo: "'IM Fell English SC', Georgia, serif",
+      chiaro: true, carta: "#ece5d3", mare: "#d9ddd2", terra: "#efe8d6", terraAlta: "#e0d5bb", terra2: "#e0d5bb", ink: "#3a3128", gesso: "#3a3128", gessoTenue: "#6c6252", batimetria: "#3d6c82", fiume: "#3d6c82",
+      bosco: "#5c7f63", ambra: "#a8452a", muro: "#cfc3aa", tetto: "#a8452a", oro: "#a8452a", testo: "#2f2820", testoAlone: "#ece5d3", mareTesto: "#3d6c82", margine: "#ece5d3", peso: 600,
+      font: "'Cormorant SC', Georgia, serif", fontCurvo: "'Cormorant SC', Georgia, serif",
     },
     notte: {
       carta: "#0b1820", mare: "#0b1820", terra: "#13303b", terraAlta: "#1d4150", terra2: "#1d4150", ink: "#0b1820", gesso: "#e8e1cf", gessoTenue: "#b9b4a6", batimetria: "#78afc4", fiume: "#7ebad8",
@@ -300,7 +301,9 @@ const CartoRegno = (() => {
 
     /* ─── Disegno ─── */
     // Due stili: "atlante" (carta e inchiostro, di giorno) e "notte" (gesso e ambra su blu notte)
-    const A = o.palette !== 'notte';
+    // Un solo disegno per tutti gli stili (quello delle carte nautiche): gli stili cambiano solo i colori.
+    // A resta per il vecchio disegno inciso, non piu' usato; scuro accende i bagliori solo sul fondo notte.
+    const A = false, scuro = !t.chiaro;
     // Il disegno ha la sua sequenza casuale: cambiare stile non cambia nomi e luoghi
     const rd = M.rng('regno-disegno:' + o.seme);
 
@@ -504,7 +507,7 @@ const CartoRegno = (() => {
         else g += `<circle cx="${x}" cy="${y}" r="5.5" fill="${t.muro}" stroke="${t.ink}" stroke-width="1.2"/><circle cx="${x}" cy="${y}" r="2.6" fill="${t.tetto}"/>`;
       } else {
         const rr = c.rango === 2 ? 5.5 : c.rango === 1 ? 4.5 : 3.6;
-        g += `<circle cx="${x}" cy="${y}" r="${rr * 2.4}" fill="${t.ambra}" opacity="0.45" filter="url(#carto-b4)"/><circle cx="${x}" cy="${y}" r="${rr}" fill="${t.ambra}"/>`;
+        g += (scuro ? `<circle cx="${x}" cy="${y}" r="${rr * 2.4}" fill="${t.ambra}" opacity="0.45" filter="url(#carto-b4)"/>` : `<circle cx="${x}" cy="${y}" r="${rr + 2}" fill="${t.carta}"/>`) + `<circle cx="${x}" cy="${y}" r="${rr}" fill="${t.ambra}"/>`;
         if (c.rango === 2) g += `<circle cx="${x}" cy="${y}" r="11" fill="none" stroke="${t.ambra}" stroke-width="1.3"/>`;
       }
       if (c.rango === 2 && o.stemmi !== false && typeof Araldica !== 'undefined') g += Araldica.scudo(Araldica.casuale(c.nome), x - 64, y - 42, 42, true);
@@ -520,7 +523,7 @@ const CartoRegno = (() => {
     }
     fari.forEach(([x, y]) => aggiungi(y, A
       ? `<ellipse cx="${n1(x)}" cy="${n1(y)}" rx="9" ry="4.5" fill="${t.terra}" stroke="${t.ink}" stroke-width="1.3"/>` + faro(x, y, 11, t)
-      : `<circle cx="${n1(x)}" cy="${n1(y)}" r="8" fill="${t.ambra}" opacity="0.5" filter="url(#carto-b4)"/><circle cx="${n1(x)}" cy="${n1(y)}" r="2.6" fill="${t.ambra}"/>` +
+      : (scuro ? `<circle cx="${n1(x)}" cy="${n1(y)}" r="8" fill="${t.ambra}" opacity="0.5" filter="url(#carto-b4)"/>` : '') + `<circle cx="${n1(x)}" cy="${n1(y)}" r="2.6" fill="${t.ambra}"/>` +
         tratto([0, 1, 2, 3].map((k) => { const a = k * Math.PI / 4; return `M${n1(x + Math.cos(a) * 5)} ${n1(y + Math.sin(a) * 5)}L${n1(x + Math.cos(a) * 9)} ${n1(y + Math.sin(a) * 9)}M${n1(x - Math.cos(a) * 5)} ${n1(y - Math.sin(a) * 5)}L${n1(x - Math.cos(a) * 9)} ${n1(y - Math.sin(a) * 9)}`; }).join(''), t.ambra, 1)));
 
     scena.sort((a, b) => a[0] - b[0]);

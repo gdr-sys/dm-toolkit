@@ -11,12 +11,12 @@ const CartoAbitazione = (() => {
   // I due stili del Cartografo: pianta incisa su carta (atlante) e pianta notturna con le finestre accese (notte)
   const TONI = {
     atlante: {
-      stile: 'atlante', sfondo: '#efe5cc', muro: '#d9c9a3', finestra: '#dccfae', ink: '#33261a', luce: '#faf5e8', mezza: '#f3ead3', ombra: '#e3d4b0', griglia: '#8a7454', testo: '#33261a', testoInk: '#f6efdc', titolo: '#33261a',
-      mobile: '#e8d6b0', mobileInk: '#5e4a32', scala: '#cdb991', tegola: '#c27b5e', tegolaInk: '#5e2f20', cantina: ['#ece2c8', '#ddd0b0', '#c6b68f'],
+      stile: 'notte', chiaro: true, sfondo: '#ece5d3', muro: '#cdc1a6', finestra: '#c08a2e', ink: '#4a4034', luce: '#f6f2e7', mezza: '#ece4d1', ombra: '#d8ccb0', griglia: '#a3927a', testo: '#3a3128', testoInk: '#f6f2e7', titolo: '#3a3128',
+      mobile: '#dccdaa', mobileInk: '#5a4c3a', scala: '#cfc09e', tegola: '#bdae90', tegolaInk: '#5a4c3a', cantina: ['#e6decb', '#d8cfb8', '#c4b897'],
     },
     colori: {
-      stile: 'atlante', colore: true, sfondo: '#efe5cc', muro: '#cdbfa3', finestra: '#a9c6cf', ink: '#33261a', luce: '#f8eed6', mezza: '#efdfbd', ombra: '#dcc59a', griglia: '#8a7454', testo: '#33261a', testoInk: '#f6efdc', titolo: '#33261a',
-      mobile: '#d9b585', mobileInk: '#5e4a32', scala: '#c9ad82', tegola: '#c97f5f', tegolaInk: '#5e2f20', cantina: ['#e6dcc4', '#d6cbb0', '#bfb293'],
+      stile: 'notte', chiaro: true, colore: true, sfondo: '#eae6d6', muro: '#c9bc9f', finestra: '#2f6680', ink: '#4a4034', luce: '#f6f0de', mezza: '#ece0c3', ombra: '#d9c69e', griglia: '#a3927a', testo: '#3a3128', testoInk: '#f6f0de', titolo: '#3a3128',
+      mobile: '#d9b585', mobileInk: '#5a4c3a', scala: '#c9ad82', tegola: '#c98a6a', tegolaInk: '#5e2f20', cantina: ['#e3dbc5', '#d4cab0', '#bdb093'],
     },
     notte: {
       stile: 'notte', sfondo: '#0e1d26', muro: '#2f4856', finestra: '#e9b84f', ink: '#c3ced1', luce: '#3b5a6a', mezza: '#264151', ombra: '#132a36', griglia: '#5f7f8c', testo: '#e8e1cf', testoInk: '#0d1d26', titolo: '#e8e1cf',
@@ -27,7 +27,7 @@ const CartoAbitazione = (() => {
   const abitazione = (o) => {
     const r = M.rng('abitazione:' + o.seme);
     const t = TONI[M.stileDi(o.palette)];
-    const carta = { ...(t.stile === 'notte' ? M.PALETTE.cartografo : t.colore ? M.PALETTE.colori : M.PALETTE.atlante), carta: t.sfondo, carta2: t.sfondo, inchiostro: t.titolo, tenue: t.griglia };
+    const carta = { ...(t.chiaro ? (t.colore ? M.PALETTE.colori : M.PALETTE.atlante) : t.stile === 'notte' ? M.PALETTE.cartografo : t.colore ? M.PALETTE.colori : M.PALETTE.atlante), carta: t.sfondo, carta2: t.sfondo, inchiostro: t.titolo, tenue: t.griglia };
     const tipo = CartoTesti.TIPI_CASA[o.edificio] ? o.edificio : 'casa', T = CartoTesti.TIPI_CASA[tipo];
     const nPiani = Math.max(1, Math.min(3, parseInt(o.piani, 10) || 2));
     const cantina = o.cantina !== false, conLegenda = o.legenda === true, conTetto = o.tetto !== false;

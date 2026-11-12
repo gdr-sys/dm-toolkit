@@ -12,7 +12,7 @@ const CartoCatalogo = (() => {
   const TIPI = {
     regno: {
       nome: 'Regno', genera: (o) => CartoRegno.regno(o),
-      colori: [['atlante', 'Atlante'], ['colori', 'Atlante a colori'], ['notte', 'Notte']],
+      colori: [['atlante', 'Carta'], ['colori', 'Colori'], ['notte', 'Notte']],
       opzioni: [
         POPOLO(),
         S('forma', 'Forma', [['isola', 'Isola'], ['continente', 'Continente'], ['arcipelago', 'Arcipelago'], ['costa', 'Costa']], 'isola'),
@@ -23,7 +23,7 @@ const CartoCatalogo = (() => {
     },
     citta: {
       nome: 'Città', genera: (o) => CartoInsediamenti.citta(o),
-      colori: [['atlante', 'Atlante'], ['colori', 'Atlante a colori'], ['notte', 'Notte']],
+      colori: [['atlante', 'Carta'], ['colori', 'Colori'], ['notte', 'Notte']],
       opzioni: [
         POPOLO(),
         S('taglia', 'Dimensione', [['piccola', 'Piccola'], ['media', 'Media'], ['grande', 'Grande']], 'media'),
@@ -32,7 +32,7 @@ const CartoCatalogo = (() => {
     },
     villaggio: {
       nome: 'Villaggio', genera: (o) => CartoVillaggio.villaggio(o),
-      colori: [['atlante', 'Atlante'], ['colori', 'Atlante a colori'], ['notte', 'Notte']],
+      colori: [['atlante', 'Carta'], ['colori', 'Colori'], ['notte', 'Notte']],
       opzioni: [
         POPOLO(),
         S('taglia', 'Dimensione', [['piccolo', 'Piccolo'], ['medio', 'Medio'], ['grande', 'Grande']], 'medio'),
@@ -42,7 +42,7 @@ const CartoCatalogo = (() => {
     },
     caverna: {
       nome: 'Caverna o radura', genera: (o) => CartoCaverna.caverna(o),
-      colori: [['atlante', 'Atlante'], ['colori', 'Atlante a colori'], ['notte', 'Notte']],
+      colori: [['atlante', 'Carta'], ['colori', 'Colori'], ['notte', 'Notte']],
       opzioni: [
         POPOLO(),
         S('ambiente', 'Ambiente', [['caverna', 'Caverna'], ['radura', 'Radura']], 'caverna'),
@@ -52,7 +52,7 @@ const CartoCatalogo = (() => {
     },
     dungeon: {
       nome: 'Dungeon', genera: (o) => CartoDungeon.dungeon(o),
-      colori: [['atlante', 'Atlante'], ['colori', 'Atlante a colori'], ['notte', 'Notte']],
+      colori: [['atlante', 'Carta'], ['colori', 'Colori'], ['notte', 'Notte']],
       opzioni: [
         POPOLO(),
         S('tema', 'Tema', [['cripta', 'Cripta'], ['fortezza', 'Fortezza'], ['tempio', 'Tempio'], ['miniera', 'Miniera']], 'cripta'),
@@ -63,7 +63,7 @@ const CartoCatalogo = (() => {
     },
     abitazione: {
       nome: 'Abitazione', genera: (o) => CartoAbitazione.abitazione(o),
-      colori: [['atlante', 'Atlante'], ['colori', 'Atlante a colori'], ['notte', 'Notte']],
+      colori: [['atlante', 'Carta'], ['colori', 'Colori'], ['notte', 'Notte']],
       opzioni: [
         POPOLO(),
         S('edificio', 'Edificio', [['casa', 'Casa'], ['taverna', 'Taverna'], ['bottega', 'Bottega'], ['torre', 'Torre']], 'casa'),

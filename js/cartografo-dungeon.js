@@ -163,7 +163,7 @@ const CartoDungeon = (() => {
         tratti += gruppo(cx + Math.cos(a) * (rr + 0.42), cy + Math.sin(a) * (rr + 0.42), a + r.range(-0.6, 0.6), 2, 0.28, 0.13);
       }
     });
-    let g0 = `<path d="${fondo}" fill="${t.roccia}" stroke="${t.roccia}" stroke-width="${n1(S * 0.7)}" stroke-linejoin="round"/><path d="${fondo}" fill="url(#carto-tratt)" stroke="url(#carto-tratt)" stroke-width="${n1(S * 0.7)}" stroke-linejoin="round"/>`;
+    let g0 = `<path d="${fondo}" fill="${t.roccia}" stroke="${t.roccia}" stroke-width="${n1(S * 0.7)}" stroke-linejoin="round"/><path d="${fondo}" fill="url(#carto-sassi)" stroke="url(#carto-sassi)" stroke-width="${n1(S * 0.7)}" stroke-linejoin="round"/>`;
 
     /* ── Pavimenti, ombra interna, griglia ── */
     let pav = '', muri = '';

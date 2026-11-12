@@ -319,15 +319,15 @@ const CartoInsediamenti = (() => {
         const rec = dentroCortile(c, 4);
         if (rec.length < 3) return;
         const d = M.via(rec);
-        castelloSvg += `<path d="${d}" fill="${p.pavimento}"/><path d="${d}" fill="none" stroke="${p.inchiostro}" stroke-width="10" stroke-linejoin="round"/><path d="${d}" fill="none" stroke="${p.carta2}" stroke-width="6.5" stroke-linejoin="round"/>`;
+        castelloSvg += `<path d="${d}" fill="${p.pavimento}"/><path d="${d}" fill="none" stroke="${p.inchiostro}" stroke-width="5" stroke-linejoin="round" opacity="0.88"/>`;
         const [kx, ky] = M.centro(rec);
         let s = Math.sqrt(Math.abs(M.area(rec))) * 0.5;
         const ang = angoloU((c.u0 + c.u1) / 2);
         while (s > 18 && !M.rettangolo(kx, ky, s, s, ang).every((v) => M.dentro(v, rec))) s *= 0.88;
         castelloSvg += M.edifici([{ poly: M.rettangolo(kx, ky, s, s, ang), colore: p.tettoNobile }], p, 3.5);
-        M.rettangolo(kx, ky, s, s, ang).forEach(([x, y]) => { castelloSvg += `<circle cx="${M.n1(x)}" cy="${M.n1(y)}" r="${M.n1(s * 0.13 + 2)}" fill="${p.tettoNobile}" stroke="${p.inchiostro}" stroke-width="1.2"/>`; });
-        // Torri tonde agli angoli della cinta del castello
-        [0, 0.25, 0.5, 0.75].map((f) => rec[Math.floor(f * rec.length)]).forEach(([x, y]) => { castelloSvg += `<circle cx="${M.n1(x)}" cy="${M.n1(y)}" r="9" fill="${p.carta2}" stroke="${p.inchiostro}" stroke-width="1.5"/><circle cx="${M.n1(x)}" cy="${M.n1(y)}" r="3.6" fill="none" stroke="${p.inchiostro}" stroke-width="0.8"/>`; });
+        M.rettangolo(kx, ky, s, s, ang).forEach(([x, y]) => { castelloSvg += `<path d="${M.via(M.rettangolo(x, y, s * 0.24 + 4, s * 0.24 + 4, ang))}" fill="${p.tettoNobile}"/>`; });
+        // Bastioni quadrati agli angoli della cinta del castello
+        [0, 0.25, 0.5, 0.75].map((f) => Math.floor(f * rec.length)).forEach((k) => { const [x, y] = rec[k], q = rec[(k + 1) % rec.length]; castelloSvg += `<path d="${M.via(M.rettangolo(x, y, 12, 12, Math.atan2(q[1] - y, q[0] - x)))}" fill="${p.inchiostro}"/>`; });
       } else {
         const prof = PROFILI[c.tipo] || PROFILI.normale;
         fronte(c, prof);
@@ -387,10 +387,12 @@ const CartoInsediamenti = (() => {
     alberi.sort((a, b) => a[1] - b[1]);
     svg += M.alberi(alberi, p, r);
 
-    /* ── Mura curve, torri tonde a passo regolare, porte sulle vie maestre ── */
+    /* ── Mura curve, bastioni quadrati a passo regolare, porte sulle vie maestre ── */
     if (o.mura) {
       const d = M.via(muraPoly);
-      svg += `<path d="${d}" fill="none" stroke="${p.inchiostro}" stroke-width="10" stroke-linejoin="round"/><path d="${d}" fill="none" stroke="${p.carta2}" stroke-width="6.5" stroke-linejoin="round"/>`;
+      // Mura piene, senza doppio contorno; bastioni quadrati orientati lungo il muro
+      svg += `<path d="${d}" fill="none" stroke="${p.inchiostro}" stroke-width="6" stroke-linejoin="round" opacity="0.88"/>`;
+      const bastione = (x, y, ang, lato) => `<path d="${M.via(M.rettangolo(x, y, lato, lato, ang))}" fill="${p.inchiostro}"/>`;
       let passo = 0;
       for (let i = 0; i < muraPoly.length; i++) {
         passo += M.dist(muraPoly[i], muraPoly[(i + 1) % muraPoly.length]);
@@ -398,13 +400,14 @@ const CartoInsediamenti = (() => {
         const v = muraPoly[i];
         if (porte.some(({ g }) => M.dist(g, v) < 30) || inAcqua(v, 2)) continue;
         passo = 0;
-        svg += `<circle cx="${M.n1(v[0])}" cy="${M.n1(v[1])}" r="8.5" fill="${p.carta2}" stroke="${p.inchiostro}" stroke-width="1.6"/><circle cx="${M.n1(v[0])}" cy="${M.n1(v[1])}" r="3.3" fill="none" stroke="${p.inchiostro}" stroke-width="0.8"/>`;
+        const v2 = muraPoly[(i + 1) % muraPoly.length];
+        svg += bastione(v[0], v[1], Math.atan2(v2[1] - v[1], v2[0] - v[0]), 13);
       }
       porte.forEach(({ k, g }) => {
         const a = P(k, 1.06), ang = Math.atan2(a[1] - g[1], a[0] - g[0]);
         // Porta: due torri tonde ai lati del varco
         const nx = -Math.sin(ang), ny = Math.cos(ang);
-        [1, -1].forEach((s) => { const x = g[0] + nx * 13 * s, y = g[1] + ny * 13 * s; svg += `<circle cx="${M.n1(x)}" cy="${M.n1(y)}" r="9.5" fill="${p.carta2}" stroke="${p.inchiostro}" stroke-width="1.6"/>`; });
+        [1, -1].forEach((s) => { const x = g[0] + nx * 13 * s, y = g[1] + ny * 13 * s; svg += bastione(x, y, ang, 15); });
         svg += `<path d="${M.via(M.rettangolo(g[0], g[1], 16, 16, ang))}" fill="${p.strada}" stroke="${p.stradaBordo}" stroke-width="0.8"/>`;
       });
     }

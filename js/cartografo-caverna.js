@@ -164,7 +164,8 @@ const CartoCaverna = (() => {
           }
         }
       });
-      s += `<path d="${dFondo}" fill="none" stroke="url(#carto-tratt)" stroke-width="64" stroke-linejoin="round"/>`;
+      // Alone di roccia a sassolini (non piu' il tratteggio diagonale)
+      s += `<path d="${dFondo}" fill="none" stroke="url(#carto-sassi)" stroke-width="64" stroke-linejoin="round"/>`;
       s += `<path d="${dFondo}" fill="${t.pavimento}" fill-rule="evenodd"/>`;
       // Ombra interna: il buio si appoggia alle pareti
       s += `<g clip-path="url(#carto-fondo)"><path d="${dFondo}" fill="none" stroke="${t.ombra}" stroke-width="15" filter="url(#carto-b4)" opacity="${notte ? 0.6 : 0.3}"/>`;

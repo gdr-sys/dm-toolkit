@@ -10,16 +10,16 @@ const CartoVillaggio = (() => {
   const n1 = M.n1;
 
   const TONI = {
-    // I due stili del Cartografo
+    // Carta e Colori: stesso disegno di Notte, colori chiari
     atlante: {
-      stile: 'atlante', prato: '#e8dec2', pratoScuro: '#c9b991', luce: '#fbf6e6', chioma: ['#f3ebd4', '#efe6cc', '#f6efdc'], chiomaL: '#ffffff', bosco: '#e4d8b8', boscoProfondo: '#cdbd96', ink: '#33261a',
-      campo: ['#e9dec2', '#e2d5b4', '#ede4cb', '#dccfac'], solco: '#6e5a40', strada: '#f6efdc', stradaBordo: '#8a7454', piazza: '#f3ead3', tetti: ['#e3d2a8', '#ddcb9f', '#e8d9b3', '#d8c69a'], ardesia: ['#a8382a', '#93301f'],
-      acqua: '#dccfae', acquaInk: '#33261a', riflesso: '#33261a', testo: '#33261a', testoAlone: '#f3ead3', ombraOp: 0.26, font: M.FONT_ATLANTE, fontTitolo: M.FONT_ATLANTE_SC,
+      stile: 'notte', chiaro: true, prato: '#e6dec8', pratoScuro: '#d3c8ac', luce: '#f6f1e3', chioma: ['#a9b99a', '#b2c1a2', '#a1b293'], chiomaL: '#5c7f63', bosco: '#c9d0b4', boscoProfondo: '#aab797', ink: '#3a3128',
+      campo: ['#e3dac2', '#ddd4ba', '#e8dfc9', '#d8ceb3'], solco: '#8a7c66', strada: '#f5f0e3', stradaBordo: '#a3927a', piazza: '#f1ebdc', tetti: ['#d6cbb4', '#cfc3aa', '#dcd2bc', '#c9bca2'], ardesia: ['#a8452a', '#93391f'],
+      acqua: '#d9ddd2', acquaInk: '#3d6c82', riflesso: '#3d6c82', testo: '#3a3128', testoAlone: '#ece5d3', ambra: '#a8452a', ombraOp: 0.18, font: M.FONT_NOTTE, fontTitolo: M.FONT_NOTTE,
     },
     colori: {
-      stile: 'atlante', colore: true, prato: '#d6dca8', pratoScuro: '#b4bf86', luce: '#f6f3dc', chioma: ['#bccb94', '#b2c48a', '#c6d29e'], chiomaL: '#ffffff', bosco: '#adbd85', boscoProfondo: '#93a56d', ink: '#33261a',
-      campo: ['#e4d48f', '#d9d08c', '#ead59a', '#cfcb8a'], solco: '#6e5a40', strada: '#f4ead2', stradaBordo: '#8a7454', piazza: '#efe4c8', tetti: ['#cf9070', '#c68163', '#d6a07e', '#bd785c'], ardesia: ['#5d7392', '#4f6382'],
-      acqua: '#a9c6cf', acquaInk: '#33261a', riflesso: '#33261a', testo: '#33261a', testoAlone: '#f3ead3', ombraOp: 0.26, font: M.FONT_ATLANTE, fontTitolo: M.FONT_ATLANTE_SC,
+      stile: 'notte', chiaro: true, colore: true, prato: '#dde3c1', pratoScuro: '#bfcb98', luce: '#f4f2e2', chioma: ['#8fb07e', '#9cbb8a', '#86a775'], chiomaL: '#3f6f4a', bosco: '#a9c08f', boscoProfondo: '#89a672', ink: '#3a3128',
+      campo: ['#e2d696', '#d4d797', '#e8d69f', '#c9d199'], solco: '#8a7c66', strada: '#f4efe0', stradaBordo: '#a3927a', piazza: '#efe8d6', tetti: ['#c98f70', '#bf8265', '#cf9c7c', '#b5775b'], ardesia: ['#2f6680', '#285a72'],
+      acqua: '#b9d2d9', acquaInk: '#2f6680', riflesso: '#2f6680', testo: '#3a3128', testoAlone: '#eae6d6', ambra: '#a8452a', ombraOp: 0.18, font: M.FONT_NOTTE, fontTitolo: M.FONT_NOTTE,
     },
     notte: {
       stile: 'notte', prato: '#12262f', pratoScuro: '#0a1820', luce: '#2b4a56', chioma: ['#1d3a3d', '#22424a', '#1a3436'], chiomaL: '#7eb696', bosco: '#0f2629', boscoProfondo: '#08191b', ink: '#03090b',
@@ -106,7 +106,7 @@ const CartoVillaggio = (() => {
   const villaggio = (o) => {
     const r = M.rng('villaggio:' + o.seme), rn = M.rumore(r), rf = M.rumore(r);
     const t = TONI[M.stileDi(o.palette)];
-    const carta = t.stile === 'notte' ? M.PALETTE.cartografo : t.colore ? M.PALETTE.colori : M.PALETTE.atlante;
+    const carta = t.chiaro ? (t.colore ? M.PALETTE.colori : M.PALETTE.atlante) : t.stile === 'notte' ? M.PALETTE.cartografo : t.colore ? M.PALETTE.colori : M.PALETTE.atlante;
     const W = 1600, H = 900;
     const nome = o.nome || M.nomeLuogo(r, o.popolo);
     const nCase = { piccolo: 28, medio: 50, grande: 80 }[o.taglia] || 50;
