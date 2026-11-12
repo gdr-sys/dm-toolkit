@@ -59,7 +59,8 @@ const Musica = (() => {
       '<div class="card-header" style="flex-wrap:wrap;gap:6px;align-items:flex-start;">' +
         '<div style="flex:1;min-width:160px;">' +
           '<input type="text" class="form-input" autocomplete="off" value="' + _esc(p.nome) + '" aria-label="Nome della playlist" style="font-family:var(--font-display);font-size:1rem;background:transparent;border-color:transparent;padding:2px 4px;" onchange="Musica._campo(\'' + p.id + '\',\'nome\',this.value)">' +
-          '<input type="text" class="form-input" autocomplete="off" value="' + _esc(p.descrizione || '') + '" placeholder="Quando usarla (es. combattimenti contro i Custodi)" aria-label="Descrizione" style="font-size:0.8rem;background:transparent;border-color:transparent;padding:2px 4px;color:var(--text-muted);" onchange="Musica._campo(\'' + p.id + '\',\'descrizione\',this.value)">' +
+          // La descrizione va a capo e cresce col testo, invece di essere tagliata su una riga
+          '<textarea class="form-input musica-desc" rows="1" autocomplete="off" placeholder="Quando usarla (es. combattimenti contro i Custodi)" aria-label="Descrizione" oninput="this.style.height=\'auto\';this.style.height=this.scrollHeight+\'px\'" onchange="Musica._campo(\'' + p.id + '\',\'descrizione\',this.value)">' + _esc(p.descrizione || '') + '</textarea>' +
         '</div>' +
         '<button type="button" class="btn btn-ghost btn-sm" style="color:var(--danger-text);" onclick="Musica._elimina(\'' + p.id + '\')">Elimina</button>' +
       '</div>' +
@@ -89,6 +90,8 @@ const Musica = (() => {
     const el = document.getElementById('page-musica');
     if (!el) return;
     const lista = _playlist();
+    // Safari (iPad) non conosce field-sizing: l'altezza delle descrizioni si calcola dopo il disegno
+    requestAnimationFrame(() => el.querySelectorAll('.musica-desc').forEach((t) => { t.style.height = 'auto'; t.style.height = t.scrollHeight + 'px'; }));
     el.innerHTML =
       '<div class="page-header">' +
         '<div><h1 class="page-title">Musica e atmosfere</h1>' +

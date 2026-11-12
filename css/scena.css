@@ -255,7 +255,7 @@ input, textarea { caret-color: var(--ac); }
 .mz-hub > div:nth-of-type(2) { grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)) !important; gap: 16px !important; }
 .mz-voce { position: relative; min-height: 170px; display: flex; flex-direction: column; justify-content: flex-end; gap: 4px; padding: 22px !important; cursor: pointer; transition: transform .2s cubic-bezier(.2, .7, .2, 1), background-color .2s; }
 .mz-voce:hover { transform: translateY(-3px); background: var(--bg-card-hover) !important; }
-.mz-voce > div:first-child { position: absolute; top: 20px; left: 22px; right: 20px; margin: 0 !important; align-items: flex-start !important; }
+.mz-voce > div:first-child { position: static; display: flex !important; justify-content: space-between !important; align-items: flex-start !important; gap: 12px; margin: 0 0 auto !important; padding-bottom: 12px; }
 .mz-voce > div:first-child > span:first-child { color: var(--text-muted) !important; }
 .mz-voce > div:first-child > span:last-child { background: none !important; padding: 0 !important; font: 400 2.6rem/1 var(--font-titoli) !important; color: var(--accent-text) !important; font-variant-numeric: tabular-nums; }
 .mz-voce > div:nth-child(2) { font: 400 1.5rem var(--font-titoli) !important; }
@@ -384,13 +384,13 @@ input, textarea { caret-color: var(--ac); }
   .mz-carta { padding: 14px; border-radius: 16px; }
   .mz-carta .mz-mono { font-size: 5.4rem; left: 12px; }
   .mz-carta .mz-nome { font-size: 1.15rem; }
-  .mz-corte { grid-template-columns: 1fr; gap: 20px; padding-top: 70px; }
-  .mz-faccia { max-width: 150px; } .mz-faccia .mz-iniz { font-size: 6rem; }
+  .mz-corte { grid-template-columns: 92px minmax(0, 1fr); gap: 16px; align-items: start; padding-top: 28px; }
+  .mz-faccia { width: 92px; max-width: none; border-radius: 16px; } .mz-faccia .mz-iniz { font-size: 4.2rem; }
   .mz-corpo { grid-template-columns: 1fr; gap: 26px; }
   .mz-sez div { font-size: 1.05rem; }
   .mz-hub > div:nth-of-type(2) { grid-template-columns: 1fr 1fr !important; gap: 10px !important; }
   .mz-voce { min-height: 140px; padding: 16px !important; }
-  .mz-voce > div:first-child { top: 14px; left: 16px; right: 14px; }
+  .mz-voce > div:first-child { padding-bottom: 8px; }
 }
 @media (max-width: 1100px) { .mz-corpo { grid-template-columns: 1fr; } }
 @media (prefers-reduced-motion: reduce) { .sc-t, .mz-carta, .mz-voce, .hub-card { transition: none; } }
@@ -645,3 +645,7 @@ body.barra-alta #wiki-section-tabbar:not([style*="display:none"]):not([style*="d
 .pf-temp-badge { margin-top: 2px; font-size: 0.7rem; font-weight: 700; color: #7db8ff; white-space: nowrap; }
 .pf-valore::-webkit-inner-spin-button, .pf-valore::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; } .pf-valore { -moz-appearance: textfield; }
 [data-theme="light"] .pf-temp-badge { color: #1f5fae; }
+.musica-desc { display: block; width: 100%; min-height: 0 !important; resize: none; overflow: hidden; field-sizing: content; font-size: 0.86rem !important; line-height: 1.45; background: transparent !important; border-color: transparent !important; padding: 2px 4px !important; color: var(--text-muted) !important; }
+.musica-desc:focus { border-color: var(--border) !important; color: var(--text-primary) !important; }
+.musica-desc { display: block; width: 100%; min-height: 0 !important; resize: none; overflow: hidden; field-sizing: content; font-size: 0.86rem !important; line-height: 1.45; background: transparent !important; border-color: transparent !important; padding: 2px 4px !important; color: var(--text-muted) !important; }
+.musica-desc:focus { border-color: var(--border) !important; color: var(--text-primary) !important; }
