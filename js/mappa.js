@@ -211,7 +211,7 @@ const MappaUI = (() => {
       (mappe.length
         ? '<select id="mappa-selettore" class="form-select" style="font-size:0.78rem;padding:4px 8px;display:inline-block;width:auto;max-width:220px;" onchange="MappaUI.vaiAMappa(this.value)">' + opzioni + '</select>'
         : '') +
-      '<button class="btn btn-ghost btn-icon-sm" title="Nuova mappa" onclick="MappaUI.nuovaMappa()" style="margin-left:6px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>';
+      '<button class="btn btn-ghost btn-sm" onclick="MappaUI.nuovaMappa()" style="margin-left:6px;gap:6px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Nuova mappa</button>';
   };
 
   const TESTO_VUOTA = 'Carica un’immagine (un disegno, una scansione, una mappa fatta altrove) e inizia a segnare luoghi e PNG sopra.';

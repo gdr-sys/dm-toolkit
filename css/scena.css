@@ -230,7 +230,7 @@ input, textarea { caret-color: var(--ac); }
 /* ── Home: le tue campagne ── */
 #page-home .campaign-grid-section { max-width: 1320px; padding: 28px clamp(16px, 4vw, 56px) 96px; }
 .hn-head h1 { font-family: var(--font-titoli); font-weight: 400; font-size: clamp(2rem, 4vw, 3rem); letter-spacing: -0.02em; }
-.hn-card { position: relative; isolation: isolate; overflow: hidden; display: flex !important; flex-direction: column; justify-content: flex-end; min-height: min(600px, 74vh); border: 0; border-radius: 28px; background: var(--bg-card); box-shadow: none; }
+.hn-card { position: relative; isolation: isolate; overflow: hidden; display: flex !important; flex-direction: column; justify-content: flex-end; min-height: min(420px, 52vh); border: 0; border-radius: 28px; background: var(--bg-card); box-shadow: none; }
 .hn-card:not(:first-child) { min-height: 340px; }
 .hn-card .hn-main { padding: 40px clamp(20px, 4vw, 48px) 8px; gap: 12px; }
 .hn-card .hn-main::before { display: none; }
@@ -377,7 +377,7 @@ input, textarea { caret-color: var(--ac); }
   #dn-hero .dn-azioni-s .btn { flex: 1 1 auto !important; min-height: 46px !important; padding: 10px 16px; }
   .dn-fascia { padding-top: 26px; } .dn-fascia-t h2 { font-size: 1.5rem; }
   .hn-card { min-height: 0; border-radius: 22px; }
-  .hn-card .hn-main { padding-top: 150px; }
+  .hn-card .hn-main { padding-top: 96px; }
   .hn-card .hn-azioni-c .btn { flex: 1 1 auto !important; }
   .hn-card .hn-azioni-c .btn-primary { flex: 1 1 100% !important; }
   .mz-mazzo { grid-template-columns: 1fr 1fr; gap: 10px; }
@@ -532,8 +532,8 @@ body.barra-alta #wiki-section-tabbar:not([style*="display:none"]):not([style*="d
 }
 
 /* ══ Cartografo e Scrittoio: le scelte sono tessere con icona ══ */
-#carto-tipi, #sc-voci { display: grid !important; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 10px !important; margin-bottom: 14px !important; }
-.sc-scelta { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; min-width: 0; min-height: 92px; padding: 14px 10px; line-height: 1.2; overflow-wrap: anywhere; hyphens: auto; border: 0; border-radius: 18px; background: var(--bg-card); color: var(--text-secondary); font: 600 0.95rem var(--font-body); text-align: center; cursor: pointer; transition: background-color .15s, transform .2s cubic-bezier(.2, .7, .2, 1); }
+#carto-tipi, #sc-voci { display: grid !important; grid-template-columns: repeat(auto-fill, minmax(7.6em, 1fr)); gap: 10px !important; margin-bottom: 14px !important; }
+.sc-scelta { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; min-width: 0; min-height: 92px; padding: 14px 10px; line-height: 1.2; overflow-wrap: normal; hyphens: manual; border: 0; border-radius: 18px; background: var(--bg-card); color: var(--text-secondary); font: 600 0.95rem var(--font-body); text-align: center; cursor: pointer; transition: background-color .15s, transform .2s cubic-bezier(.2, .7, .2, 1); }
 .sc-scelta:hover { background: var(--bg-card-hover); color: var(--text-primary); transform: translateY(-2px); }
 .sc-scelta[aria-selected="true"] { background: var(--ac); color: var(--ac-t); }
 .sc-scelta .sc-icona { opacity: .9; }
@@ -545,7 +545,7 @@ body.barra-alta #wiki-section-tabbar:not([style*="display:none"]):not([style*="d
 .carto-zoom { border: 0 !important; border-radius: 999px !important; background: color-mix(in oklch, var(--bg-primary) 80%, transparent) !important; box-shadow: none !important; }
 #carto-contesto { border-radius: 14px !important; border: 0 !important; background: color-mix(in oklch, var(--ac) 18%, var(--bg-card)) !important; }
 @media (max-width: 760px) {
-  #carto-tipi, #sc-voci { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px !important; }
+  #carto-tipi, #sc-voci { grid-template-columns: repeat(auto-fill, minmax(6.4em, 1fr)); gap: 8px !important; }
   .sc-scelta { min-height: 74px; padding: 10px 6px; font-size: 0.85rem; gap: 6px; border-radius: 14px; }
   .sc-scelta .sc-icona { width: 22px; height: 22px; }
 }
@@ -553,7 +553,7 @@ body.barra-alta #wiki-section-tabbar:not([style*="display:none"]):not([style*="d
 /* ══ Schermo del DM ══ */
 #schermo-empty { border: 1px dashed var(--border-strong) !important; border-radius: var(--raggio) !important; background: none !important; padding: 34px clamp(16px, 4vw, 40px) !important; }
 #schermo-empty h2 { font-size: 1.8rem; }
-.schermo-scelte { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; margin: 22px auto 0; max-width: 980px; text-align: left; }
+.schermo-scelte { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(230px, 100%), 1fr)); gap: 12px; margin: 22px auto 0; max-width: 980px; text-align: left; }
 .schermo-scelta { display: flex; align-items: flex-start; gap: 14px; padding: 16px 18px; border: 0; border-radius: 18px; background: var(--bg-card); color: var(--text-primary); font: inherit; text-align: left; cursor: pointer; transition: background-color .15s, transform .2s cubic-bezier(.2, .7, .2, 1); }
 .schermo-scelta:hover { background: var(--bg-card-hover); transform: translateY(-2px); }
 .schermo-scelta-icona { flex: none; width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; background: color-mix(in oklch, var(--ac) 20%, transparent); color: var(--accent-text); }
@@ -649,3 +649,14 @@ body.barra-alta #wiki-section-tabbar:not([style*="display:none"]):not([style*="d
 .musica-desc:focus { border-color: var(--border) !important; color: var(--text-primary) !important; }
 .musica-desc { display: block; width: 100%; min-height: 0 !important; resize: none; overflow: hidden; field-sizing: content; font-size: 0.86rem !important; line-height: 1.45; background: transparent !important; border-color: transparent !important; padding: 2px 4px !important; color: var(--text-muted) !important; }
 .musica-desc:focus { border-color: var(--border) !important; color: var(--text-primary) !important; }
+.hn-head .hn-azioni { flex-wrap: wrap; } .hn-head .hn-azioni > .btn { flex: 1 1 auto; }
+#mappa-vuota { overflow-y: auto; justify-content: safe center !important; } #mappa-canvas { min-height: 380px; }
+
+/* Home: le altre campagne in righe compatte sotto quella in uso */
+.hn-altre { grid-column: 1 / -1; margin: 18px 0 2px; font: 400 1.5rem var(--font-titoli); color: var(--text-primary); }
+.hn-riga { grid-column: 1 / -1; display: flex; align-items: center; flex-wrap: wrap; gap: 12px 20px; padding: 16px 20px; border-radius: 18px; background: var(--bg-card); }
+.hn-riga-testo { flex: 1 1 260px; min-width: 0; }
+.hn-riga h3 { margin: 0 0 4px; font: 400 1.35rem/1.15 var(--font-titoli); color: var(--text-primary); }
+.hn-riga p { margin: 0; font-size: 0.88rem; color: var(--text-muted); line-height: 1.45; }
+.hn-riga-azioni { display: flex; flex-wrap: wrap; gap: 6px; }
+.hn-riga .hn-elimina { color: var(--danger-text) !important; }
