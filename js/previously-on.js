@@ -232,7 +232,7 @@ const PreviouslyOn = (() => {
     card.className = 'card dash-card-full';
     card.id = 'dash-prevon-card';
     card.innerHTML =
-      '<div class="card-header"><h3 class="card-title">Previously On...</h3></div>' +
+      '<div class="card-header"><h2 class="card-title">Previously On...</h2></div>' +
       '<div style="padding:6px 0;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">' +
         '<div style="font-size:0.82rem;color:var(--text-muted);">Riassunto narrativo delle ultime sessioni, pronto da condividere con il gruppo.</div>' +
         '<button class="btn btn-primary btn-sm" onclick="PreviouslyOn.open()">Genera</button>' +

@@ -428,7 +428,7 @@ body.barra-alta #wiki-section-tabbar:not([style*="display:none"]):not([style*="d
 #page-mappa .sc-hero { margin: 0 !important; flex: none; }
 #page-mappa .sc-hero .page-subtitle { max-width: 70ch; font-size: 1rem !important; color: var(--text-secondary) !important; }
 #mappa-canvas { background: var(--bg-secondary) !important; }
-#mappa-vuota h3 { font-size: 1.6rem; }
+#mappa-vuota h2 { font-size: 1.6rem; }
 
 /* Calendario: i giorni sono tessere */
 .cal-mese { font-family: var(--font-titoli); font-size: 1.7rem; min-width: 240px; text-align: center; }
@@ -552,7 +552,7 @@ body.barra-alta #wiki-section-tabbar:not([style*="display:none"]):not([style*="d
 
 /* ══ Schermo del DM ══ */
 #schermo-empty { border: 1px dashed var(--border-strong) !important; border-radius: var(--raggio) !important; background: none !important; padding: 34px clamp(16px, 4vw, 40px) !important; }
-#schermo-empty h3 { font-size: 1.8rem; }
+#schermo-empty h2 { font-size: 1.8rem; }
 .schermo-scelte { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; margin: 22px auto 0; max-width: 980px; text-align: left; }
 .schermo-scelta { display: flex; align-items: flex-start; gap: 14px; padding: 16px 18px; border: 0; border-radius: 18px; background: var(--bg-card); color: var(--text-primary); font: inherit; text-align: left; cursor: pointer; transition: background-color .15s, transform .2s cubic-bezier(.2, .7, .2, 1); }
 .schermo-scelta:hover { background: var(--bg-card-hover); transform: translateY(-2px); }
@@ -574,3 +574,28 @@ body.barra-alta #wiki-section-tabbar:not([style*="display:none"]):not([style*="d
   .schermo-block-actions { opacity: 0; transition: opacity .15s; }
   .schermo-block:hover .schermo-block-actions, .schermo-block:focus-within .schermo-block-actions { opacity: 1; }
 }
+
+/* ══ Sfondi con immagini (js/scena.js) ══
+   L'immagine prende la luminosita' (luminosity) e la tavolozza da' tinta e saturazione:
+   la stessa immagine segue brace, bosco, inchiostro... e la luce notte o giorno. */
+.sc-foto { position: absolute; inset: 0; z-index: -2; overflow: hidden; isolation: isolate; background: linear-gradient(180deg, var(--sc-c1), var(--sc-c2)); pointer-events: none; }
+.sc-foto img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 70% center; mix-blend-mode: luminosity; filter: grayscale(1) brightness(.62) contrast(1.12); }
+:root:not([data-theme="dark"]) .sc-foto img { filter: grayscale(1) brightness(1.18) contrast(.85); opacity: .55; }
+.hn-card > .sc-foto, .sc-sfondo > .sc-foto { z-index: -2; }
+.sc-sfondo > .sc-foto { z-index: 0; }
+.sc-cambia { position: absolute; right: clamp(12px, 3vw, 40px); bottom: 14px; z-index: 2; display: inline-flex; align-items: center; gap: 6px; min-height: 32px; padding: 5px 12px; border: 0; border-radius: 999px; background: color-mix(in oklch, var(--bg-primary) 70%, transparent); color: var(--text-secondary); font: 600 0.82rem var(--font-body); cursor: pointer; opacity: .75; transition: opacity .15s, background-color .15s; }
+.sc-cambia:hover, .sc-cambia:focus-visible { opacity: 1; background: var(--bg-card); color: var(--text-primary); }
+#dn-hero > .sc-cambia { bottom: auto; top: 22px; right: auto; left: 50%; transform: translateX(-50%); }
+.sc-menu-sfondo { position: absolute; z-index: 400; width: min(340px, calc(100vw - 24px)); padding: 18px; border-radius: 18px; background: var(--bg-secondary); box-shadow: 0 18px 40px -16px rgba(0, 0, 0, .55), inset 0 0 0 1px var(--border); display: flex; flex-direction: column; align-items: flex-start; gap: 10px; }
+.sc-menu-sfondo h3 { font-size: 1.35rem; margin: 0; }
+.sc-menu-sfondo h4 { font: 700 0.85rem var(--font-body); color: var(--text-muted); margin: 6px 0 0; }
+.sc-menu-sfondo p { margin: 0; font-size: 0.9rem; line-height: 1.5; color: var(--text-secondary); }
+.sc-menu-sfondo .sc-nota { font-size: 0.82rem; color: var(--text-muted); }
+.sc-menu-sfondo .sc-carica { cursor: pointer; }
+.sc-paesaggi { display: flex; flex-wrap: wrap; gap: 6px; }
+.sc-paesaggi button { border: 0; border-radius: 999px; padding: 6px 12px; background: color-mix(in oklch, var(--text-primary) 9%, transparent); color: var(--text-primary); font: 600 0.84rem var(--font-body); cursor: pointer; }
+.sc-paesaggi button[aria-pressed="true"] { background: var(--text-primary); color: var(--bg-primary); }
+@media (max-width: 760px) { #dn-hero > .sc-cambia { top: auto; bottom: 10px; left: auto; right: 12px; transform: none; } }
+
+/* I titoli dei vuoti ora sono h2: stessa misura di prima */
+.module-placeholder h2 { font-size: 1.4rem; margin: 0 0 6px; }

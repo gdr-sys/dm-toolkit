@@ -211,7 +211,7 @@ const TurniFazione = (() => {
     let card = document.getElementById('dash-turni-fazione');
     if (!lista.length) { card?.remove(); return; }
     if (!card) { card = document.createElement('div'); card.id = 'dash-turni-fazione'; card.className = 'card'; griglia.appendChild(card); }
-    card.innerHTML = '<div class="card-header"><h3 class="card-title">Il mondo si muove</h3><button type="button" class="btn btn-ghost btn-sm" onclick="TurniFazione.apri()">Muovi le fazioni</button></div>' +
+    card.innerHTML = '<div class="card-header"><h2 class="card-title">Il mondo si muove</h2><button type="button" class="btn btn-ghost btn-sm" onclick="TurniFazione.apri()">Muovi le fazioni</button></div>' +
       lista.slice(0, 6).map(f => {
         const t = _turni(f), m = t.storia.slice(-1)[0];
         return '<div class="sc-t" data-t="viola" role="button" tabindex="0" onclick="TurniFazione.apri()">' +

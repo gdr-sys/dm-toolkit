@@ -212,7 +212,7 @@ const TabelleCasuali = (() => {
     card.innerHTML =
       '<div class="card-header" style="flex-wrap:wrap;gap:8px;">' +
         '<div>' +
-          '<h3 class="card-title">Le mie tabelle</h3>' +
+          '<h2 class="card-title">Le mie tabelle</h2>' +
           '<div id="tc-sottotitolo" style="font-size:0.78rem;color:var(--text-muted);margin-top:2px;">Tabelle casuali del tuo mondo: le scrivi tu, l\'app le tira.</div>' +
         '</div>' +
         '<div style="display:flex;gap:6px;flex-wrap:wrap;">' +

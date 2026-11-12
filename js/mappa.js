@@ -157,7 +157,7 @@ const MappaUI = (() => {
         '<div id="mappa-canvas" style="flex:1;position:relative;overflow:hidden;background:var(--bg-tertiary);cursor:grab;touch-action:none;">' +
           '<div id="mappa-vuota" style="display:none;position:absolute;inset:0;flex-direction:column;align-items:center;justify-content:center;gap:12px;text-align:center;padding:24px;">' +
             '<div style="opacity:0.4;"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 6v16l7-4 8 4 7-4V2l-7 4-8-4-7 4z"/><path d="M8 2v16"/><path d="M16 6v16"/></svg></div>' +
-            '<div><h3 id="mappa-vuota-titolo" style="margin:0 0 4px;">Nessuna mappa ancora</h3><p id="mappa-vuota-testo" class="text-sm text-muted" style="margin:0 auto;max-width:420px;line-height:1.55;">Carica un’immagine (un disegno, una scansione, una mappa fatta altrove) e inizia a segnare luoghi e PNG sopra.</p></div>' +
+            '<div><h2 id="mappa-vuota-titolo" style="margin:0 0 4px;">Nessuna mappa ancora</h2><p id="mappa-vuota-testo" class="text-sm text-muted" style="margin:0 auto;max-width:420px;line-height:1.55;">Carica un’immagine (un disegno, una scansione, una mappa fatta altrove) e inizia a segnare luoghi e PNG sopra.</p></div>' +
             '<div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;">' +
               '<button class="btn btn-primary btn-sm" onclick="MappaUI.apriImpostazioni()">Carica una mappa</button>' +
               '<button class="btn btn-secondary btn-sm" onclick="App.navigateTo(\'cartografo\')">Genera una mappa</button>' +

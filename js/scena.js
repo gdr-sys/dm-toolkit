@@ -30,17 +30,30 @@ const Scena = (() => {
   };
 
   // Il tipo di paesaggio si intuisce dalle parole del nome o della descrizione; altrimenti lo sceglie il nome
+  // Paesaggi conosciuti: ognuno puo' avere la sua immagine in img/scene/<nome>.jpg
+  const PAESAGGI = [
+    ['vulcano', 'Vulcano', /vulcan|cener|lava|fuoco|fiamm|brac|drag/],
+    ['gelo', 'Nord gelido', /gel|ghiacc|nev|invern|tundr|nord/],
+    ['montagne', 'Montagne', /mont|picc|vett|nan[io]\b|rocc|passo/],
+    ['costa', 'Costa', /mar[ei]?\b|cost|port[oi]\b|isol|nav[ei]|onde|scogl/],
+    ['deserto', 'Deserto', /desert|sabbi|dun[ae]|oasi/],
+    ['palude', 'Palude', /palud|acquitrin|stagn|marcit/],
+    ['foresta', 'Foresta', /bosc|forest|selv|alber|elf/],
+    ['rovine', 'Rovine', /rovin|tempi|antic|perdut|tomb|cripta/],
+    ['citta', 'Città', /citt|regn|castel|corona|re\b|regina|mura/],
+    ['colline', 'Colline', /vall|coll|villag|campagn|vign/],
+  ];
+  const _disegnoDi = (k) => ({ vulcano: 'vulcano', gelo: 'monti', montagne: 'monti', monti: 'monti' }[k] || 'colline');
   const tipo = (testo) => {
     const t = String(testo || '').toLowerCase();
-    if (/vulcan|cener|lava|fuoco|fiamm|brac|drag/.test(t)) return 'vulcano';
-    if (/mont|picc|vett|nev|ghiacc|nan[io]\b|rocc/.test(t)) return 'monti';
-    if (/vall|coll|villag|bosc|forest|torre|castel|regno|citt/.test(t)) return 'colline';
-    return ['monti', 'colline', 'vulcano', 'colline'][Math.floor(_seme(t)() * 4)];
+    const p = PAESAGGI.find(([, , re]) => re.test(t));
+    if (p) return p[0];
+    return ['montagne', 'colline', 'foresta', 'costa'][Math.floor(_seme(t)() * 4)];
   };
 
   const disegna = (svg) => {
     const nome = svg.dataset.seme || 'x';
-    const r = _seme(nome), tp = svg.dataset.tipo && svg.dataset.tipo !== 'auto' ? svg.dataset.tipo : tipo(nome), id = 'sc' + (_n++);
+    const r = _seme(nome), tp = _disegnoDi(svg.dataset.tipo && svg.dataset.tipo !== 'auto' ? svg.dataset.tipo : tipo(nome)), id = 'sc' + (_n++);
     svg.setAttribute('viewBox', '0 0 1440 620'); svg.setAttribute('preserveAspectRatio', 'xMidYMid slice'); svg.setAttribute('aria-hidden', 'true');
     svg.innerHTML = '';
     const defs = _el('defs', {}, svg);
@@ -66,11 +79,71 @@ const Scena = (() => {
     _el('path', { d: _cresta(r, 540, 90, tp === 'monti' ? 16 : 5), style: 'fill:var(--sc-m2)' }, svg);
     _el('path', { d: _cresta(r, 600, 50, 4), style: 'fill:var(--bg-primary)' }, svg);
     svg.dataset.fatta = nome;
+    _foto(svg);
   };
 
   // Disegna tutte le scene non ancora disegnate (o il cui nome e' cambiato)
-  const tutte = (radice) => (radice || document).querySelectorAll('svg.sc-scena').forEach((s) => { if (s.dataset.fatta !== (s.dataset.seme || 'x')) disegna(s); });
-  const svg = (seme, tp) => '<svg class="sc-scena" data-seme="' + String(seme || '').replace(/"/g, '&quot;').replace(/</g, '&lt;') + '" data-tipo="' + (tp || 'auto') + '"></svg>';
+  // (quelle gia' disegnate ricontrollano solo l'immagine: un caricamento o un cambio di campagna la cambia)
+  const tutte = (radice) => (radice || document).querySelectorAll('svg.sc-scena').forEach((s) => { if (s.dataset.fatta !== (s.dataset.seme || 'x')) disegna(s); else _foto(s); });
+  // chiave: 'campagna' per Home e Dashboard, altrimenti l'id della pagina; camp: id della campagna (per la Home)
+  const svg = (seme, tp, chiave, camp) => '<svg class="sc-scena" data-seme="' + _attr(seme) + '" data-tipo="' + (tp || 'auto') + '"' +
+    (chiave ? ' data-chiave="' + _attr(chiave) + '"' : '') + (camp ? ' data-camp="' + _attr(camp) + '"' : '') + '></svg>';
+  const _attr = (t) => String(t || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+
+  // ── Immagini al posto del disegno ──
+  // Ordine: immagine caricata per questa pagina > immagine dell'app per la pagina (img/scene/<pagina>.jpg) >
+  // immagine caricata per la campagna > immagine dell'app per il paesaggio (img/scene/<paesaggio>.jpg) > disegno.
+  // Le immagini vanno bene in bianco e nero: il colore lo da' la tavolozza (css/scena.css, .sc-foto).
+  const PAGINE_FILE = { 'page-wiki': 'wiki', 'page-sessione': 'sessione', 'page-mappa': 'mappa', 'page-cartografo': 'cartografo', 'page-scrittoio': 'scrittoio',
+    'page-schermo': 'schermo', 'page-compendio': 'compendio', 'page-musica': 'musica', 'page-calendario': 'calendario', 'page-generatori': 'generatori', 'page-trame': 'wiki' };
+  const _fileDiPagina = (chiave) => { const k = Object.keys(PAGINE_FILE).find((p) => chiave === p || chiave.indexOf(p + '-') === 0); return k ? PAGINE_FILE[k] : ''; };
+  const _campDi = (svg) => {
+    if (typeof App === 'undefined') return null;
+    if (svg.dataset.camp && typeof Storage !== 'undefined' && Storage.getCampaign) return Storage.getCampaign(svg.dataset.camp);
+    return App.getActiveCampaign ? App.getActiveCampaign() : null;
+  };
+  const paesaggioDi = (camp) => (camp && camp.sfondoTipo) || tipo(((camp && camp.name) || '') + ' ' + ((camp && camp.description) || ''));
+  const _candidati = (svg) => {
+    const camp = _campDi(svg), sf = (camp && camp.sfondi) || {};
+    const chiave = svg.dataset.chiave || '';
+    const lista = [];
+    if (chiave && chiave !== 'campagna') {
+      if (sf[chiave]) lista.push(sf[chiave]);
+      const f = _fileDiPagina(chiave);
+      if (f) lista.push('img/scene/' + f + '.jpg');
+    }
+    if (chiave) {
+      if (sf.campagna) lista.push(sf.campagna);
+      lista.push('img/scene/' + paesaggioDi(camp) + '.jpg');
+    }
+    return lista;
+  };
+  const _esiste = new Map(); // url -> true/false (le immagini mancanti non si richiedono di nuovo)
+  const _prova = (url) => new Promise((ok) => {
+    if (_esiste.has(url)) return ok(_esiste.get(url));
+    const i = new Image();
+    i.onload = () => { _esiste.set(url, true); ok(true); };
+    i.onerror = () => { _esiste.set(url, false); ok(false); };
+    i.src = url;
+  });
+  const _foto = async (svg) => {
+    const lista = _candidati(svg);
+    let url = '';
+    for (const u of lista) { if (await _prova(u)) { url = u; break; } }
+    const padre = svg.parentElement;
+    if (!padre) return;
+    let f = padre.querySelector(':scope > .sc-foto');
+    if (!url) { if (f) f.remove(); svg.style.visibility = ''; return; }
+    if (!f) { f = document.createElement('div'); f.className = 'sc-foto'; f.setAttribute('aria-hidden', 'true'); f.innerHTML = '<img alt="">'; svg.insertAdjacentElement('afterend', f); }
+    const img = f.querySelector('img');
+    if (img.getAttribute('src') !== url) img.setAttribute('src', url);
+    svg.style.visibility = 'hidden';
+  };
+  // Ridisegna disegni e immagini (dopo un caricamento o un cambio di paesaggio)
+  const ricarica = () => document.querySelectorAll('svg.sc-scena').forEach((s) => {
+    if (s.dataset.chiave === 'campagna') s.dataset.tipo = paesaggioDi(_campDi(s));
+    s.dataset.fatta = ''; disegna(s);
+  });
 
   // ── Segni del gioco ──
   const ruota = (k, n) => {
@@ -88,6 +161,69 @@ const Scena = (() => {
     for (let i = 0; i < n; i++) h += '<i' + (i < k ? ' class="on"' : '') + '></i>';
     return h + '</div>';
   };
+
+  // ── Cambiare lo sfondo: caricare un'immagine, scegliere il paesaggio, tornare al disegno ──
+  const _icoImg = '<svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-9 9"/></svg>';
+  const pulsante = (eroe, chiave) => {
+    if (!eroe || eroe.querySelector(':scope > .sc-cambia')) return;
+    eroe.insertAdjacentHTML('beforeend', '<button type="button" class="sc-cambia" aria-haspopup="dialog" onclick="Scena.apriSfondo(\'' + _attr(chiave) + '\', this)">' + _icoImg + '<span>Sfondo</span></button>');
+  };
+  const _nomeChiave = (chiave) => chiave === 'campagna' ? 'della campagna' : 'di questa pagina';
+  const apriSfondo = (chiave, btn) => {
+    const camp = App.getActiveCampaign && App.getActiveCampaign();
+    if (!camp) return;
+    chiudiSfondo();
+    const sf = camp.sfondi || {}, ha = !!sf[chiave], scelto = camp.sfondoTipo || '';
+    const box = document.createElement('div');
+    box.id = 'sc-menu-sfondo'; box.className = 'sc-menu-sfondo'; box.setAttribute('role', 'dialog'); box.setAttribute('aria-label', 'Sfondo');
+    box.innerHTML = '<h3>Sfondo ' + _nomeChiave(chiave) + '</h3>' +
+      '<p>Carica un\'immagine larga: va bene anche in bianco e nero, il colore lo prende dalla tavolozza.</p>' +
+      '<label class="btn btn-primary btn-sm sc-carica">Carica un\'immagine<input type="file" accept="image/*" hidden onchange="Scena._file(event,\'' + _attr(chiave) + '\')"></label>' +
+      (ha ? '<button type="button" class="btn btn-ghost btn-sm" onclick="Scena._togli(\'' + _attr(chiave) + '\')">Togli l\'immagine</button>' : '') +
+      (chiave === 'campagna' ? '<h4>Paesaggio disegnato</h4><div class="sc-paesaggi">' +
+        [['', 'Dal nome']].concat(PAESAGGI.map(([k, n]) => [k, n])).map(([k, n]) => '<button type="button" aria-pressed="' + (k === scelto) + '" onclick="Scena._paesaggio(\'' + k + '\')">' + n + '</button>').join('') + '</div>' : '') +
+      (typeof DriveBackup !== 'undefined' && DriveBackup.isConnected && !DriveBackup.isConnected() ? '<p class="sc-nota">Google Drive non è collegato: l\'immagine resta solo su questo dispositivo.</p>' : '');
+    document.body.appendChild(box);
+    const r = btn.getBoundingClientRect();
+    box.style.top = (r.bottom + window.scrollY + 8) + 'px';
+    box.style.left = Math.max(12, Math.min(window.innerWidth - box.offsetWidth - 12, r.right - box.offsetWidth)) + 'px';
+    box.querySelector('button, label')?.focus?.();
+    setTimeout(() => document.addEventListener('click', _fuori, true), 0);
+  };
+  const _fuori = (e) => { const b = document.getElementById('sc-menu-sfondo'); if (b && !b.contains(e.target) && !e.target.closest('.sc-cambia')) chiudiSfondo(); };
+  const chiudiSfondo = () => { document.getElementById('sc-menu-sfondo')?.remove(); document.removeEventListener('click', _fuori, true); };
+  const _salva = (modifica) => {
+    const camp = App.getActiveCampaign();
+    if (!camp) return;
+    const sfondi = Object.assign({}, camp.sfondi || {});
+    const dati = modifica(sfondi, camp);
+    App.saveActiveCampaign(Object.assign({ sfondi }, dati || {}));
+    chiudiSfondo();
+    setTimeout(ricarica, 30);
+  };
+  // L'immagine si riduce (larghezza massima 1800px) e si porta in scala di grigi: pesa poco e prende i colori della tavolozza
+  const _file = (e, chiave) => {
+    const file = e.target && e.target.files && e.target.files[0];
+    if (!file) return;
+    if (!/^image\//.test(file.type)) { if (typeof Toast !== 'undefined') Toast.show('Scegli un file immagine', 'warning'); return; }
+    const url = URL.createObjectURL(file), img = new Image();
+    img.onload = () => {
+      const s = Math.min(1, 1800 / img.width), c = document.createElement('canvas');
+      c.width = Math.round(img.width * s); c.height = Math.round(img.height * s);
+      const x = c.getContext('2d');
+      x.filter = 'grayscale(1)';
+      x.drawImage(img, 0, 0, c.width, c.height);
+      URL.revokeObjectURL(url);
+      let dati = c.toDataURL('image/webp', 0.8);
+      if (dati.indexOf('data:image/webp') !== 0) dati = c.toDataURL('image/jpeg', 0.82);
+      _salva((sf) => { sf[chiave] = dati; });
+      if (typeof Toast !== 'undefined') Toast.show('Sfondo aggiornato', 'success');
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); if (typeof Toast !== 'undefined') Toast.show('Non riesco a leggere questa immagine', 'error'); };
+    img.src = url;
+  };
+  const _togli = (chiave) => _salva((sf) => { delete sf[chiave]; });
+  const _paesaggio = (k) => _salva(() => ({ sfondoTipo: k || '' }));
 
   // ── Icone delle scelte di Cartografo e Scrittoio: tratto 1.6, stesso stile delle icone dell'app ──
   const ICONE = {
@@ -117,7 +253,8 @@ const Scena = (() => {
     teste.forEach((t) => {
       if (!t.classList.contains('sc-hero')) {
         t.classList.add('sc-hero', 'sc-basso');
-        t.insertAdjacentHTML('afterbegin', svg(t.dataset.scSeme || (nome + ' · ' + pag.id), t.dataset.scTipo || (pag.id.indexOf('wiki') >= 0 ? 'colline' : 'auto')));
+        t.insertAdjacentHTML('afterbegin', svg(t.dataset.scSeme || (nome + ' · ' + pag.id), t.dataset.scTipo || (pag.id.indexOf('wiki') >= 0 ? 'colline' : 'auto'), t.dataset.scChiave || pag.id));
+        pulsante(t, t.dataset.scChiave || pag.id);
       }
       // A tutta larghezza: l'intestazione esce dai margini interni della pagina
       t.style.marginLeft = t.style.marginRight = t.style.marginTop = '0px';
@@ -145,7 +282,8 @@ const Scena = (() => {
     window.addEventListener('resize', aggiorna);
     aggiorna();
   };
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') chiudiSfondo(); });
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', avvia); else avvia();
 
-  return { disegna, tutte, svg, tipo, ruota, pallini, aggiorna, icona };
+  return { disegna, tutte, svg, tipo, paesaggioDi, ruota, pallini, aggiorna, icona, ricarica, pulsante, apriSfondo, chiudiSfondo, _file, _togli, _paesaggio };
 })();

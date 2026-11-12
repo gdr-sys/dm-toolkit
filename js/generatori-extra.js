@@ -311,7 +311,7 @@ const GeneratoriExtra = (() => {
   const _card = (id, titoloCard, controlli, risultatoId, testoVuoto) =>
     '<div class="card gen-card" data-gen-id="' + id + '">' +
       '<div class="card-header" style="flex-wrap:wrap;gap:6px;">' +
-        '<h3 class="card-title">' + titoloCard + '</h3>' +
+        '<h2 class="card-title">' + titoloCard + '</h2>' +
         '<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">' + controlli + '</div>' +
       '</div>' +
       '<div id="' + risultatoId + '" style="min-height:60px;">' + vuoto(testoVuoto) + '</div>' +

@@ -61,7 +61,7 @@ const Segreti = (() => {
     }
     const aperti = _lista().filter(s => !s.scoperto);
     card.innerHTML =
-      '<div class="card-header"><h3 class="card-title">Segreti non rivelati</h3>' +
+      '<div class="card-header"><h2 class="card-title">Segreti non rivelati</h2>' +
         '<button type="button" class="btn btn-ghost btn-sm" onclick="Segreti.apri()">' + (_lista().length ? 'Gestisci' : 'Aggiungi') + '</button></div>' +
       (aperti.length
         ? aperti.slice(0, 8).map((s, i) => {

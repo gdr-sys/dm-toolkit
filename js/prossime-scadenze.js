@@ -19,7 +19,7 @@ const ProssimeScadenze = (() => {
     card.id = 'dash-scadenze-card';
     card.innerHTML =
       '<div class="card-header">' +
-        '<h3 class="card-title">Prossime scadenze</h3>' +
+        '<h2 class="card-title">Prossime scadenze</h2>' +
       '</div>' +
       '<div id="dash-scadenze-list" style="padding:4px 0;"></div>';
 

@@ -45,7 +45,7 @@ const SessioneZero = (() => {
     card.id = 'dash-sz-card';
     card.innerHTML =
       '<div class="card-header" style="flex-wrap:wrap;gap:6px;">' +
-        '<h3 class="card-title">Sessione Zero</h3>' +
+        '<h2 class="card-title">Sessione Zero</h2>' +
         '<div style="display:flex;gap:6px;">' +
           '<button type="button" class="btn btn-ghost btn-sm" onclick="SessioneZero.apri()">Apri</button>' +
         '</div>' +

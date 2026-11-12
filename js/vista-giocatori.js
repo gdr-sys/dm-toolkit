@@ -101,7 +101,7 @@ const VistaGiocatori = (() => {
       btn.innerHTML = '<svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg> ' +
         (s.attiva ? 'Copia link giocatori' : 'Condividi con i giocatori');
     }
-    card.innerHTML = '<div class="card-header"><h3 class="card-title">Vista giocatori</h3><button type="button" class="btn btn-ghost btn-sm" onclick="VistaGiocatori.apri()">' + (s.attiva ? 'Gestisci' : 'Attiva') + '</button></div>' +
+    card.innerHTML = '<div class="card-header"><h2 class="card-title">Vista giocatori</h2><button type="button" class="btn btn-ghost btn-sm" onclick="VistaGiocatori.apri()">' + (s.attiva ? 'Gestisci' : 'Attiva') + '</button></div>' +
       (s.attiva
         ? '<div style="font-size:0.82rem;color:var(--text-secondary);line-height:1.5;">I giocatori vedono ' + [s.riassunti && 'i riassunti', s.iniziativa && 'l\'iniziativa', s.luoghi.length && s.luoghi.length + ' luoghi', s.png.length && s.png.length + ' PNG', s.lore.length && s.lore.length + ' documenti', s.mappe.length && s.mappe.length + ' mappe'].filter(Boolean).join(', ') + '.</div>' +
           '<button type="button" class="btn btn-secondary btn-sm" style="margin-top:8px;" onclick="VistaGiocatori.copiaLink()">Copia il link per i giocatori</button>'

@@ -35,7 +35,7 @@ const StaleThreads = (() => {
     card.id = 'dash-stale-card';
     card.innerHTML =
       '<div class="card-header" style="flex-wrap:wrap;gap:6px;">' +
-        '<h3 class="card-title">Fili in sospeso</h3>' +
+        '<h2 class="card-title">Fili in sospeso</h2>' +
         '<div style="display:flex;align-items:center;gap:5px;font-size:0.7rem;color:var(--text-muted);">' +
           '<span id="dash-stale-count"></span>' +
           '<span>non toccati da</span>' +

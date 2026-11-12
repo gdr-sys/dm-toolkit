@@ -75,7 +75,7 @@ const CampagnaHub = (() => {
 
     el.innerHTML =
       // "Modifica" sta sulla riga del tipo: cosi' nome e descrizione usano tutta la larghezza
-      '<div class="sc-testa" data-sc-seme="' + _esc(camp.name) + '" data-sc-tipo="' + (typeof Scena !== 'undefined' ? Scena.tipo((camp.name || '') + ' ' + (camp.description || '')) : 'auto') + '"><div style="min-width:0;flex:1;">' +
+      '<div class="sc-testa" data-sc-seme="' + _esc(camp.name) + '" data-sc-tipo="' + (typeof Scena !== 'undefined' ? Scena.paesaggioDi(camp) : 'auto') + '" data-sc-chiave="campagna"><div style="min-width:0;flex:1;">' +
       '<div class="hub-testa"><span class="hub-tipo">' + tipo + ' · ' + _esc(camp.system || '5e') + (sessioni ? ' · ' + sessioni + (sessioni === 1 ? ' sessione' : ' sessioni') : '') + '</span>' +
         '<button type="button" class="btn btn-ghost btn-sm" onclick="App.editCampaign(\'' + camp.id + '\')">Modifica</button></div>' +
       '<h2 class="hub-nome">' + _esc(camp.name) + '</h2>' +

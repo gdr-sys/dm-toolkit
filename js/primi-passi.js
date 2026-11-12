@@ -41,7 +41,7 @@ const PrimiPassi = (() => {
     }
     card.innerHTML =
       '<div class="card-header" style="flex-wrap:wrap;gap:6px;">' +
-        '<div><h3 class="card-title">Primi passi</h3>' +
+        '<div><h2 class="card-title">Primi passi</h2>' +
           '<div style="font-size:0.78rem;color:var(--text-muted);margin-top:2px;">' + fatti + ' di ' + PASSI.length + ' fatti — si spuntano da soli man mano</div></div>' +
         '<button type="button" class="btn btn-ghost btn-sm" onclick="PrimiPassi.chiudi()">Nascondi</button>' +
       '</div>' +

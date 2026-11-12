@@ -98,10 +98,10 @@ const DashboardNuova = (() => {
         eroe.id = 'dn-hero'; eroe.className = 'sc-hero';
         contenitore.insertBefore(eroe, contenitore.firstChild);
       }
-      const tipo = typeof Scena !== 'undefined' ? Scena.tipo((camp.name || '') + ' ' + (camp.description || '')) : 'auto';
+      const tipo = typeof Scena !== 'undefined' ? Scena.paesaggioDi(camp) : 'auto';
       let scena = eroe.querySelector('svg.sc-scena');
-      if (!scena && typeof Scena !== 'undefined') { eroe.insertAdjacentHTML('afterbegin', Scena.svg(camp.name || 'Campagna', tipo)); scena = eroe.querySelector('svg.sc-scena'); }
-      if (scena && scena.dataset.seme !== (camp.name || 'Campagna')) { scena.dataset.seme = camp.name || 'Campagna'; scena.dataset.tipo = tipo; }
+      if (!scena && typeof Scena !== 'undefined') { eroe.insertAdjacentHTML('afterbegin', Scena.svg(camp.name || 'Campagna', tipo, 'campagna')); scena = eroe.querySelector('svg.sc-scena'); Scena.pulsante(eroe, 'campagna'); }
+      if (scena && (scena.dataset.seme !== (camp.name || 'Campagna') || scena.dataset.tipo !== tipo)) { scena.dataset.seme = camp.name || 'Campagna'; scena.dataset.tipo = tipo; scena.dataset.fatta = ''; }
 
       // La riga col nome della campagna e "Condividi" sta dentro la scena, sopra l'ultima sessione
       const testa = $('campagna-title')?.parentElement?.parentElement;
