@@ -108,7 +108,7 @@ Crea una mappa da zero, senza caricare nulla: **regno** (isola, continente, arci
 
 ![Il Cartografo genera un regno, poi una città, un dungeon e una casa su più piani](docs/img/demo-cartografo.gif)
 
-- **Tre stili** per ogni mappa: **Atlante** (inciso a inchiostro su carta), **Atlante a colori** (con le velature dell’acquerello) e **Notte** (gesso e ambra su blu notte). I **nomi** possono essere all’italiana, elfici, nanici, orcheschi o nordici, e una mappa creata da un segnaposto eredita quelli della regione.
+- **Tre colori** per ogni mappa: **Carta** (chiara, da stampare), **Colori** (prati, boschi e mari colorati) e **Notte** (su blu notte). Montagne, colline, boschi e città sono disegnati in modo da riconoscerli a colpo d’occhio. I **nomi** possono essere all’italiana, elfici, nanici, orcheschi o nordici, e una mappa creata da un segnaposto eredita quelli della regione.
 - Scegli forma, dimensione, colori e cosa mostrare, oppure lascia fare al caso con **A caso**: resta nel tipo di mappa scelto e, con **Tieni i miei colori**, non cambia il tuo stile. **Mappa precedente** ti riporta a quella di prima.
 - **Metti nelle mappe** la porta nella pagina Mappa con la scala già impostata e i luoghi segnati dai pin con le loro note. A richiesta crea anche le schede Luogo nella Wiki.
 - **Genera la sua mappa**: clicca un pin e crea la mappa di quel luogo, già collegata. La città nata da un regno eredita ciò che lì si vede, come il mare e il fiume. Così si scende dal regno alla città fino alla locanda, e si torna indietro.
