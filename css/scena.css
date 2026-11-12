@@ -476,3 +476,57 @@ body.barra-alta #wiki-section-tabbar:not([style*="display:none"]):not([style*="d
 .toast-info { background: color-mix(in oklch, var(--ac) 18%, var(--bg-secondary)); }
 .comp-note { border: 0; border-radius: 12px; background: color-mix(in oklch, var(--accent-warning) 16%, var(--bg-card)); }
 .combat-row-active { border-left: 0; background: color-mix(in oklch, var(--ac) 20%, transparent) !important; box-shadow: inset 0 0 0 2px var(--ac); border-radius: 12px; }
+
+/* ══ Dashboard: il quadro completo nel primo schermo ══
+   Nella scena: in alto nome della campagna, viste e Condividi; sotto, a sinistra l'ultima sessione,
+   a destra "Cosa incombe" in tessere compatte. Sotto la scena partono subito Quest e Mondo. */
+#dn-hero { display: grid !important; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto 1fr; align-items: end; gap: 22px 36px; min-height: 0 !important; padding: 20px clamp(16px, 4vw, 56px) 30px !important; margin-bottom: 0 !important; }
+#dn-hero.dn-con-incombe { grid-template-columns: minmax(0, 1fr) minmax(360px, 500px); }
+#dn-hero .dn-testa { grid-column: 1 / -1; display: flex !important; align-items: center !important; flex-wrap: wrap; gap: 10px 16px; margin: 0 !important; padding: 0 0 clamp(70px, 14vh, 150px) !important; }
+#dn-hero .dn-testa > div:first-child { margin-right: auto; }
+#dn-hero #dash-mia-barra { order: 2; margin: 0 !important; }
+#dn-hero .dn-testa > div:last-child { order: 3; }
+#dn-hero .dn-lead-card { align-self: end; }
+#dn-hero .dn-lead h2 { font-size: clamp(2.6rem, 6.4vw, 5.2rem) !important; margin: 10px 0 14px !important; }
+#dn-hero .dn-lead p { display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+#dn-hero .dn-azioni-s { margin-top: 20px; }
+#dn-hero > .dn-fascia { padding-top: 0; align-self: end; }
+#dn-hero > .dn-fascia .dn-fascia-t { margin-bottom: 10px; }
+#dn-hero > .dn-fascia .dn-fascia-t h2 { font-size: 1.45rem !important; line-height: 1.1; }
+#dn-hero > .dn-fascia .sc-riga { grid-template-columns: 1fr 1fr; gap: 10px; }
+#dn-hero > .dn-fascia .sc-t { min-height: 0; padding: 14px 16px; border-radius: 16px; background: color-mix(in oklch, var(--bg-card) 92%, transparent); gap: 4px; }
+#dn-hero > .dn-fascia .sc-t:hover { background: var(--bg-card-hover); }
+#dn-hero > .dn-fascia .sc-urgente { background: color-mix(in oklch, var(--ac) 26%, var(--bg-card)); }
+#dn-hero > .dn-fascia .sc-h { font-size: 1.15rem !important; }
+#dn-hero > .dn-fascia .sc-s { font-size: 0.84rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+#dn-hero > .dn-fascia .sc-larga { grid-column: 1 / -1; }
+#dn-hero > .dn-fascia .sc-cw { grid-column: auto; }
+#dn-hero > .dn-fascia .sc-cw.sc-larga { grid-column: 1 / -1; }
+#dn-hero > .dn-fascia .sc-ruota { width: 52px; height: 52px; }
+#dn-hero > .dn-fascia .sc-giorni { font-size: 2.6rem; }
+#dn-hero > .dn-fascia .sc-pallini { padding-top: 6px; } #dn-hero > .dn-fascia .sc-pallini i { width: 12px; height: 12px; }
+#dn-hero > .dn-fascia .sc-riga > .card { grid-column: 1 / -1; }
+.dn-con-scena > .dash-grid > .dn-fascia:first-of-type, .dn-con-scena > .dash-grid > .dn-fascia[data-f="quest"] { padding-top: 22px; }
+@media (max-width: 1100px) {
+  #dn-hero.dn-con-incombe { grid-template-columns: minmax(0, 1fr); }
+  #dn-hero .dn-testa { padding-bottom: 60px !important; }
+  #dn-hero > .dn-fascia { padding-top: 14px; }
+}
+@media (max-width: 760px) {
+  #dn-hero { gap: 16px; padding: 16px 16px 22px !important; }
+  #dn-hero .dn-testa { padding-bottom: 44px !important; }
+  #dn-hero .dn-testa > div:first-child { width: 100%; }
+  #dn-hero .dn-lead h2 { font-size: 2.4rem !important; }
+  #dn-hero .dn-lead p { -webkit-line-clamp: 5; }
+  #dn-hero > .dn-fascia .sc-riga { grid-template-columns: 1fr; }
+  #dn-hero > .dn-fascia .sc-cw { grid-column: 1 / -1; }
+}
+#dn-hero .dn-lead-card { grid-column: 1 / 2 !important; } #dn-hero > .dn-fascia { grid-column: 2 / 3; } @media (max-width: 1100px) { #dn-hero .dn-lead-card, #dn-hero > .dn-fascia { grid-column: 1 / -1 !important; } }
+@media (max-width: 760px) {
+  #dn-hero .dn-testa { padding-bottom: 18px !important; gap: 8px; }
+  #dn-hero #dash-mia-barra [role="tab"], #dn-hero .dn-testa .btn { min-height: 34px !important; padding: 6px 12px !important; font-size: 0.86rem !important; }
+  #dn-hero .dn-lead p { -webkit-line-clamp: 3; font-size: 0.98rem; }
+  #dn-hero .dn-azioni-s { margin-top: 14px; gap: 8px; }
+  #dn-hero .dn-azioni-s .btn { flex: 1 1 0 !important; min-height: 42px !important; padding: 8px 10px !important; font-size: 0.9rem !important; white-space: normal; }
+  #dn-hero .dn-azioni-s .btn:nth-child(3) { flex-basis: 100% !important; background: transparent !important; min-height: 32px !important; text-decoration: underline; text-underline-offset: 4px; }
+}

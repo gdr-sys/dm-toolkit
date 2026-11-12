@@ -58,6 +58,10 @@ const DashboardNuova = (() => {
     // Le card tornano tutte figlie dirette della griglia; scena e fasce spariscono
     const eroe = $('dn-hero');
     if (eroe) {
+      const barra = $('dash-mia-barra');
+      if (barra && eroe.contains(barra)) contenitore.insertBefore(barra, g);
+      const inc = eroe.querySelector('.dn-fascia');
+      if (inc) g.insertBefore(inc, g.firstChild);
       const testa = eroe.querySelector('.dn-testa');
       if (testa) { testa.classList.remove('dn-testa'); contenitore.insertBefore(testa, contenitore.firstChild); }
       eroe.querySelectorAll('.card').forEach((c) => g.insertBefore(c, g.firstChild)); eroe.remove();
@@ -102,6 +106,8 @@ const DashboardNuova = (() => {
       // La riga col nome della campagna e "Condividi" sta dentro la scena, sopra l'ultima sessione
       const testa = $('campagna-title')?.parentElement?.parentElement;
       if (testa && testa.parentElement !== eroe) { testa.classList.add('dn-testa'); eroe.appendChild(testa); }
+      const barraViste = $('dash-mia-barra');
+      if (testa && barraViste && barraViste.parentElement !== testa) testa.insertBefore(barraViste, testa.children[1] || null);
 
       const perFascia = {};
       const vuote = [];
@@ -121,7 +127,7 @@ const DashboardNuova = (() => {
 
       FASCE.forEach((f) => {
         const carte = perFascia[f.k] || [];
-        let sez = g.querySelector(':scope > .dn-fascia[data-f="' + f.k + '"]');
+        let sez = g.querySelector(':scope > .dn-fascia[data-f="' + f.k + '"]') || (eroe && eroe.querySelector(':scope > .dn-fascia[data-f="' + f.k + '"]'));
         if (!sez) {
           sez = document.createElement('section');
           sez.className = 'dn-fascia'; sez.dataset.f = f.k;
@@ -134,6 +140,11 @@ const DashboardNuova = (() => {
         carte.forEach((c) => riga.appendChild(c));
         sez.hidden = !carte.some((c) => !c.classList.contains('dn-nascosta'));
       });
+
+      // "Cosa incombe" sta nella scena, accanto all'ultima sessione: tutto il quadro nel primo schermo
+      const incombe = g.querySelector(':scope > .dn-fascia[data-f="incombe"]');
+      if (incombe) eroe.appendChild(incombe);
+      eroe.classList.toggle('dn-con-incombe', !!incombe && !incombe.hidden);
 
       // I riquadri senza contenuto: una riga sola in fondo
       let rigaVuoti = $('dn-vuoti');
