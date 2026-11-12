@@ -466,3 +466,13 @@ body.barra-alta #wiki-section-tabbar:not([style*="display:none"]):not([style*="d
 /* Cartografo e Scrittoio: il foglio di lavoro e' una tessera grande */
 #carto-stage, #carto-vista { border-radius: var(--raggio) !important; border-color: transparent !important; }
 #carto-titolo-mappa { font-family: var(--font-titoli); font-weight: 400; font-size: 1.6rem; }
+
+/* ── Niente righe colorate su un lato: lo stato si legge dal fondo ── */
+.card-accent, .card-gold { border-left: 0 !important; }
+.toast-success, .toast-error, .toast-warning, .toast-info { border-left: 0; border-radius: 14px; }
+.toast-success { background: color-mix(in oklch, var(--accent-success) 22%, var(--bg-secondary)); }
+.toast-error { background: color-mix(in oklch, var(--accent-danger) 24%, var(--bg-secondary)); }
+.toast-warning { background: color-mix(in oklch, var(--accent-warning) 22%, var(--bg-secondary)); }
+.toast-info { background: color-mix(in oklch, var(--ac) 18%, var(--bg-secondary)); }
+.comp-note { border: 0; border-radius: 12px; background: color-mix(in oklch, var(--accent-warning) 16%, var(--bg-card)); }
+.combat-row-active { border-left: 0; background: color-mix(in oklch, var(--ac) 20%, transparent) !important; box-shadow: inset 0 0 0 2px var(--ac); border-radius: 12px; }
