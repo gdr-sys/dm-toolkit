@@ -180,7 +180,7 @@ const Cartografo = (() => {
     const tab = $('carto-tipi');
     if (!tab) return;
     tab.innerHTML = Object.entries(K().TIPI).map(([k, v]) =>
-      '<button type="button" role="tab" aria-selected="' + (k === tipo) + '" class="btn btn-sm ' + (k === tipo ? 'btn-primary' : 'btn-ghost') + '" onclick="Cartografo.scegliTipo(\'' + k + '\')">' + _esc(v.nome) + '</button>').join('');
+      '<button type="button" role="tab" aria-selected="' + (k === tipo) + '" class="sc-scelta" onclick="Cartografo.scegliTipo(\'' + k + '\')">' + (typeof Scena !== 'undefined' ? Scena.icona(k) : '') + '<span>' + _esc(v.nome) + '</span></button>').join('');
     const sel = (id, etichetta, lista, val, azione) => '<div class="form-group"><label class="form-label" for="' + id + '">' + _esc(etichetta) + '</label>' +
       '<select id="' + id + '" class="form-select" onchange="' + azione + '">' + lista.map(([v, l]) => '<option value="' + _esc(v) + '"' + (v === val ? ' selected' : '') + '>' + _esc(l) + '</option>').join('') + '</select></div>';
     const spunta = (id, etichetta, val, azione) => '<label class="carto-spunta" for="' + id + '"><input type="checkbox" id="' + id + '"' + (val ? ' checked' : '') + ' onchange="' + azione + '"><span>' + _esc(etichetta) + '</span></label>';

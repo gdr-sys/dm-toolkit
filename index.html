@@ -1972,8 +1972,9 @@
           </svg>
         </div>
         <h3>Schermo vuoto</h3>
-        <p class="text-sm text-muted" style="max-width:360px;margin:0 auto;">Clicca "+ Aggiungi Blocco" per personalizzare il tuo schermo con i widget che ti servono durante la sessione.</p>
-        <button class="btn btn-primary" style="margin-top:var(--space-md);" onclick="Schermo.addBlock()">+ Aggiungi il primo blocco</button>
+        <p class="text-sm text-muted" style="max-width:420px;margin:0 auto;">Metti qui quello che ti serve sotto mano durante la sessione. Tocca un blocco per aggiungerlo, potrai spostarlo e ridimensionarlo.</p>
+        <div id="schermo-scelte" class="schermo-scelte"></div>
+        <button class="btn btn-ghost" style="margin-top:var(--space-md);" onclick="Schermo.addBlock()">Tutti i blocchi e le opzioni</button>
       </div>
 
       <!-- Griglia blocchi -->
@@ -8108,6 +8109,12 @@ const Schermo = (() => {
     if (_blocks.length === 0) {
       grid.innerHTML = '';
       if (empty) empty.style.display = '';
+      // Scelta rapida: i blocchi piu' usati al tavolo, aggiunti con un tocco
+      const scelte = document.getElementById('schermo-scelte');
+      if (scelte) scelte.innerHTML = ['percezioni', 'combat_mini', 'condizioni', 'dc', 'dadi', 'note_sessione'].filter(k => BLOCK_TYPES[k]).map(k =>
+        '<button type="button" class="schermo-scelta" onclick="Schermo.aggiungiRapido(\'' + k + '\')">' +
+          '<span class="schermo-scelta-icona">' + BLOCK_TYPES[k].icon + '</span>' +
+          '<span class="schermo-scelta-testo"><b>' + BLOCK_TYPES[k].label + '</b><small>' + (BLOCK_TYPES[k].desc || '') + '</small></span></button>').join('');
       return;
     }
     if (empty) empty.style.display = 'none';
@@ -8873,6 +8880,19 @@ const Schermo = (() => {
     }
   };
 
+  // Aggiunge un blocco con le impostazioni predefinite (dalla scelta rapida dello schermo vuoto)
+  const aggiungiRapido = (type) => {
+    const def = BLOCK_TYPES[type];
+    if (!def) return;
+    const block = { id: 'sb_' + Date.now(), type, size: def.defaultSize || 'md', title: def.label, content: '' };
+    const colCounts = [0,1,2,3].map(c => _blocks.filter(b => (b.col ?? 0) === c).length);
+    block.col = colCounts.indexOf(Math.min(...colCounts));
+    _blocks.push(block);
+    save();
+    render();
+    Toast.show(def.label + ' aggiunto allo schermo', 'success');
+  };
+
   const submitAddBlock = () => {
     const type    = document.getElementById('schermo-block-type')?.value || 'note';
     const size    = document.getElementById('schermo-block-size')?.value || 'md';
@@ -8993,7 +9013,7 @@ const Schermo = (() => {
   };
 
   return {
-    init, render, addBlock, submitAddBlock, _onTypeChange, eseguiGeneratore, aggiungiMusica, togliMusica,
+    init, render, addBlock, aggiungiRapido, submitAddBlock, _onTypeChange, eseguiGeneratore, aggiungiMusica, togliMusica,
     removeBlock, resizeBlock, moveBlock, editBlock, resetLayout,
     rollDie, generateMeteo, saveNote, advanceTime, refreshCombat,
     setCompendioRef, _refreshCombat, _refreshFavoriti, _swapBlocks,

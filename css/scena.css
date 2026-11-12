@@ -530,3 +530,47 @@ body.barra-alta #wiki-section-tabbar:not([style*="display:none"]):not([style*="d
   #dn-hero .dn-azioni-s .btn { flex: 1 1 0 !important; min-height: 42px !important; padding: 8px 10px !important; font-size: 0.9rem !important; white-space: normal; }
   #dn-hero .dn-azioni-s .btn:nth-child(3) { flex-basis: 100% !important; background: transparent !important; min-height: 32px !important; text-decoration: underline; text-underline-offset: 4px; }
 }
+
+/* ══ Cartografo e Scrittoio: le scelte sono tessere con icona ══ */
+#carto-tipi, #sc-voci { display: grid !important; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 10px !important; margin-bottom: 14px !important; }
+.sc-scelta { display: flex; flex-direction: column; align-items: flex-start; justify-content: space-between; gap: 14px; min-height: 92px; padding: 14px 16px; border: 0; border-radius: 18px; background: var(--bg-card); color: var(--text-secondary); font: 600 0.95rem var(--font-body); text-align: left; cursor: pointer; transition: background-color .15s, transform .2s cubic-bezier(.2, .7, .2, 1); }
+.sc-scelta:hover { background: var(--bg-card-hover); color: var(--text-primary); transform: translateY(-2px); }
+.sc-scelta[aria-selected="true"] { background: var(--ac); color: var(--ac-t); }
+.sc-scelta .sc-icona { opacity: .9; }
+.carto-comandi { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 18px !important; }
+.carto-pannello { background: var(--bg-card) !important; border-radius: var(--raggio) !important; }
+.carto-pannello .form-label { color: var(--text-muted); font-weight: 600; }
+.carto-nome-mappa, #carto-titolo-mappa { font-family: var(--font-titoli) !important; font-weight: 400 !important; font-size: 1.7rem !important; line-height: 1.1; }
+#carto-stage, #sc-stage { border-radius: var(--raggio) !important; border: 0 !important; overflow: hidden; background: var(--bg-card) !important; }
+.carto-zoom { border: 0 !important; border-radius: 999px !important; background: color-mix(in oklch, var(--bg-primary) 80%, transparent) !important; box-shadow: none !important; }
+#carto-contesto { border-radius: 14px !important; border: 0 !important; background: color-mix(in oklch, var(--ac) 18%, var(--bg-card)) !important; }
+@media (max-width: 760px) {
+  #carto-tipi, #sc-voci { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px !important; }
+  .sc-scelta { min-height: 74px; padding: 10px 12px; font-size: 0.85rem; gap: 8px; border-radius: 14px; }
+  .sc-scelta .sc-icona { width: 22px; height: 22px; }
+}
+
+/* ══ Schermo del DM ══ */
+#schermo-empty { border: 1px dashed var(--border-strong) !important; border-radius: var(--raggio) !important; background: none !important; padding: 34px clamp(16px, 4vw, 40px) !important; }
+#schermo-empty h3 { font-size: 1.8rem; }
+.schermo-scelte { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; margin: 22px auto 0; max-width: 980px; text-align: left; }
+.schermo-scelta { display: flex; align-items: flex-start; gap: 14px; padding: 16px 18px; border: 0; border-radius: 18px; background: var(--bg-card); color: var(--text-primary); font: inherit; text-align: left; cursor: pointer; transition: background-color .15s, transform .2s cubic-bezier(.2, .7, .2, 1); }
+.schermo-scelta:hover { background: var(--bg-card-hover); transform: translateY(-2px); }
+.schermo-scelta-icona { flex: none; width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; background: color-mix(in oklch, var(--ac) 20%, transparent); color: var(--accent-text); }
+.schermo-scelta-icona svg { width: 20px; height: 20px; }
+.schermo-scelta-testo { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.schermo-scelta-testo b { font-family: var(--font-titoli); font-weight: 400; font-size: 1.2rem; }
+.schermo-scelta-testo small { font-size: 0.86rem; color: var(--text-muted); line-height: 1.4; }
+.schermo-block { background: var(--bg-card) !important; border: 0 !important; border-radius: var(--raggio) !important; box-shadow: none !important; }
+.schermo-block-header { border-bottom: 0 !important; background: none !important; padding: 14px 16px 6px !important; }
+.schermo-block-title { font-family: var(--font-titoli); font-weight: 400; font-size: 1.2rem; }
+.schermo-block-icon { color: var(--accent-text); }
+.schermo-block-header { flex-wrap: wrap; row-gap: 4px; }
+.schermo-block-title { text-transform: none !important; letter-spacing: 0 !important; color: var(--text-primary) !important; flex: 1 1 120px !important; min-width: 0; }
+.schermo-block-actions { margin-left: auto; }
+.schermo-block-actions > span { border: 0 !important; background: color-mix(in oklch, var(--text-primary) 8%, transparent); border-radius: 999px !important; }
+/* Con il mouse, i comandi del blocco compaiono solo quando servono: il titolo resta leggibile anche nei blocchi stretti */
+@media (hover: hover) {
+  .schermo-block-actions { opacity: 0; transition: opacity .15s; }
+  .schermo-block:hover .schermo-block-actions, .schermo-block:focus-within .schermo-block-actions { opacity: 1; }
+}

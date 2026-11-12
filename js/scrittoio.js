@@ -126,7 +126,7 @@ const Scrittoio = (() => {
   const _controlli = () => {
     const tab = $('sc-voci'), box = $('sc-controlli');
     if (!tab || !box) return;
-    tab.innerHTML = VOCI.map(([k, l]) => '<button type="button" role="tab" aria-selected="' + (k === _voce) + '" class="btn btn-sm ' + (k === _voce ? 'btn-primary' : 'btn-ghost') + '" onclick="Scrittoio.scegli(\'' + k + '\')">' + _esc(l) + '</button>').join('');
+    tab.innerHTML = VOCI.map(([k, l]) => '<button type="button" role="tab" aria-selected="' + (k === _voce) + '" class="sc-scelta" onclick="Scrittoio.scegli(\'' + k + '\')">' + (typeof Scena !== 'undefined' ? Scena.icona(k) : '') + '<span>' + _esc(l) + '</span></button>').join('');
     const op = _opera();
     if (_voce === 'stemma') {
       box.innerHTML = _testo('sc-nome', 'Nome sotto lo stemma', op.nome, 'nome', 'Facoltativo') +

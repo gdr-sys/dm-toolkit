@@ -89,6 +89,23 @@ const Scena = (() => {
     return h + '</div>';
   };
 
+  // ── Icone delle scelte di Cartografo e Scrittoio: tratto 1.6, stesso stile delle icone dell'app ──
+  const ICONE = {
+    regno: '<path d="M3 20l5-9 4 6 3-4 6 7z"/><path d="M8 11V4l4 2-4 2"/>',
+    citta: '<path d="M3 21V10l3-2 3 2v11"/><path d="M9 21V6l4-3 4 3v15"/><path d="M17 21v-8l2-1 2 1v8"/><path d="M2 21h20"/>',
+    villaggio: '<path d="M3 21v-7l5-4 5 4v7"/><path d="M13 21v-5l4-3 4 3v5"/><path d="M7 21v-3h2v3"/><path d="M2 21h20"/>',
+    caverna: '<path d="M2 20c1-8 5-13 10-13s9 5 10 13"/><path d="M8 20c0-4 2-7 4-7s4 3 4 7"/><path d="M2 20h20"/>',
+    dungeon: '<rect x="4" y="4" width="16" height="16" rx="1"/><path d="M4 12h6v8"/><path d="M14 4v6h6"/><path d="M14 16h2"/>',
+    abitazione: '<path d="M3 11l9-7 9 7"/><path d="M5 9.5V20h14V9.5"/><path d="M10 20v-6h4v6"/>',
+    stemma: '<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M12 8v8"/><path d="M8 12h8"/>',
+    lettera: '<rect x="3" y="5" width="18" height="14" rx="1.5"/><path d="M3 7l9 6 9-6"/>',
+    taglia: '<rect x="4" y="3" width="16" height="18" rx="1"/><circle cx="12" cy="10" r="3"/><path d="M8 17h8"/>',
+    editto: '<path d="M7 3h10v16l-5-3-5 3z"/><path d="M10 8h4"/><path d="M10 11h4"/>',
+    avviso: '<path d="M12 2v3"/><rect x="4" y="5" width="16" height="15" rx="1"/><path d="M8 10h8"/><path d="M8 14h5"/>',
+    tesoro: '<path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2z"/><path d="M14 10l3 3"/><path d="M17 10l-3 3"/>',
+  };
+  const icona = (k) => '<svg class="sc-icona" aria-hidden="true" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">' + (ICONE[k] || '<rect x="4" y="4" width="16" height="16" rx="3"/>') + '</svg>';
+
   // ── Intestazione con scena per le pagine che hanno un .page-header o un titolo di sezione ──
   const _camp = () => (typeof App !== 'undefined' && App.getActiveCampaign ? App.getActiveCampaign() : null);
   const _intesta = () => {
@@ -130,5 +147,5 @@ const Scena = (() => {
   };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', avvia); else avvia();
 
-  return { disegna, tutte, svg, tipo, ruota, pallini, aggiorna };
+  return { disegna, tutte, svg, tipo, ruota, pallini, aggiorna, icona };
 })();
