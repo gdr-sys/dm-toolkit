@@ -60,33 +60,33 @@ const StaleThreads = (() => {
       if ((n.stato || 'Vivo') === 'Morto') return;
       const days = _daysSince(n.aggiornatoAt);
       if (days !== null && days >= threshold) {
-        items.push({ tipo: 'png', nome: n.name || n.nome || 'Senza nome', days, ts: n.aggiornatoAt, id: n.id, icon: '👤' });
+        items.push({ tipo: 'png', nome: n.name || n.nome || 'Senza nome', days, ts: n.aggiornatoAt, id: n.id, icon: '' });
       }
     });
     (camp.locations || []).forEach(l => {
       const days = _daysSince(l.aggiornatoAt);
       if (days !== null && days >= threshold) {
-        items.push({ tipo: 'luoghi', nome: l.nome || l.name || 'Senza nome', days, ts: l.aggiornatoAt, id: l.id, icon: '🗺️' });
+        items.push({ tipo: 'luoghi', nome: l.nome || l.name || 'Senza nome', days, ts: l.aggiornatoAt, id: l.id, icon: '' });
       }
     });
     (camp.factions || []).forEach(f => {
       const days = _daysSince(f.aggiornatoAt);
       if (days !== null && days >= threshold) {
-        items.push({ tipo: 'fazioni', nome: f.nome || f.name || 'Senza nome', days, ts: f.aggiornatoAt, id: f.id, icon: '⚔️' });
+        items.push({ tipo: 'fazioni', nome: f.nome || f.name || 'Senza nome', days, ts: f.aggiornatoAt, id: f.id, icon: '' });
       }
     });
     (camp.quests || []).forEach(q => {
       if (q.stato === 'Completata' || q.stato === 'Fallita') return;
       const days = _daysSince(q.aggiornatoAt);
       if (days !== null && days >= threshold) {
-        items.push({ tipo: 'quest', nome: q.titolo || 'Senza titolo', days, ts: q.aggiornatoAt, id: q.id, icon: '📜' });
+        items.push({ tipo: 'quest', nome: q.titolo || 'Senza titolo', days, ts: q.aggiornatoAt, id: q.id, icon: '' });
       }
     });
     (camp.trame || []).forEach(t => {
       if (t.stato === 'Completata' || t.stato === 'Abbandonata') return;
       const days = _daysSince(t.aggiornatoAt);
       if (days !== null && days >= threshold) {
-        items.push({ tipo: 'trame', nome: t.titolo || 'Senza titolo', days, ts: t.aggiornatoAt, id: t.id, icon: '🎭' });
+        items.push({ tipo: 'trame', nome: t.titolo || 'Senza titolo', days, ts: t.aggiornatoAt, id: t.id, icon: '' });
       }
     });
 

@@ -53,7 +53,7 @@ const QuickCard = (() => {
       return '<button onclick="QuickCard.show(\'' + n.id + '\')" ' +
         'style="display:block;width:100%;text-align:left;padding:7px 10px;background:none;border:none;border-radius:var(--radius-sm);cursor:pointer;color:var(--text-primary);font-size:0.85rem;" ' +
         'onmouseenter="this.style.background=\'var(--bg-tertiary)\'" onmouseleave="this.style.background=\'none\'">' +
-        '👤 ' + (n.name || n.nome || '') +
+        '' + (n.name || n.nome || '') +
         (sub ? '<span style="color:var(--text-muted);font-size:0.75rem;"> — ' + sub + '</span>' : '') +
         '</button>';
     }).join('');
@@ -97,7 +97,7 @@ const QuickCard = (() => {
       (personalita ? _block('Voce e personalità', personalita) : '') +
       (vuole ? _block('Vuole', vuole) : '') +
       (gancio ? _block('Gancio per il party', gancio) : '') +
-      (segreto ? _block('🔒 Segreto DM', segreto, true) : '') +
+      (segreto ? _block('Segreto DM', segreto, true) : '') +
       (!personalita && !vuole && !gancio && !segreto ? '<div class="text-muted text-sm">Nessun dettaglio compilato per questo PNG ancora.</div>' : '');
   };
 

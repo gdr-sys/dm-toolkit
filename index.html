@@ -706,7 +706,7 @@
 
         <!-- ══ 👥 PNG & Personaggi ══ -->
         <div style="grid-column:1/-1;margin-top:4px;margin-bottom:-4px;">
-          <div style="font-family:var(--font-display);font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);border-bottom:1px solid var(--border);padding-bottom:4px;">👥 PNG & Personaggi</div>
+          <div style="font-family:var(--font-display);font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);border-bottom:1px solid var(--border);padding-bottom:4px;">PNG & Personaggi</div>
         </div>
 <div class="card card-gold gen-card" data-gen-id="npc" style="grid-column:1/-1;">
           <div class="card-header" style="flex-wrap:wrap;gap:6px;">
@@ -756,18 +756,18 @@
 
         <!-- ══ 🌍 Ambiente & Atmosfera ══ -->
         <div style="grid-column:1/-1;margin-top:4px;margin-bottom:-4px;">
-          <div style="font-family:var(--font-display);font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);border-bottom:1px solid var(--border);padding-bottom:4px;">🌍 Ambiente & Atmosfera</div>
+          <div style="font-family:var(--font-display);font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);border-bottom:1px solid var(--border);padding-bottom:4px;">Ambiente & Atmosfera</div>
         </div>
 <div class="card gen-card" data-gen-id="meteo">
           <div class="card-header">
             <h2 class="card-title">Meteo</h2>
             <select id="gen-meteo-stagione" class="form-select" style="width:auto;font-size:0.75rem;">
-              <option value="primavera">🌸 Primavera</option>
-              <option value="estate">☀️ Estate</option>
-              <option value="autunno">🍂 Autunno</option>
-              <option value="inverno">❄️ Inverno</option>
-              <option value="tropicale">🌴 Tropicale</option>
-              <option value="artico">🧊 Artico</option>
+              <option value="primavera">Primavera</option>
+              <option value="estate">Estate</option>
+              <option value="autunno">Autunno</option>
+              <option value="inverno">Inverno</option>
+              <option value="tropicale">Tropicale</option>
+              <option value="artico">Artico</option>
             </select>
             <button class="btn btn-secondary btn-sm" onclick="Generatori.rollWeather()">Genera</button>
           </div>
@@ -798,21 +798,21 @@
             <h2 class="card-title">Descrizione Luoghi</h2>
             <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
               <select id="gen-desc-tipo" class="form-select" style="width:auto;font-size:0.75rem;" onchange="DescrizioneGen.aggiornaSottotipo()">
-                <option value="taverna">🍺 Taverna</option>
-                <option value="bottega">🛒 Bottega</option>
-                <option value="strada">🛤️ Strada</option>
-                <option value="quartiere">🏘️ Quartiere</option>
-                <option value="dungeon">🏚️ Dungeon</option>
-                <option value="foresta">🌲 Foresta</option>
-                <option value="tempio">⛪ Tempio</option>
-                <option value="castello">🏰 Castello</option>
-                <option value="porto">⚓ Porto</option>
-                <option value="mercato">🏪 Mercato</option>
+                <option value="taverna">Taverna</option>
+                <option value="bottega">Bottega</option>
+                <option value="strada">Strada</option>
+                <option value="quartiere">Quartiere</option>
+                <option value="dungeon">Dungeon</option>
+                <option value="foresta">Foresta</option>
+                <option value="tempio">Tempio</option>
+                <option value="castello">Castello</option>
+                <option value="porto">Porto</option>
+                <option value="mercato">Mercato</option>
               </select>
               <select id="gen-desc-qualita" class="form-select" style="width:auto;font-size:0.75rem;">
-                <option value="squallido">💀 Squallido</option>
-                <option value="normale" selected>⚖️ Normale</option>
-                <option value="lusso">👑 Lusso</option>
+                <option value="squallido">Squallido</option>
+                <option value="normale" selected>Normale</option>
+                <option value="lusso">Lusso</option>
               </select>
               <button class="btn btn-primary btn-sm" onclick="DescrizioneGen.genera()">Genera</button>
               <button class="btn btn-ghost btn-sm" onclick="DescrizioneGen.genera()">↺ Rigenera</button>
@@ -826,15 +826,15 @@
           <div class="card-header">
             <h2 class="card-title">Nomi Luoghi</h2>
             <select id="gen-nomluogo-tipo" class="form-select" style="width:auto;font-size:0.75rem;">
-              <option value="citta">🏙️ Città</option>
-              <option value="villaggio">🏘️ Villaggio</option>
-              <option value="fiume">🌊 Fiume</option>
-              <option value="montagna">⛰️ Montagna</option>
-              <option value="foresta">🌲 Foresta</option>
-              <option value="dungeon">🏚️ Dungeon/Rovina</option>
-              <option value="regno">👑 Regno/Regione</option>
+              <option value="citta">Città</option>
+              <option value="villaggio">Villaggio</option>
+              <option value="fiume">Fiume</option>
+              <option value="montagna">Montagna</option>
+              <option value="foresta">Foresta</option>
+              <option value="dungeon">Dungeon/Rovina</option>
+              <option value="regno">Regno/Regione</option>
             </select>
-            <button class="btn btn-secondary btn-sm" onclick="NomiLuoghiGen.genera()">🎲</button>
+            <button class="btn btn-secondary btn-sm" onclick="NomiLuoghiGen.genera()"></button>
           </div>
           <div id="gen-nomluogo-result" style="min-height:60px;">
             <div class="text-muted text-sm">Seleziona il tipo e genera</div>
@@ -843,7 +843,7 @@
 
         <!-- ══ 🏪 Negozio & Economia ══ -->
         <div style="grid-column:1/-1;margin-top:4px;margin-bottom:-4px;">
-          <div style="font-family:var(--font-display);font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);border-bottom:1px solid var(--border);padding-bottom:4px;">🏪 Negozio & Economia</div>
+          <div style="font-family:var(--font-display);font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);border-bottom:1px solid var(--border);padding-bottom:4px;">Negozio & Economia</div>
         </div>
 <div class="card gen-card" data-gen-id="shop">
           <div class="card-header">
@@ -861,7 +861,7 @@
                 <option value="magia">Emporio Arcano</option>
                 <option value="bazar">Bazar Strambo</option>
                 <option value="taverna_shop">Taverna (extra)</option>
-                <option value="biblioteca">📚 Biblioteca</option>
+                <option value="biblioteca">Biblioteca</option>
               </select>
             </div>
             <div class="form-group" style="margin-bottom:0;">
@@ -906,7 +906,7 @@
 
         <!-- ══ 💰 Loot & Tesori ══ -->
         <div style="grid-column:1/-1;margin-top:4px;margin-bottom:-4px;">
-          <div style="font-family:var(--font-display);font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);border-bottom:1px solid var(--border);padding-bottom:4px;">💰 Loot & Tesori</div>
+          <div style="font-family:var(--font-display);font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);border-bottom:1px solid var(--border);padding-bottom:4px;">Loot & Tesori</div>
         </div>
         <div class="card gen-card" data-gen-id="loot" style="grid-column:1/-1;">
           <div class="card-header">
@@ -924,15 +924,15 @@
                 <div style="font-size:0.7rem;color:var(--text-muted);margin-bottom:6px;font-family:var(--font-display);text-transform:uppercase;letter-spacing:0.05em;">Rango Nemico</div>
                 <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;">
                   <button id="rng-rank-Minion" class="btn btn-primary btn-sm" onclick="RNGLoot.setRank('Minion')" style="display:flex;flex-direction:column;align-items:center;padding:6px 4px;gap:1px;">
-                    <span>⚔️ Minion</span>
+                    <span>Minion</span>
                     <span style="font-size:0.6rem;opacity:0.7;font-weight:400;">Multi-categoria</span>
                   </button>
                   <button id="rng-rank-Elite" class="btn btn-ghost btn-sm" onclick="RNGLoot.setRank('Elite')" style="display:flex;flex-direction:column;align-items:center;padding:6px 4px;gap:1px;">
-                    <span>🛡️ Elite</span>
+                    <span>Elite</span>
                     <span style="font-size:0.6rem;opacity:0.7;font-weight:400;">Singola cat.</span>
                   </button>
                   <button id="rng-rank-Boss" class="btn btn-ghost btn-sm" onclick="RNGLoot.setRank('Boss')" style="display:flex;flex-direction:column;align-items:center;padding:6px 4px;gap:1px;">
-                    <span>👑 Boss</span>
+                    <span>Boss</span>
                     <span style="font-size:0.6rem;opacity:0.7;font-weight:400;">Singola cat.</span>
                   </button>
                 </div>
@@ -944,9 +944,9 @@
                 <div style="font-size:0.72rem;color:var(--text-muted);margin-bottom:6px;font-style:italic;">Clicca per applicare una condizione al bottino generato. Utile se il combattimento ha danneggiato gli oggetti, se il DM vuole aggiungere un maleficio narrativo o se l'ambiente (es. acido, fuoco) ha rovinato l'equipaggiamento nemico.</div>
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;">
                   <button id="rng-cond-intatto" class="btn btn-ghost btn-sm" onclick="RNGLoot.setCond('intatto')">✓ Intatto</button>
-                  <button id="rng-cond-danneggiato" class="btn btn-ghost btn-sm" onclick="RNGLoot.setCond('danneggiato')">⚠ Danneggiato</button>
+                  <button id="rng-cond-danneggiato" class="btn btn-ghost btn-sm" onclick="RNGLoot.setCond('danneggiato')">Danneggiato</button>
                   <button id="rng-cond-inutilizzabile" class="btn btn-ghost btn-sm" onclick="RNGLoot.setCond('inutilizzabile')">✗ Inutilizzabile</button>
-                  <button id="rng-cond-maledetto" class="btn btn-ghost btn-sm" onclick="RNGLoot.setCond('maledetto')">☠ Maledetto</button>
+                  <button id="rng-cond-maledetto" class="btn btn-ghost btn-sm" onclick="RNGLoot.setCond('maledetto')">Maledetto</button>
                 </div>
               </div>
 
@@ -985,7 +985,7 @@
                 style="width:100%;height:100%;border:none;border-radius:0 0 var(--radius-lg) var(--radius-lg);"
                 title="D&D Loot Generator" loading="lazy"></iframe>
               <div id="loot-iframe-placeholder" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--bg-secondary);border-radius:0 0 var(--radius-lg) var(--radius-lg);">
-                <div style="font-size:2.5rem;margin-bottom:12px;">📚</div>
+                <div style="font-size:2.5rem;margin-bottom:12px;"></div>
                 <div style="font-family:var(--font-display);font-size:0.9rem;margin-bottom:6px;">DMG Loot Generator</div>
                 <div class="text-muted text-sm" style="margin-bottom:16px;text-align:center;max-width:280px;">Tabelle ufficiali DMG 2014 e 2024<br>400+ oggetti magici</div>
                 <button class="btn btn-primary btn-sm" onclick="LootPanel.loadIframe()">Carica Tool</button>
@@ -996,7 +996,7 @@
 
         <!-- ══ 🗺️ Viaggio & Incontri ══ -->
         <div style="grid-column:1/-1;margin-top:4px;margin-bottom:-4px;">
-          <div style="font-family:var(--font-display);font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);border-bottom:1px solid var(--border);padding-bottom:4px;">🗺️ Viaggio & Incontri</div>
+          <div style="font-family:var(--font-display);font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);border-bottom:1px solid var(--border);padding-bottom:4px;">Viaggio & Incontri</div>
         </div>
 <div class="card gen-card" data-gen-id="viaggio">
           <div class="card-header">
@@ -1047,14 +1047,14 @@
           <div class="card-header">
             <h2 class="card-title">Incontri Casuali</h2>
             <select id="gen-incontri-ambiente" class="form-select" style="width:auto;font-size:0.75rem;">
-              <option value="foresta">🌲 Foresta</option>
-              <option value="dungeon">🏚️ Dungeon</option>
-              <option value="citta">🏙️ Città</option>
-              <option value="pianura">🌾 Pianura</option>
-              <option value="montagna">⛰️ Montagna</option>
-              <option value="mare">🌊 Mare / Costa</option>
-              <option value="palude">🌿 Palude</option>
-              <option value="deserto">🏜️ Deserto</option>
+              <option value="foresta">Foresta</option>
+              <option value="dungeon">Dungeon</option>
+              <option value="citta">Città</option>
+              <option value="pianura">Pianura</option>
+              <option value="montagna">Montagna</option>
+              <option value="mare">Mare / Costa</option>
+              <option value="palude">Palude</option>
+              <option value="deserto">Deserto</option>
             </select>
             <select id="gen-incontri-livello" class="form-select" style="width:auto;font-size:0.75rem;">
               <option value="basso">Liv. 1–4</option>
@@ -1081,10 +1081,10 @@
                 <option value="19">Liv. 19</option><option value="20">Liv. 20</option>
               </select>
               <select id="enc-difficolta" class="form-select" style="width:auto;font-size:0.75rem;">
-                <option value="facile">🟢 Facile</option>
-                <option value="media" selected>🟡 Media</option>
-                <option value="difficile">🟠 Difficile</option>
-                <option value="mortale">🔴 Mortale</option>
+                <option value="facile">Facile</option>
+                <option value="media" selected>Media</option>
+                <option value="difficile">Difficile</option>
+                <option value="mortale">Mortale</option>
               </select>
               <select id="enc-npg" class="form-select" style="width:auto;font-size:0.75rem;">
                 <option value="2">2 PG</option><option value="3">3 PG</option>
@@ -1114,9 +1114,9 @@
               <div style="display:flex;gap:6px;">
                 <select id="enc-loot-stato" class="form-select" style="width:auto;font-size:0.72rem;">
                   <option value="intatto">✓ Intatto</option>
-                  <option value="danneggiato">⚠ Danneggiato</option>
+                  <option value="danneggiato">Danneggiato</option>
                   <option value="inutilizzabile">✗ Inutilizzabile</option>
-                  <option value="maledetto">☠ Maledetto</option>
+                  <option value="maledetto">Maledetto</option>
                 </select>
                 <button class="btn btn-secondary btn-sm" onclick="EncounterBuilder.generaLoot()">Genera Loot</button>
               </div>
@@ -1127,7 +1127,7 @@
 
         <!-- ══ 🎭 Strumenti Narrativi ══ -->
         <div style="grid-column:1/-1;margin-top:4px;margin-bottom:-4px;">
-          <div style="font-family:var(--font-display);font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);border-bottom:1px solid var(--border);padding-bottom:4px;">🎭 Strumenti Narrativi</div>
+          <div style="font-family:var(--font-display);font-size:0.7rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);border-bottom:1px solid var(--border);padding-bottom:4px;">Strumenti Narrativi</div>
         </div>
 <div class="card gen-card" data-gen-id="rumors">
           <div class="card-header">
@@ -1185,13 +1185,13 @@
             <h2 class="card-title">Gancio Narrativo</h2>
             <select id="gen-gancio-tipo" class="form-select" style="width:auto;font-size:0.75rem;">
               <option value="tutti">Tutti</option>
-              <option value="mistero">🔍 Mistero</option>
-              <option value="azione">⚔️ Azione</option>
-              <option value="sociale">💬 Sociale</option>
-              <option value="esplorazione">🗺️ Esplorazione</option>
-              <option value="soprannaturale">🌀 Soprannaturale</option>
+              <option value="mistero">Mistero</option>
+              <option value="azione">Azione</option>
+              <option value="sociale">Sociale</option>
+              <option value="esplorazione">Esplorazione</option>
+              <option value="soprannaturale">Soprannaturale</option>
             </select>
-            <button class="btn btn-secondary btn-sm" onclick="GanciGen.genera()">🎲</button>
+            <button class="btn btn-secondary btn-sm" onclick="GanciGen.genera()"></button>
           </div>
           <div id="gen-gancio-result" style="min-height:60px;">
             <div class="text-muted text-sm">Genera un gancio narrativo</div>
@@ -1222,12 +1222,12 @@
               </select>
               <select id="gen-miss-tipo" class="form-select" style="width:auto;font-size:0.75rem;">
                 <option value="tutti">Tutti i tipi</option>
-                <option value="caccia">⚔️ Caccia/Sterminio</option>
-                <option value="recupero">📦 Recupero</option>
-                <option value="scorta">🛡️ Scorta</option>
-                <option value="esplorazione">🗺️ Esplorazione</option>
-                <option value="intriga">🎭 Intriga</option>
-                <option value="salvataggio">💚 Salvataggio</option>
+                <option value="caccia">Caccia/Sterminio</option>
+                <option value="recupero">Recupero</option>
+                <option value="scorta">Scorta</option>
+                <option value="esplorazione">Esplorazione</option>
+                <option value="intriga">Intriga</option>
+                <option value="salvataggio">Salvataggio</option>
               </select>
               <button class="btn btn-primary btn-sm" onclick="MissioniGen.genera()">Genera</button>
               <button class="btn btn-ghost btn-sm" onclick="MissioniGen.genera()">↺ Rigenera</button>
@@ -1527,7 +1527,7 @@
             <button class="nc-tb" onclick="wikiF('insertOrderedList')">1.</button>
             <button class="nc-tb" onclick="wikiFB('blockquote')">❝</button>
             <div style="width:1px;background:var(--border);margin:2px 3px;"></div>
-            <button class="nc-tb" onclick="wikiInsertImage()" title="Inserisci immagine via URL" style="color:#c98a24;">🖼</button>
+            <button class="nc-tb" onclick="wikiInsertImage()" title="Inserisci immagine via URL" style="color:#c98a24;"></button>
             <button class="nc-tb" onclick="wikiInsertTag()" style="color:var(--accent-secondary-text);">#tag</button>
             <button class="nc-tb" onclick="wikiInsertLink()" style="color:#3f7fc4;">[[link]]</button>
             <div style="width:1px;background:var(--border);margin:2px 3px;"></div>
@@ -1546,12 +1546,12 @@
               <button class="nc-tb" onclick="document.getElementById('wiki-hl-pick').click()" title="Scegli evidenziatore" style="font-size:0.6rem;padding:0 2px;">▾</button>
             </div>
             <div style="width:1px;background:var(--border);margin:2px 3px;"></div>
-            <button class="nc-tb" onclick="wikiCallout('read-aloud')" title="Read Aloud — testo da leggere ai giocatori" style="color:#3f9a6b;font-size:0.68rem;">📢</button>
-            <button class="nc-tb" onclick="wikiCallout('secret')" title="Segreto DM" style="color:#8f6bc8;font-size:0.68rem;">🔒</button>
-            <button class="nc-tb" onclick="wikiCallout('loot')" title="Loot" style="color:#c98a24;font-size:0.68rem;">💰</button>
-            <button class="nc-tb" onclick="wikiCallout('clue')" title="Indizio" style="color:#3f7fc4;font-size:0.68rem;">🔍</button>
-            <button class="nc-tb" onclick="wikiCallout('trap')" title="Trappola" style="color:#cf5450;font-size:0.68rem;">⚠️</button>
-            <button class="nc-tb" onclick="wikiCallout('improv')" title="Improv — idea al volo" style="color:var(--accent-secondary-text);font-size:0.68rem;">💡</button>
+            <button class="nc-tb" onclick="wikiCallout('read-aloud')" title="Read Aloud — testo da leggere ai giocatori" style="color:#3f9a6b;font-size:0.68rem;"></button>
+            <button class="nc-tb" onclick="wikiCallout('secret')" title="Segreto DM" style="color:#8f6bc8;font-size:0.68rem;"></button>
+            <button class="nc-tb" onclick="wikiCallout('loot')" title="Loot" style="color:#c98a24;font-size:0.68rem;"></button>
+            <button class="nc-tb" onclick="wikiCallout('clue')" title="Indizio" style="color:#3f7fc4;font-size:0.68rem;"></button>
+            <button class="nc-tb" onclick="wikiCallout('trap')" title="Trappola" style="color:#cf5450;font-size:0.68rem;"></button>
+            <button class="nc-tb" onclick="wikiCallout('improv')" title="Improv — idea al volo" style="color:var(--accent-secondary-text);font-size:0.68rem;"></button>
           </div>
           <!-- Editor -->
           <div id="wiki-note-content"
@@ -2077,8 +2077,8 @@
         <div class="form-group">
           <label class="form-label">Tipo</label>
           <select id="nc-type" class="form-select">
-            <option value="campagna">📖 Campagna</option>
-            <option value="oneshot">⚡ One Shot</option>
+            <option value="campagna">Campagna</option>
+            <option value="oneshot">One Shot</option>
           </select>
         </div>
         <div class="form-group">
@@ -2142,8 +2142,8 @@
         <div class="form-group">
           <label class="form-label">Tipo</label>
           <select id="ec-type" class="form-select">
-            <option value="campagna">📖 Campagna</option>
-            <option value="oneshot">⚡ One Shot</option>
+            <option value="campagna">Campagna</option>
+            <option value="oneshot">One Shot</option>
           </select>
         </div>
         <div class="form-group">
@@ -2321,7 +2321,7 @@
           <div class="form-group"><label class="form-label">Professione / Ruolo</label><input type="text" id="nm-job" class="form-input" placeholder="es. Fabbro"></div>
         </div>
         <div class="form-row">
-          <div class="form-group"><label class="form-label">Icona / Emoji</label><input type="text" id="nm-icon" class="form-input" placeholder="👤" maxlength="4"></div>
+          <div class="form-group"><label class="form-label">Icona / Emoji</label><input type="text" id="nm-icon" class="form-input" placeholder="" maxlength="4"></div>
           <div class="form-group"><label class="form-label">Fazione</label><select id="nm-faction" class="form-select"><option value="">Nessuna</option></select></div>
         </div>
         <div class="form-group">
@@ -2364,8 +2364,8 @@
   <div style="width:1px;background:var(--border);margin:0 2px;height:18px;"></div>
   <button type="button" class="nc-tb" onclick="miniFmt('nm-trait','link')" title="[[Link]]" style="color:#3f7fc4;font-size:0.68rem;">[[]]</button>
   <button type="button" class="nc-tb" onclick="miniFmt('nm-trait','tag')" title="#tag" style="color:var(--accent-secondary-text);font-size:0.68rem;">#</button>
-  <button type="button" class="nc-tb" onclick="miniFmt('nm-trait','secret')" title="🔒 Segreto DM" style="color:#8f6bc8;font-size:0.65rem;">🔒</button>
-  <button type="button" class="nc-tb" onclick="miniFmt('nm-trait','clue')" title="🔍 Indizio" style="color:#3f7fc4;font-size:0.65rem;">🔍</button>
+  <button type="button" class="nc-tb" onclick="miniFmt('nm-trait','secret')" title="Segreto DM" style="color:#8f6bc8;font-size:0.65rem;"></button>
+  <button type="button" class="nc-tb" onclick="miniFmt('nm-trait','clue')" title="Indizio" style="color:#3f7fc4;font-size:0.65rem;"></button>
   <div style="width:1px;background:var(--border);margin:0 2px;height:18px;"></div>
   <button type="button" class="nc-tb" onclick="miniFmtColor('nm-trait')" title="Colore testo" style="border-bottom:3px solid #c98a24;">A</button>
   <button type="button" class="nc-tb" onclick="miniFmtHL('nm-trait')" title="Evidenzia" style="background:rgba(245,166,35,0.25);border-bottom:3px solid rgba(245,166,35,0.7);">H</button>
@@ -2377,8 +2377,8 @@
   <div style="width:1px;background:var(--border);margin:0 2px;height:18px;"></div>
   <button type="button" class="nc-tb" onclick="miniFmt('nm-secret','link')" title="[[Link]]" style="color:#3f7fc4;font-size:0.68rem;">[[]]</button>
   <button type="button" class="nc-tb" onclick="miniFmt('nm-secret','tag')" title="#tag" style="color:var(--accent-secondary-text);font-size:0.68rem;">#</button>
-  <button type="button" class="nc-tb" onclick="miniFmt('nm-secret','secret')" title="🔒 Segreto DM" style="color:#8f6bc8;font-size:0.65rem;">🔒</button>
-  <button type="button" class="nc-tb" onclick="miniFmt('nm-secret','clue')" title="🔍 Indizio" style="color:#3f7fc4;font-size:0.65rem;">🔍</button>
+  <button type="button" class="nc-tb" onclick="miniFmt('nm-secret','secret')" title="Segreto DM" style="color:#8f6bc8;font-size:0.65rem;"></button>
+  <button type="button" class="nc-tb" onclick="miniFmt('nm-secret','clue')" title="Indizio" style="color:#3f7fc4;font-size:0.65rem;"></button>
   <div style="width:1px;background:var(--border);margin:0 2px;height:18px;"></div>
   <button type="button" class="nc-tb" onclick="miniFmtColor('nm-secret')" title="Colore testo" style="border-bottom:3px solid #c98a24;">A</button>
   <button type="button" class="nc-tb" onclick="miniFmtHL('nm-secret')" title="Evidenzia" style="background:rgba(245,166,35,0.25);border-bottom:3px solid rgba(245,166,35,0.7);">H</button>
@@ -2395,9 +2395,9 @@
         <div style="margin-top:var(--space-md);">
           <label class="form-label">Relazione col Party — <span id="nm-rel-label" style="color:var(--accent-secondary-text);">Neutrale</span> (<span id="nm-rel-val">50</span>)</label>
           <div style="display:flex;align-items:center;gap:var(--space-sm);">
-            <span class="text-xs text-muted" style="flex-shrink:0;width:52px;">😡 Ostile</span>
+            <span class="text-xs text-muted" style="flex-shrink:0;width:52px;">Ostile</span>
             <input type="range" id="nm-relation" min="0" max="100" value="50" style="flex:1;" oninput="NPC.updateRelationPreview(this.value)">
-            <span class="text-xs text-muted" style="flex-shrink:0;width:56px;text-align:right;">Alleato 💚</span>
+            <span class="text-xs text-muted" style="flex-shrink:0;width:56px;text-align:right;">Alleato</span>
           </div>
           <div class="relation-bar-track" style="margin-top:6px;">
             <div id="nm-rel-bar" class="relation-bar-fill" style="width:50%;background:rgb(170,200,30);"></div>
@@ -2630,10 +2630,12 @@
       <button class="btn btn-ghost btn-icon" onclick="Modal.close('monster-search-modal')" aria-label="Chiudi"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
     <div class="modal-body">
-      <div style="position:relative;display:inline-flex;align-items:center;flex:1;">
-            <input autocomplete="off" type="text" id="monster-search-input" class="form-input" placeholder="Cerca mostro nel Compendio..." oninput="Sessione.searchMonster()" style="margin-bottom:var(--space-md);">
-            <button onclick="document.getElementById('monster-search-input').value='';Sessione.searchMonster();" style="position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:0.85rem;padding:2px 4px;line-height:1;border-radius:var(--radius-sm);" title="Cancella ricerca"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-          </div>
+      <label class="campo-cerca">
+        <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <span class="sr-only">Cerca un mostro</span>
+        <input autocomplete="off" type="search" id="monster-search-input" class="form-input" placeholder="Nome del mostro, es. lupo" oninput="Sessione.searchMonster()">
+        <button type="button" class="campo-cerca-via" onclick="const i=document.getElementById('monster-search-input');i.value='';Sessione.searchMonster();i.focus();" aria-label="Cancella la ricerca"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+      </label>
       <div id="monster-search-results" class="comp-list" style="max-height:360px;overflow-y:auto;"></div>
     </div>
   </div>
@@ -2657,9 +2659,9 @@
         <div class="form-group">
           <label class="form-label">Tipo</label>
           <select id="custom-tipo" class="form-select">
-            <option value="mostro">🐉 Mostro</option>
-            <option value="pg">👤 PG</option>
-            <option value="custom">⚔️ Altro</option>
+            <option value="mostro">Mostro</option>
+            <option value="pg">PG</option>
+            <option value="custom">Altro</option>
           </select>
         </div>
       </div>
@@ -2908,7 +2910,7 @@ const Storage = (() => {
     updatedAt: Date.now(),
     lastSession: '',
     color: '#8b2635',
-    icon: type === 'oneshot' ? '⚡' : '📖',
+    icon: '',
 
     sessionRecap: '',
     quests: [],
@@ -3260,7 +3262,7 @@ const Dadi = (() => {
       return `${sign}${p.num}d${p.faces}: ${rollStr}`;
     }).join('  ');
 
-    Debug.log(`🎲 ${formula} → ${total} (${results.detail})`);
+    Debug.log(`${formula} → ${total} (${results.detail})`);
     Storage.addDiceRoll(formula, results.rolls, total);
 
     return results;
@@ -3377,21 +3379,25 @@ const Dadi = (() => {
    ============================================================ */
 
 const Toast = (() => {
-  const show = (msg, type = 'info', duration = 3000) => {
+  const show = (msg, type = 'info', duration = 3000, azione = null) => {
     const container = document.getElementById('toast-container');
     if (!container) return;
 
-    const icons = { success: '✓', error: '✕', warning: '⚠', info: 'ℹ' };
+    // Icone disegnate (niente simboli di testo); azione facoltativa, es. { etichetta: 'Annulla', fai: () => ... }
+    const P = { success: '<path d="m5 12.5 4.2 4.2L19 7"/>', error: '<path d="M6 6l12 12M18 6 6 18"/>', warning: '<path d="M12 4 2.8 19.5h18.4Z"/><path d="M12 10v4.2M12 17h.01"/>', info: '<circle cx="12" cy="12" r="9"/><path d="M12 11v5.5M12 7.8h.01"/>' };
     const toast = document.createElement('div');
     toast.className = `toast toast-${type}`;
-    toast.innerHTML = `<span style="font-size:0.85rem;">${icons[type] || 'ℹ'}</span><span>${msg}</span>`;
-
+    toast.innerHTML = `<svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;">${P[type] || P.info}</svg><span>${msg}</span>`;
+    const via = () => { toast.style.animation = `fadeOut ${250}ms ease forwards`; setTimeout(() => toast.remove(), 250); };
+    if (azione && azione.etichetta) {
+      const b = document.createElement('button');
+      b.type = 'button'; b.className = 'toast-azione'; b.textContent = azione.etichetta;
+      b.onclick = () => { try { azione.fai(); } finally { via(); } };
+      toast.appendChild(b);
+    }
     container.appendChild(toast);
-
-    setTimeout(() => {
-      toast.style.animation = `fadeOut ${250}ms ease forwards`;
-      setTimeout(() => toast.remove(), 250);
-    }, duration);
+    setTimeout(via, duration);
+    return toast;
   };
 
   return { show };
@@ -3679,29 +3685,29 @@ const App = (() => {
   const _deepClone = (x) => (x ? JSON.parse(JSON.stringify(x)) : x);
 
   const pages = {
-    home:       { label: 'Home',   icon: '🏠', navItem: true,  requiresCampaign: false },
-    campagna:   { label: 'Dashboard',   icon: '📖', navItem: true,  requiresCampaign: true  },
+    home:       { label: 'Home',   icon: '', navItem: true,  requiresCampaign: false },
+    campagna:   { label: 'Dashboard',   icon: '', navItem: true,  requiresCampaign: true  },
     'campagna-hub': { label: 'Campagna', icon: '', navItem: false, requiresCampaign: true },
-    sessione:   { label: 'Sessione',   icon: '⚔️', navItem: true,  requiresCampaign: true  },
+    sessione:   { label: 'Sessione',   icon: '', navItem: true,  requiresCampaign: true  },
     calendario: { label: 'Calendario', icon: '',   navItem: true,  requiresCampaign: true  },
     mappa:      { label: 'Mappa',      icon: '',   navItem: true,  requiresCampaign: true  },
-    generatori: { label: 'Generatori', icon: '✨', navItem: true,  requiresCampaign: false },
+    generatori: { label: 'Generatori', icon: '', navItem: true,  requiresCampaign: false },
     cartografo: { label: 'Cartografo', icon: '',   navItem: true,  requiresCampaign: false },
     scrittoio:  { label: 'Scrittoio',  icon: '',   navItem: true,  requiresCampaign: false },
-    compendio:  { label: 'Compendio',  icon: '📚', navItem: true,  requiresCampaign: false },
-    schermo:    { label: 'Schermo DM', icon: '🖥️', navItem: true,  requiresCampaign: false },
+    compendio:  { label: 'Compendio',  icon: '', navItem: true,  requiresCampaign: false },
+    schermo:    { label: 'Schermo DM', icon: '', navItem: true,  requiresCampaign: false },
     musica:     { label: 'Musica',     icon: '',   navItem: true,  requiresCampaign: true  },
-    wiki:       { label: 'Wiki',        icon: '📝', navItem: true,  requiresCampaign: true  },
-    'wiki-hub':      { label: 'Wiki',     icon: '📝', navItem: true,  requiresCampaign: true },
-    'wiki-png':      { label: 'PNG',      icon: '📝', navItem: false, requiresCampaign: true },
-    'wiki-luoghi':   { label: 'Luoghi',   icon: '📝', navItem: false, requiresCampaign: true },
-    'wiki-fazioni':  { label: 'Fazioni',  icon: '📝', navItem: false, requiresCampaign: true },
-    'wiki-lore':     { label: 'Lore',     icon: '📝', navItem: false, requiresCampaign: true },
-    'wiki-sessioni': { label: 'Sessioni', icon: '📝', navItem: false, requiresCampaign: true },
-    trame:          { label: 'Trame',    icon: '🎭', navItem: true,  requiresCampaign: true  },
-    'wiki-quest':   { label: 'Quest',    icon: '⚔️', navItem: false, requiresCampaign: true  },
-    'wiki-pg':      { label: 'PG',       icon: '🧙', navItem: false, requiresCampaign: true  },
-    'wiki-incontri':{ label: 'Incontri', icon: '⚔️',  navItem: false, requiresCampaign: true  },
+    wiki:       { label: 'Wiki',        icon: '', navItem: true,  requiresCampaign: true  },
+    'wiki-hub':      { label: 'Wiki',     icon: '', navItem: true,  requiresCampaign: true },
+    'wiki-png':      { label: 'PNG',      icon: '', navItem: false, requiresCampaign: true },
+    'wiki-luoghi':   { label: 'Luoghi',   icon: '', navItem: false, requiresCampaign: true },
+    'wiki-fazioni':  { label: 'Fazioni',  icon: '', navItem: false, requiresCampaign: true },
+    'wiki-lore':     { label: 'Lore',     icon: '', navItem: false, requiresCampaign: true },
+    'wiki-sessioni': { label: 'Sessioni', icon: '', navItem: false, requiresCampaign: true },
+    trame:          { label: 'Trame',    icon: '', navItem: true,  requiresCampaign: true  },
+    'wiki-quest':   { label: 'Quest',    icon: '', navItem: false, requiresCampaign: true  },
+    'wiki-pg':      { label: 'PG',       icon: '', navItem: false, requiresCampaign: true  },
+    'wiki-incontri':{ label: 'Incontri', icon: '',  navItem: false, requiresCampaign: true  },
   };
 
   const navigateTo = (pageId) => {
@@ -4145,11 +4151,11 @@ const openCampaign = (id) => {
     el.innerHTML = (() => {
       const typeColors = {
         '':             { dot:'var(--border-strong)', badge:'badge-muted',    label:'Generico'       },
-        'politico':     { dot:'#3f7fc4',              badge:'badge-primary',  label:'⚖️ Politico'    },
-        'combattimento':{ dot:'var(--accent-danger)', badge:'badge-danger',   label:'⚔️ Combattimento'},
-        'magia':        { dot:'#8f6bc8',              badge:'badge-secondary',label:'🔮 Magia'        },
-        'disastro':     { dot:'#c98a24',              badge:'badge-warning',  label:'⚠️ Disastro'    },
-        'scoperta':     { dot:'#3f9a6b',              badge:'badge-success',  label:'🔍 Scoperta'    },
+        'politico':     { dot:'#3f7fc4',              badge:'badge-primary',  label:'Politico'    },
+        'combattimento':{ dot:'var(--accent-danger)', badge:'badge-danger',   label:'Combattimento'},
+        'magia':        { dot:'#8f6bc8',              badge:'badge-secondary',label:'Magia'        },
+        'disastro':     { dot:'#c98a24',              badge:'badge-warning',  label:'Disastro'    },
+        'scoperta':     { dot:'#3f9a6b',              badge:'badge-success',  label:'Scoperta'    },
       };
       return events.map((e, i) => {
         const tc = typeColors[e.type || ''] || typeColors[''];
@@ -4168,7 +4174,7 @@ const openCampaign = (id) => {
                 <div class="timeline-event-text" style="margin-bottom:3px;">${e.event}</div>
                 ${e.type ? `<span class="badge ${tc.badge}" style="font-size:0.6rem;">${tc.label}</span>` : ''}
               </div>
-              <button class="btn btn-ghost btn-icon-sm" onclick="App.deleteTimelineEvent('${e.id}')" title="Elimina" style="color:var(--text-muted);flex-shrink:0;">🗑️</button>
+              <button class="btn btn-ghost btn-icon-sm" onclick="App.deleteTimelineEvent('${e.id}')" title="Elimina" style="color:var(--text-muted);flex-shrink:0;"></button>
             </div>
           </div>
         </div>`;
@@ -4303,7 +4309,7 @@ const openCampaign = (id) => {
     }
 
     Debug.log('App.init() completato');
-    Toast.show('DM Toolkit caricato ⚔️', 'success');
+    Toast.show('DM Toolkit caricato', 'success');
   };
 
   return {
@@ -4363,14 +4369,14 @@ const NPC = (() => {
 
   const relLabel = (v) => {
     v = parseInt(v);
-    if (v <= 15)  return '😡 Ostile';
-    if (v <= 30)  return '😤 Diffidente';
-    if (v <= 45)  return '😐 Sospettoso';
-    if (v <= 55)  return '😶 Neutrale';
-    if (v <= 70)  return '🙂 Cordiale';
-    if (v <= 85)  return '😊 Amichevole';
-    if (v <= 95)  return '😄 Fidato';
-    return '💚 Alleato';
+    if (v <= 15)  return 'Ostile';
+    if (v <= 30)  return 'Diffidente';
+    if (v <= 45)  return 'Sospettoso';
+    if (v <= 55)  return 'Neutrale';
+    if (v <= 70)  return 'Cordiale';
+    if (v <= 85)  return 'Amichevole';
+    if (v <= 95)  return 'Fidato';
+    return 'Alleato';
   };
 
   const updateRelationPreview = (v) => {
@@ -4627,7 +4633,7 @@ const NPC = (() => {
       alias:    document.getElementById('nm-alias')?.value?.trim()  || '',
       race:     document.getElementById('nm-race')?.value?.trim()   || '',
       job:      document.getElementById('nm-job')?.value?.trim()    || '',
-      icon:     document.getElementById('nm-icon')?.value?.trim()   || '👤',
+      icon:     document.getElementById('nm-icon')?.value?.trim()   || '',
       voice:    document.getElementById('nm-voice')?.value?.trim()  || '',
       tic:      document.getElementById('nm-tic')?.value?.trim()    || '',
       trait:    _fieldVal('nm-trait')?.trim()  || '',
@@ -4727,7 +4733,7 @@ const NPC = (() => {
     _viewingId = id;
     _flipped = false;
 
-    document.getElementById('npc-view-icon').textContent = npc.icon || '👤';
+    document.getElementById('npc-view-icon').textContent = npc.icon || '';
     document.getElementById('npc-view-name').textContent = npc.name;
     document.getElementById('npc-view-meta').textContent = [npc.race, npc.job].filter(Boolean).join(' · ');
 
@@ -4777,12 +4783,12 @@ const NPC = (() => {
     if (moraleWrap && moraleEl) {
       if (npc.morale) {
         const moraleLabels = {
-          coraggioso: '🗡️ Coraggioso — combatte fino alla morte',
-          determinato: '⚠️ Determinato — fugge sotto il 25% PF',
-          cauto: '🏃 Cauto — fugge sotto il 50% PF',
-          codardo: '💨 Codardo — fugge al primo danno subito',
-          fanatico: '🔥 Fanatico — non si arrende mai',
-          mercenario: '💰 Mercenario — si arrende se offri oro',
+          coraggioso: 'Coraggioso — combatte fino alla morte',
+          determinato: 'Determinato — fugge sotto il 25% PF',
+          cauto: 'Cauto — fugge sotto il 50% PF',
+          codardo: 'Codardo — fugge al primo danno subito',
+          fanatico: 'Fanatico — non si arrende mai',
+          mercenario: 'Mercenario — si arrende se offri oro',
         };
         moraleEl.textContent = moraleLabels[npc.morale] || npc.morale;
         moraleWrap.style.display = '';
@@ -4995,7 +5001,7 @@ const NPC = (() => {
         <button onclick="event.stopPropagation();npcImgAdjust.bind(null,'${npc.id}')('z',20)" style="width:24px;height:24px;background:none;border:none;color:#fff;cursor:pointer;font-size:1rem;line-height:1;" title="+">+</button>
       </div></div>` : ''}
           <div class="npc-card-header">
-            <div class="npc-avatar">${npc.icon || '👤'}</div>
+            <div class="npc-avatar">${npc.icon || ''}</div>
             <div style="flex:1;min-width:0;">
               <div class="npc-name">${npc.name}</div>
               <div class="npc-meta">${[npc.race, npc.job].filter(Boolean).join(' · ') || '—'}</div>
@@ -5231,8 +5237,8 @@ const Sessione = (() => {
             <div style="font-size:0.68rem;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${[pg.giocatore, pg.classe, pg.livello ? 'Lv.' + pg.livello : ''].filter(Boolean).join(' · ')}</div>
           </div>
           <div style="display:flex;gap:1px;flex-shrink:0;">
-            <button class="btn btn-ghost btn-icon-sm" onclick="Sessione.editPG('${pg.id}')" title="Modifica" style="width:22px;height:22px;font-size:0.6rem;">✏️</button>
-            <button class="btn btn-ghost btn-icon-sm" onclick="Sessione.deletePG('${pg.id}')" title="Rimuovi" style="width:22px;height:22px;font-size:0.6rem;color:var(--danger-text);">🗑️</button>
+            <button class="btn btn-ghost btn-icon-sm" onclick="Sessione.editPG('${pg.id}')" title="Modifica" style="width:22px;height:22px;font-size:0.6rem;"></button>
+            <button class="btn btn-ghost btn-icon-sm" onclick="Sessione.deletePG('${pg.id}')" title="Rimuovi" style="width:22px;height:22px;font-size:0.6rem;color:var(--danger-text);"></button>
           </div>
         </div>
 
@@ -5264,7 +5270,7 @@ const Sessione = (() => {
           <button class="party-inspiration-btn ${pg.inspirazione ? 'active' : ''}"
             onclick="Sessione.toggleInspirazione('${pg.id}')"
             title="Ispirazione" style="font-size:0.6rem;padding:2px 5px;white-space:nowrap;">
-            ✨
+           
           </button>
         </div>
       </div>`;
@@ -5280,7 +5286,7 @@ const Sessione = (() => {
     party[idx].inspirazione = !party[idx].inspirazione;
     saveParty(party);
     renderParty();
-    Toast.show(party[idx].inspirazione ? `✨ ${party[idx].nome} ha ispirazione!` : `${party[idx].nome}: ispirazione rimossa`, 'info');
+    Toast.show(party[idx].inspirazione ? `${party[idx].nome} ha ispirazione!` : `${party[idx].nome}: ispirazione rimossa`, 'info');
     Debug.log(`Ispirazione ${party[idx].nome}: ${party[idx].inspirazione}`);
   };
 
@@ -5868,7 +5874,7 @@ const Sessione = (() => {
           ${formula ? `onclick="Sessione._rollAction('${formula}','${nomeAz.replace(/'/g,"\'")}',this)"` : ''}>
           <strong>${nomeAz}.</strong>
           <span class="text-secondary"> ${descAz}</span>
-          ${formula ? `<span class="badge badge-muted" style="margin-left:4px;font-size:0.6rem;">🎲 ${formula}</span>` : ''}
+          ${formula ? `<span class="badge badge-muted" style="margin-left:4px;font-size:0.6rem;">${formula}</span>` : ''}
         </div>`;
     }).join('') || '<div class="text-muted text-sm" style="padding:4px 0;">Nessuna azione disponibile</div>';
 
@@ -5895,20 +5901,20 @@ const Sessione = (() => {
           <div class="stat-block-divider"></div>
           ${m.grado_sfida ? `<div class="stat-row"><strong>GS</strong> <span>${m.grado_sfida.raw||m.grado_sfida.valore}</span></div>` : ''}
           <div class="stat-block-divider"></div>
-          <div style="font-size:0.7rem;color:var(--text-muted);margin-bottom:6px;">💡 Clicca su un\'azione con 🎲 per tirare i dadi automaticamente</div>
+          <div style="font-size:0.7rem;color:var(--text-muted);margin-bottom:6px;">Clicca su un\'azione con per tirare i dadi automaticamente</div>
           <div class="sb-section-title">Azioni</div>
           ${azioniHTML}
           ${m.azioni_bonus?.length ? `<div class="sb-section-title" style="margin-top:8px;">Azioni Bonus</div>${m.azioni_bonus.map(a=>{
             const formula = parseRoll(a.descrizione||'');
             return `<div class="sb-action" style="cursor:${formula?'pointer':'default'};" ${formula?`onclick="Sessione._rollAction('${formula}','${(a.nome||'').replace(/'/g,"\'")}',this)"`:''}>
               <strong>${a.nome||''}.</strong> <span class="text-secondary">${a.descrizione||''}</span>
-              ${formula?`<span class="badge badge-muted" style="margin-left:4px;font-size:0.6rem;">🎲 ${formula}</span>`:''}
+              ${formula?`<span class="badge badge-muted" style="margin-left:4px;font-size:0.6rem;">${formula}</span>`:''}
             </div>`;
           }).join('')}` : ''}
           ${m.reazioni?.length ? `<div class="sb-section-title" style="margin-top:8px;">Reazioni</div>${m.reazioni.map(a=>`<div class="sb-action"><strong>${a.nome||''}.</strong> <span class="text-secondary">${a.descrizione||''}</span></div>`).join('')}` : ''}
         </div>
       </div>` :
-      `<div class="empty-state"><div class="empty-state-icon">📋</div>
+      `<div class="empty-state"><div class="empty-state-icon"></div>
         <h3>${c.nome}</h3>
         <p class="text-sm text-muted">Mostro custom — nessuna scheda nel Compendio</p>
         ${c.gs ? `<p class="text-sm">GS ${c.gs} · CA ${c.ca} · PF ${c.hp}/${c.maxHp}</p>` : ''}
@@ -5982,7 +5988,7 @@ const Sessione = (() => {
 
   const addMonsterQuick = () => {
     document.getElementById('monster-search-input').value = '';
-    document.getElementById('monster-search-results').innerHTML = '<div class="text-muted text-sm">Digita per cercare...</div>';
+    document.getElementById('monster-search-results').innerHTML = '';
     Modal.open('monster-search-modal');
     setTimeout(() => document.getElementById('monster-search-input')?.focus(), 100);
   };
@@ -5991,7 +5997,7 @@ const Sessione = (() => {
     const q = document.getElementById('monster-search-input')?.value?.toLowerCase() || '';
     const el = document.getElementById('monster-search-results');
     if (!el) return;
-    if (!q) { el.innerHTML = '<div class="text-muted text-sm">Digita per cercare...</div>'; return; }
+    if (!q) { el.innerHTML = ''; return; }
 
     if (!MonsterCache.isLoaded()) {
       el.innerHTML = '<div class="text-muted text-sm">Caricamento mostri...</div>';
@@ -6033,12 +6039,12 @@ const Sessione = (() => {
     modal.style.cssText = 'display:flex;';
     modal.innerHTML = `<div class="modal" style="max-width:420px;">
       <div class="modal-header">
-        <h2 style="font-family:var(--font-display);font-size:1rem;">👤 Aggiungi NPC al Combat</h2>
+        <h2 style="font-family:var(--font-display);font-size:1rem;">Aggiungi NPC al Combat</h2>
         <button class="btn btn-ghost btn-icon" onclick="this.closest('.modal-overlay').remove()" aria-label="Chiudi"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
       </div>
       <div class="modal-body" style="padding:0;max-height:50vh;overflow-y:auto;">
         <div class="comp-filters" style="padding:8px;border-bottom:1px solid var(--border);">
-          <input autocomplete="off" type="text" class="form-input" placeholder="🔍 Cerca NPC..." style="flex:1;"
+          <input autocomplete="off" type="text" class="form-input" placeholder="Cerca NPC..." style="flex:1;"
             oninput="this.closest('.modal').querySelectorAll('.comp-row').forEach(r=>r.style.display=r.textContent.toLowerCase().includes(this.value.toLowerCase())?'':'none')">
         </div>
         ${npcs.map(npc => `
@@ -6669,7 +6675,7 @@ const Compendio = (() => {
 
     const hasContent = favRows;
     if (!hasContent) return '';
-    return `<div class="comp-cat-header" style="color:var(--accent-secondary-text);">⭐ Preferiti</div>` +
+    return `<div class="comp-cat-header" style="color:var(--accent-secondary-text);">Preferiti</div>` +
       favRows +
       `<div style="height:1px;background:var(--border);margin:6px 0 8px;"></div>`;
   };
@@ -6729,7 +6735,7 @@ const Compendio = (() => {
     });
 
     if (combined.length === 0) {
-      el.innerHTML = `<div class="empty-state"><div class="empty-state-icon">🐉</div><h3>Nessun mostro trovato</h3><p class="text-muted">Prova a modificare i filtri</p></div>`;
+      el.innerHTML = `<div class="empty-state"><div class="empty-state-icon"></div><h3>Nessun mostro trovato</h3><p class="text-muted">Prova a modificare i filtri</p></div>`;
       if (count) count.textContent = '0 mostri';
       return;
     }
@@ -6780,7 +6786,7 @@ const Compendio = (() => {
     if (count) count.textContent = `${list.length} oggetti`;
 
     if (list.length === 0) {
-      el.innerHTML = `<div class="empty-state"><div class="empty-state-icon">✨</div><h3>Nessun oggetto trovato</h3></div>`;
+      el.innerHTML = `<div class="empty-state"><div class="empty-state-icon"></div><h3>Nessun oggetto trovato</h3></div>`;
       return;
     }
 
@@ -6836,7 +6842,7 @@ const Compendio = (() => {
     if (count) count.textContent = `${list.length} voci`;
 
     if (list.length === 0) {
-      el.innerHTML = `<div class="empty-state"><div class="empty-state-icon">⚔️</div><h3>Nessun equipaggiamento trovato</h3></div>`;
+      el.innerHTML = `<div class="empty-state"><div class="empty-state-icon"></div><h3>Nessun equipaggiamento trovato</h3></div>`;
       return;
     }
 
@@ -6881,7 +6887,7 @@ const Compendio = (() => {
     if (count) count.textContent = `${list.length} regole`;
 
     if (list.length === 0) {
-      el.innerHTML = `<div class="empty-state"><div class="empty-state-icon">📖</div><h3>Nessuna regola trovata</h3></div>`;
+      el.innerHTML = `<div class="empty-state"><div class="empty-state-icon"></div><h3>Nessuna regola trovata</h3></div>`;
       return;
     }
 
@@ -7165,7 +7171,7 @@ const Compendio = (() => {
     }
 
     if (list.length === 0) {
-      el.innerHTML = '<div class="empty-state"><div class="empty-state-icon">✨</div><h3>Nessun incantesimo trovato</h3></div>';
+      el.innerHTML = '<div class="empty-state"><div class="empty-state-icon"></div><h3>Nessun incantesimo trovato</h3></div>';
       return;
     }
 
@@ -7245,10 +7251,10 @@ const Compendio = (() => {
     const count = document.getElementById('comp-count-homebrew');
     if (count) count.textContent = list.length + ' voci';
     if (list.length === 0) {
-      el.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🔧</div><h3>Nessuna voce homebrew</h3><p class="text-muted">Clicca "+ Aggiungi" per creare la tua prima voce</p></div>';
+      el.innerHTML = '<div class="empty-state"><div class="empty-state-icon"></div><h3>Nessuna voce homebrew</h3><p class="text-muted">Clicca "+ Aggiungi" per creare la tua prima voce</p></div>';
       return;
     }
-    const catLabel = { monsters:'🐉 Mostri', magic_items:'✨ Oggetti Magici', equipment:'⚔️ Equipaggiamento', spells:'💫 Incantesimi', rules:'📖 Regole', altro:'📌 Altro' };
+    const catLabel = { monsters:'Mostri', magic_items:'Oggetti Magici', equipment:'Equipaggiamento', spells:'Incantesimi', rules:'Regole', altro:'Altro' };
     const catBadge = { monsters:'badge-primary', magic_items:'badge-gold', equipment:'badge-muted', spells:'badge-blue', rules:'badge-muted', altro:'badge-muted' };
     el.innerHTML = list.map(h => {
 
@@ -7276,8 +7282,8 @@ const Compendio = (() => {
         '<div class="comp-row-stats">' +
           stats +
           favBtn(h.id, h.nome, 'homebrew') +
-          '<button class="btn btn-ghost btn-icon-sm" style="font-size:0.7rem;" onclick="event.stopPropagation();Compendio.editHomebrew(\'' + h.id + '\')">✏️</button>' +
-          '<button class="btn btn-ghost btn-icon-sm" style="font-size:0.7rem;color:var(--danger-text);" onclick="event.stopPropagation();Compendio.deleteHomebrew(\'' + h.id + '\')">🗑️</button>' +
+          '<button class="btn btn-ghost btn-icon-sm" style="font-size:0.7rem;" onclick="event.stopPropagation();Compendio.editHomebrew(\'' + h.id + '\')"></button>' +
+          '<button class="btn btn-ghost btn-icon-sm" style="font-size:0.7rem;color:var(--danger-text);" onclick="event.stopPropagation();Compendio.deleteHomebrew(\'' + h.id + '\')"></button>' +
         '</div>' +
       '</div>';
     }).join('');
@@ -7535,9 +7541,9 @@ const Compendio = (() => {
     modal.id = 'hb-modal';
 
     const catOptions = [
-      ['monsters','🐉 Mostri'],['magic_items','✨ Oggetti Magici'],
-      ['equipment','⚔️ Equipaggiamento'],['spells','💫 Incantesimi'],
-      ['rules','📖 Regole'],['altro','📌 Altro'],
+      ['monsters','Mostri'],['magic_items','Oggetti Magici'],
+      ['equipment','Equipaggiamento'],['spells','Incantesimi'],
+      ['rules','Regole'],['altro','Altro'],
     ].map(([v,l]) => `<option value="${v}"${cat===v?' selected':''}>${l}</option>`).join('');
 
     modal.innerHTML =
@@ -7666,7 +7672,7 @@ const Compendio = (() => {
     const q = (_filters.cerca.q || '').toLowerCase().trim();
     const count = document.getElementById('comp-count-cerca');
     if (!q) {
-      el.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🔍</div><h3>Cerca in tutto il Compendio</h3><p class="text-muted">Mostri, oggetti, equipaggiamento, regole, incantesimi, homebrew</p></div>';
+      el.innerHTML = '<div class="empty-state"><div class="empty-state-icon"></div><h3>Cerca in tutto il Compendio</h3><p class="text-muted">Mostri, oggetti, equipaggiamento, regole, incantesimi, homebrew</p></div>';
       if (count) count.textContent = '';
       return;
     }
@@ -7676,22 +7682,22 @@ const Compendio = (() => {
     }
     const results = [];
     _data.monsters.filter(m => m.nome.toLowerCase().includes(q)).slice(0,5).forEach(m =>
-      results.push({ tipo:'🐉 Mostro', nome:m.nome, meta:(m.tipo||'')+(m.grado_sfida?.valore!=null?' · GS '+m.grado_sfida.valore:''), fn:"Compendio.openMonster('"+m.id+"')" }));
+      results.push({ tipo:'Mostro', nome:m.nome, meta:(m.tipo||'')+(m.grado_sfida?.valore!=null?' · GS '+m.grado_sfida.valore:''), fn:"Compendio.openMonster('"+m.id+"')" }));
     _data.magic_items.filter(m => m.nome.toLowerCase().includes(q)).slice(0,5).forEach(m =>
-      results.push({ tipo:'✨ Oggetto', nome:m.nome, meta:(m.rarita||''), fn:"Compendio.openMagicItem('"+m.id+"')" }));
+      results.push({ tipo:'Oggetto', nome:m.nome, meta:(m.rarita||''), fn:"Compendio.openMagicItem('"+m.id+"')" }));
     _data.equipment.filter(m => m.nome.toLowerCase().includes(q)).slice(0,5).forEach(m =>
-      results.push({ tipo:'⚔️ Equip.', nome:m.nome, meta:(m.categoria||''), fn:"Compendio.openEquipment('"+m.id+"')" }));
+      results.push({ tipo:'Equip.', nome:m.nome, meta:(m.categoria||''), fn:"Compendio.openEquipment('"+m.id+"')" }));
     _data.spells.filter(m => m.nome.toLowerCase().includes(q)).slice(0,5).forEach(m =>
-      results.push({ tipo:'💫 Incant.', nome:m.nome, meta:(m.livello===0?'Trucchetto':m.livello+'° lv')+(m.scuola?' · '+m.scuola:''), fn:"Compendio.openSpell('"+m.id+"')" }));
+      results.push({ tipo:'Incant.', nome:m.nome, meta:(m.livello===0?'Trucchetto':m.livello+'° lv')+(m.scuola?' · '+m.scuola:''), fn:"Compendio.openSpell('"+m.id+"')" }));
     _data.rules.filter(m => m.nome.toLowerCase().includes(q)).slice(0,3).forEach(m =>
-      results.push({ tipo:'📖 Regola', nome:m.nome, meta:m.capitolo||'', fn:"Compendio.openRule('"+m.id+"')" }));
+      results.push({ tipo:'Regola', nome:m.nome, meta:m.capitolo||'', fn:"Compendio.openRule('"+m.id+"')" }));
     _getHomebrew().filter(m => m.nome.toLowerCase().includes(q)).slice(0,5).forEach(m => {
-      const cl = {monsters:'🐉',magic_items:'✨',equipment:'⚔️',spells:'💫',rules:'📖',altro:'📌'}[m.categoria]||'🔧';
+      const cl = {monsters:'',magic_items:'',equipment:'',spells:'',rules:'',altro:''}[m.categoria]||'';
       results.push({ tipo:cl+' HB', nome:m.nome, meta:m.sottotitolo||'', fn:"Compendio.openHomebrew('"+m.id+"')" });
     });
     if (count) count.textContent = results.length + ' risultati';
     if (!results.length) {
-      el.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🔍</div><h3>Nessun risultato per "'+q+'"</h3></div>';
+      el.innerHTML = '<div class="empty-state"><div class="empty-state-icon"></div><h3>Nessun risultato per "'+q+'"</h3></div>';
       return;
     }
     el.innerHTML = results.map(r =>
@@ -7757,9 +7763,9 @@ const Compendio = (() => {
               <span class="comp-row-name">${m.vel_base_ft}ft / ${m.vel_base_m}m base</span>
             </div>
             <div class="comp-row-stats">
-              <span class="comp-stat-pill" title="Lento">🐢 ${lento}</span>
-              <span class="comp-stat-pill" title="Normale">🚶 ${norm}</span>
-              <span class="comp-stat-pill" title="Veloce">💨 ${fast}</span>
+              <span class="comp-stat-pill" title="Lento">${lento}</span>
+              <span class="comp-stat-pill" title="Normale">${norm}</span>
+              <span class="comp-stat-pill" title="Veloce">${fast}</span>
             </div>
           </div>`;
         }).join('');
@@ -7782,7 +7788,7 @@ const Compendio = (() => {
       const norm = c[keys.norm] ?? '—';
       const lento = c[keys.lento] ?? '—';
       const fast = c[keys.fast] ?? '—';
-      const badges = { terrestri:'🦶', acquatici:'🌊', volanti:'🦅', veicoli:'⚓', magia_terra:'✨', magia_aria:'✨' };
+      const badges = { terrestri:'', acquatici:'', volanti:'', veicoli:'', magia_terra:'', magia_aria:'' };
       const badge = badges[c.categoria] || '';
       const noteHtml = c.note ? `<span class="text-xs text-muted" style="margin-left:6px;">${c.note}</span>` : '';
       return `<div class="comp-row">
@@ -8155,24 +8161,14 @@ const Schermo = (() => {
     return `
       <div class="schermo-block schermo-block-${size}" id="sblock-${block.id}" style="${spanStyle}">
         <div class="schermo-block-header">
-          <span class="schermo-block-icon" style="cursor:grab;" title="Trascina per spostare">${def.icon}</span>
+          <span class="schermo-block-icon" aria-hidden="true">${def.icon}</span>
           <span class="schermo-block-title">${title}</span>
-          <div class="schermo-block-actions">
-            <span style="display:inline-flex;align-items:center;border:1px solid var(--border);border-radius:var(--radius-sm);">
-              <button class="btn btn-ghost btn-icon-sm" onclick="Schermo.resizeBlock('${block.id}', -1)" title="Più stretto" aria-label="Più stretto" ${cols <= 1 ? 'disabled' : ''} style="width:22px;">−</button>
-              <button class="btn btn-ghost btn-icon-sm" onclick="Schermo.resizeBlock('${block.id}')" title="Larghezza: ${SIZES[size].label} (clic per cambiare)" style="font-family:var(--font-mono);font-size:0.68rem;width:auto;padding:0 4px;">${SIZES[size].label}</button>
-              <button class="btn btn-ghost btn-icon-sm" onclick="Schermo.resizeBlock('${block.id}', 1)" title="Più largo" aria-label="Più largo" ${cols >= 5 ? 'disabled' : ''} style="width:22px;">+</button>
-            </span>
-            <button class="btn btn-ghost btn-icon-sm" onclick="Schermo.moveBlock('${block.id}', -1)" title="Sposta prima (oppure trascina l'intestazione)" aria-label="Sposta prima"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg></button>
-            <button class="btn btn-ghost btn-icon-sm" onclick="Schermo.moveBlock('${block.id}', 1)" title="Sposta dopo (oppure trascina l'intestazione)" aria-label="Sposta dopo"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button>
-            ${block.type === 'custom' || block.type === 'note' ? `<button class="btn btn-ghost btn-icon-sm" onclick="Schermo.editBlock('${block.id}')" title="Modifica"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>` : ''}
-            <button class="btn btn-ghost btn-icon-sm" onclick="Schermo.removeBlock('${block.id}')" title="Rimuovi" aria-label="Rimuovi"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-          </div>
+          <button type="button" class="schermo-block-menu-btn" aria-label="Opzioni: ${String(title).replace(/"/g, '&quot;')}" aria-haspopup="menu" aria-expanded="false" title="Larghezza, posizione, rimuovi" onclick="Schermo.apriMenu('${block.id}', this)"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="5.5" cy="12" r="1.9"/><circle cx="12" cy="12" r="1.9"/><circle cx="18.5" cy="12" r="1.9"/></svg></button>
         </div>
         <div class="schermo-block-body" id="sbody-${block.id}" style="min-height:${block.bodyHeight ? block.bodyHeight+'px' : 'auto'};overflow:auto;">
           <!-- Popolato da updateBlockContent -->
         </div>
-        <div class="schermo-block-resize" onmousedown="Schermo.startResize(event,'${block.id}')"></div>
+        <div class="schermo-block-resize" title="Trascina per cambiare l'altezza" onpointerdown="Schermo.startResize(event,'${block.id}')"></div>
       </div>`;
   };
 
@@ -8208,7 +8204,7 @@ const Schermo = (() => {
     App.reloadActiveCampaign();
     const camp = App.getActiveCampaign();
     const favs = camp?.compendioFavoriti || [];
-    if (!favs.length) return '<div class="text-muted text-sm">Nessun preferito. Aggiungi ⭐ dal Compendio.</div>';
+    if (!favs.length) return '<div class="text-muted text-sm">Nessun preferito. Aggiungi dal Compendio.</div>';
 
     const tipoLabel = {
       monsters: 'Mostri', magic_items: 'Oggetti Magici', equipment: 'Equipaggiamento', rules: 'Regole', spells: 'Incantesimi', homebrew: 'Homebrew',
@@ -8256,7 +8252,7 @@ const Schermo = (() => {
     return '<div style="display:flex;flex-direction:column;gap:3px;margin-bottom:8px;">' +
       notes.map((n, i) =>
         '<div style="display:flex;gap:6px;align-items:flex-start;padding:4px 0;border-bottom:1px solid var(--border);">' +
-          '<span style="flex-shrink:0;font-size:0.85rem;">' + (n.tipo||'📌') + '</span>' +
+          '<span style="flex-shrink:0;font-size:0.72rem;color:var(--text-muted);font-weight:600;">' + ({ '📌': 'Nota', '👤': 'PNG', '📍': 'Luogo', '⚔️': 'Combattimento', '🎯': 'Obiettivo', '❓': 'Da fare', '💡': 'Idea' }[n.tipo] || '') + '</span>' +
           '<span style="flex:1;font-size:0.8rem;line-height:1.4;word-break:break-word;">' + (n.testo||'') + '</span>' +
           '<button class="btn btn-ghost btn-icon-sm" style="flex-shrink:0;font-size:0.65rem;opacity:0.5;" ' +
             'onclick="NoteSessione.remove('+i+');Schermo._refreshNoteSessione()" title="Rimuovi" aria-label="Rimuovi"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>' +
@@ -8293,7 +8289,7 @@ const Schermo = (() => {
           (pg.inspirazione ? '<span class="badge badge-gold" style="font-size:0.6rem;">Ispirazione</span>' : '') +
         '</div>' +
         '<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:3px;margin-bottom:6px;">' +
-          ['percezionePassiva:👁️Perc.', 'investigazionePassiva:🔍Inv.', 'intuizionePassiva:💡Int.', 'ca:🛡️CA', 'hpAttuali:❤️HP'].map(s => {
+          ['percezionePassiva:Perc.', 'investigazionePassiva:Inv.', 'intuizionePassiva:Int.', 'ca:CA', 'hpAttuali:HP'].map(s => {
             const [key, lbl] = s.split(':');
             const val = key === 'hpAttuali' ? (pg.hpAttuali ?? pg.hpMax ?? '?') + '/' + (pg.hpMax||'?') : (pg[key] || 10);
             return '<div style="background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:3px;text-align:center;">' +
@@ -8342,8 +8338,8 @@ const Schermo = (() => {
       const tipo = tipi[Math.floor(Math.random() * tipi.length)];
       const pool = t.meteo[tipo];
       const desc = pool[Math.floor(Math.random() * pool.length)];
-      const icons = { soleggiato: '☀️', nuvoloso: '☁️', pioggia: '🌧️', temporale: '⛈️', neve: '❄️', nebbia: '🌫️' };
-      el.innerHTML = `<span style="font-size:1.2rem;">${icons[tipo] || '🌤️'}</span> <strong>${tipo}</strong><br><span class="text-muted">${desc}</span>`;
+      const icons = { soleggiato: '', nuvoloso: '', pioggia: '', temporale: '', neve: '', nebbia: '' };
+      el.innerHTML = `<span style="font-size:1.2rem;">${icons[tipo] || ''}</span> <strong>${tipo}</strong><br><span class="text-muted">${desc}</span>`;
     } catch (e) {
       el.textContent = 'Errore caricamento dati';
     }
@@ -8369,7 +8365,7 @@ const Schermo = (() => {
     if (!combat || !combat.combatants?.length) {
       return '<div class="text-muted text-sm" style="margin-bottom:8px;">Nessuno scontro attivo.</div>' +
         '<div style="display:flex;gap:4px;flex-wrap:wrap;">' +
-          '<button class="btn btn-primary btn-sm" onclick="App.navigateTo(\'sessione\');setTimeout(()=>Sessione.newCombat(),300)">⚔️ Nuovo Scontro</button>' +
+          '<button class="btn btn-primary btn-sm" onclick="App.navigateTo(\'sessione\');setTimeout(()=>Sessione.newCombat(),300)">Nuovo Scontro</button>' +
           '<button class="btn btn-secondary btn-sm" onclick="App.navigateTo(\'sessione\')">→ Sessione</button>' +
         '</div>';
     }
@@ -8384,7 +8380,7 @@ const Schermo = (() => {
       const condBadges = (c.condizioni || []).map(cond =>
         `<span class="badge badge-primary" style="font-size:0.6rem;padding:1px 4px;">${cond.slice(0,6)}</span>`
       ).join('');
-      const icon = c.tipo === 'pg' ? '👤' : c.tipo === 'mostro' ? '🐉' : '⚔️';
+      const icon = '';
 
       return `<div class="combat-row${isActive ? ' combat-active' : ''}${c.hp <= 0 ? ' combat-dead' : ''}"
           id="schermo-comb-${c.id}"
@@ -8398,8 +8394,8 @@ const Schermo = (() => {
         <!-- Nome + condizioni -->
         <div style="min-width:0;">
           <div style="display:flex;align-items:center;gap:5px;">
-            <span style="font-size:0.85rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${icon} ${c.nome}${c.concentrazione ? ' 🔮' : ''}</span>
-            ${c.tipo === 'pg' ? '' : `<button class="btn btn-ghost btn-icon-sm" style="flex-shrink:0;width:22px;height:22px;font-size:0.6rem;" onclick="Sessione.openCombatantSheet('${c.id}')" title="Scheda">📋</button>`}
+            <span style="font-size:0.85rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${icon} ${c.nome}${c.concentrazione ? '' : ''}</span>
+            ${c.tipo === 'pg' ? '' : `<button class="btn btn-ghost btn-icon-sm" style="flex-shrink:0;width:22px;height:22px;font-size:0.6rem;" onclick="Sessione.openCombatantSheet('${c.id}')" title="Scheda" aria-label="Scheda"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></button>`}
           </div>
           ${condBadges ? `<div style="display:flex;flex-wrap:wrap;gap:2px;margin-top:2px;">${condBadges}</div>` : ''}
         </div>
@@ -8417,11 +8413,11 @@ const Schermo = (() => {
         <!-- Azioni -->
         <div style="display:flex;gap:4px;flex-shrink:0;">
           <button class="btn btn-ghost btn-sm" style="padding:2px 8px;font-size:0.72rem;"
-            onclick="Sessione.changeHPSchermo('${c.id}',-1);setTimeout(()=>Schermo._refreshCombat(),200)" title="Danno">💥 Danno</button>
+            onclick="Sessione.changeHPSchermo('${c.id}',-1);setTimeout(()=>Schermo._refreshCombat(),200)" title="Danno">Danno</button>
           <button class="btn btn-ghost btn-sm" style="padding:2px 8px;font-size:0.72rem;"
-            onclick="Sessione.changeHPSchermo('${c.id}',1);setTimeout(()=>Schermo._refreshCombat(),200)" title="Cura">💚 Cura</button>
+            onclick="Sessione.changeHPSchermo('${c.id}',1);setTimeout(()=>Schermo._refreshCombat(),200)" title="Cura">Cura</button>
           <button class="btn btn-ghost btn-sm" style="padding:2px 8px;font-size:0.72rem;"
-            onclick="Sessione.openCondizioneSchermo('${c.id}')" title="Condizioni">🔴 Cond.</button>
+            onclick="Sessione.openCondizioneSchermo('${c.id}')" title="Condizioni">Cond.</button>
         </div>
       </div>`;
     }).join('');
@@ -8430,10 +8426,10 @@ const Schermo = (() => {
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:6px;">
         <div>
           <span style="font-family:var(--font-display);font-size:0.95rem;font-weight:700;">Round ${combat.round || 1}</span>
-          <span style="color:var(--accent-secondary-text);margin-left:8px;font-size:0.85rem;">🎯 ${sorted[activeIdx]?.nome || '—'}</span>
+          <span style="color:var(--accent-secondary-text);margin-left:8px;font-size:0.85rem;">${sorted[activeIdx]?.nome || '—'}</span>
         </div>
         <div style="display:flex;gap:6px;flex-wrap:wrap;">
-          <button class="btn btn-ghost btn-sm" onclick="Sessione.rollAllInitiative();setTimeout(()=>Schermo._refreshCombat(),200)">🎲 Init tutti</button>
+          <button class="btn btn-ghost btn-sm" onclick="Sessione.rollAllInitiative();setTimeout(()=>Schermo._refreshCombat(),200)">Init tutti</button>
           <button class="btn btn-secondary btn-sm" onclick="Sessione.prevTurn();setTimeout(()=>Schermo._refreshCombat(),200)">◀ Indietro</button>
           <button class="btn btn-primary btn-sm" onclick="Sessione.nextTurn();setTimeout(()=>Schermo._refreshCombat(),200)">▶ Avanti</button>
           <button class="btn btn-ghost btn-sm" onclick="App.navigateTo('sessione');closeMobileMenu()">→ Sessione</button>
@@ -8480,8 +8476,8 @@ const Schermo = (() => {
             (c.hp <= 0 ? 'opacity:0.4;' : '') + '">' +
           '<span style="font-family:var(--font-mono);font-size:0.72rem;width:22px;text-align:right;color:var(--accent-secondary-text);">' + c.iniziativa + '</span>' +
           '<span style="flex:1;font-size:0.8rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' +
-            (c.tipo==='pg'?'👤':c.tipo==='mostro'?'🐉':'⚔️') + ' ' + c.nome +
-            (c.concentrazione ? ' 🔮' : '') +
+            c.nome +
+            (c.concentrazione ? '' : '') +
           '</span>' +
           (cond ? '<span style="display:flex;gap:2px;">' + cond + '</span>' : '') +
           '<div style="display:flex;align-items:center;gap:3px;">' +
@@ -8720,7 +8716,7 @@ const Schermo = (() => {
     block.content = sezioneId;
     const allRules = Compendio?.getData()?.rules || [];
     const regola = allRules.find(r => r.id === sezioneId);
-    if (regola) block.title = '📖 ' + regola.nome;
+    if (regola) block.title = '' + regola.nome;
     save();
     updateBlockContent(block);
 
@@ -8758,7 +8754,7 @@ const Schermo = (() => {
       <div style="text-align:center;margin-bottom:10px;">
         <div style="font-family:var(--font-mono);font-size:2rem;font-weight:700;color:var(--accent-text);">${timeStr}</div>
         <div style="font-size:0.82rem;color:var(--text-secondary);margin-top:2px;font-family:var(--font-display);">${dateStr}</div>
-        ${festivita ? `<div style="font-size:0.72rem;color:var(--accent-secondary-text);margin-top:3px;">🎉 ${festivita.nome}</div>` : ''}
+        ${festivita ? `<div style="font-size:0.72rem;color:var(--accent-secondary-text);margin-top:3px;">${festivita.nome}</div>` : ''}
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:6px;">
         <button class="btn btn-secondary btn-sm" style="font-size:0.72rem;" onclick="Schermo._avanzaTempo('minuti',10)">+10 min</button>
@@ -8793,7 +8789,7 @@ const Schermo = (() => {
     return `
       <div style="margin-bottom:6px;display:flex;gap:6px;align-items:center;">
         <input type="text" id="vel-schermo-q-${blockId}" class="form-input"
-          placeholder="🔍 Cerca..." style="flex:1;font-size:0.78rem;padding:4px 8px;"
+          placeholder="Cerca..." style="flex:1;font-size:0.78rem;padding:4px 8px;"
           oninput="Schermo.filterVelocita('${blockId}')">
         <select id="vel-schermo-dur-${blockId}" class="form-select"
           style="font-size:0.72rem;width:auto;" onchange="Schermo.filterVelocita('${blockId}')">
@@ -8847,7 +8843,7 @@ const Schermo = (() => {
           <span style="font-size:0.75rem;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${c.nome}</span>
           <div style="display:flex;gap:4px;flex-shrink:0;">
             ${lento !== '—' ? `<span class="schermo-stat" title="Lento">L ${lento}</span>` : ''}
-            <span class="schermo-stat" title="Normale">🚶${norm}</span>
+            <span class="schermo-stat" title="Normale">${norm}</span>
             ${fast !== '—' ? `<span class="schermo-stat" title="Veloce">V ${fast}</span>` : ''}
           </div>
         </div>`;
@@ -8855,7 +8851,7 @@ const Schermo = (() => {
   };
 
   const renderCustom = (block) => `
-    <div style="font-size:0.85rem;color:var(--text-secondary);white-space:pre-wrap;line-height:1.6;">${block.content || '<span class="text-muted">Clicca ✏️ per modificare</span>'}</div>`;
+    <div style="font-size:0.85rem;color:var(--text-secondary);white-space:pre-wrap;line-height:1.6;">${block.content || '<span class="text-muted">Clicca per modificare</span>'}</div>`;
 
   const addBlock = () => {
 
@@ -8933,31 +8929,106 @@ const Schermo = (() => {
     Debug.log(`Schermo: blocco ${type} aggiunto`);
   };
 
+  const _el = (id) => document.getElementById('sblock-' + id);
+  let _timerSalva = null;
+  const _salvaPresto = () => { clearTimeout(_timerSalva); _timerSalva = setTimeout(save, 250); };
+
   const removeBlock = (id) => {
-    _blocks = _blocks.filter(b => b.id !== id);
-    save();
-    render();
+    const idx = _blocks.findIndex(b => b.id === id);
+    if (idx === -1) return;
+    const [tolto] = _blocks.splice(idx, 1);
+    chiudiMenu();
+    const el = _el(id);
+    if (el) el.remove();
+    if (!_blocks.length) render(); else _layoutMasonry();
+    _salvaPresto();
+    const def = BLOCK_TYPES[tolto.type] || BLOCK_TYPES.custom;
+    Toast.show('Blocco "' + (tolto.title || def.label) + '" rimosso', 'info', 6000, { etichetta: 'Annulla', fai: () => { _blocks.splice(Math.min(idx, _blocks.length), 0, tolto); save(); render(); } });
   };
 
-  // dir: +1 piu' largo, -1 piu' stretto, assente = passa alla misura successiva (dopo 5 torna a 1)
+  // dir: +1 piu' largo, -1 piu' stretto
   const resizeBlock = (id, dir) => {
     const block = _blocks.find(b => b.id === id);
     if (!block) return;
     const sizeKeys = Object.keys(SIZES);
     const cur = Math.max(0, sizeKeys.indexOf(block.size));
-    block.size = dir ? sizeKeys[Math.max(0, Math.min(sizeKeys.length - 1, cur + dir))] : sizeKeys[(cur + 1) % sizeKeys.length];
-    save();
-    render();
+    const nuovo = sizeKeys[Math.max(0, Math.min(sizeKeys.length - 1, cur + (dir || 1)))];
+    if (nuovo === block.size) return;
+    block.size = nuovo;
+    const el = _el(id);
+    if (el) { el.className = el.className.replace(/schermo-block-s\d/, 'schermo-block-' + nuovo); _layoutMasonry(); }
+    _salvaPresto();
   };
 
   const moveBlock = (id, dir) => {
     const idx = _blocks.findIndex(b => b.id === id);
-    if (idx === -1) return;
     const newIdx = idx + dir;
-    if (newIdx < 0 || newIdx >= _blocks.length) return;
+    if (idx === -1 || newIdx < 0 || newIdx >= _blocks.length) return;
+    const altro = _blocks[newIdx];
     [_blocks[idx], _blocks[newIdx]] = [_blocks[newIdx], _blocks[idx]];
-    save();
-    render();
+    const a = _el(id), b = _el(altro.id);
+    if (a && b) { if (dir < 0) a.parentNode.insertBefore(a, b); else a.parentNode.insertBefore(b, a); _layoutMasonry(); }
+    _salvaPresto();
+  };
+
+  /* ── Menu del blocco: azioni scritte per esteso, sempre raggiungibili anche col dito ── */
+  let _menuBlocco = null;
+  const ICONE_MENU = {
+    largo: '<path d="M4 12h16M8 8l-4 4 4 4M16 8l4 4-4 4"/>',
+    stretto: '<path d="M3 12h6M15 12h6M6 8l4 4-4 4M18 8l-4 4 4 4"/>',
+    prima: '<path d="M19 12H5M11 6l-6 6 6 6"/>',
+    dopo: '<path d="M5 12h14M13 6l6 6-6 6"/>',
+    modifica: '<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/>',
+    rimuovi: '<path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/>',
+  };
+  const chiudiMenu = () => {
+    document.getElementById('schermo-menu')?.remove();
+    document.querySelectorAll('.schermo-block-menu-btn[aria-expanded="true"]').forEach(b => b.setAttribute('aria-expanded', 'false'));
+    document.removeEventListener('pointerdown', _fuoriMenu, true);
+    document.removeEventListener('keydown', _tastoMenu, true);
+    _menuBlocco = null;
+  };
+  const _fuoriMenu = (e) => { if (!e.target.closest('#schermo-menu, .schermo-block-menu-btn')) chiudiMenu(); };
+  const _tastoMenu = (e) => { if (e.key === 'Escape') { const id = _menuBlocco; chiudiMenu(); _el(id)?.querySelector('.schermo-block-menu-btn')?.focus(); } };
+  const apriMenu = (id, btn) => {
+    const riapri = _menuBlocco === id && document.getElementById('schermo-menu');
+    if (riapri && btn && btn.getAttribute('aria-expanded') === 'true' && !apriMenu._interno) { chiudiMenu(); return; }
+    chiudiMenu();
+    const block = _blocks.find(b => b.id === id);
+    if (!block) return;
+    btn = _el(id)?.querySelector('.schermo-block-menu-btn') || btn;
+    const idx = _blocks.indexOf(block), cols = SIZES[block.size]?.cols || 2;
+    const nCol = Math.max(1, getComputedStyle(document.getElementById('schermo-grid')).gridTemplateColumns.split(' ').filter(Boolean).length);
+    const voce = (k, testo, off, cls = '') => '<button type="button" role="menuitem" data-k="' + k + '"' + (off ? ' disabled' : '') + (cls ? ' class="' + cls + '"' : '') + '><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + ICONE_MENU[k] + '</svg><span>' + testo + '</span></button>';
+    const m = document.createElement('div');
+    m.id = 'schermo-menu';
+    m.setAttribute('role', 'menu');
+    m.innerHTML = '<div class="sm-nota">Larghezza: ' + Math.min(cols, nCol) + ' ' + (Math.min(cols, nCol) === 1 ? 'colonna' : 'colonne') + ' su ' + nCol + '</div>' +
+      voce('largo', 'Più largo', cols >= Math.min(5, nCol)) + voce('stretto', 'Più stretto', cols <= 1) + '<hr>' +
+      voce('prima', 'Sposta prima', idx === 0) + voce('dopo', 'Sposta dopo', idx === _blocks.length - 1) +
+      (block.type === 'custom' || block.type === 'note' ? voce('modifica', 'Modifica titolo e testo') : '') + '<hr>' +
+      voce('rimuovi', 'Rimuovi', false, 'pericolo');
+    document.body.appendChild(m);
+    const r = btn.getBoundingClientRect(), mw = m.offsetWidth, mh = m.offsetHeight;
+    m.style.left = Math.max(8, Math.min(innerWidth - mw - 8, r.right - mw)) + 'px';
+    m.style.top = (r.bottom + 6 + mh > innerHeight - 8 ? Math.max(8, r.top - mh - 6) : r.bottom + 6) + 'px';
+    btn.setAttribute('aria-expanded', 'true');
+    _menuBlocco = id;
+    m.addEventListener('click', (e) => {
+      const b = e.target.closest('button[data-k]');
+      if (!b || b.disabled) return;
+      const k = b.dataset.k;
+      if (k === 'rimuovi') { removeBlock(id); return; }
+      if (k === 'modifica') { chiudiMenu(); editBlock(id); return; }
+      if (k === 'largo') resizeBlock(id, 1);
+      if (k === 'stretto') resizeBlock(id, -1);
+      if (k === 'prima') moveBlock(id, -1);
+      if (k === 'dopo') moveBlock(id, 1);
+      // Il menu resta aperto vicino al blocco, cosi' si puo' ripetere subito l'azione
+      requestAnimationFrame(() => { apriMenu._interno = true; apriMenu(id); apriMenu._interno = false; document.querySelector('#schermo-menu button[data-k="' + k + '"]:not([disabled])')?.focus(); });
+    });
+    setTimeout(() => { document.addEventListener('pointerdown', _fuoriMenu, true); document.addEventListener('keydown', _tastoMenu, true); }, 0);
+    m.querySelector('button:not([disabled])')?.focus();
   };
 
   const editBlock = (id) => {
@@ -8999,37 +9070,30 @@ const Schermo = (() => {
     e.stopPropagation();
     const bodyEl = document.getElementById(`sbody-${blockId}`);
     if (!bodyEl) return;
-    const startY = e.clientY;
-
-    const startH = bodyEl.getBoundingClientRect().height;
+    const startY = e.clientY, startH = bodyEl.getBoundingClientRect().height;
     document.body.style.userSelect = 'none';
     document.body.style.cursor = 'ns-resize';
-
     const onMove = (ev) => {
-      const delta = ev.clientY - startY;
-      const newH = Math.max(40, Math.round(startH + delta));
-      bodyEl.style.minHeight = newH + 'px';
+      bodyEl.style.minHeight = Math.max(40, Math.round(startH + ev.clientY - startY)) + 'px';
       bodyEl.style.maxHeight = 'none';
     };
     const onUp = () => {
       document.body.style.userSelect = '';
       document.body.style.cursor = '';
-      document.removeEventListener('mousemove', onMove);
-      document.removeEventListener('mouseup', onUp);
-      const screen = Storage.getMasterScreen();
-      const blk = (screen.blocks || []).find(b => b.id === blockId);
-      if (blk) {
-        blk.bodyHeight = parseInt(bodyEl.style.minHeight) || blk.bodyHeight;
-        Storage.saveMasterScreen(screen);
-      }
+      window.removeEventListener('pointermove', onMove);
+      window.removeEventListener('pointerup', onUp);
+      window.removeEventListener('pointercancel', onUp);
+      const blk = _blocks.find(b => b.id === blockId);
+      if (blk) { blk.bodyHeight = parseInt(bodyEl.style.minHeight) || blk.bodyHeight; _salvaPresto(); }
     };
-    document.addEventListener('mousemove', onMove);
-    document.addEventListener('mouseup', onUp);
+    window.addEventListener('pointermove', onMove);
+    window.addEventListener('pointerup', onUp);
+    window.addEventListener('pointercancel', onUp);
   };
 
   return {
     init, render, addBlock, aggiungiRapido, submitAddBlock, _onTypeChange, eseguiGeneratore, aggiungiMusica, togliMusica,
-    removeBlock, resizeBlock, moveBlock, editBlock, resetLayout,
+    removeBlock, resizeBlock, moveBlock, editBlock, resetLayout, apriMenu, chiudiMenu, _riordina: () => _layoutMasonry(),
     rollDie, generateMeteo, saveNote, advanceTime, refreshCombat,
     setCompendioRef, _refreshCombat, _refreshFavoriti, _swapBlocks,
     _refreshNoteSessione, _avanzaTempo, _refreshTempo, filterVelocita,
@@ -9074,24 +9138,24 @@ const rnd = (arr) => arr[Math.floor(Math.random() * arr.length)];
 const Generatori = {
 
   _GEN_DEFS: {
-    npc:       { label: 'PNG Completo',         emoji: '👤' },
-    meteo:     { label: 'Meteo',                emoji: '🌤️' },
-    sensori:   { label: 'Rumori & Odori',       emoji: '👁️' },
-    rumors:    { label: 'Voci di Corridoio',    emoji: '💬' },
-    accento:   { label: 'Voce & Accento',       emoji: '🎭' },
-    shop:      { label: 'Shop Generator',       emoji: '🏪' },
-    viaggio:   { label: 'Calcolatore Viaggio',  emoji: '🧭' },
-    loot:      { label: 'Loot Generator',       emoji: '💰' },
-    biblioteca:{ label: 'Biblioteca',           emoji: '📚' },
-    nomi:      { label: 'Generatore Nomi',      emoji: '📛' },
-    incontri:  { label: 'Incontri Casuali',     emoji: '⚠️' },
-    follia:    { label: 'Follia',               emoji: '🌀' },
-    encounter:  { label: 'Encounter Builder',    emoji: '⚔️' },
-    descrizione:  { label: 'Descrizione Luoghi',    emoji: '🏙️' },
-    nomi_luoghi:  { label: 'Nomi Luoghi',             emoji: '🗺️' },
-    ganci:        { label: 'Ganci Narrativi',          emoji: '🎣' },
-    oracolo:      { label: 'Oracolo',                  emoji: '🔮' },
-    missioni:     { label: 'Missioni Secondarie',      emoji: '📜' },
+    npc:       { label: 'PNG Completo',         emoji: '' },
+    meteo:     { label: 'Meteo',                emoji: '' },
+    sensori:   { label: 'Rumori & Odori',       emoji: '' },
+    rumors:    { label: 'Voci di Corridoio',    emoji: '' },
+    accento:   { label: 'Voce & Accento',       emoji: '' },
+    shop:      { label: 'Shop Generator',       emoji: '' },
+    viaggio:   { label: 'Calcolatore Viaggio',  emoji: '' },
+    loot:      { label: 'Loot Generator',       emoji: '' },
+    biblioteca:{ label: 'Biblioteca',           emoji: '' },
+    nomi:      { label: 'Generatore Nomi',      emoji: '' },
+    incontri:  { label: 'Incontri Casuali',     emoji: '' },
+    follia:    { label: 'Follia',               emoji: '' },
+    encounter:  { label: 'Encounter Builder',    emoji: '' },
+    descrizione:  { label: 'Descrizione Luoghi',    emoji: '' },
+    nomi_luoghi:  { label: 'Nomi Luoghi',             emoji: '' },
+    ganci:        { label: 'Ganci Narrativi',          emoji: '' },
+    oracolo:      { label: 'Oracolo',                  emoji: '' },
+    missioni:     { label: 'Missioni Secondarie',      emoji: '' },
   },
 
   // Generatori che esistevano prima di generatoriConosciuti: l'elenco dei visibili salvato da una
@@ -9135,7 +9199,7 @@ const Generatori = {
       document.getElementById('gen-settings-btn').textContent = 'Chiudi';
     } else {
       panel.style.display = 'none';
-      document.getElementById('gen-settings-btn').textContent = '⚙️ Personalizza';
+      document.getElementById('gen-settings-btn').textContent = 'Personalizza';
     }
   },
 
@@ -9335,7 +9399,7 @@ const Generatori = {
       stats[k] = Math.floor(Math.random() * (range[1] - range[0] + 1)) + range[0];
     });
 
-    const icon = ['👨','👩','🧙','⚔️','🗡️','🛡️','🎭','🧝','🐉'][Math.floor(Math.random()*9)];
+    const icon = ['','','','','','','','',''][Math.floor(Math.random()*9)];
 
     Generatori._lastGeneratedNPC = {
       name: nome, race: razza, job: prof, icon,
@@ -9363,7 +9427,7 @@ const Generatori = {
           <div class="text-sm" style="margin-bottom:4px;"><strong>Background:</strong> ${background}</div>
           <div class="text-sm" style="margin-bottom:4px;"><strong>Legame:</strong> ${legameTesto}</div>
           <div class="text-sm" style="margin-bottom:4px;"><strong>Difetto:</strong> ${difetto}</div>
-          <div class="text-sm" style="margin-bottom:4px;"><strong>🎬 Ora sta facendo:</strong> <em>${hookSituazionale}</em></div>` : '';
+          <div class="text-sm" style="margin-bottom:4px;"><strong>Ora sta facendo:</strong> <em>${hookSituazionale}</em></div>` : '';
 
     el.innerHTML = `
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-md);">
@@ -9374,7 +9438,7 @@ const Generatori = {
             <div>
               <div style="font-family:var(--font-display);font-size:1.1rem;">${nome}</div>
               <div><span class="badge badge-muted">${razza}</span> <span class="badge badge-gold">${prof}</span></div>
-              <div class="text-xs text-muted" style="margin-top:2px;">🎭 ${archetipo.nome}</div>
+              <div class="text-xs text-muted" style="margin-top:2px;">${archetipo.nome}</div>
             </div>
           </div>
           <div class="text-sm" style="margin-bottom:4px;"><strong>Apparenza:</strong> ${apparenza}</div>
@@ -9387,7 +9451,7 @@ const Generatori = {
           <div class="text-sm" style="margin-bottom:4px;"><strong>Desiderio dai PG:</strong> ${desiderio}</div>
           ${espansoHTML}
           <div class="card card-gold" style="padding:6px 10px;margin-top:6px;">
-            <div class="text-xs" style="color:var(--accent-secondary-text);"><strong>🔒 Segreto:</strong> ${segreto}</div>
+            <div class="text-xs" style="color:var(--accent-secondary-text);"><strong>Segreto:</strong> ${segreto}</div>
           </div>
         </div>
 
@@ -9800,9 +9864,9 @@ const Generatori = {
     el.innerHTML =
       '<div style="background:var(--bg-secondary);border-left:3px solid var(--accent-primary);border-radius:0 var(--radius-sm) var(--radius-sm) 0;padding:8px;margin-bottom:6px;font-size:0.85rem;line-height:1.5;">' + incontro + '</div>' +
       '<div style="display:flex;gap:6px;flex-wrap:wrap;">' +
-        '<span class="badge badge-muted">🕐 ' + ora + '</span>' +
-        '<span class="badge badge-muted">📍 ' + distanza + '</span>' +
-        '<span class="badge badge-muted">⚔️ ' + lvLabel + '</span>' +
+        '<span class="badge badge-muted">' + ora + '</span>' +
+        '<span class="badge badge-muted">' + distanza + '</span>' +
+        '<span class="badge badge-muted">' + lvLabel + '</span>' +
       '</div>' +
       '<button class="btn btn-ghost btn-sm w-full" style="margin-top:6px;font-size:0.72rem;" onclick="Generatori.rollIncontro()">Nuovo incontro</button>';
     Debug.log('Incontro: ' + ambiente + ' / ' + livello);
@@ -9904,7 +9968,7 @@ const Generatori = {
           '<th style="text-align:right;padding:3px 0;border-bottom:1px solid var(--border);font-family:var(--font-display);font-size:0.62rem;letter-spacing:0.05em;text-transform:uppercase;color:var(--text-muted);">Prezzo</th>' +
         '</tr></thead><tbody>' +
         shuffled.map(s =>
-          '<tr><td style="padding:3px 0;border-bottom:1px solid var(--border);">📜 ' + s.nome + '</td>' +
+          '<tr><td style="padding:3px 0;border-bottom:1px solid var(--border);">' + s.nome + '</td>' +
           '<td style="padding:3px 4px;border-bottom:1px solid var(--border);text-align:center;font-family:var(--font-mono);color:var(--text-muted);">' + s.livello + '</td>' +
           '<td style="padding:3px 0;border-bottom:1px solid var(--border);text-align:right;font-family:var(--font-mono);color:var(--accent-secondary-text);">' + (cfg.prezzi[s.livello]||'—') + ' mo</td></tr>'
         ).join('') +
@@ -9919,45 +9983,45 @@ const Generatori = {
 
     const meteoStagionale = {
       primavera: {
-        '☀️ Soleggiato':   ['Sole caldo, vento leggero. Ideale per viaggiare.', 'Cielo limpido, profumo di fiori. Temperatura gradevole.', 'Sole con qualche nuvola. Brezza fresca dal nord.'],
-        '🌦️ Variabile':    ['Alternanza di sole e nuvole. Possibili rovesci brevi.', 'Cielo incerto, arcobaleno al mattino.'],
-        '🌧️ Pioggia':      ['Pioggia leggera e persistente. Strade fangose.', 'Rovescio intermittente. Terreno scivoloso (-2 velocità).'],
-        '⛈️ Temporale':    ['Temporale improvviso. Fulmini vicini. Rischio per i metalli.'],
-        '🌫️ Nebbia':       ['Nebbia mattutina densa. Visibilità ridotta a 9m. Si dirada a mezzogiorno.'],
+        'Soleggiato':   ['Sole caldo, vento leggero. Ideale per viaggiare.', 'Cielo limpido, profumo di fiori. Temperatura gradevole.', 'Sole con qualche nuvola. Brezza fresca dal nord.'],
+        'Variabile':    ['Alternanza di sole e nuvole. Possibili rovesci brevi.', 'Cielo incerto, arcobaleno al mattino.'],
+        'Pioggia':      ['Pioggia leggera e persistente. Strade fangose.', 'Rovescio intermittente. Terreno scivoloso (-2 velocità).'],
+        'Temporale':    ['Temporale improvviso. Fulmini vicini. Rischio per i metalli.'],
+        'Nebbia':       ['Nebbia mattutina densa. Visibilità ridotta a 9m. Si dirada a mezzogiorno.'],
       },
       estate: {
-        '☀️ Soleggiato':   ['Caldo intenso. Rischio esaurimento senza acqua ogni 4 ore.', 'Sole cocente, nessuna nuvola. Ombra preziosa.', 'Afa opprimente. Velocità ridotta di 3m in armatura pesante.'],
-        '🌬️ Ventoso':      ['Vento caldo e secco. Polvere negli occhi (-1 Percezione).', 'Raffiche di vento da sud. Difficoltà a mantenere torce accese.'],
-        '🌧️ Rovescio':     ['Temporale estivo breve ma violento. Poi sole.', 'Pioggia calda improvvisa. Finisce in 1 ora.'],
-        '☁️ Nuvoloso':     ['Coperto, nessuna pioggia. Temperatura piacevole.'],
+        'Soleggiato':   ['Caldo intenso. Rischio esaurimento senza acqua ogni 4 ore.', 'Sole cocente, nessuna nuvola. Ombra preziosa.', 'Afa opprimente. Velocità ridotta di 3m in armatura pesante.'],
+        'Ventoso':      ['Vento caldo e secco. Polvere negli occhi (-1 Percezione).', 'Raffiche di vento da sud. Difficoltà a mantenere torce accese.'],
+        'Rovescio':     ['Temporale estivo breve ma violento. Poi sole.', 'Pioggia calda improvvisa. Finisce in 1 ora.'],
+        'Nuvoloso':     ['Coperto, nessuna pioggia. Temperatura piacevole.'],
       },
       autunno: {
-        '☁️ Coperto':      ['Cielo grigio, luce fioca. Temperatura fresca.', 'Nuvole basse, atmosfera cupa. Ottimo per tensione narrativa.'],
-        '🌧️ Pioggia':      ['Pioggia costante. Terreno fangoso. -3m velocità.', 'Pioggia battente con vento. Torce impossibili da tenere accese.'],
-        '🌫️ Nebbia':       ['Nebbia fitta dall\'alba al tramonto. Visibilità 6m.', 'Nebbia banchi irregolari. Si apre e si chiude.'],
-        '☀️ Soleggiato':   ['Giornata autunnale limpida. Foglie colorate. Temperatura fresca.'],
-        '🌬️ Vento':        ['Vento freddo da nord. Foglie che volano. Difficoltà Stealth all\'aperto.'],
+        'Coperto':      ['Cielo grigio, luce fioca. Temperatura fresca.', 'Nuvole basse, atmosfera cupa. Ottimo per tensione narrativa.'],
+        'Pioggia':      ['Pioggia costante. Terreno fangoso. -3m velocità.', 'Pioggia battente con vento. Torce impossibili da tenere accese.'],
+        'Nebbia':       ['Nebbia fitta dall\'alba al tramonto. Visibilità 6m.', 'Nebbia banchi irregolari. Si apre e si chiude.'],
+        'Soleggiato':   ['Giornata autunnale limpida. Foglie colorate. Temperatura fresca.'],
+        'Vento':        ['Vento freddo da nord. Foglie che volano. Difficoltà Stealth all\'aperto.'],
       },
       inverno: {
-        '❄️ Neve':         ['Neve abbondante. Velocità dimezzata. Tracce visibili per ore.', 'Nevicata leggera. Silenzio totale. Vantaggio su Furtività.', 'Bufera di neve. Visibilità 3m. Rischio esaurimento senza riparo.'],
-        '🧊 Ghiaccio':     ['Ghiaccio sul terreno. DC DES 13 o caduta ogni 9m di corsa.', 'Tutto ghiacciato. DC DES 10 per azioni fisiche veloci.'],
-        '☁️ Grigio':       ['Cielo grigio piombo. Freddo pungente. Nessuna precipitazione.'],
-        '☀️ Sole invernale':['Sole freddo e limpido. Terreno gelato ma praticabile. Magnifico.'],
-        '🌬️ Bufera':       ['Tempesta di vento e gelo. Movimento possibile solo a metà velocità. Danno freddo 1 ogni ora senza riparo.'],
+        'Neve':         ['Neve abbondante. Velocità dimezzata. Tracce visibili per ore.', 'Nevicata leggera. Silenzio totale. Vantaggio su Furtività.', 'Bufera di neve. Visibilità 3m. Rischio esaurimento senza riparo.'],
+        'Ghiaccio':     ['Ghiaccio sul terreno. DC DES 13 o caduta ogni 9m di corsa.', 'Tutto ghiacciato. DC DES 10 per azioni fisiche veloci.'],
+        'Grigio':       ['Cielo grigio piombo. Freddo pungente. Nessuna precipitazione.'],
+        'Sole invernale':['Sole freddo e limpido. Terreno gelato ma praticabile. Magnifico.'],
+        'Bufera':       ['Tempesta di vento e gelo. Movimento possibile solo a metà velocità. Danno freddo 1 ogni ora senza riparo.'],
       },
       tropicale: {
-        '🌧️ Pioggia torrenziale':['Pioggia tropicale violenta. Fiumi in piena. Visibilità 9m.', 'Rovescio equatoriale. Finisce in 20 minuti. Poi caldo umido.'],
-        '☀️ Sole cocente': ['Umidità al 90%. Caldo insopportabile. Esaurimento dopo 6 ore senza acqua.'],
-        '🌩️ Temporale':    ['Temporale tropicale. Fulmini frequenti. Alberi che cadono.'],
-        '🌫️ Umidità':      ['Nebbia calda e umida. Visibilità ridotta. Tutto si inzuppa.'],
-        '🌊 Uragano':      ['Uragano in avvicinamento. 1d4 ore prima dell\'impatto.'],
+        'Pioggia torrenziale':['Pioggia tropicale violenta. Fiumi in piena. Visibilità 9m.', 'Rovescio equatoriale. Finisce in 20 minuti. Poi caldo umido.'],
+        'Sole cocente': ['Umidità al 90%. Caldo insopportabile. Esaurimento dopo 6 ore senza acqua.'],
+        'Temporale':    ['Temporale tropicale. Fulmini frequenti. Alberi che cadono.'],
+        'Umidità':      ['Nebbia calda e umida. Visibilità ridotta. Tutto si inzuppa.'],
+        'Uragano':      ['Uragano in avvicinamento. 1d4 ore prima dell\'impatto.'],
       },
       artico: {
-        '❄️ Tormenta':     ['Tormenta artica. Visibilità 0. Muoversi è pericoloso (danno freddo 1d4/ora).', 'Neve fitta e vento tagliente. DC CON 12 o un livello esaurimento.'],
-        '🧊 Freddo estremo':['Temperatura sotto lo zero. Danno freddo 1 ogni 2 ore senza protezione.'],
-        '☀️ Luce artica':  ['Sole basso, luce abbagliante sul ghiaccio. Svantaggio Percezione visiva.'],
-        '🌌 Aurora boreale':['Cielo sgombro con aurora. Effetti magici potenziati (+1 livello incantesimo slot).'],
-        '🌬️ Bufera':       ['Bufera polare. Impossibile avanzare. Rifugiarsi o 1d6 danno freddo/ora.'],
+        'Tormenta':     ['Tormenta artica. Visibilità 0. Muoversi è pericoloso (danno freddo 1d4/ora).', 'Neve fitta e vento tagliente. DC CON 12 o un livello esaurimento.'],
+        'Freddo estremo':['Temperatura sotto lo zero. Danno freddo 1 ogni 2 ore senza protezione.'],
+        'Luce artica':  ['Sole basso, luce abbagliante sul ghiaccio. Svantaggio Percezione visiva.'],
+        'Aurora boreale':['Cielo sgombro con aurora. Effetti magici potenziati (+1 livello incantesimo slot).'],
+        'Bufera':       ['Bufera polare. Impossibile avanzare. Rifugiarsi o 1d6 danno freddo/ora.'],
       },
     };
 
@@ -9974,7 +10038,7 @@ const Generatori = {
         '<div>' +
           '<div style="font-family:var(--font-display);font-size:0.8rem;color:var(--accent-secondary-text);">' + tipo.slice(tipo.indexOf(' ')+1) + ' — ' + stagione.charAt(0).toUpperCase()+stagione.slice(1) + '</div>' +
           '<div class="text-sm" style="margin-top:2px;">' + desc + '</div>' +
-          (temp ? '<div style="font-size:0.7rem;color:var(--text-muted);margin-top:4px;">🌡️ ' + temp + '</div>' : '') +
+          (temp ? '<div style="font-size:0.7rem;color:var(--text-muted);margin-top:4px;">' + temp + '</div>' : '') +
         '</div>' +
       '</div>';
     Debug.log('Meteo: ' + tipo + ' (' + stagione + ')');
@@ -10061,11 +10125,11 @@ const Generatori = {
     }
 
     const rolls = [];
-    if (rame > 0)    rolls.push(`<span>🟤 ${rame.toLocaleString('it-IT')} mr</span>`);
-    if (argento > 0) rolls.push(`<span>⚪ ${argento.toLocaleString('it-IT')} ma</span>`);
-    if (elettro > 0) rolls.push(`<span>🔵 ${elettro.toLocaleString('it-IT')} me</span>`);
-    if (oro > 0)     rolls.push(`<span style="color:var(--accent-secondary-text)">🟡 ${oro.toLocaleString('it-IT')} mo</span>`);
-    if (platino > 0) rolls.push(`<span style="color:var(--accent-info)">🔷 ${platino.toLocaleString('it-IT')} mp</span>`);
+    if (rame > 0)    rolls.push(`<span>${rame.toLocaleString('it-IT')} mr</span>`);
+    if (argento > 0) rolls.push(`<span>${argento.toLocaleString('it-IT')} ma</span>`);
+    if (elettro > 0) rolls.push(`<span>${elettro.toLocaleString('it-IT')} me</span>`);
+    if (oro > 0)     rolls.push(`<span style="color:var(--accent-secondary-text)">${oro.toLocaleString('it-IT')} mo</span>`);
+    if (platino > 0) rolls.push(`<span style="color:var(--accent-info)">${platino.toLocaleString('it-IT')} mp</span>`);
 
     el.innerHTML = `
       <div style="display:flex;flex-wrap:wrap;gap:8px;font-family:var(--font-mono);font-size:0.82rem;margin-top:4px;">
@@ -10087,7 +10151,7 @@ const Generatori = {
 
     const attMult = { ostile: 1.2, diffidente: 1.1, neutrale: 1.0, cordiale: 0.9, amico: 0.8 };
     const mult  = attMult[att] || 1.0;
-    const sconto = mult < 1 ? `🟢 ${Math.round((1-mult)*100)}% sconto` : mult > 1 ? `🔴 +${Math.round((mult-1)*100)}% rincaro` : '';
+    const sconto = mult < 1 ? `${Math.round((1-mult)*100)}% sconto` : mult > 1 ? `+${Math.round((mult-1)*100)}% rincaro` : '';
 
     const camp   = App.getActiveCampaign();
     const sistema = camp?.system === '5e2014' ? '5e2014' : '5e2024';
@@ -10155,7 +10219,7 @@ const Generatori = {
     };
 
     if (tipo === 'biblioteca') {
-      el.innerHTML = '<div class="text-muted text-sm">Usa il generatore <strong>📚 Biblioteca</strong> nella griglia per le pergamene. Lo Shop mostra equipaggiamento fisico.</div>';
+      el.innerHTML = '<div class="text-muted text-sm">Usa il generatore <strong>Biblioteca</strong> nella griglia per le pergamene. Lo Shop mostra equipaggiamento fisico.</div>';
 
       const prezziScroll = { basso:{0:10,1:60}, medio:{0:10,1:60,2:120,3:200,4:320}, alto:{0:10,1:60,2:120,3:200,4:320,5:640,6:1280} };
       const scrollLv = prezziScroll[livello] || prezziScroll.medio;
@@ -10167,11 +10231,11 @@ const Generatori = {
         '</tr></thead><tbody>' +
         Object.entries(scrollLv).map(([lv, p]) => {
           const prezFin = Math.round(p * mult);
-          return `<tr><td style="padding:3px 0;border-bottom:1px solid var(--border);">📜 Pergamena magica (${lv}° livello)</td>` +
+          return `<tr><td style="padding:3px 0;border-bottom:1px solid var(--border);">Pergamena magica (${lv}° livello)</td>` +
             `<td style="padding:3px 0;border-bottom:1px solid var(--border);text-align:right;font-family:var(--font-mono);color:var(--accent-secondary-text);">${prezFin} mo</td></tr>`;
         }).join('') +
         '</tbody></table>' +
-        '<div class="text-muted text-sm" style="margin-top:6px;">Livelli disponibili variano per dimensione biblioteca. Usa il generatore 📚 per la lista completa.</div>';
+        '<div class="text-muted text-sm" style="margin-top:6px;">Livelli disponibili variano per dimensione biblioteca. Usa il generatore per la lista completa.</div>';
       Debug.log(`Shop biblioteca: ${nomeNeg}`);
       return;
     }
@@ -10293,7 +10357,7 @@ const Generatori = {
         <tbody>${selected.map(item => {
           const prezzoFin = Math.round(item.p * mult * 10) / 10;
           const mostra = item.raro ? '<span class="badge badge-gold" style="font-size:0.58rem;">magico</span> ' : '';
-          const nomeCell = `<span style="cursor:pointer;color:var(--accent-secondary-text);text-decoration:underline dotted;" onclick="CompendioCache.openItem(this.dataset.nome)" data-nome="${item.n.replace(/"/g,'&quot;')}" title="Apri nel Compendio">${mostra}${item.n} 🔗</span>`;
+          const nomeCell = `<span style="cursor:pointer;color:var(--accent-secondary-text);text-decoration:underline dotted;" onclick="CompendioCache.openItem(this.dataset.nome)" data-nome="${item.n.replace(/"/g,'&quot;')}" title="Apri nel Compendio">${mostra}${item.n} <svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-1px;margin-left:3px;"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg></span>`;
           return `<tr>
             <td style="padding:3px 0;border-bottom:1px solid var(--border);">${nomeCell}</td>
             <td style="padding:3px 4px;border-bottom:1px solid var(--border);text-align:center;font-family:var(--font-mono);color:var(--text-muted);">×${item.qty}</td>
@@ -10336,29 +10400,29 @@ const Generatori = {
     if (tipo === 'mostro' || tipo === 'scrigno') {
       if (cr <= 4) {
         const mr = d(5,6)*100; const ma = d(2,6)*10; const mo = d(1,6);
-        monete = `🟤 ${mr} mr · ⚪ ${ma} ma · 🟡 ${mo} mo`;
+        monete = `${mr} mr · ${ma} ma · ${mo} mo`;
       } else if (cr <= 10) {
         const mr = d(2,6)*50; const ma = d(4,6)*100; const mo = d(2,6)*10;
         const me = useElettro ? d(1,6)*10 : 0;
-        monete = `🟤 ${mr} mr · ⚪ ${ma} ma${me ? ' · 🔵 ' + me + ' me' : ''} · 🟡 ${mo} mo`;
-        if (pct(40)) extras.push('💎 ' + r(gemme_basse));
-        if (pct(20)) extras.push('💎 ' + r(gemme_medie));
-        if (pct(20)) extras.push('🖼️ ' + r(arte_media));
+        monete = `${mr} mr · ${ma} ma${me ? ' · ' + me + ' me' : ''} · ${mo} mo`;
+        if (pct(40)) extras.push('' + r(gemme_basse));
+        if (pct(20)) extras.push('' + r(gemme_medie));
+        if (pct(20)) extras.push('' + r(arte_media));
         if (pct(25)) extras.push('✨ ' + r(magia_B));
         if (pct(10)) extras.push('✨ ' + r(magia_C));
       } else if (cr <= 16) {
         const mo = d(4,6)*100; const mp = d(1,6)*10;
-        monete = `🟡 ${mo} mo · 🔷 ${mp} mp`;
-        if (pct(50)) extras.push('💎 ' + r(gemme_medie));
-        if (pct(30)) extras.push('💎 ' + r(gemme_alte));
-        if (pct(30)) extras.push('🖼️ ' + r(arte_alta));
+        monete = `${mo} mo · ${mp} mp`;
+        if (pct(50)) extras.push('' + r(gemme_medie));
+        if (pct(30)) extras.push('' + r(gemme_alte));
+        if (pct(30)) extras.push('' + r(arte_alta));
         if (pct(35)) extras.push('✨ ' + r(magia_C));
         if (pct(20)) extras.push('✨ ' + r(magia_D));
       } else {
         const mo = d(6,6)*1000; const mp = d(3,6)*100;
-        monete = `🟡 ${mo.toLocaleString('it-IT')} mo · 🔷 ${mp} mp`;
-        if (pct(70)) extras.push('💎 ' + r(gemme_alte));
-        if (pct(50)) extras.push('🖼️ ' + r(arte_alta));
+        monete = `${mo.toLocaleString('it-IT')} mo · ${mp} mp`;
+        if (pct(70)) extras.push('' + r(gemme_alte));
+        if (pct(50)) extras.push('' + r(arte_alta));
         if (pct(40)) extras.push('✨ ' + r(magia_D));
         if (pct(25)) extras.push('✨ ' + r(magia_E));
         if (pct(10)) extras.push('✨ ' + r(magia_F));
@@ -10372,8 +10436,8 @@ const Generatori = {
       sacerdote: ['Simbolo sacro (25 mo)', 'Acqua santa (fiala)', 'Libro di preghiere', '2d6 mo nelle offerte', 'Reliquia (valore incerto)'],
       mercante:  [`${d(2,6)*10} mo in cassa`, 'Manifesto di carico', 'Sigillo di una gilda', 'Campione di merce esotica', 'Lettera di credito (100 mo)'],
       non_morto: ['Dente d\'oro (5 mo)', 'Amuleto funerario (10 mo)', 'Olio di unzione (25 mo)', 'Pergamena antica illeggibile', 'Frammento di osso inciso'],
-      drago:     [`🔷 ${d(6,6)*1000} mp · 🟡 ${d(12,6)*1000} mo`, '💎 ' + r(gemme_alte), '💎 ' + r(gemme_alte), '✨ ' + r(magia_E), '✨ ' + r(magia_F)],
-      tomba:     ['Urna funeraria (50 mo)', 'Gioiello sepolcrale (100 mo)', 'Amuleto antico (25 mo)', '💎 ' + r(gemme_medie), pct(30) ? '✨ ' + r(magia_C) : 'Bende mummificate (inutili)'],
+      drago:     [`${d(6,6)*1000} mp · ${d(12,6)*1000} mo`, r(gemme_alte), r(gemme_alte), '✨ ' + r(magia_E), '✨ ' + r(magia_F)],
+      tomba:     ['Urna funeraria (50 mo)', 'Gioiello sepolcrale (100 mo)', 'Amuleto antico (25 mo)', r(gemme_medie), pct(30) ? '✨ ' + r(magia_C) : 'Bende mummificate (inutili)'],
     };
 
     if (tipo !== 'mostro' && tipo !== 'scrigno' && tematici[tipo]) {
@@ -10386,7 +10450,7 @@ const Generatori = {
       if (!testo.startsWith('✨')) return `<span>${testo}</span>`;
       const nomePulito = testo.replace('✨ ', '').replace(/ \(.*\)$/, '').trim();
       return `<span style="cursor:pointer;color:var(--accent-secondary-text);text-decoration:underline dotted;"
-        onclick="CompendioCache.openItem('${nomePulito.replace(/'/g,"\'")}')" title="Cerca nel Compendio">✨ ${nomePulito} 🔗</span>`;
+        onclick="CompendioCache.openItem('${nomePulito.replace(/'/g,"\'")}')" title="Cerca nel Compendio">${nomePulito}<svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-1px;margin-left:3px;"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg></span>`;
     };
 
     const rows = extras.map(e => `
@@ -10659,37 +10723,37 @@ const WikiDM = (() => {
   const _uid = () => 'n' + Date.now() + Math.random().toString(36).slice(2,5);
 
   const _builtinTemplates = () => [
-    { id:'tpl_sess', nome:'⚔️ Sessione', icona:'⚔️', builtin:true, contenuto:`<h1>Sessione — </h1>
+    { id:'tpl_sess', nome:'Sessione', icona:'', builtin:true, contenuto:`<h1>Sessione — </h1>
 <p><strong>Data:</strong> &nbsp;|&nbsp; <strong>Sessione n°:</strong> </p>
-<h2>🎯 Obiettivi</h2><ul><li></li></ul>
-<h2>🗺️ Scene Preparate</h2><p></p>
-<h2>👥 PNG Coinvolti</h2><ul><li></li></ul>
-<h2>⚔️ Encounter</h2><p></p>
-<h2>💰 Loot</h2><p></p>
-<h2>🔒 Segreti DM</h2><blockquote></blockquote>
-<h2>📝 Note Live</h2><p></p>
-<h2>📖 Recap</h2><p></p>
-<h2>🔗 Thread aperti</h2><ul><li></li></ul>` },
-    { id:'tpl_lore', nome:'📚 Lore', icona:'📚', builtin:true, contenuto:`<h1></h1>
+<h2>Obiettivi</h2><ul><li></li></ul>
+<h2>Scene Preparate</h2><p></p>
+<h2>PNG Coinvolti</h2><ul><li></li></ul>
+<h2>Encounter</h2><p></p>
+<h2>Loot</h2><p></p>
+<h2>Segreti DM</h2><blockquote></blockquote>
+<h2>Note Live</h2><p></p>
+<h2>Recap</h2><p></p>
+<h2>Thread aperti</h2><ul><li></li></ul>` },
+    { id:'tpl_lore', nome:'Lore', icona:'', builtin:true, contenuto:`<h1></h1>
 <p><em>#tag</em></p>
 <h2>Descrizione</h2><p></p>
 <h2>Storia</h2><p></p>
 <h2>Connessioni</h2><ul><li>[[Collegamento]]</li></ul>
 <h2>Note DM</h2><blockquote></blockquote>` },
-    { id:'tpl_npc', nome:'👤 PNG', icona:'👤', builtin:true, contenuto:`<h1></h1>
+    { id:'tpl_npc', nome:'PNG', icona:'', builtin:true, contenuto:`<h1></h1>
 <p><strong>Razza:</strong> &nbsp;|&nbsp; <strong>Ruolo:</strong> &nbsp;|&nbsp; <strong>Luogo:</strong> [[]]</p>
 <p>#png</p>
 <h2>Descrizione</h2><p></p>
 <h2>Personalità</h2><p><strong>Vuole:</strong> <br><strong>Teme:</strong> <br><strong>Segreto:</strong> </p>
 <h2>Relazioni</h2><ul><li>[[]] — </li></ul>
 <h2>Dialoghi</h2><blockquote></blockquote>` },
-    { id:'tpl_loc', nome:'🗺️ Luogo', icona:'🗺️', builtin:true, contenuto:`<h1></h1>
+    { id:'tpl_loc', nome:'Luogo', icona:'', builtin:true, contenuto:`<h1></h1>
 <p><strong>Tipo:</strong> &nbsp;|&nbsp; <strong>Regione:</strong> [[]] &nbsp;|&nbsp; #luogo</p>
 <h2>Descrizione</h2><p></p>
 <h2>Atmosfera</h2><p><strong>Vista:</strong> <br><strong>Suoni:</strong> <br><strong>Odori:</strong> </p>
 <h2>Abitanti</h2><ul><li>[[]]</li></ul>
 <h2>Note DM</h2><blockquote></blockquote>` },
-    { id:'tpl_free', nome:'📄 Nota Libera', icona:'📄', builtin:true, contenuto:`<h1></h1><p></p>` },
+    { id:'tpl_free', nome:'Nota Libera', icona:'', builtin:true, contenuto:`<h1></h1><p></p>` },
   ];
 
   const _ensureTemplates = (w) => {
@@ -10832,7 +10896,7 @@ const WikiDM = (() => {
     if (!notes.length) {
       const labels = { lore:'Lore', sessioni:'Sessioni' };
       tree.innerHTML = `<div style="padding:20px 12px;text-align:center;color:var(--text-muted);">
-        <div style="font-size:2rem;margin-bottom:8px;">${_section==='lore'?'📚':'📋'}</div>
+        
         <div style="font-size:0.82rem;margin-bottom:12px;">Nessuna nota in ${labels[_section]}</div>
         <button class="btn btn-primary btn-sm" onclick="WikiDM.newNote()">+ Nuova nota</button>
       </div>`;
@@ -10854,12 +10918,12 @@ const WikiDM = (() => {
         onclick="WikiDM._clickNote('${n.id}')"
         onmouseenter="if(!${active})this.style.background='var(--bg-tertiary)'"
         onmouseleave="if(!${active})this.style.background='transparent'">
-        <span style="font-size:0.75rem;flex-shrink:0;">${n.pinned ? '📌' : _noteIcon(n.titolo)}</span>
+        <span style="font-size:0.75rem;flex-shrink:0;">${n.pinned ? '' : _noteIcon(n.titolo)}</span>
         <span style="font-size:0.82rem;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;${n.pinned?'font-weight:600;':''}">${n.titolo || 'Senza titolo'}</span>
         <div style="display:flex;gap:2px;flex-shrink:0;opacity:0.5;" onclick="event.stopPropagation();">
           <button title="${n.pinned?'Rimuovi pin':'Fissa in cima'}"
             style="width:18px;height:18px;background:none;border:none;cursor:pointer;font-size:0.65rem;padding:0;color:color-mix(in srgb, ${n.pinned?'var(--accent-secondary)':'var(--text-muted)'} 50%, var(--text-primary));"
-            onclick="WikiDM.togglePin('${n.id}')">📌</button>
+            onclick="WikiDM.togglePin('${n.id}')"></button>
         </div>
       </div>`;
     }).join('');
@@ -10867,10 +10931,10 @@ const WikiDM = (() => {
 
   const _noteIcon = (titolo) => {
     const t = (titolo||'').toLowerCase();
-    if (t.includes('sessione')) return '⚔️';
-    if (t.includes('png') || t.includes('npc')) return '👤';
-    if (t.includes('luogo')) return '🗺️';
-    return '📄';
+    if (t.includes('sessione')) return '';
+    if (t.includes('png') || t.includes('npc')) return '';
+    if (t.includes('luogo')) return '';
+    return '';
   };
 
   const _clickNote = (id) => {
@@ -10892,7 +10956,7 @@ const WikiDM = (() => {
     const nota = _noteId ? (w[_section]||[]).find(n => n.id === _noteId) : null;
 
     if (breadEl) {
-      const sec = { lore:'📚 Lore', sessioni:'📋 Sessioni' }[_section] || '';
+      const sec = { lore:'Lore', sessioni:'Sessioni' }[_section] || '';
       breadEl.innerHTML = nota
         ? `<span style="cursor:pointer;" onclick="WikiDM.switchSection('${_section}')">${sec}</span> › ${nota.titolo||'Senza titolo'}`
         : sec;
@@ -10900,7 +10964,7 @@ const WikiDM = (() => {
 
     if (actionsEl) {
       actionsEl.innerHTML = nota
-        ? `<button class="btn btn-ghost btn-icon-sm" onclick="WikiDM.deleteNote()" title="Elimina" style="color:var(--danger-text);">🗑️</button>`
+        ? `<button class="btn btn-ghost btn-icon-sm" onclick="WikiDM.deleteNote()" title="Elimina" style="color:var(--danger-text);"></button>`
         : '';
     }
 
@@ -10909,7 +10973,7 @@ const WikiDM = (() => {
       titleEl.disabled = true;
       contentEl.contentEditable = 'false';
       contentEl.innerHTML = `<div style="max-width:440px;margin:48px auto;text-align:center;color:var(--text-muted);">
-        <div style="font-size:3rem;margin-bottom:16px;">${_section==='lore'?'📚':'📋'}</div>
+        
         <div style="font-size:0.9rem;margin-bottom:20px;line-height:1.6;">
           ${_section==='lore'
             ? 'Scrivi la lore del mondo: storia, divinità, magia, fazioni...'
@@ -10999,7 +11063,7 @@ const WikiDM = (() => {
         const npcData = {
           id: 'npc_' + uid,
           name: nota.titolo || 'Nuovo PNG',
-          race: '', job: '', icon: '👤',
+          race: '', job: '', icon: '',
           trait: '', secret: '', wants: '', offers: '', links: '',
           relation: 50, imgPosX: 50, imgPosY: 50, imgZoom: 100,
           wikiId: nota.id,
@@ -11113,7 +11177,7 @@ const WikiDM = (() => {
     const sr = document.getElementById('wiki-search-results');
     const sl = document.getElementById('wiki-search-list');
     if (sr) sr.style.display = '';
-    const icons = { lore:'📚', sessioni:'📋' };
+    const icons = { lore:'', sessioni:'' };
     if (sl) sl.innerHTML = !results.length
       ? '<p style="color:var(--text-muted);text-align:center;padding:20px;">Nessun risultato.</p>'
       : results.map(r => `<div style="padding:10px;border:1px solid var(--border);border-radius:var(--radius-md);
@@ -11172,7 +11236,7 @@ const WikiDM = (() => {
     });
     if (!links.length) { panel.style.display = 'none'; return; }
     panel.style.display = 'flex';
-    panel.innerHTML = '<span style="flex-shrink:0;margin-right:6px;">🔗 Citata da:</span>' +
+    panel.innerHTML = '<span style="flex-shrink:0;margin-right:6px;">Citata da:</span>' +
       links.map(l => `<span style="padding:2px 8px;background:var(--bg-card);border:1px solid var(--border);
           border-radius:var(--radius-sm);cursor:pointer;color:#3f7fc4;font-size:0.75rem;"
           onclick="WikiDM._clickNote('${l.n.id}');WikiDM.switchSection('${l.sec}')">
@@ -11213,20 +11277,20 @@ const WikiDM = (() => {
     const contentEl = document.getElementById('wiki-note-content');
     const actionsEl = document.getElementById('wiki-note-actions');
     const breadEl  = document.getElementById('wiki-breadcrumb');
-    if (breadEl) breadEl.textContent = '🗂️ Template';
+    if (breadEl) breadEl.textContent = 'Template';
     if (!titleEl || !contentEl) return;
     const w = _getWiki();
     const tpl = (w.templates||_builtinTemplates()).find(t => t.id === _noteId);
     if (actionsEl) {
       actionsEl.innerHTML = (tpl && !tpl.builtin)
-        ? `<button class="btn btn-ghost btn-icon-sm" onclick="WikiDM.deleteTemplate('${tpl.id}')" style="color:var(--danger-text);">🗑️</button>`
+        ? `<button class="btn btn-ghost btn-icon-sm" onclick="WikiDM.deleteTemplate('${tpl.id}')" style="color:var(--danger-text);"></button>`
         : '';
     }
     if (!tpl) {
       titleEl.value = ''; titleEl.disabled = true;
       contentEl.contentEditable = 'false';
       contentEl.innerHTML = `<div style="text-align:center;padding:40px;color:var(--text-muted);">
-        <div style="font-size:2.5rem;margin-bottom:12px;">🗂️</div>
+        <div style="font-size:2.5rem;margin-bottom:12px;"></div>
         <div style="margin-bottom:16px;">Seleziona un template o creane uno nuovo</div>
         <button class="btn btn-primary btn-sm" onclick="WikiDM.newTemplate()">+ Nuovo template</button>
       </div>`;
@@ -11255,7 +11319,7 @@ const WikiDM = (() => {
       if (!nome?.trim()) return;
       const w = _getWiki();
       if (!w.templates) w.templates = _builtinTemplates();
-      const tpl = { id:'tpl_'+Date.now(), nome:nome.trim(), icona:'📄', builtin:false, contenuto:`<h1>${nome.trim()}</h1>\n<p></p>` };
+      const tpl = { id:'tpl_'+Date.now(), nome:nome.trim(), icona:'', builtin:false, contenuto:`<h1>${nome.trim()}</h1>\n<p></p>` };
       w.templates.push(tpl);
       _saveWiki(w);
       _noteId = tpl.id;
@@ -11426,16 +11490,16 @@ const wikiInsertLink = () => {
 
   const pages = [];
   ['lore','sessioni'].forEach(sec => (w[sec]||[]).forEach(n =>
-    pages.push({ tipo:'wiki', tipo_label:'📝 Wiki', titolo:n.titolo, key:n.titolo })
+    pages.push({ tipo:'wiki', tipo_label:'Wiki', titolo:n.titolo, key:n.titolo })
   ));
   (camp?.npcs||[]).forEach(n =>
-    pages.push({ tipo:'png', tipo_label:'👤 PNG', titolo:n.name||n.nome||'', id:n.id, key:'png:'+( n.name||n.nome||'') })
+    pages.push({ tipo:'png', tipo_label:'PNG', titolo:n.name||n.nome||'', id:n.id, key:'png:'+( n.name||n.nome||'') })
   );
   (camp?.locations||[]).forEach(l =>
-    pages.push({ tipo:'luogo', tipo_label:'🗺️ Luogo', titolo:l.nome||'', id:l.id, key:'luogo:'+(l.nome||'') })
+    pages.push({ tipo:'luogo', tipo_label:'Luogo', titolo:l.nome||'', id:l.id, key:'luogo:'+(l.nome||'') })
   );
   (camp?.factions||[]).forEach(f =>
-    pages.push({ tipo:'fazione', tipo_label:'⚔️ Fazione', titolo:f.nome||'', id:f.id, key:'fazione:'+(f.nome||'') })
+    pages.push({ tipo:'fazione', tipo_label:'Fazione', titolo:f.nome||'', id:f.id, key:'fazione:'+(f.nome||'') })
   );
 
   if (!pages.length) { Toast.show('Nessuna nota o entità disponibile','info'); return; }
@@ -11457,9 +11521,9 @@ const wikiInsertLink = () => {
     const key = found ? found.key : titolo;
     const cls = found ? 'nc-wikilink' : 'nc-wikilink nc-broken';
     const label = found ? (
-      found.tipo === 'png' ? '👤 ' :
-      found.tipo === 'luogo' ? '🗺️ ' :
-      found.tipo === 'fazione' ? '⚔️ ' : ''
+      found.tipo === 'png' ? '' :
+      found.tipo === 'luogo' ? '' :
+      found.tipo === 'fazione' ? '' : ''
     ) + titolo : titolo;
 
     _restoreEditorCaret(document.getElementById('wiki-note-content'));
@@ -11567,7 +11631,7 @@ const GlobalSearch = (() => {
       (wiki[sec]||[]).forEach(n => {
         const text = (n.titolo + ' ' + (n.contenuto||'').replace(/<[^>]+>/g,'')).toLowerCase();
         if (text.includes(query)) {
-          const secLabel = sec === 'lore' ? '📚 Lore' : '📋 Sessione';
+          const secLabel = sec === 'lore' ? 'Lore' : 'Sessione';
           _results.push({ tipo:secLabel, nome:n.titolo||'Senza titolo', sub:'', action:() => { Modal.close('global-search'); App.navigateTo('wiki'); setTimeout(()=>{ WikiDM.switchSection(sec); WikiDM.openNote(n.id); },200); } });
         }
       });
@@ -11577,14 +11641,14 @@ const GlobalSearch = (() => {
       const cd = Compendio?.getData() || {};
       (cd.monsters||[]).slice(0,500).forEach(m => {
         if ((m.nome||'').toLowerCase().includes(query)) {
-          _results.push({ tipo:'🐉 Mostro', nome:m.nome, sub:'GS '+(m.grado_sfida?.raw||'?'), action:() => { Modal.close('global-search'); App.navigateTo('compendio'); setTimeout(()=>Compendio.openMonster(m.id),200); } });
+          _results.push({ tipo:'Mostro', nome:m.nome, sub:'GS '+(m.grado_sfida?.raw||'?'), action:() => { Modal.close('global-search'); App.navigateTo('compendio'); setTimeout(()=>Compendio.openMonster(m.id),200); } });
         }
       });
       [
-        { key:'magic_items', label:'✨ Oggetto Magico', open:'openMagicItem' },
-        { key:'equipment',   label:'🎒 Equipaggiamento', open:'openEquipment' },
-        { key:'rules',       label:'📖 Regola',          open:'openRule' },
-        { key:'spells',      label:'🔮 Incantesimo',     open:'openSpell' },
+        { key:'magic_items', label:'Oggetto Magico', open:'openMagicItem' },
+        { key:'equipment',   label:'Equipaggiamento', open:'openEquipment' },
+        { key:'rules',       label:'Regola',          open:'openRule' },
+        { key:'spells',      label:'Incantesimo',     open:'openSpell' },
       ].forEach(({ key, label, open }) => {
         (cd[key]||[]).slice(0,500).forEach(item => {
           const desc = (item.descrizione||'').replace(/<[^>]+>/g,'');
@@ -11686,12 +11750,12 @@ const Scratchpad = (() => {
 
 const wikiCallout = (tipo) => {
   const labels = {
-    'read-aloud': '📢 READ ALOUD',
-    'secret':     '🔒 SEGRETO DM',
-    'loot':       '💰 LOOT',
-    'clue':       '🔍 INDIZIO',
-    'trap':       '⚠️ TRAPPOLA',
-    'improv':     '💡 IMPROV',
+    'read-aloud': 'READ ALOUD',
+    'secret':     'SEGRETO DM',
+    'loot':       'LOOT',
+    'clue':       'INDIZIO',
+    'trap':       'TRAPPOLA',
+    'improv':     'IMPROV',
   };
   const el = document.getElementById('wiki-note-content');
   if (!el) return;
@@ -11739,7 +11803,7 @@ const Clocks = (() => {
         '<div style="display:flex;height:14px;border-radius:4px;overflow:hidden;gap:1px;">' + segs + '</div>' +
         // I clock sono salvati con 'nota' (vedi add): qui si leggeva 'note' e la nota non compariva mai
         ((c.nota || c.note) ? '<div style="font-size:0.72rem;color:' + (pct >= 100 ? 'var(--text-primary)' : 'var(--text-muted)') + ';margin-top:4px;">' + (pct >= 100 ? 'È successo: ' : 'Quando si riempie: ') + String(c.nota || c.note).replace(/</g,'&lt;') + '</div>' : '') +
-        (pct >= 100 ? '<div style="font-size:0.7rem;color:var(--danger-text);margin-top:4px;font-weight:600;">⚡ COMPLETATO</div>' : '') +
+        (pct >= 100 ? '<div style="font-size:0.7rem;color:var(--danger-text);margin-top:4px;font-weight:600;">COMPLETATO</div>' : '') +
       '</div>';
     }).join('');
   };
@@ -11803,7 +11867,7 @@ const _renderDashRecenti = () => {
     } else {
       el.innerHTML = all.map(n => {
         const sec = (wiki.lore||[]).find(x=>x.id===n.id) ? 'lore' : 'sessioni';
-        const icon = sec === 'sessioni' ? '⚔️' : (n.pinned ? '📌' : '📄');
+        const icon = '';
         const ago = _timeAgo(n.aggiornatoAt);
         return '<div style="display:flex;align-items:center;gap:8px;padding:6px 12px;cursor:pointer;border-bottom:1px solid var(--border);" onclick="App.navigateTo(\'wiki\');setTimeout(()=>{WikiDM.switchSection(\''+sec+'\');WikiDM.openNote(\''+n.id+'\');},200)">' +
           '<span style="font-size:0.8rem;">' + icon + '</span>' +
@@ -11850,7 +11914,7 @@ const _timeAgo = (ts) => {
 const WikiGrafo = (() => {
   let _sim = null;
   const C = { wiki:'#3f7fc4', sessione:'#8f6bc8', png:'#3f9a6b', luogo:'#c98a24', fazione:'#cf5450' };
-  const I = { wiki:'📄', sessione:'⚔️', png:'👤', luogo:'🗺️', fazione:'⚔️' };
+  const I = { wiki:'', sessione:'', png:'', luogo:'', fazione:'' };
 
   const _build = () => {
     const camp = App.getActiveCampaign();
@@ -11968,7 +12032,7 @@ const WikiGrafo = (() => {
     nd.append('circle').attr('r',d=>Math.max(16,12+d.deg*3))
       .attr('fill',d=>C[d.tipo]||'#888').attr('fill-opacity',0.85)
       .style('stroke','var(--bg-primary)').attr('stroke-width',2);
-    nd.append('text').attr('text-anchor','middle').attr('dy','0.35em').attr('font-size','12').text(d=>I[d.tipo]||'📄');
+    nd.append('text').attr('text-anchor','middle').attr('dy','0.35em').attr('font-size','12').text(d=>I[d.tipo]||'');
     nd.append('text').attr('text-anchor','middle').attr('dy',d=>Math.max(16,12+d.deg*3)+13)
       .style('fill','var(--text-secondary)').attr('font-size','10').text(d=>d.label.length>16?d.label.slice(0,14)+'…':d.label);
 
@@ -11999,7 +12063,7 @@ const wikiInsertImage = () => {
       document.execCommand('insertHTML', false,
         '<figure style="margin:12px 0;text-align:center;">' +
         '<img src="' + url.trim() + '" alt="' + alt + '" style="max-width:100%;border-radius:var(--radius-md);border:1px solid var(--border);" onerror="this.style.display=\'none\';this.nextSibling.style.display=\'block\'">' +
-        '<div style="display:none;padding:8px;background:var(--bg-tertiary);border-radius:var(--radius-md);color:var(--text-muted);font-size:0.78rem;">⚠️ Immagine non caricata: ' + url.trim() + '</div>' +
+        '<div style="display:none;padding:8px;background:var(--bg-tertiary);border-radius:var(--radius-md);color:var(--text-muted);font-size:0.78rem;">Immagine non caricata: ' + url.trim() + '</div>' +
         (alt !== 'immagine' ? '<figcaption style="font-size:0.72rem;color:var(--text-muted);margin-top:4px;">' + alt + '</figcaption>' : '') +
         '</figure><p><br></p>'
       );
@@ -12221,12 +12285,12 @@ const _applyViewMode = () => {
     if (content) { content.contentEditable = 'false'; content.style.cursor = 'default'; }
     if (toolbar)  toolbar.classList.add('view-mode');
     if (titleEl)  titleEl.disabled = true;
-    if (btn) { btn.textContent = '✏️ Modifica'; btn.title = 'Passa in modalità modifica'; btn.style.color = 'var(--accent-secondary-text)'; }
+    if (btn) { btn.textContent = 'Modifica'; btn.title = 'Passa in modalità modifica'; btn.style.color = 'var(--accent-secondary-text)'; }
   } else {
     if (content) { content.contentEditable = 'true'; content.style.cursor = ''; content.focus(); }
     if (toolbar)  toolbar.classList.remove('view-mode');
     if (titleEl)  titleEl.disabled = false;
-    if (btn) { btn.textContent = '👁 Vista'; btn.title = 'Passa in modalità lettura'; btn.style.color = ''; }
+    if (btn) { btn.textContent = 'Vista'; btn.title = 'Passa in modalità lettura'; btn.style.color = ''; }
   }
 };
 
@@ -12285,10 +12349,10 @@ const miniFmt = (fieldId, cmd) => {
       const camp = App.getActiveCampaign();
       const pages = [];
       const wiki = camp?.wiki || {};
-      ['lore','sessioni'].forEach(sec => (wiki[sec]||[]).forEach(n => pages.push({label:'📄 '+n.titolo, key:n.titolo})));
-      (camp?.npcs||[]).forEach(n => pages.push({label:'👤 '+(n.name||n.nome||''), key:'png:'+(n.name||n.nome||'')}));
-      (camp?.locations||[]).forEach(l => pages.push({label:'🗺️ '+(l.nome||''), key:'luogo:'+(l.nome||'')}));
-      (camp?.factions||[]).forEach(f => pages.push({label:'⚔️ '+(f.nome||''), key:'fazione:'+(f.nome||'')}));
+      ['lore','sessioni'].forEach(sec => (wiki[sec]||[]).forEach(n => pages.push({label:''+n.titolo, key:n.titolo})));
+      (camp?.npcs||[]).forEach(n => pages.push({label:''+(n.name||n.nome||''), key:'png:'+(n.name||n.nome||'')}));
+      (camp?.locations||[]).forEach(l => pages.push({label:''+(l.nome||''), key:'luogo:'+(l.nome||'')}));
+      (camp?.factions||[]).forEach(f => pages.push({label:''+(f.nome||''), key:'fazione:'+(f.nome||'')}));
       const list = pages.slice(0,25).map((p,i) => (i+1)+'. '+p.label).join('\n');
       _saveEditorCaret();
       openInputModal('Collega a (numero o titolo)', '', (input) => {
@@ -12302,7 +12366,7 @@ const miniFmt = (fieldId, cmd) => {
                      : key.startsWith('fazione:') ? key.slice(8)
                      : key;
         const cls = found ? 'nc-wikilink' : 'nc-wikilink nc-broken';
-        const icon = !found ? '' : key.startsWith('png:') ? '👤 ' : key.startsWith('luogo:') ? '🗺️ ' : key.startsWith('fazione:') ? '⚔️ ' : '';
+        const icon = '';
         _restoreEditorCaret(el);
         document.execCommand('insertHTML', false,
           '<span class="'+cls+'" data-link="'+key+'" onclick="wikiNavigateLink(\''+key.replace(/'/g,"\\'")+'\')" style="cursor:pointer;">[['+icon+titolo+']]</span>&nbsp;'
@@ -12321,12 +12385,12 @@ const miniFmt = (fieldId, cmd) => {
     }
     else if (cmd === 'secret') {
       document.execCommand('insertHTML', false,
-        '<div class="wiki-callout wiki-callout-secret"><span class="wiki-callout-label">🔒 SEGRETO DM</span><p>...</p></div><p><br></p>'
+        '<div class="wiki-callout wiki-callout-secret"><span class="wiki-callout-label">SEGRETO DM</span><p>...</p></div><p><br></p>'
       );
     }
     else if (cmd === 'clue') {
       document.execCommand('insertHTML', false,
-        '<div class="wiki-callout wiki-callout-clue"><span class="wiki-callout-label">🔍 INDIZIO</span><p>...</p></div><p><br></p>'
+        '<div class="wiki-callout wiki-callout-clue"><span class="wiki-callout-label">INDIZIO</span><p>...</p></div><p><br></p>'
       );
     }
     return;
@@ -12377,7 +12441,7 @@ const _insertInTextarea = (el, ins, start, end) => {
 
 const _extraTemplates = () => [
   {
-    id:'tpl_oggetto', nome:'💎 Oggetto Magico', icona:'💎', builtin:true,
+    id:'tpl_oggetto', nome:'Oggetto Magico', icona:'', builtin:true,
     contenuto:`<h1></h1>
 <p><strong>Tipo:</strong> &nbsp;|&nbsp; <strong>Rarità:</strong> &nbsp;|&nbsp; <strong>Richiede sintonia:</strong> No &nbsp;|&nbsp; #oggetto</p>
 <h2>Descrizione</h2><p></p>
@@ -12386,38 +12450,38 @@ const _extraTemplates = () => [
 <h2>Note DM</h2><blockquote></blockquote>`
   },
   {
-    id:'tpl_dungeon', nome:'🏚️ Dungeon / Stanza', icona:'🏚️', builtin:true,
+    id:'tpl_dungeon', nome:'Dungeon / Stanza', icona:'', builtin:true,
     contenuto:`<h1></h1>
 <p><strong>Tipo:</strong> Dungeon / Stanza &nbsp;|&nbsp; <strong>Piano:</strong> &nbsp;|&nbsp; #dungeon</p>
-<h2>📢 READ ALOUD</h2>
-<div class="wiki-callout wiki-callout-read-aloud"><span class="wiki-callout-label">📢 READ ALOUD</span><p>Descrivi la stanza ai giocatori...</p></div>
+<h2>READ ALOUD</h2>
+<div class="wiki-callout wiki-callout-read-aloud"><span class="wiki-callout-label">READ ALOUD</span><p>Descrivi la stanza ai giocatori...</p></div>
 <h2>Dettagli DM</h2><p></p>
-<h2>⚠️ Pericoli / Trappole</h2>
-<div class="wiki-callout wiki-callout-trap"><span class="wiki-callout-label">⚠️ TRAPPOLA</span><p>...</p></div>
-<h2>💰 Loot</h2>
-<div class="wiki-callout wiki-callout-loot"><span class="wiki-callout-label">💰 LOOT</span><p>...</p></div>
+<h2>Pericoli / Trappole</h2>
+<div class="wiki-callout wiki-callout-trap"><span class="wiki-callout-label">TRAPPOLA</span><p>...</p></div>
+<h2>Loot</h2>
+<div class="wiki-callout wiki-callout-loot"><span class="wiki-callout-label">LOOT</span><p>...</p></div>
 <h2>Uscite</h2><ul><li>Nord: [[]]</li><li>Sud: [[]]</li></ul>`
   },
   {
-    id:'tpl_evento', nome:'🔍 Evento / Segreto', icona:'🔍', builtin:true,
+    id:'tpl_evento', nome:'Evento / Segreto', icona:'', builtin:true,
     contenuto:`<h1></h1>
 <p><strong>Tipo:</strong> Evento / Segreto &nbsp;|&nbsp; <strong>Sessione:</strong> &nbsp;|&nbsp; #segreto</p>
 <h2>Cosa è successo</h2><p></p>
-<h2>🔒 Chi lo sa</h2>
-<div class="wiki-callout wiki-callout-secret"><span class="wiki-callout-label">🔒 SEGRETO DM</span><p>Solo il DM sa che...</p></div>
-<h2>🔍 Come può emergere</h2>
-<div class="wiki-callout wiki-callout-clue"><span class="wiki-callout-label">🔍 INDIZIO</span><p>I PG possono scoprirlo se...</p></div>
+<h2>Chi lo sa</h2>
+<div class="wiki-callout wiki-callout-secret"><span class="wiki-callout-label">SEGRETO DM</span><p>Solo il DM sa che...</p></div>
+<h2>Come può emergere</h2>
+<div class="wiki-callout wiki-callout-clue"><span class="wiki-callout-label">INDIZIO</span><p>I PG possono scoprirlo se...</p></div>
 <h2>Impatto sulla trama</h2><p></p>
 <h2>Collegato a</h2><ul><li>[[]]</li></ul>`
   },
   {
-    id:'tpl_negozio', nome:'🏪 Negozio', icona:'🏪', builtin:true,
+    id:'tpl_negozio', nome:'Negozio', icona:'', builtin:true,
     contenuto:`<h1></h1>
 <p><strong>Tipo:</strong> &nbsp;|&nbsp; <strong>Luogo:</strong> [[]] &nbsp;|&nbsp; #negozio</p>
 <h2>Descrizione</h2><p></p>
 <h2>Gestore</h2><p>[[]] — </p>
 <h2>Inventario</h2>
-<div class="wiki-callout wiki-callout-loot"><span class="wiki-callout-label">💰 IN VENDITA</span>
+<div class="wiki-callout wiki-callout-loot"><span class="wiki-callout-label">IN VENDITA</span>
 <ul><li></li></ul></div>
 <h2>Prezzi speciali / offerte</h2><p></p>
 <h2>Note DM</h2><blockquote></blockquote>`
@@ -12629,14 +12693,14 @@ const _mondoToWiki = (tipo, entita) => {
       '<h1>' + nome + '</h1>' +
       '<p><strong>Razza:</strong> ' + razza +
       ' &nbsp;|&nbsp; <strong>Ruolo:</strong> ' + ruolo +
-      (faz ? ' &nbsp;|&nbsp; <strong>Fazione:</strong> <span class="nc-wikilink" data-link="fazione:'+faz.nome+'" onclick="wikiNavigateLink(\'fazione:'+faz.nome+'\')">[[⚔️ '+faz.nome+']]</span>' : '') +
+      (faz ? ' &nbsp;|&nbsp; <strong>Fazione:</strong> <span class="nc-wikilink" data-link="fazione:'+faz.nome+'" onclick="wikiNavigateLink(\'fazione:'+faz.nome+'\')">'+faz.nome+'</span>' : '') +
       '</p>' +
       '<p>#npc #png' + (entita.factionId ? '' : '') + (razza ? ' #'+razza.toLowerCase().replace(/\s+/g,'_') : '') + '</p>' +
       '<h2>Tratto caratteriale</h2>' +
       '<p>' + personalita + '</p>' +
       '<h2>Vuole</h2>' +
       '<p>' + (vuole||'...') + '</p>' +
-      (segreto ? '<h2>🔒 Segreto DM</h2><div class="wiki-callout wiki-callout-secret"><span class="wiki-callout-label">🔒 SEGRETO DM</span><p>' + segreto + '</p></div>' : '') +
+      (segreto ? '<h2>Segreto DM</h2><div class="wiki-callout wiki-callout-secret"><span class="wiki-callout-label">SEGRETO DM</span><p>' + segreto + '</p></div>' : '') +
       '<h2>Legami</h2>' +
       '<p>' + relazioni + '</p>';
   }
@@ -12662,7 +12726,7 @@ const _mondoToWiki = (tipo, entita) => {
       '<p>#fazione' + (entita.tipo ? ' #'+entita.tipo.toLowerCase().replace(/\s+/g,'_') : '') + '</p>' +
       '<h2>Obiettivi</h2>' +
       '<p>' + obiettivo + '</p>' +
-      (noteLibere ? '<h2>Note DM</h2><div class="wiki-callout wiki-callout-secret"><span class="wiki-callout-label">🔒 SEGRETO DM</span><p>' + noteLibere + '</p></div>' : '');
+      (noteLibere ? '<h2>Note DM</h2><div class="wiki-callout wiki-callout-secret"><span class="wiki-callout-label">SEGRETO DM</span><p>' + noteLibere + '</p></div>' : '');
   }
 
   const now = Date.now();
@@ -12835,7 +12899,7 @@ const npcRenderCronologia = (npcId) => {
   eventi.forEach(e => {
     const div = document.createElement('div');
     div.style.cssText = 'display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid var(--border);cursor:pointer;';
-    const icon = e.sec === 'sessioni' ? '⚔️' : '📚';
+    const icon = '';
     div.innerHTML = '<span>' + icon + '</span><span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + (e.titolo||'Senza titolo') + '</span>';
     div.addEventListener('click', () => {
       App.navigateTo('wiki');
@@ -12859,9 +12923,9 @@ const _enrichedSearch = (q, camp) => {
       let sub = ruolo || razza || '';
 
       if (personalita.toLowerCase().includes(query)) sub = 'Personalità: ' + personalita.slice(0,40);
-      else if (segreto.toLowerCase().includes(query)) sub = '🔒 Segreto';
+      else if (segreto.toLowerCase().includes(query)) sub = 'Segreto';
       else if (vuole.toLowerCase().includes(query)) sub = 'Vuole: ' + vuole.slice(0,40);
-      results.push({ tipo:'👤 PNG', nome:n.name||n.nome||'', sub,
+      results.push({ tipo:'PNG', nome:n.name||n.nome||'', sub,
         action:() => { Modal.close('global-search'); WikiSections.goto('png'); setTimeout(()=>WikiSections.openCard('png', n.id),150); }
       });
     }
@@ -12873,7 +12937,7 @@ const _enrichedSearch = (q, camp) => {
     if (haystack.includes(query)) {
       let sub = l.tipo || '';
       if (atmosfera.toLowerCase().includes(query)) sub = atmosfera.replace(/<[^>]+>/g,'').slice(0,40);
-      results.push({ tipo:'🗺️ Luogo', nome:l.nome||'', sub,
+      results.push({ tipo:'Luogo', nome:l.nome||'', sub,
         action:() => { Modal.close('global-search'); WikiSections.goto('luoghi'); setTimeout(()=>WikiSections.openCard('luoghi', l.id),150); }
       });
     }
@@ -12885,16 +12949,16 @@ const _enrichedSearch = (q, camp) => {
     if (haystack.includes(query)) {
       let sub = f.tipo || '';
       if (obiettivo.toLowerCase().includes(query)) sub = obiettivo.replace(/<[^>]+>/g,'').slice(0,40);
-      results.push({ tipo:'⚔️ Fazione', nome:f.nome||'', sub,
+      results.push({ tipo:'Fazione', nome:f.nome||'', sub,
         action:() => { Modal.close('global-search'); WikiSections.goto('fazioni'); setTimeout(()=>WikiSections.openCard('fazioni', f.id),150); }
       });
     }
   });
 
   [
-    { type:'quest',    label:'📜 Quest' },
-    { type:'pg',       label:'🧙 PG' },
-    { type:'incontri', label:'⚔️ Incontro' },
+    { type:'quest',    label:'Quest' },
+    { type:'pg',       label:'PG' },
+    { type:'incontri', label:'Incontro' },
   ].forEach(({ type, label }) => {
     const cfg = WikiSections._getCfg && WikiSections._getCfg(type);
     if (!cfg) return;
@@ -12918,7 +12982,7 @@ const _enrichedSearch = (q, camp) => {
     if (haystack.includes(query)) {
       let sub = t.categoria || '';
       if (corpo.toLowerCase().includes(query)) sub = corpo.slice(0,40);
-      results.push({ tipo:'🎭 Trama', nome:t.titolo||'Senza titolo', sub,
+      results.push({ tipo:'Trama', nome:t.titolo||'Senza titolo', sub,
         action:() => { Modal.close('global-search'); App.navigateTo('trame'); setTimeout(()=>Trame.openTrama(t.id),150); }
       });
     }
@@ -13218,7 +13282,7 @@ const FirebaseSync = (() => {
       titolo.textContent = 'Cambia modalità';
       const chi = _user.isAnonymous ? 'in modalità anonima' : ('come ' + (_user.email || _user.displayName || 'account Google'));
       avviso.style.display = 'block';
-      avviso.innerHTML = '⚠ Sei attualmente collegata ' + chi + '. Scegliendo un\'altra opzione qui sotto (o un account Google diverso) esci da questo accesso: le campagne sincronizzate su di esso spariscono dall\'app finché non ci riaccedi — restano comunque salvate, nulla viene cancellato.';
+      avviso.innerHTML = 'Sei attualmente collegata ' + chi + '. Scegliendo un\'altra opzione qui sotto (o un account Google diverso) esci da questo accesso: le campagne sincronizzate su di esso spariscono dall\'app finché non ci riaccedi — restano comunque salvate, nulla viene cancellato.';
     } else if (titolo) {
       titolo.textContent = 'Benvenuto nel DM Toolkit';
       if (avviso) avviso.style.display = 'none';
@@ -14229,7 +14293,7 @@ const MentionPicker = (() => {
       (wiki[sec]||[]).forEach(n => {
         if (!lc || (n.titolo||'').toLowerCase().includes(lc)) {
           items.push({
-            label: (sec === 'sessioni' ? '⚔️' : '📄') + ' ' + (n.titolo||'Senza titolo'),
+            label: (n.titolo||'Senza titolo'),
             key: n.titolo || '', tipo: 'wiki', sec, id: n.id,
             color: sec === 'sessioni' ? '#8f6bc8' : '#3f7fc4',
           });
@@ -14240,19 +14304,19 @@ const MentionPicker = (() => {
     (camp?.npcs||[]).forEach(n => {
       const nome = n.name || n.nome || '';
       if (!lc || nome.toLowerCase().includes(lc)) {
-        items.push({ label:'👤 '+nome, key:'png:'+nome, tipo:'png', id:n.id, color:'#3f9a6b' });
+        items.push({ label:''+nome, key:'png:'+nome, tipo:'png', id:n.id, color:'#3f9a6b' });
       }
     });
 
     (camp?.locations||[]).forEach(l => {
       if (!lc || (l.nome||'').toLowerCase().includes(lc)) {
-        items.push({ label:'🗺️ '+(l.nome||''), key:'luogo:'+(l.nome||''), tipo:'luogo', id:l.id, color:'#c98a24' });
+        items.push({ label:''+(l.nome||''), key:'luogo:'+(l.nome||''), tipo:'luogo', id:l.id, color:'#c98a24' });
       }
     });
 
     (camp?.factions||[]).forEach(f => {
       if (!lc || (f.nome||'').toLowerCase().includes(lc)) {
-        items.push({ label:'⚔️ '+(f.nome||''), key:'fazione:'+(f.nome||''), tipo:'fazione', id:f.id, color:'#cf5450' });
+        items.push({ label:''+(f.nome||''), key:'fazione:'+(f.nome||''), tipo:'fazione', id:f.id, color:'#cf5450' });
       }
     });
 
@@ -14264,7 +14328,7 @@ const MentionPicker = (() => {
     const nomeDigitato = q.trim();
     if (nomeDigitato) {
       const giaEsiste = (tipoCfg) => items.some(it => it.tipo === tipoCfg && it.label.toLowerCase().includes(nomeDigitato.toLowerCase()) && it.label.toLowerCase().replace(/^\S+\s/, '') === nomeDigitato.toLowerCase());
-      [['png','👤','PNG'], ['luogo','🗺️','Luogo'], ['fazione','⚔️','Fazione']].forEach(([tipoCfg, emoji, label]) => {
+      [['png','','PNG'], ['luogo','','Luogo'], ['fazione','','Fazione']].forEach(([tipoCfg, emoji, label]) => {
         if (!giaEsiste(tipoCfg)) {
           risultati.push({ label: '+ Crea ' + label + ' "' + nomeDigitato + '"', key: nomeDigitato, tipo: 'crea', tipoEntita: tipoCfg, color: 'var(--accent-primary)' });
         }
@@ -14402,9 +14466,9 @@ const MentionPicker = (() => {
                  : r.tipo === 'png'  ? r.key.slice(4)
                  : r.tipo === 'luogo' ? r.key.slice(6)
                  : r.key.slice(8);
-    const icon = r.tipo === 'png' ? '👤 '
-               : r.tipo === 'luogo' ? '🗺️ '
-               : r.tipo === 'fazione' ? '⚔️ '
+    const icon = r.tipo === 'png' ? ''
+               : r.tipo === 'luogo' ? ''
+               : r.tipo === 'fazione' ? ''
                : '';
 
     document.execCommand('insertHTML', false,
@@ -14559,7 +14623,7 @@ const ScenePlanner = (() => {
               ).join('') +
               '</select>' +
               (b.principale ? '<span style="font-size:0.65rem;background:rgba(91,164,245,0.2);color:#3f7fc4;padding:1px 6px;border-radius:var(--radius-full);">★ Principale</span>' : '') +
-              (b.tipo === 'cliffhanger' ? '<span style="font-size:0.65rem;background:rgba(255,159,67,0.2);color:#d17a33;padding:1px 6px;border-radius:var(--radius-full);">⚡ Cliffhanger</span>' : '') +
+              (b.tipo === 'cliffhanger' ? '<span style="font-size:0.65rem;background:rgba(255,159,67,0.2);color:#d17a33;padding:1px 6px;border-radius:var(--radius-full);">Cliffhanger</span>' : '') +
             '</div>' +
 
             '<input type="text" value="'+((b.titolo||'').replace(/"/g,'&quot;'))+'" '+
@@ -14781,10 +14845,10 @@ const SessioniLog = (() => {
             '</div>' +
             '<div style="display:flex;gap:6px;">' +
               (wikiNota ?
-                '<button class="btn btn-ghost btn-sm" onclick="SessioniLog.openWiki(\''+s.id+'\')" style="font-size:0.72rem;">📝 Wiki</button>' :
+                '<button class="btn btn-ghost btn-sm" onclick="SessioniLog.openWiki(\''+s.id+'\')" style="font-size:0.72rem;">Wiki</button>' :
                 '<button class="btn btn-ghost btn-sm" onclick="SessioniLog.createWikiNote(\''+s.id+'\')" style="font-size:0.72rem;">+ Nota Wiki</button>'
               ) +
-              '<button class="btn btn-ghost btn-sm" onclick="SessioniLog.edit(\''+s.id+'\')" style="font-size:0.72rem;">✏️ Modifica</button>' +
+              '<button class="btn btn-ghost btn-sm" onclick="SessioniLog.edit(\''+s.id+'\')" style="font-size:0.72rem;">Modifica</button>' +
               (s.stato !== 'giocata' ?
                 '<button class="btn btn-primary btn-sm" onclick="SessioniLog.setInCorso(\''+s.id+'\')" style="font-size:0.72rem;">▶ In corso</button>' : '') +
               '<button class="btn btn-ghost btn-sm" onclick="SessioniLog.remove(\''+s.id+'\')" style="font-size:0.72rem;color:var(--danger-text);"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>' +
@@ -14792,7 +14856,7 @@ const SessioniLog = (() => {
           '</div>' +
 
           (npcs.length ? '<div style="display:flex;flex-wrap:wrap;gap:4px;">'+
-            npcs.map(n => '<span style="font-size:0.72rem;padding:1px 8px;background:var(--bg-tertiary);border:1px solid var(--border);border-radius:var(--radius-full);">👤 '+n+'</span>').join('')+
+            npcs.map(n => '<span style="font-size:0.72rem;padding:1px 8px;background:var(--bg-tertiary);border:1px solid var(--border);border-radius:var(--radius-full);">'+n+'</span>').join('')+
           '</div>' : '') +
 
           (beatCount ? '<div style="display:flex;flex-wrap:wrap;gap:4px;align-items:center;">' +
@@ -14916,7 +14980,7 @@ const SessioniLog = (() => {
       const n = (camp?.npcs||[]).find(x => x.id === id);
       const nome = n ? (n.name||n.nome||'') : id;
       return '<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;background:var(--bg-tertiary);border:1px solid var(--border);border-radius:var(--radius-full);font-size:0.72rem;">'+
-        '👤 '+nome+
+        ''+nome+
         '<button onclick="SessioniLog._removeNpc(\''+id+'\')" style="background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:0.7rem;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>'+
         '</span>';
     }).join('');
@@ -14940,7 +15004,7 @@ const SessioniLog = (() => {
     const uid = 'n' + Date.now() + Math.random().toString(36).slice(2,5);
     const npcsLinks = (s.npcs||[]).map(id => {
       const n = (camp?.npcs||[]).find(x => x.id === id);
-      return n ? '<span class="nc-wikilink" data-link="png:'+(n.name||n.nome||'')+'" onclick="wikiNavigateLink(\'png:'+(n.name||n.nome||'')+'\')">[[👤 '+(n.name||n.nome||'')+']]</span>' : '';
+      return n ? '<span class="nc-wikilink" data-link="png:'+(n.name||n.nome||'')+'" onclick="wikiNavigateLink(\'png:'+(n.name||n.nome||'')+'\')">'+(n.name||n.nome||'')+'</span>' : '';
     }).filter(Boolean).join(' · ');
 
     const beatsHtml = (s.beats||[]).map(b =>
@@ -16785,7 +16849,7 @@ const WikiSections = (() => {
       if (!content) return '';
       return '<div style="margin-bottom:14px;">' +
         '<div style="font-size:0.65rem;font-family:var(--font-display);text-transform:uppercase;letter-spacing:0.08em;color:' + (isSecret ? '#cf5450' : 'var(--text-muted)') + ';margin-bottom:4px;">' +
-        (isSecret ? '🔒 ' : '') + f.label + '</div>' +
+        (isSecret ? '' : '') + f.label + '</div>' +
         (isSecret ?
           '<div style="background:rgba(255,107,107,0.08);border-left:3px solid #cf5450;padding:8px 12px;border-radius:0 var(--radius-md) var(--radius-md) 0;">' + content + '</div>' :
           content) +
@@ -16818,7 +16882,7 @@ const WikiSections = (() => {
       const isSecret = f.type === 'secret';
       return '<div class="form-group" style="margin-bottom:12px;">' +
         '<label class="form-label" style="font-size:0.68rem;' + (isSecret ? 'color:#cf5450;' : '') + '">' +
-        (isSecret ? '🔒 ' : '') + f.label +
+        (isSecret ? '' : '') + f.label +
         (f.hint ? '<span style="font-weight:400;color:var(--text-muted);font-size:0.65rem;margin-left:6px;">' + f.hint + '</span>' : '') +
         '</label>' + input + '</div>';
     };
@@ -18188,7 +18252,7 @@ const SessCtx = (() => {
         '<span style="font-size:0.82rem;flex:1;">' + v + '</span>' +
         '</div>'
       ).join('') +
-      '<button onclick="SessCtx.openWikiSessione()" class="btn btn-ghost btn-sm" style="margin-top:8px;font-size:0.72rem;">📖 Scheda completa in Wiki →</button>';
+      '<button onclick="SessCtx.openWikiSessione()" class="btn btn-ghost btn-sm" style="margin-top:8px;font-size:0.72rem;">Scheda completa in Wiki →</button>';
   };
 
   const openWikiSessione = () => {
@@ -19013,27 +19077,27 @@ const EncounterBuilder = (() => {
   };
 
   const CATS = [
-    { id:'humanoid-warrior',    nome:'Umanoidi — Guerriero',    emoji:'⚔️',  tipi:['umanoide','goblinoide','orco','umano'] },
-    { id:'humanoid-caster',     nome:'Umanoidi — Incantatore',  emoji:'🧙',  tipi:['umanoide'] },
-    { id:'humanoid-rogue',      nome:'Umanoidi — Ladro/Ranger', emoji:'🏹',  tipi:['umanoide'] },
-    { id:'beasts',              nome:'Bestie',                  emoji:'🐺',  tipi:['bestia'] },
-    { id:'undead-physical',     nome:'Non Morti — Fisico',      emoji:'💀',  tipi:['non morto'] },
-    { id:'undead-incorporeal',  nome:'Non Morti — Incorporeo',  emoji:'👻',  tipi:['non morto'] },
-    { id:'demons',              nome:'Demoni',                  emoji:'😈',  tipi:['demone','aberrazione'] },
-    { id:'devils',              nome:'Diavoli',                 emoji:'🔱',  tipi:['diavolo'] },
-    { id:'dragons',             nome:'Draghi',                  emoji:'🐉',  tipi:['drago'] },
-    { id:'constructs',          nome:'Costrutti',               emoji:'🤖',  tipi:['costrutto'] },
-    { id:'aberrations',         nome:'Aberrazioni',             emoji:'🦑',  tipi:['aberrazione'] },
-    { id:'fey-benevolent',      nome:'Fate Benevole',           emoji:'🧚',  tipi:['folletto','fata'] },
-    { id:'fey-malevolent',      nome:'Fate Malvagie',           emoji:'🧟',  tipi:['folletto','fata'] },
-    { id:'giants',              nome:'Giganti',                 emoji:'🗿',  tipi:['gigante'] },
-    { id:'oozes',               nome:'Melme & Ooze',            emoji:'🟢',  tipi:['melma'] },
-    { id:'plants',              nome:'Piante',                  emoji:'🌿',  tipi:['pianta'] },
-    { id:'elemental-fire',      nome:'Elementali — Fuoco',      emoji:'🔥',  tipi:['elementale'] },
-    { id:'elemental-water',     nome:'Elementali — Acqua',      emoji:'💧',  tipi:['elementale'] },
-    { id:'elemental-earth',     nome:'Elementali — Terra',      emoji:'⛰️',  tipi:['elementale'] },
-    { id:'elemental-air',       nome:'Elementali — Aria',       emoji:'🌪️',  tipi:['elementale'] },
-    { id:'celestials',          nome:'Celestiali',              emoji:'✨',  tipi:['celestiale'] },
+    { id:'humanoid-warrior',    nome:'Umanoidi — Guerriero',    emoji:'',  tipi:['umanoide','goblinoide','orco','umano'] },
+    { id:'humanoid-caster',     nome:'Umanoidi — Incantatore',  emoji:'',  tipi:['umanoide'] },
+    { id:'humanoid-rogue',      nome:'Umanoidi — Ladro/Ranger', emoji:'',  tipi:['umanoide'] },
+    { id:'beasts',              nome:'Bestie',                  emoji:'',  tipi:['bestia'] },
+    { id:'undead-physical',     nome:'Non Morti — Fisico',      emoji:'',  tipi:['non morto'] },
+    { id:'undead-incorporeal',  nome:'Non Morti — Incorporeo',  emoji:'',  tipi:['non morto'] },
+    { id:'demons',              nome:'Demoni',                  emoji:'',  tipi:['demone','aberrazione'] },
+    { id:'devils',              nome:'Diavoli',                 emoji:'',  tipi:['diavolo'] },
+    { id:'dragons',             nome:'Draghi',                  emoji:'',  tipi:['drago'] },
+    { id:'constructs',          nome:'Costrutti',               emoji:'',  tipi:['costrutto'] },
+    { id:'aberrations',         nome:'Aberrazioni',             emoji:'',  tipi:['aberrazione'] },
+    { id:'fey-benevolent',      nome:'Fate Benevole',           emoji:'',  tipi:['folletto','fata'] },
+    { id:'fey-malevolent',      nome:'Fate Malvagie',           emoji:'',  tipi:['folletto','fata'] },
+    { id:'giants',              nome:'Giganti',                 emoji:'',  tipi:['gigante'] },
+    { id:'oozes',               nome:'Melme & Ooze',            emoji:'',  tipi:['melma'] },
+    { id:'plants',              nome:'Piante',                  emoji:'',  tipi:['pianta'] },
+    { id:'elemental-fire',      nome:'Elementali — Fuoco',      emoji:'',  tipi:['elementale'] },
+    { id:'elemental-water',     nome:'Elementali — Acqua',      emoji:'',  tipi:['elementale'] },
+    { id:'elemental-earth',     nome:'Elementali — Terra',      emoji:'',  tipi:['elementale'] },
+    { id:'elemental-air',       nome:'Elementali — Aria',       emoji:'',  tipi:['elementale'] },
+    { id:'celestials',          nome:'Celestiali',              emoji:'',  tipi:['celestiale'] },
   ];
 
   const LOOT_TABLES = /* inserito dopo */ null;
@@ -19193,7 +19257,7 @@ const EncounterBuilder = (() => {
     const nMostri = encounter.reduce((s, e) => s + e.qty, 0);
     const mult    = _moltiplicatore(nMostri);
     const xpAdj   = Math.round(xpTotale * mult);
-    const diffLabel = { facile:'🟢 Facile', media:'🟡 Media', difficile:'🟠 Difficile', mortale:'🔴 Mortale' }[difficolta];
+    const diffLabel = { facile:'Facile', media:'Media', difficile:'Difficile', mortale:'Mortale' }[difficolta];
 
     _ultimoEncounter = encounter;
 
@@ -19226,8 +19290,8 @@ const EncounterBuilder = (() => {
       ).join('') +
       `</tbody></table>` +
       `<div style="display:flex;gap:6px;">
-        <button class="btn btn-primary btn-sm" onclick="EncounterBuilder.aggiungiAlCombat()">⚔️ Aggiungi al Combat Tracker</button>
-        <button class="btn btn-secondary btn-sm" onclick="EncounterBuilder.genera()">🎲 Rigenera</button>
+        <button class="btn btn-primary btn-sm" onclick="EncounterBuilder.aggiungiAlCombat()">Aggiungi al Combat Tracker</button>
+        <button class="btn btn-secondary btn-sm" onclick="EncounterBuilder.genera()">Rigenera</button>
       </div>`;
 
     if (lootSec) lootSec.style.display = '';
@@ -19261,7 +19325,7 @@ const EncounterBuilder = (() => {
     const el = document.getElementById('enc-loot-result');
     if (!el || !_ultimoEncounter?.length) return;
     const stato = document.getElementById('enc-loot-stato')?.value || 'intatto';
-    const statoLabel = { intatto:'✓ Intatto', danneggiato:'⚠ Danneggiato', inutilizzabile:'✗ Inutilizzabile', maledetto:'☠ Maledetto' }[stato] || '';
+    const statoLabel = { intatto:'✓ Intatto', danneggiato:'Danneggiato', inutilizzabile:'✗ Inutilizzabile', maledetto:'Maledetto' }[stato] || '';
 
     const risultati = [];
     _ultimoEncounter.forEach((entry, idx) => {
@@ -19300,7 +19364,7 @@ const EncounterBuilder = (() => {
           <td style="padding:3px 0;border-bottom:1px solid var(--border);">${r.nome}</td>
           <td style="padding:3px 4px;border-bottom:1px solid var(--border);text-align:center;font-size:0.7rem;color:var(--text-muted);">${r.rango}</td>
           <td style="padding:3px 0;border-bottom:1px solid var(--border);color:color-mix(in srgb, ${coloreRarita[r.rarita] || 'inherit'} 50%, var(--text-primary));">
-            ${r.item}${r.lucky ? ' ✨' : ''}
+            ${r.item}${r.lucky ? '' : ''}
           </td>
         </tr>`
       ).join('') +
@@ -19623,11 +19687,11 @@ const DescrizioneGen = (() => {
     const extra     = q.persone || q.merce || q.suoni || q.pericolo || q.cliente || [];
     const extItem   = extra.length ? rnd(extra) : null;
 
-    const qualLabel = { squallido:'💀 Squallido', normale:'⚖️ Normale', lusso:'👑 Lusso' }[qualita] || '';
+    const qualLabel = { squallido:'Squallido', normale:'Normale', lusso:'Lusso' }[qualita] || '';
     const tipoLabel = {
-      taverna:'🍺 Taverna', bottega:'🛒 Bottega', strada:'🛤️ Strada',
-      quartiere:'🏘️ Quartiere', dungeon:'🏚️ Dungeon', foresta:'🌲 Foresta',
-      tempio:'⛪ Tempio', castello:'🏰 Castello', porto:'⚓ Porto', mercato:'🏪 Mercato',
+      taverna:'Taverna', bottega:'Bottega', strada:'Strada',
+      quartiere:'Quartiere', dungeon:'Dungeon', foresta:'Foresta',
+      tempio:'Tempio', castello:'Castello', porto:'Porto', mercato:'Mercato',
     }[tipo] || tipo;
 
     el.innerHTML =
@@ -19718,8 +19782,8 @@ const NomiLuoghiGen = (() => {
     nomi.push((pref2 + rad2).replace(/([a-z])([A-Z])/g, '$1 $2'));
 
     const tipoLabel = {
-      citta:'🏙️ Città', villaggio:'🏘️ Villaggio', fiume:'🌊 Fiume',
-      montagna:'⛰️ Montagna', foresta:'🌲 Foresta', dungeon:'🏚️ Dungeon/Rovina', regno:'👑 Regno'
+      citta:'Città', villaggio:'Villaggio', fiume:'Fiume',
+      montagna:'Montagna', foresta:'Foresta', dungeon:'Dungeon/Rovina', regno:'Regno'
     }[tipo] || tipo;
 
     el.innerHTML =
@@ -19730,7 +19794,7 @@ const NomiLuoghiGen = (() => {
           (i===0 ? '<span class="badge badge-muted" style="font-size:0.6rem;">suggerito</span>' : '') +
         '</div>'
       ).join('') +
-      '<button class="btn btn-ghost btn-sm w-full" style="margin-top:6px;font-size:0.72rem;" onclick="NomiLuoghiGen.genera()">🎲 Altri nomi</button>';
+      '<button class="btn btn-ghost btn-sm w-full" style="margin-top:6px;font-size:0.72rem;" onclick="NomiLuoghiGen.genera()">Altri nomi</button>';
 
     Debug.log('Nomi luoghi generati per ' + tipo);
   };
@@ -19830,17 +19894,17 @@ const GanciGen = (() => {
     const gancio  = rnd(pool);
     const contesto = rnd(CONTESTI);
     const tipoLabel = {
-      tutti:'🎣', mistero:'🔍 Mistero', azione:'⚔️ Azione',
-      sociale:'💬 Sociale', esplorazione:'🗺️ Esplorazione', soprannaturale:'🌀 Soprannaturale'
-    }[tipo] || '🎣';
+      tutti:'', mistero:'Mistero', azione:'Azione',
+      sociale:'Sociale', esplorazione:'Esplorazione', soprannaturale:'Soprannaturale'
+    }[tipo] || '';
 
     el.innerHTML =
       '<div style="background:var(--bg-secondary);border-left:3px solid var(--accent-secondary);border-radius:0 var(--radius-sm) var(--radius-sm) 0;padding:10px 12px;margin-bottom:8px;font-size:0.85rem;line-height:1.7;">' + gancio + '</div>' +
-      '<div style="font-size:0.75rem;color:var(--text-muted);font-style:italic;margin-bottom:8px;">📍 ' + contesto + '</div>' +
+      '<div style="font-size:0.75rem;color:var(--text-muted);font-style:italic;margin-bottom:8px;">' + contesto + '</div>' +
       '<div style="display:flex;gap:4px;">' +
         '<span class="badge badge-muted">' + tipoLabel + '</span>' +
       '</div>' +
-      '<button class="btn btn-ghost btn-sm w-full" style="margin-top:8px;font-size:0.72rem;" onclick="GanciGen.genera()">🎲 Altro gancio</button>';
+      '<button class="btn btn-ghost btn-sm w-full" style="margin-top:8px;font-size:0.72rem;" onclick="GanciGen.genera()">Altro gancio</button>';
 
     Debug.log('Gancio generato: ' + tipo);
   };
@@ -19858,19 +19922,19 @@ const OracoloGen = (() => {
 
     let risposta, colore, emoji;
     if (d100 <= 10) {
-      risposta = 'NO, e inoltre...'; colore = 'var(--accent-danger)'; emoji = '❌❌';
+      risposta = 'NO, e inoltre...'; colore = 'var(--accent-danger)'; emoji = '';
     } else if (d100 <= 35) {
-      risposta = 'No'; colore = 'var(--accent-danger)'; emoji = '❌';
+      risposta = 'No'; colore = 'var(--accent-danger)'; emoji = '';
     } else if (d100 <= 45) {
-      risposta = 'No, ma...'; colore = '#e07b39'; emoji = '❌✨';
+      risposta = 'No, ma...'; colore = '#e07b39'; emoji = '';
     } else if (d100 <= 55) {
-      risposta = 'Sì, ma...'; colore = '#c8a43a'; emoji = '✅⚠️';
+      risposta = 'Sì, ma...'; colore = '#c8a43a'; emoji = '';
     } else if (d100 <= 75) {
-      risposta = 'Sì'; colore = 'var(--accent-success)'; emoji = '✅';
+      risposta = 'Sì'; colore = 'var(--accent-success)'; emoji = '';
     } else if (d100 <= 90) {
-      risposta = 'Sì, e inoltre...'; colore = 'var(--accent-success)'; emoji = '✅✅';
+      risposta = 'Sì, e inoltre...'; colore = 'var(--accent-success)'; emoji = '';
     } else {
-      risposta = 'Sì, assolutamente!'; colore = '#5bc85b'; emoji = '✅✅✅';
+      risposta = 'Sì, assolutamente!'; colore = '#5bc85b'; emoji = '';
     }
 
     const TWIST = [
@@ -20109,8 +20173,8 @@ const MissioniGen = (() => {
     const complicazione = rnd(COMPLICAZIONI[livello] || COMPLICAZIONI['5-10']);
 
     const tipoLabel = {
-      caccia:'⚔️ Caccia/Sterminio', recupero:'📦 Recupero', scorta:'🛡️ Scorta',
-      esplorazione:'🗺️ Esplorazione', intriga:'🎭 Intriga', salvataggio:'💚 Salvataggio'
+      caccia:'Caccia/Sterminio', recupero:'Recupero', scorta:'Scorta',
+      esplorazione:'Esplorazione', intriga:'Intriga', salvataggio:'Salvataggio'
     }[missione.tipo] || missione.tipo;
 
     const livLabel = { '1-4':'Liv. 1–4','5-10':'Liv. 5–10','11-16':'Liv. 11–16','17-20':'Liv. 17–20' }[livello] || livello;
@@ -20123,39 +20187,39 @@ const MissioniGen = (() => {
       </div>
       <div style="display:grid;gap:8px;font-size:0.83rem;">
         <div style="background:var(--bg-secondary);border-radius:var(--radius-sm);padding:8px 10px;">
-          <div style="font-family:var(--font-display);font-size:0.65rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:3px;">📋 Obiettivo</div>
+          <div style="font-family:var(--font-display);font-size:0.65rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:3px;">Obiettivo</div>
           <div style="line-height:1.6;">${missione.obiettivo}</div>
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
           <div style="background:var(--bg-secondary);border-radius:var(--radius-sm);padding:8px 10px;">
-            <div style="font-family:var(--font-display);font-size:0.65rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:3px;">👤 Committente</div>
+            <div style="font-family:var(--font-display);font-size:0.65rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:3px;">Committente</div>
             <div>${committente}</div>
           </div>
           <div style="background:var(--bg-secondary);border-radius:var(--radius-sm);padding:8px 10px;">
-            <div style="font-family:var(--font-display);font-size:0.65rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:3px;">📍 Luogo</div>
+            <div style="font-family:var(--font-display);font-size:0.65rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:3px;">Luogo</div>
             <div>${missione.luogo}</div>
           </div>
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
           <div style="background:var(--bg-secondary);border-radius:var(--radius-sm);padding:8px 10px;">
-            <div style="font-family:var(--font-display);font-size:0.65rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:3px;">⚔️ Nemici</div>
+            <div style="font-family:var(--font-display);font-size:0.65rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:3px;">Nemici</div>
             <div>${missione.nemico}</div>
           </div>
           <div style="background:var(--bg-secondary);border-radius:var(--radius-sm);padding:8px 10px;">
-            <div style="font-family:var(--font-display);font-size:0.65rem;color:var(--accent-secondary-text);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:3px;">🎁 Ricompensa</div>
+            <div style="font-family:var(--font-display);font-size:0.65rem;color:var(--accent-secondary-text);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:3px;">Ricompensa</div>
             <div style="color:var(--accent-secondary-text);">${ricompensa}</div>
           </div>
         </div>
         <div style="background:var(--bg-secondary);border-left:3px solid #e07b39;border-radius:0 var(--radius-sm) var(--radius-sm) 0;padding:8px 10px;">
-          <div style="font-family:var(--font-display);font-size:0.65rem;color:#e07b39;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:3px;">💡 Dettaglio segreto</div>
+          <div style="font-family:var(--font-display);font-size:0.65rem;color:#e07b39;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:3px;">Dettaglio segreto</div>
           <div style="color:var(--text-secondary);font-style:italic;">${missione.dettaglio}</div>
         </div>
         <div style="background:var(--bg-secondary);border-left:3px solid var(--accent-danger);border-radius:0 var(--radius-sm) var(--radius-sm) 0;padding:8px 10px;">
-          <div style="font-family:var(--font-display);font-size:0.65rem;color:var(--danger-text);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:3px;">⚡ Complicazione</div>
+          <div style="font-family:var(--font-display);font-size:0.65rem;color:var(--danger-text);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:3px;">Complicazione</div>
           <div style="color:var(--text-secondary);">${complicazione}</div>
         </div>
       </div>
-      <button class="btn btn-ghost btn-sm w-full" style="margin-top:10px;font-size:0.72rem;" onclick="MissioniGen.genera()">🎲 Altra missione</button>`;
+      <button class="btn btn-ghost btn-sm w-full" style="margin-top:10px;font-size:0.72rem;" onclick="MissioniGen.genera()">Altra missione</button>`;
 
     Debug.log('Missione generata: ' + missione.titolo + ' [' + livello + '/' + missione.tipo + ']');
   };
@@ -20171,27 +20235,27 @@ const RNGLoot = (() => {
   let _multiplier = 1;
 
   const CATS = [
-    { id:'humanoid-warrior',   name:'⚔️ Umanoidi — Guerriero',   prob:'Standard' },
-    { id:'humanoid-caster',    name:'🧙 Umanoidi — Incantatore',  prob:'Standard' },
-    { id:'humanoid-rogue',     name:'🏹 Umanoidi — Ladro/Ranger', prob:'Standard' },
-    { id:'beasts',             name:'🐺 Bestie',                  prob:'Bestie'   },
-    { id:'undead-physical',    name:'💀 Non Morti — Fisico',      prob:'Standard' },
-    { id:'undead-incorporeal', name:'👻 Non Morti — Incorporeo',  prob:'Standard' },
-    { id:'demons',             name:'😈 Demoni',                  prob:'Standard' },
-    { id:'devils',             name:'🔱 Diavoli',                 prob:'Standard' },
-    { id:'dragons',            name:'🐉 Draghi',                  prob:'Standard' },
-    { id:'constructs',         name:'🤖 Costrutti',               prob:'Standard' },
-    { id:'aberrations',        name:'🦑 Aberrazioni',             prob:'Standard' },
-    { id:'fey-benevolent',     name:'🧚 Fate Benevole',           prob:'Standard' },
-    { id:'fey-malevolent',     name:'🧟 Fate Malvagie',           prob:'Standard' },
-    { id:'giants',             name:'🗿 Giganti',                  prob:'Standard' },
-    { id:'oozes',              name:'🟢 Melme & Ooze',            prob:'Melme'    },
-    { id:'plants',             name:'🌿 Piante',                  prob:'Piante'   },
-    { id:'elemental-fire',     name:'🔥 Elementali — Fuoco',      prob:'Standard' },
-    { id:'elemental-water',    name:'💧 Elementali — Acqua',      prob:'Standard' },
-    { id:'elemental-earth',    name:'⛰️ Elementali — Terra',      prob:'Standard' },
-    { id:'elemental-air',      name:'🌪️ Elementali — Aria',      prob:'Standard' },
-    { id:'celestials',         name:'✨ Celestiali',               prob:'Celestiali'},
+    { id:'humanoid-warrior',   name:'Umanoidi — Guerriero',   prob:'Standard' },
+    { id:'humanoid-caster',    name:'Umanoidi — Incantatore',  prob:'Standard' },
+    { id:'humanoid-rogue',     name:'Umanoidi — Ladro/Ranger', prob:'Standard' },
+    { id:'beasts',             name:'Bestie',                  prob:'Bestie'   },
+    { id:'undead-physical',    name:'Non Morti — Fisico',      prob:'Standard' },
+    { id:'undead-incorporeal', name:'Non Morti — Incorporeo',  prob:'Standard' },
+    { id:'demons',             name:'Demoni',                  prob:'Standard' },
+    { id:'devils',             name:'Diavoli',                 prob:'Standard' },
+    { id:'dragons',            name:'Draghi',                  prob:'Standard' },
+    { id:'constructs',         name:'Costrutti',               prob:'Standard' },
+    { id:'aberrations',        name:'Aberrazioni',             prob:'Standard' },
+    { id:'fey-benevolent',     name:'Fate Benevole',           prob:'Standard' },
+    { id:'fey-malevolent',     name:'Fate Malvagie',           prob:'Standard' },
+    { id:'giants',             name:'Giganti',                  prob:'Standard' },
+    { id:'oozes',              name:'Melme & Ooze',            prob:'Melme'    },
+    { id:'plants',             name:'Piante',                  prob:'Piante'   },
+    { id:'elemental-fire',     name:'Elementali — Fuoco',      prob:'Standard' },
+    { id:'elemental-water',    name:'Elementali — Acqua',      prob:'Standard' },
+    { id:'elemental-earth',    name:'Elementali — Terra',      prob:'Standard' },
+    { id:'elemental-air',      name:'Elementali — Aria',      prob:'Standard' },
+    { id:'celestials',         name:'Celestiali',               prob:'Celestiali'},
   ];
 
   const PROB = {
@@ -20386,8 +20450,8 @@ const RNGLoot = (() => {
       const catName = CATS.find(c => c.id === catId)?.name || catId;
 
       const condLabel = _condition && item ? ({
-        intatto:'✓ Intatto', danneggiato:'⚠ Danneggiato',
-        inutilizzabile:'✗ Inutilizzabile', maledetto:'☠ Maledetto',
+        intatto:'✓ Intatto', danneggiato:'Danneggiato',
+        inutilizzabile:'✗ Inutilizzabile', maledetto:'Maledetto',
       }[_condition] || '') : '';
       results.push({ n: i+1, catId, catName, rarity, d100, lucky, item, condLabel });
     }
@@ -20406,22 +20470,22 @@ const RNGLoot = (() => {
           ? `<div style="display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid var(--border);">
               <span style="font-family:var(--font-mono);font-size:0.7rem;color:var(--text-muted);min-width:28px;">#${r.n}</span>
               <span style="font-size:0.7rem;color:var(--text-muted);">d100: ${r.d100}</span>
-              <span style="color:var(--text-muted);font-size:0.78rem;">💀 Nessun loot</span>
+              <span style="color:var(--text-muted);font-size:0.78rem;">Nessun loot</span>
             </div>`
           : `<div style="display:flex;align-items:flex-start;gap:8px;padding:4px 0;border-bottom:1px solid var(--border);">
               <span style="font-family:var(--font-mono);font-size:0.7rem;color:var(--text-muted);min-width:28px;flex-shrink:0;">#${r.n}</span>
               <div style="min-width:0;flex:1;">
                 <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
                   <span style="font-size:0.68rem;color:var(--text-muted);">d100:${r.d100}</span>
-                  <span style="font-size:0.72rem;color:color-mix(in srgb, ${RARITY_COLOR[r.rarity]} 50%, var(--text-primary));font-weight:600;">${r.rarity}${r.lucky ? ' ✨' : ''}</span>
+                  <span style="font-size:0.72rem;color:color-mix(in srgb, ${RARITY_COLOR[r.rarity]} 50%, var(--text-primary));font-weight:600;">${r.rarity}${r.lucky ? '' : ''}</span>
                   <span style="font-size:0.65rem;color:var(--text-muted);">${n > 1 && _selectedCats.length > 1 ? r.catName : ''}</span>
                 </div>
-                <div style="font-size:0.82rem;margin-top:2px;">🎁 ${r.item}${r.condLabel ? ` <span style="font-size:0.68rem;color:var(--text-muted);">(${r.condLabel})</span>` : ''}</div>
+                <div style="font-size:0.82rem;margin-top:2px;">${r.item}${r.condLabel ? ` <span style="font-size:0.68rem;color:var(--text-muted);">(${r.condLabel})</span>` : ''}</div>
               </div>
             </div>`
       ).join('') +
       `</div>` +
-      `<button class="btn btn-ghost btn-sm w-full" style="margin-top:8px;font-size:0.72rem;" onclick="RNGLoot.genera()">🎲 Tira ancora ×${n}</button>`;
+      `<button class="btn btn-ghost btn-sm w-full" style="margin-top:8px;font-size:0.72rem;" onclick="RNGLoot.genera()">Tira ancora ×${n}</button>`;
 
     Debug.log('RNGLoot: ' + n + '× ' + _rank + ' → ' + withLoot + ' con loot');
   };
@@ -21425,7 +21489,7 @@ const NoteSessione = (() => {
         <select style="border:none;background:transparent;font-size:0.75rem;color:var(--text-muted);cursor:pointer;padding:0;flex-shrink:0;"
           onchange="NoteSessione.updateTipo(${i},this.value)">
           ${[['📌','Generico'],['👤','PNG'],['📍','Luogo'],['⚔️','Combattimento'],['🎯','Obiettivo'],['❓','Da fare'],['💡','Idea']].map(
-            ([emoji,label]) => `<option value="${emoji}" ${n.tipo===emoji?'selected':''}>${emoji} ${label}</option>`
+            ([emoji,label]) => `<option value="${emoji}" ${n.tipo===emoji?'selected':''}>${label}</option>`
           ).join('')}
         </select>
         <textarea style="flex:1;border:none;background:transparent;font-size:0.82rem;color:var(--text-primary);resize:none;outline:none;font-family:var(--font-body);padding:0;min-height:20px;"
@@ -21445,7 +21509,7 @@ const NoteSessione = (() => {
     window.Schermo?._refreshNoteSessione?.();
   };
 
-  const addVoce = (tipo='📌', testo='') => {
+  const addVoce = (tipo='', testo='') => {
     const list = [..._get(), { tipo, testo }];
     _save(list);
     render();
@@ -21554,7 +21618,7 @@ const SchermoDD = (() => {
     const prima = r.width > r.height * 0.6 ? e.clientX < r.left + r.width / 2 : e.clientY < r.top + r.height / 2;
     t.parentNode.insertBefore(st.blocco, prima ? t : t.nextSibling);
     Schermo._syncFromDOM();
-    Schermo.render();
+    Schermo._riordina();
   };
 
   const _annulla = () => { _fine(); _stato = null; };
