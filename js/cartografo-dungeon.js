@@ -325,8 +325,8 @@ const CartoDungeon = (() => {
     if (o.nomi !== false) svg += testi;
     if (conLegenda) svg += M.legenda(W - 348, 36, 316, H - 72, 'Le stanze', voci, { ...carta, numeroFondo: t.numero, numeroTesto: t.stile === 'notte' && !t.chiaro ? '#0e1d26' : '#ffffff' });
     if (o.titolo !== false) {
-      svg += M.etichetta(cxM, 68, t.stile === 'notte' ? nome.toUpperCase() : nome, carta, { size: t.stile === 'notte' ? 36 : 44, font: carta.fontTitolo, peso: t.stile === 'notte' ? 600 : 400, spazio: t.stile === 'notte' ? 6 : 1.5, aloneW: 6 });
-      M.righe(storia, 86).forEach((riga, i) => { svg += M.etichetta(cxM, 102 + i * 24, riga, carta, { size: 19, corsivo: t.stile !== 'notte', colore: t.stile === 'notte' ? carta.ambra : I, aloneW: 4 }); });
+      svg += M.etichetta(cxM, 72, nome, carta, { size: 48, font: M.FONT_APP_TITOLI, peso: 400, aloneW: 6 });
+      M.righe(storia, 86).forEach((riga, i) => { svg += M.etichetta(cxM, 104 + i * 24, riga, carta, { size: 17, font: M.FONT_APP_TESTO, peso: 500, colore: t.stile === 'notte' ? carta.ambra : I, aloneW: 4 }); });
     }
     svg += M.scala(50, H - 48, S * 5, { valore: 7.5, nome: 'metri' }, 2, carta) + M.chiudi(W, H, carta);
     return { nome, pin, W, H, larghezzaKm: W / S * 1.5 / 1000, svg }; // un quadretto = 1,5 metri

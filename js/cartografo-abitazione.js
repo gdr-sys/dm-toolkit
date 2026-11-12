@@ -239,7 +239,10 @@ const CartoAbitazione = (() => {
     piani.forEach((pi, indice) => {
       const [ox, oy] = origine(indice);
       const fondoStanza = pi.interrato ? 'url(#carto-cantina)' : 'url(#carto-stanza)';
-      testi += M.etichetta(ox + fw * S / 2, oy - 14, NOME(pi.livello), carta, { size: Math.max(22, Math.min(32, S * 0.64)), font: carta.fontTitolo, peso: t.stile === 'notte' ? 600 : 400, spazio: 2, colore: t.titolo, alone: t.sfondo, aloneW: 3 });
+      // Nome del piano appena sopra le sue stanze (la cantina puo' occupare solo una parte della pianta)
+      const cima = pi.stanze.length ? Math.min(...pi.stanze.map((s) => s.y)) : 0;
+      const sx = pi.stanze.length ? Math.min(...pi.stanze.map((s) => s.x)) : 0, dx = pi.stanze.length ? Math.max(...pi.stanze.map((s) => s.x + s.w)) : fw;
+      testi += M.etichetta(ox + (sx + dx) * S / 2, oy + cima * S - 14, NOME(pi.livello), carta, { size: Math.max(22, Math.min(32, S * 0.64)), font: carta.fontTitolo, peso: t.stile === 'notte' ? 600 : 400, spazio: 2, colore: t.titolo, alone: t.sfondo, aloneW: 3 });
       let g = `<g transform="translate(${n1(ox)} ${n1(oy)})">`;
 
       // Sotto: i tetti dei corpi che a questo piano non ci sono piu'
@@ -384,7 +387,7 @@ const CartoAbitazione = (() => {
     if (o.nomi !== false) svg += testi;
     if (conLegenda) svg += M.legenda(W - 348, 36, 316, H - 72, 'Le stanze', voci, carta);
     const cx = conLegenda ? (W - 372) / 2 : W / 2;
-    if (o.titolo !== false) svg += M.etichetta(cx, 66, t.stile === 'notte' ? nome.toUpperCase() : nome, carta, { size: t.stile === 'notte' ? 34 : 40, font: carta.fontTitolo, peso: t.stile === 'notte' ? 600 : 400, spazio: t.stile === 'notte' ? 6 : 1.5, aloneW: 6 });
+    if (o.titolo !== false) svg += M.etichetta(cx, 70, nome, carta, { size: 44, font: M.FONT_APP_TITOLI, peso: 400, aloneW: 6 });
     svg += M.scala(50, H - 48, S * 4, { valore: 6, nome: 'metri' }, 2, carta) + M.chiudi(W, H, carta);
     return { nome, pin, W, H, larghezzaKm: W / S * 1.5 / 1000, svg };
   };

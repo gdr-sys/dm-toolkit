@@ -398,8 +398,8 @@ const CartoVillaggio = (() => {
     let titolo = '';
     if (o.titolo !== false) {
       titolo = t.stile === 'notte'
-        ? M.etichetta(48, 66, nome.toUpperCase(), t, { size: 36, ancora: 'start', font: t.fontTitolo, peso: 600, colore: t.testo, alone: t.testoAlone, aloneW: 5, spazio: 7 }) +
-          M.etichetta(50, 94, abitanti + ' abitanti', t, { size: 17, ancora: 'start', font: t.font, peso: 500, spazio: 1.5, colore: t.ambra, alone: t.testoAlone, aloneW: 3.5 })
+        ? M.etichetta(48, 70, nome, t, { size: 46, ancora: 'start', font: M.FONT_APP_TITOLI, peso: 400, colore: t.testo, alone: t.testoAlone, aloneW: 6 }) +
+          M.etichetta(50, 98, abitanti + ' abitanti', t, { size: 17, ancora: 'start', font: M.FONT_APP_TESTO, peso: 600, colore: t.ambra, alone: t.testoAlone, aloneW: 3.5 })
         : M.etichetta(48, 68, nome, t, { size: 42, ancora: 'start', font: t.fontTitolo, colore: t.testo, alone: t.testoAlone, aloneW: 6, spazio: 1.5 }) +
           M.etichetta(50, 96, abitanti + ' abitanti', t, { size: 19, ancora: 'start', font: t.font, colore: t.testo, alone: t.testoAlone, aloneW: 4, corsivo: true });
     }

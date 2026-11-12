@@ -246,6 +246,7 @@ const CartoMotore = (() => {
   /* I due stili del Cartografo: Atlante inciso (di giorno) e Notte del cartografo (scuro).
      Hanno "stile" e i propri caratteri: le parti comuni qui sotto (cornice, titolo, rosa, scala,
      edifici, alberi) cambiano disegno in base a questo campo. */
+  const FONT_APP_TITOLI = "Gloock, Georgia, serif", FONT_APP_TESTO = "Figtree, 'Segoe UI', sans-serif";
   const FONT_ATLANTE = "'IM Fell English', Georgia, serif", FONT_ATLANTE_SC = "'IM Fell English SC', Georgia, serif", FONT_NOTTE = "'Cormorant SC', Georgia, serif";
   // Carta e Colori usano lo stesso disegno di Notte (stile 'notte'): curve di livello, foreste a puntini,
   // insediamenti come punti, linee sottili. "chiaro" indica i fondi chiari, dove i bagliori non servono.
@@ -331,8 +332,8 @@ const CartoMotore = (() => {
 
   const titolo = (W, testo, sotto, p) => {
     if (p.stile === 'notte') {
-      return etichetta(W / 2, 74, String(testo).toUpperCase(), p, { size: 34, font: p.fontTitolo, peso: 600, spazio: 8, aloneW: 5 }) +
-        (sotto ? etichetta(W / 2, 100, sotto, p, { size: 17, peso: 500, spazio: 2, colore: p.ambra, aloneW: 4 }) : '');
+      return etichetta(W / 2, 78, String(testo), p, { size: 46, font: FONT_APP_TITOLI, peso: 400, aloneW: 6 }) +
+        (sotto ? etichetta(W / 2, 106, sotto, p, { size: 17, font: FONT_APP_TESTO, peso: 600, colore: p.ambra, aloneW: 4 }) : '');
     }
     if (p.stile === 'atlante') {
       const larg = Math.max(300, String(testo).length * 19 + 90), x = W / 2 - larg / 2, y = 34, h = sotto ? 82 : 60;
@@ -409,7 +410,6 @@ const CartoMotore = (() => {
 
   // Legenda come le tessere dell'app DM Toolkit: card tonda senza cornice, titolo in Gloock, numero in un cerchio pieno,
   // titolo della voce e descrizione in Figtree. Se non ci sta, riduce il corpo del testo.
-  const FONT_APP_TITOLI = "Gloock, Georgia, serif", FONT_APP_TESTO = "Figtree, 'Segoe UI', sans-serif";
   const numeroTondo = (x, y, n, p, r = 13) => `<circle cx="${n1(x)}" cy="${n1(y)}" r="${r}" fill="${p.numeroFondo || p.rosso || p.inchiostro}"/>` +
     `<text x="${n1(x)}" y="${n1(y + r * 0.36)}" font-family="${FONT_APP_TESTO}" font-size="${n1(r * 1.05)}" font-weight="700" text-anchor="middle" fill="${p.numeroTesto || '#ffffff'}">${n}</text>`;
   const legenda = (x, y, larg, altMax, intestazione, voci, p) => {
@@ -630,6 +630,6 @@ const CartoMotore = (() => {
   return {
     campoDistanze, rng, rumore, dist, lerp, area, centro, dentro, taglia, rientra, distSeg, distLinea, incrocio, celle, morbida, contorni,
     n1, via, esc, PALETTE, FONT_TITOLO, FONT_TESTO, FONT_ATLANTE, FONT_ATLANTE_SC, FONT_NOTTE, apri, chiudi, areaMappa, etichetta, titolo, rosa, scala,
-    alberi, edifici, rettangolo, campo, fiumeSvg, nomeLuogo, POPOLO_OPZIONI, legenda, numeroTondo, componi, cartaInterni, stileDi, tratteggio, testoCurvo, curvaSuPunti, TONI_INTERNI, righe: _righe,
+    alberi, edifici, rettangolo, campo, fiumeSvg, nomeLuogo, POPOLO_OPZIONI, legenda, numeroTondo, FONT_APP_TITOLI, FONT_APP_TESTO, componi, cartaInterni, stileDi, tratteggio, testoCurvo, curvaSuPunti, TONI_INTERNI, righe: _righe,
   };
 })();

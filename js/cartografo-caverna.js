@@ -255,7 +255,7 @@ const CartoCaverna = (() => {
     let svg = M.apri(W, H, carta, o.seme) + s;
     if (o.nomi !== false) svg += testi;
     if (conLegenda) svg += M.legenda(W - 368, 36, 336, 520, 'Legenda', voci, { ...carta, numeroFondo: t.numero, numeroTesto: notte ? '#0e1d26' : '#ffffff' });
-    if (o.titolo !== false) svg += M.etichetta(areaTit / 2, 70, notte ? nome.toUpperCase() : nome, carta, { size: notte ? 36 : 44, font: carta.fontTitolo, peso: notte ? 600 : 400, spazio: notte ? 6 : 1.5, colore: radura ? v.testo : t.ink, alone: radura ? v.testoAlone : t.sfondo, aloneW: 6 });
+    if (o.titolo !== false) svg += M.etichetta(areaTit / 2, 74, nome, carta, { size: 48, font: M.FONT_APP_TITOLI, peso: 400, colore: radura ? v.testo : t.ink, alone: radura ? v.testoAlone : t.sfondo, aloneW: 6 });
     svg += M.scala(50, H - 48, Q * 5, { valore: 7.5, nome: 'metri' }, 2, radura ? { ...carta, carta: v.piazza } : { ...carta, carta: t.pavimento }) + M.chiudi(W, H, carta);
     return { nome, pin, W, H, larghezzaKm: W / Q * 1.5 / 1000, svg }; // un quadretto = 1,5 metri
   };

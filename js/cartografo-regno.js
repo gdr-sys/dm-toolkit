@@ -725,8 +725,8 @@ const CartoRegno = (() => {
       for (let y = 200, k = 0; y < H; y += 200, k++) cornice += M.etichetta(15, y + 4, `${lat - (k >> 1)}°${k % 2 ? '30' : '00'}′`, t, { size: 12, font: t.font, peso: 500, colore: t.gessoTenue, aloneW: 0, ruota: -90 });
       if (o.titolo !== false) {
         const tx = destra ? 66 : W - 66, ancora = destra ? 'start' : 'end';
-        cornice += M.etichetta(tx, 94, nome.toUpperCase(), t, { size: 36, font: t.font, peso: 600, spazio: 8, ancora, colore: t.gesso, alone: t.testoAlone, aloneW: 5 }) +
-          M.etichetta(tx, 126, `${lat}°${r.int(10, 59)}′ N  ·  ${lon}°${r.int(10, 59)}′ E`, t, { size: 16, font: t.font, peso: 500, spazio: 1.5, ancora, colore: t.ambra, alone: t.testoAlone, aloneW: 4 });
+        cornice += M.etichetta(tx, 96, nome, t, { size: 48, font: M.FONT_APP_TITOLI, peso: 400, ancora, colore: t.gesso, alone: t.testoAlone, aloneW: 5 }) +
+          M.etichetta(tx, 126, `${lat}°${r.int(10, 59)}′ N  ·  ${lon}°${r.int(10, 59)}′ E`, t, { size: 16, font: M.FONT_APP_TESTO, peso: 600, ancora, colore: t.ambra, alone: t.testoAlone, aloneW: 4 });
       }
     }
 
