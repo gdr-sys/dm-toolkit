@@ -139,10 +139,11 @@ const MappaUI = (() => {
     page.dataset.ready = '1';
     page.innerHTML =
       '<div style="display:flex;flex-direction:column;height:100%;">' +
-        '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:var(--space-md) var(--space-lg);border-bottom:1px solid var(--border);flex-wrap:wrap;">' +
+        '<div class="page-header mappa-testa">' +
           '<div style="min-width:0;">' +
-            '<h1 class="page-title" style="margin:0;">Mappa</h1>' +
-            '<div id="mappa-selettore-wrap" style="margin-top:6px;"></div>' +
+            '<h1 class="page-title" style="margin:0;">Mappe</h1>' +
+            '<p class="page-subtitle">Tocca uno spazio vuoto per aggiungere un segnaposto, tocca un segnaposto per aprirlo. Un segnaposto può aprire un\'altra mappa, per esempio una città o un dungeon.</p>' +
+            '<div id="mappa-selettore-wrap" style="margin-top:10px;"></div>' +
           '</div>' +
           '<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">' +
             '<button class="btn btn-ghost btn-icon-sm" onclick="MappaUI.zoom(-0.2)" title="Riduci">−</button>' +
@@ -153,7 +154,6 @@ const MappaUI = (() => {
             '<button class="btn btn-secondary btn-sm" onclick="App.navigateTo(\'cartografo\')">Genera una mappa</button>' +
           '</div>' +
         '</div>' +
-        '<p class="page-subtitle" style="margin:0;padding:0 var(--space-lg) var(--space-sm);">Click su uno spazio vuoto per aggiungere un pin, click su un pin per aprirlo. Un pin puo\' anche aprire un\'altra mappa (es. la mappa di una citta\' o di un dungeon). Con Percorso misuri un viaggio a tappe.</p>' +
         '<div id="mappa-canvas" style="flex:1;position:relative;overflow:hidden;background:var(--bg-tertiary);cursor:grab;touch-action:none;">' +
           '<div id="mappa-vuota" style="display:none;position:absolute;inset:0;flex-direction:column;align-items:center;justify-content:center;gap:12px;text-align:center;padding:24px;">' +
             '<div style="opacity:0.4;"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 6v16l7-4 8 4 7-4V2l-7 4-8-4-7 4z"/><path d="M8 2v16"/><path d="M16 6v16"/></svg></div>' +
