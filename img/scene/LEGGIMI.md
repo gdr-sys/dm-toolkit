@@ -11,7 +11,7 @@ Se un file manca, l'app continua a usare il disegno.
 - **Bianco e nero:** il colore lo aggiunge l'app, prendendolo dalla tavolozza scelta nelle Impostazioni
   (brace, grigio, verde, marrone, blu, vino, nero), sia di notte sia di giorno.
   Un'immagine a colori funziona lo stesso, ma l'app la porta comunque in bianco e nero.
-- **Estensione `.jpg`**, nomi tutti minuscoli e senza accenti.
+- **Formato `.webp`**, nomi tutti minuscoli e senza accenti (per esempio `vulcano.webp`).
 - **Peso:** meglio sotto i 400 KB l'una; l'app si scarica sui telefoni.
 
 ## Paesaggi della campagna (Home, Dashboard, pagina della campagna)
@@ -21,31 +21,31 @@ L'app sceglie il paesaggio dalle parole del nome e della descrizione della campa
 
 | File | Paesaggio |
 |---|---|
-| `vulcano.jpg` | Vulcano |
-| `montagne.jpg` | Montagne |
-| `colline.jpg` | Colline, valli, villaggi |
-| `foresta.jpg` | Foresta |
-| `costa.jpg` | Costa e mare |
-| `citta.jpg` | Città e castelli |
-| `deserto.jpg` | Deserto |
-| `palude.jpg` | Palude |
-| `gelo.jpg` | Nord gelido |
-| `rovine.jpg` | Rovine |
+| `vulcano.webp` | Vulcano |
+| `montagne.webp` | Montagne |
+| `colline.webp` | Colline, valli, villaggi |
+| `foresta.webp` | Foresta |
+| `costa.webp` | Costa e mare |
+| `citta.webp` | Città e castelli |
+| `deserto.webp` | Deserto |
+| `palude.webp` | Palude |
+| `gelo.webp` | Nord gelido |
+| `rovine.webp` | Rovine |
 
 ## Pagine
 
 | File | Pagina |
 |---|---|
-| `wiki.jpg` | Wiki (tutte le sezioni e le schede) |
-| `sessione.jpg` | Sessione |
-| `mappa.jpg` | Mappe |
-| `cartografo.jpg` | Cartografo |
-| `scrittoio.jpg` | Scrittoio |
-| `schermo.jpg` | Schermo del DM |
-| `compendio.jpg` | Compendio |
-| `musica.jpg` | Musica e atmosfere |
-| `calendario.jpg` | Calendario |
-| `generatori.jpg` | Generatori |
+| `wiki.webp` | Wiki (tutte le sezioni e le schede) |
+| `sessione.webp` | Sessione |
+| `mappa.webp` | Mappe |
+| `cartografo.webp` | Cartografo |
+| `scrittoio.webp` | Scrittoio |
+| `schermo.webp` | Schermo del DM |
+| `compendio.webp` | Compendio |
+| `musica.webp` | Musica e atmosfere |
+| `calendario.webp` | Calendario |
+| `generatori.webp` | Generatori |
 
 ## Ordine di scelta
 

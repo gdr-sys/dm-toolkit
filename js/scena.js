@@ -30,7 +30,7 @@ const Scena = (() => {
   };
 
   // Il tipo di paesaggio si intuisce dalle parole del nome o della descrizione; altrimenti lo sceglie il nome
-  // Paesaggi conosciuti: ognuno puo' avere la sua immagine in img/scene/<nome>.jpg
+  // Paesaggi conosciuti: ognuno puo' avere la sua immagine in img/scene/<nome>.webp
   const PAESAGGI = [
     ['vulcano', 'Vulcano', /vulcan|cener|lava|fuoco|fiamm|brac|drag/],
     ['gelo', 'Nord gelido', /gel|ghiacc|nev|invern|tundr|nord/],
@@ -91,8 +91,8 @@ const Scena = (() => {
   const _attr = (t) => String(t || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
 
   // ── Immagini al posto del disegno ──
-  // Ordine: immagine caricata per questa pagina > immagine dell'app per la pagina (img/scene/<pagina>.jpg) >
-  // immagine caricata per la campagna > immagine dell'app per il paesaggio (img/scene/<paesaggio>.jpg) > disegno.
+  // Ordine: immagine caricata per questa pagina > immagine dell'app per la pagina (img/scene/<pagina>.webp) >
+  // immagine caricata per la campagna > immagine dell'app per il paesaggio (img/scene/<paesaggio>.webp) > disegno.
   // Le immagini vanno bene in bianco e nero: il colore lo da' la tavolozza (css/scena.css, .sc-foto).
   const PAGINE_FILE = { 'page-wiki': 'wiki', 'page-sessione': 'sessione', 'page-mappa': 'mappa', 'page-cartografo': 'cartografo', 'page-scrittoio': 'scrittoio',
     'page-schermo': 'schermo', 'page-compendio': 'compendio', 'page-musica': 'musica', 'page-calendario': 'calendario', 'page-generatori': 'generatori', 'page-trame': 'wiki' };
@@ -110,11 +110,11 @@ const Scena = (() => {
     if (chiave && chiave !== 'campagna') {
       if (sf[chiave]) lista.push(sf[chiave]);
       const f = _fileDiPagina(chiave);
-      if (f) lista.push('img/scene/' + f + '.jpg');
+      if (f) lista.push('img/scene/' + f + '.webp');
     }
     if (chiave) {
       if (sf.campagna) lista.push(sf.campagna);
-      lista.push('img/scene/' + paesaggioDi(camp) + '.jpg');
+      lista.push('img/scene/' + paesaggioDi(camp) + '.webp');
     }
     return lista;
   };
