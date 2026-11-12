@@ -16,16 +16,22 @@ const CartoRegno = (() => {
       colore: true, chiaro: true, carta: "#eae6d6", mare: "#b9d2d9", terra: "#dfe5c3", terraAlta: "#d5c9a0", terra2: "#d5c9a0", ink: "#3a3128", gesso: "#3a3128", gessoTenue: "#6c6252", batimetria: "#2f6680", fiume: "#2f6680",
       bosco: "#4d8257", ambra: "#a8452a", muro: "#cfc3aa", tetto: "#a8452a", oro: "#a8452a", testo: "#2f2820", testoAlone: "#eae6d6", mareTesto: "#2f6680", margine: "#eae6d6", peso: 600,
       boschi: "#9fbe8b", boschiLatif: "#b3c995", rilievo: "#c8b48c", steppa: "#e6d39a", palude: "#a6b98f",
+      monteLuce: "#efe3c4", monteOmbra: "#b59d74", neve: "#ffffff", collina: "#cdbb8c", collinaOmbra: "#b29f72",
+      chiomaLuce: "#8db878", chiomaOmbra: "#5f8f52", pinoLuce: "#6f9d68", pinoOmbra: "#477a4a", casaMuro: "#f3ead6", casaTetto: "#c4573a", casaTettoOmbra: "#94402b", ombraSimboli: "#3a3128",
       font: "'Cormorant SC', Georgia, serif", fontCurvo: "'Cormorant SC', Georgia, serif",
     },
     atlante: {
       chiaro: true, carta: "#ece5d3", mare: "#d9ddd2", terra: "#efe8d6", terraAlta: "#e0d5bb", terra2: "#e0d5bb", ink: "#3a3128", gesso: "#3a3128", gessoTenue: "#6c6252", batimetria: "#3d6c82", fiume: "#3d6c82",
       bosco: "#5c7f63", ambra: "#a8452a", muro: "#cfc3aa", tetto: "#a8452a", oro: "#a8452a", testo: "#2f2820", testoAlone: "#ece5d3", mareTesto: "#3d6c82", margine: "#ece5d3", peso: 600,
+      monteLuce: "#f4ede0", monteOmbra: "#c2b293", neve: "#ffffff", collina: "#ddd0b2", collinaOmbra: "#c4b593",
+      chiomaLuce: "#a7b99a", chiomaOmbra: "#7d9576", pinoLuce: "#8ea489", pinoOmbra: "#64806a", casaMuro: "#f4eee0", casaTetto: "#a8452a", casaTettoOmbra: "#7f331f", ombraSimboli: "#3a3128",
       font: "'Cormorant SC', Georgia, serif", fontCurvo: "'Cormorant SC', Georgia, serif",
     },
     notte: {
       carta: "#0b1820", mare: "#0b1820", terra: "#13303b", terraAlta: "#1d4150", terra2: "#1d4150", ink: "#0b1820", gesso: "#e8e1cf", gessoTenue: "#b9b4a6", batimetria: "#78afc4", fiume: "#7ebad8",
       bosco: "#7eb696", ambra: "#e9b84f", muro: "#c9c3b2", tetto: "#e9b84f", oro: "#e9b84f", testo: "#e8e1cf", testoAlone: "#0d1d26", mareTesto: "#8cbacc", margine: "#0b1820", peso: 600,
+      monteLuce: "#4f7584", monteOmbra: "#244453", neve: "#e8e1cf", collina: "#2f5563", collinaOmbra: "#1f3e4b",
+      chiomaLuce: "#5f9a7c", chiomaOmbra: "#36664f", pinoLuce: "#4f8a6d", pinoOmbra: "#2c5a45", casaMuro: "#c9c3b2", casaTetto: "#e9b84f", casaTettoOmbra: "#b8892f", ombraSimboli: "#03090b",
       font: "'Cormorant SC', Georgia, serif", fontCurvo: "'Cormorant SC', Georgia, serif",
     },
   };
@@ -386,10 +392,11 @@ const CartoRegno = (() => {
       // Curve di livello: una ogni quattro piu' marcata
       for (let k = 1; k < 14; k++) {
         const d = M.contorni(w, h, e, k / 14, G).filter((l) => l.length > 6).map((l) => M.via(M.morbida(l, 1, true))).join('');
-        dentro += tratto(d, t.gesso, k % 4 === 0 ? 1.1 : 0.6, ` opacity="${k % 4 === 0 ? 0.48 : 0.2}"`);
+        dentro += tratto(d, t.gesso, k % 4 === 0 ? 0.9 : 0.5, ` opacity="${k % 4 === 0 ? (scuro ? 0.4 : 0.22) : (scuro ? 0.16 : 0.1)}"`);
       }
+      // I boschi hanno un fondo verde: gli alberi sopra li rendono riconoscibili a colpo d'occhio
       const dBoschi = steppe_(conifere) + steppe_(latifoglie);
-      if (dBoschi) dentro += `<path d="${dBoschi}" fill="url(#carto-puntini)" fill-rule="evenodd" opacity="0.75"/>`;
+      if (dBoschi && !t.colore) dentro += `<path d="${dBoschi}" fill="${t.chiomaOmbra}" fill-rule="evenodd" opacity="${scuro ? 0.35 : 0.22}"/>`;
     }
 
     // Segni del terreno: ciuffi d'erba in piano, canne in palude, onde di sabbia in steppa
@@ -469,8 +476,50 @@ const CartoRegno = (() => {
       }
     }
 
-    // Vette con la quota (notte): le cime piu' alte, ben distanziate
+    /* Simboli a due toni (luce da sinistra, ombra a destra), senza contorni a inchiostro */
     if (!A) {
+      const ombraPiede = (x, y, rx, ry) => `<ellipse cx="${n1(x + rx * 0.15)}" cy="${n1(y)}" rx="${n1(rx)}" ry="${n1(ry)}" fill="${t.ombraSimboli}" opacity="${scuro ? 0.45 : 0.14}"/>`;
+      // Montagne: due facce, la sinistra in luce e la destra in ombra; neve sulle cime piu' alte
+      for (let y = 16; y < H; y += 24) for (let x = 10; x < W; x += 30) {
+        const qx = x + (Math.floor(y / 24) % 2 ? 15 : 0) + rd.range(-9, 9), qy = y + rd.range(-7, 7), q = eIn(qx, qy);
+        if (q < 0.74 || !rd.chance(0.9) || !lontanoCitta(qx, qy + 10, 32) || !lontanoStrade(qx, qy, 8)) continue;
+        const m = 11 + Math.pow((q - 0.74) / 0.26, 1.1) * 20 + rd.range(-2, 4), pkx = qx + rd.range(-0.15, 0.15) * m, pky = qy - m * 1.25;
+        const sx = qx - m, dx = qx + m, base = qy;
+        const neve = clima === 'freddo' || q > 0.9;
+        aggiungi(qy, ombraPiede(qx, base, m * 1.05, m * 0.22) +
+          `<path d="M${n1(sx)} ${n1(base)}L${n1(pkx)} ${n1(pky)}L${n1(pkx + m * 0.08)} ${n1(base)}Z" fill="${t.monteLuce}"/>` +
+          `<path d="M${n1(pkx)} ${n1(pky)}L${n1(dx)} ${n1(base)}H${n1(pkx + m * 0.08)}Z" fill="${t.monteOmbra}"/>` +
+          (neve ? `<path d="M${n1(pkx)} ${n1(pky)}L${n1(pkx - m * 0.3)} ${n1(pky + m * 0.36)}L${n1(pkx - m * 0.08)} ${n1(pky + m * 0.28)}L${n1(pkx + m * 0.06)} ${n1(pky + m * 0.4)}L${n1(pkx + m * 0.3)} ${n1(pky + m * 0.36)}Z" fill="${t.neve}" opacity="0.95"/>` : ''));
+      }
+      // Colline: gobbe basse a due toni ai piedi delle catene
+      for (let y = 14; y < H; y += 22) for (let x = 12; x < W; x += 30) {
+        const qx = x + rd.range(-10, 10), qy = y + rd.range(-8, 8), q = eIn(qx, qy);
+        if (q < 0.62 || q > 0.74 || !rd.chance(0.5) || !lontanoCitta(qx, qy, 26) || !lontanoStrade(qx, qy, 7) || inB(fConifera, qx, qy) > -0.01 || inB(fLatifoglia, qx, qy) > -0.01) continue;
+        const m = rd.range(9, 13);
+        aggiungi(qy, ombraPiede(qx, qy, m, m * 0.2) +
+          `<path d="M${n1(qx - m)} ${n1(qy)}Q${n1(qx - m * 0.5)} ${n1(qy - m * 0.9)} ${n1(qx)} ${n1(qy - m * 0.75)}V${n1(qy)}Z" fill="${t.collina}"/>` +
+          `<path d="M${n1(qx)} ${n1(qy - m * 0.75)}Q${n1(qx + m * 0.55)} ${n1(qy - m * 0.65)} ${n1(qx + m)} ${n1(qy)}H${n1(qx)}Z" fill="${t.collinaOmbra}"/>`);
+      }
+      // Alberi: chiome tonde (latifoglie) e abeti (conifere), fitti dentro i boschi
+      const chioma = (x, y, k) => `<circle cx="${n1(x + k * 0.25)}" cy="${n1(y + k * 0.15)}" r="${n1(k)}" fill="${t.chiomaOmbra}"/><circle cx="${n1(x - k * 0.18)}" cy="${n1(y - k * 0.18)}" r="${n1(k * 0.72)}" fill="${t.chiomaLuce}"/>`;
+      const abete = (x, y, k) => `<path d="M${n1(x)} ${n1(y - k * 2.2)}L${n1(x - k)} ${n1(y)}H${n1(x)}Z" fill="${t.pinoLuce}"/><path d="M${n1(x)} ${n1(y - k * 2.2)}L${n1(x + k)} ${n1(y)}H${n1(x)}Z" fill="${t.pinoOmbra}"/>`;
+      for (let y = 6; y < H; y += 9) for (let x = 6; x < W; x += 9) {
+        const qx = x + (Math.floor(y / 9) % 2 ? 4.5 : 0) + rd.range(-2.5, 2.5), qy = y + rd.range(-2.5, 2.5);
+        if (eIn(qx, qy) < 0.03) continue;
+        const c = inB(fConifera, qx, qy) > 0, l = !c && inB(fLatifoglia, qx, qy) > 0;
+        if ((!c && !l) || !lontanoCitta(qx, qy, 26) || !lontanoStrade(qx, qy, 6)) continue;
+        aggiungi(qy, c ? abete(qx, qy, rd.range(3.4, 4.4)) : chioma(qx, qy - 3, rd.range(3.8, 5)));
+      }
+      // Qualche albero isolato in pianura
+      for (let i = 0; i < 60; i++) {
+        const qx = rd.range(40, W - 40), qy = rd.range(40, H - 40), q = eIn(qx, qy);
+        if (q < 0.06 || q > 0.62 || inB(fConifera, qx, qy) > -0.012 || inB(fLatifoglia, qx, qy) > -0.012 || !lontanoCitta(qx, qy, 30) || !lontanoStrade(qx, qy, 8) || inB(fSteppa, qx, qy) > 0) continue;
+        aggiungi(qy, rd.chance(0.5) ? abete(qx, qy, 3.8) : chioma(qx, qy - 3, 4.4));
+      }
+    }
+
+    // Vette con la quota: non piu' usate (i simboli delle montagne bastano e le quote finivano sotto i picchi)
+    if (false) {
       const vette = [];
       for (let j = 4; j < h - 4; j += 2) for (let i = 4; i < w - 4; i += 2) {
         const q = e(i, j);
@@ -506,9 +555,21 @@ const CartoRegno = (() => {
         else if (c.rango === 1) g += castello(x, y + 5, 0.95);
         else g += `<circle cx="${x}" cy="${y}" r="5.5" fill="${t.muro}" stroke="${t.ink}" stroke-width="1.2"/><circle cx="${x}" cy="${y}" r="2.6" fill="${t.tetto}"/>`;
       } else {
-        const rr = c.rango === 2 ? 5.5 : c.rango === 1 ? 4.5 : 3.6;
-        g += (scuro ? `<circle cx="${x}" cy="${y}" r="${rr * 2.4}" fill="${t.ambra}" opacity="0.45" filter="url(#carto-b4)"/>` : `<circle cx="${x}" cy="${y}" r="${rr + 2}" fill="${t.carta}"/>`) + `<circle cx="${x}" cy="${y}" r="${rr}" fill="${t.ambra}"/>`;
-        if (c.rango === 2) g += `<circle cx="${x}" cy="${y}" r="11" fill="none" stroke="${t.ambra}" stroke-width="1.3"/>`;
+        // Case raggruppate: una per i villaggi, tre per le citta', cinque con una torre per le capitali
+        const casa = (cx, cy, k) => {
+          const lw = 5 * k, lh = 4 * k, th = 3.6 * k;
+          return `<rect x="${n1(cx - lw)}" y="${n1(cy - lh)}" width="${n1(lw * 2)}" height="${n1(lh)}" fill="${t.casaMuro}"/>` +
+            `<path d="M${n1(cx - lw - k * 0.8)} ${n1(cy - lh)}L${n1(cx)} ${n1(cy - lh - th)}V${n1(cy - lh)}Z" fill="${t.casaTetto}"/>` +
+            `<path d="M${n1(cx)} ${n1(cy - lh - th)}L${n1(cx + lw + k * 0.8)} ${n1(cy - lh)}H${n1(cx)}Z" fill="${t.casaTettoOmbra}"/>`;
+        };
+        const torre = (cx, cy, k) => `<rect x="${n1(cx - 2.6 * k)}" y="${n1(cy - 11 * k)}" width="${n1(5.2 * k)}" height="${n1(11 * k)}" fill="${t.casaMuro}"/>` +
+          `<path d="M${n1(cx - 3.4 * k)} ${n1(cy - 11 * k)}L${n1(cx)} ${n1(cy - 16 * k)}V${n1(cy - 11 * k)}Z" fill="${t.casaTetto}"/><path d="M${n1(cx)} ${n1(cy - 16 * k)}L${n1(cx + 3.4 * k)} ${n1(cy - 11 * k)}H${n1(cx)}Z" fill="${t.casaTettoOmbra}"/>`;
+        const K = 1.45, disposizione = (c.rango === 2 ? [[-9, 2, 0.9], [9, 3, 0.9], [-3, 8, 1], [6, 9, 0.85], [-11, 9, 0.75]] : c.rango === 1 ? [[-6, 3, 0.95], [6, 4, 0.9], [0, 9, 1]] : [[0, 5, 1]]).map(([dx, dy, k]) => [dx * K, dy * K - 4, k * K]);
+        g += `<ellipse cx="${n1(x + 1)}" cy="${n1(y + 10)}" rx="${c.rango === 2 ? 26 : c.rango === 1 ? 19 : 11}" ry="${c.rango === 2 ? 6 : 5}" fill="${t.ombraSimboli}" opacity="${scuro ? 0.45 : 0.15}"/>`;
+        if (c.rango === 2) g += torre(x + 1, y, 1.4);
+        disposizione.forEach(([dx, dy, k]) => { g += casa(x + dx, y + dy, k); });
+        if (scuro) g += `<circle cx="${x}" cy="${y}" r="16" fill="${t.ambra}" opacity="0.18" filter="url(#carto-b4)"/>`;
+
       }
       if (c.rango === 2 && o.stemmi !== false && typeof Araldica !== 'undefined') g += Araldica.scudo(Araldica.casuale(c.nome), x - 64, y - 42, 42, true);
       aggiungi(y + 22, g);

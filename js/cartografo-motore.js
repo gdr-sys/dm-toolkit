@@ -407,22 +407,29 @@ const CartoMotore = (() => {
     return out;
   };
 
-  // Riquadro legenda: voci {n, titolo, testo}. Se non ci sta, riduce il corpo del testo.
+  // Legenda come le tessere dell'app DM Toolkit: card tonda senza cornice, titolo in Gloock, numero in un cerchio pieno,
+  // titolo della voce e descrizione in Figtree. Se non ci sta, riduce il corpo del testo.
+  const FONT_APP_TITOLI = "Gloock, Georgia, serif", FONT_APP_TESTO = "Figtree, 'Segoe UI', sans-serif";
+  const numeroTondo = (x, y, n, p, r = 13) => `<circle cx="${n1(x)}" cy="${n1(y)}" r="${r}" fill="${p.numeroFondo || p.rosso || p.inchiostro}"/>` +
+    `<text x="${n1(x)}" y="${n1(y + r * 0.36)}" font-family="${FONT_APP_TESTO}" font-size="${n1(r * 1.05)}" font-weight="700" text-anchor="middle" fill="${p.numeroTesto || '#ffffff'}">${n}</text>`;
   const legenda = (x, y, larg, altMax, intestazione, voci, p) => {
-    for (const size of [16, 15, 14, 13, 12, 11, 10]) {
-      const riga = size * 1.2, max = Math.floor((larg - 24) / (size * 0.47));
-      let h = 46, corpo = '';
+    const scuro = p.stile === 'notte' && !p.chiaro;
+    const fondo = p.fondoLegenda || (scuro ? 'rgba(255,255,255,0.07)' : 'rgba(255,255,255,0.55)');
+    for (const size of [16, 15, 14, 13, 12, 11]) {
+      const riga = size * 1.32, rientro = 46, max = Math.floor((larg - rientro - 18) / (size * 0.5));
+      let h = 62, corpo = '';
       for (const v of voci) {
-        const testa = _righe((v.n ? v.n + '. ' : '') + v.titolo, Math.floor(max * 0.92));
-        const resto = v.testo ? _righe(v.testo, max) : [];
-        testa.forEach((t) => { h += riga; corpo += `<text x="${x + 13}" y="${n1(y + h)}" font-family="${p.fontCorpo || p.font || FONT_TESTO}" font-size="${size}" font-weight="${p.stile ? 600 : 700}" fill="${p.inchiostro}">${esc(t)}</text>`; });
-        resto.forEach((t) => { h += riga; corpo += `<text x="${x + 13}" y="${n1(y + h)}" font-family="${p.fontCorpo || p.font || FONT_TESTO}" font-size="${size}" fill="${p.inchiostro}">${esc(t)}</text>`; });
-        h += size * 0.5;
+        const testa = _righe(v.titolo, max), resto = v.testo ? _righe(v.testo, max) : [];
+        const cima = h;
+        h += riga;
+        if (v.n) corpo += numeroTondo(x + 26, y + cima + riga * 0.62, v.n, p, Math.max(10, size * 0.78));
+        testa.forEach((t, k) => { if (k) h += riga; corpo += `<text x="${x + rientro}" y="${n1(y + h)}" font-family="${FONT_APP_TESTO}" font-size="${size}" font-weight="600" fill="${p.inchiostro}">${esc(t)}</text>`; });
+        resto.forEach((t) => { h += riga; corpo += `<text x="${x + rientro}" y="${n1(y + h)}" font-family="${FONT_APP_TESTO}" font-size="${size}" fill="${p.inchiostro}" opacity="0.75">${esc(t)}</text>`; });
+        h += size * 0.9;
       }
-      if (h + 10 <= altMax || size === 10) {
-        return `<g><rect x="${x}" y="${y}" width="${larg}" height="${n1(Math.min(altMax, h + 10))}" fill="${p.carta}" stroke="${p.inchiostro}" stroke-width="1.6"/>` +
-          `<rect x="${x + 4}" y="${y + 4}" width="${larg - 8}" height="${n1(Math.min(altMax, h + 10) - 8)}" fill="none" stroke="${p.inchiostro}" stroke-width="0.6"/>` +
-          `<text x="${x + larg / 2}" y="${y + 31}" font-family="${p.fontTitolo || FONT_TITOLO}" font-size="${p.stile ? 21 : 18}" font-weight="${p.stile ? 600 : 700}" text-anchor="middle" fill="${p.inchiostro}">${esc(intestazione)}</text>${corpo}</g>`;
+      if (h + 14 <= altMax || size === 11) {
+        return `<g><rect x="${x}" y="${y}" width="${larg}" height="${n1(Math.min(altMax, h + 14))}" rx="20" fill="${fondo}"/>` +
+          `<text x="${x + 20}" y="${y + 40}" font-family="${FONT_APP_TITOLI}" font-size="25" fill="${p.inchiostro}">${esc(intestazione)}</text>${corpo}</g>`;
       }
     }
     return '';
@@ -623,6 +630,6 @@ const CartoMotore = (() => {
   return {
     campoDistanze, rng, rumore, dist, lerp, area, centro, dentro, taglia, rientra, distSeg, distLinea, incrocio, celle, morbida, contorni,
     n1, via, esc, PALETTE, FONT_TITOLO, FONT_TESTO, FONT_ATLANTE, FONT_ATLANTE_SC, FONT_NOTTE, apri, chiudi, areaMappa, etichetta, titolo, rosa, scala,
-    alberi, edifici, rettangolo, campo, fiumeSvg, nomeLuogo, POPOLO_OPZIONI, legenda, componi, cartaInterni, stileDi, tratteggio, testoCurvo, curvaSuPunti, TONI_INTERNI, righe: _righe,
+    alberi, edifici, rettangolo, campo, fiumeSvg, nomeLuogo, POPOLO_OPZIONI, legenda, numeroTondo, componi, cartaInterni, stileDi, tratteggio, testoCurvo, curvaSuPunti, TONI_INTERNI, righe: _righe,
   };
 })();

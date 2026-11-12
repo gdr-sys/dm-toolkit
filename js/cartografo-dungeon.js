@@ -311,7 +311,7 @@ const CartoDungeon = (() => {
       else if (s.w >= s.h) { quartoX = s.x + 0.6; quartoY = s.y + s.h / 2; }
       else { quartoX = s.x + s.w / 2; quartoY = s.y + 0.6; }
       const [x, y] = schermo(quartoX, quartoY);
-      testi += M.etichetta(x, y + 7, String(i + 1), carta, { size: Math.max(22, S * 0.95), font: carta.fontTitolo, peso: 600, colore: t.numero, alone: t.pavimento, aloneW: 4 });
+      testi += M.numeroTondo(x, y, i + 1, { numeroFondo: t.numero, numeroTesto: t.stile === 'notte' && !t.chiaro ? '#0e1d26' : '#ffffff' }, Math.max(12, S * 0.5));
       const trappola = o.trappole !== false && i > 0 && r.chance(0.26) ? ' ' + r.pick(CartoTesti.TRAPPOLE) : '';
       const titolo = i === 0 ? 'Ingresso: ' + dati[i][0].toLowerCase() : dati[i][0];
       voci.push({ n: i + 1, titolo, testo: dati[i][1] + trappola });
@@ -323,7 +323,7 @@ const CartoDungeon = (() => {
     let svg = M.apri(W, H, carta, o.seme);
     svg += `<g transform="translate(${n1(cxM)} ${n1(cyM)}) rotate(${ang}) translate(${n1(-ccx * S)} ${n1(-ccy * S)})">${g0}</g>`;
     if (o.nomi !== false) svg += testi;
-    if (conLegenda) svg += M.legenda(W - 348, 36, 316, H - 72, 'Le stanze', voci, { ...carta, carta: t.pavimento });
+    if (conLegenda) svg += M.legenda(W - 348, 36, 316, H - 72, 'Le stanze', voci, { ...carta, numeroFondo: t.numero, numeroTesto: t.stile === 'notte' && !t.chiaro ? '#0e1d26' : '#ffffff' });
     if (o.titolo !== false) {
       svg += M.etichetta(cxM, 68, t.stile === 'notte' ? nome.toUpperCase() : nome, carta, { size: t.stile === 'notte' ? 36 : 44, font: carta.fontTitolo, peso: t.stile === 'notte' ? 600 : 400, spazio: t.stile === 'notte' ? 6 : 1.5, aloneW: 6 });
       M.righe(storia, 86).forEach((riga, i) => { svg += M.etichetta(cxM, 102 + i * 24, riga, carta, { size: 19, corsivo: t.stile !== 'notte', colore: t.stile === 'notte' ? carta.ambra : I, aloneW: 4 }); });
