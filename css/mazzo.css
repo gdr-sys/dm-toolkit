@@ -1,0 +1,354 @@
+/* ============================================================
+   MAZZO.CSS — Identita' dell'app: "il mazzo" (2026-11).
+   Ogni cosa della campagna appartiene a un seme, come nelle carte:
+   un colore pieno e un simbolo disegnato che stanno nell'angolo della
+   card. Le card sono carte appoggiate sul tavolo: niente bordo grigio,
+   un'ombra vera, raggio ampio. Titoli in Schibsted Grotesk, testo in
+   Atkinson Hyperlegible Next. Il vino del logo resta per le azioni.
+   Caricato dopo identita.css (struttura) e ne sovrascrive l'aspetto.
+   ============================================================ */
+
+/* ── Semi: colore e simbolo ── */
+:root {
+  --font-titoli: 'Schibsted Grotesk', 'Atkinson Hyperlegible Next', system-ui, sans-serif;
+
+  --s-sessioni: #d17a33;
+  --s-png:      #3f9a6b;
+  --s-luoghi:   #c98a24;
+  --s-fazioni:  #8f6bc8;
+  --s-lore:     #3f7fc4;
+  --s-quest:    #c44a7c;
+  --s-pg:       #2f9aa3;
+  --s-incontri: #cf5450;
+  --s-segreti:  #7d8594;
+  --s-tempo:    #a8893a;
+  --s-strumenti:#6f7a8a;
+
+  --g-sessioni: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M8 1l6 3.5v7L8 15l-6-3.5v-7z'/%3E%3C/svg%3E");
+  --g-png:      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ccircle cx='8' cy='8' r='6.2'/%3E%3C/svg%3E");
+  --g-luoghi:   url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M8 1.5l7 12.5H1z'/%3E%3C/svg%3E");
+  --g-fazioni:  url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M8 1l6.2 2.3v4.3c0 3.7-2.7 6.2-6.2 7-3.5-.8-6.2-3.3-6.2-7V3.3z'/%3E%3C/svg%3E");
+  --g-lore:     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M8 .8L15.2 8 8 15.2.8 8z'/%3E%3C/svg%3E");
+  --g-quest:    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M8 .5l2.1 5.4L15.5 8l-5.4 2.1L8 15.5l-2.1-5.4L.5 8l5.4-2.1z'/%3E%3C/svg%3E");
+  --g-pg:       url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M8 1c3 3.8 5.2 6.5 5.2 9a5.2 5.2 0 0 1-10.4 0C2.8 7.5 5 4.8 8 1z'/%3E%3C/svg%3E");
+  --g-incontri: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M6 1h4v5h5v4h-5v5H6v-5H1V6h5z'/%3E%3C/svg%3E");
+  --g-segreti:  url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M8 1a4.2 4.2 0 0 0-1.7 8L5 15h6L9.7 9A4.2 4.2 0 0 0 8 1z'/%3E%3C/svg%3E");
+  --g-tempo:    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3 1h10v2.6L9.4 8l3.6 4.4V15H3v-2.6L6.6 8 3 3.6z'/%3E%3C/svg%3E");
+  --g-strumenti:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect x='2' y='2' width='12' height='12' rx='2'/%3E%3C/svg%3E");
+
+  /* Carta appoggiata sul tavolo */
+  --carta-raggio: 16px;
+  --carta-ombra: 0 1px 2px rgba(40, 32, 18, 0.07), 0 10px 28px -14px rgba(40, 32, 18, 0.22);
+  --carta-ombra-su: 0 2px 4px rgba(40, 32, 18, 0.08), 0 18px 36px -16px rgba(40, 32, 18, 0.30);
+  --carta-filo: inset 0 0 0 1px rgba(40, 32, 18, 0.06);
+  --vino: #9e2b3a;
+  --vino-su: #b8364a;
+}
+[data-theme="dark"] {
+  --carta-ombra: inset 0 1px 0 rgba(255, 255, 255, 0.045), 0 1px 2px rgba(0, 0, 0, 0.45), 0 12px 28px -14px rgba(0, 0, 0, 0.75);
+  --carta-ombra-su: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 2px 4px rgba(0, 0, 0, 0.5), 0 20px 40px -16px rgba(0, 0, 0, 0.85);
+  --carta-filo: inset 0 0 0 1px rgba(255, 255, 255, 0.035);
+}
+
+/* Assegnazione dei semi: per pagina, per card della Dashboard, o con data-seme */
+[data-seme="sessioni"], #page-wiki-sessioni, #page-sessione { --seme: var(--s-sessioni); --seme-g: var(--g-sessioni); }
+[data-seme="png"], #page-wiki-png, [data-dn="png"] { --seme: var(--s-png); --seme-g: var(--g-png); }
+[data-seme="luoghi"], #page-wiki-luoghi, #page-mappa { --seme: var(--s-luoghi); --seme-g: var(--g-luoghi); }
+[data-seme="fazioni"], #page-wiki-fazioni, [data-dn="mondo"] { --seme: var(--s-fazioni); --seme-g: var(--g-fazioni); }
+[data-seme="lore"], #page-wiki-lore, [data-dn="note"] { --seme: var(--s-lore); --seme-g: var(--g-lore); }
+[data-seme="quest"], #page-wiki-quest, #page-trame, [data-dn="quest"], [data-dn="trame"] { --seme: var(--s-quest); --seme-g: var(--g-quest); }
+[data-seme="pg"], #page-wiki-pg, [data-dn="vista"] { --seme: var(--s-pg); --seme-g: var(--g-pg); }
+[data-seme="incontri"], #page-wiki-incontri { --seme: var(--s-incontri); --seme-g: var(--g-incontri); }
+[data-seme="segreti"], [data-dn="segreti"] { --seme: var(--s-segreti); --seme-g: var(--g-segreti); }
+[data-seme="tempo"], #page-calendario, [data-dn="scadenze"], [data-dn="clock"], [data-dn="fili"] { --seme: var(--s-tempo); --seme-g: var(--g-tempo); }
+[data-seme="strumenti"], #page-generatori, #page-schermo, #page-cartografo, #page-scrittoio, #page-compendio, #page-musica, [data-dn="zero"], [data-dn="passi"] { --seme: var(--s-strumenti); --seme-g: var(--g-strumenti); }
+[data-dn="ultima"], [data-dn="ganci"] { --seme: var(--s-sessioni); --seme-g: var(--g-sessioni); }
+
+/* Il simbolo del seme: un piccolo segno pieno, sempre dello stesso disegno */
+.seme-segno { display: inline-block; flex: none; width: 13px; height: 13px; background: var(--seme, var(--text-muted)); -webkit-mask: var(--seme-g, var(--g-strumenti)) center / contain no-repeat; mask: var(--seme-g, var(--g-strumenti)) center / contain no-repeat; }
+
+/* ── Testo e titoli ── */
+h1, h2, h3, h4, .page-title, .card-title, .modal-title, .logo-text { font-family: var(--font-titoli); }
+.page-title, .page-header h1 { font-size: clamp(1.7rem, 2.6vw, 2.25rem); font-weight: 800; letter-spacing: -0.03em; line-height: 1.05; text-wrap: balance; }
+.page-header { align-items: flex-end; margin-bottom: 28px; }
+.page-header .page-title { display: flex; align-items: center; gap: 12px; }
+.page-header .page-title::before { content: ''; flex: none; width: 0.62em; height: 0.62em; background: var(--seme, var(--vino)); -webkit-mask: var(--seme-g, var(--g-strumenti)) center / contain no-repeat; mask: var(--seme-g, var(--g-strumenti)) center / contain no-repeat; }
+.page-subtitle { font-size: 0.98rem; color: var(--text-muted); margin-top: 6px; }
+::selection { background: color-mix(in srgb, var(--vino) 30%, transparent); }
+
+/* Le minuscole etichette di 9-10px scritte a mano nei moduli diventano leggibili */
+[style*="font-size:0.6rem"], [style*="font-size:0.62rem"], [style*="font-size:0.65rem"], [style*="font-size:0.66rem"] { font-size: 0.74rem !important; }
+[style*="font-size:0.68rem"], [style*="font-size:0.7rem"] { font-size: 0.78rem !important; }
+[style*="letter-spacing:0.08em"], [style*="letter-spacing:0.06em"], [style*="letter-spacing:0.05em"], [style*="letter-spacing:1px"] { letter-spacing: 0 !important; }
+
+/* ── Card: carte sul tavolo ── */
+.card,
+[style*="background:var(--bg-card);border:1px solid var(--border)"],
+[style*="background: var(--bg-card); border: 1px solid var(--border)"] {
+  border-color: transparent !important;
+  border-radius: var(--carta-raggio) !important;
+  box-shadow: var(--carta-ombra) !important;
+}
+.card { padding: 20px 22px; }
+.card:hover { box-shadow: var(--carta-ombra) !important; border-color: transparent !important; }
+.card-clickable:hover, .hub-card:hover, .card[role="button"]:hover { box-shadow: var(--carta-ombra-su) !important; transform: translateY(-1px); }
+.card-header { margin-bottom: 12px; gap: 10px; }
+.card-title { display: flex; align-items: center; gap: 9px; font-size: 1.02rem; font-weight: 700; letter-spacing: -0.01em; color: var(--text-primary); }
+/* Il segno del seme davanti al titolo, solo dove la card ha un seme */
+.card-title::before { content: ''; flex: none; width: var(--seme-l, 0); height: 13px; background: var(--seme, transparent); -webkit-mask: var(--seme-g, none) center / contain no-repeat; mask: var(--seme-g, none) center / contain no-repeat; }
+[data-seme], .page[id^="page-wiki-"], #page-sessione, #page-calendario, #page-generatori, #page-schermo, #page-cartografo, #page-scrittoio, #page-compendio, #page-musica, #page-trame, #page-mappa, [data-dn] { --seme-l: 13px; }
+/* Le card dentro le pagine che non hanno un seme proprio */
+.card .card .card-title::before { width: 0; }
+/* Niente card dentro le card: quelle annidate diventano zone piatte */
+.card .card { box-shadow: none !important; background: var(--bg-secondary); border-radius: 12px !important; }
+[data-theme="dark"] .card .card { background: var(--bg-tertiary); }
+
+/* ── Pulsanti: pieni, compatti, un solo colore d'azione ── */
+.btn { font-family: var(--font-body); font-weight: 600; border-radius: 999px; }
+.btn-primary { background: var(--vino); border-color: var(--vino); color: #fff; box-shadow: 0 1px 0 rgba(255,255,255,.14) inset, 0 6px 14px -8px color-mix(in srgb, var(--vino) 80%, transparent); }
+.btn-primary:hover { background: var(--vino-su); border-color: var(--vino-su); }
+.btn-ghost { border-color: transparent; background: color-mix(in srgb, var(--text-primary) 7%, transparent); color: var(--text-primary); }
+.btn-ghost:hover { background: color-mix(in srgb, var(--text-primary) 12%, transparent); }
+.btn-secondary, .btn:not(.btn-primary):not(.btn-ghost):not(.btn-danger):not(.btn-secondary):not(.btn-gold) { background: color-mix(in srgb, var(--text-primary) 7%, transparent) !important; border-color: transparent !important; color: var(--text-primary); }
+.btn-secondary:hover, .btn:not(.btn-primary):not(.btn-ghost):not(.btn-danger):not(.btn-secondary):not(.btn-gold):hover { background: color-mix(in srgb, var(--text-primary) 12%, transparent) !important; }
+.btn-icon, .btn-icon-sm { border-radius: 10px; }
+.card-header .btn-ghost, .card-header .btn-secondary { background: transparent !important; color: var(--text-muted); }
+.card-header .btn-ghost:hover, .card-header .btn-secondary:hover { color: var(--text-primary); background: color-mix(in srgb, var(--text-primary) 7%, transparent) !important; }
+
+/* ── Campi e linguette ── */
+.form-input, .form-select, .form-textarea { border-radius: 12px; background: var(--bg-secondary); border-color: transparent; box-shadow: var(--carta-filo); }
+[data-theme="dark"] .form-input, [data-theme="dark"] .form-select, [data-theme="dark"] .form-textarea { background: #12151b; }
+.form-input:focus, .form-select:focus, .form-textarea:focus { border-color: transparent; box-shadow: 0 0 0 2px color-mix(in srgb, var(--vino) 55%, transparent); }
+.tab-btn { font-family: var(--font-titoli); font-weight: 600; }
+.tab-btn.active { box-shadow: inset 0 -3px 0 var(--seme, var(--vino)); }
+.badge { border-radius: 999px; font-weight: 600; }
+
+/* ── Barra in alto: ogni sezione con il suo seme ── */
+@media (min-width: 900px) {
+  body.barra-alta #topbar { background: color-mix(in srgb, var(--bg-primary) 90%, transparent); border-bottom: 0; box-shadow: 0 1px 0 var(--border); }
+  .ba-logo { font-family: var(--font-titoli); font-weight: 800; letter-spacing: -0.02em; }
+  .ba-voce { font-family: var(--font-titoli); font-weight: 600; font-size: 0.95rem; gap: 7px; }
+  .ba-voce[data-pagina]::before { content: ''; width: 9px; height: 9px; background: var(--seme); -webkit-mask: var(--seme-g) center / contain no-repeat; mask: var(--seme-g) center / contain no-repeat; opacity: 0.55; }
+  .ba-voce[data-pagina]:hover::before, .ba-voce[aria-current="page"]::before { opacity: 1; }
+  .ba-voce[data-pagina="campagna"] { --seme: var(--s-sessioni); --seme-g: var(--g-sessioni); }
+  .ba-voce[data-pagina="wiki-hub"] { --seme: var(--s-lore); --seme-g: var(--g-lore); }
+  .ba-voce[data-pagina="mappa"] { --seme: var(--s-luoghi); --seme-g: var(--g-luoghi); }
+  .ba-voce[data-pagina="sessione"] { --seme: var(--s-incontri); --seme-g: var(--g-incontri); }
+  .ba-voce[aria-current="page"], .ba-voce[data-dentro] { box-shadow: inset 0 -3px 0 var(--seme, var(--vino)); }
+  .ba-campagna { border: 0; background: color-mix(in srgb, var(--text-primary) 7%, transparent); border-radius: 999px; font-family: var(--font-titoli); font-weight: 600; }
+  .ba-campagna i { width: 9px; height: 9px; border-radius: 0; background: var(--s-sessioni); -webkit-mask: var(--g-sessioni) center / contain no-repeat; mask: var(--g-sessioni) center / contain no-repeat; }
+  .ba-menu { border: 0; border-radius: 14px; box-shadow: var(--carta-ombra-su), var(--carta-filo); background: var(--bg-card); }
+}
+
+/* ── Menu laterale (tra 768 e 900px) e barra del telefono ── */
+.nav-label { font-family: var(--font-titoli); font-weight: 600; }
+.nav-item.active { box-shadow: inset 3px 0 0 var(--vino); }
+.mobile-nav-label { font-family: var(--font-titoli); font-weight: 600; }
+
+/* ── Dashboard ── */
+#page-campagna #campagna-title { font-family: var(--font-titoli); font-size: clamp(1.9rem, 3vw, 2.6rem); font-weight: 800; letter-spacing: -0.035em; line-height: 1.02; }
+/* L'ultima sessione e' la carta di corte: faccia colorata del suo seme, segni negli angoli */
+.dash-grid.dn .dn-lead-card { position: relative; overflow: hidden; background: color-mix(in srgb, var(--s-sessioni) 13%, var(--bg-card)) !important; padding: 26px 28px 24px 64px !important; }
+[data-theme="dark"] .dash-grid.dn .dn-lead-card { background: color-mix(in srgb, var(--s-sessioni) 11%, var(--bg-card)) !important; }
+.dash-grid.dn .dn-lead-card::before, .dash-grid.dn .dn-lead-card::after { content: ''; position: absolute; width: 18px; height: 18px; background: var(--s-sessioni); -webkit-mask: var(--g-sessioni) center / contain no-repeat; mask: var(--g-sessioni) center / contain no-repeat; }
+.dash-grid.dn .dn-lead-card::before { top: 26px; left: 26px; }
+.dash-grid.dn .dn-lead-card::after { bottom: 24px; right: 24px; transform: rotate(180deg); opacity: 0.5; }
+.dn-lead h2 { font-family: var(--font-titoli); font-size: clamp(1.6rem, 2.4vw, 2rem); font-weight: 800; letter-spacing: -0.03em; margin: 8px 0 10px; }
+.dn-lead .dn-quando { color: color-mix(in srgb, var(--s-sessioni) 55%, var(--text-primary)); font-weight: 600; }
+.dn-lead p { font-size: 1.05rem; color: var(--text-primary); }
+.dn-chip { font-weight: 600; }
+/* Le card della colonna laterale: piu' piccole e piatte, senza ombra, si consultano */
+.dash-grid.dn .dn-side > .card { box-shadow: none !important; background: transparent !important; padding: 16px 4px 18px !important; border-radius: 0 !important; border-top: 1px solid var(--border) !important; }
+.dash-grid.dn .dn-side > .card:first-child { border-top: 0 !important; padding-top: 4px !important; }
+/* Scadenze e clock: carte basse, il seme del tempo */
+.dash-grid.dn .dn-split > .card { background: color-mix(in srgb, var(--s-tempo) 7%, var(--bg-card)) !important; }
+.dn-segs i.on, [id="dash-clocks-preview"] [style*="background:var(--accent"] { background: var(--s-tempo) !important; }
+/* Le note recenti: un elenco con il segno della categoria, non sei riquadri */
+.dash-grid.dn [data-dn="note"] { box-shadow: none !important; background: transparent !important; padding: 8px 0 0 !important; }
+.dn-vuoti { border: 0; background: color-mix(in srgb, var(--text-primary) 5%, transparent); border-radius: 14px; }
+.dn-vuoti button { font-weight: 600; color: var(--accent-text); }
+
+/* ── Home: le tue campagne ── */
+.hn-head h1 { font-size: clamp(1.9rem, 3vw, 2.6rem); font-weight: 800; letter-spacing: -0.035em; }
+.hn-card { border: 0; box-shadow: var(--carta-ombra); border-radius: 20px; position: relative; }
+.hn-card .hn-main { padding: 28px 30px 26px 66px; position: relative; }
+.hn-card .hn-main::before { content: ''; position: absolute; top: 31px; left: 28px; width: 18px; height: 18px; background: var(--s-sessioni); -webkit-mask: var(--g-sessioni) center / contain no-repeat; mask: var(--g-sessioni) center / contain no-repeat; }
+.hn-card h2 { font-size: clamp(1.5rem, 2.4vw, 2rem); font-weight: 800; letter-spacing: -0.03em; }
+.hn-fatti { background: color-mix(in srgb, var(--s-sessioni) 10%, var(--bg-card)); border-left: 0; }
+.hn-fatti b { font-family: var(--font-titoli); font-weight: 700; font-size: 1.02rem; }
+.hn-menu { border: 0; border-radius: 14px; background: var(--bg-card); box-shadow: var(--carta-ombra-su), var(--carta-filo); }
+
+/* ── Pagina della campagna (CampagnaHub): ogni voce col suo seme ── */
+.hub-nome { font-weight: 800; letter-spacing: -0.035em; font-size: clamp(1.9rem, 3vw, 2.6rem) !important; }
+.hub-gruppo-titolo { font-family: var(--font-titoli) !important; font-size: 1rem !important; font-weight: 700 !important; color: var(--text-primary) !important; text-transform: none !important; letter-spacing: -0.01em !important; }
+.hub-griglia { gap: 12px !important; }
+.hub-card { border-radius: 16px !important; }
+.hub-card-icona { background: color-mix(in srgb, var(--seme, var(--vino)) 16%, transparent) !important; color: color-mix(in srgb, var(--seme, var(--vino)) 70%, var(--text-primary)) !important; border-radius: 12px !important; }
+.hub-card-nome { font-family: var(--font-titoli); font-weight: 700 !important; font-size: 1rem !important; }
+.hub-card-num { font-family: var(--font-titoli); font-weight: 700; background: transparent !important; font-size: 1.15rem !important; color: var(--text-primary) !important; font-variant-numeric: tabular-nums; }
+
+/* ── Wiki: elenco come un mazzo, scheda come carta di corte (js/mazzo-wiki.js) ── */
+.mz-mazzo { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 16px; }
+.mz-carta { position: relative; display: flex; flex-direction: column; gap: 6px; min-height: 148px; padding: 44px 18px 16px; background: var(--bg-card); border: 0; border-radius: var(--carta-raggio); box-shadow: var(--carta-ombra); text-align: left; font: inherit; color: inherit; cursor: pointer; transition: transform 160ms cubic-bezier(.2,.7,.2,1), box-shadow 160ms ease; overflow: hidden; }
+.mz-carta:hover, .mz-carta:focus-visible { transform: translateY(-3px); box-shadow: var(--carta-ombra-su); }
+.mz-carta .mz-indice { position: absolute; top: 16px; left: 18px; display: flex; align-items: center; gap: 7px; font: 700 0.78rem var(--font-titoli); color: color-mix(in srgb, var(--seme) 62%, var(--text-primary)); }
+.mz-carta .mz-indice i { width: 13px; height: 13px; background: var(--seme); -webkit-mask: var(--seme-g) center / contain no-repeat; mask: var(--seme-g) center / contain no-repeat; }
+.mz-carta .mz-nome { font: 700 1.12rem/1.2 var(--font-titoli); letter-spacing: -0.015em; color: var(--text-primary); overflow-wrap: anywhere; }
+.mz-carta .mz-sotto { font-size: 0.9rem; color: var(--text-muted); line-height: 1.45; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.mz-carta .mz-tag { margin-top: auto; padding-top: 8px; display: flex; flex-wrap: wrap; gap: 5px; }
+.mz-carta .mz-tag span { font-size: 0.74rem; font-weight: 600; padding: 2px 8px; border-radius: 999px; background: color-mix(in srgb, var(--seme) 14%, transparent); color: color-mix(in srgb, var(--seme) 60%, var(--text-primary)); }
+.mz-carta .mz-mono { position: absolute; right: -6px; bottom: -22px; font: 800 6.4rem/1 var(--font-titoli); letter-spacing: -0.06em; color: color-mix(in srgb, var(--seme) 11%, transparent); pointer-events: none; user-select: none; }
+.mz-carta.con-img { padding-top: 0; }
+.mz-carta.con-img img { display: block; width: calc(100% + 36px); margin: 0 -18px 10px; height: 120px; object-fit: cover; }
+.mz-carta.con-img .mz-indice { top: 12px; padding: 3px 8px; border-radius: 999px; background: color-mix(in srgb, var(--bg-card) 88%, transparent); }
+.mz-vuoto { grid-column: 1 / -1; display: flex; flex-direction: column; align-items: flex-start; gap: 12px; padding: 28px; border-radius: var(--carta-raggio); background: color-mix(in srgb, var(--seme, var(--text-primary)) 7%, transparent); color: var(--text-secondary); }
+
+.page[id^="page-wiki-"] [id^="wiki-"][id$="-list"] > div:first-child h2 { display: flex; align-items: center; gap: 12px; font-family: var(--font-titoli) !important; font-size: clamp(1.7rem, 2.6vw, 2.25rem) !important; font-weight: 800 !important; letter-spacing: -0.03em; }
+.page[id^="page-wiki-"] [id^="wiki-"][id$="-list"] > div:first-child h2::before { content: ''; width: 0.6em; height: 0.6em; background: var(--seme); -webkit-mask: var(--seme-g) center / contain no-repeat; mask: var(--seme-g) center / contain no-repeat; }
+.page[id^="page-wiki-"] [id^="wiki-"][id$="-list"] > div:first-child p { font-size: 0.98rem !important; margin-top: 6px !important; }
+.page[id^="page-wiki-"] [id^="wiki-"][id$="-list"] > div:first-child { margin-bottom: 26px !important; align-items: flex-end !important; }
+.page[id^="page-wiki-"] [id^="wiki-"][id$="-list"], .page[id^="page-wiki-"] [id^="wiki-"][id$="-detail"] { padding: 28px 28px 96px !important; }
+
+/* Scheda: la carta di corte */
+.mz-corte { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 28px; align-items: stretch; margin-bottom: 28px; }
+.mz-faccia { position: relative; aspect-ratio: 5 / 7; border-radius: 18px; overflow: hidden; background: color-mix(in srgb, var(--seme) 22%, var(--bg-card)); box-shadow: var(--carta-ombra); display: grid; place-items: center; }
+.mz-faccia img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; cursor: zoom-in; }
+.mz-faccia .mz-iniz { font: 800 5.6rem/1 var(--font-titoli); letter-spacing: -0.06em; color: color-mix(in srgb, var(--seme) 70%, var(--text-primary)); }
+.mz-faccia .mz-angolo { position: absolute; width: 18px; height: 18px; background: var(--seme); -webkit-mask: var(--seme-g) center / contain no-repeat; mask: var(--seme-g) center / contain no-repeat; z-index: 1; }
+.mz-faccia .mz-angolo.a { top: 14px; left: 14px; }
+.mz-faccia .mz-angolo.b { bottom: 14px; right: 14px; transform: rotate(180deg); }
+.mz-faccia.con-img .mz-angolo { background: #fff; filter: drop-shadow(0 1px 2px rgba(0,0,0,.5)); }
+.mz-testa { display: flex; flex-direction: column; gap: 12px; min-width: 0; padding-top: 6px; }
+.mz-testa .mz-torna { align-self: flex-start; display: inline-flex; align-items: center; gap: 6px; background: none; border: 0; padding: 4px 0; font: 600 0.9rem var(--font-titoli); color: var(--text-muted); cursor: pointer; }
+.mz-testa .mz-torna:hover { color: var(--text-primary); }
+.mz-testa .mz-tipo { display: flex; align-items: center; gap: 8px; font: 700 0.85rem var(--font-titoli); color: color-mix(in srgb, var(--seme) 62%, var(--text-primary)); }
+.mz-testa .mz-tipo i { width: 12px; height: 12px; background: var(--seme); -webkit-mask: var(--seme-g) center / contain no-repeat; mask: var(--seme-g) center / contain no-repeat; }
+.mz-testa h2 { margin: 0; font: 800 clamp(2rem, 3.4vw, 3rem)/1.02 var(--font-titoli); letter-spacing: -0.04em; text-wrap: balance; }
+.mz-testa .mz-ruolo { font-size: 1.12rem; color: var(--text-secondary); margin: 0; }
+.mz-fatti { display: flex; flex-wrap: wrap; gap: 8px; margin: 2px 0 0; padding: 0; list-style: none; }
+.mz-fatti li { display: inline-flex; align-items: center; gap: 6px; min-height: 30px; padding: 3px 12px; border-radius: 999px; background: color-mix(in srgb, var(--text-primary) 7%, transparent); font-size: 0.9rem; color: var(--text-secondary); }
+.mz-fatti li b { font-weight: 600; color: var(--text-primary); }
+.mz-fatti li.stato { background: color-mix(in srgb, var(--stato, var(--seme)) 16%, transparent); color: color-mix(in srgb, var(--stato, var(--seme)) 60%, var(--text-primary)); font-weight: 600; }
+.mz-testa .mz-azioni { display: flex; flex-wrap: wrap; gap: 8px; margin-top: auto; padding-top: 8px; }
+.mz-corpo { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 28px; align-items: start; }
+.mz-corpo > * { min-width: 0; }
+.mz-testi { display: flex; flex-direction: column; gap: 22px; }
+.mz-sez h3 { margin: 0 0 6px; font: 700 0.95rem var(--font-titoli); color: var(--text-muted); letter-spacing: 0; }
+.mz-sez div { font-size: 1.04rem; line-height: 1.7; color: var(--text-primary); white-space: pre-wrap; max-width: 68ch; }
+.mz-lato { display: flex; flex-direction: column; gap: 16px; }
+.mz-segreto { position: relative; padding: 18px 18px 18px 46px; border-radius: 16px; background: color-mix(in srgb, var(--s-segreti) 16%, var(--bg-card)); box-shadow: var(--carta-ombra); }
+.mz-segreto::before { content: ''; position: absolute; top: 20px; left: 18px; width: 15px; height: 15px; background: var(--text-primary); -webkit-mask: var(--g-segreti) center / contain no-repeat; mask: var(--g-segreti) center / contain no-repeat; }
+.mz-segreto h3 { margin: 0 0 6px; font: 700 0.9rem var(--font-titoli); color: var(--text-secondary); }
+.mz-segreto div { line-height: 1.6; white-space: pre-wrap; }
+.mz-dettagli { margin: 0; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 10px 16px; padding: 18px; border-radius: 16px; background: color-mix(in srgb, var(--text-primary) 4%, transparent); font-size: 0.94rem; }
+.mz-dettagli dt { color: var(--text-muted); }
+.mz-dettagli dd { margin: 0; color: var(--text-primary); }
+.mz-resto { margin-top: 28px; display: flex; flex-direction: column; gap: 16px; }
+.mz-resto > div { margin-bottom: 0 !important; }
+@media (max-width: 1100px) { .mz-corpo { grid-template-columns: 1fr; } }
+@media (max-width: 700px) {
+  .mz-corte { grid-template-columns: 96px minmax(0, 1fr); gap: 16px; }
+  .mz-faccia .mz-iniz { font-size: 2.8rem; }
+  .mz-faccia .mz-angolo { width: 12px; height: 12px; }
+  .mz-faccia .mz-angolo.a { top: 9px; left: 9px; } .mz-faccia .mz-angolo.b { bottom: 9px; right: 9px; }
+  .mz-testa h2 { font-size: 1.7rem; }
+  .mz-testa .mz-azioni { grid-column: 1 / -1; }
+  .mz-mazzo { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .mz-carta { min-height: 128px; padding: 38px 14px 14px; }
+  .mz-carta .mz-indice { top: 13px; left: 14px; }
+  .mz-carta .mz-nome { font-size: 1rem; }
+  .mz-carta .mz-mono { font-size: 4.6rem; }
+  .page[id^="page-wiki-"] [id^="wiki-"][id$="-list"], .page[id^="page-wiki-"] [id^="wiki-"][id$="-detail"] { padding: 18px 14px 110px !important; }
+}
+
+/* Linguette della Wiki */
+#wiki-section-tabbar { gap: 4px !important; border-bottom: 0 !important; }
+#wiki-section-tabbar .tab-btn { border-radius: 999px; padding: 6px 13px; box-shadow: none; }
+#wiki-section-tabbar .tab-btn.active { background: color-mix(in srgb, var(--text-primary) 9%, transparent); box-shadow: none; }
+
+/* ── Pagine degli strumenti e della sessione: intestazione e spazi comuni ── */
+.page > .page-header, .page > div > .page-header { padding-top: 6px; }
+#page-sessione, #page-generatori, #page-calendario, #page-schermo, #page-compendio, #page-scrittoio, #page-musica, #page-cartografo, #page-trame { padding-left: clamp(16px, 3vw, 32px); padding-right: clamp(16px, 3vw, 32px); }
+.party-card { border-radius: 16px !important; }
+.party-stat-box { border: 0 !important; background: color-mix(in srgb, var(--text-primary) 6%, transparent) !important; border-radius: 10px !important; }
+.party-stat-value { font-family: var(--font-titoli); font-weight: 800; font-variant-numeric: tabular-nums; }
+.gen-card .card-title { font-size: 1.05rem; }
+
+/* Generatori: le schede degli strumenti come carte del seme strumenti */
+.generatori-grid { gap: 14px !important; }
+
+/* ── Finestre ── */
+.modal { border: 0 !important; border-radius: 20px !important; box-shadow: 0 30px 80px -20px rgba(0,0,0,.6), var(--carta-filo) !important; }
+.modal-title { font-weight: 800; letter-spacing: -0.02em; }
+.modal-header { border-bottom-color: transparent !important; }
+
+/* ── Bordi colorati a sinistra o in alto scritti nei moduli: diventano il tono della superficie ── */
+[style*="border-left:3px solid"], [style*="border-left: 3px solid"], [style*="border-left:4px solid"], [style*="border-left: 4px solid"] { border-left-width: 0 !important; }
+[style*="border-top:3px solid"], [style*="border-top: 3px solid"] { border-top-width: 0 !important; }
+
+/* ── Rifiniture dopo la prima foto ── */
+.mz-carta .mz-mono { right: 16px; bottom: 10px; font-size: 3.4rem; color: color-mix(in srgb, var(--seme) 22%, transparent); }
+/* I blocchi dei moduli sotto la scheda (statistiche, cosa sa, note...): titolo vero invece dell'etichetta minuscola */
+.mz-resto > div > div:first-child > div:first-child:not(:has(*)),
+.mz-resto > div > div:first-child:not(:has(*)) { font-family: var(--font-titoli) !important; font-size: 1rem !important; font-weight: 700 !important; color: var(--text-primary) !important; }
+.mz-resto > div[style*="overflow:hidden"] > div:first-child { border-bottom: 0 !important; padding: 16px 18px 4px !important; }
+
+/* ── Pagina Wiki: le categorie come assi dei semi ── */
+#page-wiki-hub { padding: 28px clamp(16px, 3vw, 32px) 96px !important; }
+.mz-hub > h2 { display: flex; align-items: center; gap: 12px; font-family: var(--font-titoli) !important; font-size: clamp(1.7rem, 2.6vw, 2.25rem) !important; font-weight: 800; letter-spacing: -0.03em; }
+.mz-hub > h2::before { content: ''; width: 0.6em; height: 0.6em; background: var(--s-lore); -webkit-mask: var(--g-lore) center / contain no-repeat; mask: var(--g-lore) center / contain no-repeat; }
+.mz-hub > p { font-size: 0.98rem !important; margin: 6px 0 26px !important; }
+.mz-hub > div:nth-of-type(1) { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)) !important; gap: 16px !important; }
+.mz-voce { position: relative; min-height: 158px; display: flex; flex-direction: column; justify-content: flex-end; gap: 4px; padding: 20px !important; background: color-mix(in srgb, var(--seme) 9%, var(--bg-card)) !important; transition: transform 160ms cubic-bezier(.2,.7,.2,1), box-shadow 160ms ease; }
+.mz-voce:hover, .mz-voce:focus-visible { transform: translateY(-3px); box-shadow: var(--carta-ombra-su) !important; }
+.mz-voce > div:first-child { position: absolute; top: 18px; left: 20px; right: 18px; margin: 0 !important; align-items: flex-start !important; }
+.mz-voce > div:first-child > span:first-child { color: color-mix(in srgb, var(--seme) 75%, var(--text-primary)) !important; }
+.mz-voce > div:first-child > span:last-child { background: none !important; padding: 0 !important; font: 800 2rem/1 var(--font-titoli) !important; letter-spacing: -0.04em; color: color-mix(in srgb, var(--seme) 70%, var(--text-primary)) !important; font-variant-numeric: tabular-nums; }
+.mz-voce > div:nth-child(2) { font: 700 1.15rem var(--font-titoli) !important; letter-spacing: -0.015em; }
+.mz-voce > div:nth-child(3) { font-size: 0.9rem !important; line-height: 1.4; }
+.mz-hub > div:last-child > div:first-child { font: 700 1rem var(--font-titoli) !important; color: var(--text-primary) !important; margin: 8px 0 12px !important; }
+.mz-hub > div:last-child .card { border-style: solid !important; box-shadow: none !important; background: color-mix(in srgb, var(--text-primary) 5%, transparent) !important; }
+
+/* ── Sessione: un solo pulsante d'azione per zona, il party come carte del seme PG ── */
+#page-sessione { --seme: var(--s-incontri); --seme-g: var(--g-incontri); }
+#page-sessione .page-header div[style*="padding:2px"] { background: color-mix(in srgb, var(--text-primary) 7%, transparent) !important; border: 0 !important; border-radius: 999px !important; padding: 3px !important; }
+#page-sessione .page-header div[style*="padding:2px"] .btn { box-shadow: none; }
+#page-sessione .page-header div[style*="padding:2px"] .btn-primary { background: var(--bg-card) !important; border-color: transparent !important; color: var(--text-primary) !important; box-shadow: var(--carta-ombra) !important; }
+#page-sessione .page-header div[style*="padding:2px"] .btn-ghost { background: transparent; }
+#cs-btn, #page-sessione .card-header .btn-primary, #page-sessione .combat-header .btn-primary { background: color-mix(in srgb, var(--text-primary) 7%, transparent) !important; border-color: transparent !important; color: var(--text-primary) !important; box-shadow: none !important; }
+#cs-btn:hover, #page-sessione .card-header .btn-primary:hover, #page-sessione .combat-header .btn-primary:hover { background: color-mix(in srgb, var(--text-primary) 12%, transparent) !important; }
+.party-card { --seme: var(--s-pg); --seme-g: var(--g-pg); position: relative; background: color-mix(in srgb, var(--s-pg) 9%, var(--bg-card)) !important; border: 0 !important; box-shadow: var(--carta-ombra) !important; }
+
+/* ── Generatori: le scelte e i "Tira" in inchiostro, il vino resta alle azioni grandi ── */
+#page-generatori .btn-primary.btn-sm { background: var(--text-primary) !important; border-color: var(--text-primary) !important; color: var(--bg-primary) !important; box-shadow: none !important; }
+#page-generatori .btn-primary.btn-sm:hover { background: color-mix(in srgb, var(--text-primary) 85%, var(--bg-primary)) !important; }
+
+/* ── Pagina della campagna ── */
+#page-campagna-hub { padding: 28px clamp(16px, 3vw, 32px) 96px !important; }
+#campagna-hub-body { max-width: 1240px; margin: 0 auto; }
+.hub-tipo { text-transform: none !important; letter-spacing: 0 !important; font: 600 0.92rem var(--font-titoli) !important; color: color-mix(in srgb, var(--s-sessioni) 60%, var(--text-primary)) !important; display: inline-flex; align-items: center; gap: 8px; }
+.hub-tipo::before { content: ''; width: 12px; height: 12px; background: var(--s-sessioni); -webkit-mask: var(--g-sessioni) center / contain no-repeat; mask: var(--g-sessioni) center / contain no-repeat; }
+.hub-desc { max-width: 72ch; font-size: 1.04rem; line-height: 1.65; }
+
+/* ── Telefono: nulla deve allargare la pagina oltre lo schermo ── */
+#main-content { min-width: 0; }
+#topbar, .topbar-title, #main-content > * { min-width: 0; max-width: 100%; }
+#wiki-section-tabbar { max-width: calc(100% - 2 * var(--space-lg)); scrollbar-width: none; }
+#wiki-section-tabbar::-webkit-scrollbar { display: none; }
+.mz-carta { min-width: 0; width: 100%; }
+.mz-faccia { align-self: start; width: 100%; }
+@media (max-width: 760px) {
+  .hn-card .hn-main { padding: 22px 18px 20px; }
+  .hn-card .hn-main::before { position: static; display: block; margin-bottom: 2px; }
+  .hn-card .hn-azioni-c .btn { flex: 1 1 0 !important; min-height: 40px !important; padding-inline: 8px; }
+  .hn-card .hn-azioni-c .btn-primary { flex: 1 1 100% !important; min-height: 46px !important; }
+  .dash-grid.dn .dn-lead-card { padding: 22px 18px 20px !important; }
+  .dash-grid.dn .dn-lead-card::before { top: 24px; left: auto; right: 20px; }
+  .dash-grid.dn .dn-lead-card::after { display: none; }
+  .dn-lead .dn-azioni-s .btn { flex: 1 1 auto !important; min-height: 42px !important; }
+  #page-campagna #campagna-title { font-size: 1.9rem; }
+}
+@media (max-width: 700px) {
+  .mz-testa h2 { font-size: 1.7rem !important; }
+  .mz-carta .mz-mono { display: none; }
+}

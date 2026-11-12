@@ -36,8 +36,8 @@ const QuickCard = (() => {
   };
 
   const _block = (label, text, secret) =>
-    '<div style="margin-bottom:10px;' + (secret ? 'background:rgba(255,107,107,0.08);border-left:3px solid #ff6b6b;padding:8px 10px;border-radius:0 var(--radius-md) var(--radius-md) 0;' : '') + '">' +
-      '<div style="font-size:0.62rem;font-family:var(--font-display);text-transform:uppercase;letter-spacing:0.06em;color:' + (secret ? '#ff6b6b' : 'var(--text-muted)') + ';margin-bottom:3px;">' + label + '</div>' +
+    '<div style="margin-bottom:10px;' + (secret ? 'background:rgba(255,107,107,0.08);border-left:3px solid #cf5450;padding:8px 10px;border-radius:0 var(--radius-md) var(--radius-md) 0;' : '') + '">' +
+      '<div style="font-size:0.62rem;font-family:var(--font-display);text-transform:uppercase;letter-spacing:0.06em;color:' + (secret ? '#cf5450' : 'var(--text-muted)') + ';margin-bottom:3px;">' + label + '</div>' +
       '<div style="font-size:0.88rem;line-height:1.6;white-space:pre-wrap;">' + text + '</div>' +
     '</div>';
 

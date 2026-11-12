@@ -53,7 +53,7 @@ const MappaUI = (() => {
   };
   const MEZZO_LABEL = { piedi: 'A piedi', cavallo: 'A cavallo', barca: 'In barca', nave: 'In nave' };
   const TERRENO_LABEL = { strada: 'Strada', pianura: 'Pianura', foresta: 'Foresta', colline: 'Colline', montagna: 'Montagna', palude: 'Palude', deserto: 'Deserto', mare: 'Mare aperto' };
-  const COLORI = ['#8b2635', '#2d5a6b', '#3a7d44', '#c17f3b', '#c97bea', '#5a5248'];
+  const COLORI = ['#8b2635', '#2d5a6b', '#3a7d44', '#c17f3b', '#8f6bc8', '#5a5248'];
 
   // Icona interna del pin (stesso guscio a goccia per tutti, cambia solo il
   // glifo bianco al centro) in base al "Tipo di luogo" gia' presente nella

@@ -23,8 +23,10 @@ const CampagnaHub = (() => {
   // Card orizzontali: icona a sinistra, testo al centro, conteggio a destra. Larghe almeno
   // 260px e quante ne stanno per riga: si adattano alla larghezza dello schermo senza
   // diventare colonne strette e lunghe.
+  // Nuova grafica: ogni voce porta il seme della sua sezione (colore e simbolo, css/mazzo.css)
+  const SEMI = { Dashboard: 'sessioni', 'Sessione Live': 'incontri', PNG: 'png', Luoghi: 'luoghi', Fazioni: 'fazioni', Lore: 'lore', Sessioni: 'sessioni', Quest: 'quest', PG: 'pg', Incontri: 'incontri', Trame: 'quest', Mappe: 'luoghi', Calendario: 'tempo', 'Vista giocatori': 'pg' };
   const _card = (icona, nome, sotto, azione, n) =>
-    '<div class="card hub-card" role="button" tabindex="0" onclick="' + azione + '" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();' + azione + '}">' +
+    '<div class="card hub-card" data-seme="' + (SEMI[nome] || 'strumenti') + '" role="button" tabindex="0" onclick="' + azione + '" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();' + azione + '}">' +
       '<span class="hub-card-icona">' + icona + '</span>' +
       '<span class="hub-card-testo"><span class="hub-card-nome">' + nome + '</span><span class="hub-card-sotto">' + sotto + '</span></span>' +
       (n != null ? '<span class="hub-card-num">' + n + '</span>' : '') +

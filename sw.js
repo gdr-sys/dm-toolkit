@@ -1,6 +1,6 @@
 // Cambiare il numero quando cambia l'elenco dei file precaricati, cosi' il nuovo service
 // worker scarica di nuovo tutto e cancella la cache vecchia.
-const CACHE_NAME = 'dm-toolkit-v3';
+const CACHE_NAME = 'dm-toolkit-v4';
 const APP_SHELL = [
   './',
   './index.html',
@@ -8,7 +8,7 @@ const APP_SHELL = [
   './css/base.css',
   './css/components.css',
   './css/layout.css',
-  './css/identita.css',
+  './css/identita.css', './css/mazzo.css',
   './favicon.png',
   './icons/icon-192.png',
   './icons/icon-512.png',
@@ -26,7 +26,7 @@ const DATA_FILES = [
   'srd_5_2_1_equipment.json', 'srd_5_2_1_magic_items.json', 'srd_5_2_1_monsters.json', 'srd_5_2_1_rules.json', 'srd_5_2_1_spells.json',
 ].map((f) => './data/' + f);
 
-const FONTS_CSS = 'https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500&display=swap';
+const FONTS_CSS = 'https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Schibsted+Grotesk:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap';
 
 // Gli script (js/*.js e librerie da CDN) si leggono direttamente da index.html invece di
 // elencarli a mano qui: un nuovo modulo js/ aggiunto alla pagina finisce in cache da solo.

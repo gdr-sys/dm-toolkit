@@ -68,7 +68,7 @@ const ProssimeScadenze = (() => {
       ? items.slice(0, 12).map(it =>
           '<div onclick="ProssimeScadenze.openItem(\'' + it.id + '\')" ' +
           'style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);cursor:pointer;">' +
-            '<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:' + (it.giorniRimanenti <= 0 ? 'var(--accent-danger)' : '#f5a623') + ';flex-shrink:0;"></span>' +
+            '<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:' + (it.giorniRimanenti <= 0 ? 'var(--accent-danger)' : '#c98a24') + ';flex-shrink:0;"></span>' +
             '<span style="flex:1;font-size:0.83rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + _esc(it.titolo || 'Senza titolo') + '</span>' +
             '<span style="font-size:0.68rem;color:var(--text-muted);flex-shrink:0;">' + _label(it.giorniRimanenti) + '</span>' +
           '</div>' +
