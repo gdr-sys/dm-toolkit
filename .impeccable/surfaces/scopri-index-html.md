@@ -21,4 +21,4 @@ FIRST VIEWPORT: A sinistra h1 su tre righe, la frase con la storia, due pulsanti
 
 FORM: tavolo luminoso a fogli sovrapposti, settimo della lista ordinata, seed:44f21955b929d89f.
 
-FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance
+FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, scopri/DESIGN.md, and every shipping raster carrying its provenance

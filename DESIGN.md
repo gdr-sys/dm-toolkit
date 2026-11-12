@@ -1,289 +1,261 @@
 ---
-name: "DM Toolkit: sito di presentazione (solo scopri/)"
-description: "Vale solo per il sito in scopri/. Non descrive e non governa l'app (index.html alla radice, css/, js/), che ha un proprio sistema visivo."
+name: "DM Toolkit: l'app"
+description: "Ogni pagina si apre come la locandina della campagna: una scena illustrata col titolo sopra, poi tessere tonde e piatte. Sette tavolozze, notte e giorno."
 colors:
-  ambra: "#e9b84f"
-  ambra-forte: "#f6cd6e"
-  cinabro: "#e0523f"
-  cinabro-chiaro: "#ffb4a6"
-  stanza: "#122a35"
-  fondo: "#0c1f28"
-  petrolio: "#123a4a"
-  foglio: "#18343f"
-  carta: "#f2ecd8"
-  nebbia: "#c0d0d5"
-  inchiostro: "#0f2029"
-  filo: "#f2ecd82e"
-  filo-forte: "#f2ecd84d"
-  filo-bottone: "#f2ecd880"
-  velo: "#0c1f28d9"
+  notte-fondo: "oklch(13% 0.02 40)"
+  notte-fondo-alto: "oklch(17% 0.024 40)"
+  notte-tessera: "oklch(22% 0.03 40)"
+  notte-tessera-su: "oklch(25% 0.034 40)"
+  notte-campo: "oklch(15% 0.02 40)"
+  notte-testo: "oklch(94% 0.02 40)"
+  notte-testo-medio: "oklch(85% 0.025 40)"
+  notte-testo-quieto: "oklch(74% 0.03 40)"
+  notte-filo: "oklch(30% 0.03 40)"
+  notte-brace: "oklch(74% 0.17 52)"
+  notte-brace-testo: "oklch(78% 0.153 52)"
+  notte-sul-brace: "oklch(17% 0.03 52)"
+  giorno-fondo: "oklch(96.5% 0.012 40)"
+  giorno-tessera: "oklch(91.5% 0.022 40)"
+  giorno-tessera-su: "oklch(89.5% 0.026 40)"
+  giorno-campo: "oklch(99% 0.005 40)"
+  giorno-testo: "oklch(22% 0.03 40)"
+  giorno-testo-quieto: "oklch(45% 0.03 40)"
+  giorno-filo: "oklch(84% 0.025 40)"
+  giorno-brace: "oklch(50% 0.17 52)"
+  giorno-brace-testo: "oklch(44% 0.17 52)"
+  sul-brace-giorno: "#ffffff"
 typography:
-  display:
-    fontFamily: "Alegreya, Georgia, serif"
-    fontSize: "clamp(2.5rem, 4.1vw, 4rem)"
-    fontWeight: 500
-    lineHeight: 1.04
-    letterSpacing: "-0.015em"
-  closing:
-    fontFamily: "Alegreya, Georgia, serif"
-    fontSize: "clamp(2.25rem, 4vw, 3.75rem)"
-    fontWeight: 500
-    lineHeight: 1.05
-    letterSpacing: "-0.01em"
-  headline:
-    fontFamily: "Alegreya, Georgia, serif"
-    fontSize: "clamp(2rem, 3.2vw, 3rem)"
-    fontWeight: 500
-    lineHeight: 1.08
-    letterSpacing: "-0.01em"
-  title:
-    fontFamily: "Alegreya, Georgia, serif"
-    fontSize: "clamp(1.25rem, 1.6vw, 1.5rem)"
-    fontWeight: 500
-    lineHeight: 1.2
-  item-title:
-    fontFamily: "Alegreya, Georgia, serif"
-    fontSize: "1.3125rem"
-    fontWeight: 500
-    lineHeight: 1.25
-  lead:
-    fontFamily: "Alegreya Sans, Segoe UI, sans-serif"
-    fontSize: "1.1875rem"
+  scena:
+    fontFamily: "Gloock, Georgia, 'Times New Roman', serif"
+    fontSize: "clamp(2.6rem, 6.4vw, 5.2rem)"
     fontWeight: 400
-    lineHeight: 1.55
-  body:
-    fontFamily: "Alegreya Sans, Segoe UI, sans-serif"
-    fontSize: "1.125rem"
+    lineHeight: 0.97
+    letterSpacing: "-0.02em"
+  titolo-pagina:
+    fontFamily: "Gloock, Georgia, 'Times New Roman', serif"
+    fontSize: "clamp(2.2rem, 4.4vw, 3.4rem)"
     fontWeight: 400
-    lineHeight: 1.55
-  support:
-    fontFamily: "Alegreya Sans, Segoe UI, sans-serif"
+    lineHeight: 1
+    letterSpacing: "-0.02em"
+  fascia:
+    fontFamily: "Gloock, Georgia, 'Times New Roman', serif"
+    fontSize: "1.75rem"
+    fontWeight: 400
+    lineHeight: 1.1
+  tessera:
+    fontFamily: "Gloock, Georgia, 'Times New Roman', serif"
+    fontSize: "1.45rem"
+    fontWeight: 400
+    lineHeight: 1.15
+  corpo:
+    fontFamily: "Figtree, system-ui, -apple-system, 'Segoe UI', sans-serif"
     fontSize: "1rem"
     fontWeight: 400
-    lineHeight: 1.4
-  label:
-    fontFamily: "Alegreya Sans, Segoe UI, sans-serif"
-    fontSize: "1.0625rem"
-    fontWeight: 500
-    lineHeight: 1.15
-  small:
-    fontFamily: "Alegreya Sans, Segoe UI, sans-serif"
-    fontSize: "0.9375rem"
-    fontWeight: 400
     lineHeight: 1.55
+  lettura:
+    fontFamily: "Figtree, system-ui, -apple-system, 'Segoe UI', sans-serif"
+    fontSize: "1.12rem"
+    fontWeight: 400
+    lineHeight: 1.65
+  etichetta:
+    fontFamily: "Figtree, system-ui, -apple-system, 'Segoe UI', sans-serif"
+    fontSize: "0.82rem"
+    fontWeight: 700
+    lineHeight: 1.3
+  pulsante:
+    fontFamily: "Figtree, system-ui, -apple-system, 'Segoe UI', sans-serif"
+    fontSize: "0.95rem"
+    fontWeight: 600
+    lineHeight: 1.1
 rounded:
-  sm: "5px"
-  md: "6px"
-  lg: "8px"
-  xl: "10px"
+  piccolo: "12px"
+  medio: "16px"
+  tessera: "20px"
+  finestra: "24px"
+  campagna: "28px"
+  pillola: "999px"
 spacing:
-  xs: "4px"
-  sm: "12px"
-  md: "16px"
-  lg: "24px"
-  xl: "32px"
-  gutter: "clamp(24px, 5.6vw, 80px)"
-  section-top: "clamp(96px, 13.3svh, 120px)"
-  section-bottom: "clamp(48px, 8svh, 72px)"
+  stretto: "8px"
+  tessere: "16px"
+  dentro-tessera: "22px"
+  fascia: "34px"
+  margine: "clamp(16px, 4vw, 56px)"
 components:
-  button-primary:
-    backgroundColor: "{colors.ambra}"
-    textColor: "{colors.inchiostro}"
-    typography: "{typography.label}"
-    rounded: "{rounded.md}"
-    padding: "0.55em 1.35em"
-    height: "48px"
-  button-primary-hover:
-    backgroundColor: "{colors.ambra-forte}"
-  button-outline:
-    backgroundColor: "{colors.velo}"
-    textColor: "{colors.carta}"
-    typography: "{typography.label}"
-    rounded: "{rounded.md}"
-    padding: "0.55em 1.35em"
-    height: "48px"
-  step-selected:
-    backgroundColor: "{colors.foglio}"
-    textColor: "{colors.ambra-forte}"
-    typography: "{typography.item-title}"
-    rounded: "{rounded.md}"
-    padding: "12px 14px 12px 44px"
-  sheet:
-    backgroundColor: "{colors.stanza}"
-    rounded: "{rounded.lg}"
-  hero-screenshot:
-    rounded: "{rounded.xl}"
-  note:
-    backgroundColor: "{colors.foglio}"
-    textColor: "{colors.carta}"
-    rounded: "{rounded.xl}"
-    padding: "clamp(20px, 2.6vw, 32px)"
-  toggle-on:
-    backgroundColor: "{colors.ambra}"
-    textColor: "{colors.inchiostro}"
-    rounded: "{rounded.sm}"
+  pulsante-azione:
+    backgroundColor: "{colors.notte-brace}"
+    textColor: "{colors.notte-sul-brace}"
+    typography: "{typography.pulsante}"
+    rounded: "{rounded.pillola}"
+    padding: "10px 20px"
     height: "44px"
-  pin-label:
-    backgroundColor: "{colors.ambra}"
-    textColor: "{colors.inchiostro}"
-    rounded: "{rounded.sm}"
-    padding: "0.32em 0.75em"
+  pulsante-quieto:
+    backgroundColor: "{colors.notte-tessera-su}"
+    textColor: "{colors.notte-testo}"
+    typography: "{typography.pulsante}"
+    rounded: "{rounded.pillola}"
+    padding: "10px 20px"
+    height: "44px"
+  linguetta-attiva:
+    backgroundColor: "{colors.notte-testo}"
+    textColor: "{colors.notte-fondo}"
+    typography: "{typography.pulsante}"
+    rounded: "{rounded.pillola}"
+    padding: "8px 16px"
+  tessera:
+    backgroundColor: "{colors.notte-tessera}"
+    textColor: "{colors.notte-testo}"
+    rounded: "{rounded.tessera}"
+    padding: "22px"
+  tessera-su:
+    backgroundColor: "{colors.notte-tessera-su}"
+  campo:
+    backgroundColor: "{colors.notte-campo}"
+    textColor: "{colors.notte-testo}"
+    typography: "{typography.corpo}"
+    rounded: "{rounded.piccolo}"
+    padding: "10px 14px"
+  scelta-attiva:
+    backgroundColor: "{colors.notte-brace}"
+    textColor: "{colors.notte-sul-brace}"
+    rounded: "{rounded.medio}"
+    padding: "14px 16px"
 ---
 
-# Design System: DM Toolkit, sito di presentazione
+# Design System: DM Toolkit, l'app
 
-> **Ambito: solo `scopri/`** (`index.html`, `funzioni.html`, `domande.html`, `sito.css`, `sito.js`). Questo documento non descrive e non governa l'app DM Toolkit (`index.html` alla radice, `css/`, `js/`), che ha un proprio sistema visivo: non applicarlo lì e non usare l'app come fonte per il sito. Le schermate dell'app e i generatori che il sito mostra sono contenuto, non stile del sito.
+> **Ambito:** l'app (`index.html` alla radice, `css/`, `js/`, `img/scene/`). Il sito di presentazione ha un suo sistema in `scopri/DESIGN.md`: i due non si mescolano.
+> Il codice che lo realizza sta in `css/scena.css` (colori, tessere, scene), `js/scena.js` (scena disegnata, immagini di sfondo, ruote e pallini) e `js/dashboard-nuova.js` (impaginazione della Dashboard).
 
 ## Overview
 
-**Creative North Star: "Il tavolo luminoso"**
+**Creative North Star: "La locandina della campagna"**
 
-Il sito è il tavolo del Dungeon Master in una stanza buia, e il foglio acceso sul tavolo è l'app. La stanza è un blu petrolio profondo, fatta delle mappe stesse: nell'apertura un regno sta dietro a tutto, scurito da una velatura, e davanti c'è la schermata vera del combattimento. La luce viene dai fogli, e tutto il resto si ritira. Schermate, mappe e documenti generati portano quasi tutto il colore e il carattere; l'interfaccia resta sobria per lasciarli parlare.
+Ogni pagina si apre come la locandina della serata: un paesaggio della campagna in alto, il titolo grande sopra, e subito sotto quello che serve al tavolo. Il master apre l'app e vede la sua campagna, non un pannello di controllo. Tutto il resto è ordinato in tessere tonde e piatte, raccolte in fasce con un titolo.
 
-La densità è bassa sulla home, con una sezione per schermo a partire da 1024px, e media nelle pagine interne, dove la lunghezza è libera e le sezioni alternano due tinte. Ogni funzione della home si presenta allo stesso modo: passi a sinistra, foglio a destra, e un segnaposto che ingrandisce il foglio fino al passo dopo. Il sito rifiuta il titolo centrato sopra una griglia di card e il fantasy dorato con ornamenti nell'interfaccia.
+Il sistema nasce da una richiesta precisa dell'autrice: non doveva sembrare un'app generata con l'IA. Per questo non usa i segni tipici di quel genere: riquadri grigi con bordo sottile, card tutte uguali, sfumature lucide, bagliori, etichette maiuscole sopra i titoli. Il carattere viene dalla scena e dai titoli con le grazie; il resto resta calmo e leggibile, anche al tavolo con poca luce.
+
+Tutti i colori nascono da tre numeri: la tinta del fondo, la tinta dell'accento e l'intensità. Scegliendo una tavolozza nelle Impostazioni cambia tutto insieme, scena compresa, di notte e di giorno.
 
 **Key Characteristics:**
-- L'app in primo piano, le mappe come ambiente e come una funzione tra le altre.
-- Un solo componente per tutte le funzioni: passi, foglio e segnaposto.
-- Un segno ricorrente: il segnaposto cinabro indica il passo attivo e il luogo in cui sei.
-- Fogli illuminati da una luce calda che sta sotto di loro.
-- Tinte a tutta sezione al posto di divisori e riquadri.
-- Solo tema scuro, senza variante chiara.
-- Prova vera: schermate, mappe e stemmi reali al posto di illustrazioni.
+- In cima a ogni pagina una scena: illustrazione in bianco e nero tinta con la tavolozza, oppure un paesaggio disegnato dal nome.
+- Tessere tonde e piatte: niente bordi, niente ombre, niente sfumature.
+- Titoli in Gloock, testo in Figtree.
+- Un solo colore d'accento per l'azione principale di ogni zona.
+- Sette tavolozze (brace, grafite, bosco, cuoio, inchiostro, vino, nero) in notte e giorno.
+- Segni del gioco al posto delle barre generiche: ruota a spicchi per i clock, pallini per fazioni e indizi, giorni in grande per le scadenze.
 
 ## Colors
 
-Una stanza di blu-verdi molto scuri, testo color carta e due accenti caldi con compiti diversi.
+I valori nel frontmatter sono quelli della tavolozza **brace**, che è la predefinita. Le altre si ottengono cambiando i tre numeri (`--h` tinta del fondo, `--ha` tinta dell'accento, `--k` intensità) in `css/scena.css`: chi scrive codice nuovo usa le variabili (`--bg-primary`, `--bg-card`, `--text-primary`, `--ac`…), mai i valori.
 
 ### Primary
-- **Ambra di lampada** (#e9b84f): azione principale, etichetta del segnaposto, spunte e voce attiva dell'interruttore. Passa ad **Ambra accesa** (#f6cd6e) al passaggio del mouse, sul titolo del passo attivo e nell'anello di focus.
-
-### Secondary
-- **Cinabro da segnaposto** (#e0523f): il segnaposto, e la tinta del riquadro Segreto DM. Il contrasto con i fondi va da 3.1:1 a 4.4:1: basta per un segno grafico, non per il testo.
-- **Cinabro chiaro** (#ffb4a6): la versione del cinabro che si può leggere, da 7.1:1 a 9.9:1 sui fondi. Solo per l'etichetta del Segreto DM e per i messaggi di errore.
+- **Brace** (notte `oklch(74% 0.17 52)`, giorno `oklch(50% 0.17 52)`): l'azione principale, la tessera urgente, gli spicchi pieni dei clock, la linguetta della pagina attiva nella barra in alto.
+- **Brace da leggere** (notte `oklch(78% 0.153 52)`, giorno `oklch(44% 0.17 52)`): l'accento quando è testo, per esempio il nome della campagna, la data della sessione o il numero dei giorni.
 
 ### Neutral
-- **Stanza** (#122a35): fondo di pagina, apertura e prima tinta delle sezioni con i passi.
-- **Fondo** (#0c1f28): la tinta più scura, per le sezioni alterne, il piede e la testata staccata.
-- **Petrolio** (#123a4a): la tinta più aperta, per la sezione che deve staccare, lo Scrittoio.
-- **Foglio** (#18343f): superficie delle note e del passo attivo.
-- **Carta** (#f2ecd8): titoli e testo principale, da 10.3:1 a 14.3:1 su tutti i fondi.
-- **Nebbia** (#c0d0d5): testo di supporto, da 7.6:1 a 10.6:1 su tutti i fondi.
-- **Inchiostro** (#0f2029): testo sulle superfici ambra (9.1:1).
-- **Filo** (#f2ecd82e): bordi e divisori dei fogli. **Filo forte** (#f2ecd84d) per le schermate fuori dal componente a passi, **Filo da bottone** (#f2ecd880) per il pulsante a filo.
-- **Velo** (#0c1f28d9): fondo semitrasparente del pulsante a filo, che lo tiene leggibile su ogni tinta e sopra la mappa dell'apertura.
+- **Fondo** (notte `oklch(13% 0.02 40)`, giorno `oklch(96.5% 0.012 40)`): la pagina.
+- **Tessera** (notte `oklch(22% 0.03 40)`, giorno `oklch(91.5% 0.022 40)`) e **tessera sotto il mouse** (un passo più chiara).
+- **Campo** (notte `oklch(15% 0.02 40)`, giorno `oklch(99% 0.005 40)`): dove si scrive.
+- **Testo**, **testo medio**, **testo quieto**: tre livelli soltanto.
+- **Filo** (notte `oklch(30% 0.03 40)`): l'unico bordo ammesso, nei campi e nelle righe vuote tratteggiate.
 
 ### Named Rules
-**The Segnaposto Rule.** Il segnaposto cinabro indica sempre il passo attivo o il luogo corrente, cioè il punto del foglio da cui si scende. Non è decorazione.
+**The Single Accent Rule.** In ogni zona c'è al massimo un pulsante color brace: l'azione principale. Tutto il resto è un pulsante quieto. Nei Generatori le scelte e i "Tira" sono in inchiostro (testo su fondo chiaro), non in brace.
 
-**The Due Accenti Rule.** L'ambra agisce, il cinabro segna. Un pulsante non è mai cinabro e la goccia del segnaposto non è mai ambra; la sua etichetta è ambra perché è l'azione.
+**The Quiet Category Rule.** Con le card **sobrie** (predefinite) la categoria (quest, PNG, fazione…) si legge solo dal colore dell'etichetta piccola, mai dal fondo della tessera. Le card **colorate** sono una scelta dell'utente nelle Impostazioni, non un'impostazione da attivare nel codice.
+
+**The Palette-Follows Rule.** Nessun colore fisso nelle pagine nuove: ogni colore deriva dalle variabili, così segue le sette tavolozze e la luce notte o giorno.
 
 ## Typography
 
-**Display Font:** Alegreya, peso 500 (con Georgia, serif)
-**Body Font:** Alegreya Sans, 400 e 500 (con Segoe UI, sans-serif)
+**Titoli:** Gloock (con le grazie, peso unico 400).
+**Testo:** Figtree (400, 600, 700).
 
-**Character:** Un serif umanistico da atlante per le voci che si leggono come nomi su una mappa, e il suo sans gemello per il testo, leggibile al tavolo con poca luce.
+Gloock dà la voce della campagna: è il carattere della locandina. Figtree fa il lavoro: etichette, pulsanti, testi lunghi. Non si usano altri caratteri.
 
 ### Hierarchy
-- **Display** (500, clamp(2.5rem, 4.1vw, 4rem), 1.04): un solo h1 per pagina. Riduzioni dedicate: fino a 3.25rem sotto 1180px, poi su una colonna fino a 3.75rem sotto 1024px, e 2.375rem sotto 640px.
-- **Closing** (500, clamp(2.25rem, 4vw, 3.75rem), 1.05): la frase di chiusura nel piede della home.
-- **Headline** (500, clamp(2rem, 3.2vw, 3rem), 1.08): titolo di sezione.
-- **Title** (500, clamp(1.25rem, 1.6vw, 1.5rem), 1.2): h3 generico. La nota di esempio lo ingrandisce fino a 2.25rem.
-- **Item title** (500, 1.3125rem, 1.25): passi, domande e garanzie, sempre in Alegreya. Nei passi l'interlinea scende a 1.2.
-- **Lead** (400, 1.1875rem, 1.55): frase sotto un titolo, in Nebbia, larga al massimo 34rem. Nell'apertura sale a 1.3125rem sotto 1024px e scende a 1.0625rem sotto 640px.
-- **Body** (400, 1.125rem, 1.55): testo corrente. Sotto 640px scende a 1.0625rem.
-- **Support** (400, 1rem, 1.4): riga di testo dei passi, fatti dell'apertura e stato del generatore, in Nebbia.
-- **Label** (500, 1.0625rem, 1.15): pulsanti.
-- **Small** (400, 0.9375rem, 1.55): la nota legale del piede e, su telefono, i fatti dell'apertura.
+- **Scena** (Gloock 400, `clamp(2.6rem, 6.4vw, 5.2rem)`, interlinea 0.97): il titolo sopra la scena, per esempio il nome dell'ultima sessione o della campagna.
+- **Titolo di pagina** (Gloock 400, `clamp(2.2rem, 4.4vw, 3.4rem)`): le pagine di lavoro (Cartografo, Calendario…), dove la scena è più bassa.
+- **Fascia** (Gloock 400, 1.75rem): "Cosa incombe", "Quest attive"…
+- **Tessera** (Gloock 400, 1.45rem; 2.1rem per la tessera principale).
+- **Corpo** (Figtree 400, 1rem, interlinea 1.55) e **lettura** (1.12rem, interlinea 1.65, al massimo 62 caratteri per riga) per riassunti e schede.
+- **Etichetta** (Figtree 700, 0.82rem): tipo e stato sopra il titolo della tessera, sempre in minuscolo.
 
 ### Named Rules
-**The Lettura al Tavolo Rule.** Il testo corrente non scende sotto 1.0625rem, le righe brevi di supporto non scendono sotto 0.9375rem e il testo di supporto resta in Nebbia, mai più tenue: il sito si legge anche su iPad con poca luce.
-
-**The Niente Maiuscoletto Rule.** I titoli restano in maiuscole e minuscole normali, in Alegreya 500. Cinzel, Crimson Pro e IM Fell caricati dalla home servono solo a stemmi e mappe generati dal vivo, e restano dentro i loro SVG.
+**The No Uppercase Rule.** Niente maiuscoletto e niente lettere spaziate: si scrive come si legge.
+**The Two Voices Rule.** Gloock solo per i titoli; mai per testi lunghi, pulsanti o etichette.
 
 ## Layout
 
-La griglia è a moduli interi dentro un contenitore largo al massimo 1280px, con margine laterale fluido (clamp(24px, 5.6vw, 80px)). La composizione delle funzioni sulla home è una colonna da 4 parti con titolo e passi accanto a un foglio da 8. L'apertura e le pagine interne usano 5 e 7, la chiusura 7 e 5, le testate di sezione 1 e 1, documenti e garanzie tre parti uguali con 24px di intervallo. Sono divisioni a colonne piene, e i blocchi non si accavallano: l'unica sovrapposizione è la mappa velata dietro all'apertura.
-
-Sulla home, da 1024px, ogni sezione occupa almeno uno schermo (100svh), con un'intestazione fissa di 72px e padding verticale fluido. L'apertura ha il testo a sinistra e la schermata vera a destra, centrati in verticale, con i due pulsanti impilati a tutta colonna e sotto una riga di fatti con la spunta ambra. Dietro, a tutto schermo, c'è il regno sotto una velatura di Stanza che va dal 96% a sinistra, dove sta il testo, al 40% a destra, e che in basso si scioglie nella tinta della pagina.
-
-Sotto 1024px tutto va su una colonna. L'apertura resta alta uno schermo, con il testo sopra e la schermata sotto, e la velatura diventa verticale e più fitta (dal 96% all'80%). Le altre sezioni perdono l'altezza minima e passano a 72px di padding (56px sotto 640px). I passi stanno su tre colonne fino a 640px, poi su una.
-
-Il ritmo usa passi di 4, 8, 12, 16, 20, 24, 28 e 32px dentro i blocchi, e 48, 56 e 72px tra i blocchi.
+- **Margini:** `clamp(16px, 4vw, 56px)` ai lati; la scena va da bordo a bordo.
+- **Fasce:** un titolo con uno o due collegamenti sottolineati a destra, poi una griglia di tessere (`repeat(auto-fill, minmax(290px, 1fr))`, spazio 16px). Una tessera importante occupa due colonne.
+- **Dashboard:** tutto il quadro nel primo schermo. Nella scena, a sinistra l'ultima sessione e a destra "Cosa incombe" (scadenze, clock, segreti) in tessere compatte; sotto partono subito Quest attive, Il mondo si muove, Dalla campagna. Le card vuote diventano una sola riga tratteggiata in fondo.
+- **Pagine di lavoro** (Cartografo, Scrittoio, Calendario, Schermo del DM…): scena bassa (circa 200px), così lo strumento si vede senza scorrere.
+- **Telefono** (sotto 760px): tessere su una o due colonne, pulsanti in fila, niente righe che escono dallo schermo. Sopra i 900px la navigazione è una barra in alto; tra 760 e 900 resta il menu laterale; sul telefono la barra in basso.
 
 ### Named Rules
-**The Una Sezione per Schermo Rule.** Sulla home ogni sezione dice una cosa sola e riempie lo schermo a partire da 1024px. Le pagine interne non seguono questa regola: la loro altezza dipende dal contenuto.
+**The First Screen Rule.** La Dashboard mostra sessione, scadenze, clock e segreti senza scorrere su un computer. Un'informazione che serve al tavolo non comincia "molto sotto".
 
 ## Elevation & Depth
 
-Il sistema è stratificato con una sola luce. La profondità viene dal cambio di tinta tra le sezioni e dalla luce sotto i fogli: un alone caldo di ambra che esce dal basso, accompagnato da un'ombra scura e stretta che appoggia il foglio. Dietro al foglio delle sezioni con i passi c'è anche una pozza di luce ambra molto tenue (gradiente radiale di #e9b84f12 a 66% 62%). Le sezioni restano piatte, e la testata prende un fondo solo quando si stacca.
+Il sistema è piatto. La profondità la danno la scena e il passo di luminosità tra fondo e tessera, non le ombre.
 
-### Shadow Vocabulary
-- **Luce del foglio** (`box-shadow: 0 30px 80px -24px #e9b84f66, 0 12px 28px -12px #000c`, token `--luce-foglio`): sotto la schermata dell'apertura, i fogli con i passi, la nota, la mappa della chiusura e le schermate delle pagine interne.
-- **Segnaposto** (`filter: drop-shadow(0 3px 4px #000a)`): stacca il segnaposto dal foglio sotto.
-- **Etichetta del segnaposto** (`box-shadow: 0 4px 10px #0008`): stacca l'etichetta ambra dal foglio sotto.
+- **Tessere, campi e pulsanti:** nessuna ombra e nessun bordo.
+- **Menu e finestre che galleggiano** (menu Strumenti, menu Sfondo, finestre): `0 18px 40px -16px rgba(0,0,0,.55)` più un filo interno di 1px del colore filo. Sono gli unici elementi con ombra.
+- **Movimento:** le tessere cliccabili salgono di 3px al passaggio del mouse (`.2s cubic-bezier(.2,.7,.2,1)`); nient'altro si muove. Con "riduci movimento" non si muove nulla.
 
 ### Named Rules
-**The Foglio Acceso Rule.** Ogni foglio che mostra una cosa vera prende la stessa luce sotto, e nessun'altra ombra. Sta fermo: al passaggio del mouse non si solleva. Stemmi e documenti dello Scrittoio stanno senza foglio e senza luce, perché hanno già la propria sagoma.
+**The Flat-Until-Floating Rule.** Ombra solo per ciò che sta sopra la pagina (menu e finestre), mai per ciò che sta nella pagina.
 
 ## Shapes
 
-Angoli appena smussati e in crescita con la misura: 5px per etichette e controlli interni, 6px per pulsanti e passi, 8px per i fogli e le immagini, 10px per le due superfici più importanti, cioè la schermata dell'apertura e la nota. I bordi sono linee da 1px color carta traslucido. L'unica sagoma propria è la goccia del segnaposto, disegnata in SVG inline; icone e segni di interfaccia sono sempre SVG a tratto. Il marchio è l'icona dell'app (`icons/icon-192.png`) a 32px, su fondo trasparente e senza riquadro.
+- **Tessere:** raggio 20px (16px sul telefono e per le tessere compatte).
+- **Pulsanti, linguette, etichette di stato:** a pillola.
+- **Campi:** 12px. **Finestre:** 24px. **Card della campagna in Home:** 28px.
+- **Ruota dei clock:** cerchio diviso in spicchi uguali; gli spicchi pieni in brace, i vuoti in testo al 14%.
+- **Pallini:** cerchi di 16px (12px nelle tessere compatte); pieni in brace, vuoti con un contorno di 2px.
 
 ## Components
 
-### Buttons
-Pari per misura e peso, diversi solo per il riempimento.
-- **Shape:** curvatura media (6px), altezza minima 48px, testo sempre centrato.
-- **Primary:** pieno, Ambra di lampada con testo Inchiostro. Si usa per "Prova la campagna di esempio".
-- **Outline:** Velo con bordo Filo da bottone e testo Carta. Si usa per "Apri il toolkit" e per i generatori dal vivo, come "Disegna un altro regno".
-- **Hover / Focus:** il pieno passa ad Ambra accesa; il filo prende bordo Carta e fondo #f2ecd814. Alla pressione scendono di 1px e scalano a .985. Il focus è un anello da 3px in Ambra accesa con 3px di distacco, uguale per ogni elemento.
-- **Disabled:** opacità .65 e cursore di attesa, con il testo che racconta cosa accade ("Sto disegnando…").
+### Scena (`.sc-hero`, `js/scena.js`)
+- **Struttura:** contenitore a tutta larghezza con un'immagine sotto e una sfumatura verso il fondo che tiene leggibile il testo.
+- **Immagine:** nell'ordine, quella caricata per la pagina, `img/scene/<pagina>.webp`, quella caricata per la campagna, `img/scene/<paesaggio>.webp`, il paesaggio disegnato dal nome. Le immagini sono in bianco e nero; l'app le tinge con la tavolozza (`mix-blend-mode: luminosity`).
+- **Pulsante Sfondo:** in alto a destra; carica un'immagine, la toglie o sceglie il paesaggio.
 
-### Passi, foglio e segnaposto
-La firma del sito (`.discesa`, `.tappa`, `.lastra`, `.segno`), uguale in Wiki, tavolo, mappe e generatori. Una funzione nuova della home si costruisce con questo componente.
-- **Passi:** tre righe a tutta larghezza senza bordo a riposo, con titolo e una riga di testo e 44px di rientro a sinistra per il segnaposto. Il passo attivo ha fondo Foglio, bordo Filo, segnaposto da 22px e titolo in Ambra accesa; al passaggio del mouse il fondo è #f2ecd80f. Semantica di tablist, con frecce e Home/End da tastiera.
-- **Foglio:** rapporto 1.44:1 per le schermate e 1.4:1 per le mappe, 8px di curvatura, bordo Filo, fondo Stanza e Luce del foglio. Le immagini stanno impilate, a filo del bordo.
-- **Segnaposto:** una goccia cinabro da 44px con etichetta ambra in Alegreya Sans, posata sul punto vero del foglio da cui si scende e con l'etichetta che dice dove porta ("Apri il Monte Ardegna"). L'ultimo passo non ha segnaposto sul foglio, perché non c'è un livello sotto. Su telefono si riduce a 32px, con etichetta a .875rem; l'area di tocco resta di 44px grazie a un margine invisibile.
-- **Movimento:** il segnaposto ingrandisce il foglio verso il proprio punto (.8s, scala fino a 5) mentre il passo dopo arriva da .94 con una dissolvenza (.5s).
-- **Generatore dal vivo:** nella sezione delle mappe, sotto i passi, un pulsante a filo disegna un altro regno in un worker e sostituisce il primo foglio, con una riga di stato che porta il codice della mappa. Il segnaposto si nasconde, perché il luogo a cui portava non esiste sul regno nuovo.
+### Tessera (`.sc-t`)
+- **Struttura:** etichetta (tipo e stato), titolo in Gloock, eventuale riga di testo quieto, eventuale segno del gioco a destra (`.sc-cw`) o in basso (pallini).
+- **Varianti:** larga (due colonne), principale (più alta, titolo 2.1rem), urgente (fondo mescolato al 22% col brace).
+- **Stato:** sotto il mouse fondo un passo più chiaro e salita di 3px; si apre con un clic o con Invio.
 
-### Apertura
-Il testo e la schermata del combattimento, sulle cinque e sette colonne descritte in Layout. La schermata ha 10px di curvatura, bordo Filo forte e Luce del foglio, e si accende una sola volta al caricamento salendo di 14px con una dissolvenza (.9s). La mappa dietro è solo ambiente: nascosta ai lettori di schermo, non animata e senza segnaposto.
+### Pulsanti (`.btn`)
+- **Azione** (`.btn-primary`): pillola brace, testo scuro di notte e bianco di giorno. Uno per zona.
+- **Quieto** (`.btn-ghost`, `.btn-secondary`, `.btn`): pillola col testo all'11% sul fondo.
+- **Nelle intestazioni delle card:** trasparenti, testo quieto.
 
-### Schermate dell'app
-Tutte catturate dall'app vera con la campagna di esempio, tema scuro, sfondo Grigio chiaro e testo al 125%, a 1800 per 1250px. Così la finestra si stacca dalla stanza e si legge anche dentro un foglio.
+### Linguette (`.tab-btn`, viste della Dashboard, sezioni della Wiki)
+- Pillole quiete; quella attiva è in inchiostro pieno (fondo testo, testo fondo), non in brace.
 
-### Cards / Containers
-Fogli, non card: si usano per mostrare una cosa vera, non per ripetere griglie di testo. Il foglio con i passi, la schermata dell'apertura e la nota hanno le regole già viste. Nelle pagine interne le schermate hanno 8px di curvatura e bordo Filo forte, e la mappa della chiusura 8px e bordo Filo, con un segnaposto fisso sul luogo. La Luce del foglio vale per tutti.
+### Scelte con icona (`.sc-scelta`: Cartografo, Scrittoio)
+- Tessere da circa 120px con un'icona disegnata (tratto 1.6) e il nome; quella scelta è piena di brace.
 
-### Navigation
-Testata fissa da 72px con marchio, due collegamenti e il pulsante a filo "Apri il toolkit". Sulla home parte trasparente su una sfumatura e diventa Fondo pieno con bordo Filo dopo 40px di scorrimento; nelle pagine interne è piena da subito. Il collegamento attivo o sotto il mouse prende una sottolineatura ambra da 2px che cresce da sinistra. Sotto 640px il nome "DM Toolkit" resta solo per i lettori di schermo e si vede l'icona, mentre collegamenti e pulsante restano al loro posto.
-
-### Nota con vista giocatori
-La nota mostra una scheda vera; un interruttore a due posizioni (selezionata in Ambra con testo Inchiostro) nasconde il riquadro Segreto DM, che si chiude in altezza (.4s). Il riquadro usa un fondo cinabro al 12% (#e0523f1f), un bordo cinabro al 50% (#e0523f80) e l'etichetta in Cinabro chiaro, perché il cinabro pieno non basta per il testo. Padding da 20 a 32px, fino a 40px nella sezione Segreti su schermi ampi.
-
-### Domande
-Elenco a due colonne di voci espandibili separate da un Filo in alto, con titolo Item title e un più in SVG ambra che ruota di 45 gradi all'apertura (.25s). Altezza minima 60px.
+### Wiki
+- **Elenco:** locandine verticali 2:3 con l'iniziale grande in trasparenza, stato in etichetta, nome in Gloock.
+- **Scheda:** ritratto o iniziale a sinistra, nome grande, stato e dettagli brevi a pillola; i testi da leggere al centro, segreto e dettagli in tessere a lato.
 
 ## Do's and Don'ts
 
 ### Do:
-- **Do** mostrare cose vere e provabili: schermate reali da `scopri/img/`, mappe generate, stemmi disegnati dal vivo.
-- **Do** catturare le schermate nuove come le altre: campagna di esempio, tema scuro, sfondo Grigio chiaro, testo al 125%.
-- **Do** presentare ogni funzione della home con passi, foglio e segnaposto.
-- **Do** tenere le due azioni con la stessa misura (altezza 48px, stesso peso), una piena e una a filo.
-- **Do** usare per il movimento la curva `cubic-bezier(.16, 1, .3, 1)` e tempi di .18s per gli stati, e rispettare `prefers-reduced-motion`.
-- **Do** garantire aree di tocco di almeno 44px, come in testata, passi, piede e interruttore.
-- **Do** separare le sezioni con il cambio di tinta tra Stanza, Fondo e Petrolio.
+- **Do** apri ogni pagina nuova con un `.page-header`: la scena e il pulsante Sfondo arrivano da soli (`js/scena.js`).
+- **Do** usa le variabili di colore (`--bg-card`, `--text-primary`, `--ac`, `--accent-text`…), così il componente segue le sette tavolozze e la luce.
+- **Do** mostra lo stato con i segni del gioco: `Scena.ruota(k, n)` per i clock, `Scena.pallini(k, n)` per avanzamenti e indizi.
+- **Do** raccogli le card vuote in una riga sola invece di mostrare riquadri con "Nessun…".
+- **Do** controlla ogni pagina nei due temi e a 390px di larghezza prima di considerarla finita.
 
 ### Don't:
-- **Don't** applicare questo sistema all'app alla radice, né portare qui i temi e i colori dell'app.
-- **Don't** usare il titolo centrato sopra una griglia di card.
-- **Don't** rimettere la mappa in primo piano nell'apertura: lì il soggetto è l'app, e la mappa resta velata dietro.
-- **Don't** aggiungere ornamenti dorati, cornici o pergamena all'interfaccia del sito. Il limite vale per l'interfaccia: bussole dorate, pergamene e sigilli restano ammessi dentro mappe e documenti generati, che sono il prodotto.
-- **Don't** aggiungere illustrazioni dipinte: se servono, si chiedono all'utente, che le fa generare.
-- **Don't** usare emoji, loghi o personaggi ufficiali di D&D.
-- **Don't** usare il cinabro pieno per il testo o per i pulsanti.
-- **Don't** ripetere l'animazione di apertura a ogni scorrimento: la schermata si accende una volta sola.
+- **Don't** usare riquadri con bordo grigio sottile, card tutte uguali, sfumature o bagliori: è l'estetica "fatta con l'IA" che l'autrice ha chiesto di evitare.
+- **Don't** mettere una riga colorata su un lato di card, note o avvisi: lo stato si legge dal fondo.
+- **Don't** scrivere etichette in maiuscolo o con lettere spaziate, né mettere un'etichetta sopra un titolo per decorarlo.
+- **Don't** usare più di un pulsante brace per zona.
+- **Don't** mettere colori fissi nelle pagine nuove, né illustrazioni a colori in `img/scene/`: devono essere in bianco e nero per seguire la tavolozza.
+- **Don't** spingere le informazioni del tavolo sotto la piega della Dashboard.
+- **Don't** usare emoji nell'interfaccia: le icone sono disegnate con lo stesso tratto.
