@@ -523,15 +523,15 @@ const Cartografo = (() => {
         '<div class="carto-anteprima">' +
           '<div class="carto-barra"><div style="min-width:0;"><div class="carto-nome-mappa" id="carto-titolo-mappa"></div><div id="carto-info" aria-live="polite"></div></div>' +
             '<div class="carto-azioni">' +
+              '<div class="carto-zoom"><button type="button" class="btn btn-ghost btn-icon-sm" onclick="Cartografo.zoom(1/1.4)" aria-label="Riduci">−</button>' +
+              '<button type="button" class="btn btn-ghost btn-sm" id="carto-zoom" onclick="Cartografo.zoomReset()" title="Adatta allo spazio">100%</button>' +
+              '<button type="button" class="btn btn-ghost btn-icon-sm" onclick="Cartografo.zoom(1.4)" aria-label="Ingrandisci">+</button></div>' +
               '<button type="button" class="btn btn-primary btn-sm" onclick="Cartografo.apriMettiNelleMappe()">Metti nelle mappe</button>' +
               '<button type="button" class="btn btn-secondary btn-sm" id="carto-png" onclick="Cartografo.scaricaPng()">Scarica PNG</button>' +
               '<button type="button" class="btn btn-secondary btn-sm" onclick="Cartografo.scaricaSvg()">Scarica SVG</button>' +
             '</div></div>' +
           '<div id="carto-stage"><div id="carto-vista" role="img"></div>' +
             '<div id="carto-attesa" role="status">Sto disegnando la mappa…</div>' +
-            '<div class="carto-zoom"><button type="button" class="btn btn-ghost btn-icon-sm" onclick="Cartografo.zoom(1/1.4)" aria-label="Riduci">−</button>' +
-              '<button type="button" class="btn btn-ghost btn-sm" id="carto-zoom" onclick="Cartografo.zoomReset()" title="Adatta allo spazio">100%</button>' +
-              '<button type="button" class="btn btn-ghost btn-icon-sm" onclick="Cartografo.zoom(1.4)" aria-label="Ingrandisci">+</button></div>' +
           '</div>' +
         '</div>' +
       '</div>';

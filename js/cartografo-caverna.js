@@ -247,7 +247,7 @@ const CartoCaverna = (() => {
     const inkT = radura ? v.ink : t.ink;
     camere.forEach((c, i) => {
       const [tit, d] = c === cameraAcqua ? (radura ? ['Sorgente', 'Acqua limpida e impronte di animali.'] : ['Lago sotterraneo', 'Acqua nera e immobile, profondità ignota.']) : i === 0 ? prime : altre[i % altre.length];
-      testi += M.numeroTondo(c[0], c[1], i + 1, { numeroFondo: t.numero, numeroTesto: notte ? '#0e1d26' : '#ffffff' }, 15);
+      if (conLegenda) testi += M.numeroTondo(c[0], c[1], i + 1, { numeroFondo: t.numero, numeroTesto: notte ? '#0e1d26' : '#ffffff' }, 15);
       voci.push({ n: i + 1, titolo: tit, testo: d });
       pin.push({ x: c[0], y: c[1] - 14, label: (i + 1) + '. ' + tit, note: d, sottotipo: 'nota' });
     });

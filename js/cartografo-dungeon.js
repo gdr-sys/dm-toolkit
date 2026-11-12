@@ -311,7 +311,7 @@ const CartoDungeon = (() => {
       else if (s.w >= s.h) { quartoX = s.x + 0.6; quartoY = s.y + s.h / 2; }
       else { quartoX = s.x + s.w / 2; quartoY = s.y + 0.6; }
       const [x, y] = schermo(quartoX, quartoY);
-      testi += M.numeroTondo(x, y, i + 1, { numeroFondo: t.numero, numeroTesto: t.stile === 'notte' && !t.chiaro ? '#0e1d26' : '#ffffff' }, Math.max(12, S * 0.5));
+      if (conLegenda) testi += M.numeroTondo(x, y, i + 1, { numeroFondo: t.numero, numeroTesto: t.stile === 'notte' && !t.chiaro ? '#0e1d26' : '#ffffff' }, Math.max(12, S * 0.5));
       const trappola = o.trappole !== false && i > 0 && r.chance(0.26) ? ' ' + r.pick(CartoTesti.TRAPPOLE) : '';
       const titolo = i === 0 ? 'Ingresso: ' + dati[i][0].toLowerCase() : dati[i][0];
       voci.push({ n: i + 1, titolo, testo: dati[i][1] + trappola });

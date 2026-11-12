@@ -533,7 +533,7 @@ body.barra-alta #wiki-section-tabbar:not([style*="display:none"]):not([style*="d
 
 /* ══ Cartografo e Scrittoio: le scelte sono tessere con icona ══ */
 #carto-tipi, #sc-voci { display: grid !important; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 10px !important; margin-bottom: 14px !important; }
-.sc-scelta { display: flex; flex-direction: column; align-items: flex-start; justify-content: space-between; gap: 14px; min-height: 92px; padding: 14px 16px; border: 0; border-radius: 18px; background: var(--bg-card); color: var(--text-secondary); font: 600 0.95rem var(--font-body); text-align: left; cursor: pointer; transition: background-color .15s, transform .2s cubic-bezier(.2, .7, .2, 1); }
+.sc-scelta { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; min-width: 0; min-height: 92px; padding: 14px 10px; line-height: 1.2; overflow-wrap: anywhere; hyphens: auto; border: 0; border-radius: 18px; background: var(--bg-card); color: var(--text-secondary); font: 600 0.95rem var(--font-body); text-align: center; cursor: pointer; transition: background-color .15s, transform .2s cubic-bezier(.2, .7, .2, 1); }
 .sc-scelta:hover { background: var(--bg-card-hover); color: var(--text-primary); transform: translateY(-2px); }
 .sc-scelta[aria-selected="true"] { background: var(--ac); color: var(--ac-t); }
 .sc-scelta .sc-icona { opacity: .9; }
@@ -546,7 +546,7 @@ body.barra-alta #wiki-section-tabbar:not([style*="display:none"]):not([style*="d
 #carto-contesto { border-radius: 14px !important; border: 0 !important; background: color-mix(in oklch, var(--ac) 18%, var(--bg-card)) !important; }
 @media (max-width: 760px) {
   #carto-tipi, #sc-voci { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px !important; }
-  .sc-scelta { min-height: 74px; padding: 10px 12px; font-size: 0.85rem; gap: 8px; border-radius: 14px; }
+  .sc-scelta { min-height: 74px; padding: 10px 6px; font-size: 0.85rem; gap: 6px; border-radius: 14px; }
   .sc-scelta .sc-icona { width: 22px; height: 22px; }
 }
 
@@ -611,3 +611,4 @@ body.barra-alta #wiki-section-tabbar:not([style*="display:none"]):not([style*="d
 .module-placeholder h2 { font-size: 1.4rem; margin: 0 0 6px; }
 .sc-hero > .sc-cambia { top: 14px; bottom: auto; } #dn-hero > .sc-cambia { top: 22px; } @media (max-width: 760px) { .sc-hero > .sc-cambia { top: 10px; right: 12px; } #dn-hero > .sc-cambia { top: auto; bottom: 10px; } }
 .schermo-block-resize { background: transparent !important; border-top: 0 !important; }
+.carto-azioni .carto-zoom { position: static !important; padding: 0 !important; background: var(--bg-card) !important; margin-right: 4px; }

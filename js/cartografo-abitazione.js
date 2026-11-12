@@ -273,6 +273,11 @@ const CartoAbitazione = (() => {
         const DIM = { letto: [1, 2], tavolo: [2, 1], tavolino: [1, 1], bancone: [3, 1], botte: [1, 1], cassa: [1, 1], baule: [1, 1], scaffale: [2, 1], camino: [2, 1] };
         const AL_MURO = new Set(['letto', 'bancone', 'scaffale', 'camino']);
         pi.stanze.forEach((s) => {
+          // La fascia centrale resta libera per il nome della stanza: i mobili vanno attorno
+          if (s.nome !== 'Disimpegno' && s.h >= 2) {
+            const meta = s.y + s.h / 2, file = s.h % 2 ? [Math.floor(meta)] : [meta - 1, meta];
+            file.forEach((j) => { for (let i = s.x; i < s.x + s.w; i++) blocca(i, j); });
+          }
           const libero = (x, y, w, h) => {
             if (x < s.x || y < s.y || x + w > s.x + s.w || y + h > s.y + s.h) return false;
             for (let j = y; j < y + h; j++) for (let i = x; i < x + w; i++) if (occ.has(i + ',' + j)) return false;
@@ -346,22 +351,20 @@ const CartoAbitazione = (() => {
         numero += 1;
         const cx = ox + (s.x + s.w / 2) * S, cy = oy + (s.y + s.h / 2) * S, largB = s.w * S * 0.88;
         const eti = (conLegenda ? numero + '. ' : '') + s.etichetta;
-        const parole = eti.split(' ');
-        let righe = [eti];
-        let dim = Math.min(S * 0.62, largB / (eti.length * 0.5));
-        if (parole.length > 1 && dim < S * 0.46) {
-          const meta = Math.ceil(parole.length / 2);
-          righe = [parole.slice(0, meta).join(' '), parole.slice(meta).join(' ')];
-          dim = Math.min(S * 0.6, largB / (Math.max(righe[0].length, righe[1].length) * 0.5), s.h * S * 0.34);
-        }
-        dim = Math.max(11.5, dim);
+        // Il nome sta dentro la stanza: fino a tre righe, corpo ridotto finche' entra in larghezza e in altezza
+        const parole = eti.split(' '), altB = s.h * S * 0.78;
+        const spezza = (n) => { const out = [], per = Math.ceil(parole.length / n); for (let k = 0; k < parole.length; k += per) out.push(parole.slice(k, k + per).join(' ')); return out; };
+        const misura = (rr) => Math.min(S * 0.62, largB / (Math.max(...rr.map((x) => x.length)) * 0.5), altB / (rr.length * 1.05));
+        let righe = [eti], dim = misura(righe);
+        for (let n = 2; n <= Math.min(3, parole.length); n++) { const rr = spezza(n), d = misura(rr); if (d > dim * 1.08) { righe = rr; dim = d; } }
+        dim = Math.max(10, dim);
         righe.forEach((rg, i) => {
           testi += M.etichetta(cx, cy + dim * 0.34 + (i - (righe.length - 1) / 2) * dim * 1.02, rg, carta, { size: n1(dim), font: carta.fontCorpo || carta.font, peso: 600, colore: t.testo, alone: t.testoInk, aloneW: Math.max(2.4, dim * 0.13) });
         });
         voci.push({ n: numero, titolo: s.etichetta, testo: s.nota });
         pin.push({ x: cx, y: cy - dim * (righe.length * 0.62), label: (conLegenda ? numero + '. ' : '') + s.etichetta, note: NOME(pi.livello) + '. ' + s.nota, sottotipo: 'nota' });
       });
-      voci.push({ titolo: NOME(pi.livello).toUpperCase(), testo: '' });
+      voci.push({ titolo: NOME(pi.livello), testo: '', piano: true });
       // L'intestazione del piano va prima delle sue stanze
       const ultimaInt = voci.pop(), quante = pi.stanze.filter((s) => s.nome !== 'Disimpegno').length;
       voci.splice(voci.length - quante, 0, ultimaInt);

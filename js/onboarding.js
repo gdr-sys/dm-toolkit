@@ -55,7 +55,7 @@ const Onboarding = (() => {
   const _maybeNudge = () => {
     if (localStorage.getItem(SEEN_KEY)) return;
     setTimeout(() => {
-      try { Toast.show('Nuovo qui? Trovi una guida rapida nella sidebar, in "Aiuto e contatti".', 'info', 8000); } catch (e) {}
+      try { Toast.show('Nuovo qui? La guida rapida è in Aiuto: il punto di domanda in alto, oppure Menu sul telefono.', 'info', 8000); } catch (e) {}
     }, 800);
   };
 

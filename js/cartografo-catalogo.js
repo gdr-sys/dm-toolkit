@@ -47,7 +47,7 @@ const CartoCatalogo = (() => {
         POPOLO(),
         S('ambiente', 'Ambiente', [['caverna', 'Caverna'], ['radura', 'Radura']], 'caverna'),
         S('taglia', 'Dimensione', [['piccola', 'Piccola'], ['media', 'Media'], ['grande', 'Grande']], 'media'),
-        C('acqua', 'Acqua', true, 0.6), C('griglia', 'Griglia', true, 0.7), C('legenda', 'Legenda', true, 0.7),
+        C('acqua', 'Acqua', true, 0.6), C('griglia', 'Griglia', true, 0.7), C('legenda', 'Legenda', true, 1),
       ],
     },
     dungeon: {
@@ -58,7 +58,7 @@ const CartoCatalogo = (() => {
         S('tema', 'Tema', [['cripta', 'Cripta'], ['fortezza', 'Fortezza'], ['tempio', 'Tempio'], ['miniera', 'Miniera']], 'cripta'),
         S('taglia', 'Dimensione', [['piccolo', 'Piccolo'], ['medio', 'Medio'], ['grande', 'Grande']], 'medio'),
         S('rotazione', 'Orientamento', [['caso', 'A caso'], ['dritto', 'Dritto'], ['traverso', 'Di traverso']], 'caso'),
-        C('griglia', 'Griglia', true, 0.8), C('trappole', 'Trappole', true, 0.7), C('legenda', 'Legenda', true, 0.8),
+        C('griglia', 'Griglia', true, 0.8), C('trappole', 'Trappole', true, 0.7), C('legenda', 'Legenda', true, 1),
       ],
     },
     abitazione: {

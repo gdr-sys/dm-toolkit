@@ -419,6 +419,12 @@ const CartoMotore = (() => {
       const riga = size * 1.32, rientro = 46, max = Math.floor((larg - rientro - 18) / (size * 0.5));
       let h = 62, corpo = '';
       for (const v of voci) {
+        if (v.piano) { // intestazione di un piano: a filo, senza numero, un po' piu' staccata
+          h += riga + (h > 62 ? size * 0.5 : 0);
+          corpo += `<text x="${x + 20}" y="${n1(y + h)}" font-family="${FONT_APP_TITOLI}" font-size="${n1(size * 1.12)}" fill="${p.inchiostro}">${esc(v.titolo)}</text>`;
+          h += size * 0.5;
+          continue;
+        }
         const testa = _righe(v.titolo, max), resto = v.testo ? _righe(v.testo, max) : [];
         const cima = h;
         h += riga;
