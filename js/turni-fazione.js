@@ -214,9 +214,11 @@ const TurniFazione = (() => {
     card.innerHTML = '<div class="card-header"><h3 class="card-title">Il mondo si muove</h3><button type="button" class="btn btn-ghost btn-sm" onclick="TurniFazione.apri()">Muovi le fazioni</button></div>' +
       lista.slice(0, 6).map(f => {
         const t = _turni(f), m = t.storia.slice(-1)[0];
-        return '<div style="padding:7px 0;border-bottom:1px solid var(--border);">' +
-          '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;"><span style="font-size:0.85rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + _esc(_nome(f)) + '</span>' + _orologio(t, f.id, false) + '</div>' +
-          (m ? '<div style="font-size:0.76rem;color:var(--text-muted);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + _esc(m.testo) + '</div>' : '') +
+        return '<div class="sc-t" data-t="viola" role="button" tabindex="0" onclick="TurniFazione.apri()">' +
+          '<span class="sc-et">Fazione · ' + t.progresso + ' di ' + t.max + '</span>' +
+          '<h3 class="sc-h">' + _esc(_nome(f)) + '</h3>' +
+          (m ? '<small class="sc-s">' + _esc(m.testo) + '</small>' : '') +
+          (typeof Scena !== 'undefined' ? Scena.pallini(t.progresso, t.max) : '') +
         '</div>';
       }).join('');
   };

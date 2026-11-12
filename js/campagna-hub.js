@@ -75,11 +75,13 @@ const CampagnaHub = (() => {
 
     el.innerHTML =
       // "Modifica" sta sulla riga del tipo: cosi' nome e descrizione usano tutta la larghezza
+      '<div class="sc-testa" data-sc-seme="' + _esc(camp.name) + '" data-sc-tipo="' + (typeof Scena !== 'undefined' ? Scena.tipo((camp.name || '') + ' ' + (camp.description || '')) : 'auto') + '"><div style="min-width:0;flex:1;">' +
       '<div class="hub-testa"><span class="hub-tipo">' + tipo + ' · ' + _esc(camp.system || '5e') + (sessioni ? ' · ' + sessioni + (sessioni === 1 ? ' sessione' : ' sessioni') : '') + '</span>' +
         '<button type="button" class="btn btn-ghost btn-sm" onclick="App.editCampaign(\'' + camp.id + '\')">Modifica</button></div>' +
       '<h2 class="hub-nome">' + _esc(camp.name) + '</h2>' +
       // Testi incollati da PDF hanno un a capo a fine riga: si uniscono, restano solo i paragrafi
       (camp.description ? '<p class="hub-desc">' + _esc(String(camp.description).replace(/([^\n])\n(?!\n)/g, '$1 ')) + '</p>' : '') +
+      '</div></div>' +
       _gruppo('Al tavolo', [
         _card(_iconaMenu('campagna'), 'Dashboard', 'Ultima sessione, scadenze, clock e quest', go('campagna')),
         _card(_iconaMenu('sessione'), 'Sessione Live', 'Iniziativa, combattimento e note', go('sessione')),

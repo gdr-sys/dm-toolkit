@@ -4,7 +4,7 @@
 
 /* Un solo carattere per tutta l'interfaccia: Atkinson Hyperlegible, disegnato per la leggibilita'
    (al tavolo, con poca luce, I l 1 e O 0 non si confondono). Il mono resta per codici e numeri tecnici. */
-@import url('https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Schibsted+Grotesk:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Gloock&family=JetBrains+Mono:wght@400;500&display=swap');
 
 /* ── Variabili Tema Chiaro ── */
 :root {
@@ -60,8 +60,8 @@
   --nav-label-color:    rgba(0,0,0,0.62);
 
   /* Tipografia */
-  --font-display: 'Atkinson Hyperlegible Next', system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-body:    'Atkinson Hyperlegible Next', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-display: 'Gloock', Georgia, 'Times New Roman', serif;
+  --font-body:    'Figtree', system-ui, -apple-system, 'Segoe UI', sans-serif;
   --font-mono:    'JetBrains Mono', monospace;
 
   /* Spacing */

@@ -64,23 +64,17 @@ const ProssimeScadenze = (() => {
     card.style.display = '';
 
     const items = _collect(camp, cal);
+    // Nuova grafica: ogni scadenza e' una tessera col numero dei giorni in grande
     list.innerHTML = items.length
-      ? items.slice(0, 12).map(it =>
-          '<div onclick="ProssimeScadenze.openItem(\'' + it.id + '\')" ' +
-          'style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);cursor:pointer;">' +
-            '<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:' + (it.giorniRimanenti <= 0 ? 'var(--accent-danger)' : '#c98a24') + ';flex-shrink:0;"></span>' +
-            '<span style="flex:1;font-size:0.83rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + _esc(it.titolo || 'Senza titolo') + '</span>' +
-            '<span style="font-size:0.68rem;color:var(--text-muted);flex-shrink:0;">' + _label(it.giorniRimanenti) + '</span>' +
-          '</div>' +
-          // Conseguenza programmata: avviso prima della data, "è successo" quando scade
-          (it.conseguenza
-            ? '<div style="font-size:0.78rem;line-height:1.45;margin:-2px 0 6px 16px;padding:4px 8px;' +
-                (it.giorniRimanenti <= 0
-                  ? 'border-left:3px solid var(--accent-danger);background:var(--bg-secondary);color:var(--text-primary);"><strong>È successo:</strong> '
-                  : 'color:var(--text-muted);">Se scade: ') +
-                _esc(it.conseguenza) + '</div>'
-            : '')
-        ).join('')
+      ? items.slice(0, 12).map((it, i) => {
+          const g = it.giorniRimanenti, scaduta = g <= 0;
+          return '<div class="sc-t sc-cw' + (i === 0 ? ' sc-larga' : '') + (g <= 7 ? ' sc-urgente' : '') + '" data-t="lava" role="button" tabindex="0" onclick="ProssimeScadenze.openItem(\'' + it.id + '\')">' +
+            '<span class="sc-et">Scadenza' + (scaduta ? ' · ' + _label(g).toLowerCase() : '') + '</span>' +
+            '<h3 class="sc-h">' + _esc(it.titolo || 'Senza titolo') + '</h3>' +
+            (it.conseguenza ? '<small class="sc-s">' + (scaduta ? '<strong>È successo:</strong> ' : 'Se scade: ') + _esc(it.conseguenza) + '</small>' : '') +
+            (scaduta ? '' : '<div class="sc-w sc-giorni" aria-label="' + _label(g) + '">' + (g === 1 ? '1' : g) + '<em>' + (g === 1 ? 'giorno' : 'giorni') + '</em></div>') +
+          '</div>';
+        }).join('')
       : '<div class="text-muted text-sm" style="padding:6px 0;">Nessuna scadenza imminente.</div>';
   };
 

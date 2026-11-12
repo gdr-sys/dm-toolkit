@@ -150,7 +150,7 @@
 }
 </style>
 <link rel="stylesheet" href="css/identita.css">
-<link rel="stylesheet" href="css/mazzo.css">
+<link rel="stylesheet" href="css/scena.css">
 </head>
 <body>
 
@@ -1600,8 +1600,8 @@
 
     <section class="page" id="page-wiki-hub" style="padding:20px;height:calc(100vh - var(--header-height));overflow-y:auto;">
       <div class="mz-hub" style="max-width:1120px;margin:0 auto;">
-        <h2 style="font-family:var(--font-display);font-size:1.3rem;margin:0 0 4px;">Wiki</h2>
-        <p style="font-size:0.85rem;color:var(--text-muted);margin:0 0 20px;">Tutto quello che sai sul tuo mondo: personaggi, luoghi, fazioni, storia e altro. Scegli una categoria.</p>
+        <div class="sc-testa"><div><h2>Wiki</h2>
+        <p>Tutto quello che sai sul tuo mondo: personaggi, luoghi, fazioni, storia e altro. Scegli una categoria.</p></div></div>
 
         <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px;">
           <div class="card mz-voce" data-seme="png" role="button" tabindex="0" style="cursor:pointer;padding:16px;" onclick="WikiSections.goto('png')">
@@ -4050,15 +4050,16 @@ const App = (() => {
       const ultimaTesto = ultimaS ? _esc(ultimaS.titolo || ('Sessione ' + (ultimaS.numero || ''))) + (ultimaS.data ? ' · ' + new Date(ultimaS.data).toLocaleDateString('it-IT', { day: 'numeric', month: 'short' }) : '') : 'Nessuna, per ora';
       const sistema = camp.system === '5e2014' ? 'D&amp;D 5e 2014' : 'D&amp;D 5e 2024';
       card.innerHTML = `
+        ${typeof Scena !== 'undefined' ? Scena.svg(camp.name, Scena.tipo((camp.name || '') + ' ' + (camp.description || ''))) : ''}
         <div class="hn-main">
-          <div class="hn-stato">${isActive ? '<span class="dn-chip acqua">In uso</span>' : ''}<span>${typeLabel} · ${sistema}</span></div>
+          <div class="hn-stato">${isActive ? '<span class="dn-chip acqua">In uso</span>' : ''}<span class="hn-tipo">${typeLabel} · ${sistema}</span></div>
           <h2>${_esc(camp.name)}</h2>
           ${camp.description ? '<p>' + camp.description + '</p>' : ''}
           <div class="hn-azioni-c">
             <button type="button" class="btn btn-primary btn-lg" onclick="App.openCampaign('${camp.id}')">Apri la dashboard</button>
-            <button type="button" class="btn btn-ghost btn-lg" style="border-color:transparent;color:var(--text-muted);" onclick="App.editCampaign('${camp.id}')">Modifica</button>
-            <button type="button" class="btn btn-ghost btn-lg" style="border-color:transparent;color:var(--text-muted);" onclick="Storage.exportCampaign('${camp.id}')">Esporta</button>
-            <button type="button" class="btn btn-ghost btn-lg" style="border-color:transparent;color:var(--danger-text);" onclick="App.confirmDeleteCampaign('${camp.id}')">Elimina</button>
+            <button type="button" class="btn btn-ghost btn-lg" onclick="App.editCampaign('${camp.id}')">Modifica</button>
+            <button type="button" class="btn btn-ghost btn-lg" onclick="Storage.exportCampaign('${camp.id}')">Esporta</button>
+            <button type="button" class="btn btn-ghost btn-lg hn-elimina" onclick="App.confirmDeleteCampaign('${camp.id}')">Elimina</button>
           </div>
         </div>
         <div class="hn-fatti">
@@ -4069,6 +4070,7 @@ const App = (() => {
       `;
       grid.appendChild(card);
     });
+    if (typeof Scena !== 'undefined') Scena.tutte(grid);
 
 
     // "Leggi tutto" solo dove la descrizione e' davvero piu' lunga dello spazio della card
@@ -11777,7 +11779,7 @@ const _renderDashRecenti = () => {
     }
   }
 
-  if (clocksEl) {
+  if (false && clocksEl) {
     const clocks = camp?.clocks || [];
     if (!clocks.length) {
       clocksEl.innerHTML = '<div style="color:var(--text-muted);font-size:0.82rem;">Nessun clock. Aggiungili in Sessione.</div>';
@@ -15296,10 +15298,7 @@ const Settings = (() => {
     if (s.density && s.density !== 'normal') {
       setDensity(s.density);
     }
-    if (s.bgColor && s.bgColor !== 'default') {
-      const c = BG_COLORS[s.bgColor];
-      if (c) _applyBgPalette(c);
-    }
+    _applicaAspetto();
   };
 
   const BG_COLORS = {
@@ -15374,37 +15373,41 @@ const Settings = (() => {
     [...BG_VARS, ...TEXT_VARS, ...BORDER_VARS, ...NAV_VARS].forEach(v => root.removeProperty(v));
   };
 
+  // Nuova grafica: il colore e' una tavolozza (attributo data-colore su <html>); tinte e luminosita'
+  // le calcola css/scena.css per il tema notte e giorno. Le vecchie scelte di sfondo vengono tradotte.
+  const TAVOLOZZE = ['brace', 'grafite', 'bosco', 'cuoio', 'inchiostro', 'vino', 'nero'];
+  const VECCHI_SFONDI = { 'default': 'brace', 'gray-900': 'nero', 'gray-800': 'grafite', 'gray-700': 'grafite', 'slate': 'inchiostro', 'parchment': 'cuoio' };
+  const _tavolozza = (key) => (TAVOLOZZE.includes(key) ? key : (VECCHI_SFONDI[key] || 'brace'));
+  const _segnaAspetto = () => {
+    const s = _getSettings(), c = _tavolozza(s.bgColor), k = s.card === 'colorate' ? 'colorate' : 'sobrie';
+    document.querySelectorAll('.settings-bg-btn').forEach(btn => btn.setAttribute('aria-pressed', String(btn.dataset.bg === c)));
+    document.querySelectorAll('.settings-card-btn').forEach(btn => { btn.className = 'btn btn-sm settings-card-btn' + (btn.dataset.card === k ? ' btn-primary' : ' btn-ghost'); });
+  };
+  const _applicaAspetto = () => {
+    const s = _getSettings();
+    _clearBgPalette();
+    document.documentElement.dataset.colore = _tavolozza(s.bgColor);
+    document.documentElement.dataset.card = s.card === 'colorate' ? 'colorate' : 'sobrie';
+  };
+
   const setBg = (key) => {
-    const color = BG_COLORS[key] || '';
-    if (color) _applyBgPalette(color);
-    else _clearBgPalette();
-
     const s = _getSettings();
-    s.bgColor = key;
+    s.bgColor = _tavolozza(key);
     _save(s);
-
-    document.querySelectorAll('.settings-bg-btn').forEach(btn => {
-      btn.className = btn.dataset.bg === key ? 'btn btn-primary btn-sm settings-bg-btn' : 'btn btn-ghost btn-sm settings-bg-btn';
-    });
+    _applicaAspetto(); _segnaAspetto();
   };
-
-  // Ricalcola lo sfondo personalizzato attivo (se c'e') per il tema chiaro/scuro appena
-  // impostato — chiamata da App.applyTheme ad ogni cambio tema.
-  const reapplyBg = () => {
+  const setCard = (k) => {
     const s = _getSettings();
-    const color = BG_COLORS[s.bgColor || 'default'];
-    if (color) _applyBgPalette(color);
+    s.card = k === 'colorate' ? 'colorate' : 'sobrie';
+    _save(s);
+    _applicaAspetto(); _segnaAspetto();
   };
 
-  const _initBgUI = () => {
-    const s = _getSettings();
-    const currentBg = s.bgColor || 'default';
-    document.querySelectorAll('.settings-bg-btn').forEach(btn => {
-      btn.className = btn.dataset.bg === currentBg ? 'btn btn-primary btn-sm settings-bg-btn' : 'btn btn-ghost btn-sm settings-bg-btn';
-    });
-  };
+  // Chiamata da App.applyTheme a ogni cambio tema e all'avvio: rimette tavolozza e card salvate
+  const reapplyBg = () => { _applicaAspetto(); };
+  const _initBgUI = () => { _segnaAspetto(); };
 
-  return { setFontSize, setTheme, setBg, reapplyBg, setDensity, updateAuthInfo, open, init, _initBgUI };
+  return { setFontSize, setTheme, setBg, setCard, reapplyBg, setDensity, updateAuthInfo, open, init, _initBgUI };
 })();
 
 const DriveBackup = (() => {
@@ -16829,7 +16832,8 @@ const WikiSections = (() => {
         segreti.map(([l, t]) => '<div class="mz-segreto"><h3>' + _escHtml(l.replace(/\s*DM$/, '')) + ', solo per te</h3><div>' + t + '</div></div>').join('') +
         (dettagli.length ? '<dl class="mz-dettagli">' + dettagli.map(([l, t]) => '<dt>' + _escHtml(l) + '</dt><dd>' + t + '</dd>').join('') + '</dl>' : '') +
         '</div>';
-      return '<div class="mz-corte" data-seme="' + type + '">' + faccia + testa + '</div>' +
+      return (typeof Scena !== 'undefined' ? '<div class="sc-sfondo">' + Scena.svg(item.nome || cfg.label, type === 'luoghi' ? 'auto' : 'colline') + '</div>' : '') +
+        '<div class="mz-corte" data-seme="' + type + '">' + faccia + testa + '</div>' +
         '<div class="mz-corpo" data-seme="' + type + '">' + testi + lato + '</div><div class="mz-resto">';
     };
 
@@ -18533,6 +18537,7 @@ const _openWikiCard = (type, id) => {
 const renderDashboard = () => {
   const camp = App.getActiveCampaign();
   if (!camp) return;
+  var _escDash = function(t){ return String(t==null?'':t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); };
   const sessLog = camp.sessioni_log || [];
   // L'ultima sessione GIOCATA (con riassunto e ganci), non la piu' alta in numero: dopo aver
   // pianificato la prossima, la Dashboard mostrava una sessione vuota e "Nessun gancio".
@@ -18577,11 +18582,12 @@ const renderDashboard = () => {
   if (dashQuest) {
     var qA = (camp.quests||[]).filter(function(q){ return q.stato==='Attiva'||q.stato==='In sospeso'; });
     var SQ = { Attiva:'#c44a7c', 'In sospeso':'#c98a24', Completata:'#3f9a6b', Fallita:'#7a7068' };
-    dashQuest.innerHTML = qA.length ? qA.map(function(q) {
-      return '<div class="dash-q-item" data-id="'+q.id+'" style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);cursor:pointer;">' +
-        '<span style="width:6px;height:6px;border-radius:50%;background:'+(SQ[q.stato]||'#aaa')+';flex-shrink:0;"></span>' +
-        '<span style="font-size:0.83rem;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+(q.titolo||q.name||'Quest')+'</span>' +
-        '<span style="font-size:0.68rem;color:var(--text-muted);">'+(q.tipo||'')+'</span></div>';
+    // Nuova grafica: ogni quest e' una tessera; la principale e' piu' grande
+    dashQuest.innerHTML = qA.length ? qA.map(function(q, i) {
+      var capo = /princip/i.test(q.tipo||'') || (i === 0 && qA.length > 2);
+      return '<div class="sc-t dash-q-item' + (capo ? ' sc-larga sc-capo' : '') + '" data-t="' + (q.stato==='In sospeso' ? '' : 'oro') + '" data-id="'+q.id+'" role="button" tabindex="0">' +
+        '<span class="sc-et">'+_escDash(q.tipo||q.stato||'Quest')+(q.stato==='In sospeso'?' · in sospeso':'')+'</span>' +
+        '<h3 class="sc-h">'+_escDash(q.titolo||q.name||'Quest')+'</h3></div>';
     }).join('') : '<div style="color:var(--text-muted);font-size:0.82rem;padding:8px 0;">Nessuna quest attiva.</div>';
   }
 
@@ -18596,10 +18602,9 @@ const renderDashboard = () => {
       return n?Object.assign({},n,{sessNum:e[1]}):null;
     }).filter(Boolean);
     dashPng.innerHTML = rNpcs.length ? rNpcs.map(function(n) {
-      var img = n.immagine?'<img src="'+n.immagine+'" style="width:24px;height:24px;border-radius:50%;object-fit:cover;">':'';
-      return '<div class="dash-n-item" data-id="'+n.id+'" style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--border);cursor:pointer;">' +
-        img+'<div style="flex:1;min-width:0;"><div style="font-size:0.82rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+(n.name||n.nome||'?')+'</div>' +
-        '<div style="font-size:0.68rem;color:var(--text-muted);">'+(n.ruolo||n.job||'')+(n.sessNum?' S'+n.sessNum:'')+'</div></div></div>';
+      return '<div class="sc-t dash-n-item" data-t="bosco" data-id="'+n.id+'" role="button" tabindex="0">' +
+        '<span class="sc-et">'+_escDash(n.ruolo||n.job||'PNG')+(n.sessNum?' · sessione '+n.sessNum:'')+'</span>' +
+        '<h3 class="sc-h">'+_escDash(n.name||n.nome||'?')+'</h3></div>';
     }).join('') : '<div style="color:var(--text-muted);font-size:0.82rem;">Nessun PNG nelle sessioni recenti.</div>';
   }
 
@@ -18607,10 +18612,8 @@ const renderDashboard = () => {
   if (dashTrame) {
     var tA = (camp.trame||[]).filter(function(t){return t.stato==='In corso';});
     dashTrame.innerHTML = tA.length ? tA.map(function(t) {
-      return '<div class="dash-t-item" style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);cursor:pointer;">' +
-        '<div style="width:10px;height:10px;border-radius:50%;background:'+(t.colore||'#aaa')+';flex-shrink:0;"></div>' +
-        '<div style="flex:1;min-width:0;"><div style="font-size:0.82rem;font-weight:600;">'+(t.titolo||'Trama')+'</div>' +
-        '<div style="font-size:0.68rem;color:var(--text-muted);">'+(t.tipo||'')+'</div></div></div>';
+      return '<div class="sc-t dash-t-item" data-t="viola" role="button" tabindex="0"><span class="sc-et">Trama'+(t.tipo?' · '+_escDash(t.tipo):'')+'</span>' +
+        '<h3 class="sc-h">'+_escDash(t.titolo||'Trama')+'</h3></div>';
     }).join('') : '<div style="color:var(--text-muted);font-size:0.82rem;">Nessuna trama in corso.</div>';
     document.querySelectorAll('.dash-t-item').forEach(function(el){el.addEventListener('click',function(){WikiSections.gotoTrame();});});
   }
@@ -18625,24 +18628,15 @@ const renderDashboard = () => {
     var activeClocks = clocks.filter(function(c){ return c.attivo !== false; });
     if (activeClocks.length) {
       dashClocks.innerHTML = activeClocks.map(function(c) {
-        // I clock vengono salvati come {max, current} (vedi Clocks): la Dashboard leggeva solo
-        // progresso/totale e mostrava ogni clock fermo a 0/8.
+        // I clock vengono salvati come {max, current} (vedi Clocks)
         var filled = c.current != null ? c.current : (c.progresso || 0);
         var total  = c.max || c.totale || 8;
         var scattato = filled >= total;
-        var segs   = '';
-        for (var s = 0; s < total; s++) {
-          segs += '<div style="flex:1;height:8px;border-radius:2px;background:' + (s < filled ? (c.colore||'var(--accent-primary)') : 'var(--bg-tertiary)') + ';margin:0 1px;"></div>';
-        }
-        return '<div style="margin-bottom:10px;">' +
-          '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">' +
-            '<span style="font-size:0.8rem;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:70%;">' + (c.nome||'Clock') + '</span>' +
-            '<span style="font-size:0.72rem;color:' + (scattato ? 'var(--accent-danger);font-weight:700' : 'var(--text-muted)') + ';">' + (scattato ? 'Scattato' : filled + '/' + total) + '</span>' +
-          '</div>' +
-          '<div style="display:flex;gap:1px;">' + segs + '</div>' +
-          // Clock pieno: la sua nota e' la conseguenza che ora accade
-          (scattato && c.nota ? '<div style="font-size:0.78rem;color:var(--text-primary);margin-top:4px;padding:4px 8px;border-left:3px solid var(--accent-danger);background:var(--bg-secondary);">' + String(c.nota).replace(/</g,'&lt;') + '</div>' : '') +
-        '</div>';
+        return '<div class="sc-t sc-cw' + (scattato ? ' sc-urgente' : '') + '" data-t="lava" role="button" tabindex="0" onclick="App.navigateTo(\x27sessione\x27)">' +
+          '<span class="sc-et">Clock · ' + (scattato ? 'scattato' : filled + ' di ' + total) + '</span>' +
+          '<h3 class="sc-h">' + _escDash(c.nome||'Clock') + '</h3>' +
+          (scattato && c.nota ? '<small class="sc-s">' + _escDash(c.nota) + '</small>' : '') +
+          '<div class="sc-w">' + (typeof Scena !== 'undefined' ? Scena.ruota(filled, total) : filled + '/' + total) + '</div></div>';
       }).join('');
     } else {
       dashClocks.innerHTML = '<div style="color:var(--text-muted);font-size:0.82rem;">Nessun clock attivo.</div>';
@@ -18659,17 +18653,10 @@ const renderDashboard = () => {
     allNotes.sort(function(a,b){ return (b.ts||0)-(a.ts||0); });
     var recent = allNotes.slice(0,6);
     if (recent.length) {
-      dashNotes.innerHTML = '<div style="display:flex;flex-wrap:wrap;gap:8px;">' +
-        recent.map(function(n) {
-          return '<div class="dash-note-item" data-tipo="' + n.tipo.toLowerCase() + '" data-id="' + n.id + '" ' +
-            'style="display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--bg-secondary);border:1px solid var(--border);border-left:3px solid ' + n.color + ';border-radius:var(--radius-md);cursor:pointer;min-width:140px;flex:1;">' +
-            '<div style="min-width:0;">' +
-              '<div style="font-size:0.68rem;color:color-mix(in srgb, ' + n.color + ' 50%, var(--text-primary));text-transform:uppercase;letter-spacing:0.05em;margin-bottom:2px;">' + n.tipo + '</div>' +
-              '<div style="font-size:0.82rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + (n.titolo||'Senza titolo') + '</div>' +
-            '</div>' +
-          '</div>';
-        }).join('') +
-      '</div>';
+      dashNotes.innerHTML = recent.map(function(n) {
+          return '<div class="sc-t dash-note-item" data-t="' + (n.tipo==='Lore'?'mare':n.tipo==='Quest'?'oro':'lava') + '" data-tipo="' + n.tipo.toLowerCase() + '" data-id="' + n.id + '" role="button" tabindex="0">' +
+            '<span class="sc-et">' + n.tipo + '</span><h3 class="sc-h">' + _escDash(n.titolo||'Senza titolo') + '</h3></div>';
+        }).join('');
       document.querySelectorAll('.dash-note-item').forEach(function(el) {
         el.addEventListener('click', function() {
           var tipo = this.dataset.tipo;
@@ -22272,16 +22259,27 @@ document.addEventListener('DOMContentLoaded', initMobileNav);
                 class="btn btn-sm" style="font-size:0.78rem;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg> Chiaro</button>
             </div>
           </div>
-          <!-- Colore sfondo -->
+          <!-- Colore: sette tavolozze, ognuna in versione notte e giorno (css/scena.css) -->
           <div>
-            <div style="font-size:0.78rem;font-weight:600;margin-bottom:6px;">Colore di sfondo</div>
-            <div style="display:flex;gap:6px;flex-wrap:wrap;">
-              <button onclick="Settings.setBg('default')" id="bg-btn-default" class="btn btn-sm settings-bg-btn" data-bg="default" style="font-size:0.72rem;">Default</button>
-              <button onclick="Settings.setBg('gray-900')" id="bg-btn-gray-900" class="btn btn-ghost btn-sm settings-bg-btn" data-bg="gray-900" style="font-size:0.72rem;background:#111;color:#fff;">Grigio scuro</button>
-              <button onclick="Settings.setBg('gray-800')" id="bg-btn-gray-800" class="btn btn-ghost btn-sm settings-bg-btn" data-bg="gray-800" style="font-size:0.72rem;background:#1f2937;color:#fff;">Grigio medio</button>
-              <button onclick="Settings.setBg('gray-700')" id="bg-btn-gray-700" class="btn btn-ghost btn-sm settings-bg-btn" data-bg="gray-700" style="font-size:0.72rem;background:#374151;color:#fff;">Grigio chiaro</button>
-              <button onclick="Settings.setBg('slate')" id="bg-btn-slate" class="btn btn-ghost btn-sm settings-bg-btn" data-bg="slate" style="font-size:0.72rem;background:#1e293b;color:#fff;">Ardesia</button>
-              <button onclick="Settings.setBg('parchment')" id="bg-btn-parchment" class="btn btn-ghost btn-sm settings-bg-btn" data-bg="parchment" style="font-size:0.72rem;background:#f5f0e8;color:#333;">Pergamena</button>
+            <div style="font-size:0.88rem;font-weight:600;margin-bottom:8px;">Colore</div>
+            <div class="sc-tavolozze" role="group" aria-label="Colore dell'app">
+              <button type="button" onclick="Settings.setBg('brace')" class="settings-bg-btn" data-bg="brace" title="Brace" aria-label="Brace" style="background:oklch(62% .17 50)"></button>
+              <button type="button" onclick="Settings.setBg('grafite')" class="settings-bg-btn" data-bg="grafite" title="Grigio" aria-label="Grigio" style="background:oklch(55% .01 255)"></button>
+              <button type="button" onclick="Settings.setBg('bosco')" class="settings-bg-btn" data-bg="bosco" title="Verde" aria-label="Verde" style="background:oklch(52% .12 150)"></button>
+              <button type="button" onclick="Settings.setBg('cuoio')" class="settings-bg-btn" data-bg="cuoio" title="Marrone" aria-label="Marrone" style="background:oklch(45% .08 62)"></button>
+              <button type="button" onclick="Settings.setBg('inchiostro')" class="settings-bg-btn" data-bg="inchiostro" title="Blu" aria-label="Blu" style="background:oklch(48% .13 255)"></button>
+              <button type="button" onclick="Settings.setBg('vino')" class="settings-bg-btn" data-bg="vino" title="Vino" aria-label="Vino" style="background:oklch(45% .15 12)"></button>
+              <button type="button" onclick="Settings.setBg('nero')" class="settings-bg-btn" data-bg="nero" title="Nero" aria-label="Nero" style="background:#000"></button>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:14px;flex-wrap:wrap;">
+              <div>
+                <div style="font-size:0.88rem;font-weight:600;">Card</div>
+                <div style="font-size:0.78rem;color:var(--text-muted);">Sobrie: tutte nel colore scelto. Colorate: una tinta per categoria.</div>
+              </div>
+              <div style="display:flex;gap:6px;">
+                <button type="button" class="btn btn-sm settings-card-btn" data-card="sobrie" onclick="Settings.setCard('sobrie')">Sobrie</button>
+                <button type="button" class="btn btn-sm settings-card-btn" data-card="colorate" onclick="Settings.setCard('colorate')">Colorate</button>
+              </div>
             </div>
           </div>
         </div>
@@ -22584,6 +22582,7 @@ document.addEventListener('DOMContentLoaded', initMobileNav);
 <script src="js/vista-giocatori.js"></script>
 <script src="js/suggerisci.js"></script>
 <script src="js/generatori-schede.js"></script>
+<script src="js/scena.js"></script>
 <script src="js/dashboard-mia.js"></script>
 <script src="js/dashboard-nuova.js"></script>
 <script src="js/home-menu.js"></script>

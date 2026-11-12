@@ -64,12 +64,13 @@ const Segreti = (() => {
       '<div class="card-header"><h3 class="card-title">Segreti non rivelati</h3>' +
         '<button type="button" class="btn btn-ghost btn-sm" onclick="Segreti.apri()">' + (_lista().length ? 'Gestisci' : 'Aggiungi') + '</button></div>' +
       (aperti.length
-        ? aperti.slice(0, 8).map(s => {
-            const tot = (s.indizi || []).length, trovati = (s.indizi || []).filter(i => i.trovato).length;
-            return '<div onclick="Segreti.apri(\'' + s.id + '\')" style="padding:6px 0;border-bottom:1px solid var(--border);cursor:pointer;">' +
-              '<div style="display:flex;justify-content:space-between;gap:8px;font-size:0.84rem;"><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + _esc(s.titolo || 'Senza titolo') + '</span>' +
-              '<span style="flex-shrink:0;font-size:0.72rem;color:var(--text-muted);">' + trovati + '/' + tot + ' indizi</span></div>' +
-              (tot < 3 ? '<div style="font-size:0.72rem;color:var(--warning-text);">Meno di tre indizi: rischia di non essere mai scoperto</div>' : '') +
+        ? aperti.slice(0, 8).map((s, i) => {
+            const tot = (s.indizi || []).length, trovati = (s.indizi || []).filter(x => x.trovato).length;
+            return '<div class="sc-t' + (i === 0 ? ' sc-larga' : '') + '" data-t="viola" role="button" tabindex="0" onclick="Segreti.apri(\'' + s.id + '\')">' +
+              '<span class="sc-et">Segreto · ' + (tot ? trovati + (trovati === 1 ? ' indizio trovato' : ' indizi trovati') + ' su ' + tot : 'nessun indizio') + '</span>' +
+              '<h3 class="sc-h">' + _esc(s.titolo || 'Senza titolo') + '</h3>' +
+              (tot < 3 ? '<small class="sc-s">Meno di tre indizi: rischia di non essere mai scoperto</small>' : '') +
+              (tot && typeof Scena !== 'undefined' ? Scena.pallini(trovati, tot) : '') +
             '</div>';
           }).join('')
         : '<div style="font-size:0.82rem;color:var(--text-muted);">' + (_lista().length ? 'Tutti i segreti sono stati rivelati.' : 'Annota i segreti della campagna e dove si trovano gli indizi per scoprirli.') + '</div>');
