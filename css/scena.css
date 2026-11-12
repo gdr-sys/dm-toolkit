@@ -569,11 +569,21 @@ body.barra-alta #wiki-section-tabbar:not([style*="display:none"]):not([style*="d
 .schermo-block-title { text-transform: none !important; letter-spacing: 0 !important; color: var(--text-primary) !important; flex: 1 1 120px !important; min-width: 0; }
 .schermo-block-actions { margin-left: auto; }
 .schermo-block-actions > span { border: 0 !important; background: color-mix(in oklch, var(--text-primary) 8%, transparent); border-radius: 999px !important; }
-/* Con il mouse, i comandi del blocco compaiono solo quando servono: il titolo resta leggibile anche nei blocchi stretti */
+/* Con il mouse, i comandi del blocco compaiono sopra l'intestazione solo quando servono e non occupano spazio:
+   il titolo resta leggibile anche nei blocchi stretti e il contenuto parte subito sotto */
+.schermo-block { position: relative; }
 @media (hover: hover) {
-  .schermo-block-actions { opacity: 0; transition: opacity .15s; }
-  .schermo-block:hover .schermo-block-actions, .schermo-block:focus-within .schermo-block-actions { opacity: 1; }
+  .schermo-block-actions { position: absolute; top: 10px; right: 10px; z-index: 3; display: flex; align-items: center; gap: 2px; padding: 3px; border-radius: 999px; background: var(--bg-secondary); box-shadow: 0 8px 20px -10px rgba(0, 0, 0, .6), inset 0 0 0 1px var(--border); opacity: 0; pointer-events: none; transition: opacity .15s; }
+  .schermo-block:hover .schermo-block-actions, .schermo-block:focus-within .schermo-block-actions { opacity: 1; pointer-events: auto; }
 }
+/* Griglia a muratura (Schermo._layoutMasonry): righe da 1px, ogni blocco ne occupa quante ne servono alla sua altezza.
+   Senza questa regola i blocchi lasciavano buchi enormi e lo spostamento sembrava non funzionare. */
+#schermo-grid, .schermo-grid { grid-auto-rows: 1px !important; row-gap: 16px !important; align-items: start !important; }
+.schermo-block-header { cursor: grab; }
+.schermo-block-header:active { cursor: grabbing; }
+.schermo-block-resize { height: 14px !important; cursor: ns-resize; display: flex; align-items: center; justify-content: center; }
+.schermo-block-resize::after { content: ''; width: 36px; height: 4px; border-radius: 4px; background: color-mix(in oklch, var(--text-primary) 18%, transparent); }
+.schermo-block-resize:hover::after { background: var(--ac); }
 
 /* ══ Sfondi con immagini (js/scena.js) ══
    L'immagine prende la luminosita' (luminosity) e la tavolozza da' tinta e saturazione:
@@ -600,3 +610,4 @@ body.barra-alta #wiki-section-tabbar:not([style*="display:none"]):not([style*="d
 /* I titoli dei vuoti ora sono h2: stessa misura di prima */
 .module-placeholder h2 { font-size: 1.4rem; margin: 0 0 6px; }
 .sc-hero > .sc-cambia { top: 14px; bottom: auto; } #dn-hero > .sc-cambia { top: 22px; } @media (max-width: 760px) { .sc-hero > .sc-cambia { top: 10px; right: 12px; } #dn-hero > .sc-cambia { top: auto; bottom: 10px; } }
+.schermo-block-resize { background: transparent !important; border-top: 0 !important; }

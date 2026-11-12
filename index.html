@@ -8051,10 +8051,25 @@ const Schermo = (() => {
     const cs = getComputedStyle(grid);
     const rowUnit = parseFloat(cs.gridAutoRows) || 1;
     const rowGap = parseFloat(cs.rowGap || cs.gap) || 0;
+    const nCol = Math.max(1, cs.gridTemplateColumns.split(' ').filter(Boolean).length);
+    // Muratura vera, nell'ordine scelto dal master: ogni blocco va nella posizione piu' in alto dove
+    // c'e' spazio per la sua larghezza (a parita', la piu' a sinistra). La griglia del browser,
+    // da sola, non torna indietro a riempire i buchi lasciati dai blocchi piu' bassi.
+    const alt = new Array(nCol).fill(0);
     grid.querySelectorAll('.schermo-block').forEach(el => {
+      const blk = _blocks.find(x => 'sblock-' + x.id === el.id);
+      const larg = Math.min(nCol, SIZES[blk?.size]?.cols || 2);
+      el.style.removeProperty('grid-row');
       const h = el.getBoundingClientRect().height;
-      const span = Math.max(1, Math.ceil((h + rowGap) / (rowUnit + rowGap)));
-      el.style.gridRowEnd = 'span ' + span;
+      const righe = Math.max(1, Math.ceil((h + rowGap) / (rowUnit + rowGap)));
+      let col = 0, cima = Infinity;
+      for (let c = 0; c + larg <= nCol; c++) {
+        const m = Math.max(...alt.slice(c, c + larg));
+        if (m < cima) { cima = m; col = c; }
+      }
+      el.style.setProperty('grid-column', (col + 1) + ' / span ' + larg, 'important');
+      el.style.setProperty('grid-row', (cima + 1) + ' / span ' + righe, 'important');
+      for (let c = col; c < col + larg; c++) alt[c] = cima + righe;
     });
   };
 
