@@ -834,7 +834,7 @@
               <option value="dungeon">Dungeon/Rovina</option>
               <option value="regno">Regno/Regione</option>
             </select>
-            <button class="btn btn-secondary btn-sm" onclick="NomiLuoghiGen.genera()"></button>
+            <button class="btn btn-secondary btn-sm" onclick="NomiLuoghiGen.genera()">Genera</button>
           </div>
           <div id="gen-nomluogo-result" style="min-height:60px;">
             <div class="text-muted text-sm">Seleziona il tipo e genera</div>
@@ -1191,7 +1191,7 @@
               <option value="esplorazione">Esplorazione</option>
               <option value="soprannaturale">Soprannaturale</option>
             </select>
-            <button class="btn btn-secondary btn-sm" onclick="GanciGen.genera()"></button>
+            <button class="btn btn-secondary btn-sm" onclick="GanciGen.genera()">Genera</button>
           </div>
           <div id="gen-gancio-result" style="min-height:60px;">
             <div class="text-muted text-sm">Genera un gancio narrativo</div>
@@ -1527,7 +1527,7 @@
             <button class="nc-tb" onclick="wikiF('insertOrderedList')">1.</button>
             <button class="nc-tb" onclick="wikiFB('blockquote')">❝</button>
             <div style="width:1px;background:var(--border);margin:2px 3px;"></div>
-            <button class="nc-tb" onclick="wikiInsertImage()" title="Inserisci immagine via URL" style="color:#c98a24;"></button>
+            <button class="nc-tb" onclick="wikiInsertImage()" title="Inserisci immagine via URL" style="color:#c98a24;" aria-label="Inserisci immagine via URL"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="m21 16-5-5-9 9"/></svg></button>
             <button class="nc-tb" onclick="wikiInsertTag()" style="color:var(--accent-secondary-text);">#tag</button>
             <button class="nc-tb" onclick="wikiInsertLink()" style="color:#3f7fc4;">[[link]]</button>
             <div style="width:1px;background:var(--border);margin:2px 3px;"></div>
@@ -1546,12 +1546,12 @@
               <button class="nc-tb" onclick="document.getElementById('wiki-hl-pick').click()" title="Scegli evidenziatore" style="font-size:0.6rem;padding:0 2px;">▾</button>
             </div>
             <div style="width:1px;background:var(--border);margin:2px 3px;"></div>
-            <button class="nc-tb" onclick="wikiCallout('read-aloud')" title="Read Aloud — testo da leggere ai giocatori" style="color:#3f9a6b;font-size:0.68rem;"></button>
-            <button class="nc-tb" onclick="wikiCallout('secret')" title="Segreto DM" style="color:#8f6bc8;font-size:0.68rem;"></button>
-            <button class="nc-tb" onclick="wikiCallout('loot')" title="Loot" style="color:#c98a24;font-size:0.68rem;"></button>
-            <button class="nc-tb" onclick="wikiCallout('clue')" title="Indizio" style="color:#3f7fc4;font-size:0.68rem;"></button>
-            <button class="nc-tb" onclick="wikiCallout('trap')" title="Trappola" style="color:#cf5450;font-size:0.68rem;"></button>
-            <button class="nc-tb" onclick="wikiCallout('improv')" title="Improv — idea al volo" style="color:var(--accent-secondary-text);font-size:0.68rem;"></button>
+            <button class="nc-tb" onclick="wikiCallout('read-aloud')" title="Read Aloud — testo da leggere ai giocatori" style="color:#3f9a6b;font-size:0.68rem;" aria-label="Read Aloud — testo da leggere ai giocatori"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11v2a1 1 0 0 0 1 1h3l5 4V6L7 10H4a1 1 0 0 0-1 1Z"/><path d="M16 9a4 4 0 0 1 0 6"/></svg></button>
+            <button class="nc-tb" onclick="wikiCallout('secret')" title="Segreto DM" style="color:#8f6bc8;font-size:0.68rem;" aria-label="Segreto DM"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></button>
+            <button class="nc-tb" onclick="wikiCallout('loot')" title="Loot" style="color:#c98a24;font-size:0.68rem;" aria-label="Loot"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><path d="M12 8v8M9.5 10h4a1.5 1.5 0 0 1 0 3h-3a1.5 1.5 0 0 0 0 3h4"/></svg></button>
+            <button class="nc-tb" onclick="wikiCallout('clue')" title="Indizio" style="color:#3f7fc4;font-size:0.68rem;" aria-label="Indizio"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></button>
+            <button class="nc-tb" onclick="wikiCallout('trap')" title="Trappola" style="color:#cf5450;font-size:0.68rem;" aria-label="Trappola"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4 2.8 19.5h18.4Z"/><path d="M12 10v4M12 17h.01"/></svg></button>
+            <button class="nc-tb" onclick="wikiCallout('improv')" title="Improv — idea al volo" style="color:var(--accent-secondary-text);font-size:0.68rem;" aria-label="Improv — idea al volo"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.5 10.9V16h7v-2.1A6 6 0 0 0 12 3Z"/></svg></button>
           </div>
           <!-- Editor -->
           <div id="wiki-note-content"
@@ -2364,8 +2364,8 @@
   <div style="width:1px;background:var(--border);margin:0 2px;height:18px;"></div>
   <button type="button" class="nc-tb" onclick="miniFmt('nm-trait','link')" title="[[Link]]" style="color:#3f7fc4;font-size:0.68rem;">[[]]</button>
   <button type="button" class="nc-tb" onclick="miniFmt('nm-trait','tag')" title="#tag" style="color:var(--accent-secondary-text);font-size:0.68rem;">#</button>
-  <button type="button" class="nc-tb" onclick="miniFmt('nm-trait','secret')" title="Segreto DM" style="color:#8f6bc8;font-size:0.65rem;"></button>
-  <button type="button" class="nc-tb" onclick="miniFmt('nm-trait','clue')" title="Indizio" style="color:#3f7fc4;font-size:0.65rem;"></button>
+  <button type="button" class="nc-tb" onclick="miniFmt('nm-trait','secret')" title="Segreto DM" style="color:#8f6bc8;font-size:0.65rem;" aria-label="Segreto DM"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></button>
+  <button type="button" class="nc-tb" onclick="miniFmt('nm-trait','clue')" title="Indizio" style="color:#3f7fc4;font-size:0.65rem;" aria-label="Indizio"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></button>
   <div style="width:1px;background:var(--border);margin:0 2px;height:18px;"></div>
   <button type="button" class="nc-tb" onclick="miniFmtColor('nm-trait')" title="Colore testo" style="border-bottom:3px solid #c98a24;">A</button>
   <button type="button" class="nc-tb" onclick="miniFmtHL('nm-trait')" title="Evidenzia" style="background:rgba(245,166,35,0.25);border-bottom:3px solid rgba(245,166,35,0.7);">H</button>
@@ -2377,8 +2377,8 @@
   <div style="width:1px;background:var(--border);margin:0 2px;height:18px;"></div>
   <button type="button" class="nc-tb" onclick="miniFmt('nm-secret','link')" title="[[Link]]" style="color:#3f7fc4;font-size:0.68rem;">[[]]</button>
   <button type="button" class="nc-tb" onclick="miniFmt('nm-secret','tag')" title="#tag" style="color:var(--accent-secondary-text);font-size:0.68rem;">#</button>
-  <button type="button" class="nc-tb" onclick="miniFmt('nm-secret','secret')" title="Segreto DM" style="color:#8f6bc8;font-size:0.65rem;"></button>
-  <button type="button" class="nc-tb" onclick="miniFmt('nm-secret','clue')" title="Indizio" style="color:#3f7fc4;font-size:0.65rem;"></button>
+  <button type="button" class="nc-tb" onclick="miniFmt('nm-secret','secret')" title="Segreto DM" style="color:#8f6bc8;font-size:0.65rem;" aria-label="Segreto DM"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></button>
+  <button type="button" class="nc-tb" onclick="miniFmt('nm-secret','clue')" title="Indizio" style="color:#3f7fc4;font-size:0.65rem;" aria-label="Indizio"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></button>
   <div style="width:1px;background:var(--border);margin:0 2px;height:18px;"></div>
   <button type="button" class="nc-tb" onclick="miniFmtColor('nm-secret')" title="Colore testo" style="border-bottom:3px solid #c98a24;">A</button>
   <button type="button" class="nc-tb" onclick="miniFmtHL('nm-secret')" title="Evidenzia" style="background:rgba(245,166,35,0.25);border-bottom:3px solid rgba(245,166,35,0.7);">H</button>
@@ -4174,7 +4174,7 @@ const openCampaign = (id) => {
                 <div class="timeline-event-text" style="margin-bottom:3px;">${e.event}</div>
                 ${e.type ? `<span class="badge ${tc.badge}" style="font-size:0.6rem;">${tc.label}</span>` : ''}
               </div>
-              <button class="btn btn-ghost btn-icon-sm" onclick="App.deleteTimelineEvent('${e.id}')" title="Elimina" style="color:var(--text-muted);flex-shrink:0;"></button>
+              <button class="btn btn-ghost btn-icon-sm" onclick="App.deleteTimelineEvent('${e.id}')" title="Elimina" style="color:var(--text-muted);flex-shrink:0;" aria-label="Elimina"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg></button>
             </div>
           </div>
         </div>`;
@@ -5237,8 +5237,8 @@ const Sessione = (() => {
             <div style="font-size:0.68rem;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${[pg.giocatore, pg.classe, pg.livello ? 'Lv.' + pg.livello : ''].filter(Boolean).join(' · ')}</div>
           </div>
           <div style="display:flex;gap:1px;flex-shrink:0;">
-            <button class="btn btn-ghost btn-icon-sm" onclick="Sessione.editPG('${pg.id}')" title="Modifica" style="width:22px;height:22px;font-size:0.6rem;"></button>
-            <button class="btn btn-ghost btn-icon-sm" onclick="Sessione.deletePG('${pg.id}')" title="Rimuovi" style="width:22px;height:22px;font-size:0.6rem;color:var(--danger-text);"></button>
+            <button class="btn btn-ghost btn-icon-sm" onclick="Sessione.editPG('${pg.id}')" title="Modifica" style="width:22px;height:22px;font-size:0.6rem;" aria-label="Modifica"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
+            <button class="btn btn-ghost btn-icon-sm" onclick="Sessione.deletePG('${pg.id}')" title="Rimuovi" style="width:22px;height:22px;font-size:0.6rem;color:var(--danger-text);" aria-label="Rimuovi"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg></button>
           </div>
         </div>
 
@@ -5269,9 +5269,7 @@ const Sessione = (() => {
           </div>
           <button class="party-inspiration-btn ${pg.inspirazione ? 'active' : ''}"
             onclick="Sessione.toggleInspirazione('${pg.id}')"
-            title="Ispirazione" style="font-size:0.6rem;padding:2px 5px;white-space:nowrap;">
-           
-          </button>
+            title="Ispirazione" style="font-size:0.6rem;padding:2px 5px;white-space:nowrap;" aria-label="Ispirazione"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8Z"/></svg></button>
         </div>
       </div>`;
     }).join('');
@@ -5589,14 +5587,15 @@ const Sessione = (() => {
         <!-- HP -->
         <div class="combat-hp-col">
           <div style="display:flex;align-items:center;gap:4px;">
-            <button class="btn btn-ghost btn-icon-sm" onclick="Sessione.changeHP('${c.id}', -1)" title="Danno">−</button>
+            <button class="btn btn-ghost btn-icon-sm" onclick="Sessione.changeHP('${c.id}', -1)" title="Danno" aria-label="Danno a ${c.nome}">−</button>
             <div style="text-align:center;min-width:60px;">
               <input type="number" class="combat-hp-input" value="${c.hp}"
                 onchange="Sessione.setHP('${c.id}', this.value)"
                 style="color:${hpColor};" title="HP attuali">
               <div class="text-xs text-muted">/ ${c.maxHp || '∞'}</div>
+              ${c.pfTemp ? `<div class="pf-temp-badge" title="PF temporanei">+${c.pfTemp} temp</div>` : ''}
             </div>
-            <button class="btn btn-ghost btn-icon-sm" onclick="Sessione.changeHP('${c.id}', 1)" title="Cura">+</button>
+            <button class="btn btn-ghost btn-icon-sm" onclick="Sessione.changeHP('${c.id}', 1)" title="Cura" aria-label="Cura ${c.nome}">+</button>
           </div>
           <div class="combat-hp-bar">
             <div class="combat-hp-fill" style="width:${hpPct}%;background:${hpColor};"></div>
@@ -5615,7 +5614,7 @@ const Sessione = (() => {
           ${c.tipo !== 'pg' ? `<button class="btn btn-ghost btn-icon-sm" title="Scheda mostro" onclick="Sessione.openCombatantSheet('${c.id}')"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></button>` : ''}
           <button class="btn btn-ghost btn-icon-sm" title="Aggiungi condizione" onclick="Sessione.openCondizioneModal('${c.id}')"><span style="color:#e74c3c;"><svg aria-hidden="true" width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="8"/></svg></span></button>
           <button class="btn btn-ghost btn-icon-sm" title="Concentrazione" onclick="Sessione.toggleConcentrazione('${c.id}')" style="${c.concentrazione ? 'color:var(--accent-tertiary);' : ''}"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></button>
-          <button class="btn btn-ghost btn-icon-sm" title="Danno rapido" onclick="Sessione.quickDamage('${c.id}')"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></button>
+          <button class="btn btn-ghost btn-icon-sm" title="Punti ferita: danno, cura, temporanei" aria-label="Punti ferita di ${c.nome}" onclick="Sessione.apriPF('${c.id}', 'danno')"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></button>
           <button class="btn btn-ghost btn-icon-sm" title="Note" onclick="Sessione.openNote('${c.id}')" style="${c.note ? 'color:var(--accent-secondary-text);' : ''}"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></button>
           <button class="btn btn-ghost btn-icon-sm" title="Rimuovi" onclick="Sessione.removeCombatant('${c.id}')"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>
         </div>
@@ -5698,20 +5697,69 @@ const Sessione = (() => {
     Debug.log(`Party sync: ${combatant.nome} HP → ${combatant.hp}`);
   };
 
-  const changeHP = (id, delta) => {
+  const changeHP = (id, delta) => apriPF(id, delta > 0 ? 'cura' : 'danno');
+
+  /* ── Punti ferita: danno, cura e temporanei nella stessa finestra ──
+     Regole 5e: il danno consuma prima i PF temporanei; la cura non supera il massimo;
+     i PF temporanei non si sommano, si tiene il valore piu' alto. */
+  const _applicaPF = (c, azione, n) => {
+    const tmp = c.pfTemp || 0;
+    if (azione === 'danno') {
+      const assorbiti = Math.min(tmp, n);
+      c.pfTemp = tmp - assorbiti;
+      c.hp = Math.max(0, c.hp - (n - assorbiti));
+      if (c.hp === 0) Toast.show(`${c.nome} è a 0 PF`, 'warning');
+    } else if (azione === 'cura') {
+      c.hp = Math.min(c.maxHp || 9999, c.hp + n);
+    } else if (azione === 'temp') {
+      if (n < tmp) Toast.show(`${c.nome} ha già ${tmp} PF temporanei: non si sommano, resta il valore più alto`, 'info', 4500);
+      c.pfTemp = Math.max(tmp, n);
+    }
+  };
+  const _assicuraFinestraPF = () => {
+    if (document.getElementById('modal-pf-rapidi')) return;
+    const d = document.createElement('div');
+    d.className = 'modal-overlay hidden'; d.id = 'modal-pf-rapidi'; d.style.display = 'none';
+    d.innerHTML = '<div class="modal" style="max-width:420px;" role="dialog" aria-labelledby="pf-titolo">' +
+      '<div class="modal-header"><h2 id="pf-titolo" style="font-size:1.25rem;"></h2>' +
+      '<button class="btn btn-ghost btn-icon" onclick="Modal.close(\'pf-rapidi\')" aria-label="Chiudi"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>' +
+      '<div class="modal-body"><p id="pf-stato" class="pf-stato"></p>' +
+      '<label class="form-label" for="pf-valore">Quanti punti?</label>' +
+      '<input id="pf-valore" class="form-input pf-valore" type="number" inputmode="numeric" min="0" autocomplete="off">' +
+      '<div class="pf-azioni">' +
+        '<button type="button" class="btn pf-danno" data-a="danno">Danno</button>' +
+        '<button type="button" class="btn pf-cura" data-a="cura">Cura</button>' +
+        '<button type="button" class="btn pf-temp" data-a="temp">PF temporanei</button>' +
+      '</div></div></div>';
+    document.body.appendChild(d);
+    d.querySelector('.pf-azioni').addEventListener('click', (e) => { const b = e.target.closest('button[data-a]'); if (b) _confermaPF(b.dataset.a); });
+    d.querySelector('#pf-valore').addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); _confermaPF(d.dataset.azione || 'danno'); } });
+  };
+  const apriPF = (id, azione = 'danno') => {
     const c = _combat?.combatants.find(x => x.id === id);
     if (!c) return;
-    openInputModal(delta > 0 ? `Cura per ${c.nome}` : `Danno per ${c.nome}`, '', (val) => {
-      const amount = parseInt(val);
-      if (isNaN(amount) || amount < 0) { Toast.show('Valore non valido', 'warning'); return; }
-      c.hp = Math.max(0, Math.min(c.maxHp || 9999, c.hp + (delta > 0 ? amount : -amount)));
-      if (c.hp === 0) Toast.show(`${c.nome} è a 0 PF!`, 'warning');
-      saveCombat(_combat);
-      _syncPartyHP(c);
-      _pushPgLive(c);
-      renderCombat();
-      Debug.log(`${c.nome}: HP ${c.hp}/${c.maxHp}`);
-    }, { type: 'number', hint: `HP attuali: ${c.hp}/${c.maxHp}`, confirmLabel: delta > 0 ? 'Cura' : 'Danno' });
+    _assicuraFinestraPF();
+    const d = document.getElementById('modal-pf-rapidi');
+    d.dataset.id = id; d.dataset.azione = azione;
+    document.getElementById('pf-titolo').textContent = c.nome;
+    document.getElementById('pf-stato').textContent = 'PF ' + c.hp + ' / ' + (c.maxHp || '—') + (c.pfTemp ? '  ·  ' + c.pfTemp + ' temporanei' : '');
+    d.querySelectorAll('.pf-azioni button').forEach(b => b.classList.toggle('pf-scelta', b.dataset.a === azione));
+    const i = document.getElementById('pf-valore'); i.value = '';
+    Modal.open('pf-rapidi');
+    setTimeout(() => i.focus(), 60);
+  };
+  const _confermaPF = (azione) => {
+    const d = document.getElementById('modal-pf-rapidi');
+    const c = _combat?.combatants.find(x => x.id === d?.dataset.id);
+    const n = parseInt(document.getElementById('pf-valore').value, 10);
+    if (!c) return;
+    if (isNaN(n) || n < 0) { Toast.show('Scrivi quanti punti', 'warning'); document.getElementById('pf-valore').focus(); return; }
+    _applicaPF(c, azione, n);
+    saveCombat(_combat);
+    _syncPartyHP(c);
+    _pushPgLive(c);
+    Modal.close('pf-rapidi');
+    renderCombat();
   };
 
   const setHP = (id, val) => {
@@ -5727,20 +5775,7 @@ const Sessione = (() => {
     if (bar) { bar.style.width = pct + '%'; bar.style.background = col; }
   };
 
-  const quickDamage = (id) => {
-    const c = _combat?.combatants.find(x => x.id === id);
-    if (!c) return;
-    openInputModal(`Danno rapido per ${c.nome}`, '', (val) => {
-      const amount = parseInt(val);
-      if (isNaN(amount)) return;
-      c.hp = Math.max(0, c.hp - amount);
-      if (c.hp === 0) Toast.show(`${c.nome} è a 0 PF!`, 'warning');
-      saveCombat(_combat);
-      _syncPartyHP(c);
-      _pushPgLive(c);
-      renderCombat();
-    }, { type: 'number', hint: `HP: ${c.hp}/${c.maxHp}`, confirmLabel: 'Danno' });
-  };
+  const quickDamage = (id) => apriPF(id, 'danno');
 
   const openCondizioneModal = (id) => {
     document.getElementById('cond-combatant-id').value = id;
@@ -6272,7 +6307,7 @@ const Sessione = (() => {
     changeHP, setHP, quickDamage,
     openCondizioneModal, submitCondizioni, removeCondizione,
     toggleConcentrazione, openNote,
-    addMonsterQuick, addMonsterDirect, searchMonster, addMonsterFromCompendio, addHomebrewMonster,
+    apriPF, addMonsterQuick, addMonsterDirect, searchMonster, addMonsterFromCompendio, addHomebrewMonster,
     addNPCFromWorld, _addNPCById,
     addCustomCombatant, submitCustomCombatant, removeCombatant,
     saveCombatSession, endCombat, loadCombatSession,
@@ -7282,8 +7317,8 @@ const Compendio = (() => {
         '<div class="comp-row-stats">' +
           stats +
           favBtn(h.id, h.nome, 'homebrew') +
-          '<button class="btn btn-ghost btn-icon-sm" style="font-size:0.7rem;" onclick="event.stopPropagation();Compendio.editHomebrew(\'' + h.id + '\')"></button>' +
-          '<button class="btn btn-ghost btn-icon-sm" style="font-size:0.7rem;color:var(--danger-text);" onclick="event.stopPropagation();Compendio.deleteHomebrew(\'' + h.id + '\')"></button>' +
+          '<button class="btn btn-ghost btn-icon-sm" style="font-size:0.7rem;" onclick="event.stopPropagation();Compendio.editHomebrew(\'' + h.id + '\')" title="Modifica" aria-label="Modifica"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>' +
+          '<button class="btn btn-ghost btn-icon-sm" style="font-size:0.7rem;color:var(--danger-text);" onclick="event.stopPropagation();Compendio.deleteHomebrew(\'' + h.id + '\')" title="Elimina" aria-label="Elimina"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg></button>' +
         '</div>' +
       '</div>';
     }).join('');
@@ -10923,7 +10958,7 @@ const WikiDM = (() => {
         <div style="display:flex;gap:2px;flex-shrink:0;opacity:0.5;" onclick="event.stopPropagation();">
           <button title="${n.pinned?'Rimuovi pin':'Fissa in cima'}"
             style="width:18px;height:18px;background:none;border:none;cursor:pointer;font-size:0.65rem;padding:0;color:color-mix(in srgb, ${n.pinned?'var(--accent-secondary)':'var(--text-muted)'} 50%, var(--text-primary));"
-            onclick="WikiDM.togglePin('${n.id}')"></button>
+            onclick="WikiDM.togglePin('${n.id}')" aria-label="${n.pinned?'Rimuovi pin':'Fissa in cima'}"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4h6l-1 5 3 3v2H7v-2l3-3Z"/><path d="M12 14v6"/></svg></button>
         </div>
       </div>`;
     }).join('');
@@ -10964,7 +10999,7 @@ const WikiDM = (() => {
 
     if (actionsEl) {
       actionsEl.innerHTML = nota
-        ? `<button class="btn btn-ghost btn-icon-sm" onclick="WikiDM.deleteNote()" title="Elimina" style="color:var(--danger-text);"></button>`
+        ? `<button class="btn btn-ghost btn-icon-sm" onclick="WikiDM.deleteNote()" title="Elimina" style="color:var(--danger-text);" aria-label="Elimina"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg></button>`
         : '';
     }
 
@@ -11283,7 +11318,7 @@ const WikiDM = (() => {
     const tpl = (w.templates||_builtinTemplates()).find(t => t.id === _noteId);
     if (actionsEl) {
       actionsEl.innerHTML = (tpl && !tpl.builtin)
-        ? `<button class="btn btn-ghost btn-icon-sm" onclick="WikiDM.deleteTemplate('${tpl.id}')" style="color:var(--danger-text);"></button>`
+        ? `<button class="btn btn-ghost btn-icon-sm" onclick="WikiDM.deleteTemplate('${tpl.id}')" style="color:var(--danger-text);" title="Elimina" aria-label="Elimina"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg></button>`
         : '';
     }
     if (!tpl) {

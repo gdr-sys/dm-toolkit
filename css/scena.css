@@ -631,3 +631,17 @@ body.barra-alta #wiki-section-tabbar:not([style*="display:none"]):not([style*="d
 .campo-cerca input:placeholder-shown ~ .campo-cerca-via { display: none; }
 .sr-only { position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
 .modal-header > .btn-icon, .modal-header .btn-icon:last-child { align-self: center; flex: none; width: 40px !important; height: 40px !important; min-height: 0 !important; padding: 0 !important; border-radius: 999px !important; display: grid; place-items: center; }
+
+/* Finestra dei punti ferita nel combattimento */
+.pf-stato { margin: 0 0 14px; color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+.pf-valore { font-size: 1.6rem !important; text-align: center; height: 56px; margin-bottom: 14px; font-variant-numeric: tabular-nums; }
+.pf-azioni { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.pf-azioni .btn { min-height: 48px; border: 0 !important; border-radius: 14px !important; font-weight: 600; justify-content: center; }
+.pf-azioni .pf-temp { grid-column: 1 / -1; }
+.pf-danno { background: color-mix(in oklch, var(--danger-text, #e5484d) 40%, var(--bg-card)) !important; color: var(--text-primary) !important; }
+.pf-cura { background: color-mix(in oklch, var(--success-text, #3fb950) 40%, var(--bg-card)) !important; color: var(--text-primary) !important; }
+.pf-temp { background: color-mix(in oklch, #4ea1ff 34%, var(--bg-card)) !important; color: var(--text-primary) !important; }
+.pf-azioni .pf-scelta { box-shadow: inset 0 0 0 2px currentColor; }
+.pf-temp-badge { margin-top: 2px; font-size: 0.7rem; font-weight: 700; color: #7db8ff; white-space: nowrap; }
+.pf-valore::-webkit-inner-spin-button, .pf-valore::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; } .pf-valore { -moz-appearance: textfield; }
+[data-theme="light"] .pf-temp-badge { color: #1f5fae; }
