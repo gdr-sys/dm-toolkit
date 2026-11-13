@@ -151,6 +151,7 @@ const MappaUI = (() => {
             '<button class="btn btn-ghost btn-sm" onclick="MappaUI.zoomReset()" id="mappa-zoom-label" style="min-width:48px;">100%</button>' +
             '<button class="btn btn-ghost btn-icon-sm" onclick="MappaUI.zoom(0.2)" title="Ingrandisci">+</button>' +
             '<button class="btn btn-secondary btn-sm" onclick="MappaUI.iniziaPercorso()" title="Misura un percorso a tappe e i tempi di viaggio">Percorso</button>' +
+            '<button class="btn btn-secondary btn-sm" onclick="MappaEsagoni.apri()" title="Griglia di esagoni ed esplorazione, si accende e si spegne per ogni mappa">Esagoni</button>' +
             '<button class="btn btn-secondary btn-sm" onclick="MappaUI.apriImpostazioni()">Modifica mappa</button>' +
             '<button class="btn btn-secondary btn-sm" onclick="App.navigateTo(\'cartografo\')">Genera una mappa</button>' +
           '</div>' +
@@ -167,10 +168,12 @@ const MappaUI = (() => {
           '<div id="mappa-inner" style="position:absolute;left:0;top:0;transform-origin:0 0;">' +
             '<img id="mappa-img" src="" alt="Mappa" draggable="false" style="display:block;max-width:none;user-select:none;-webkit-user-drag:none;">' +
             // Sotto i pin e trasparente ai click: i pin restano cliccabili anche sopra la linea
+            '<svg id="mappa-esagoni" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible;"></svg>' +
             '<svg id="mappa-percorso" aria-hidden="true" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible;"></svg>' +
             '<div id="mappa-pins"></div>' +
           '</div>' +
           // I suoi click non arrivano alla mappa: premere un pulsante non aggiunge una tappa
+          '<div id="mappa-esagoni-pannello" class="esa-pannello" onclick="event.stopPropagation()" onmousedown="event.stopPropagation()" ontouchstart="event.stopPropagation()" style="display:none;"></div>' +
           '<div id="mappa-percorso-pannello" role="status" aria-live="polite" onclick="event.stopPropagation()" onmousedown="event.stopPropagation()" ontouchstart="event.stopPropagation()" ' +
             'style="display:none;position:absolute;left:50%;bottom:12px;transform:translateX(-50%);z-index:5;width:max-content;max-width:calc(100% - 24px);background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);box-shadow:var(--shadow-lg);padding:10px 12px;cursor:default;"></div>' +
         '</div>' +
@@ -188,6 +191,8 @@ const MappaUI = (() => {
     canvas.addEventListener('gesturestart', (e) => e.preventDefault());
     canvas.addEventListener('wheel', _onWheel, { passive: false });
     canvas.addEventListener('click', _onCanvasClick);
+    // La griglia si disegna quando l'immagine ha le sue misure
+    document.getElementById('mappa-img').addEventListener('load', () => { if (typeof MappaEsagoni !== 'undefined') MappaEsagoni.disegna(); });
   };
 
   // Barra sopra la mappa: se si e' entrati qui navigando da un pin "apri mappa",
@@ -218,6 +223,7 @@ const MappaUI = (() => {
   const TESTO_VUOTA = 'Carica un’immagine (un disegno, una scansione, una mappa fatta altrove) e inizia a segnare luoghi e PNG sopra.';
   const _testoVuota = (t) => { const el = document.getElementById('mappa-vuota-testo'); if (el) el.textContent = t || TESTO_VUOTA; };
 
+  let _esaMappaId = null;
   const _render = () => {
     _injectPage();
     _testoVuota();
@@ -229,6 +235,7 @@ const MappaUI = (() => {
     const mappa = _getMappaAttiva();
     // Un percorso appartiene alla sua mappa: cambiandola si chiude
     if (_percorso && (!mappa || mappa.id !== _percorso.mappaId)) fermaPercorso();
+    if ((mappa && mappa.id) !== _esaMappaId) { _esaMappaId = mappa && mappa.id; if (typeof MappaEsagoni !== 'undefined') MappaEsagoni.cambioMappa(); }
     const vuota = document.getElementById('mappa-vuota');
     const inner = document.getElementById('mappa-inner');
     const img = document.getElementById('mappa-img');
@@ -286,6 +293,7 @@ const MappaUI = (() => {
       else img.onload = () => { img.onload = null; adatta(); };
     }
     _renderPins();
+    if (typeof MappaEsagoni !== 'undefined') MappaEsagoni.aggiorna();
   };
 
   const vaiAMappa = (id) => {
@@ -393,7 +401,9 @@ const MappaUI = (() => {
     const lbl = document.getElementById('mappa-zoom-label');
     if (lbl) lbl.textContent = Math.round(_scale * 100) + '%';
     if (_percorso) _disegnaPercorso(); // spessori e scritte restano uguali a ogni zoom
+    if (typeof MappaEsagoni !== 'undefined' && !_esaRaf) _esaRaf = requestAnimationFrame(() => { _esaRaf = 0; MappaEsagoni.disegna(); });
   };
+  let _esaRaf = 0;
 
   const zoom = (delta) => { _scale = Math.max(0.2, Math.min(5, _scale + delta)); _applyTransform(); };
   const zoomReset = () => { _scale = 1; _panX = 0; _panY = 0; _applyTransform(); };
@@ -495,6 +505,7 @@ const MappaUI = (() => {
     if (fx < 0 || fx > 1 || fy < 0 || fy > 1) return;
 
     if (_percorso) { _aggiungiTappa({ x: fx, y: fy }); return; }
+    if (typeof MappaEsagoni !== 'undefined' && MappaEsagoni.attivo() && MappaEsagoni.click(fx, fy)) return;
     apriModalNuovoPin(fx, fy);
   };
 
@@ -999,6 +1010,7 @@ const MappaUI = (() => {
     const mappa = _getMappaAttiva();
     if (!mappa || !mappa.immagine) return;
     if (!mappa.scalaKm) { Toast.show('Imposta prima la larghezza reale della mappa in "Modifica mappa"', 'warning', 3500); return; }
+    if (typeof MappaEsagoni !== 'undefined') MappaEsagoni.chiudi();
     _percorso = { mappaId: mappa.id, punti: [] };
     const pin = pinId ? _trovaPin(pinId) : null;
     if (pin) _percorso.punti.push({ x: pin.x, y: pin.y, pinId });
@@ -1201,5 +1213,11 @@ const MappaUI = (() => {
     onPinClick, rimuoviPin, _ricalcolaMisura, _terrenoTratto, _sceltaViaggio,
     iniziaPercorso, annullaTappa, fermaPercorso, mostraTempiPercorso,
     iniziaMisuraDaPin: iniziaPercorso, // nome vecchio, se qualcosa lo chiama ancora
+    // Per js/mappa-esagoni.js: la mappa aperta e cio' che serve per disegnarci sopra
+    _ctxEsagoni: () => {
+      const mappa = _getMappaAttiva();
+      return { mappa, aggiorna: _aggiornaMappaAttiva, img: document.getElementById('mappa-img'), scale: _scale,
+        scalaKm: (mappa && mappa.scalaKm) || 0, viaggio: _viaggio, VEL_BASE, TERRENO_MULT, TERRENO_LABEL, MEZZO_LABEL, fermaPercorso };
+    },
   };
 })();

@@ -750,3 +750,22 @@ button[onclick*="').value='';Compendio.onSearch("] { min-width: 32px; min-height
 .cielo-stagione { font-size: 0.75rem; font-weight: 600; color: var(--accent-text); padding: 2px 10px; border-radius: 999px; background: var(--bg-tertiary); white-space: nowrap; }
 .cielo-dettaglio { display: grid; gap: 6px; font-size: 0.82rem; padding: 10px 12px; margin-bottom: 10px; border-radius: 12px; background: var(--bg-secondary); }
 .cielo-dettaglio .cielo-luna { color: var(--text-primary); }
+
+/* Mappe: esagoni ed esplorazione (js/mappa-esagoni.js) */
+.esa-pannello { position: absolute; left: 50%; bottom: 12px; transform: translateX(-50%); z-index: 5; width: max-content; max-width: calc(100% - 24px); background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-md); box-shadow: var(--shadow-lg); padding: 10px 12px; cursor: default; font-size: 0.85rem; display: grid; gap: 8px; }
+.esa-riga { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; }
+.esa-info { font-size: 0.82rem; line-height: 1.4; }
+.esa-check input { accent-color: var(--accent-primary); width: 15px; height: 15px; }
+.esa-check { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; white-space: nowrap; }
+.esa-gruppo-seg { display: inline-flex; flex-wrap: wrap; gap: 4px; }
+.esa-sel { width: auto; font-size: 0.8rem; padding: 3px 8px; }
+.esa-num { width: 72px; font-size: 0.8rem; padding: 3px 8px; }
+.esa-campo { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; color: var(--text-secondary); }
+.esa-griglia summary { cursor: pointer; color: var(--text-secondary); font-size: 0.8rem; }
+.esa-griglia[open] summary { margin-bottom: 8px; }
+#mappa-esagoni g { pointer-events: auto; }
+.esa-pannello { max-height: 48%; overflow-y: auto; }
+@media (max-width: 600px) {
+  .esa-pannello { bottom: 8px; padding: 8px 10px; gap: 6px; }
+  .esa-gruppo-seg { order: 3; width: 100%; }
+}
