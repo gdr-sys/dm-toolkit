@@ -705,3 +705,4 @@ body.barra-alta #wiki-section-tabbar:not([style*="display:none"]):not([style*="d
   .combat-list .combat-row { grid-template-areas: "init name ca" "hp hp hp" "actions actions actions" !important; }
   .combat-list .combat-actions-col { justify-content: space-between; }
 }
+.imp-interruttore input[type="checkbox"] { width: 44px !important; min-width: 44px !important; max-width: 44px !important; height: 26px !important; min-height: 26px !important; padding: 0 !important; border: 0 !important; box-shadow: none !important; } .imp-interruttore > span { flex: 1 1 auto; min-width: 0; }
