@@ -15,7 +15,7 @@
 
 const Cartografo = (() => {
   const KEY = 'dm_cartografo';
-  const FONT_CSS = 'https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&family=Cormorant+SC:wght@500;600&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Gloock&family=Figtree:wght@400;600;700&display=swap';
+  const FONT_CSS = 'assets/fonts/mappe.css'; // font in locale: niente richieste a Google e mappe giuste anche offline
   const SCALA_IMMAGINE = 2;
   const _esc = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   const $ = (id) => document.getElementById(id);
@@ -76,9 +76,10 @@ const Cartografo = (() => {
           return dati.get(url);
         };
         const out = await Promise.all(blocchi.map(async (b) => {
-          const m = b.match(/url\((https:[^)]+)\)/);
+          const m = b.match(/url\(([^)]+)\)/);
           if (!m) return '';
-          return b.replace(/\/\*[^*]*\*\//, '').replace(m[1], await leggi(m[1]));
+          const assoluto = new URL(m[1].replace(/['"]/g, ''), new URL(indirizzo, location.href)).href;
+          return b.replace(/\/\*[^*]*\*\//, '').replace(m[1], await leggi(assoluto));
         }));
         return out.join('');
       } catch (e) {

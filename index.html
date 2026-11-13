@@ -19,12 +19,12 @@
   <link rel="stylesheet" href="css/layout.css">
   <!-- Firebase SDK -->
   <!-- Firebase SDK — caricamento silenzioso se offline -->
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js" crossorigin="anonymous" onerror="console.warn('[DM] Firebase app non caricato')"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js" crossorigin="anonymous" onerror="console.warn('[DM] Firebase auth non caricato')"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js" crossorigin="anonymous" onerror="console.warn('[DM] Firebase DB non caricato')"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js" integrity="sha384-sEVIly94UBRLKWdkYoPpSG7GD/e79YHMrxVyZaOk712Ga7+EAw6w1EFi+xBzBdd+" crossorigin="anonymous" onerror="console.warn('[DM] Firebase app non caricato')"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js" integrity="sha384-EkqK+ezBWJuvO3hfrSx2iVqr3YQbhmnzn8kPhOpBZ+0GMVU5oGSgptwIu8D84HjE" crossorigin="anonymous" onerror="console.warn('[DM] Firebase auth non caricato')"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js" integrity="sha384-1/m+A1jVWbD3yiK3/vtFvm1+LjK1WLpSoDY+Kaxppwn/yP9BVSgdHTNQVOjrzUO5" crossorigin="anonymous" onerror="console.warn('[DM] Firebase DB non caricato')"></script>
   <!-- Librerie CDN -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js" crossorigin="anonymous" onerror="console.warn('[DM] d3 non caricato')"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.2/Sortable.min.js" crossorigin="anonymous" onerror="console.warn('[DM] Sortable non caricato')"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js" integrity="sha384-su5kReKyYlIFrI62mbQRKXHzFobMa7BHp1cK6julLPbnYcCW9NIZKJiTODjLPeDh" crossorigin="anonymous" onerror="console.warn('[DM] d3 non caricato')"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.2/Sortable.min.js" integrity="sha384-BSxuMLxX+FCbTdYec3TbXlnMGEEM2QXTFdtDaveen71o+jswm2J36+xFqp8k4VHM" crossorigin="anonymous" onerror="console.warn('[DM] Sortable non caricato')"></script>
 <style>
 /* FIX SCHERMO DM — grid 5 colonne con span */
 #page-schermo { overflow-x: hidden !important; max-width: none !important; }
@@ -987,7 +987,7 @@
               <a href="https://dnd-loot-generator-sepia.vercel.app/" target="_blank" class="btn btn-ghost btn-sm" style="font-size:0.72rem;">↗ Apri separato</a>
             </div>
             <div style="position:relative;width:100%;height:600px;">
-              <iframe id="loot-dmg-iframe" src="" data-src="https://dnd-loot-generator-sepia.vercel.app/"
+              <iframe id="loot-dmg-iframe" src="" data-src="https://dnd-loot-generator-sepia.vercel.app/" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox" referrerpolicy="no-referrer"
                 style="width:100%;height:100%;border:none;border-radius:0 0 var(--radius-lg) var(--radius-lg);"
                 title="D&D Loot Generator" loading="lazy"></iframe>
               <div id="loot-iframe-placeholder" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--bg-secondary);border-radius:0 0 var(--radius-lg) var(--radius-lg);">
@@ -3478,6 +3478,7 @@ const submitNewCampaign = () => {
 
   localStorage.setItem('dm_toolkit_last_system', system);
   const camp = Storage.createCampaign(name, type);
+  try { if (navigator.storage && navigator.storage.persist) navigator.storage.persisted().then(p => { if (!p) navigator.storage.persist(); }); } catch (e) {}
   const updates = { system, description, useElettro };
   if (useCalendario) {
     updates.calendario = Calendario.initPreset(calendarioTipo);
@@ -4022,6 +4023,7 @@ const App = (() => {
           ${typeof CampagnaDemo !== 'undefined' ? `<div style="margin-top:12px;">
             <button class="btn btn-ghost" onclick="CampagnaDemo.crea()" style="font-size:0.88rem;">Prova con una campagna di esempio</button>
             <div style="font-size:0.76rem;color:var(--text-muted);margin-top:4px;">Già piena di PNG, luoghi, sessioni e tabelle, per vedere cosa sa fare l'app. Puoi eliminarla quando vuoi.</div>
+            <div style="font-size:0.74rem;color:var(--text-muted);margin-top:14px;max-width:420px;margin-left:auto;margin-right:auto;line-height:1.5;">Le campagne restano in questo browser: se cancelli i dati del sito si perdono. Per averne una copia collega Google Drive o esporta un file dalle Impostazioni.</div>
           </div>` : ''}
           <div style="margin-top:32px;display:flex;flex-direction:column;gap:10px;text-align:left;max-width:260px;margin-left:auto;margin-right:auto;">
             <div style="display:flex;align-items:center;gap:12px;font-size:0.82rem;color:var(--text-muted);">
@@ -22423,6 +22425,9 @@ document.addEventListener('DOMContentLoaded', initMobileNav);
         </form>
       </div>
 
+      <div style="font-size:0.72rem;color:var(--text-muted);line-height:1.5;margin-top:4px;">
+        Con «Anonimo» o con un account, le campagne vengono salvate anche su Firebase (Google, server in Belgio) per sincronizzarle. In «Solo locale» restano nel browser: se cancelli i dati del sito le perdi, salvo un backup su Drive o in un file. <a href="scopri/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);">Informativa privacy</a>
+      </div>
       <div style="font-size:0.7rem;color:var(--text-muted);text-align:center;margin-top:4px;">
         Puoi cambiare modalità in qualsiasi momento dalle impostazioni.
       </div>
@@ -22857,6 +22862,8 @@ document.addEventListener('DOMContentLoaded', initMobileNav);
             <a href="https://github.com/gdr-sys/dm-toolkit" target="_blank" style="color:var(--accent-text);text-decoration:none;display:inline-flex;align-items:center;gap:4px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg> GitHub</a>
             &nbsp;·&nbsp;
             <a href="https://ko-fi.com/noemimarcolini" target="_blank" style="color:var(--accent-text);text-decoration:none;">Ko-fi</a>
+            &nbsp;·&nbsp;
+            <a href="scopri/privacy.html" target="_blank" rel="noopener" style="color:var(--accent-text);text-decoration:none;">Privacy</a>
           </div>
         </div>
       </section>

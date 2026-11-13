@@ -9,8 +9,8 @@
    ============================================================ */
 
 const Scrittoio = (() => {
-  const FONT_DOC = 'https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&family=UnifrakturMaguntia&family=La+Belle+Aurore&family=Reenie+Beanie&display=swap';
-  const FONT_BASE = 'https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap';
+  const FONT_DOC = 'assets/fonts/documenti.css';
+  const FONT_BASE = 'assets/fonts/documenti-base.css';
   const $ = (id) => document.getElementById(id);
   const _esc = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   const _camp = () => (typeof App !== 'undefined' ? App.getActiveCampaign() : null);

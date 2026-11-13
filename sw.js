@@ -1,7 +1,7 @@
 /* Pocket GM Screen (già DM Toolkit) — © 2026 Noemi Marcolini. Tutti i diritti riservati. Vedi LICENSE. */
 // Cambiare il numero quando cambia l'elenco dei file precaricati, cosi' il nuovo service
 // worker scarica di nuovo tutto e cancella la cache vecchia.
-const CACHE_NAME = 'dm-toolkit-v12';
+const CACHE_NAME = 'dm-toolkit-v13';
 const APP_SHELL = [
   './',
   './index.html',
@@ -30,7 +30,9 @@ const DATA_FILES = [
   'srd_5_2_1_equipment.json', 'srd_5_2_1_magic_items.json', 'srd_5_2_1_monsters.json', 'srd_5_2_1_rules.json', 'srd_5_2_1_spells.json',
 ].map((f) => './data/' + f);
 
-const FONTS_CSS = 'https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Gloock&family=JetBrains+Mono:wght@400;500&display=swap';
+// Font in locale (assets/fonts): quelli dell'app, delle mappe e dei documenti, cosi' offline
+// anche le mappe e gli stemmi esportati hanno i caratteri giusti.
+const FONT_CSS_LOCALI = ['./assets/fonts/app.css', './assets/fonts/mappe.css', './assets/fonts/documenti.css', './assets/fonts/documenti-base.css'];
 
 // Gli script (js/*.js e librerie da CDN) si leggono direttamente da index.html invece di
 // elencarli a mano qui: un nuovo modulo js/ aggiunto alla pagina finisce in cache da solo.
@@ -44,16 +46,19 @@ const _scriptsFromIndex = async () => {
   }
 };
 
-// I font veri (woff2) sono elencati dentro il CSS di Google Fonts: si scaricano da li'.
+// I font veri (woff2) sono elencati dentro i CSS locali: si leggono da li'.
 const _fontFiles = async (cache) => {
-  try {
-    const res = await fetch(FONTS_CSS);
-    if (!res.ok) return;
-    await cache.put(FONTS_CSS, res.clone());
-    const css = await res.text();
-    const urls = [...css.matchAll(/url\((https:[^)]+)\)/g)].map((m) => m[1]);
-    await Promise.all(urls.map((u) => cache.add(u).catch(() => {})));
-  } catch (e) {}
+  await Promise.all(FONT_CSS_LOCALI.map(async (cssUrl) => {
+    try {
+      const res = await fetch(cssUrl, { cache: 'no-cache' });
+      if (!res.ok) return;
+      await cache.put(cssUrl, res.clone());
+      const css = await res.text();
+      const base = new URL(cssUrl, self.location.href);
+      const urls = [...css.matchAll(/url\(([^)]+)\)/g)].map((m) => new URL(m[1].replace(/['"]/g, ''), base).href);
+      await Promise.all(urls.map((u) => cache.add(u).catch(() => {})));
+    } catch (e) {}
+  }));
 };
 
 self.addEventListener('install', (event) => {

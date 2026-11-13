@@ -1,0 +1,121 @@
+<!doctype html>
+<!-- Pocket GM Screen (già DM Toolkit) — © 2026 Noemi Marcolini. Tutti i diritti riservati. Vedi LICENSE. -->
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Privacy di Pocket GM Screen</title>
+<meta name="description" content="Quali dati usa Pocket GM Screen, dove finiscono e come cancellarli.">
+<meta name="theme-color" content="#0c1f28">
+<link rel="icon" type="image/svg+xml" href="../favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="../favicon.png">
+<link rel="stylesheet" href="../assets/fonts/sito.css">
+<link rel="stylesheet" href="sito.css">
+<style>
+  .informativa { max-width: 46rem; display: grid; gap: 28px; padding-bottom: 72px; }
+  .informativa h2 { margin: 0 0 8px; font-size: clamp(1.4rem, 3vw, 1.8rem); }
+  .informativa p, .informativa li { margin: 0; line-height: 1.6; }
+  .informativa ul { margin: 8px 0 0; padding-left: 1.2em; display: grid; gap: 8px; }
+  .informativa table { width: 100%; border-collapse: collapse; font-size: .95rem; }
+  .informativa th, .informativa td { text-align: left; vertical-align: top; padding: 10px 8px; border-bottom: 1px solid currentColor; border-color: rgba(127,127,127,.3); }
+  .tab-scorre { overflow-x: auto; }
+</style>
+</head>
+<body class="pagina">
+<a class="salto" href="#contenuto">Vai al contenuto</a>
+<header class="nav nav--piena">
+  <div class="wrap">
+    <a class="marchio" href="index.html"><img src="../icons/simbolo.svg" alt="" width="32" height="32"> <span class="marchio__testo">Pocket GM Screen</span></a>
+    <nav aria-label="Menu del sito">
+      <a href="funzioni.html">Funzioni</a>
+      <a href="domande.html">Domande</a>
+      <a class="bott bott--filo" href="../">Apri il toolkit</a>
+    </nav>
+  </div>
+</header>
+<main id="contenuto">
+<div class="wrap testa-pagina">
+  <h1>Privacy</h1>
+  <p class="lead">Quali dati usa Pocket GM Screen, dove finiscono e come cancellarli. Ultimo aggiornamento: 13 novembre 2026.</p>
+</div>
+<section><div class="wrap informativa">
+
+  <div>
+    <h2>In breve</h2>
+    <ul>
+      <li>Senza account, le campagne restano solo nel tuo browser: non arrivano a nessun server.</li>
+      <li>Non ci sono pubblicità, statistiche sulle visite né cookie di tracciamento. I caratteri sono nel sito stesso, non vengono chiesti a Google.</li>
+      <li>Se accedi, se colleghi Google Drive o se mandi una segnalazione, alcuni dati passano ai servizi elencati qui sotto, solo per far funzionare quella cosa.</li>
+    </ul>
+  </div>
+
+  <div>
+    <h2>Chi è la titolare</h2>
+    <p>Pocket GM Screen è un progetto personale e gratuito di Noemi Marcolini, che decide come vengono usati i dati descritti qui. Per domande o richieste sui tuoi dati scrivi dalla pagina del progetto su GitHub: <a href="https://github.com/gdr-sys/dm-toolkit/issues" rel="noopener">github.com/gdr-sys/dm-toolkit/issues</a>.</p>
+  </div>
+
+  <div>
+    <h2>Quali dati e dove finiscono</h2>
+    <div class="tab-scorre"><table>
+      <thead><tr><th>Quando</th><th>Quali dati</th><th>Dove</th></tr></thead>
+      <tbody>
+        <tr><td>Usi l'app senza account</td><td>Campagne e impostazioni</td><td>Solo nella memoria del tuo browser, su questo dispositivo</td></tr>
+        <tr><td>Accedi con Google, con email o in modo anonimo</td><td>Identificativo dell'account; con Google o email anche nome, email e foto del profilo</td><td>Firebase Authentication (Google)</td></tr>
+        <tr><td>Con l'accesso fatto</td><td>Le campagne, per sincronizzarle tra i tuoi dispositivi e con i co-master; il nome che mostri ai co-master. Con Drive collegato, su Firebase resta solo un riferimento al file</td><td>Firebase Realtime Database (Google), server in Belgio</td></tr>
+        <tr><td>Colleghi Google Drive</td><td>Le campagne e le immagini, in file creati dall'app. L'app vede solo i file che ha creato lei</td><td>Il tuo Google Drive</td></tr>
+        <tr><td>Condividi la vista giocatori</td><td>Solo le parti che scegli di mostrare, senza segreti</td><td>Firebase Realtime Database, leggibile da chi ha il link</td></tr>
+        <tr><td>Mandi una segnalazione o un'idea</td><td>Quello che scrivi e alcune informazioni tecniche (browser, schermo, pagina aperta)</td><td>Web3Forms, che le inoltra per email alla titolare</td></tr>
+        <tr><td>Ti iscrivi alla newsletter</td><td>Il tuo indirizzo email</td><td>Brevo</td></tr>
+        <tr><td>Ascolti la musica dell'app</td><td>Le richieste dei video al momento in cui premi play</td><td>YouTube, in modalità privacy avanzata (youtube-nocookie.com)</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <div>
+    <h2>Perché</h2>
+    <p>I dati servono solo a far funzionare quello che hai chiesto: salvare e sincronizzare le campagne, farti collaborare con altri master, rispondere alle segnalazioni. La newsletter parte solo se ti iscrivi tu, e puoi disiscriverti da ogni email. Nessun dato viene venduto o usato per pubblicità.</p>
+  </div>
+
+  <div>
+    <h2>Servizi esterni</h2>
+    <p>Google (Firebase e Drive), Web3Forms, Brevo e YouTube trattano i dati secondo le proprie regole sulla privacy. Alcuni hanno sede o server fuori dall'Unione Europea, dove il trasferimento avviene con le garanzie previste dal GDPR.</p>
+  </div>
+
+  <div>
+    <h2>Quanto restano</h2>
+    <ul>
+      <li>Nel browser: finché non elimini la campagna o i dati del sito. Attenzione: se cancelli i dati di navigazione, le campagne salvate solo nel browser si perdono. Collega Drive o esporta un file per averne una copia.</li>
+      <li>Su Firebase e su Drive: finché non elimini la campagna dall'app.</li>
+      <li>Segnalazioni e newsletter: finché servono a rispondere o finché resti iscritto.</li>
+    </ul>
+  </div>
+
+  <div>
+    <h2>I tuoi diritti</h2>
+    <p>Puoi chiedere di vedere, correggere o cancellare i tuoi dati, e opporti al loro uso. Le campagne le cancelli tu dall'app; per l'account o per altre richieste scrivi alla titolare dal link sopra. Se pensi che i tuoi dati siano usati male, puoi rivolgerti al Garante per la protezione dei dati personali (<a href="https://www.garanteprivacy.it" rel="noopener">garanteprivacy.it</a>).</p>
+  </div>
+
+  <div>
+    <h2>Cookie</h2>
+    <p>Pocket GM Screen non usa cookie di tracciamento né statistiche. Usa la memoria del browser solo per far funzionare l'app (campagne, impostazioni, l'accesso). Per questo non trovi un banner dei cookie.</p>
+  </div>
+
+</div></section>
+</main>
+<footer class="closing">
+  <div class="wrap">
+    <div class="piede">
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="funzioni.html">Funzioni</a></li>
+        <li><a href="domande.html">Domande</a></li>
+        <li><a href="privacy.html" aria-current="page">Privacy</a></li>
+        <li><a href="https://github.com/gdr-sys/dm-toolkit" rel="noopener">GitHub</a></li>
+      </ul>
+      <p>© 2026 Noemi Marcolini. Tutti i diritti riservati.</p>
+    </div>
+  </div>
+</footer>
+<script src="sito.js"></script>
+</body>
+</html>

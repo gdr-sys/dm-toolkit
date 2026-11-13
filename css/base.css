@@ -5,7 +5,7 @@
 
 /* Un solo carattere per tutta l'interfaccia: Atkinson Hyperlegible, disegnato per la leggibilita'
    (al tavolo, con poca luce, I l 1 e O 0 non si confondono). Il mono resta per codici e numeri tecnici. */
-@import url('https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Gloock&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('../assets/fonts/app.css');
 
 /* ── Variabili Tema Chiaro ── */
 :root {
