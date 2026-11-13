@@ -706,3 +706,7 @@ body.barra-alta #wiki-section-tabbar:not([style*="display:none"]):not([style*="d
   .combat-list .combat-actions-col { justify-content: space-between; }
 }
 .imp-interruttore input[type="checkbox"] { width: 44px !important; min-width: 44px !important; max-width: 44px !important; height: 26px !important; min-height: 26px !important; padding: 0 !important; border: 0 !important; box-shadow: none !important; } .imp-interruttore > span { flex: 1 1 auto; min-width: 0; }
+.combat-legenda em { font-style: normal; }
+.combat-legenda b { white-space: nowrap; }
+@container (max-width: 560px) { .combat-legenda-wrap .leg-extra { display: none; } }
+@media (max-width: 600px) { .combat-legenda .leg-extra { display: none; } .combat-legenda { gap: 6px 14px; font-size: 0.78rem; } .combat-list .combat-actions-col { justify-content: flex-end !important; } }
