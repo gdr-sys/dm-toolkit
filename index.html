@@ -16734,6 +16734,9 @@ const WikiSections = (() => {
         const d = { id:item.id, titolo:item.nome, categoria:item.categoria, periodo:item.periodo,
           collegati:item.collegati, rilevanza:item.rilevanza, fonti:item.fonti,
           contenuto:item.contenuto||'', tags:item.tags||[], aggiornatoAt:Date.now() };
+        // Un documento dello Scrittoio porta con se' i suoi testi, per poterlo riaprire e modificare
+        const sc = item.scrittoio || (idx>=0 && wiki.lore[idx].scrittoio);
+        if (sc) d.scrittoio = sc;
         if (idx>=0) wiki.lore[idx]=d; else wiki.lore.unshift(d);
         App.saveActiveCampaign({ wiki });
       },

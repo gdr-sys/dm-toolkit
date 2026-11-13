@@ -22,6 +22,7 @@ const Scrittoio = (() => {
   let _opere = {};      // stato di ogni voce: { seme, ...campi }
   let _risultato = null;
   let _storia = [];
+  let _modifica = null; // documento o stemma riaperto: { tipo: 'l' (Lore) | 'f' (Fazione), id, nome, voce }
 
   /* ── Stato ── */
   const _nomiCampagna = () => {
@@ -106,7 +107,18 @@ const Scrittoio = (() => {
     $('sc-precedente').disabled = !_storia.length;
   };
   const _ricorda = () => { if (_risultato) { _storia.push({ voce: _voce, op: JSON.parse(JSON.stringify(_opera())) }); if (_storia.length > 20) _storia.shift(); } };
-  const nuovo = () => { _ricorda(); _opere[_voce] = _nuovaOpera(_voce); _controlli(); disegna(); };
+  const nuovo = () => { _ricorda(); if (_modifica && _modifica.voce === _voce) _modifica = null; _opere[_voce] = _nuovaOpera(_voce); _controlli(); disegna(); };
+  // Foglio bianco: tutti i testi vuoti, si scrive quello che si vuole
+  const foglioBianco = () => {
+    if (_voce === 'stemma') return;
+    _ricorda();
+    const op = _opera();
+    ['titolo', 'soggetto', 'corpo', 'premio', 'firma'].forEach((k) => { op[k] = ''; });
+    op.sigillo = '';
+    _controlli(); disegna();
+    setTimeout(() => $('sc-tit')?.focus(), 50);
+  };
+  const smettiModifica = () => { _modifica = null; _controlli(); };
   const precedente = () => {
     const f = _storia.pop();
     if (!f) return;
@@ -114,8 +126,13 @@ const Scrittoio = (() => {
     _controlli(); disegna();
   };
   const scegli = (v) => { if (v !== _voce) { _ricorda(); _voce = v; _controlli(); disegna(); } };
+  const _blasone = (op = _opera()) => (op.blasoneMano ? String(op.blasone || '') : Araldica.blasona(op));
   const _campo = (k, val) => {
     if (k === 'sigillo') _cambiaSigillo(val); else _opera()[k] = val;
+    if (_voce === 'stemma') {
+      if (k === 'blasone') { if (!_opera().blasoneMano) { _opera().blasoneMano = true; _sotto(); } return; }
+      const t = $('sc-blasone'); if (t && !_opera().blasoneMano) t.value = _blasone();
+    }
     clearTimeout(_timer); _timer = setTimeout(disegna, 250);
   };
 
@@ -123,14 +140,16 @@ const Scrittoio = (() => {
   const _sel = (id, et, lista, val, k) => '<div class="form-group"><label class="form-label" for="' + id + '">' + _esc(et) + '</label><select id="' + id + '" class="form-select" onchange="Scrittoio._campo(\'' + k + '\',this.value)">' +
     lista.map(([v, l]) => '<option value="' + _esc(v) + '"' + (v === val ? ' selected' : '') + '>' + _esc(l) + '</option>').join('') + '</select></div>';
   const _testo = (id, et, val, k, ph = '') => '<div class="form-group"><label class="form-label" for="' + id + '">' + _esc(et) + '</label><input type="text" id="' + id + '" class="form-input" autocomplete="off" value="' + _esc(val) + '" placeholder="' + _esc(ph) + '" oninput="Scrittoio._campo(\'' + k + '\',this.value)"></div>';
-  const _area = (id, et, val, k, righe = 8) => '<div class="form-group"><label class="form-label" for="' + id + '">' + _esc(et) + '</label><textarea id="' + id + '" class="form-input" rows="' + righe + '" style="resize:vertical;line-height:1.45;" oninput="Scrittoio._campo(\'' + k + '\',this.value)">' + _esc(val) + '</textarea></div>';
+  const _area = (id, et, val, k, righe = 8, ph = '') => '<div class="form-group"><label class="form-label" for="' + id + '">' + _esc(et) + '</label><textarea id="' + id + '" class="form-input" rows="' + righe + '" placeholder="' + _esc(ph) + '" style="resize:vertical;line-height:1.45;" oninput="Scrittoio._campo(\'' + k + '\',this.value)">' + _esc(val) + '</textarea></div>';
   const _controlli = () => {
     const tab = $('sc-voci'), box = $('sc-controlli');
     if (!tab || !box) return;
     tab.innerHTML = VOCI.map(([k, l]) => '<button type="button" role="tab" aria-selected="' + (k === _voce) + '" class="sc-scelta" onclick="Scrittoio.scegli(\'' + k + '\')">' + (typeof Scena !== 'undefined' ? Scena.icona(k) : '') + '<span>' + _esc(l) + '</span></button>').join('');
     const op = _opera();
+    const inModifica = _modifica && _modifica.voce === _voce;
+    const avviso = inModifica ? '<div class="sc-modifica"><span>Stai modificando <strong>' + _esc(_modifica.nome) + '</strong>' + (_modifica.tipo === 'l' ? ', dalla Lore della Wiki' : ', lo stemma della Fazione') + '.</span><button type="button" class="btn btn-ghost btn-sm" onclick="Scrittoio.smettiModifica()">Smetti</button></div>' : '';
     if (_voce === 'stemma') {
-      box.innerHTML = _testo('sc-nome', 'Nome sotto lo stemma', op.nome, 'nome', 'Facoltativo') +
+      box.innerHTML = avviso + _testo('sc-nome', 'Nome sotto lo stemma', op.nome, 'nome', 'Facoltativo') +
         '<div class="carto-griglia">' +
           _sel('sc-forma', 'Forma', Araldica.FORME_ELENCO, op.forma, 'forma') + _sel('sc-part', 'Partizione', Araldica.PARTIZIONI_ELENCO, op.partizione, 'partizione') +
           _sel('sc-s1', 'Primo colore', Araldica.SMALTI_ELENCO, op.smalto1, 'smalto1') + _sel('sc-s2', 'Secondo colore', Araldica.SMALTI_ELENCO, op.smalto2, 'smalto2') +
@@ -140,9 +159,10 @@ const Scrittoio = (() => {
         '<div class="form-hint">Hai già uno stemma tuo? Caricalo come immagine nella scheda della Fazione: verrà usato anche su editti e lettere.</div>';
     } else {
       const fazioni = (_camp()?.factions || []).filter((f) => f.stemma || f.immagine);
-      box.innerHTML = _testo('sc-tit', _voce === 'lettera' ? 'Saluto' : 'Titolo', op.titolo, 'titolo') +
+      box.innerHTML = avviso + '<div class="form-hint" style="margin:0 0 10px;">Ogni testo si può cambiare: scrivi direttamente qui sotto. Con <strong>Foglio bianco</strong> parti da zero.</div>' +
+        _testo('sc-tit', _voce === 'lettera' ? 'Saluto' : 'Titolo', op.titolo, 'titolo', _voce === 'lettera' ? 'es. Caro amico,' : 'es. Avviso alla cittadinanza') +
         (_voce === 'taglia' ? _testo('sc-sog', 'Ricercato', op.soggetto, 'soggetto') : '') +
-        _area('sc-corpo', _voce === 'tesoro' ? 'Indizio' : _voce === 'taglia' ? 'Accuse' : 'Testo', op.corpo, 'corpo', _voce === 'lettera' || _voce === 'editto' ? 9 : 5) +
+        _area('sc-corpo', _voce === 'tesoro' ? 'Indizio' : _voce === 'taglia' ? 'Accuse' : 'Testo', op.corpo, 'corpo', _voce === 'lettera' || _voce === 'editto' ? 9 : 5, 'Scrivi qui quello che vuoi. Una riga vuota fa un nuovo paragrafo; più testo scrivi, più piccola diventa la scrittura.') +
         (_voce === 'taglia' ? _testo('sc-premio', 'Ricompensa', op.premio, 'premio') : '') +
         _testo('sc-firma', _voce === 'avviso' ? 'A chi rivolgersi' : 'Firma', op.firma, 'firma') +
         '<div class="carto-griglia">' +
@@ -153,10 +173,25 @@ const Scrittoio = (() => {
         ((_voce === 'lettera' || _voce === 'editto') && !fazioni.length ? '<div class="form-hint">Dai uno stemma a una Fazione, anche caricando un’immagine tua nella sua scheda, e qui potrai usarlo come sigillo.</div>' : '');
     }
     $('sc-azione').textContent = _voce === 'stemma' ? 'Assegna…' : 'Salva nella Wiki';
+    $('sc-bianco').style.display = _voce === 'stemma' ? 'none' : '';
+    _sotto();
     $('sc-copia').style.display = _voce === 'stemma' ? 'none' : '';
     $('sc-nuovo').title = _voce === 'stemma' ? 'Uno stemma diverso' : 'Un documento diverso, scritto con i nomi della tua campagna';
     $('sc-precedente').disabled = !_storia.length;
   };
+
+  const _sotto = () => {
+    const el = $('sc-sotto');
+    if (!el) return;
+    $('page-scrittoio')?.classList.toggle('sc-con-sotto', _voce === 'stemma');
+    if (_voce !== 'stemma') { el.innerHTML = ''; el.hidden = true; return; }
+    const op = _opera();
+    el.hidden = false;
+    el.innerHTML = '<div class="sc-blasone-testa"><label class="form-label" for="sc-blasone" style="margin:0;">Blasonatura</label>' +
+      (op.blasoneMano ? '<button type="button" class="btn btn-ghost btn-sm" onclick="Scrittoio.riscriviBlasone()" title="Torna alla descrizione scritta dallo stemma">Riscrivi dallo stemma</button>' : '<span class="text-muted" style="font-size:0.75rem;">si scrive da sola, puoi cambiarla</span>') + '</div>' +
+      '<textarea id="sc-blasone" class="form-input sc-blasone" rows="2" oninput="Scrittoio._campo(\'blasone\',this.value)">' + _esc(_blasone(op)) + '</textarea>';
+  };
+  const riscriviBlasone = () => { const op = _opera(); op.blasoneMano = false; op.blasone = ''; _sotto(); };
 
   /* ── Esportazione ── */
   const _nomeFile = () => (_risultato?.nome || 'documento').replace(/[\\/:*?"<>|]+/g, ' ').trim() || 'documento';
@@ -217,6 +252,7 @@ const Scrittoio = (() => {
       $('sc-az-corpo').innerHTML = '<div class="form-group" style="margin-bottom:8px;"><label class="form-label" for="sc-az-a">A chi appartiene</label><select id="sc-az-a" class="form-select">' + gruppo('Fazioni', faz, 'f') + gruppo('Luoghi', luo, 'l') + '</select></div>' +
         '<div class="carto-nota">Diventa l’immagine della sua scheda e, se c’era già un’immagine, la sostituisce. Una Fazione potrà usarlo anche come sigillo su editti e lettere.</div>';
       $('sc-az-piede').innerHTML = '<button class="btn btn-ghost" onclick="Modal.close(\'sc-azione\')">Annulla</button><button class="btn btn-primary" id="sc-az-ok" onclick="Scrittoio._confermaStemma()">Assegna</button>';
+      if (_modifica && _modifica.tipo === 'f' && faz.some((f) => f.id === _modifica.id)) $('sc-az-a').value = 'f:' + _modifica.id;
     } else {
       if (!camp) return _senzaCampagna('Salva nella Wiki');
       const drive = typeof DriveBackup !== 'undefined' && DriveBackup.isConnected();
@@ -225,9 +261,62 @@ const Scrittoio = (() => {
         '<div class="carto-nota">Lo trovi in Wiki, tra le schede Lore. Da <strong>Vista giocatori</strong> puoi scegliere di condividerlo.</div>' +
         '<div class="carto-nota">' + (drive ? 'L’immagine del documento verrà salvata su Google Drive, il testo nella scheda.' : '<strong>Google Drive non è collegato:</strong> nella scheda si salva solo il testo. Scarica il PNG per avere anche l’immagine, oppure collega Drive dalle Impostazioni.') + '</div>';
       $('sc-az-piede').innerHTML = '<button class="btn btn-ghost" onclick="Modal.close(\'sc-azione\')">Annulla</button><button class="btn btn-primary" id="sc-az-ok" onclick="Scrittoio._confermaDocumento()">Salva</button>';
+      const riaperta = _modifica && _modifica.tipo === 'l' && _modifica.voce === _voce && (camp.wiki?.lore || []).some((n) => n.id === _modifica.id);
+      if (riaperta) {
+        $('sc-az-nome').value = _modifica.nome;
+        $('sc-az-corpo').insertAdjacentHTML('afterbegin', '<div class="form-group" style="margin-bottom:10px;"><label class="carto-spunta"><input type="radio" name="sc-az-dove" value="aggiorna" checked><span>Aggiorna «' + _esc(_modifica.nome) + '»</span></label><label class="carto-spunta"><input type="radio" name="sc-az-dove" value="nuova"><span>Salva come scheda nuova</span></label></div>');
+      }
     }
     Modal.open('sc-azione');
   };
+  const riapri = () => {
+    _modale();
+    const camp = _camp();
+    if (!camp) return _senzaCampagna('Riapri');
+    const stemmi = (camp.factions || []).filter((f) => f.stemma && _nome(f));
+    const docs = (camp.wiki?.lore || []).filter((n) => n.scrittoio && n.scrittoio.op);
+    const nomeVoce = (v) => (VOCI.find(([k]) => k === v) || [v, v])[1];
+    $('sc-az-titolo').textContent = 'Riapri per modificare';
+    const nota = '<div class="carto-nota">Si riaprono i documenti salvati nella Wiki da oggi in poi: di quelli più vecchi è rimasto solo il testo nella scheda, che puoi copiare in un Foglio bianco.</div>';
+    if (!stemmi.length && !docs.length) {
+      $('sc-az-corpo').innerHTML = '<p style="margin:0 0 8px;line-height:1.55;">Non c’è ancora niente da riaprire: salva un documento nella Wiki o assegna uno stemma a una Fazione.</p>' + nota;
+      $('sc-az-piede').innerHTML = '<button class="btn btn-primary" onclick="Modal.close(\'sc-azione\')">Va bene</button>';
+      Modal.open('sc-azione');
+      return;
+    }
+    const prima = _voce === 'stemma' ? 'f' : 'l';
+    const gruppo = (et, l, t, nm) => (l.length ? '<optgroup label="' + et + '">' + l.map((x) => '<option value="' + t + ':' + _esc(x.id) + '">' + _esc(nm(x)) + '</option>').join('') + '</optgroup>' : '');
+    const gD = gruppo('Documenti nella Wiki', docs, 'l', (n) => (n.titolo || 'Senza titolo') + ' (' + nomeVoce(n.scrittoio.voce) + ')');
+    const gS = gruppo('Stemmi delle Fazioni', stemmi, 'f', _nome);
+    $('sc-az-corpo').innerHTML = '<div class="form-group" style="margin-bottom:8px;"><label class="form-label" for="sc-az-r">Cosa vuoi modificare</label><select id="sc-az-r" class="form-select">' + (prima === 'f' ? gS + gD : gD + gS) + '</select></div>' + nota;
+    $('sc-az-piede').innerHTML = '<button class="btn btn-ghost" onclick="Modal.close(\'sc-azione\')">Annulla</button><button class="btn btn-primary" onclick="Scrittoio._confermaRiapri()">Riapri</button>';
+    Modal.open('sc-azione');
+  };
+  const _confermaRiapri = () => {
+    const [t, id] = ($('sc-az-r')?.value || '').split(/:(.*)/);
+    const camp = _camp();
+    if (!id || !camp) return;
+    _ricorda();
+    if (t === 'f') {
+      const f = (camp.factions || []).find((x) => x.id === id);
+      if (!f || !f.stemma) return;
+      const st = JSON.parse(JSON.stringify(f.stemma));
+      _voce = 'stemma';
+      _opere.stemma = { seme: _nuovoSeme(), ...st, conMotto: !!st.motto, nome: st.nome || '', blasone: st.blasone || '', blasoneMano: !!st.blasoneMano };
+      _modifica = { tipo: 'f', id, nome: _nome(f), voce: 'stemma' };
+    } else {
+      const n = (camp.wiki?.lore || []).find((x) => x.id === id);
+      if (!n || !n.scrittoio) return;
+      const v = n.scrittoio.voce;
+      if (!Documenti.TIPI[v]) return;
+      _voce = v;
+      _opere[v] = JSON.parse(JSON.stringify(n.scrittoio.op));
+      _modifica = { tipo: 'l', id, nome: n.titolo || 'Senza titolo', voce: v };
+    }
+    Modal.close('sc-azione');
+    _controlli(); disegna();
+  };
+
   const _attendi = (testo) => { const b = $('sc-az-ok'); if (b) { b.disabled = true; b.textContent = testo; } };
   const _riprova = (testo) => { const b = $('sc-az-ok'); if (b) { b.disabled = false; b.textContent = testo; } };
   const _confermaStemma = async () => {
@@ -237,7 +326,7 @@ const Scrittoio = (() => {
     try {
       const camp = _camp(), chiave = t === 'f' ? 'factions' : 'locations', lista = camp[chiave] || [], el = lista.find((x) => x.id === id);
       const url = await DriveBackup.uploadImage(_ridotta(480), 'stemma_' + _nome(el));
-      const op = _risultato.opzioni;
+      const op = { ..._risultato.opzioni, nome: _opera().nome || '', blasone: _blasone(), blasoneMano: !!_opera().blasoneMano };
       App.saveActiveCampaign({ [chiave]: lista.map((x) => (x.id !== id ? x : { ...x, immagine: url, ...(t === 'f' ? { stemma: op, simbolo: x.simbolo || (Araldica.SIMBOLI_ELENCO.find(([k]) => k === op.simbolo)?.[1] || '') + (op.motto ? ' — “' + op.motto + '”' : '') } : {}) })) });
       Modal.close('sc-azione');
       Toast.show('Stemma assegnato a ' + _nome(el), 'success', 3000);
@@ -260,12 +349,17 @@ const Scrittoio = (() => {
         const url = await DriveBackup.uploadImage(_ridotta(1200, 'image/jpeg', 0.88, '#2a231c'), 'documento_' + titolo);
         if (/^https?:/.test(url)) img = '<p><img src="' + _esc(DriveBackup.toEmbeddableUrl(url)) + '" alt="' + _esc(titolo) + '" style="max-width:100%;"></p>';
       }
-      const cfg = WikiSections._getCfg('lore'), item = cfg.newItem();
+      const cfg = WikiSections._getCfg('lore');
+      const aggiorna = document.querySelector('input[name="sc-az-dove"]:checked')?.value === 'aggiorna' && _modifica;
+      const item = (aggiorna && (cfg.getData(_camp()) || []).find((x) => x.id === _modifica.id)) || cfg.newItem();
       item.nome = titolo; item.contenuto = img + par;
+      item.scrittoio = { voce: _voce, op: JSON.parse(JSON.stringify(o)) };
       cfg.saveItem(_camp(), item);
       try { WikiSections.renderCounters(); } catch (e) {}
       Modal.close('sc-azione');
-      Toast.show('“' + titolo + '” è nella Lore della Wiki', 'success', 3000);
+      _modifica = { tipo: 'l', id: item.id, nome: titolo, voce: _voce };
+      _controlli();
+      Toast.show(aggiorna ? '“' + titolo + '” aggiornato nella Lore' : '“' + titolo + '” è nella Lore della Wiki', 'success', 3000);
     } catch (e) {
       Toast.show('Non è stato possibile salvarlo: ' + (e?.message || 'errore sconosciuto'), 'error', 6000);
       _riprova('Salva');
@@ -286,6 +380,11 @@ const Scrittoio = (() => {
       '#sc-vista canvas, #sc-vista svg { display:block; max-width:100%; max-height:100%; width:auto; height:auto; }' +
       '#sc-attesa { position:absolute; left:50%; top:12px; transform:translateX(-50%); padding:6px 14px; background:var(--bg-card); color:var(--text-primary); border:1px solid var(--border); border-radius:var(--radius-full); font-size:0.88rem; box-shadow:var(--shadow-md); z-index:2; white-space:nowrap; }' +
       '#sc-attesa[hidden] { display:none; }' +
+      '.sc-con-sotto #sc-stage { height:max(400px, calc(100vh - 430px)); height:max(400px, calc(100dvh - 430px)); }' +
+      '#sc-sotto { margin-top:var(--space-sm); padding:12px 14px; } #sc-sotto[hidden] { display:none; }' +
+      '.sc-blasone-testa { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:6px; min-height:30px; }' +
+      '.sc-blasone { font-family:var(--font-display, serif); font-style:italic; font-size:1rem; line-height:1.5; resize:vertical; }' +
+      '.sc-modifica { display:flex; align-items:center; justify-content:space-between; gap:8px; padding:8px 10px; margin-bottom:12px; border-radius:var(--radius-md); background:var(--bg-tertiary); font-size:0.85rem; line-height:1.4; }' +
       '@media (max-width: 900px) { #sc-stage { height:auto; } #sc-vista { height:auto; } #sc-vista canvas, #sc-vista svg { width:100%; } }' +
       '@container (max-width: 860px) { #sc-stage { height:auto; max-height:80vh; } #sc-vista { height:58vh; } }' +
       '@container (max-width: 640px) { #sc-vista { height:auto; } #sc-vista canvas, #sc-vista svg { width:100%; } #sc-stage { max-height:none; } }';
@@ -302,6 +401,8 @@ const Scrittoio = (() => {
       '<div id="sc-voci" role="tablist" aria-label="Cosa creare"></div>' +
       '<div class="carto-comandi">' +
         '<button type="button" class="btn btn-gold btn-sm" id="sc-nuovo" onclick="Scrittoio.nuovo()">Nuovo</button>' +
+        '<button type="button" class="btn btn-secondary btn-sm" id="sc-bianco" onclick="Scrittoio.foglioBianco()" title="Tutti i testi vuoti: scrivi tu quello che vuoi">Foglio bianco</button>' +
+        '<button type="button" class="btn btn-secondary btn-sm" id="sc-riapri" onclick="Scrittoio.riapri()" title="Riapri un documento salvato nella Wiki o lo stemma di una Fazione, per modificarlo">Riapri…</button>' +
         '<button type="button" class="btn btn-ghost btn-sm" id="sc-precedente" onclick="Scrittoio.precedente()" disabled title="Torna a quello di prima">← Precedente</button>' +
       '</div>' +
       '<div class="carto-corpo"><div class="card carto-pannello" id="sc-controlli"></div>' +
@@ -312,6 +413,7 @@ const Scrittoio = (() => {
             '<button type="button" class="btn btn-secondary btn-sm" onclick="Scrittoio.scaricaSvg()">Scarica SVG</button>' +
           '</div>' +
           '<div id="sc-stage"><div id="sc-vista"></div><div id="sc-attesa" role="status">Sto disegnando…</div></div>' +
+          '<div id="sc-sotto" class="card" hidden></div>' +
         '</div></div>';
     _controlli();
   };
@@ -325,5 +427,6 @@ const Scrittoio = (() => {
   };
   document.addEventListener('DOMContentLoaded', () => setTimeout(() => { _aggancia(); if ($('page-scrittoio')?.classList.contains('active')) apri(); }, 220));
 
-  return { apri, nuovo, precedente, scegli, azione, copia, scaricaPng, scaricaSvg, _campo, _confermaStemma, _confermaDocumento };
+  return { apri, nuovo, precedente, scegli, azione, copia, scaricaPng, scaricaSvg, _campo, _confermaStemma, _confermaDocumento,
+    foglioBianco, riapri, _confermaRiapri, smettiModifica, riscriviBlasone };
 })();

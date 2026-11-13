@@ -188,9 +188,49 @@ const Araldica = (() => {
     return { svg: svg + '</svg>', W, H, nome: o.nome || 'Stemma', opzioni: { forma: con.forma, partizione: con.partizione, smalto1: con.smalto1, smalto2: con.smalto2, simbolo: con.simbolo, motto: haMotto ? con.motto : '', disposizione: con.disposizione, bordura: !!con.bordura, ornamento: orn } };
   };
 
+  /* ── Blasonatura: lo stemma descritto a parole, come nell'araldica italiana ──
+     "D'azzurro, al leone d'oro". Gli smalti non si accordano ("d'oro", "di rosso"). */
+  const _di = (s) => (s === 'oro' || s === 'argento' || s === 'azzurro' ? 'd’' : 'di ') + s;
+  const _Di = (s) => { const t = _di(s); return t.charAt(0).toUpperCase() + t.slice(1); };
+  // [nome, plurale, femminile]
+  const FIGURE = {
+    torre: ['torre', 'torri', 1], corona: ['corona', 'corone', 1], spada: ['spada', 'spade', 1], chiave: ['chiave', 'chiavi', 1],
+    stella: ['stella', 'stelle', 1], sole: ['sole', 'soli', 0], luna: ['crescente', 'crescenti', 0], croce: ['croce', 'croci', 1],
+    albero: ['albero', 'alberi', 0], giglio: ['giglio', 'gigli', 0], rosa: ['rosa', 'rose', 1], ascia: ['ascia', 'asce', 1],
+    monte: ['monte', 'monti', 0], calice: ['calice', 'calici', 0], occhio: ['occhio', 'occhi', 0], corvo: ['corvo', 'corvi', 0],
+    lupo: ['testa di lupo', 'teste di lupo', 1],
+  };
+  const _voc = (n) => /^[aeiou]/.test(n);
+  const _al = (f) => (_voc(f[0]) ? 'all’' : f[2] ? 'alla ' : 'al ') + f[0];
+  const _uno = (f) => (f[2] ? (_voc(f[0]) ? 'un’' : 'una ') : 'un ') + f[0];
+  const PEZZI = { banda: 'alla banda', scaglione: 'allo scaglione', palo: 'al palo', fascia: 'alla fascia', croce: 'alla croce' };
+  const DIVISI = { partito: 'Partito', troncato: 'Troncato', inquartato: 'Inquartato', sbarre: 'Sbarrato', scaccato: 'Scaccato' };
+  const blasona = (o) => {
+    const a = o.smalto1 || 'azzurro', b = o.smalto2 || 'oro', part = o.partizione || 'pieno', fig = FIGURE[o.simbolo];
+    const parti = [];
+    if (part === 'pieno') {
+      parti.push(_Di(a));
+      if (fig) parti.push(o.disposizione === 'tre' ? 'a tre ' + fig[1] + ' ' + _di(b) + ', ' + (fig[2] ? 'poste' : 'posti') + ' 2 e 1' : _al(fig) + ' ' + _di(b));
+    } else if (PEZZI[part]) {
+      parti.push(_Di(a), PEZZI[part] + ' ' + _di(b));
+      if (fig) parti.push(_al(fig) + ' dell’uno nell’altro');
+    } else {
+      parti.push((DIVISI[part] || 'Partito') + ' ' + _di(a) + ' e ' + _di(b));
+      if (fig) parti.push(part === 'sbarre' || part === 'scaccato'
+        ? 'al tondo ' + _di(a) + ', caricato di ' + _uno(fig) + ' ' + _di(b)
+        : _al(fig) + ' dell’uno nell’altro');
+    }
+    if (o.bordura) parti.push('alla bordura ' + _di(b));
+    let t = parti.join(', ') + '.';
+    if (o.ornamento === 'corona') t += ' Lo scudo è timbrato da una corona.';
+    if (o.ornamento === 'mantello') t += ' Lo scudo è posto sotto un manto, timbrato da una corona.';
+    if (o.motto && o.conMotto !== false) t += ' Motto: «' + String(o.motto).trim() + '».';
+    return t;
+  };
+
   const elenco = (o) => Object.entries(o).map(([k, v]) => [k, Array.isArray(v) ? v[0] : v]);
   return {
-    casuale, scudo, impronta, genera, MOTTI, SMALTI, ORNAMENTI_ELENCO: elenco(ORNAMENTI),
+    casuale, scudo, impronta, genera, blasona, MOTTI, SMALTI, ORNAMENTI_ELENCO: elenco(ORNAMENTI),
     FORME_ELENCO: elenco(FORME), SMALTI_ELENCO: elenco(SMALTI), PARTIZIONI_ELENCO: elenco(PARTIZIONI), SIMBOLI_ELENCO: elenco(SIMBOLI),
   };
 })();
