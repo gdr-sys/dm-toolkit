@@ -741,3 +741,12 @@ button[onclick^="Clocks."]:hover { background: color-mix(in oklch, var(--text-pr
 button[onclick*="').value='';Compendio.onSearch("] { min-width: 32px; min-height: 32px; display: grid !important; place-items: center; border-radius: 999px !important; }
 .hn-piede button, #hn-piede button, .dn-fascia a, .dn-testa button { min-height: 32px; }
 .dn-vuoti button { min-height: 32px; }
+
+/* Calendario: lune, stagioni e meteo (js/calendario-cielo.js) */
+.cielo-cella { display: flex; align-items: center; gap: 5px; margin-top: auto; padding-top: 4px; color: var(--text-secondary); font-size: 0.68rem; }
+.cal-g { display: flex; flex-direction: column; }
+.cielo-tempo { display: inline-flex; align-items: center; gap: 2px; margin-left: auto; }
+.cielo-luna { flex-shrink: 0; color: var(--text-primary); }
+.cielo-stagione { font-size: 0.75rem; font-weight: 600; color: var(--accent-text); padding: 2px 10px; border-radius: 999px; background: var(--bg-tertiary); white-space: nowrap; }
+.cielo-dettaglio { display: grid; gap: 6px; font-size: 0.82rem; padding: 10px 12px; margin-bottom: 10px; border-radius: 12px; background: var(--bg-secondary); }
+.cielo-dettaglio .cielo-luna { color: var(--text-primary); }

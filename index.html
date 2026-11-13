@@ -8433,9 +8433,18 @@ const Schermo = (() => {
     Debug.log(`Schermo dice: d${faces} → ${result}`);
   };
 
-  const renderMeteoMini = (blockId) => `
-    <div id="schermo-meteo-${blockId}" class="text-sm text-muted" style="margin-bottom:8px;">Clicca per generare il meteo</div>
-    <button class="btn btn-secondary btn-sm w-full" onclick="Schermo.generateMeteo('${blockId}')">Genera Meteo</button>`;
+  const renderMeteoMini = (blockId) => {
+    // Con il meteo del calendario acceso, il blocco mostra il tempo di oggi (cambia avanzando i giorni)
+    let oggi = null;
+    try { oggi = typeof CalendarioCielo !== 'undefined' ? CalendarioCielo.oggi(Calendario.get()) : null; } catch (e) {}
+    const m = oggi && oggi.meteo;
+    const lune = oggi ? oggi.lune.map(l => '<span style="display:inline-flex;align-items:center;gap:4px;margin-right:8px;">' + CalendarioCielo.iconaLuna(l.f, 14, l.luna + ': ' + l.fase) + l.luna + ': ' + l.fase.toLowerCase() + '</span>') : [];
+    const testa = m
+      ? `<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">${CalendarioCielo.iconaMeteo(m.tipo, 22)}<div><strong>${m.testo}</strong>, ${m.tMin}–${m.tMax} °C<div class="text-muted" style="font-size:0.75rem;">Oggi${oggi.stagione ? ' · ' + oggi.stagione : ''}</div></div></div><div class="text-muted" style="font-size:0.78rem;margin-bottom:6px;">${m.nota}</div>${lune.length ? '<div style="font-size:0.78rem;margin-bottom:8px;">' + lune.join('') + '</div>' : ''}`
+      : '';
+    return `${testa}<div id="schermo-meteo-${blockId}" class="text-sm text-muted" style="margin-bottom:8px;">${m ? '' : 'Clicca per generare il meteo'}</div>
+    <button class="btn btn-secondary btn-sm w-full" onclick="Schermo.generateMeteo('${blockId}')">${m ? 'Meteo a caso, invece' : 'Genera Meteo'}</button>`;
+  };
 
   const generateMeteo = async (blockId) => {
     const el = document.getElementById(`schermo-meteo-${blockId}`);
@@ -21290,6 +21299,7 @@ const CalendarioUI = (() => {
         '</div>' +
         (festa ? '<div style="font-size:0.62rem;color:var(--text-muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="' + _esc(festa.nome) + '">' + _esc(festa.nome) + '</div>' : '') +
         pills + extra +
+        (typeof CalendarioCielo !== 'undefined' ? CalendarioCielo.cella(cal, primoGiornoAssoluto + g - 1) : '') +
         '</div>';
     }
 
@@ -21301,6 +21311,7 @@ const CalendarioUI = (() => {
           '<button class="btn btn-ghost btn-icon-sm" onclick="CalendarioUI.navAnno(-1)" title="Anno precedente">«</button>' +
           '<button class="btn btn-ghost btn-icon-sm" onclick="CalendarioUI.navMese(-1)" title="Mese precedente">‹</button>' +
           '<div class="cal-mese">' + _esc(mese?.it || mese?.nome || '') + ' — ' + _esc(cal.prefisso_anno || '') + ' ' + _viewAnno + '</div>' +
+          (typeof CalendarioCielo !== 'undefined' ? CalendarioCielo.etichettaMese(cal, primoGiornoAssoluto, giorniInMese) : '') +
           '<button class="btn btn-ghost btn-icon-sm" onclick="CalendarioUI.navMese(1)" title="Mese successivo">›</button>' +
           '<button class="btn btn-ghost btn-icon-sm" onclick="CalendarioUI.navAnno(1)" title="Anno successivo">»</button>' +
         '</div>' +
@@ -21339,6 +21350,7 @@ const CalendarioUI = (() => {
         '<div style="font-family:var(--font-display);font-size:0.95rem;">' + _esc(titolo) + '</div>' +
         '<button class="btn btn-secondary btn-sm" onclick="CalendarioUI.newEvento(' + giorno + ')">+ Aggiungi evento</button>' +
       '</div>' +
+      (typeof CalendarioCielo !== 'undefined' ? CalendarioCielo.dettaglio(cal, Calendario.toAbsoluteDay(cal, { giorno, mese: _viewMese, anno: _viewAnno })) : '') +
       (eventi.length ? eventi.map(e => {
         const cat = CATEGORIE[e.categoria] || CATEGORIE[''];
         return '<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-top:1px solid var(--border);cursor:pointer;" onclick="CalendarioUI.viewEvento(\'' + e.id + '\')">' +
@@ -23045,6 +23057,7 @@ document.addEventListener('DOMContentLoaded', initMobileNav);
 <script src="js/cartografo.js"></script>
 <script src="js/scrittoio.js"></script>
 <script src="js/calendario-config.js"></script>
+<script src="js/calendario-cielo.js"></script>
 
 <!-- Statistiche anonime senza cookie (Cloudflare Web Analytics), solo sul nuovo indirizzo -->
 <script>

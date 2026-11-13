@@ -130,7 +130,7 @@ const CalendarioConfig = (() => {
       return;
     }
     _syncDraftFromCal(cal);
-    el.innerHTML = _dataCardHTML(cal) + _strutturaCardHTML();
+    el.innerHTML = _dataCardHTML(cal) + (typeof CalendarioCielo !== 'undefined' ? CalendarioCielo.cardHTML(cal) : '') + _strutturaCardHTML();
   };
 
   // Rileva i valori attualmente nei campi della card struttura dentro _draft,
