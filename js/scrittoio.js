@@ -427,9 +427,11 @@ const Scrittoio = (() => {
       '.sc-blasone-testa { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:6px; min-height:30px; }' +
       '.sc-blasone { font-family:var(--font-display, serif); font-style:italic; font-size:1rem; line-height:1.5; resize:vertical; }' +
       '.sc-modifica { display:flex; align-items:center; justify-content:space-between; gap:8px; padding:8px 10px; margin-bottom:12px; border-radius:var(--radius-md); background:var(--bg-tertiary); font-size:0.85rem; line-height:1.4; }' +
-      '@media (max-width: 900px) { #sc-stage { height:auto; } #sc-vista { height:auto; } #sc-vista canvas, #sc-vista svg { width:100%; } }' +
+      '@media (max-width: 900px) { #sc-stage { height:auto; } #sc-vista { height:auto; } }' +
       '@container (max-width: 860px) { #sc-stage { height:auto; max-height:80vh; } #sc-vista { height:58vh; } }' +
-      '@container (max-width: 640px) { #sc-vista { height:auto; } #sc-vista canvas, #sc-vista svg { width:100%; } #sc-stage { max-height:none; } }';
+      '@container (max-width: 640px) { #sc-vista { height:auto; } #sc-stage { max-height:none; } }' +
+      // Mai larghezza e altezza forzate insieme: l'immagine si rimpicciolisce senza deformarsi (su iPad si allargava)
+      '#sc-vista canvas, #sc-vista svg { object-fit:contain; }';
     document.head.appendChild(st);
   };
   const _monta = () => {
