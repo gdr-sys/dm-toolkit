@@ -660,3 +660,18 @@ body.barra-alta #wiki-section-tabbar:not([style*="display:none"]):not([style*="d
 .hn-riga p { margin: 0; font-size: 0.88rem; color: var(--text-muted); line-height: 1.45; }
 .hn-riga-azioni { display: flex; flex-wrap: wrap; gap: 6px; }
 .hn-riga .hn-elimina { color: var(--danger-text) !important; }
+
+/* Impostazioni: tre gruppi, titoli normali (niente maiuscolo), interruttore per le card */
+.imp-corpo { display: flex; flex-direction: column; gap: 26px; padding: 20px !important; }
+.imp-corpo > section + section { border-top: 1px solid var(--border); padding-top: 20px; }
+.imp-titolo { margin: 0 0 14px; font: 400 1.35rem var(--font-titoli); color: var(--text-primary); text-transform: none; letter-spacing: 0; }
+.imp-riquadro { background: var(--bg-secondary); border-radius: 14px; padding: 12px 14px; margin-bottom: 10px; }
+.imp-nota { margin: 0; font-size: 0.82rem; color: var(--text-muted); }
+.imp-interruttore { display: flex; align-items: center; gap: 12px; margin-top: 16px; cursor: pointer; }
+.imp-interruttore input { appearance: none; -webkit-appearance: none; flex: none; width: 44px; height: 26px; margin: 0; border-radius: 999px; background: color-mix(in oklch, var(--text-primary) 18%, transparent); position: relative; cursor: pointer; transition: background-color .15s; }
+.imp-interruttore input::after { content: ''; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: var(--text-primary); transition: transform .18s; }
+.imp-interruttore input:checked { background: var(--ac); }
+.imp-interruttore input:checked::after { transform: translateX(18px); background: var(--ac-t, #fff); }
+.imp-interruttore input:focus-visible { outline: 2px solid var(--ac); outline-offset: 2px; }
+.imp-interruttore span { display: flex; flex-direction: column; gap: 2px; font-size: 0.9rem; }
+.imp-interruttore small { font-size: 0.8rem; color: var(--text-muted); }

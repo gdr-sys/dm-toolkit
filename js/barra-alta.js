@@ -27,6 +27,7 @@ const BarraAlta = (() => {
     { nome: 'Guida rapida', azione: 'Onboarding.open()' },
     { nome: 'Segnala un problema', azione: 'BugReport.open()' },
     { nome: 'Suggerisci una funzione', azione: 'Suggerisci.open()' },
+    { nome: 'Altre app e informazioni', azione: "Modal.open('info-app')" },
   ];
   const _esc = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   const _camp = () => (typeof App !== 'undefined' ? App.getActiveCampaign() : null);
