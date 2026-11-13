@@ -553,7 +553,7 @@ body.barra-alta #wiki-section-tabbar:not([style*="display:none"]):not([style*="d
 /* ══ Schermo del DM ══ */
 #schermo-empty { border: 1px dashed var(--border-strong) !important; border-radius: var(--raggio) !important; background: none !important; padding: 34px clamp(16px, 4vw, 40px) !important; }
 #schermo-empty h2 { font-size: 1.8rem; }
-.schermo-scelte { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(230px, 100%), 1fr)); gap: 12px; margin: 22px auto 0; max-width: 980px; text-align: left; }
+.schermo-scelte { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(230px, 100%), 1fr)); gap: 12px; margin: 22px auto 0; max-width: 980px; width: 100%; box-sizing: border-box; text-align: left; }
 .schermo-scelta { display: flex; align-items: flex-start; gap: 14px; padding: 16px 18px; border: 0; border-radius: 18px; background: var(--bg-card); color: var(--text-primary); font: inherit; text-align: left; cursor: pointer; transition: background-color .15s, transform .2s cubic-bezier(.2, .7, .2, 1); }
 .schermo-scelta:hover { background: var(--bg-card-hover); transform: translateY(-2px); }
 .schermo-scelta-icona { flex: none; width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; background: color-mix(in oklch, var(--ac) 20%, transparent); color: var(--accent-text); }
@@ -710,3 +710,16 @@ body.barra-alta #wiki-section-tabbar:not([style*="display:none"]):not([style*="d
 .combat-legenda b { white-space: nowrap; }
 @container (max-width: 560px) { .combat-legenda-wrap .leg-extra { display: none; } }
 @media (max-width: 600px) { .combat-legenda .leg-extra { display: none; } .combat-legenda { gap: 6px 14px; font-size: 0.78rem; } .combat-list .combat-actions-col { justify-content: flex-end !important; } }
+
+/* Scheda di un PNG/luogo su schermi medi (tablet): iniziale piu' piccola, titolo che si adatta alla colonna */
+.mz-testa { container-type: inline-size; }
+.mz-testa h2 { font-size: clamp(2rem, 15cqi, 4.8rem) !important; overflow-wrap: normal; word-break: normal; hyphens: manual; }
+@media (min-width: 761px) and (max-width: 1100px) {
+  .mz-corte { grid-template-columns: 170px minmax(0, 1fr); gap: 28px; padding-top: 56px; }
+  .mz-faccia .mz-iniz { font-size: 7.5rem; }
+}
+.cal-g { min-width: 0; overflow: hidden; } .cal-g .cal-ev { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; }
+.schermo-scelta { min-width: 0; } .schermo-scelta-testo b { overflow-wrap: break-word; }
+/* Nota della Wiki: il titolo resta leggibile, i pulsanti vanno a capo quando lo spazio e' poco */
+:has(> #wiki-note-title) { flex-wrap: wrap; row-gap: 8px; }
+#wiki-note-title { flex: 1 1 16ch !important; min-width: 16ch; }

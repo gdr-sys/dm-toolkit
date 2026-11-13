@@ -1,6 +1,6 @@
 // Cambiare il numero quando cambia l'elenco dei file precaricati, cosi' il nuovo service
 // worker scarica di nuovo tutto e cancella la cache vecchia.
-const CACHE_NAME = 'dm-toolkit-v8';
+const CACHE_NAME = 'dm-toolkit-v9';
 const APP_SHELL = [
   './',
   './index.html',
