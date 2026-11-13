@@ -115,7 +115,7 @@ const Trasloco = (() => {
     const testo = fatto
       ? 'Fatto: le tue campagne sono al nuovo indirizzo. Da ora apri Pocket GM Screen da lì.'
       : campagne
-        ? 'Pocket GM Screen ha un nuovo indirizzo. Porta lì le tue campagne con un clic: qui restano comunque una copia.'
+        ? 'Pocket GM Screen ha un nuovo indirizzo. Porta lì le tue campagne con un clic: qui ne resta comunque una copia.'
         : 'Pocket GM Screen ha un nuovo indirizzo: da ora lo trovi lì.';
     b.innerHTML = '<span style="flex:1 1 260px;min-width:0;">' + testo + ' <b style="white-space:nowrap;">pocketgmscreen.pages.dev</b></span>' +
       '<span style="display:flex;gap:8px;flex-wrap:wrap;">' +

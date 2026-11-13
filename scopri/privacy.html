@@ -36,7 +36,7 @@
 <main id="contenuto">
 <div class="wrap testa-pagina">
   <h1>Privacy</h1>
-  <p class="lead">Quali dati usa Pocket GM Screen, dove finiscono e come cancellarli. Ultimo aggiornamento: 13 novembre 2026.</p>
+  <p class="lead">Quali dati usa Pocket GM Screen, dove finiscono e come cancellarli. Ultimo aggiornamento: 13 novembre 2026 (nuovo indirizzo su Cloudflare).</p>
 </div>
 <section><div class="wrap informativa">
 
@@ -44,7 +44,7 @@
     <h2>In breve</h2>
     <ul>
       <li>Senza account, le campagne restano solo nel tuo browser: non arrivano a nessun server.</li>
-      <li>Non ci sono pubblicità, statistiche sulle visite né cookie di tracciamento. I caratteri sono nel sito stesso, non vengono chiesti a Google.</li>
+      <li>Non ci sono pubblicità né cookie di tracciamento. Le visite si contano in forma anonima, senza cookie e senza sapere chi sei. I caratteri sono nel sito stesso, non vengono chiesti a Google.</li>
       <li>Se accedi, se colleghi Google Drive o se mandi una segnalazione, alcuni dati passano ai servizi elencati qui sotto, solo per far funzionare quella cosa.</li>
     </ul>
   </div>
@@ -59,6 +59,7 @@
     <div class="tab-scorre"><table>
       <thead><tr><th>Quando</th><th>Quali dati</th><th>Dove</th></tr></thead>
       <tbody>
+        <tr><td>Apri il sito o l'app</td><td>L'indirizzo IP e il tipo di browser, solo per consegnare le pagine; statistiche anonime delle visite (pagine viste, paese, tipo di dispositivo), senza cookie</td><td>Cloudflare, che ospita il sito (Cloudflare Pages e Web Analytics)</td></tr>
         <tr><td>Usi l'app senza account</td><td>Campagne e impostazioni</td><td>Solo nella memoria del tuo browser, su questo dispositivo</td></tr>
         <tr><td>Accedi con Google, con email o in modo anonimo</td><td>Identificativo dell'account; con Google o email anche nome, email e foto del profilo</td><td>Firebase Authentication (Google)</td></tr>
         <tr><td>Con l'accesso fatto</td><td>Le campagne, per sincronizzarle tra i tuoi dispositivi e con i co-master; il nome che mostri ai co-master. Con Drive collegato, su Firebase resta solo un riferimento al file</td><td>Firebase Realtime Database (Google), server in Belgio</td></tr>
@@ -78,7 +79,7 @@
 
   <div>
     <h2>Servizi esterni</h2>
-    <p>Google (Firebase e Drive), Web3Forms, Brevo e YouTube trattano i dati secondo le proprie regole sulla privacy. Alcuni hanno sede o server fuori dall'Unione Europea, dove il trasferimento avviene con le garanzie previste dal GDPR.</p>
+    <p>Cloudflare, Google (Firebase e Drive), Web3Forms, Brevo e YouTube trattano i dati secondo le proprie regole sulla privacy. Alcuni hanno sede o server fuori dall'Unione Europea, dove il trasferimento avviene con le garanzie previste dal GDPR.</p>
   </div>
 
   <div>
@@ -97,7 +98,7 @@
 
   <div>
     <h2>Cookie</h2>
-    <p>Pocket GM Screen non usa cookie di tracciamento né statistiche. Usa la memoria del browser solo per far funzionare l'app (campagne, impostazioni, l'accesso). Per questo non trovi un banner dei cookie.</p>
+    <p>Pocket GM Screen non usa cookie di tracciamento. Le statistiche delle visite di Cloudflare non usano cookie né identificano chi visita. La memoria del browser serve solo a far funzionare l'app (campagne, impostazioni, l'accesso). Per questo non trovi un banner dei cookie.</p>
   </div>
 
 </div></section>
@@ -117,5 +118,12 @@
   </div>
 </footer>
 <script src="sito.js"></script>
+<!-- Statistiche anonime senza cookie (Cloudflare Web Analytics), solo sul nuovo indirizzo -->
+<script>
+  if (location.hostname === 'pocketgmscreen.pages.dev') {
+    var s = document.createElement('script'); s.defer = true; s.src = 'https://static.cloudflareinsights.com/beacon.min.js';
+    s.setAttribute('data-cf-beacon', '{"token": "e558105b69b443d195298f153cfbf6d8"}'); document.head.appendChild(s);
+  }
+</script>
 </body>
 </html>

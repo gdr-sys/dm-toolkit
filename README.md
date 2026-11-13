@@ -7,10 +7,10 @@
 
 **Tutta la campagna, in tasca.** Prima si chiamava DM Toolkit: le campagne salvate restano dove sono.
 
-[![Scopri](https://img.shields.io/badge/scopri-il%20sito%20di%20presentazione-8B2635?style=flat-square)](https://gdr-sys.github.io/dm-toolkit/scopri/)
-[![Live](https://img.shields.io/badge/apri-l'app-crimson?style=flat-square)](https://gdr-sys.github.io/dm-toolkit/)
-[![D&D 5e](https://img.shields.io/badge/D%26D-5e%202014%20%2F%202024-8B2635?style=flat-square)](https://gdr-sys.github.io/dm-toolkit/)
-[![Vanilla JS](https://img.shields.io/badge/stack-Vanilla%20JS-F7DF1E?style=flat-square&logo=javascript&logoColor=black)](https://gdr-sys.github.io/dm-toolkit/)
+[![Scopri](https://img.shields.io/badge/scopri-il%20sito%20di%20presentazione-8B2635?style=flat-square)](https://pocketgmscreen.pages.dev/scopri/)
+[![Live](https://img.shields.io/badge/apri-l'app-crimson?style=flat-square)](https://pocketgmscreen.pages.dev/)
+[![D&D 5e](https://img.shields.io/badge/D%26D-5e%202014%20%2F%202024-8B2635?style=flat-square)](https://pocketgmscreen.pages.dev/)
+[![Vanilla JS](https://img.shields.io/badge/stack-Vanilla%20JS-F7DF1E?style=flat-square&logo=javascript&logoColor=black)](https://pocketgmscreen.pages.dev/)
 [![Firebase](https://img.shields.io/badge/sync-Firebase-FFCA28?style=flat-square&logo=firebase&logoColor=black)](https://firebase.google.com/)
 [![License](https://img.shields.io/badge/game%20data-SRD%20CC--BY--4.0-lightgrey?style=flat-square)](https://www.dndbeyond.com/srd)
 
@@ -18,9 +18,9 @@ Web app per Dungeon Master di D&D 5e (edizioni 2014 e 2024) per gestire una camp
 
 ![Pocket GM Screen in azione: Dashboard, percorso a tappe sulla mappa, tempi di viaggio, combat tracker e musica](docs/img/demo.gif)
 
-### [Scopri Pocket GM Screen](https://gdr-sys.github.io/dm-toolkit/scopri/)
+### [Scopri Pocket GM Screen](https://pocketgmscreen.pages.dev/scopri/)
 
-Il sito di presentazione, con le funzioni mostrate passo per passo. Se vuoi andare subito al sodo, [apri l'app](https://gdr-sys.github.io/dm-toolkit/).
+Il sito di presentazione, con le funzioni mostrate passo per passo. Se vuoi andare subito al sodo, [apri l'app](https://pocketgmscreen.pages.dev/).
 
 Per vederla in azione: apri l'app e, nella Home vuota, scegli **"Prova con una campagna di esempio"**. Si crea *Le Ceneri di Valmora*, già piena di PNG, luoghi, sessioni, tabelle e calendario.
 
@@ -292,7 +292,7 @@ Il cuore dell'app è un unico file HTML: niente framework, niente bundler, nessu
 
 © 2026 Noemi Marcolini. Tutti i diritti riservati.
 
-Il codice, la grafica, i testi originali e il logo di Pocket GM Screen sono protetti dal diritto d'autore. Puoi usare gratuitamente [l'app pubblicata](https://gdr-sys.github.io/dm-toolkit/) per le tue campagne, ma non copiare, modificare o ripubblicare il codice senza permesso scritto. Leggere il codice su GitHub non concede una licenza. Testo completo in [LICENSE](LICENSE).
+Il codice, la grafica, i testi originali e il logo di Pocket GM Screen sono protetti dal diritto d'autore. Puoi usare gratuitamente [l'app pubblicata](https://pocketgmscreen.pages.dev/) per le tue campagne, ma non copiare, modificare o ripubblicare il codice senza permesso scritto. Leggere il codice su GitHub non concede una licenza. Testo completo in [LICENSE](LICENSE).
 
 ### Dati di gioco
 
