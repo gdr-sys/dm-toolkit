@@ -5553,12 +5553,18 @@ const Sessione = (() => {
           </div>
         </div>
         <div style="display:flex;gap:var(--space-sm);">
-          <button class="btn btn-primary btn-sm" onclick="Sessione.nextTurn()">▶ Avanti</button>
+          <button class="btn btn-primary btn-sm" onclick="Sessione.nextTurn()"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l12-7.5Z"/></svg> Avanti</button>
           <button class="btn btn-secondary btn-sm" onclick="Sessione.addMonsterQuick()">+ Mostro</button>
           <button class="btn btn-secondary btn-sm" onclick="Sessione.rollAllInitiative()">Init tutti</button>
           <button class="btn btn-ghost btn-sm" onclick="Sessione.saveCombatSession()">Salva</button>
-          <button class="btn btn-danger btn-sm" onclick="Sessione.endCombat()">■ Fine</button>
+          <button class="btn btn-danger btn-sm" onclick="Sessione.endCombat()"><svg aria-hidden="true" width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="5" width="14" height="14" rx="2"/></svg> Fine</button>
         </div>
+      </div>
+
+      <!-- Legenda dei pulsanti: su tablet e telefono non c'e' il passaggio del mouse per leggere i nomi -->
+      <div class="combat-legenda" aria-hidden="true">
+        <span><svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 5.5A1.5 1.5 0 0 1 3.5 4H9a3 3 0 0 1 3 3v13a2.5 2.5 0 0 0-2.5-2.5h-6A1.5 1.5 0 0 1 2 16Z"/><path d="M22 5.5A1.5 1.5 0 0 0 20.5 4H15a3 3 0 0 0-3 3v13a2.5 2.5 0 0 1 2.5-2.5h6a1.5 1.5 0 0 0 1.5-1.5Z"/></svg>Scheda del mostro</span><span><svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7.5v5M12 16.2h.01"/></svg>Condizioni</span><span><svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.6 5.6 6.1.7-4.5 4.2 1.2 6L12 16.6 6.6 19.5l1.2-6L3.3 9.3l6.1-.7Z"/></svg>Concentrazione</span><span><svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20s-7.5-4.6-7.5-10A4.3 4.3 0 0 1 12 7.3 4.3 4.3 0 0 1 19.5 10c0 5.4-7.5 10-7.5 10Z"/><path d="M8 12h2l1-2 2 4 1-2h2"/></svg>Punti ferita: danno, cura, temporanei</span><span><svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9a2.1 2.1 0 0 0-3-3L5 17Z"/><path d="M14 20h6"/></svg>Note</span><span><svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg>Togli dallo scontro</span>
+        <span class="combat-legenda-pf"><b>− / +</b>danno o cura · tocca il numero per scriverlo</span>
       </div>
 
       <!-- Lista combatenti -->
@@ -5643,12 +5649,12 @@ const Sessione = (() => {
 
         <!-- Azioni rapide -->
         <div class="combat-actions-col">
-          ${c.tipo !== 'pg' ? `<button class="btn btn-ghost btn-icon-sm" title="Scheda mostro" onclick="Sessione.openCombatantSheet('${c.id}')"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></button>` : ''}
-          <button class="btn btn-ghost btn-icon-sm" title="Aggiungi condizione" onclick="Sessione.openCondizioneModal('${c.id}')"><span style="color:#e74c3c;"><svg aria-hidden="true" width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="8"/></svg></span></button>
-          <button class="btn btn-ghost btn-icon-sm" title="Concentrazione" onclick="Sessione.toggleConcentrazione('${c.id}')" style="${c.concentrazione ? 'color:var(--accent-tertiary);' : ''}"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></button>
-          <button class="btn btn-ghost btn-icon-sm" title="Punti ferita: danno, cura, temporanei" aria-label="Punti ferita di ${c.nome}" onclick="Sessione.apriPF('${c.id}', 'danno')"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></button>
-          <button class="btn btn-ghost btn-icon-sm" title="Note" onclick="Sessione.openNote('${c.id}')" style="${c.note ? 'color:var(--accent-secondary-text);' : ''}"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></button>
-          <button class="btn btn-ghost btn-icon-sm" title="Rimuovi" onclick="Sessione.removeCombatant('${c.id}')"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>
+          ${c.tipo !== 'pg' ? `<button aria-label="Scheda di ${c.nome}" class="btn btn-ghost btn-icon-sm" title="Scheda mostro" onclick="Sessione.openCombatantSheet('${c.id}')"><svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 5.5A1.5 1.5 0 0 1 3.5 4H9a3 3 0 0 1 3 3v13a2.5 2.5 0 0 0-2.5-2.5h-6A1.5 1.5 0 0 1 2 16Z"/><path d="M22 5.5A1.5 1.5 0 0 0 20.5 4H15a3 3 0 0 0-3 3v13a2.5 2.5 0 0 1 2.5-2.5h6a1.5 1.5 0 0 0 1.5-1.5Z"/></svg></button>` : ''}
+          <button aria-label="Condizioni di ${c.nome}" class="btn btn-ghost btn-icon-sm" title="Condizioni" onclick="Sessione.openCondizioneModal('${c.id}')"><svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7.5v5M12 16.2h.01"/></svg></button>
+          <button aria-label="Concentrazione di ${c.nome}" class="btn btn-ghost btn-icon-sm" title="Concentrazione" onclick="Sessione.toggleConcentrazione('${c.id}')" style="${c.concentrazione ? 'color:var(--accent-tertiary);' : ''}"><svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.6 5.6 6.1.7-4.5 4.2 1.2 6L12 16.6 6.6 19.5l1.2-6L3.3 9.3l6.1-.7Z"/></svg></button>
+          <button class="btn btn-ghost btn-icon-sm" title="Punti ferita: danno, cura, temporanei" aria-label="Punti ferita di ${c.nome}" onclick="Sessione.apriPF('${c.id}', 'danno')"><svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20s-7.5-4.6-7.5-10A4.3 4.3 0 0 1 12 7.3 4.3 4.3 0 0 1 19.5 10c0 5.4-7.5 10-7.5 10Z"/><path d="M8 12h2l1-2 2 4 1-2h2"/></svg></button>
+          <button aria-label="Note su ${c.nome}" class="btn btn-ghost btn-icon-sm" title="Note" onclick="Sessione.openNote('${c.id}')" style="${c.note ? 'color:var(--accent-secondary-text);' : ''}"><svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9a2.1 2.1 0 0 0-3-3L5 17Z"/><path d="M14 20h6"/></svg></button>
+          <button aria-label="Togli ${c.nome} dallo scontro" class="btn btn-ghost btn-icon-sm" title="Togli dallo scontro" onclick="Sessione.removeCombatant('${c.id}')"><svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg></button>
         </div>
       </div>`;
   };
@@ -8118,31 +8124,44 @@ const Schermo = (() => {
   // impacchetta per conto suo come un vero masonry invece di seguire la riga
   // più alta. Un ResizeObserver lo ricalcola da solo quando un blocco cambia
   // altezza (contenuto caricato in ritardo, resize manuale, risposta...).
-  const _layoutMasonry = () => {
+  const _misureGriglia = () => {
     const grid = document.getElementById('schermo-grid');
-    if (!grid) return;
+    if (!grid) return null;
     const cs = getComputedStyle(grid);
-    const rowUnit = parseFloat(cs.gridAutoRows) || 1;
-    const rowGap = parseFloat(cs.rowGap || cs.gap) || 0;
-    const nCol = Math.max(1, cs.gridTemplateColumns.split(' ').filter(Boolean).length);
-    // Muratura vera, nell'ordine scelto dal master: ogni blocco va nella posizione piu' in alto dove
-    // c'e' spazio per la sua larghezza (a parita', la piu' a sinistra). La griglia del browser,
-    // da sola, non torna indietro a riempire i buchi lasciati dai blocchi piu' bassi.
-    const alt = new Array(nCol).fill(0);
-    grid.querySelectorAll('.schermo-block').forEach(el => {
-      const blk = _blocks.find(x => 'sblock-' + x.id === el.id);
-      const larg = Math.min(nCol, SIZES[blk?.size]?.cols || 2);
-      el.style.removeProperty('grid-row');
-      const h = el.getBoundingClientRect().height;
-      const righe = Math.max(1, Math.ceil((h + rowGap) / (rowUnit + rowGap)));
-      let col = 0, cima = Infinity;
-      for (let c = 0; c + larg <= nCol; c++) {
-        const m = Math.max(...alt.slice(c, c + larg));
-        if (m < cima) { cima = m; col = c; }
+    return { grid, rowUnit: parseFloat(cs.gridAutoRows) || 1, rowGap: parseFloat(cs.rowGap || cs.gap) || 0, colGap: parseFloat(cs.columnGap || cs.gap) || 0,
+      nCol: Math.max(1, cs.gridTemplateColumns.split(' ').filter(Boolean).length) };
+  };
+  // Calcola dove va ogni blocco: ognuno sta nella sua colonna (block.col), sotto quelli che lo precedono nella lista.
+  // I blocchi senza colonna (schermi salvati prima) prendono la colonna piu' corta, poi la tengono.
+  const _calcolaPosti = (lista, altezze, m) => {
+    const alt = new Array(m.nCol).fill(0), posti = [];
+    lista.forEach((blk, i) => {
+      const larg = Math.min(m.nCol, SIZES[blk.size]?.cols || 2);
+      const righe = Math.max(1, Math.ceil((altezze[i] + m.rowGap) / (m.rowUnit + m.rowGap)));
+      let col;
+      if (m.nCol > 1 && Number.isInteger(blk.col)) col = Math.max(0, Math.min(blk.col, m.nCol - larg));
+      else {
+        let cima = Infinity; col = 0;
+        for (let c = 0; c + larg <= m.nCol; c++) { const h = Math.max(...alt.slice(c, c + larg)); if (h < cima) { cima = h; col = c; } }
       }
-      el.style.setProperty('grid-column', (col + 1) + ' / span ' + larg, 'important');
-      el.style.setProperty('grid-row', (cima + 1) + ' / span ' + righe, 'important');
+      const cima = Math.max(...alt.slice(col, col + larg));
       for (let c = col; c < col + larg; c++) alt[c] = cima + righe;
+      posti.push({ col, larg, riga: cima, righe });
+    });
+    return posti;
+  };
+  const _layoutMasonry = () => {
+    const m = _misureGriglia();
+    if (!m) return;
+    const els = [...m.grid.querySelectorAll('.schermo-block')];
+    const lista = els.map(el => _blocks.find(x => 'sblock-' + x.id === el.id) || {});
+    els.forEach(el => el.style.removeProperty('grid-row'));
+    const posti = _calcolaPosti(lista, els.map(el => el.getBoundingClientRect().height), m);
+    els.forEach((el, i) => {
+      const q = posti[i];
+      if (m.nCol > 1 && lista[i].id && !Number.isInteger(lista[i].col)) lista[i].col = q.col;
+      el.style.setProperty('grid-column', (q.col + 1) + ' / span ' + q.larg, 'important');
+      el.style.setProperty('grid-row', (q.riga + 1) + ' / span ' + q.righe, 'important');
     });
   };
 
@@ -9027,15 +9046,72 @@ const Schermo = (() => {
     _salvaPresto();
   };
 
+  // Su/giu': scambia il posto con il blocco sopra/sotto nelle stesse colonne
   const moveBlock = (id, dir) => {
-    const idx = _blocks.findIndex(b => b.id === id);
-    const newIdx = idx + dir;
-    if (idx === -1 || newIdx < 0 || newIdx >= _blocks.length) return;
-    const altro = _blocks[newIdx];
-    [_blocks[idx], _blocks[newIdx]] = [_blocks[newIdx], _blocks[idx]];
-    const a = _el(id), b = _el(altro.id);
-    if (a && b) { if (dir < 0) a.parentNode.insertBefore(a, b); else a.parentNode.insertBefore(b, a); _layoutMasonry(); }
+    const m = _misureGriglia();
+    if (!m) return;
+    const els = [...m.grid.querySelectorAll('.schermo-block')];
+    const io = els.find(el => el.id === 'sblock-' + id);
+    if (!io) return;
+    const r0 = io.getBoundingClientRect();
+    const vicini = els.filter(el => el !== io).map(el => ({ el, r: el.getBoundingClientRect() }))
+      .filter(v => v.r.left < r0.right - 4 && v.r.right > r0.left + 4)
+      .filter(v => dir < 0 ? v.r.top < r0.top : v.r.top > r0.top)
+      .sort((a, b) => dir < 0 ? b.r.top - a.r.top : a.r.top - b.r.top);
+    if (!vicini.length) return;
+    const altroId = vicini[0].el.id.replace('sblock-', '');
+    const a = _blocks.findIndex(b => b.id === id), b = _blocks.findIndex(x => x.id === altroId);
+    [_blocks[a], _blocks[b]] = [_blocks[b], _blocks[a]];
+    const A = _blocks[b], B = _blocks[a];
+    if (Number.isInteger(A.col) && Number.isInteger(B.col) && (SIZES[A.size]?.cols === SIZES[B.size]?.cols)) { const c = A.col; A.col = B.col; B.col = c; }
+    // l'ordine nel DOM segue la lista
+    _blocks.forEach(x => { const el = _el(x.id); if (el) m.grid.appendChild(el); });
+    _layoutMasonry();
     _salvaPresto();
+  };
+  // Sinistra/destra: cambia colonna
+  const moveBlockCol = (id, dir) => {
+    const m = _misureGriglia();
+    const block = _blocks.find(b => b.id === id);
+    if (!m || !block) return;
+    const larg = Math.min(m.nCol, SIZES[block.size]?.cols || 2);
+    const ora = Number.isInteger(block.col) ? Math.min(block.col, m.nCol - larg) : 0;
+    const nuova = Math.max(0, Math.min(m.nCol - larg, ora + dir));
+    if (nuova === ora) return;
+    block.col = nuova;
+    _layoutMasonry();
+    _salvaPresto();
+  };
+  // Trascinamento: il blocco va nella colonna e all'altezza in cui viene lasciato
+  const _posizionaDa = (id, col, yTop) => {
+    const m = _misureGriglia();
+    const block = _blocks.find(b => b.id === id);
+    if (!m || !block) return;
+    const larg = Math.min(m.nCol, SIZES[block.size]?.cols || 2);
+    block.col = Math.max(0, Math.min(m.nCol - larg, col));
+    const gTop = m.grid.getBoundingClientRect().top;
+    const cime = new Map([...m.grid.querySelectorAll('.schermo-block')].map(el => [el.id.replace('sblock-', ''), el.getBoundingClientRect().top - gTop]));
+    cime.set(id, yTop - 0.5);
+    _blocks.sort((a, b) => (cime.get(a.id) ?? 0) - (cime.get(b.id) ?? 0));
+    _blocks.forEach(x => { const el = _el(x.id); if (el) m.grid.appendChild(el); });
+    _layoutMasonry();
+    _salvaPresto();
+  };
+  // Dove finirebbe il blocco se lasciato qui (per l'anteprima tratteggiata)
+  const _anteprimaPosto = (id, col, yTop) => {
+    const m = _misureGriglia();
+    const block = _blocks.find(b => b.id === id);
+    if (!m || !block) return null;
+    const larg = Math.min(m.nCol, SIZES[block.size]?.cols || 2);
+    const c = Math.max(0, Math.min(m.nCol - larg, col));
+    const gTop = m.grid.getBoundingClientRect().top;
+    const els = [...m.grid.querySelectorAll('.schermo-block')];
+    const voci = els.map(el => { const b = _blocks.find(x => 'sblock-' + x.id === el.id) || {}; return { b: b.id === id ? { ...b, col: c } : b, el, top: b.id === id ? yTop - 0.5 : el.getBoundingClientRect().top - gTop }; })
+      .sort((a, b) => a.top - b.top);
+    const posti = _calcolaPosti(voci.map(v => v.b), voci.map(v => v.el.getBoundingClientRect().height), m);
+    const q = posti[voci.findIndex(v => v.b.id === id)];
+    const colW = (m.grid.clientWidth - m.colGap * (m.nCol - 1)) / m.nCol;
+    return { left: q.col * (colW + m.colGap), top: q.riga * (m.rowUnit + m.rowGap), width: q.larg * colW + (q.larg - 1) * m.colGap, colW, colGap: m.colGap, nCol: m.nCol, larg };
   };
 
   /* ── Menu del blocco: azioni scritte per esteso, sempre raggiungibili anche col dito ── */
@@ -9043,8 +9119,10 @@ const Schermo = (() => {
   const ICONE_MENU = {
     largo: '<path d="M4 12h16M8 8l-4 4 4 4M16 8l4 4-4 4"/>',
     stretto: '<path d="M3 12h6M15 12h6M6 8l4 4-4 4M18 8l-4 4 4 4"/>',
-    prima: '<path d="M19 12H5M11 6l-6 6 6 6"/>',
-    dopo: '<path d="M5 12h14M13 6l6 6-6 6"/>',
+    su: '<path d="M12 19V5M6 11l6-6 6 6"/>',
+    giu: '<path d="M12 5v14M6 13l6 6 6-6"/>',
+    sinistra: '<path d="M19 12H5M11 6l-6 6 6 6"/>',
+    destra: '<path d="M5 12h14M13 6l6 6-6 6"/>',
     modifica: '<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/>',
     rimuovi: '<path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/>',
   };
@@ -9072,7 +9150,7 @@ const Schermo = (() => {
     m.setAttribute('role', 'menu');
     m.innerHTML = '<div class="sm-nota">Larghezza: ' + Math.min(cols, nCol) + ' ' + (Math.min(cols, nCol) === 1 ? 'colonna' : 'colonne') + ' su ' + nCol + '</div>' +
       voce('largo', 'Più largo', cols >= Math.min(5, nCol)) + voce('stretto', 'Più stretto', cols <= 1) + '<hr>' +
-      voce('prima', 'Sposta prima', idx === 0) + voce('dopo', 'Sposta dopo', idx === _blocks.length - 1) +
+      voce('su', 'Sposta su') + voce('giu', 'Sposta giù') + (nCol > 1 ? voce('sinistra', 'Sposta a sinistra') + voce('destra', 'Sposta a destra') : '') +
       (block.type === 'custom' || block.type === 'note' ? voce('modifica', 'Modifica titolo e testo') : '') + '<hr>' +
       voce('rimuovi', 'Rimuovi', false, 'pericolo');
     document.body.appendChild(m);
@@ -9089,8 +9167,10 @@ const Schermo = (() => {
       if (k === 'modifica') { chiudiMenu(); editBlock(id); return; }
       if (k === 'largo') resizeBlock(id, 1);
       if (k === 'stretto') resizeBlock(id, -1);
-      if (k === 'prima') moveBlock(id, -1);
-      if (k === 'dopo') moveBlock(id, 1);
+      if (k === 'su') moveBlock(id, -1);
+      if (k === 'giu') moveBlock(id, 1);
+      if (k === 'sinistra') moveBlockCol(id, -1);
+      if (k === 'destra') moveBlockCol(id, 1);
       // Il menu resta aperto vicino al blocco, cosi' si puo' ripetere subito l'azione
       requestAnimationFrame(() => { apriMenu._interno = true; apriMenu(id); apriMenu._interno = false; document.querySelector('#schermo-menu button[data-k="' + k + '"]:not([disabled])')?.focus(); });
     });
@@ -9160,7 +9240,7 @@ const Schermo = (() => {
 
   return {
     init, render, addBlock, aggiungiRapido, submitAddBlock, _onTypeChange, eseguiGeneratore, aggiungiMusica, togliMusica,
-    removeBlock, resizeBlock, moveBlock, editBlock, resetLayout, apriMenu, chiudiMenu, _riordina: () => _layoutMasonry(),
+    removeBlock, resizeBlock, moveBlock, moveBlockCol, editBlock, resetLayout, apriMenu, chiudiMenu, _riordina: () => _layoutMasonry(), _posizionaDa, _anteprimaPosto,
     rollDie, generateMeteo, saveNote, advanceTime, refreshCombat,
     setCompendioRef, _refreshCombat, _refreshFavoriti, _swapBlocks,
     _refreshNoteSessione, _avanzaTempo, _refreshTempo, filterVelocita,
@@ -21625,13 +21705,20 @@ const SchermoDD = (() => {
   const SOGLIA = 6; // px prima che una pressione diventi un trascinamento (cosi' i click restano click)
   let _stato = null;
 
-  const _bersaglio = (x, y) => {
-    const el = document.elementFromPoint(x, y);
-    const b = el && el.closest && el.closest('#schermo-grid .schermo-block');
-    return b && b !== _stato?.blocco ? b : null;
+  const _segno = () => {
+    let d = document.getElementById('schermo-segno-arrivo');
+    if (!d) { d = document.createElement('div'); d.id = 'schermo-segno-arrivo'; document.getElementById('schermo-grid')?.appendChild(d); }
+    return d;
   };
-
-  const _pulisciEvidenza = () => document.querySelectorAll('#schermo-grid .schermo-block').forEach(b => { b.style.outline = ''; b.style.outlineOffset = ''; });
+  const _dove = (e) => {
+    const st = _stato, grid = document.getElementById('schermo-grid');
+    const g = grid.getBoundingClientRect();
+    const x = e.clientX - st.dx - g.left, y = e.clientY - st.dy - g.top;
+    const prova = Schermo._anteprimaPosto(st.id, 0, y);
+    if (!prova) return null;
+    const col = Math.round(x / (prova.colW + prova.colGap));
+    return { col, y, posto: Schermo._anteprimaPosto(st.id, col, y) };
+  };
 
   const _giu = (e) => {
     if (e.button !== undefined && e.button !== 0) return;
@@ -21639,11 +21726,10 @@ const SchermoDD = (() => {
     if (!header || e.target.closest('button, input, select, textarea, a')) return;
     const blocco = header.closest('.schermo-block');
     if (!blocco) return;
-    // Senza questo il browser, al primo movimento, avvia il suo trascinamento nativo (del testo o
-    // dell'icona dell'intestazione) e annulla i pointer event: era il motivo per cui i blocchi non
-    // si spostavano.
+    // Senza questo il browser avvia il suo trascinamento nativo e annulla i pointer event
     e.preventDefault();
-    _stato = { blocco, x: e.clientX, y: e.clientY, attivo: false };
+    const r = blocco.getBoundingClientRect();
+    _stato = { blocco, id: blocco.id.replace('sblock-', ''), x: e.clientX, y: e.clientY, dx: e.clientX - r.left, dy: e.clientY - r.top, attivo: false };
     window.addEventListener('pointermove', _muovi);
     window.addEventListener('pointerup', _su);
     window.addEventListener('pointercancel', _annulla);
@@ -21654,38 +21740,37 @@ const SchermoDD = (() => {
     if (!_stato.attivo) {
       if (Math.hypot(e.clientX - _stato.x, e.clientY - _stato.y) < SOGLIA) return;
       _stato.attivo = true;
-      _stato.blocco.style.opacity = '0.45';
-      _stato.blocco.style.pointerEvents = 'none'; // cosi' elementFromPoint trova il blocco sotto
+      Schermo.chiudiMenu?.();
+      _stato.blocco.classList.add('in-volo');
       document.body.style.userSelect = 'none';
     }
     e.preventDefault();
-    _pulisciEvidenza();
-    const t = _bersaglio(e.clientX, e.clientY);
-    if (t) { t.style.outline = '2px dashed var(--accent-secondary)'; t.style.outlineOffset = '2px'; }
+    _stato.blocco.style.transform = 'translate(' + (e.clientX - _stato.x) + 'px,' + (e.clientY - _stato.y) + 'px)';
+    const d = _dove(e);
+    if (!d || !d.posto) return;
+    const q = d.posto, segno = _segno();
+    segno.style.cssText = 'left:' + q.left + 'px;top:' + q.top + 'px;width:' + q.width + 'px;height:' + _stato.blocco.offsetHeight + 'px;';
+    _stato.ultimo = d;
+    // vicino ai bordi della finestra la pagina scorre da sola
+    if (e.clientY > innerHeight - 60) window.scrollBy(0, 14); else if (e.clientY < 80) window.scrollBy(0, -14);
   };
 
   const _fine = () => {
     window.removeEventListener('pointermove', _muovi);
     window.removeEventListener('pointerup', _su);
     window.removeEventListener('pointercancel', _annulla);
-    if (_stato?.blocco) { _stato.blocco.style.opacity = ''; _stato.blocco.style.pointerEvents = ''; }
+    if (_stato?.blocco) { _stato.blocco.classList.remove('in-volo'); _stato.blocco.style.transform = ''; }
+    document.getElementById('schermo-segno-arrivo')?.remove();
     document.body.style.userSelect = '';
-    _pulisciEvidenza();
   };
 
   const _su = (e) => {
     const st = _stato;
     if (!st) return;
-    const t = st.attivo ? _bersaglio(e.clientX, e.clientY) : null;
+    const d = st.attivo ? (_dove(e) || st.ultimo) : null;
     _fine();
     _stato = null;
-    if (!t) return;
-    const r = t.getBoundingClientRect();
-    // Lasciato sulla meta' sinistra (o superiore, su una colonna sola) del bersaglio: va prima
-    const prima = r.width > r.height * 0.6 ? e.clientX < r.left + r.width / 2 : e.clientY < r.top + r.height / 2;
-    t.parentNode.insertBefore(st.blocco, prima ? t : t.nextSibling);
-    Schermo._syncFromDOM();
-    Schermo._riordina();
+    if (d) Schermo._posizionaDa(st.id, d.col, d.y);
   };
 
   const _annulla = () => { _fine(); _stato = null; };

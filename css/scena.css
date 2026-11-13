@@ -675,3 +675,33 @@ body.barra-alta #wiki-section-tabbar:not([style*="display:none"]):not([style*="d
 .imp-interruttore input:focus-visible { outline: 2px solid var(--ac); outline-offset: 2px; }
 .imp-interruttore span { display: flex; flex-direction: column; gap: 2px; font-size: 0.9rem; }
 .imp-interruttore small { font-size: 0.8rem; color: var(--text-muted); }
+
+/* Trascinamento dei blocchi: il blocco segue il dito, il riquadro tratteggiato mostra dove andra' */
+#schermo-grid { position: relative; }
+#schermo-segno-arrivo { position: absolute; z-index: 1; pointer-events: none; border: 2px dashed var(--ac); border-radius: var(--raggio); background: color-mix(in oklch, var(--ac) 10%, transparent); transition: left .12s, top .12s, width .12s; }
+.schermo-block.in-volo { z-index: 50; opacity: .92; pointer-events: none; box-shadow: 0 24px 48px -16px rgba(0, 0, 0, .7) !important; transition: none !important; }
+
+/* Legenda dei pulsanti degli scontri */
+.combat-legenda { display: flex; flex-wrap: wrap; gap: 6px 18px; padding: 10px 16px 12px; font-size: 0.8rem; color: var(--text-muted); border-bottom: 1px solid var(--border); }
+.combat-legenda span { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+.combat-legenda svg { color: var(--text-secondary); }
+.combat-legenda b { font-family: var(--font-mono); color: var(--text-secondary); margin-right: 2px; }
+.combat-legenda span:nth-child(2) svg, .combat-actions-col button[title="Condizioni"] { color: var(--danger-text); }
+@media (max-width: 600px) { .combat-legenda span { white-space: normal; } }
+
+/* Righe dello scontro: quando l'elenco e' stretto (tablet col menu laterale, telefono) i pulsanti vanno
+   su una seconda riga e si vedono tutti, invece di essere tagliati fuori dal bordo */
+.combat-list { container-type: inline-size; }
+@container (max-width: 760px) {
+  .combat-list .combat-row { display: grid !important; grid-template-columns: 56px minmax(0, 1fr) auto !important; grid-template-areas: "init name ca" "hp hp actions" !important; align-items: center; gap: 8px 12px !important; padding: 10px 12px !important; }
+  .combat-list .combat-init-col { grid-area: init; width: auto !important; }
+  .combat-list .combat-name-col { grid-area: name; overflow-wrap: anywhere; font-size: inherit !important; }
+  .combat-list .combat-ca-col { grid-area: ca; display: block !important; }
+  .combat-list .combat-hp-col { grid-area: hp; width: auto !important; }
+  .combat-list .combat-actions-col { grid-area: actions; display: flex !important; flex-wrap: wrap; justify-content: flex-end; gap: 4px !important; }
+  .combat-list .combat-actions-col .btn-icon-sm { display: inline-flex !important; width: 40px !important; height: 40px !important; }
+}
+@container (max-width: 400px) {
+  .combat-list .combat-row { grid-template-areas: "init name ca" "hp hp hp" "actions actions actions" !important; }
+  .combat-list .combat-actions-col { justify-content: space-between; }
+}
