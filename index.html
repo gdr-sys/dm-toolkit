@@ -21856,7 +21856,7 @@ const NoteSessione = (() => {
           rows="1"
           oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px';NoteSessione.updateTesto(${i},this.value)"
           onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();NoteSessione.addVoce();}"
-          placeholder="Scrivi nota...">${n.testo}</textarea>
+          placeholder="Scrivi nota...">${String(n.testo || '').replace(/&/g, '&amp;').replace(/</g, '&lt;')}</textarea>
         <button class="btn btn-ghost btn-icon-sm" style="flex-shrink:0;opacity:0.4;font-size:0.7rem;"
           onclick="NoteSessione.remove(${i})" title="Rimuovi" aria-label="Rimuovi"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
       </div>`).join('');

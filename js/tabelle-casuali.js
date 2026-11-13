@@ -12,7 +12,10 @@
      "Goblin"       senza numeri: le voci si dividono il dado
      "3 Goblin"     con "Pesi liberi": peso 3 (esce 3 volte piu' spesso)
    Dentro una voce: {2d6+1} tira dei dadi, [[Nome tabella]] tira su
-   un'altra tabella.
+   un'altra tabella, {PNG} {Luogo} {Fazione} {PG} pescano un nome della
+   campagna. Variabili: una riga "$capo = [[Nomi]]" si tira una volta
+   sola per tiro, e ogni $capo nelle voci diventa lo stesso valore.
+   Si puo' tirare piu' volte insieme, senza doppioni (t.unici).
 
    Modulo autonomo: costruisce la sua card nella pagina Generatori e
    il suo modale a runtime. La scheda Luogo della Wiki chiama
@@ -39,9 +42,13 @@ const TabelleCasuali = (() => {
   const _RE_NUMERO = /^(\d+)\s*(?:[:.)\]|]\s*|\s+)(.+)$/;
 
   // Restituisce { voci: [{testo, da, a}] o [{testo, peso}], avvisi: [...] }
+  const _RE_VARIABILE = /^\$([A-Za-zÀ-ÿ_][\wÀ-ÿ]*)\s*=\s*(.+)$/;
   const interpreta = (sorgente, dado) => {
-    const righe = String(sorgente || '').split(/\r?\n/).map(r => r.trim()).filter(r => r && !r.startsWith('#'));
+    const tutte = String(sorgente || '').split(/\r?\n/).map(r => r.trim()).filter(r => r && !r.startsWith('#'));
+    const variabili = tutte.map(r => r.match(_RE_VARIABILE)).filter(Boolean).map(m => ({ nome: m[1], valore: m[2].trim() }));
+    const righe = tutte.filter(r => !_RE_VARIABILE.test(r));
     const avvisi = [];
+    const esito = (o) => ({ ...o, variabili });
 
     if (dado === 'pesi') {
       const voci = righe.map(r => {
@@ -51,7 +58,7 @@ const TabelleCasuali = (() => {
         const m = r.match(_RE_NUMERO);
         return m ? { testo: m[2].trim(), peso: Math.max(1, parseInt(m[1], 10)) } : { testo: r, peso: 1 };
       });
-      return { voci, avvisi };
+      return esito({ voci, avvisi });
     }
 
     const N = parseInt(dado, 10) || 20;
@@ -90,7 +97,7 @@ const TabelleCasuali = (() => {
       if (buchi.length) avvisi.push('Nessuna voce per: ' + _compatta(buchi) + ' (con quei numeri il tiro non da\' risultato).');
       if (doppi.length) avvisi.push('Numeri in piu\' voci: ' + _compatta(doppi) + ' (vince la prima).');
     }
-    return { voci, avvisi };
+    return esito({ voci, avvisi });
   };
 
   const _compatta = (nums) => {
@@ -108,7 +115,20 @@ const TabelleCasuali = (() => {
 
   const _d = (facce) => 1 + Math.floor(Math.random() * facce);
 
-  const _espandi = (testo, profondita) => String(testo)
+  // Un nome a caso della campagna: {PNG}, {Luogo}, {Fazione}, {PG}
+  const NOMI_CAMPAGNA = { png: ['npcs', 'un PNG'], luogo: ['locations', 'un luogo'], fazione: ['factions', 'una fazione'], pg: ['pg', 'un PG'] };
+  const _nomeCampagna = (chi) => {
+    const [k, riserva] = NOMI_CAMPAGNA[chi.toLowerCase()];
+    const nomi = (_camp()?.[k] || []).map(x => String(x.nome || x.name || '').trim()).filter(Boolean);
+    return nomi.length ? nomi[Math.floor(Math.random() * nomi.length)] : riserva;
+  };
+  const _espandi = (testo, profondita, vars = null) => String(testo)
+    .replace(/\$([A-Za-zÀ-ÿ_][\wÀ-ÿ]*)/g, (orig, nome) => {
+      if (!vars || !(nome in vars.def)) return orig;
+      if (!(nome in vars.val)) { vars.val[nome] = '…'; vars.val[nome] = _espandi(vars.def[nome], profondita, vars); }
+      return vars.val[nome];
+    })
+    .replace(/\{\s*(PNG|Luogo|Fazione|PG)\s*\}/gi, (_, chi) => _nomeCampagna(chi))
     .replace(/\{\s*(\d*)\s*d\s*(\d+)\s*([+-]\s*\d+)?\s*\}/gi, (_, n, f, mod) => {
       let tot = 0;
       for (let i = 0; i < Math.min(100, parseInt(n || '1', 10)); i++) tot += _d(parseInt(f, 10));
@@ -122,27 +142,61 @@ const TabelleCasuali = (() => {
       return r.testo || nome;
     });
 
-  const _tiraTabella = (t, profondita = 0) => {
-    const { voci } = interpreta(t.sorgente, t.dado);
+  const _tiraTabella = (t, profondita = 0, esclusi = null, vars = null) => {
+    const { voci, variabili } = interpreta(t.sorgente, t.dado);
     if (!voci.length) return { numero: null, testo: '', vuota: true };
-    let numero, voce;
-    if (t.dado === 'pesi') {
-      const tot = voci.reduce((s, v) => s + v.peso, 0);
-      numero = _d(tot);
-      let acc = 0;
-      voce = voci.find(v => (acc += v.peso) >= numero);
-    } else {
-      numero = _d(parseInt(t.dado, 10));
-      voce = voci.find(v => numero >= v.da && numero <= v.a);
+    // Le variabili si tirano una volta per tiro (o per gruppo di tiri): $capo resta lo stesso in tutte le voci
+    const v = vars || { def: Object.fromEntries(variabili.map(x => [x.nome, x.valore])), val: {} };
+    const scegli = () => {
+      if (t.dado === 'pesi') {
+        const tot = voci.reduce((s, x) => s + x.peso, 0), numero = _d(tot);
+        let acc = 0;
+        return { numero, indice: voci.findIndex(x => (acc += x.peso) >= numero) };
+      }
+      const numero = _d(parseInt(t.dado, 10));
+      return { numero, indice: voci.findIndex(x => numero >= x.da && numero <= x.a) };
+    };
+    let r = scegli();
+    // Senza doppioni: si ritira finche' esce una voce nuova (con un limite, poi si prende la prima libera)
+    if (esclusi) {
+      for (let i = 0; i < 200 && (r.indice < 0 || esclusi.has(r.indice)); i++) r = scegli();
+      if (r.indice < 0 || esclusi.has(r.indice)) {
+        const libera = voci.findIndex((x, i) => !esclusi.has(i));
+        if (libera >= 0) r = { numero: t.dado === 'pesi' ? r.numero : voci[libera].da, indice: libera };
+      }
     }
-    return { numero, testo: voce ? _espandi(voce.testo, profondita) : '', vuota: false };
+    const voce = voci[r.indice];
+    return { numero: r.numero, indice: r.indice, testo: voce ? _espandi(voce.testo, profondita, v) : '', vuota: false };
+  };
+  // Piu' tiri insieme: le variabili restano le stesse, e senza doppioni se la tabella lo chiede
+  const _tiraMolti = (t, n) => {
+    const { voci, variabili } = interpreta(t.sorgente, t.dado);
+    if (!voci.length) return { numero: null, testo: '', vuota: true };
+    const unici = t.unici !== false, quanti = unici ? Math.min(n, voci.length) : n;
+    const vars = { def: Object.fromEntries(variabili.map(x => [x.nome, x.valore])), val: {} }, usati = new Set(), lista = [];
+    for (let i = 0; i < quanti; i++) { const r = _tiraTabella(t, 0, unici ? usati : null, vars); if (r.indice >= 0) usati.add(r.indice); lista.push(r); }
+    return { multi: lista, chiesti: n, vuota: false };
   };
 
-  const tira = (id) => {
+  const tira = (id, n = 1) => {
     const t = _tabelle().find(x => x.id === id);
     if (!t) return;
-    _ultimi[id] = _tiraTabella(t);
+    n = Math.max(1, Math.min(20, parseInt(n, 10) || 1));
+    _ultimi[id] = n > 1 ? _tiraMolti(t, n) : _tiraTabella(t);
     _aggiornaRisultati(id);
+  };
+  // Il risultato nelle Note di sessione (pagina Sessione e blocco dello Schermo)
+  const _testoRisultato = (t, r) => {
+    const una = (x) => (t.dado === 'pesi' || x.numero == null ? '' : x.numero + ': ') + (x.testo || 'nessuna voce');
+    return (t.nome || 'Tabella') + (r.multi ? ':\n' + r.multi.map(una).join('\n') : ' → ' + una(r));
+  };
+  const nelleNote = (id) => {
+    const t = _tabelle().find(x => x.id === id), r = _ultimi[id];
+    if (!t || !r || r.vuota || typeof NoteSessione === 'undefined') return;
+    const lista = NoteSessione.getData();
+    App.saveActiveCampaign({ noteSessione: [...lista, { tipo: '', testo: _testoRisultato(t, r) }] });
+    try { NoteSessione.render(); } catch (e) {}
+    Toast.show('Aggiunto alle Note di sessione', 'success', 1800);
   };
 
   // Tira e restituisce il risultato come testo (per chi lo mostra altrove, es. Entra in scena)
@@ -160,11 +214,18 @@ const TabelleCasuali = (() => {
     const r = _ultimi[t.id];
     if (!r) return '';
     if (r.vuota) return '<span style="color:var(--text-muted);">La tabella non ha voci.</span>';
+    const note = '<button type="button" class="btn btn-ghost btn-sm tc-note" onclick="TabelleCasuali.nelleNote(\'' + t.id + '\')" title="Aggiungi il risultato alle Note di sessione">Nelle note</button>';
+    if (r.multi) {
+      const meno = r.multi.length < r.chiesti ? '<div style="font-size:0.75rem;color:var(--text-muted);margin-top:4px;">La tabella ha solo ' + r.multi.length + ' voci diverse.</div>' : '';
+      return '<div style="display:flex;gap:8px;align-items:flex-start;"><ol class="tc-multi">' + r.multi.map(x => '<li>' +
+        (t.dado === 'pesi' ? '' : '<span style="font-family:var(--font-mono);font-size:0.78rem;color:var(--text-muted);margin-right:8px;">' + x.numero + '</span>') +
+        (x.testo ? '<span style="color:var(--text-primary);">' + _esc(x.testo) + '</span>' : '<span style="color:var(--warning-text);">Nessuna voce per ' + x.numero + '</span>') + '</li>').join('') + '</ol>' + note + '</div>' + meno;
+    }
     const tiro = t.dado === 'pesi' ? '' :
       '<span style="font-family:var(--font-mono);font-size:0.78rem;color:var(--text-muted);margin-right:8px;">d' + t.dado + ' → ' + r.numero + '</span>';
-    return tiro + (r.testo
+    return '<div style="display:flex;gap:8px;align-items:flex-start;"><div style="flex:1;">' + tiro + (r.testo
       ? '<span style="color:var(--text-primary);">' + _esc(r.testo) + '</span>'
-      : '<span style="color:var(--warning-text);">Nessuna voce per ' + r.numero + '</span>');
+      : '<span style="color:var(--warning-text);">Nessuna voce per ' + r.numero + '</span>') + '</div>' + note + '</div>';
   };
 
   // Lo stesso risultato puo' essere visibile in piu' punti (Generatori e scheda Luogo)
@@ -194,7 +255,8 @@ const TabelleCasuali = (() => {
             (luoghi.length ? ' · ' + luoghi.map(l => _esc(l.nome || l.name)).join(', ') : '') + '</div>' +
         '</div>' +
         '<button type="button" class="btn btn-ghost btn-icon-sm" title="Modifica tabella" aria-label="Modifica tabella" onclick="TabelleCasuali.apriEditor(\'' + t.id + '\')">' + _iconaMatita + '</button>' +
-        '<button type="button" class="btn btn-primary btn-sm" style="display:inline-flex;align-items:center;gap:6px;" onclick="TabelleCasuali.tira(\'' + t.id + '\')">' + _iconaDado + 'Tira</button>' +
+        '<select class="form-select tc-quanti" aria-label="Quante volte tirare" title="Quante volte tirare' + (t.unici !== false ? ', senza doppioni' : '') + '">' + [1, 2, 3, 4, 5, 6, 8, 10].map(n => '<option value="' + n + '">' + n + '×</option>').join('') + '</select>' +
+        '<button type="button" class="btn btn-primary btn-sm" style="display:inline-flex;align-items:center;gap:6px;" onclick="TabelleCasuali.tira(\'' + t.id + '\', this.previousElementSibling.value)">' + _iconaDado + 'Tira</button>' +
       '</div>' +
       '<div data-tc-risultato="' + t.id + '" style="' + (_ultimi[t.id] ? '' : 'display:none;') + 'margin-top:8px;padding:8px 12px;background:var(--bg-secondary);border-radius:var(--radius-sm);font-size:0.92rem;line-height:1.5;">' + _risultatoHTML(t) + '</div>' +
     '</div>';
@@ -291,12 +353,15 @@ const TabelleCasuali = (() => {
             '<select id="tc-categoria" class="form-select"></select>' +
             '<div style="font-size:0.75rem;color:var(--text-muted);margin-top:4px;">La tabella compare anche in quella scheda dei Generatori, oltre che in Le mie tabelle.</div></div>' +
           '<div class="form-group" style="margin-bottom:6px;"><label class="form-label" for="tc-sorgente">Voci — una per riga</label>' +
-            '<textarea id="tc-sorgente" class="form-textarea" rows="9" spellcheck="false" style="font-family:var(--font-mono);font-size:0.82rem;line-height:1.6;" oninput="TabelleCasuali._anteprima()" placeholder="1-8 Un branco di lupi\n9-14 {1d4} banditi con un carro rubato\n15-19 Un druido che chiede aiuto\n20 Tira di nuovo: [[Eventi strani]]"></textarea></div>' +
+            '<textarea id="tc-sorgente" class="form-textarea" rows="9" spellcheck="false" style="font-family:var(--font-mono);font-size:0.82rem;line-height:1.6;" oninput="TabelleCasuali._anteprima()" placeholder="$capo = {PNG}&#10;1-8 Un branco di lupi\n9-14 {1d4} banditi con un carro rubato\n15-19 Un druido che chiede aiuto\n20 Tira di nuovo: [[Eventi strani]]"></textarea></div>' +
           '<div style="font-size:0.78rem;color:var(--text-muted);line-height:1.55;margin-bottom:12px;">' +
             'Scrivi l\'intervallo davanti (<code>1-3 Goblin</code>) oppure solo il testo: le voci si dividono il dado in parti uguali. ' +
             'Con <strong>Pesi liberi</strong> il numero davanti è il peso (<code>3 Goblin</code> esce 3 volte più spesso). ' +
-            'Dentro una voce, <code>{2d6}</code> tira dei dadi e <code>[[Nome tabella]]</code> tira su un\'altra tua tabella.' +
+            'Dentro una voce, <code>{2d6}</code> tira dei dadi e <code>[[Nome tabella]]</code> tira su un\'altra tua tabella. ' +
+            '<code>{PNG}</code>, <code>{Luogo}</code>, <code>{Fazione}</code> e <code>{PG}</code> pescano un nome della tua campagna. ' +
+            'Una riga come <code>$capo = {PNG}</code> crea una variabile: ogni <code>$capo</code> nelle voci diventa lo stesso nome, anche tirando più volte.' +
           '</div>' +
+          '<label style="display:flex;align-items:center;gap:8px;font-size:0.85rem;margin-bottom:12px;cursor:pointer;"><input type="checkbox" id="tc-unici" checked> Tirando più volte insieme, niente doppioni</label>' +
           '<div id="tc-anteprima" style="margin-bottom:12px;"></div>' +
           '<div class="form-group" style="margin:0;"><label class="form-label">Collega a uno o più Luoghi</label>' +
             '<div id="tc-luoghi" style="display:flex;flex-wrap:wrap;gap:6px 14px;max-height:120px;overflow-y:auto;font-size:0.85rem;"></div></div>' +
@@ -321,6 +386,9 @@ const TabelleCasuali = (() => {
     const nomi = new Set(_tabelle().map(t => (t.nome || '').trim().toLowerCase()));
     const mancanti = [...new Set(voci.flatMap(v => [...v.testo.matchAll(/\[\[([^\]]+)\]\]/g)].map(m => m[1].trim())))]
       .filter(n => !nomi.has(n.toLowerCase()));
+    const { variabili } = interpreta(document.getElementById('tc-sorgente').value, dado), def = new Set(variabili.map(x => x.nome));
+    const senza = [...new Set(voci.flatMap(v => [...v.testo.matchAll(/\$([A-Za-zÀ-ÿ_][\wÀ-ÿ]*)/g)].map(m => m[1])))].filter(n => !def.has(n));
+    if (senza.length) avvisi.push('Manca la riga che dice cosa vale ' + senza.map(n => '$' + n).join(', ') + ' (es. $' + senza[0] + ' = {PNG}).');
     if (mancanti.length) avvisi.push('Non hai ancora una tabella chiamata ' + mancanti.map(n => '"' + n + '"').join(', ') + ': finché non la crei, al suo posto comparirà solo il nome.');
     const totPesi = dado === 'pesi' ? voci.reduce((s, v) => s + v.peso, 0) : 0;
     const etichetta = (v) => dado === 'pesi'
@@ -328,6 +396,7 @@ const TabelleCasuali = (() => {
       : (v.da === v.a ? String(v.da) : v.da + '–' + v.a);
     el.innerHTML =
       '<div style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted);margin-bottom:4px;">Anteprima</div>' +
+      (variabili.length ? '<div style="font-size:0.8rem;color:var(--text-secondary);margin-bottom:6px;">Variabili: ' + variabili.map(x => '<code>$' + _esc(x.nome) + '</code> = ' + _esc(x.valore)).join(' · ') + '</div>' : '') +
       '<div style="border:1px solid var(--border);border-radius:var(--radius-sm);max-height:170px;overflow-y:auto;">' +
         voci.map(v => '<div style="display:flex;gap:10px;padding:4px 10px;border-bottom:1px solid var(--border);font-size:0.83rem;">' +
           '<span style="font-family:var(--font-mono);color:var(--text-muted);min-width:52px;">' + etichetta(v) + '</span>' +
@@ -347,6 +416,7 @@ const TabelleCasuali = (() => {
     document.getElementById('tc-nome').value = dati.nome || '';
     document.getElementById('tc-dado').value = String(dati.dado || '20');
     document.getElementById('tc-sorgente').value = dati.sorgente || '';
+    document.getElementById('tc-unici').checked = dati.unici !== false;
     const categorie = (typeof GeneratoriSchede !== 'undefined' && GeneratoriSchede.categorie) ? GeneratoriSchede.categorie() : [];
     if (dati.categoria && !categorie.includes(dati.categoria)) categorie.push(dati.categoria);
     document.getElementById('tc-categoria').innerHTML = '<option value="">Solo in Le mie tabelle</option>' +
@@ -375,6 +445,7 @@ const TabelleCasuali = (() => {
       dado: document.getElementById('tc-dado').value,
       categoria: document.getElementById('tc-categoria').value || '',
       luoghi: [...document.querySelectorAll('#tc-luoghi input:checked')].map(c => c.value),
+      unici: document.getElementById('tc-unici').checked,
       aggiornatoAt: Date.now(),
     };
     const lista = [..._tabelle()];
@@ -487,5 +558,5 @@ const TabelleCasuali = (() => {
 
   document.addEventListener('DOMContentLoaded', () => setTimeout(() => { _aggancia(); render(); }, 200));
 
-  return { render, filtra, filtrate, tira, tiraTesto, apriEditor, importaFile, bloccoLuogo, interpreta, daCSV, _anteprima, _salvaEditor, _elimina };
+  return { render, filtra, filtrate, tira, tiraTesto, nelleNote, apriEditor, importaFile, bloccoLuogo, interpreta, daCSV, _anteprima, _salvaEditor, _elimina };
 })();

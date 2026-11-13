@@ -769,3 +769,8 @@ button[onclick*="').value='';Compendio.onSearch("] { min-width: 32px; min-height
   .esa-pannello { bottom: 8px; padding: 8px 10px; gap: 6px; }
   .esa-gruppo-seg { order: 3; width: 100%; }
 }
+
+/* Le mie tabelle: tiri multipli */
+.tc-quanti { width: auto; font-size: 0.8rem; padding: 4px 8px; }
+.tc-multi { flex: 1; margin: 0; padding-left: 1.3em; display: grid; gap: 4px; }
+.tc-note { flex-shrink: 0; white-space: nowrap; }
