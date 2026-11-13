@@ -1,3 +1,4 @@
+/* DM Toolkit — © 2026 Noemi Marcolini. Tutti i diritti riservati. Vedi LICENSE. */
 /* ============================================================
    TABELLE-CASUALI.JS — "Le mie tabelle": tabelle casuali create
    dal DM (d4…d100 o pesi liberi), tirate dall'app, importabili da

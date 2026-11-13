@@ -1,3 +1,4 @@
+/* DM Toolkit — © 2026 Noemi Marcolini. Tutti i diritti riservati. Vedi LICENSE. */
 /* ============================================================
    UPDATE-BANNER.JS — Avviso "È disponibile una nuova versione"
    quando viene pubblicato un aggiornamento mentre l'app è già

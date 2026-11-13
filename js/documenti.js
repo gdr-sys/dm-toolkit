@@ -1,3 +1,4 @@
+/* DM Toolkit — © 2026 Noemi Marcolini. Tutti i diritti riservati. Vedi LICENSE. */
 /* ============================================================
    DOCUMENTI.JS — Documenti di gioco illustrati: lettere sigillate,
    taglie, editti, avvisi da bacheca e mappe del tesoro. I testi si

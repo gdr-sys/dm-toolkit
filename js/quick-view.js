@@ -1,3 +1,4 @@
+/* DM Toolkit — © 2026 Noemi Marcolini. Tutti i diritti riservati. Vedi LICENSE. */
 /* ============================================================
    QUICK-VIEW.JS — Pannello "vista rapida" affiancato.
 

@@ -1,3 +1,4 @@
+/* DM Toolkit — © 2026 Noemi Marcolini. Tutti i diritti riservati. Vedi LICENSE. */
 /* ============================================================
    VOCI-CAMPAGNA.JS — Voci di corridoio costruite con i dati veri
    della campagna (PNG, luoghi, fazioni, quest), senza IA: modelli

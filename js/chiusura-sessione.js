@@ -1,3 +1,4 @@
+/* DM Toolkit — © 2026 Noemi Marcolini. Tutti i diritti riservati. Vedi LICENSE. */
 /* ============================================================
    CHIUSURA-SESSIONE.JS — Chiusura della sessione in 5 domande.
    Il lavoro dopo la sessione (che di solito si salta) in due

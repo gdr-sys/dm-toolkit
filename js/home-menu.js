@@ -1,3 +1,4 @@
+/* DM Toolkit — © 2026 Noemi Marcolini. Tutti i diritti riservati. Vedi LICENSE. */
 /* ============================================================
    HOME-MENU.JS — Il menu "Importa e backup" della Home: si apre col
    pulsante, si chiude con Esc, con un clic fuori o scegliendo una voce.

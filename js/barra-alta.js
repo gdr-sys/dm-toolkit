@@ -1,3 +1,4 @@
+/* DM Toolkit — © 2026 Noemi Marcolini. Tutti i diritti riservati. Vedi LICENSE. */
 /* ============================================================
    BARRA-ALTA.JS — Navigazione in alto su schermi larghi (nuova grafica).
    Da 900px in su il menu laterale lascia il posto a una riga in alto:

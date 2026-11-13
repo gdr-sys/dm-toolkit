@@ -1,3 +1,4 @@
+/* DM Toolkit — © 2026 Noemi Marcolini. Tutti i diritti riservati. Vedi LICENSE. */
 /* ============================================================
    ARALDICA.JS — Stemmi generati: forma dello scudo, partizione,
    smalti, simbolo e motto. Dal seme nasce sempre lo stesso stemma.

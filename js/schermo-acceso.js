@@ -1,3 +1,4 @@
+/* DM Toolkit — © 2026 Noemi Marcolini. Tutti i diritti riservati. Vedi LICENSE. */
 /* ============================================================
    SCHERMO-ACCESO.JS — Tiene lo schermo acceso (Screen Wake Lock)
    su tablet e telefono, cosi' non si spegne a meta' scontro.

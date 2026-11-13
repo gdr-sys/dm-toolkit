@@ -1,3 +1,4 @@
+/* DM Toolkit — © 2026 Noemi Marcolini. Tutti i diritti riservati. Vedi LICENSE. */
 /* ============================================================
    CAMPAGNA-DEMO.JS — "Le Ceneri di Valmora": una campagna di
    esempio gia' piena (PNG, luoghi, fazioni, quest, PG, sessioni,

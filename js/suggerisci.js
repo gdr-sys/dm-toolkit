@@ -1,3 +1,4 @@
+/* DM Toolkit — © 2026 Noemi Marcolini. Tutti i diritti riservati. Vedi LICENSE. */
 /* ============================================================
    SUGGERISCI.JS — "Suggerisci una funzione": raccoglie le idee dei
    master con poche domande e le invia via Web3Forms, lo stesso

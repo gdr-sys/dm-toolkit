@@ -1,3 +1,4 @@
+/* DM Toolkit — © 2026 Noemi Marcolini. Tutti i diritti riservati. Vedi LICENSE. */
 /* ============================================================
    PREVIOUSLY-ON.JS — Genera un riassunto narrativo delle ultime
    sessioni (recap, beat principali, PNG coinvolti) pronto da

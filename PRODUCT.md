@@ -39,7 +39,7 @@ Si usa prima della sessione alla scrivania e durante la sessione al tavolo, anch
 - Nome: DM Toolkit. Icona esistente in `favicon.png` e `icons/`.
 - Lingua: italiano, tono semplice e diretto.
 - Gratuito, e lo restera': si puo' dire. Non si scrivono prezzi futuri.
-- Autore senza nome: "l'ho creato per il mio tavolo". Non indicare il genere dell'autore.
+- Copyright: © 2026 Noemi Marcolini, tutti i diritti riservati (LICENSE). Il nome compare solo negli avvisi di copyright (Impostazioni, piede del sito, README); nei testi del sito resta la voce in prima persona "l'ho creato per il mio tavolo".
 - Progetto indipendente, non affiliato a Wizards of the Coast. Dati di gioco da SRD 5.1 (OGL 1.0a e CC-BY-4.0) e 5.2.1 (CC-BY-4.0), con attribuzione. Nessun logo o personaggio ufficiale di D&D.
 - Niente emoji nell'interfaccia.
 

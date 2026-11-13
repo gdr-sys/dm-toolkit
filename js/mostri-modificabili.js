@@ -1,3 +1,4 @@
+/* DM Toolkit — © 2026 Noemi Marcolini. Tutti i diritti riservati. Vedi LICENSE. */
 /* ============================================================
    MOSTRI-MODIFICABILI.JS — Varianti dei mostri del Compendio:
    cambio del Grado di Sfida (come su 5e.tools), nuovo nome e tipo

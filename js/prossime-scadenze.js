@@ -1,3 +1,4 @@
+/* DM Toolkit — © 2026 Noemi Marcolini. Tutti i diritti riservati. Vedi LICENSE. */
 /* ============================================================
    PROSSIME-SCADENZE.JS — Avviso in Dashboard per le deadline del
    Calendario in scadenza entro il numero di giorni di preavviso

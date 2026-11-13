@@ -1,3 +1,4 @@
+/* DM Toolkit — © 2026 Noemi Marcolini. Tutti i diritti riservati. Vedi LICENSE. */
 /* ============================================================
    UPDATE-POPUP.JS — Avviso "cosa è stato corretto", mostrato una sola
    volta a chi ha già usato il tool (cioè ha almeno una campagna

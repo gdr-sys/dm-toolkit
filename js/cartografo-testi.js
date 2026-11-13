@@ -1,3 +1,4 @@
+/* DM Toolkit — © 2026 Noemi Marcolini. Tutti i diritti riservati. Vedi LICENSE. */
 /* ============================================================
    CARTOGRAFO-TESTI.JS — Tutti i testi dei generatori di mappe:
    temi dei dungeon, stanze, trappole, tipi di edificio, arredi e

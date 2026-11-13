@@ -1,3 +1,4 @@
+/* DM Toolkit — © 2026 Noemi Marcolini. Tutti i diritti riservati. Vedi LICENSE. */
 /* ============================================================
    VISTA-GIOCATORI.JS — Pagina di sola lettura per i giocatori,
    aperta da un link, con SOLO cio' che il DM sceglie di mostrare:

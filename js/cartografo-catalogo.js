@@ -1,3 +1,4 @@
+/* DM Toolkit — © 2026 Noemi Marcolini. Tutti i diritti riservati. Vedi LICENSE. */
 /* ============================================================
    CARTOGRAFO-CATALOGO.JS — L'elenco dei generatori di mappe, con le
    opzioni e i colori di ognuno. Da qui si generano le mappe e si

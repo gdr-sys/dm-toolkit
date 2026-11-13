@@ -1,3 +1,4 @@
+/* DM Toolkit — © 2026 Noemi Marcolini. Tutti i diritti riservati. Vedi LICENSE. */
 /* ============================================================
    PRIMI-PASSI.JS — Card "Primi passi" in cima alla Dashboard di
    una campagna nuova: cinque cose da fare per partire, che si

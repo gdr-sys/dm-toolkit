@@ -1,3 +1,4 @@
+/* DM Toolkit — © 2026 Noemi Marcolini. Tutti i diritti riservati. Vedi LICENSE. */
 /* ============================================================
    SCRITTOIO.JS — Pagina "Scrittoio": stemmi e documenti di gioco.
    Uno stemma si assegna a una Fazione o a un Luogo: diventa la loro

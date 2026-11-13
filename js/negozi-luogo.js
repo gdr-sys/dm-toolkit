@@ -1,3 +1,4 @@
+/* DM Toolkit — © 2026 Noemi Marcolini. Tutti i diritti riservati. Vedi LICENSE. */
 /* ============================================================
    NEGOZI-LUOGO.JS — "Salva nel Luogo" per il generatore di negozi:
    un negozio generato resta legato a un Luogo con gli stessi oggetti

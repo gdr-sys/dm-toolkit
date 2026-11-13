@@ -1,3 +1,4 @@
+/* DM Toolkit — © 2026 Noemi Marcolini. Tutti i diritti riservati. Vedi LICENSE. */
 /* ============================================================
    CARTOGRAFO-ABITAZIONE.JS — Generatore di edifici: pianta a corpi
    uniti (non piu' un semplice rettangolo), un disegno per ogni piano

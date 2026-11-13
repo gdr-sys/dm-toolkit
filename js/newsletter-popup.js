@@ -1,3 +1,4 @@
+/* DM Toolkit — © 2026 Noemi Marcolini. Tutti i diritti riservati. Vedi LICENSE. */
 /* ============================================================
    NEWSLETTER-POPUP.JS — Invito all'iscrizione alla newsletter
    (form Brevo). Compare una sola volta per browser dopo un breve

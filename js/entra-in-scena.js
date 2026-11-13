@@ -1,3 +1,4 @@
+/* DM Toolkit — © 2026 Noemi Marcolini. Tutti i diritti riservati. Vedi LICENSE. */
 /* ============================================================
    ENTRA-IN-SCENA.JS — Pulsante "Entra in scena" sulla scheda di un
    Luogo: compone al volo la scena usando cio' che c'e' gia' nella

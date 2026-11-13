@@ -283,4 +283,10 @@ Il cuore dell'app è un unico file HTML: niente framework, niente bundler, nessu
 
 ## Licenza
 
+© 2026 Noemi Marcolini. Tutti i diritti riservati.
+
+Il codice, la grafica, i testi originali e il logo di DM Toolkit sono protetti dal diritto d'autore. Puoi usare gratuitamente [l'app pubblicata](https://gdr-sys.github.io/dm-toolkit/) per le tue campagne, ma non copiare, modificare o ripubblicare il codice senza permesso scritto. Leggere il codice su GitHub non concede una licenza. Testo completo in [LICENSE](LICENSE).
+
+### Dati di gioco
+
 I dati di gioco provengono dal System Reference Document (SRD) di D&D 5e di Wizards of the Coast LLC, [disponibile qui](https://www.dndbeyond.com/srd): SRD 5.1 con licenze OGL 1.0a e [CC-BY-4.0](https://creativecommons.org/licenses/by/4.0/legalcode), SRD 5.2.1 con licenza CC-BY-4.0.

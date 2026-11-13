@@ -1,3 +1,4 @@
+/* DM Toolkit — © 2026 Noemi Marcolini. Tutti i diritti riservati. Vedi LICENSE. */
 /* ============================================================
    WIKI-IMPORT.JS — Importa schede Wiki (PNG, Luoghi, Fazioni, Lore,
    PG, Incontri, Quest, Sessioni) da un foglio CSV, per portare in

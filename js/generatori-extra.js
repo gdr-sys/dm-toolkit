@@ -1,3 +1,4 @@
+/* DM Toolkit — © 2026 Noemi Marcolini. Tutti i diritti riservati. Vedi LICENSE. */
 /* ============================================================
    GENERATORI-EXTRA.JS — Quattro generatori per la pagina
    Generatori: Trappole ed enigmi, Dungeon e stanze, Taverne e

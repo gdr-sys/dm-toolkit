@@ -1,3 +1,4 @@
+/* DM Toolkit — © 2026 Noemi Marcolini. Tutti i diritti riservati. Vedi LICENSE. */
 /* ============================================================
    SCENA.JS — La scena disegnata in cima alle pagine (nuova grafica).
    Non servono illustrazioni: il paesaggio nasce dal nome (stesso nome,
