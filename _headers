@@ -1,0 +1,16 @@
+# Intestazioni di sicurezza per Cloudflare Pages (pocketgmscreen.pages.dev).
+# La CSP elenca solo i servizi che l'app usa davvero: Firebase, Google (accesso, Drive, Picker),
+# librerie da cdnjs, YouTube senza cookie, il loot generator, Web3Forms, GitHub (avviso nuove
+# versioni) e le statistiche anonime di Cloudflare. 'unsafe-inline' resta finche' l'HTML usa
+# onclick e stili scritti nella pagina.
+/*
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://cdnjs.cloudflare.com https://apis.google.com https://accounts.google.com https://*.firebasedatabase.app https://*.firebaseio.com https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://accounts.google.com; img-src 'self' data: blob: https:; font-src 'self' data:; connect-src 'self' https://*.googleapis.com https://*.firebasedatabase.app wss://*.firebasedatabase.app https://*.firebaseio.com wss://*.firebaseio.com https://api.web3forms.com https://api.github.com https://www.gstatic.com https://cdnjs.cloudflare.com https://accounts.google.com https://drive.google.com https://cloudflareinsights.com; frame-src 'self' https://www.youtube-nocookie.com https://www.youtube.com https://dnd-loot-generator-sepia.vercel.app https://accounts.google.com https://docs.google.com https://drive.google.com https://content.googleapis.com https://dm-tollkit.firebaseapp.com; media-src 'self' data: blob: https:; worker-src 'self' blob:; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=()
+
+/sw.js
+  Cache-Control: no-cache
+
+/assets/fonts/*
+  Cache-Control: public, max-age=31536000, immutable

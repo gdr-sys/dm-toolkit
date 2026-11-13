@@ -2,7 +2,7 @@
   "name": "Pocket GM Screen",
   "short_name": "Pocket GM",
   "description": "Tutta la campagna, in tasca. Lo strumento gratuito per master di giochi di ruolo.",
-  "start_url": "/dm-toolkit/",
+  "start_url": "./",
   "display": "standalone",
   "background_color": "#1a1612",
   "theme_color": "#1a1612",
@@ -25,5 +25,6 @@
       "type": "image/png",
       "purpose": "maskable"
     }
-  ]
+  ],
+  "scope": "./"
 }

@@ -22119,7 +22119,7 @@ document.addEventListener('DOMContentLoaded', () => {
   setTimeout(() => MonsterCache.load(), 500);
 
   if ('serviceWorker' in navigator && window.self === window.top) {
-    navigator.serviceWorker.register('sw.js', { scope: '/dm-toolkit/' }).catch(function(){});
+    navigator.serviceWorker.register('sw.js').catch(function(){});
   }
 
 });
@@ -23000,6 +23000,7 @@ document.addEventListener('DOMContentLoaded', initMobileNav);
 <script src="js/newsletter-popup.js"></script>
 <script src="js/update-popup.js"></script>
 <script src="js/update-banner.js"></script>
+<script src="js/trasloco.js"></script>
 <script src="js/tabelle-casuali.js"></script>
 <script src="js/generatori-extra.js"></script>
 <script src="js/sessione-zero.js"></script>
