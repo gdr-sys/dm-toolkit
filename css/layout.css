@@ -825,3 +825,21 @@
   .combat-list .combat-actions-col { gap:0; }
   .combat-list .combat-actions-col .btn-icon-sm { width:30px !important; }
 }
+/* iPad e telefoni: il cassetto del menu si apre sempre largo, anche se sul computer la
+   barra laterale era stata compressa (la scelta si salva e arriva anche qui): prima le
+   scritte avevano larghezza zero, andavano a capo lettera per lettera e il menu restava
+   fatto di sole icone con grandi spazi vuoti. Il cassetto parte sotto l'ora e la batteria;
+   la barra in basso aggiunge lo spazio della barretta home invece di toglierlo alle scritte. */
+@media (max-width: 768px), (max-width: 1024px) and (hover: none) {
+  #sidebar.mobile-open { padding-top: var(--safe-top); padding-bottom: var(--safe-bottom); box-sizing: border-box; }
+  #sidebar.mobile-open .logo-text,
+  #sidebar.mobile-open .campaign-name,
+  #sidebar.mobile-open .nav-label { opacity: 1; width: auto; overflow: visible; }
+  #sidebar.mobile-open .campaign-name { overflow: hidden; }
+  #sidebar.mobile-open .nav-section-label { opacity: 1; }
+  #sidebar.mobile-open .sidebar-footer.collapsed-footer { flex-direction: row; gap: var(--space-sm); }
+  #sidebar.mobile-open .sidebar-toggle { display: none; }
+  #mobile-nav { height: calc(var(--mobile-nav-height) + var(--safe-bottom)); box-sizing: border-box; }
+  #main-content { padding-bottom: calc(var(--mobile-nav-height) + var(--safe-bottom)); }
+  #dice-widget { bottom: calc(var(--mobile-nav-height) + var(--safe-bottom) + var(--space-sm)); }
+}
