@@ -67,6 +67,11 @@ typography:
     fontSize: "0.95rem"
     fontWeight: 600
     lineHeight: 1.1
+  lettering-mappa:
+    fontFamily: "'Cormorant SC', 'Cormorant Garamond', 'IM Fell English', 'IM Fell English SC', Cinzel, 'Crimson Pro', Georgia, serif"
+    fontSize: "1rem"
+    fontWeight: 500
+    lineHeight: 1.2
 rounded:
   piccolo: "12px"
   medio: "16px"
@@ -171,7 +176,9 @@ I valori nel frontmatter sono quelli della tavolozza **brace**, che è la predef
 **Titoli:** Gloock (con le grazie, peso unico 400).
 **Testo:** Figtree (400, 600, 700).
 
-Gloock dà la voce della campagna: è il carattere della locandina. Figtree fa il lavoro: etichette, pulsanti, testi lunghi. Non si usano altri caratteri.
+Gloock dà la voce della campagna: è il carattere della locandina. Figtree fa il lavoro: etichette, pulsanti, testi lunghi. Nell'interfaccia non si usano altri caratteri.
+
+**Dentro le mappe del Cartografo** (solo nel disegno della mappa, mai nell'interfaccia) i nomi di luoghi, mari e rioni usano il lettering cartografico: Cormorant SC e Cormorant Garamond, più IM Fell English, Cinzel e Crimson Pro per gli stili storici. Titolo della mappa e legenda restano in Gloock e Figtree, come l'app.
 
 ### Hierarchy
 - **Scena** (Gloock 400, `clamp(2.6rem, 6.4vw, 5.2rem)`, interlinea 0.97): il titolo sopra la scena, per esempio il nome dell'ultima sessione o della campagna.
