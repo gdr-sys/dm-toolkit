@@ -354,7 +354,9 @@ const CartoDungeon = (() => {
       });
       // Gli archi sono varchi aperti; le altre porte diventano porte del tavolo virtuale
       const porteV = porte.filter((d) => d.tipo !== 'arco').map((d) => ({ tipo: d.tipo, seg: d.oriz ? [d.x, d.y, d.x, d.y + 1] : [d.x, d.y, d.x + 1, d.y] }));
-      return { S, ang, ox: cxM - ccx * S, oy: cyM - ccy * S, minX, minY, maxX, maxY, muri: muriV, porte: porteV };
+      const celle = [];
+      for (let y = minY; y < maxY; y++) for (let x = minX; x < maxX; x++) if (at(x, y)) celle.push([x, y]);
+      return { S, ang, ox: cxM - ccx * S, oy: cyM - ccy * S, minX, minY, maxX, maxY, muri: muriV, porte: porteV, celle };
     })();
     return { nome, pin, W, H, larghezzaKm: W / S * 1.5 / 1000, svg, vtt }; // un quadretto = 1,5 metri
   };

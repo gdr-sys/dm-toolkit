@@ -319,7 +319,7 @@ const Cartografo = (() => {
     else v.innerHTML = m.svg;
     _adatta();
     const T = K().TIPI[m.tipo];
-    { const bv = $('carto-vtt'); if (bv) bv.hidden = !VTT_TIPI.includes(m.tipo); }
+    { const bv = $('carto-vtt'), bs = $('carto-stampa'); if (bv) bv.hidden = !VTT_TIPI.includes(m.tipo); if (bs) bs.hidden = !VTT_TIPI.includes(m.tipo); }
     $('carto-titolo-mappa').textContent = m.nome;
     const n = m.pin.length;
     $('carto-info').textContent = T.nome + ' · ' + _scala(m.larghezzaKm) + ' da un lato all’altro · ' + n + (n === 1 ? ' luogo' : ' luoghi');
@@ -359,8 +359,35 @@ const Cartografo = (() => {
   // cade esattamente su quella del dungeon. Muri e porte arrivano gia' pronti per la visuale.
   const VTT_TIPI = ['dungeon', 'abitazione'];
   const PPG = 100; // pixel per quadretto nel file esportato
-  // Case su piu' piani: si sceglie il piano, ognuno e' un file a se'
-  const _scegliPiano = () => {
+  // Ritaglio comune a tavolo virtuale e stampa: la stessa mappa diritta, senza legenda e titolo,
+  // tagliata lungo i quadretti (un quadretto in piu' di margine), a ppg pixel per quadretto.
+  const _ritaglio = async (piano, ppg, opz = {}) => {
+    const casa = _mappa.tipo === 'abitazione', a = _attuale();
+    const extra = casa ? { soloPiano: piano, tetto: false } : { rotazione: 'dritto' };
+    const m = K().genera(_mappa.tipo, { ...a.opzioni, seme: a.seme, nome: _nomeEffettivo(), legenda: false, titolo: false, griglia: false, nomi: !!opz.numeri, ...extra });
+    const v = m.vtt;
+    if (!v || v.ang !== 0) throw new Error('dati dei quadretti mancanti');
+    const scala = ppg / v.S;
+    const x0 = v.minX - 1, y0 = v.minY - 1, larghi = v.maxX + 1 - x0, alti = v.maxY + 1 - y0;
+    const sorgente = await _inCanvas(_conFont(m.svg, await _font()), m.W, m.H, scala);
+    const c = document.createElement('canvas');
+    c.width = larghi * ppg; c.height = alti * ppg;
+    const g = c.getContext('2d');
+    g.drawImage(sorgente, (v.ox + x0 * v.S) * scala, (v.oy + y0 * v.S) * scala, c.width, c.height, 0, 0, c.width, c.height);
+    if (opz.griglia) {
+      // Griglia di combattimento: un quadretto = 1,5 metri, linee sottili che non coprono il disegno
+      g.strokeStyle = 'rgba(40,30,20,0.42)'; g.lineWidth = Math.max(1, ppg / 60);
+      // solo sul pavimento: niente inchiostro sprecato sulla roccia
+      g.beginPath();
+      (v.celle || []).forEach(([cx, cy]) => g.rect((cx - x0) * ppg, (cy - y0) * ppg, ppg, ppg));
+      g.stroke();
+    }
+    const piene = new Set((v.celle || []).map(([cx, cy]) => (cx - x0) + "," + (cy - y0)));
+    return { c, v, x0, y0, larghi, alti, piene };
+  };
+
+  // Scelte prima di esportare o stampare: piano (case su piu' piani), griglia e numeri (solo stampa)
+  const _apriScelta = (azione) => {
     let m = $('modal-carto-vtt');
     if (!m) {
       m = document.createElement('div');
@@ -368,34 +395,41 @@ const Cartografo = (() => {
       m.onclick = (e) => { if (e.target === m) Modal.close('carto-vtt'); };
       document.body.appendChild(m);
     }
-    m.innerHTML = '<div class="modal" style="max-width:380px;"><div class="modal-header"><h3 class="modal-title">Quale piano?</h3>' +
+    const piani = _mappa.tipo === 'abitazione' ? (_mappa.pianiVtt || []) : [];
+    const stampa = azione === 'stampa';
+    const scelte = (piani.length > 1
+      ? '<label class="form-label" for="carto-vtt-piano">Piano</label><select id="carto-vtt-piano" class="form-select" style="margin-bottom:12px;">' + piani.map((n, i) => '<option value="' + i + '">' + n + '</option>').join('') + '</select>'
+      : '') +
+      (stampa
+        ? '<label style="display:flex;gap:8px;align-items:center;min-height:36px;"><input type="checkbox" id="carto-vtt-griglia" checked> Griglia di combattimento (1 quadretto = 1,5 m)</label>' +
+          '<label style="display:flex;gap:8px;align-items:center;min-height:36px;"><input type="checkbox" id="carto-vtt-numeri"> Numeri delle stanze (per il master)</label>' +
+          '<p style="margin:10px 0 0;font-size:0.8rem;color:var(--text-muted);">Ogni quadretto esce di 2,5 cm, la misura delle miniature. La mappa si divide su più fogli A4 numerati da unire.</p>'
+        : '<p style="margin:0;font-size:0.85rem;color:var(--text-muted);">Ogni piano diventa una mappa a sé per il tavolo virtuale.</p>');
+    m.innerHTML = '<div class="modal" style="max-width:420px;"><div class="modal-header"><h3 class="modal-title">' + (stampa ? 'Stampa in scala' : 'Tavolo virtuale') + '</h3>' +
       '<button class="btn btn-ghost btn-icon-sm" onclick="Modal.close(\'carto-vtt\')" aria-label="Chiudi"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>' +
-      '<div class="modal-body"><p style="margin:0 0 12px;font-size:0.85rem;color:var(--text-muted);">Ogni piano diventa una mappa a sé per il tavolo virtuale.</p><div style="display:grid;gap:8px;">' +
-      _mappa.pianiVtt.map((n, i) => '<button type="button" class="btn btn-secondary" style="justify-content:flex-start;min-height:44px;" onclick="Modal.close(\'carto-vtt\');Cartografo.scaricaVtt(' + i + ')">' + n + '</button>').join('') +
-      '</div></div></div>';
+      '<div class="modal-body">' + scelte + '</div>' +
+      '<div class="modal-footer"><button type="button" class="btn btn-primary" style="width:100%;" onclick="Cartografo._confermaScelta(\'' + azione + '\')">' + (stampa ? 'Prepara i fogli' : 'Scarica il file') + '</button></div></div>';
     Modal.open('carto-vtt');
   };
+  const _confermaScelta = (azione) => {
+    const sel = $('carto-vtt-piano');
+    const piano = sel ? parseInt(sel.value, 10) || 0 : 0;
+    const opz = { griglia: !!($('carto-vtt-griglia') || {}).checked, numeri: !!($('carto-vtt-numeri') || {}).checked };
+    Modal.close('carto-vtt');
+    if (azione === 'stampa') stampaScala(piano, opz); else scaricaVtt(piano);
+  };
+
   const scaricaVtt = async (piano) => {
     if (!_mappa || !VTT_TIPI.includes(_mappa.tipo)) return;
     const casa = _mappa.tipo === 'abitazione';
     if (casa && !Number.isInteger(piano)) {
-      if ((_mappa.pianiVtt || []).length > 1) { _scegliPiano(); return; }
+      if ((_mappa.pianiVtt || []).length > 1) { _apriScelta('vtt'); return; }
       piano = 0;
     }
     const btn = $('carto-vtt');
     if (btn) btn.disabled = true;
     try {
-      const a = _attuale();
-      const extra = casa ? { soloPiano: piano, tetto: false } : { rotazione: 'dritto' };
-      const m = K().genera(_mappa.tipo, { ...a.opzioni, seme: a.seme, nome: _nomeEffettivo(), legenda: false, titolo: false, griglia: false, nomi: false, ...extra });
-      const v = m.vtt;
-      if (!v || v.ang !== 0) throw new Error('dati per il tavolo virtuale mancanti');
-      const scala = PPG / v.S;
-      const x0 = v.minX - 1, y0 = v.minY - 1, larghi = v.maxX + 1 - x0, alti = v.maxY + 1 - y0;
-      const sorgente = await _inCanvas(_conFont(m.svg, await _font()), m.W, m.H, scala);
-      const c = document.createElement('canvas');
-      c.width = larghi * PPG; c.height = alti * PPG;
-      c.getContext('2d').drawImage(sorgente, (v.ox + x0 * v.S) * scala, (v.oy + y0 * v.S) * scala, c.width, c.height, 0, 0, c.width, c.height);
+      const { c, v, x0, y0, larghi, alti } = await _ritaglio(piano, PPG);
       const immagine = c.toDataURL('image/png').split(',')[1];
       const p = (x, y) => ({ x: Math.round((x - x0) * 1000) / 1000, y: Math.round((y - y0) * 1000) / 1000 });
       const dati = {
@@ -423,6 +457,65 @@ const Cartografo = (() => {
       Toast.show('Il file per il tavolo virtuale non è riuscito. Riprova con “Nuova mappa”.', 'error', 5000);
     }
     if (btn) btn.disabled = false;
+  };
+
+  /* ── Stampa in scala: 1 quadretto = 2,5 cm, su fogli A4 numerati ── */
+  const PPG_STAMPA = 120; // circa 120 punti per pollice: nitida su carta
+  const _fogliDi = (larghi, alti) => {
+    // A4 con 10 mm di margine: 7 x 10 quadretti in verticale, 10 x 7 in orizzontale; vince chi usa meno fogli
+    const vert = Math.ceil(larghi / 7) * Math.ceil(alti / 10), oriz = Math.ceil(larghi / 10) * Math.ceil(alti / 7);
+    return oriz < vert ? { cw: 10, ch: 7, orient: 'landscape' } : { cw: 7, ch: 10, orient: 'portrait' };
+  };
+  const stampaScala = async (piano, opz) => {
+    if (!_mappa || !VTT_TIPI.includes(_mappa.tipo)) return;
+    if (!opz) { _apriScelta('stampa'); return; }
+    // La finestra si apre subito, nel gesto dell'utente: dopo l'attesa il browser la bloccherebbe
+    const w = window.open('', '_blank');
+    if (!w) { Toast.show('Il browser ha bloccato la finestra di stampa: permetti le finestre per questo sito e riprova.', 'warning', 6000); return; }
+    w.document.write('<!doctype html><meta charset="utf-8"><title>Preparo i fogli…</title><body style="font:16px system-ui;padding:24px;">Preparo i fogli…</body>');
+    try {
+      const { c, larghi, alti, piene } = await _ritaglio(piano || 0, PPG_STAMPA, opz);
+      const conPavimento = (k0, r0, qw, qh) => { for (let y = r0; y < r0 + qh; y++) for (let x = k0; x < k0 + qw; x++) if (piene.has(x + "," + y)) return true; return false; };
+      const { cw, ch, orient } = _fogliDi(larghi, alti);
+      const colonne = Math.ceil(larghi / cw), righe = Math.ceil(alti / ch), tot = colonne * righe;
+      const lettere = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+      let fogli = '', stampati = 0;
+      for (let r = 0; r < righe; r++) for (let k = 0; k < colonne; k++) {
+        const qw = Math.min(cw, larghi - k * cw), qh = Math.min(ch, alti - r * ch);
+        if (piene.size && !conPavimento(k * cw, r * ch, qw, qh)) continue; // foglio vuoto: non si stampa
+        stampati++;
+        const t = document.createElement('canvas');
+        t.width = qw * PPG_STAMPA; t.height = qh * PPG_STAMPA;
+        t.getContext('2d').drawImage(c, k * cw * PPG_STAMPA, r * ch * PPG_STAMPA, t.width, t.height, 0, 0, t.width, t.height);
+        const nome = lettere[r] + (k + 1);
+        fogli += '<section class="foglio"><img src="' + t.toDataURL('image/jpeg', 0.92) + '" style="width:' + (qw * 25.4) + 'mm;height:' + (qh * 25.4) + 'mm;" alt="Foglio ' + nome + '">' +
+          '<p>Foglio ' + nome + ' · riga ' + lettere[r] + ', colonna ' + (k + 1) + ' di ' + colonne + '</p></section>';
+      }
+      const titolo = (_mappa.nome || 'Mappa') + (_mappa.tipo === 'abitazione' && (_mappa.pianiVtt || []).length > 1 ? ' - ' + _mappa.pianiVtt[piano || 0] : '');
+      const esc = (x) => String(x).replace(/[&<>"]/g, (q) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[q]));
+      w.document.open();
+      w.document.write('<!doctype html><html lang="it"><head><meta charset="utf-8"><title>' + esc(titolo) + ' · stampa in scala</title><style>' +
+        '@page { size: A4 ' + orient + '; margin: 10mm; }' +
+        'body { margin: 0; font-family: system-ui, sans-serif; color: #2a2420; }' +
+        '.guida { max-width: 640px; margin: 24px auto; padding: 0 16px; line-height: 1.5; }' +
+        '.guida button { font: 600 16px system-ui; padding: 12px 22px; border-radius: 999px; border: 0; background: #8a4f1f; color: #fff; cursor: pointer; }' +
+        '.foglio { break-after: page; page-break-after: always; }' +
+        '.foglio img { display: block; }' +
+        '.foglio p { margin: 3mm 0 0; font-size: 9pt; color: #6b605a; }' +
+        '@media screen { .foglio { margin: 24px auto; width: max-content; box-shadow: 0 2px 12px rgba(0,0,0,.18); padding: 10mm; background: #fff; } body { background: #e9e4dc; } }' +
+        '@media print { .guida { display: none; } }' +
+        '</style></head><body>' +
+        '<div class="guida"><h1 style="font-size:24px;margin:0 0 8px;">' + esc(titolo) + '</h1>' +
+        '<p>' + stampati + (stampati === 1 ? ' foglio A4' : ' fogli A4') + ' (i fogli che resterebbero vuoti non si stampano), ' + (orient === 'landscape' ? 'in orizzontale' : 'in verticale') + '. Ogni quadretto è 1,5 metri e misura 2,5 cm, la base di una miniatura.</p>' +
+        '<p><b>Nella finestra di stampa scegli «Dimensioni effettive» o scala 100%</b>, non «Adatta alla pagina», altrimenti i quadretti escono più piccoli. Poi unisci i fogli seguendo lettere e numeri: A1 in alto a sinistra.</p>' +
+        '<p><button type="button" onclick="window.print()">Stampa</button></p></div>' +
+        fogli + '</body></html>');
+      w.document.close();
+    } catch (e) {
+      if (typeof Debug !== 'undefined') Debug.warn('Cartografo stampa: ' + e);
+      try { w.close(); } catch (er) {}
+      Toast.show('La stampa non è riuscita. Riprova con “Nuova mappa”.', 'error', 5000);
+    }
   };
 
   /* ── Mettere la mappa nelle Mappe della campagna ── */
@@ -605,6 +698,7 @@ const Cartografo = (() => {
               '<button type="button" class="btn btn-secondary btn-sm" id="carto-png" onclick="Cartografo.scaricaPng()">Scarica PNG</button>' +
               '<button type="button" class="btn btn-secondary btn-sm" onclick="Cartografo.scaricaSvg()">Scarica SVG</button>' +
               '<button type="button" class="btn btn-secondary btn-sm" id="carto-vtt" hidden onclick="Cartografo.scaricaVtt()" title="Per Foundry, Roll20, Fantasy Grounds e altri tavoli virtuali: mappa con muri e porte">Tavolo virtuale</button>' +
+              '<button type="button" class="btn btn-secondary btn-sm" id="carto-stampa" hidden onclick="Cartografo.stampaScala()" title="Quadretti da 2,5 cm su fogli A4, per giocare con le miniature">Stampa in scala</button>' +
             '</div></div>' +
           '<div id="carto-stage"><div id="carto-vista" role="img"></div>' +
             '<div id="carto-attesa" role="status">Sto disegnando la mappa…</div>' +
@@ -633,5 +727,5 @@ const Cartografo = (() => {
   document.addEventListener('DOMContentLoaded', () => setTimeout(() => { _aggancia(); if ($('page-cartografo')?.classList.contains('active')) apri(); }, 200));
 
   const strumenti = { fontDa: _fontDa, conFont: _conFont, inCanvas: _inCanvas, scarica: _scarica, stile: _stile };
-  return { strumenti, perPin, annullaContesto, apri, nuova, aCaso, _tieniColori, precedente, scegliTipo, zoom, zoomReset, scaricaPng, scaricaSvg, scaricaVtt, apriMettiNelleMappe, _confermaMappe, _opzione, _nome, _seme };
+  return { strumenti, perPin, annullaContesto, apri, nuova, aCaso, _tieniColori, precedente, scegliTipo, zoom, zoomReset, scaricaPng, scaricaSvg, scaricaVtt, stampaScala, _confermaScelta, apriMettiNelleMappe, _confermaMappe, _opzione, _nome, _seme };
 })();

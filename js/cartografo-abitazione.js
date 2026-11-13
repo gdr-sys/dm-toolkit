@@ -411,7 +411,7 @@ const CartoAbitazione = (() => {
         for (let j = st.y; j < st.y + st.h; j++) { tratto([st.x, j, st.x, j + 1]); tratto([st.x + st.w, j, st.x + st.w, j + 1]); }
       });
       const celle = [...pi.pieno].map((k) => k.split(',').map(Number));
-      vtt = { S, ang: 0, ox, oy, minX: Math.min(...celle.map((c) => c[0])), minY: Math.min(...celle.map((c) => c[1])), maxX: Math.max(...celle.map((c) => c[0])) + 1, maxY: Math.max(...celle.map((c) => c[1])) + 1, muri: muriV, porte: porteV };
+      vtt = { S, ang: 0, ox, oy, minX: Math.min(...celle.map((c) => c[0])), minY: Math.min(...celle.map((c) => c[1])), maxX: Math.max(...celle.map((c) => c[0])) + 1, maxY: Math.max(...celle.map((c) => c[1])) + 1, muri: muriV, porte: porteV, celle };
     }
     return { nome, pin, W, H, larghezzaKm: W / S * 1.5 / 1000, svg, vtt, pianiVtt: piani.map((pi) => NOME(pi.livello)) };
   };
