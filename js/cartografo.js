@@ -319,6 +319,7 @@ const Cartografo = (() => {
     else v.innerHTML = m.svg;
     _adatta();
     const T = K().TIPI[m.tipo];
+    { const bv = $('carto-vtt'); if (bv) bv.hidden = !VTT_TIPI.includes(m.tipo); }
     $('carto-titolo-mappa').textContent = m.nome;
     const n = m.pin.length;
     $('carto-info').textContent = T.nome + ' · ' + _scala(m.larghezzaKm) + ' da un lato all’altro · ' + n + (n === 1 ? ' luogo' : ' luoghi');
@@ -351,6 +352,78 @@ const Cartografo = (() => {
     } catch (e) { Toast.show('PNG non riuscito: prova con “Scarica SVG”.', 'error', 5000); }
   };
   const scaricaSvg = () => { if (_mappa) _scarica(new Blob([_mappa.svgCompleto], { type: 'image/svg+xml' }), _nomeFile() + '.svg'); };
+
+  /* ── Tavoli virtuali: Universal VTT (.dd2vtt), letto da Foundry, Roll20, Fantasy Grounds e altri ── */
+  // Si rigenera la stessa mappa diritta, senza legenda, titolo e griglia disegnata (la griglia la
+  // mette il tavolo virtuale) e la si ritaglia lungo i quadretti: cosi' la griglia del tavolo
+  // cade esattamente su quella del dungeon. Muri e porte arrivano gia' pronti per la visuale.
+  const VTT_TIPI = ['dungeon', 'abitazione'];
+  const PPG = 100; // pixel per quadretto nel file esportato
+  // Case su piu' piani: si sceglie il piano, ognuno e' un file a se'
+  const _scegliPiano = () => {
+    let m = $('modal-carto-vtt');
+    if (!m) {
+      m = document.createElement('div');
+      m.className = 'modal-overlay hidden'; m.id = 'modal-carto-vtt'; m.style.display = 'none';
+      m.onclick = (e) => { if (e.target === m) Modal.close('carto-vtt'); };
+      document.body.appendChild(m);
+    }
+    m.innerHTML = '<div class="modal" style="max-width:380px;"><div class="modal-header"><h3 class="modal-title">Quale piano?</h3>' +
+      '<button class="btn btn-ghost btn-icon-sm" onclick="Modal.close(\'carto-vtt\')" aria-label="Chiudi"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>' +
+      '<div class="modal-body"><p style="margin:0 0 12px;font-size:0.85rem;color:var(--text-muted);">Ogni piano diventa una mappa a sé per il tavolo virtuale.</p><div style="display:grid;gap:8px;">' +
+      _mappa.pianiVtt.map((n, i) => '<button type="button" class="btn btn-secondary" style="justify-content:flex-start;min-height:44px;" onclick="Modal.close(\'carto-vtt\');Cartografo.scaricaVtt(' + i + ')">' + n + '</button>').join('') +
+      '</div></div></div>';
+    Modal.open('carto-vtt');
+  };
+  const scaricaVtt = async (piano) => {
+    if (!_mappa || !VTT_TIPI.includes(_mappa.tipo)) return;
+    const casa = _mappa.tipo === 'abitazione';
+    if (casa && !Number.isInteger(piano)) {
+      if ((_mappa.pianiVtt || []).length > 1) { _scegliPiano(); return; }
+      piano = 0;
+    }
+    const btn = $('carto-vtt');
+    if (btn) btn.disabled = true;
+    try {
+      const a = _attuale();
+      const extra = casa ? { soloPiano: piano, tetto: false } : { rotazione: 'dritto' };
+      const m = K().genera(_mappa.tipo, { ...a.opzioni, seme: a.seme, nome: _nomeEffettivo(), legenda: false, titolo: false, griglia: false, nomi: false, ...extra });
+      const v = m.vtt;
+      if (!v || v.ang !== 0) throw new Error('dati per il tavolo virtuale mancanti');
+      const scala = PPG / v.S;
+      const x0 = v.minX - 1, y0 = v.minY - 1, larghi = v.maxX + 1 - x0, alti = v.maxY + 1 - y0;
+      const sorgente = await _inCanvas(_conFont(m.svg, await _font()), m.W, m.H, scala);
+      const c = document.createElement('canvas');
+      c.width = larghi * PPG; c.height = alti * PPG;
+      c.getContext('2d').drawImage(sorgente, (v.ox + x0 * v.S) * scala, (v.oy + y0 * v.S) * scala, c.width, c.height, 0, 0, c.width, c.height);
+      const immagine = c.toDataURL('image/png').split(',')[1];
+      const p = (x, y) => ({ x: Math.round((x - x0) * 1000) / 1000, y: Math.round((y - y0) * 1000) / 1000 });
+      const dati = {
+        format: 0.3,
+        resolution: { map_origin: { x: 0, y: 0 }, map_size: { x: larghi, y: alti }, pixels_per_grid: PPG },
+        line_of_sight: v.muri.map(([ax, ay, bx, by]) => [p(ax, ay), p(bx, by)]),
+        objects_line_of_sight: [],
+        portals: v.porte.map(({ seg: [ax, ay, bx, by] }) => ({
+          position: p((ax + bx) / 2, (ay + by) / 2),
+          bounds: [p(ax, ay), p(bx, by)],
+          rotation: ax === bx ? Math.PI / 2 : 0,
+          closed: true,
+          freestanding: false,
+        })),
+        environment: { baked_lighting: true, ambient_light: 'ffffffff' },
+        lights: [],
+        image: immagine,
+        software: 'Pocket GM Screen',
+      };
+      const suffisso = casa && (_mappa.pianiVtt || []).length > 1 ? ' - ' + _mappa.pianiVtt[piano] : '';
+      _scarica(new Blob([JSON.stringify(dati)], { type: 'application/json' }), _nomeFile() + suffisso + '.dd2vtt');
+      Toast.show('File per il tavolo virtuale pronto: ' + v.muri.length + ' tratti di muro e ' + v.porte.length + ' porte.', 'success', 4000);
+    } catch (e) {
+      if (typeof Debug !== 'undefined') Debug.warn('Cartografo VTT: ' + e);
+      Toast.show('Il file per il tavolo virtuale non è riuscito. Riprova con “Nuova mappa”.', 'error', 5000);
+    }
+    if (btn) btn.disabled = false;
+  };
 
   /* ── Mettere la mappa nelle Mappe della campagna ── */
   const _assicuraModale = () => {
@@ -531,6 +604,7 @@ const Cartografo = (() => {
               '<button type="button" class="btn btn-primary btn-sm" onclick="Cartografo.apriMettiNelleMappe()">Metti nelle mappe</button>' +
               '<button type="button" class="btn btn-secondary btn-sm" id="carto-png" onclick="Cartografo.scaricaPng()">Scarica PNG</button>' +
               '<button type="button" class="btn btn-secondary btn-sm" onclick="Cartografo.scaricaSvg()">Scarica SVG</button>' +
+              '<button type="button" class="btn btn-secondary btn-sm" id="carto-vtt" hidden onclick="Cartografo.scaricaVtt()" title="Per Foundry, Roll20, Fantasy Grounds e altri tavoli virtuali: mappa con muri e porte">Tavolo virtuale</button>' +
             '</div></div>' +
           '<div id="carto-stage"><div id="carto-vista" role="img"></div>' +
             '<div id="carto-attesa" role="status">Sto disegnando la mappa…</div>' +
@@ -559,5 +633,5 @@ const Cartografo = (() => {
   document.addEventListener('DOMContentLoaded', () => setTimeout(() => { _aggancia(); if ($('page-cartografo')?.classList.contains('active')) apri(); }, 200));
 
   const strumenti = { fontDa: _fontDa, conFont: _conFont, inCanvas: _inCanvas, scarica: _scarica, stile: _stile };
-  return { strumenti, perPin, annullaContesto, apri, nuova, aCaso, _tieniColori, precedente, scegliTipo, zoom, zoomReset, scaricaPng, scaricaSvg, apriMettiNelleMappe, _confermaMappe, _opzione, _nome, _seme };
+  return { strumenti, perPin, annullaContesto, apri, nuova, aCaso, _tieniColori, precedente, scegliTipo, zoom, zoomReset, scaricaPng, scaricaSvg, scaricaVtt, apriMettiNelleMappe, _confermaMappe, _opzione, _nome, _seme };
 })();

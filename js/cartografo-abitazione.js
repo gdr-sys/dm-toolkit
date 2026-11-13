@@ -150,9 +150,11 @@ const CartoAbitazione = (() => {
     if (cantina) livelli.push(-1);
     const piani = livelli.map(costruisci);
     const NOME = (l) => (l < 0 ? 'Cantina' : l === 0 ? 'Piano terra' : l === 1 ? 'Primo piano' : 'Secondo piano');
+    // Solo per l'esportazione ai tavoli virtuali: disegna un piano da solo, senza gli altri pannelli
+    const soloP = Number.isInteger(o.soloPiano) && piani[o.soloPiano] ? o.soloPiano : null;
 
     /* ── Impaginazione ── */
-    const pannelli = piani.length + (conTetto ? 1 : 0);
+    const pannelli = soloP !== null ? 1 : piani.length + (conTetto ? 1 : 0);
     const areaW = (conLegenda ? W - 372 : W) - 60, areaH = H - 120;
     let scelta = { c: 1, s: 0 };
     for (let col = 1; col <= pannelli; col++) {
@@ -238,7 +240,8 @@ const CartoAbitazione = (() => {
 
     /* ── Un pannello per piano ── */
     piani.forEach((pi, indice) => {
-      const [ox, oy] = origine(indice);
+      if (soloP !== null && indice !== soloP) return;
+      const [ox, oy] = origine(soloP !== null ? 0 : indice);
       const fondoStanza = pi.interrato ? 'url(#carto-cantina)' : 'url(#carto-stanza)';
       // Nome del piano appena sopra le sue stanze (la cantina puo' occupare solo una parte della pianta)
       const cima = pi.stanze.length ? Math.min(...pi.stanze.map((s) => s.y)) : 0;
@@ -372,7 +375,7 @@ const CartoAbitazione = (() => {
     });
 
     /* ── Il tetto ── */
-    if (conTetto) {
+    if (conTetto && soloP === null) {
       const [ox, oy] = origine(piani.length);
       testi += M.etichetta(ox + fw * S / 2, oy - 14, 'Tetto', carta, { size: Math.max(22, Math.min(32, S * 0.64)), font: carta.fontTitolo, peso: t.stile === 'notte' ? 600 : 400, spazio: 2, colore: t.titolo, alone: t.sfondo, aloneW: 3 });
       let g = `<g transform="translate(${n1(ox)} ${n1(oy)})">`;
@@ -393,7 +396,24 @@ const CartoAbitazione = (() => {
     const cx = conLegenda ? (W - 372) / 2 : W / 2;
     if (o.titolo !== false) svg += M.etichetta(cx, 70, nome, carta, { size: 44, font: M.FONT_APP_TITOLI, peso: 400, aloneW: 6 });
     svg += M.scala(50, H - 48, S * 4, { valore: 6, nome: 'metri' }, 2, carta) + M.chiudi(W, H, carta);
-    return { nome, pin, W, H, larghezzaKm: W / S * 1.5 / 1000, svg };
+    /* ── Dati per i tavoli virtuali (Universal VTT) del piano disegnato da solo ── */
+    let vtt = null;
+    if (soloP !== null) {
+      const pi = piani[soloP], [ox, oy] = origine(0);
+      const chiave = (a) => a.join(',');
+      const porteV = pi.porte.map((d) => ({ tipo: 'porta', seg: d.vert ? [d.pos, d.q, d.pos, d.q + 1] : [d.q, d.pos, d.q + 1, d.pos] }));
+      if (pi.ingresso) porteV.push({ tipo: 'porta', seg: [pi.ingresso.x, pi.ingresso.y, pi.ingresso.x + 1, pi.ingresso.y] });
+      const varchi = new Set(porteV.map((p) => chiave(p.seg)));
+      const visti = new Set(), muriV = [];
+      const tratto = (seg) => { const k = chiave(seg); if (visti.has(k) || varchi.has(k)) return; visti.add(k); muriV.push(seg); };
+      pi.tutte.forEach((st) => {
+        for (let i = st.x; i < st.x + st.w; i++) { tratto([i, st.y, i + 1, st.y]); tratto([i, st.y + st.h, i + 1, st.y + st.h]); }
+        for (let j = st.y; j < st.y + st.h; j++) { tratto([st.x, j, st.x, j + 1]); tratto([st.x + st.w, j, st.x + st.w, j + 1]); }
+      });
+      const celle = [...pi.pieno].map((k) => k.split(',').map(Number));
+      vtt = { S, ang: 0, ox, oy, minX: Math.min(...celle.map((c) => c[0])), minY: Math.min(...celle.map((c) => c[1])), maxX: Math.max(...celle.map((c) => c[0])) + 1, maxY: Math.max(...celle.map((c) => c[1])) + 1, muri: muriV, porte: porteV };
+    }
+    return { nome, pin, W, H, larghezzaKm: W / S * 1.5 / 1000, svg, vtt, pianiVtt: piani.map((pi) => NOME(pi.livello)) };
   };
 
   return { abitazione };

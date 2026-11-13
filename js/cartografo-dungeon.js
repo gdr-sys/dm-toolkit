@@ -330,7 +330,33 @@ const CartoDungeon = (() => {
       M.righe(storia, 86).forEach((riga, i) => { svg += M.etichetta(cxM, 104 + i * 24, riga, carta, { size: 17, font: M.FONT_APP_TESTO, peso: 500, colore: t.stile === 'notte' ? carta.ambra : I, aloneW: 4 }); });
     }
     svg += M.scala(50, H - 48, S * 5, { valore: 7.5, nome: 'metri' }, 2, carta) + M.chiudi(W, H, carta);
-    return { nome, pin, W, H, larghezzaKm: W / S * 1.5 / 1000, svg }; // un quadretto = 1,5 metri
+    /* ── Dati per i tavoli virtuali (Universal VTT): muri e porte in quadretti ── */
+    const vtt = (() => {
+      const muriV = [];
+      for (let y = minY; y < maxY; y++) for (let x = minX; x < maxX; x++) {
+        if (!at(x, y) || inTonda(x, y)) continue;
+        if (!at(x, y - 1)) muriV.push([x, y, x + 1, y]);
+        if (!at(x, y + 1)) muriV.push([x, y + 1, x + 1, y + 1]);
+        if (!at(x - 1, y)) muriV.push([x, y, x, y + 1]);
+        if (!at(x + 1, y)) muriV.push([x + 1, y, x + 1, y + 1]);
+      }
+      // Le stanze rotonde: un poligono, interrotto dove entra un corridoio
+      tonde.forEach((s) => {
+        const cx = s.x + s.w / 2, cy = s.y + s.h / 2, rr = s.w / 2, n = Math.max(16, Math.round(rr * 8));
+        const varchi = giunti.map((d) => d.oriz ? [d.x, d.y + 0.5] : [d.x + 0.5, d.y]);
+        for (let i = 0; i < n; i++) {
+          const a0 = i / n * Math.PI * 2, a1 = (i + 1) / n * Math.PI * 2;
+          const p = [cx + Math.cos(a0) * rr, cy + Math.sin(a0) * rr, cx + Math.cos(a1) * rr, cy + Math.sin(a1) * rr];
+          const mx = (p[0] + p[2]) / 2, my = (p[1] + p[3]) / 2;
+          if (varchi.some(([vx, vy]) => Math.hypot(mx - vx, my - vy) < 0.6)) continue;
+          muriV.push(p);
+        }
+      });
+      // Gli archi sono varchi aperti; le altre porte diventano porte del tavolo virtuale
+      const porteV = porte.filter((d) => d.tipo !== 'arco').map((d) => ({ tipo: d.tipo, seg: d.oriz ? [d.x, d.y, d.x, d.y + 1] : [d.x, d.y, d.x + 1, d.y] }));
+      return { S, ang, ox: cxM - ccx * S, oy: cyM - ccy * S, minX, minY, maxX, maxY, muri: muriV, porte: porteV };
+    })();
+    return { nome, pin, W, H, larghezzaKm: W / S * 1.5 / 1000, svg, vtt }; // un quadretto = 1,5 metri
   };
 
   return { dungeon };
