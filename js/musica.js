@@ -1,4 +1,4 @@
-/* DM Toolkit — © 2026 Noemi Marcolini. Tutti i diritti riservati. Vedi LICENSE. */
+/* Pocket GM Screen (già DM Toolkit) — © 2026 Noemi Marcolini. Tutti i diritti riservati. Vedi LICENSE. */
 /* ============================================================
    MUSICA.JS — Pagina "Musica": playlist della campagna da
    preparare prima e avere a portata di mano al tavolo. Ogni

@@ -1,4 +1,4 @@
-/* DM Toolkit — © 2026 Noemi Marcolini. Tutti i diritti riservati. Vedi LICENSE. */
+/* Pocket GM Screen (già DM Toolkit) — © 2026 Noemi Marcolini. Tutti i diritti riservati. Vedi LICENSE. */
 /* ============================================================
    SEGRETI.JS — Segreti e indizi, e "cosa sa ogni PNG".
    Un solo sistema: ogni segreto ha i suoi indizi, e ogni indizio

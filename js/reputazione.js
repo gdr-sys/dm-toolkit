@@ -1,4 +1,4 @@
-/* DM Toolkit — © 2026 Noemi Marcolini. Tutti i diritti riservati. Vedi LICENSE. */
+/* Pocket GM Screen (già DM Toolkit) — © 2026 Noemi Marcolini. Tutti i diritti riservati. Vedi LICENSE. */
 /* ============================================================
    REPUTAZIONE.JS — Reputazione del party presso ogni fazione:
    una scala da -3 a +3 con la cronologia di cosa l'ha fatta

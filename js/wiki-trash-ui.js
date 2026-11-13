@@ -1,4 +1,4 @@
-/* DM Toolkit — © 2026 Noemi Marcolini. Tutti i diritti riservati. Vedi LICENSE. */
+/* Pocket GM Screen (già DM Toolkit) — © 2026 Noemi Marcolini. Tutti i diritti riservati. Vedi LICENSE. */
 /* ============================================================
    WIKI-TRASH-UI.JS — Interfaccia per il Cestino della Wiki.
 

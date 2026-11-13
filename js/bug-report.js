@@ -1,4 +1,4 @@
-/* DM Toolkit — © 2026 Noemi Marcolini. Tutti i diritti riservati. Vedi LICENSE. */
+/* Pocket GM Screen (già DM Toolkit) — © 2026 Noemi Marcolini. Tutti i diritti riservati. Vedi LICENSE. */
 /* ============================================================
    BUG-REPORT.JS — "Segnala un bug": invia la segnalazione direttamente
    dal sito via Web3Forms (api.web3forms.com), senza aprire un client
@@ -120,8 +120,8 @@ const BugReport = (() => {
 
     const formData = new FormData();
     formData.append('access_key', ACCESS_KEY);
-    formData.append('subject', 'DM Toolkit - Bug: ' + titolo);
-    formData.append('from_name', 'DM Toolkit - Segnalazione bug');
+    formData.append('subject', 'Pocket GM Screen - Bug: ' + titolo);
+    formData.append('from_name', 'Pocket GM Screen - Segnalazione bug');
     formData.append('message', (descrizione || '(nessuna descrizione)') +
       '\n\n---\nInformazioni tecniche (aggiunte automaticamente):\n' + _infoTecniche());
 

@@ -1,4 +1,4 @@
-/* DM Toolkit — © 2026 Noemi Marcolini. Tutti i diritti riservati. Vedi LICENSE. */
+/* Pocket GM Screen (già DM Toolkit) — © 2026 Noemi Marcolini. Tutti i diritti riservati. Vedi LICENSE. */
 /* ============================================================
    NEWSLETTER-POPUP.JS — Invito all'iscrizione alla newsletter
    (form Brevo). Compare una sola volta per browser dopo un breve
@@ -25,12 +25,12 @@ const NewsletterPopup = (() => {
     overlay.innerHTML =
       '<div class="modal" style="max-width:400px;">' +
         '<div class="modal-header">' +
-          '<h3 class="modal-title">Novita\' DM Toolkit</h3>' +
+          '<h3 class="modal-title">Novità di Pocket GM Screen</h3>' +
           '<button class="btn btn-ghost btn-icon-sm" onclick="Modal.close(\'newsletter\')" aria-label="Chiudi"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>' +
         '</div>' +
         '<div class="modal-body" style="text-align:center;">' +
           '<div style="color:var(--accent-secondary-text);margin-bottom:12px;"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 21 8 21 16 12 22 3 16 3 8 Z"/><path d="M12 2 12 22"/><path d="M3 8 12 12 21 8"/><path d="M3 16 12 12 21 16"/></svg></div>' +
-          '<p style="color:var(--text-secondary);font-size:0.9rem;line-height:1.5;">Nuovi strumenti, aggiornamenti e funzioni per DM Toolkit, via email, senza spam.</p>' +
+          '<p style="color:var(--text-secondary);font-size:0.9rem;line-height:1.5;">Nuovi strumenti, aggiornamenti e funzioni per Pocket GM Screen, via email, senza spam.</p>' +
         '</div>' +
         '<div class="modal-footer" style="flex-direction:column;align-items:stretch;">' +
           '<a href="' + BREVO_URL + '" target="_blank" rel="noopener" class="btn btn-gold" style="width:100%;white-space:normal;" onclick="Modal.close(\'newsletter\')">Iscrivimi alla newsletter</a>' +

@@ -1,4 +1,4 @@
-/* DM Toolkit — © 2026 Noemi Marcolini. Tutti i diritti riservati. Vedi LICENSE. */
+/* Pocket GM Screen (già DM Toolkit) — © 2026 Noemi Marcolini. Tutti i diritti riservati. Vedi LICENSE. */
 /* ============================================================
    GENERATORI-SCHEDE.JS — Barra di schede e ricerca sopra la griglia
    dei Generatori: con tutte le aggiunte la pagina era diventata una

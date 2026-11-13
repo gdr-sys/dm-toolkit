@@ -1,4 +1,4 @@
-/* DM Toolkit — © 2026 Noemi Marcolini. Tutti i diritti riservati. Vedi LICENSE. */
+/* Pocket GM Screen (già DM Toolkit) — © 2026 Noemi Marcolini. Tutti i diritti riservati. Vedi LICENSE. */
 /* ============================================================
    IMPORTA-CAMPAGNA.JS — "Importa da un'altra campagna": copia
    luoghi, fazioni, PNG, note Lore e tabelle casuali da un'altra

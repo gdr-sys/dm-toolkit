@@ -1,4 +1,4 @@
-/* DM Toolkit — © 2026 Noemi Marcolini. Tutti i diritti riservati. Vedi LICENSE. */
+/* Pocket GM Screen (già DM Toolkit) — © 2026 Noemi Marcolini. Tutti i diritti riservati. Vedi LICENSE. */
 /* ============================================================
    VISTA-GIOCATORI.JS — Pagina di sola lettura per i giocatori,
    aperta da un link, con SOLO cio' che il DM sceglie di mostrare:
@@ -210,7 +210,7 @@ const VistaGiocatori = (() => {
       _sezione('Mappe', (d.mappe || []).map(m => '<figure style="margin:0 0 14px;"><div style="position:relative;display:inline-block;max-width:100%;"><img src="' + _esc(m.immagine) + '" alt="' + _esc(m.nome) + '" style="max-width:100%;border-radius:var(--radius-sm);display:block;">' +
         (m.pins || []).map(p => '<span title="' + _esc(p.nome) + '" style="position:absolute;left:' + (p.x * 100) + '%;top:' + (p.y * 100) + '%;transform:translate(-50%,-50%);background:var(--accent-primary);color:#fff;font-size:0.7rem;padding:2px 6px;border-radius:999px;white-space:nowrap;">' + _esc(p.nome) + '</span>').join('') +
         '</div><figcaption style="font-size:0.8rem;color:var(--text-muted);margin-top:4px;">' + _esc(m.nome) + '</figcaption></figure>').join('')) +
-      '<div style="margin-top:30px;font-size:0.72rem;color:var(--text-muted);">Aggiornato ' + new Date(d.aggiornatoAt || Date.now()).toLocaleString('it-IT') + ' · DM Toolkit</div>' +
+      '<div style="margin-top:30px;font-size:0.72rem;color:var(--text-muted);">Aggiornato ' + new Date(d.aggiornatoAt || Date.now()).toLocaleString('it-IT') + ' · Pocket GM Screen</div>' +
     '</div>';
   };
 

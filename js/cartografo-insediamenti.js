@@ -1,4 +1,4 @@
-/* DM Toolkit — © 2026 Noemi Marcolini. Tutti i diritti riservati. Vedi LICENSE. */
+/* Pocket GM Screen (già DM Toolkit) — © 2026 Noemi Marcolini. Tutti i diritti riservati. Vedi LICENSE. */
 /* ============================================================
    CARTOGRAFO-INSEDIAMENTI.JS — Generatore di citta'.
    La citta' e' un borgo a raggiera: vie maestre dalla piazza alle

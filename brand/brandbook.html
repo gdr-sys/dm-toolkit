@@ -1,0 +1,195 @@
+<title>Brand book Pocket GM Screen</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gloock&family=Figtree:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: brand book in una colonna; ogni capitolo una sezione, le applicazioni come riquadri realistici. */
+:root {
+  --bg: #f4efe9; --card: #ffffff; --fg: #1f1915; --muted: #685c53; --line: #e3d9cf;
+  --cuoio: #a8662e; --cuoio-chiaro: #8a4f1f; --cuoio-scuro: #e0a26b; --ink: #1a1612; --paper: #f6efe8;
+  --accent: var(--cuoio-chiaro); --accent-soft: #f2e4d6;
+  --display: "Gloock", Georgia, "Times New Roman", serif;
+  --body: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #15110e; --card: #201a16; --fg: #f1e8e0; --muted: #b5a699; --line: #382e27;
+  --accent: var(--cuoio-scuro); --accent-soft: #33261c; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #15110e; --card: #201a16; --fg: #f1e8e0; --muted: #b5a699; --line: #382e27;
+  --accent: var(--cuoio-scuro); --accent-soft: #33261c; color-scheme: dark }
+body { background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 16px; line-height: 1.55;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 0 64px; }
+.wrap { max-width: 920px; margin: 0 auto; display: grid; gap: 40px; }
+.copertina { background: var(--ink); color: var(--paper); border-radius: 0 0 24px 24px; padding: 48px 28px 40px; display: grid; gap: 18px; justify-items: start; }
+.copertina img { width: min(420px, 100%); height: auto; }
+.copertina p { margin: 0; font-family: var(--display); font-size: clamp(1.4rem, 4vw, 2rem); line-height: 1.15; color: var(--cuoio-scuro); }
+.copertina small { color: #b9ab9f; font-size: .9rem; }
+h2 { font-family: var(--display); font-weight: 400; font-size: clamp(1.6rem, 4vw, 2rem); margin: 0; }
+h3 { margin: 0; font-size: 1rem; }
+.sez { display: grid; gap: 14px; }
+.sez > p { margin: 0; color: var(--muted); max-width: 68ch; }
+.griglia { display: grid; gap: 12px; }
+.g2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.g3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.g4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.box { background: var(--card); border: 1px solid var(--line); border-radius: 16px; overflow: hidden; display: grid; grid-template-rows: 1fr auto; min-width: 0; }
+.box .vista { display: flex; align-items: center; justify-content: center; padding: 26px 18px; min-height: 120px; gap: 14px; flex-wrap: wrap; }
+.box .vista img { max-width: 100%; height: auto; }
+.box .etichetta { font-size: .8rem; color: var(--muted); padding: 7px 12px; border-top: 1px solid var(--line); }
+.scuro { background: var(--ink); } .chiaro { background: var(--paper); } .bianco { background: #fff; } .nero { background: #000; }
+.testo { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 18px 22px; display: grid; gap: 10px; }
+.testo p { margin: 0; max-width: 72ch; }
+.testo ul { margin: 0; padding-left: 1.2em; display: grid; gap: 6px; }
+.camp { border: 1px solid var(--line); border-radius: 14px; overflow: hidden; background: var(--card); display: grid; min-width: 0; }
+.camp .tinta { height: 72px; }
+.camp .dati { padding: 8px 10px; font-size: .78rem; display: grid; gap: 2px; }
+.camp code { font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; color: var(--muted); }
+.slogan { font-family: var(--display); font-size: clamp(1.5rem, 4vw, 2.1rem); line-height: 1.15; margin: 0; }
+.slogan + p { margin: 0; color: var(--muted); }
+/* applicazioni */
+.app-testa { width: 100%; border-radius: 12px; overflow: hidden; background: linear-gradient(170deg, #3a2a1f, #1a1612 70%); color: var(--paper); padding: 18px; display: grid; gap: 30px; align-self: stretch; }
+.app-testa .barra { display: flex; align-items: center; gap: 8px; font-family: var(--display); font-size: 1rem; }
+.app-testa .barra img { width: 24px; height: 24px; }
+.app-testa b { font-family: var(--display); font-weight: 400; font-size: 1.7rem; line-height: 1; }
+.app-testa span { font-size: .8rem; color: #cbbcae; }
+.browser { background: #dee1e6; align-items: flex-end !important; justify-content: flex-start !important; padding-bottom: 0 !important; }
+.scheda { background: #fff; border-radius: 9px 9px 0 0; padding: 8px 12px; display: flex; align-items: center; gap: 8px; font: 12px/1 system-ui, sans-serif; color: #3c4043; }
+.scheda img { width: 16px; height: 16px; }
+.home { background: linear-gradient(160deg, #3b4b55, #1f2a31); }
+.ic { display: grid; justify-items: center; gap: 5px; color: #fff; font: 11px/1.2 system-ui, sans-serif; }
+.ic img { width: 60px; height: 60px; border-radius: 14px; }
+.sito { background: var(--paper) !important; color: var(--ink); flex-direction: column; align-items: stretch !important; gap: 14px !important; }
+.sito .nav { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: .78rem; }
+.sito .nav img { height: 22px; width: auto; }
+.sito b { font-family: var(--display); font-weight: 400; font-size: 1.6rem; line-height: 1.1; }
+.sito .btn { align-self: flex-start; background: var(--cuoio-chiaro); color: #fff; border-radius: 999px; padding: 8px 14px; font-weight: 600; font-size: .82rem; }
+.social { aspect-ratio: 1200 / 630; width: 100%; max-width: 100%; background: var(--ink); border-radius: 10px; display: grid; align-content: center; justify-items: start; gap: 10px; padding: 7% 8%; box-sizing: border-box; color: var(--paper); }
+.social img { width: 58%; height: auto; }
+.social span { font-family: var(--display); font-size: clamp(.9rem, 2.6vw, 1.3rem); color: var(--cuoio-scuro); }
+.avvio { background: var(--ink); flex-direction: column; gap: 10px !important; min-height: 220px !important; }
+.avvio img { width: 140px; height: auto; }
+.lista { counter-reset: n; display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.lista li { display: grid; grid-template-columns: auto 1fr; gap: 10px; align-items: start; }
+.lista li::before { counter-increment: n; content: counter(n); font-weight: 700; color: var(--accent); min-width: 1.4em; }
+.attenzione { background: var(--accent-soft); border-radius: 16px; padding: 16px 20px; display: grid; gap: 6px; }
+.attenzione p { margin: 0; max-width: 72ch; }
+@media (max-width: 700px) {
+  .g2, .g3 { grid-template-columns: 1fr; }
+  .g4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+</style>
+
+<div class="wrap">
+  <header class="copertina">
+    <img src="brand/logo-orizzontale-scuro.svg" alt="Pocket GM Screen" width="298" height="48">
+    <p>Tutta la campagna, in tasca.</p>
+    <small>Brand book · novembre 2026 · © 2026 Noemi Marcolini</small>
+  </header>
+
+  <section class="sez">
+    <h2>In breve</h2>
+    <div class="testo">
+      <p><b>Per chi:</b> i master di giochi di ruolo che vogliono arrivare al tavolo leggeri.</p>
+      <p><b>Cosa promette:</b> «Vado a giocare con il tablet e basta, e ho tutto.» Mondo, mappe, regole e combattimento nello stesso posto, anche senza internet.</p>
+      <p><b>Com'è:</b> pronto ma non freddo, moderno ma non da startup, complice ma non goliardico, artigianale ma non rétro.</p>
+      <p><b>Perché esiste:</b> è nato al tavolo, da una master che va a giocare in scooter e non vuole portarsi dietro i manuali.</p>
+    </div>
+  </section>
+
+  <section class="sez">
+    <h2>Il nome</h2>
+    <div class="testo">
+      <p><b>Pocket GM Screen</b>: lo schermo del master, in tasca. «GM» e non «DM» perché vale per tutti i giochi di ruolo. Si scrive sempre per intero; a voce va bene «Pocket Screen», sotto l'icona del telefono «Pocket GM».</p>
+      <p>Nei testi italiani dell'app si dice «master»; «GM» resta nel nome.</p>
+    </div>
+  </section>
+
+  <section class="sez">
+    <h2>Il segno</h2>
+    <p>Lo schermo piegato a tre pannelli che spunta da una tasca cucita. Lo spazio libero intorno è almeno l'altezza dello schermo che spunta.</p>
+    <div class="griglia g2">
+      <div class="box"><div class="vista chiaro"><img src="brand/logo-orizzontale-chiaro.svg" alt="Logo orizzontale su chiaro" width="298" height="48"></div><div class="etichetta">Orizzontale, su chiaro</div></div>
+      <div class="box"><div class="vista scuro"><img src="brand/logo-orizzontale-scuro.svg" alt="Logo orizzontale su scuro" width="298" height="48"></div><div class="etichetta">Orizzontale, su scuro</div></div>
+      <div class="box"><div class="vista chiaro"><img src="brand/logo-verticale-chiaro.svg" alt="Logo verticale su chiaro" width="211" height="104"></div><div class="etichetta">Verticale, su chiaro</div></div>
+      <div class="box"><div class="vista scuro"><img src="brand/logo-verticale-scuro.svg" alt="Logo verticale su scuro" width="211" height="104"></div><div class="etichetta">Verticale, su scuro</div></div>
+    </div>
+    <div class="griglia g4">
+      <div class="box"><div class="vista chiaro"><img src="brand/simbolo.svg" alt="Simbolo" width="72" height="72"></div><div class="etichetta">Simbolo, da 32 px</div></div>
+      <div class="box"><div class="vista chiaro"><img src="brand/simbolo-piccolo.svg" alt="Simbolo piccolo" width="24" height="24"><img src="brand/simbolo-piccolo.svg" alt="" width="16" height="16"></div><div class="etichetta">Piccolo, 16-24 px</div></div>
+      <div class="box"><div class="vista bianco"><img src="brand/logo-nero.svg" alt="Logo nero" width="150" height="24"></div><div class="etichetta">Una tinta, nero</div></div>
+      <div class="box"><div class="vista nero"><img src="brand/logo-bianco.svg" alt="Logo bianco" width="150" height="24"></div><div class="etichetta">Una tinta, bianco</div></div>
+    </div>
+    <div class="testo"><p><b>Da non fare:</b> deformarlo, ruotarlo, cambiarne i colori, aggiungere ombre o bagliori, metterlo su fondi dove non si vede.</p></div>
+  </section>
+
+  <section class="sez">
+    <h2>Il colore</h2>
+    <p>Cuoio, come la tasca. Vive nel logo, nelle icone, nell'avvio e sul sito; dentro l'app restano le sette tavolozze a scelta.</p>
+    <div class="griglia g4" style="grid-template-columns:repeat(auto-fit,minmax(150px,1fr))">
+      <div class="camp"><div class="tinta" style="background:#a8662e"></div><div class="dati"><b>Cuoio</b><code>#a8662e</code><span>logo e icone · 4,0:1 su carta, 3,9:1 su inchiostro</span></div></div>
+      <div class="camp"><div class="tinta" style="background:#8a4f1f"></div><div class="dati"><b>Cuoio per testo sul chiaro</b><code>#8a4f1f</code><span>link, pulsanti pieni · 5,7:1</span></div></div>
+      <div class="camp"><div class="tinta" style="background:#e0a26b"></div><div class="dati"><b>Cuoio per testo sullo scuro</b><code>#e0a26b</code><span>8,2:1 su inchiostro</span></div></div>
+      <div class="camp"><div class="tinta" style="background:#1a1612"></div><div class="dati"><b>Inchiostro</b><code>#1a1612</code><span>fondo scuro, icona</span></div></div>
+      <div class="camp"><div class="tinta" style="background:#f6efe8;box-shadow:inset 0 -1px 0 rgba(0,0,0,.08)"></div><div class="dati"><b>Carta</b><code>#f6efe8</code><span>fondo chiaro</span></div></div>
+    </div>
+  </section>
+
+  <section class="sez">
+    <h2>I caratteri</h2>
+    <div class="griglia g2">
+      <div class="testo"><span style="font-size:.8rem;color:var(--muted)">Titoli e logo</span><span style="font-family:var(--display);font-size:2.2rem;line-height:1">Gloock</span><p>Il carattere artigianale, senza essere medievale. Nel logo «GM» va in maiuscoletto al 62%.</p></div>
+      <div class="testo"><span style="font-size:.8rem;color:var(--muted)">Testo e interfaccia</span><span style="font-family:var(--body);font-weight:600;font-size:2.2rem;line-height:1">Figtree</span><p>Moderna e chiara, si legge bene al tavolo anche in piccolo.</p></div>
+    </div>
+  </section>
+
+  <section class="sez">
+    <h2>La voce</h2>
+    <div class="testo">
+      <p class="slogan">Tutta la campagna, in tasca.</p>
+      <p>Your whole campaign, in your pocket.</p>
+    </div>
+    <div class="testo">
+      <ul>
+        <li><b>Da master a master:</b> si dà del tu, si usano le parole del tavolo (PNG, sessione, tiro, party), mai quelle da gestionale (modulo, storage, sistema).</li>
+        <li><b>Breve e pronto:</b> una frase, il verbo davanti.</li>
+        <li><b>Dice cosa fare:</b> ogni errore spiega cosa è successo e il passo dopo, senza punti esclamativi.</li>
+        <li><b>Complice, con misura:</b> un tocco da master nelle schermate vuote, mai nei messaggi d'errore.</li>
+        <li><b>Niente simboli nel testo</b> (né ✓ né emoji) e niente genere quando si parla al master: «Il tavolo è pronto».</li>
+      </ul>
+      <p style="color:var(--muted)">Esempio: «Storage esaurito! Esporta la campagna e riduci il contenuto.» diventa «Lo spazio su questo dispositivo è finito. Salva la campagna su Drive o in un file, poi togli le immagini più pesanti.»</p>
+    </div>
+  </section>
+
+  <section class="sez">
+    <h2>Come si vede</h2>
+    <p>Prove dell'identità dove vivrà davvero. Sono anteprime: l'app e il sito non sono ancora cambiati.</p>
+    <div class="griglia g2">
+      <div class="box"><div class="vista" style="padding:14px"><div class="app-testa"><div class="barra"><img src="brand/simbolo.svg" alt="">Pocket GM Screen</div><div><span>Le Ceneri di Valmora</span><br><b>Sessione 12</b></div></div></div><div class="etichetta">Intestazione dell'app</div></div>
+      <div class="box"><div class="vista sito"><div class="nav"><img src="brand/logo-orizzontale-chiaro.svg" alt="Pocket GM Screen" width="137" height="22"><span>Funzioni · Domande</span></div><b>Tutta la campagna, in tasca.</b><span style="font-size:.85rem">Gratis, nel browser, anche senza internet.</span><span class="btn">Apri l'app</span></div><div class="etichetta">Sito di presentazione</div></div>
+      <div class="box"><div class="vista browser"><div class="scheda"><img src="brand/icone/favicon.svg" alt="">Pocket GM Screen</div></div><div class="etichetta">Scheda del browser</div></div>
+      <div class="box"><div class="vista home"><div class="ic"><img src="brand/icone/apple-touch-icon.png" alt="Icona">Pocket GM</div><div class="ic"><img src="brand/icone/icon-maskable-512.png" alt="Icona Android" style="border-radius:50%">Pocket GM</div></div><div class="etichetta">Telefono: iPhone e Android</div></div>
+      <div class="box"><div class="vista" style="padding:14px"><div class="social"><img src="brand/logo-orizzontale-scuro.svg" alt="Pocket GM Screen"><span>Tutta la campagna, in tasca.</span></div></div><div class="etichetta">Anteprima nei social e nei messaggi (1200 × 630)</div></div>
+      <div class="box"><div class="vista avvio"><img src="brand/logo-verticale-scuro.svg" alt="Pocket GM Screen" width="211" height="104"></div><div class="etichetta">Avvio dell'app installata</div></div>
+    </div>
+  </section>
+
+  <section class="sez">
+    <h2>Cosa cambia nell'app e nel sito</h2>
+    <p>Da fare solo con il tuo via libera, in un passaggio unico.</p>
+    <div class="testo">
+      <ol class="lista">
+        <li><span><b>Icone:</b> le nuove al posto di quelle in <code>icons/</code> e di <code>favicon.png</code>, più <code>favicon.svg</code>; elenco aggiornato nel service worker.</span></li>
+        <li><span><b>Manifest:</b> nome «Pocket GM Screen», nome corto «Pocket GM», descrizione con lo slogan, colori di tema.</span></li>
+        <li><span><b>App:</b> titolo della pagina, logo nella barra laterale, riga Informazioni nelle Impostazioni («Pocket GM Screen, prima DM Toolkit»).</span></li>
+        <li><span><b>Sito /scopri/:</b> logo in testata, titoli, testi e anteprima social; immagine 1200 × 630 nuova.</span></li>
+        <li><span><b>README e PRODUCT.md, DESIGN.md:</b> nome, logo, colore di marca, voce.</span></li>
+        <li><span><b>Testi dell'app nella nuova voce:</b> i messaggi più usati (errori, schermate vuote), a piccoli gruppi.</span></li>
+        <li><span><b>Avviso a chi la usa già:</b> una riga nel popup delle novità: «DM Toolkit ora si chiama Pocket GM Screen. Le tue campagne sono dove le hai lasciate.»</span></li>
+      </ol>
+    </div>
+    <div class="attenzione">
+      <p><b>Cosa non cambia:</b> la cartella «DM Toolkit» su Google Drive (l'app la cerca con quel nome: cambiarla farebbe sparire i backup), le campagne salvate, l'indirizzo del sito fino al passaggio su Cloudflare, il nome del repository su GitHub.</p>
+      <p><b>Prima di pubblicare:</b> una ricerca del nome su TMview (marchi registrati) e, se ti interessa, la registrazione del dominio pocketgmscreen.app quando passiamo a Cloudflare.</p>
+    </div>
+  </section>
+</div>

@@ -1,4 +1,4 @@
-/* DM Toolkit — © 2026 Noemi Marcolini. Tutti i diritti riservati. Vedi LICENSE. */
+/* Pocket GM Screen (già DM Toolkit) — © 2026 Noemi Marcolini. Tutti i diritti riservati. Vedi LICENSE. */
 /* ============================================================
    FILI-SOSPESI.JS — Promemoria PNG/luoghi/fazioni/quest/trame
    non toccati da un po', per non perdere ganci lasciati a meta'.

@@ -1,4 +1,4 @@
-/* DM Toolkit — © 2026 Noemi Marcolini. Tutti i diritti riservati. Vedi LICENSE. */
+/* Pocket GM Screen (già DM Toolkit) — © 2026 Noemi Marcolini. Tutti i diritti riservati. Vedi LICENSE. */
 /* ============================================================
    CAMPAGNA-HUB.JS — Pagina della campagna (o one shot): si apre
    cliccando il nome della campagna in cima al menu. Come l'indice

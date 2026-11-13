@@ -1,4 +1,4 @@
-/* DM Toolkit — © 2026 Noemi Marcolini. Tutti i diritti riservati. Vedi LICENSE. */
+/* Pocket GM Screen (già DM Toolkit) — © 2026 Noemi Marcolini. Tutti i diritti riservati. Vedi LICENSE. */
 /* ============================================================
    DASHBOARD-MIA.JS — Seconda vista della Dashboard: "La mia dashboard",
    dove il master sceglie quali card vedere e in che ordine.

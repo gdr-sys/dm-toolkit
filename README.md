@@ -1,4 +1,11 @@
-# DM Toolkit
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="brand/logo-orizzontale-scuro.svg">
+  <img src="brand/logo-orizzontale-chiaro.svg" alt="Pocket GM Screen" width="372" height="60">
+</picture>
+
+# Pocket GM Screen
+
+**Tutta la campagna, in tasca.** Prima si chiamava DM Toolkit: le campagne salvate restano dove sono.
 
 [![Scopri](https://img.shields.io/badge/scopri-il%20sito%20di%20presentazione-8B2635?style=flat-square)](https://gdr-sys.github.io/dm-toolkit/scopri/)
 [![Live](https://img.shields.io/badge/apri-l'app-crimson?style=flat-square)](https://gdr-sys.github.io/dm-toolkit/)
@@ -9,9 +16,9 @@
 
 Web app per Dungeon Master di D&D 5e (edizioni 2014 e 2024) per gestire una campagna dalla preparazione della sessione al combattimento al tavolo, da qualsiasi dispositivo e senza installare nulla.
 
-![DM Toolkit in azione: Dashboard, percorso a tappe sulla mappa, tempi di viaggio, combat tracker e musica](docs/img/demo.gif)
+![Pocket GM Screen in azione: Dashboard, percorso a tappe sulla mappa, tempi di viaggio, combat tracker e musica](docs/img/demo.gif)
 
-### [Scopri DM Toolkit](https://gdr-sys.github.io/dm-toolkit/scopri/)
+### [Scopri Pocket GM Screen](https://gdr-sys.github.io/dm-toolkit/scopri/)
 
 Il sito di presentazione, con le funzioni mostrate passo per passo. Se vuoi andare subito al sodo, [apri l'app](https://gdr-sys.github.io/dm-toolkit/).
 
@@ -255,7 +262,7 @@ Un account anonimo si può trasformare in account Google in qualsiasi momento se
 
 ## App installabile e offline
 
-DM Toolkit si installa come un'app: "Installa app" in Chrome o Edge su PC, "Aggiungi alla schermata Home" su iPad, iPhone e Android.
+Pocket GM Screen si installa come un'app: "Installa app" in Chrome o Edge su PC, "Aggiungi alla schermata Home" su iPad, iPhone e Android.
 
 <p>
   <img src="docs/img/telefono-dashboard.jpg" width="260" alt="La Dashboard su telefono">
@@ -285,7 +292,7 @@ Il cuore dell'app è un unico file HTML: niente framework, niente bundler, nessu
 
 © 2026 Noemi Marcolini. Tutti i diritti riservati.
 
-Il codice, la grafica, i testi originali e il logo di DM Toolkit sono protetti dal diritto d'autore. Puoi usare gratuitamente [l'app pubblicata](https://gdr-sys.github.io/dm-toolkit/) per le tue campagne, ma non copiare, modificare o ripubblicare il codice senza permesso scritto. Leggere il codice su GitHub non concede una licenza. Testo completo in [LICENSE](LICENSE).
+Il codice, la grafica, i testi originali e il logo di Pocket GM Screen sono protetti dal diritto d'autore. Puoi usare gratuitamente [l'app pubblicata](https://gdr-sys.github.io/dm-toolkit/) per le tue campagne, ma non copiare, modificare o ripubblicare il codice senza permesso scritto. Leggere il codice su GitHub non concede una licenza. Testo completo in [LICENSE](LICENSE).
 
 ### Dati di gioco
 

@@ -1,5 +1,5 @@
 ---
-name: "DM Toolkit: l'app"
+name: "Pocket GM Screen: l'app"
 description: "Ogni pagina si apre come la locandina della campagna: una scena illustrata col titolo sopra, poi tessere tonde e piatte. Sette tavolozze, notte e giorno."
 colors:
   notte-fondo: "oklch(13% 0.02 40)"
@@ -126,7 +126,7 @@ components:
     padding: "14px 16px"
 ---
 
-# Design System: DM Toolkit, l'app
+# Design System: Pocket GM Screen, l'app
 
 > **Ambito:** l'app (`index.html` alla radice, `css/`, `js/`, `img/scene/`). Il sito di presentazione ha un suo sistema in `scopri/DESIGN.md`: i due non si mescolano.
 > Il codice che lo realizza sta in `css/scena.css` (colori, tessere, scene), `js/scena.js` (scena disegnata, immagini di sfondo, ruote e pallini) e `js/dashboard-nuova.js` (impaginazione della Dashboard).
@@ -266,3 +266,10 @@ Il sistema è piatto. La profondità la danno la scena e il passo di luminosità
 - **Don't** mettere colori fissi nelle pagine nuove, né illustrazioni a colori in `img/scene/`: devono essere in bianco e nero per seguire la tavolozza.
 - **Don't** spingere le informazioni del tavolo sotto la piega della Dashboard.
 - **Don't** usare emoji nell'interfaccia: le icone sono disegnate con lo stesso tratto.
+
+## Marchio (dal 2026-11)
+
+- Segno: lo schermo del master a tre pannelli che spunta da una tasca cucita. File in `brand/`; nell'app `icons/simbolo.svg` (da 32 px) e `icons/simbolo-piccolo.svg` (16-24 px, barra e menu).
+- Colore di marca cuoio `#a8662e` solo in logo, icone, avvio e sito; testo su chiaro `#8a4f1f`, su scuro `#e0a26b`; inchiostro `#1a1612`, carta `#f6efe8`. Le sette tavolozze dell'interfaccia non cambiano.
+- Logotipo in Gloock, «GM» in maiuscoletto al 62%.
+- Voce: da master a master, tu, frasi brevi col verbo davanti, ogni errore dice il passo dopo, niente punti esclamativi, niente simboli o emoji nel testo, «master» nei testi italiani e «PNG» (mai NPC).

@@ -12,7 +12,7 @@ Dungeon Master di D&D 5e (2014 e 2024) che preparano e conducono una campagna, s
 
 ## Product Purpose
 
-DM Toolkit tiene un'intera campagna nello stesso posto: preparazione, mondo, mappe, combattimento al tavolo e diario delle sessioni. Si usa nel browser, senza installare nulla, da qualsiasi dispositivo. Successo: il DM smette di tenere la campagna tra fogli, cartelle e app diverse.
+Pocket GM Screen (prima DM Toolkit) tiene un'intera campagna nello stesso posto: preparazione, mondo, mappe, combattimento al tavolo e diario delle sessioni. Si usa nel browser, senza installare nulla, da qualsiasi dispositivo. Successo: il DM smette di tenere la campagna tra fogli, cartelle e app diverse.
 
 ## Positioning
 
@@ -36,7 +36,7 @@ Si usa prima della sessione alla scrivania e durante la sessione al tavolo, anch
 
 ## Brand Commitments
 
-- Nome: DM Toolkit. Icona esistente in `favicon.png` e `icons/`.
+- Nome: Pocket GM Screen (dal 2026-11, prima DM Toolkit); sotto l'icona "Pocket GM". Slogan: «Tutta la campagna, in tasca.» / «Your whole campaign, in your pocket.» Identità completa in `brand/` (LEGGIMI.md). La cartella su Google Drive resta "DM Toolkit".
 - Lingua: italiano, tono semplice e diretto.
 - Gratuito, e lo restera': si puo' dire. Non si scrivono prezzi futuri.
 - Copyright: © 2026 Noemi Marcolini, tutti i diritti riservati (LICENSE). Il nome compare solo negli avvisi di copyright (Impostazioni, piede del sito, README); nei testi del sito resta la voce in prima persona "l'ho creato per il mio tavolo".

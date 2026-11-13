@@ -1,4 +1,4 @@
-/* DM Toolkit — © 2026 Noemi Marcolini. Tutti i diritti riservati. Vedi LICENSE. */
+/* Pocket GM Screen (già DM Toolkit) — © 2026 Noemi Marcolini. Tutti i diritti riservati. Vedi LICENSE. */
 /* ============================================================
    CARTOGRAFO-MOTORE.JS — Base comune dei generatori di mappe:
    numeri casuali ripetibili (stesso seme = stessa mappa), rumore,

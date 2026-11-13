@@ -1,4 +1,4 @@
-/* DM Toolkit — © 2026 Noemi Marcolini. Tutti i diritti riservati. Vedi LICENSE. */
+/* Pocket GM Screen (già DM Toolkit) — © 2026 Noemi Marcolini. Tutti i diritti riservati. Vedi LICENSE. */
 /* ============================================================
    SCHEDA-RAPIDA.JS — Scheda PNG compatta per consultazione al volo
    durante la sessione (voce/personalita', cosa vuole, gancio,

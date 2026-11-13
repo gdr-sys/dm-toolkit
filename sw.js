@@ -1,7 +1,7 @@
-/* DM Toolkit — © 2026 Noemi Marcolini. Tutti i diritti riservati. Vedi LICENSE. */
+/* Pocket GM Screen (già DM Toolkit) — © 2026 Noemi Marcolini. Tutti i diritti riservati. Vedi LICENSE. */
 // Cambiare il numero quando cambia l'elenco dei file precaricati, cosi' il nuovo service
 // worker scarica di nuovo tutto e cancella la cache vecchia.
-const CACHE_NAME = 'dm-toolkit-v10';
+const CACHE_NAME = 'dm-toolkit-v11';
 const APP_SHELL = [
   './',
   './index.html',
@@ -11,6 +11,9 @@ const APP_SHELL = [
   './css/layout.css',
   './css/identita.css', './css/scena.css',
   './favicon.png',
+  './favicon.svg',
+  './icons/simbolo.svg',
+  './icons/simbolo-piccolo.svg',
   './icons/icon-192.png',
   './icons/icon-512.png',
   './icons/icon-maskable-512.png',

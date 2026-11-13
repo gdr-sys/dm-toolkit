@@ -1,4 +1,4 @@
-/* DM Toolkit — © 2026 Noemi Marcolini. Tutti i diritti riservati. Vedi LICENSE. */
+/* Pocket GM Screen (già DM Toolkit) — © 2026 Noemi Marcolini. Tutti i diritti riservati. Vedi LICENSE. */
 /* ============================================================
    BARRA-ALTA.JS — Navigazione in alto su schermi larghi (nuova grafica).
    Da 900px in su il menu laterale lascia il posto a una riga in alto:
@@ -56,7 +56,7 @@ const BarraAlta = (() => {
       return `<button type="button" role="menuitem" data-pagina="${v.id}"${off ? ' aria-disabled="true"' : ''} onclick="BarraAlta.vai('${v.id}', ${off})">${_esc(v.nome)}</button>`;
     };
     barra.innerHTML =
-      `<button type="button" class="ba-logo" onclick="BarraAlta.vai('home')" aria-label="DM Toolkit, le tue campagne"><img src="icons/icon-192.png" alt="" width="26" height="26"><span>DM Toolkit</span></button>` +
+      `<button type="button" class="ba-logo" onclick="BarraAlta.vai('home')" aria-label="Pocket GM Screen, le tue campagne"><img src="icons/simbolo-piccolo.svg" alt="" width="26" height="26"><span>Pocket GM Screen</span></button>` +
       (camp ? `<button type="button" class="ba-campagna" onclick="CampagnaHub.apri()" title="Apri la pagina della campagna"><i aria-hidden="true"></i><span>${_esc(camp.name)}</span></button>` : '') +
       `<nav class="ba-nav" aria-label="Sezioni">${PRINCIPALI.map(voce).join('')}` +
         `<div class="ba-gruppo"><button type="button" class="ba-voce" id="ba-strumenti" aria-haspopup="menu" aria-expanded="false" onclick="BarraAlta.menu('ba-menu-strumenti', this)">Strumenti ${_freccia}</button>` +

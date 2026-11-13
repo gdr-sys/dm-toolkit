@@ -1,4 +1,4 @@
-/* DM Toolkit — © 2026 Noemi Marcolini. Tutti i diritti riservati. Vedi LICENSE. */
+/* Pocket GM Screen (già DM Toolkit) — © 2026 Noemi Marcolini. Tutti i diritti riservati. Vedi LICENSE. */
 /* ============================================================
    ONBOARDING.JS — Guida rapida per orientarsi nel tool, raggiungibile
    dalla voce "Guida rapida" nella sidebar (markup statico in

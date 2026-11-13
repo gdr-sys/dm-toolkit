@@ -1,17 +1,18 @@
 <!DOCTYPE html>
-<!-- DM Toolkit — © 2026 Noemi Marcolini. Tutti i diritti riservati. Vedi LICENSE. -->
+<!-- Pocket GM Screen (già DM Toolkit) — © 2026 Noemi Marcolini. Tutti i diritti riservati. Vedi LICENSE. -->
 <html lang="it" data-theme="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>DM Toolkit — 5e</title>
-  <meta name="description" content="Campaign management tool for D&D 5e Dungeon Masters">
-  <meta name="theme-color" content="#8B2635">
+  <title>Pocket GM Screen</title>
+  <meta name="description" content="Pocket GM Screen: tutta la campagna, in tasca. Lo strumento gratuito per master di giochi di ruolo.">
+  <meta name="theme-color" content="#1a1612">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="DM Toolkit">
+  <meta name="apple-mobile-web-app-title" content="Pocket GM">
   <link rel="manifest" href="manifest.json">
-  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon.png">
   <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/components.css">
@@ -165,9 +166,9 @@
     <!-- Logo -->
     <a class="sidebar-logo" onclick="App.navigateTo('home')" style="cursor:pointer;">
       <div class="logo-icon">
-        <img src="icons/icon-192.png" alt="" width="24" height="24" style="display:block;width:100%;height:100%;object-fit:contain;">
+        <img src="icons/simbolo-piccolo.svg" alt="" width="24" height="24" style="display:block;width:100%;height:100%;object-fit:contain;">
       </div>
-      <span class="logo-text">DM Toolkit</span>
+      <span class="logo-text">Pocket GM Screen</span>
     </a>
 
     <!-- Campagna attiva -->
@@ -412,7 +413,7 @@
     <section class="page active" id="page-home" aria-labelledby="home-title-lista">
       <div class="home-hero" role="banner">
         <p class="hero-eyebrow" aria-hidden="true">D&amp;D 5e · Dungeon Master Toolkit</p>
-        <h1 class="home-hero-title" id="home-title">DM Toolkit</h1>
+        <h1 class="home-hero-title" id="home-title">Pocket GM Screen</h1>
         <p class="home-hero-subtitle">Il tuo quartier generale per gestire campagne, PNG, sessioni e molto altro</p>
         <div class="hero-divider" aria-hidden="true">
           <span class="hero-divider-line"></span>
@@ -917,7 +918,7 @@
           <div class="card-header">
             <h2 class="card-title">Loot Generator</h2>
             <div style="display:flex;gap:4px;">
-              <button id="loot-tab-rng" class="btn btn-primary btn-sm" onclick="LootPanel.switchTab('rng')">RNG System</button>
+              <button id="loot-tab-rng" class="btn btn-primary btn-sm" onclick="LootPanel.switchTab('rng')">Tiri casuali</button>
               <button id="loot-tab-dmg" class="btn btn-ghost btn-sm" onclick="LootPanel.switchTab('dmg')">DMG Ufficiale</button>
             </div>
           </div>
@@ -3007,7 +3008,7 @@ const Storage = (() => {
           Toast.show('Storage pieno: la nuova immagine non e\' stata salvata. Usa un URL esterno o rimuovi altre immagini.', 'warning', 6000);
           return true;
         } catch(e2) {
-          Toast.show('Storage esaurito! Esporta la campagna e riduci il contenuto.', 'error', 8000);
+          Toast.show('Lo spazio su questo dispositivo è finito. Salva la campagna su Drive o in un file, poi togli le immagini più pesanti.', 'error', 8000);
         }
       } else {
         Toast.show(`Storage pieno (${key}): riduci le note o esporta la campagna.`, 'error', 6000);
@@ -4014,8 +4015,8 @@ const App = (() => {
               <path d="M12 2v20"/><path d="M3 7l9 5 9-5"/>
             </svg>
           </div>
-          <h2 style="font-family:var(--font-display);font-size:1.1rem;margin-bottom:8px;">Inizia la tua avventura</h2>
-          <p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:24px;line-height:1.6;">Crea la tua prima campagna per iniziare a usare il toolkit.</p>
+          <h2 style="font-family:var(--font-display);font-size:1.1rem;margin-bottom:8px;">Il tavolo è pronto</h2>
+          <p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:24px;line-height:1.6;">Crea la tua campagna, o apri quella di esempio per vedere come funziona.</p>
           <button class="btn btn-primary" onclick="openNewCampaignModal()" style="font-size:0.95rem;padding:10px 24px;">
             + Nuova Campagna
           </button>
@@ -4345,7 +4346,7 @@ const openCampaign = (id) => {
     }
 
     Debug.log('App.init() completato');
-    Toast.show('DM Toolkit caricato', 'success');
+    Toast.show('Pocket GM Screen è pronto', 'success');
   };
 
   return {
@@ -4656,7 +4657,7 @@ const NPC = (() => {
     App.reloadActiveCampaign();
     const camp = App.getActiveCampaign();
     Debug.log(`NPC save: campagna = ${camp ? camp.name : 'NULL'}, id = ${camp?.id}`);
-    if (!camp) { Toast.show('Nessuna campagna attiva — apri una campagna prima', 'warning'); return; }
+    if (!camp) { Toast.show('Apri una campagna per continuare.', 'warning'); return; }
 
     const campFresh = Storage.getCampaign(camp.id);
     Debug.log(`NPC save: campagna fresh npcs = ${JSON.stringify((campFresh?.npcs || []).length)}`);
@@ -6107,7 +6108,7 @@ const Sessione = (() => {
     const npcs = camp?.npcs || [];
 
     if (!npcs.length) {
-      Toast.show('Nessun NPC nel Mondo. Aggiungili dalla sezione Mondo → PNG.', 'info', 3000);
+      Toast.show('Ancora nessun PNG. Aggiungine uno da Mondo › PNG e lo ritrovi qui.', 'info', 3000);
       return;
     }
 
@@ -13211,13 +13212,14 @@ const _loadGapi = (clientId) => new Promise((resolve, reject) => {
 const GDriveUI = (() => {
   const syncNow = async () => {
     const camp = App.getActiveCampaign();
-    if (!camp) { Toast.show('Nessuna campagna attiva', 'warning'); return; }
+    if (!camp) { Toast.show('Apri una campagna per continuare.', 'warning'); return; }
     Toast.show('Salvataggio su Drive...', 'info', 2000);
     try {
       await DriveBackup.syncToDrive(camp);
-      Toast.show('✓ Campagna salvata su Drive', 'success', 2000);
+      Toast.show('Salvata su Drive', 'success', 2000);
     } catch(e) {
-      Toast.show('Errore salvataggio Drive: ' + e.message, 'error');
+      console.warn('[Drive] salvataggio non riuscito:', e);
+      Toast.show('Drive non ha risposto. La campagna resta salvata su questo dispositivo: riprova quando torna internet.', 'error');
     }
   };
 
@@ -13442,9 +13444,9 @@ const FirebaseSync = (() => {
       titolo.textContent = 'Cambia modalità';
       const chi = _user.isAnonymous ? 'in modalità anonima' : ('come ' + (_user.email || _user.displayName || 'account Google'));
       avviso.style.display = 'block';
-      avviso.innerHTML = 'Sei attualmente collegata ' + chi + '. Scegliendo un\'altra opzione qui sotto (o un account Google diverso) esci da questo accesso: le campagne sincronizzate su di esso spariscono dall\'app finché non ci riaccedi — restano comunque salvate, nulla viene cancellato.';
+      avviso.innerHTML = 'Hai fatto l\'accesso ' + chi + '. Scegliendo un\'altra opzione qui sotto (o un account Google diverso) esci da questo accesso: le campagne sincronizzate su di esso spariscono dall\'app finché non ci riaccedi — restano comunque salvate, nulla viene cancellato.';
     } else if (titolo) {
-      titolo.textContent = 'Benvenuto nel DM Toolkit';
+      titolo.textContent = 'Entra in Pocket GM Screen';
       if (avviso) avviso.style.display = 'none';
     }
     Modal.open('auth-choice');
@@ -22195,7 +22197,7 @@ document.addEventListener('DOMContentLoaded', initMobileNav);
 <div class="modal-overlay hidden" id="modal-auth-choice" style="display:none;" onclick="if(event.target===this)Modal.close('auth-choice')">
   <div class="modal" style="max-width:480px;">
     <div class="modal-header">
-      <h3 class="modal-title" id="auth-choice-titolo">Benvenuto nel DM Toolkit</h3>
+      <h3 class="modal-title" id="auth-choice-titolo">Entra in Pocket GM Screen</h3>
       <button class="btn btn-ghost btn-icon-sm" onclick="Modal.close('auth-choice')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
     </div>
     <div id="auth-choice-avviso" style="display:none;margin:12px 20px 0;padding:10px 12px;background:var(--bg-tertiary);border:1px solid var(--border-strong);border-left:3px solid var(--accent-primary);border-radius:var(--radius-sm);font-size:0.8rem;color:var(--text-secondary);"></div>
@@ -22686,7 +22688,7 @@ document.addEventListener('DOMContentLoaded', initMobileNav);
       <section style="border-top:1px solid var(--border);padding-top:16px;">
         <h3 class="imp-titolo">Informazioni</h3>
         <div style="font-size:0.78rem;color:var(--text-muted);line-height:1.7;">
-          <div>DM Toolkit — versione 2.0</div>
+          <div>Pocket GM Screen (prima DM Toolkit) — versione 2.0</div>
           <div>© 2026 Noemi Marcolini. Tutti i diritti riservati.</div>
           <div>Dati SRD 5.1 (OGL 1.0a, CC-BY-4.0) e 5.2.1 (CC-BY-4.0) — Wizards of the Coast LLC</div>
           <div style="margin-top:4px;">

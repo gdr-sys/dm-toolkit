@@ -1,4 +1,4 @@
-/* DM Toolkit — © 2026 Noemi Marcolini. Tutti i diritti riservati. Vedi LICENSE. */
+/* Pocket GM Screen (già DM Toolkit) — © 2026 Noemi Marcolini. Tutti i diritti riservati. Vedi LICENSE. */
 /* ============================================================
    CAMPAGNA-DEMO.JS — "Le Ceneri di Valmora": una campagna di
    esempio gia' piena (PNG, luoghi, fazioni, quest, PG, sessioni,
@@ -23,7 +23,7 @@ const CampagnaDemo = (() => {
     const camp = Storage.createCampaign(NOME, 'campagna');
     Storage.updateCampaign(camp.id, {
       system: '5e2024',
-      description: 'Il vulcano Ardegna, spento da tre secoli, si è risvegliato. Cenere sulla valle di Valmora, raccolti perduti, e dalle crepe della montagna escono creature che nessuno ricordava. Una campagna d\'esempio per scoprire DM Toolkit: guarda, modifica, elimina quando vuoi.',
+      description: 'Il vulcano Ardegna, spento da tre secoli, si è risvegliato. Cenere sulla valle di Valmora, raccolti perduti, e dalle crepe della montagna escono creature che nessuno ricordava. Una campagna d\'esempio per scoprire Pocket GM Screen: guarda, modifica, elimina quando vuoi.',
       demo: true,
     });
     App.openCampaign(camp.id);

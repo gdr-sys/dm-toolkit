@@ -1,4 +1,4 @@
-/* DM Toolkit — © 2026 Noemi Marcolini. Tutti i diritti riservati. Vedi LICENSE. */
+/* Pocket GM Screen (già DM Toolkit) — © 2026 Noemi Marcolini. Tutti i diritti riservati. Vedi LICENSE. */
 /* ============================================================
    CARTOGRAFO.JS — Pagina "Cartografo": genera mappe di regni, citta',
    villaggi, caverne, dungeon ed edifici, le scarica o le manda nella

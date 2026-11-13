@@ -1,4 +1,4 @@
-/* DM Toolkit — © 2026 Noemi Marcolini. Tutti i diritti riservati. Vedi LICENSE. */
+/* Pocket GM Screen (già DM Toolkit) — © 2026 Noemi Marcolini. Tutti i diritti riservati. Vedi LICENSE. */
 /* ============================================================
    UPDATE-BANNER.JS — Avviso "È disponibile una nuova versione"
    quando viene pubblicato un aggiornamento mentre l'app è già
@@ -102,7 +102,7 @@ const UpdateBanner = (() => {
     el.innerHTML =
       '<div style="display:flex;align-items:center;gap:10px;min-width:0;flex:1 1 220px;">' +
         _iconaSvg +
-        '<span>È disponibile una nuova versione di DM Toolkit.</span>' +
+        '<span>È disponibile una nuova versione di Pocket GM Screen.</span>' +
       '</div>' +
       '<div style="display:flex;gap:8px;margin-left:auto;">' +
         '<button type="button" class="btn btn-ghost btn-sm" data-azione="dopo">Più tardi</button>' +
@@ -162,7 +162,7 @@ const UpdateBanner = (() => {
     window.addEventListener('online', () => controlla());
     let appena = false;
     try { appena = sessionStorage.getItem(KEY_APPENA) === '1'; sessionStorage.removeItem(KEY_APPENA); } catch (e) {}
-    if (appena) setTimeout(() => { try { Toast.show('DM Toolkit è stato aggiornato all’ultima versione', 'success', 3500); } catch (e) {} }, 1200);
+    if (appena) setTimeout(() => { try { Toast.show('Pocket GM Screen è aggiornato all’ultima versione', 'success', 3500); } catch (e) {} }, 1200);
   };
 
   document.addEventListener('DOMContentLoaded', init);

@@ -1,4 +1,4 @@
-/* DM Toolkit — © 2026 Noemi Marcolini. Tutti i diritti riservati. Vedi LICENSE. */
+/* Pocket GM Screen (già DM Toolkit) — © 2026 Noemi Marcolini. Tutti i diritti riservati. Vedi LICENSE. */
 /* ============================================================
    SESSIONE-ZERO.JS — Sessione Zero e strumenti di sicurezza:
    aspettative del tavolo, linee e veli, strumenti concordati

@@ -1,4 +1,4 @@
-/* DM Toolkit — © 2026 Noemi Marcolini. Tutti i diritti riservati. Vedi LICENSE. */
+/* Pocket GM Screen (già DM Toolkit) — © 2026 Noemi Marcolini. Tutti i diritti riservati. Vedi LICENSE. */
 /* ============================================================
    TURNI-FAZIONE.JS — Il mondo si muove: dopo ogni sessione ogni
    fazione fa una mossa fuori scena e avanza (o no) verso il suo

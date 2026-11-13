@@ -1,4 +1,4 @@
-/* DM Toolkit — © 2026 Noemi Marcolini. Tutti i diritti riservati. Vedi LICENSE. */
+/* Pocket GM Screen (già DM Toolkit) — © 2026 Noemi Marcolini. Tutti i diritti riservati. Vedi LICENSE. */
 /* ============================================================
    CALENDARIO-CONFIG.JS — Tab "Impostazioni" della pagina Calendario.
    Due cose che prima non si potevano fare da nessuna parte:

@@ -1,4 +1,4 @@
-/* DM Toolkit — © 2026 Noemi Marcolini. Tutti i diritti riservati. Vedi LICENSE. */
+/* Pocket GM Screen (già DM Toolkit) — © 2026 Noemi Marcolini. Tutti i diritti riservati. Vedi LICENSE. */
 /* ============================================================
    AVVIO-SESSIONE.JS — Avvio guidato della sessione, facoltativo:
    si attiva da Impostazioni (preferenza di questo dispositivo).

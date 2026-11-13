@@ -1,4 +1,4 @@
-/* DM Toolkit — © 2026 Noemi Marcolini. Tutti i diritti riservati. Vedi LICENSE. */
+/* Pocket GM Screen (già DM Toolkit) — © 2026 Noemi Marcolini. Tutti i diritti riservati. Vedi LICENSE. */
 /* ============================================================
    SCENA.JS — La scena disegnata in cima alle pagine (nuova grafica).
    Non servono illustrazioni: il paesaggio nasce dal nome (stesso nome,
@@ -248,7 +248,7 @@ const Scena = (() => {
   const _intesta = () => {
     const pag = document.querySelector('#main-content .page.active');
     if (!pag || pag.id === 'page-campagna' || pag.id === 'page-home') { tutte(); return; }
-    const nome = (_camp()?.name || 'DM Toolkit');
+    const nome = (_camp()?.name || 'Pocket GM Screen');
     // Wiki: l'intestazione e' il primo blocco dell'elenco visibile; le altre pagine hanno .page-header
     const teste = [...pag.querySelectorAll('.page-header, [id^="wiki-"][id$="-list"] > div:first-child, .sc-testa, .hub-testa-scena')].filter((t) => t.offsetParent !== null);
     teste.forEach((t) => {

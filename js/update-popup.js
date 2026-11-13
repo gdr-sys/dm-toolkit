@@ -1,4 +1,4 @@
-/* DM Toolkit — © 2026 Noemi Marcolini. Tutti i diritti riservati. Vedi LICENSE. */
+/* Pocket GM Screen (già DM Toolkit) — © 2026 Noemi Marcolini. Tutti i diritti riservati. Vedi LICENSE. */
 /* ============================================================
    UPDATE-POPUP.JS — Avviso "cosa è stato corretto", mostrato una sola
    volta a chi ha già usato il tool (cioè ha almeno una campagna
@@ -14,15 +14,16 @@
    ============================================================ */
 
 const UpdatePopup = (() => {
-  const VERSION = '2026-10-31';
+  const VERSION = '2026-11-14-nome';
+  const TITOLO = 'DM Toolkit ora si chiama Pocket GM Screen';
+  const INTRO = 'Nuovo nome e nuovo logo. Le tue campagne sono dove le hai lasciate.';
   const STORAGE_KEY = 'dmtk_update_seen';
   const DELAY_MS = 1200; // prima del popup newsletter (3000ms), cosi' non si accavallano
 
   const CORREZIONI = [
-    'Nuovo dispositivo (es. iPad): le campagne salvate su Google Drive non si scaricavano, nemmeno dopo aver collegato Drive — ora arrivano da sole appena Drive si collega.',
-    'Google Drive: le immagini venivano caricate più volte e le campagne finivano in più copie con lo stesso nome — ora ogni immagine e ogni campagna ha un solo file. In "Ripristina" vedi anche quanto pesa ogni backup, per riconoscere quelli vuoti.',
-    'Drive risultava "non collegato" a ogni apertura, e una campagna cancellata poteva ricomparire — entrambi risolti.',
-    'Mappe e Timeline: sulle mappe ora puoi zoomare con due dita su tablet e telefono; nella Timeline i nomi degli eventi vicini non si sovrappongono più.',
+    'Campagne, impostazioni e backup su Google Drive restano come prima: la cartella su Drive si chiama ancora "DM Toolkit".',
+    'L’indirizzo dell’app per ora non cambia, quindi segnalibri e link continuano a funzionare.',
+    'Se hai installato l’app sul telefono o sul computer, la nuova icona può comparire solo dopo qualche giorno: il sistema la aggiorna da solo.',
   ];
 
   const _checkSvg = () =>
@@ -44,11 +45,11 @@ const UpdatePopup = (() => {
     overlay.innerHTML =
       '<div class="modal" style="max-width:460px;">' +
         '<div class="modal-header">' +
-          '<h3 class="modal-title">Alcuni bug sono stati corretti</h3>' +
+          '<h3 class="modal-title">' + TITOLO + '</h3>' +
           '<button class="btn btn-ghost btn-icon-sm" onclick="Modal.close(\'update-popup\')" aria-label="Chiudi"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>' +
         '</div>' +
         '<div class="modal-body">' +
-          '<p style="font-size:0.85rem;color:var(--text-muted);line-height:1.6;margin:0 0 14px;">Grazie alle segnalazioni, in questo aggiornamento sono stati risolti:</p>' +
+          '<p style="font-size:0.85rem;color:var(--text-muted);line-height:1.6;margin:0 0 14px;">' + INTRO + '</p>' +
           '<div style="background:var(--bg-secondary);border-radius:var(--radius-md);padding:12px 16px;">' +
             '<div style="display:flex;flex-direction:column;gap:12px;">' +
               CORREZIONI.map(testo =>

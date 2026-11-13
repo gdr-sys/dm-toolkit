@@ -1,4 +1,4 @@
-/* DM Toolkit — © 2026 Noemi Marcolini. Tutti i diritti riservati. Vedi LICENSE. */
+/* Pocket GM Screen (già DM Toolkit) — © 2026 Noemi Marcolini. Tutti i diritti riservati. Vedi LICENSE. */
 /* Il comportamento del sito: testata, regno disegnato dal vivo, discesa tra le mappe, schede dell'app,
    stemmi generati e vista dei giocatori. Ogni parte controlla di esistere, perche' le pagine sono diverse. */
 (() => {

@@ -1,4 +1,4 @@
-/* DM Toolkit — © 2026 Noemi Marcolini. Tutti i diritti riservati. Vedi LICENSE. */
+/* Pocket GM Screen (già DM Toolkit) — © 2026 Noemi Marcolini. Tutti i diritti riservati. Vedi LICENSE. */
 /* ============================================================
    DASHBOARD-NUOVA.JS — Impaginazione della Panoramica (nuova grafica "scena").
    Non disegna i contenuti: le tessere restano dei loro moduli (sessioni,

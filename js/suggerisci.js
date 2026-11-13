@@ -1,4 +1,4 @@
-/* DM Toolkit — © 2026 Noemi Marcolini. Tutti i diritti riservati. Vedi LICENSE. */
+/* Pocket GM Screen (già DM Toolkit) — © 2026 Noemi Marcolini. Tutti i diritti riservati. Vedi LICENSE. */
 /* ============================================================
    SUGGERISCI.JS — "Suggerisci una funzione": raccoglie le idee dei
    master con poche domande e le invia via Web3Forms, lo stesso
@@ -63,8 +63,8 @@ const Suggerisci = (() => {
     const btn = document.getElementById('sg-invia');
     const fd = new FormData();
     fd.append('access_key', ACCESS_KEY);
-    fd.append('subject', 'DM Toolkit - Idea: ' + titolo);
-    fd.append('from_name', 'DM Toolkit - Suggerimento');
+    fd.append('subject', 'Pocket GM Screen - Idea: ' + titolo);
+    fd.append('from_name', 'Pocket GM Screen - Suggerimento');
     fd.append('message',
       'Idea: ' + titolo +
       '\n\nCome la userebbe:\n' + (v('sg-uso') || '(non specificato)') +
