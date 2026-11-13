@@ -20856,7 +20856,10 @@ const LootPanel = (() => {
     const iframe = document.getElementById('loot-dmg-iframe');
     const ph = document.getElementById('loot-iframe-placeholder');
     if (!iframe) return;
-    iframe.src = iframe.dataset.src || 'https://dnd-loot-generator-sepia.vercel.app/';
+    // Il generatore prende tema e tavolozza dell'app e salta la sua schermata di benvenuto
+    const d = document.documentElement;
+    const p = new URLSearchParams({ incorporato: '1', lang: 'it', tema: d.getAttribute('data-theme') === 'light' ? 'light' : 'dark', colore: d.getAttribute('data-colore') || 'brace' });
+    iframe.src = (iframe.dataset.src || 'https://dnd-loot-generator-sepia.vercel.app/') + '?' + p.toString();
     if (ph) ph.style.display = 'none';
   };
   return { switchTab, loadIframe };
