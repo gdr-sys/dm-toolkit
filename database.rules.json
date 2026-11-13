@@ -12,13 +12,43 @@
 
     "campagne": {
       "$code": {
-        ".read": "auth != null",
-        ".write": "auth != null",
+        "proprietario": {
+          ".read": "auth != null",
+          ".write": "auth != null && !data.exists() && newData.val() === auth.uid && (now < 1796083200000 || !root.child('campagne').child($code).child('data').exists() || root.child('campagne').child($code).child('data').child('ownerId').val() === auth.uid || root.child('campagne').child($code).child('data').child('updatedBy').val() === auth.uid)"
+        },
+
+        "membri": {
+          ".read": "auth != null && root.child('campagne').child($code).child('membri').child(auth.uid).exists()",
+          "$uid": {
+            ".read": "auth != null && auth.uid === $uid",
+            ".write": "auth != null && (root.child('campagne').child($code).child('proprietario').val() === auth.uid || (auth.uid === $uid && (!newData.exists() || (data.exists() && newData.child('invito').val() === data.child('invito').val()) || (newData.child('invito').val() === 'legacy' && now < 1796083200000) || (newData.child('invito').isString() && newData.child('invito').val().matches(/^[A-Z0-9]{6}$/) && root.child('campagne').child($code).child('inviti').child(newData.child('invito').val()).exists()))))",
+            ".validate": "!newData.exists() || newData.child('invito').isString()"
+          }
+        },
+
+        "inviti": {
+          ".read": "auth != null && root.child('campagne').child($code).child('proprietario').val() === auth.uid",
+          ".write": "auth != null && root.child('campagne').child($code).child('proprietario').val() === auth.uid",
+          "$tok": {
+            ".validate": "$tok.matches(/^[A-Z0-9]{6}$/)"
+          }
+        },
+
+        "data": {
+          ".read": "auth != null && (root.child('campagne').child($code).child('membri').child(auth.uid).exists() || data.child('vista').val() === true || now < 1796083200000)",
+          ".write": "auth != null && (root.child('campagne').child($code).child('membri').child(auth.uid).exists() || now < 1796083200000)"
+        },
 
         "presenza": {
+          ".read": "auth != null && (root.child('campagne').child($code).child('membri').child(auth.uid).exists() || now < 1796083200000)",
           "$uid": {
-            ".write": "auth != null && auth.uid === $uid"
+            ".write": "auth != null && auth.uid === $uid && (root.child('campagne').child($code).child('membri').child(auth.uid).exists() || now < 1796083200000)"
           }
+        },
+
+        "pg_live": {
+          ".read": "auth != null",
+          ".write": "auth != null"
         }
       }
     }

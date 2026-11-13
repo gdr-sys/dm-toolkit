@@ -42,7 +42,7 @@ const VistaGiocatori = (() => {
 
   const _istantanea = () => {
     const c = _camp(), s = _impost();
-    const snap = { nome: c.name, aggiornatoAt: Date.now() };
+    const snap = { vista: true, ownerId: (typeof firebase !== 'undefined' && firebase.auth().currentUser || {}).uid || null, nome: c.name, aggiornatoAt: Date.now() }; // vista: le regole la rendono leggibile ai giocatori
     if (s.previously) {
       const po = [...(c.previouslyOnArchive || [])].sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0))[0];
       if (po) snap.previously = String(po.testo || '').slice(0, 4000);
@@ -75,6 +75,7 @@ const VistaGiocatori = (() => {
     const user = typeof firebase !== 'undefined' && firebase.apps?.length ? firebase.auth().currentUser : null;
     if (!user) { if (!silenzioso) Toast.show('Per condividere con i giocatori serve l\'accesso (Accedi in alto a destra)', 'warning', 4000); return; }
     try {
+      if (typeof FirebaseSync !== 'undefined' && FirebaseSync.assicuraMembro) await FirebaseSync.assicuraMembro(s.id, true);
       await firebase.database().ref('campagne/' + s.id + '/data').set(_istantanea());
       if (!silenzioso) Toast.show('Vista giocatori aggiornata', 'success', 1800);
     } catch (e) {
@@ -163,7 +164,7 @@ const VistaGiocatori = (() => {
     _salvaImpost(patch);
     if (patch.attiva) await pubblica(false);
     else if (_impost().id && typeof firebase !== 'undefined' && firebase.auth().currentUser) {
-      try { await firebase.database().ref('campagne/' + _impost().id + '/data').set({ chiusa: true, aggiornatoAt: Date.now() }); } catch (e) {}
+      try { await firebase.database().ref('campagne/' + _impost().id + '/data').set({ vista: true, chiusa: true, aggiornatoAt: Date.now() }); } catch (e) {}
     }
     _disegna();
     renderDashboard();

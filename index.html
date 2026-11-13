@@ -3037,9 +3037,8 @@ const Storage = (() => {
   const _genCampCode = () => {
 
     const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-    let code = '';
-    for (let i = 0; i < 6; i++) code += chars[Math.floor(Math.random() * chars.length)];
-    return code;
+    const r = new Uint32Array(6); crypto.getRandomValues(r);
+    return [...r].map(x => chars[x % chars.length]).join('');
   };
 
   const createCampaign = (name, type = 'campagna') => {
@@ -13232,11 +13231,11 @@ const GDriveUI = (() => {
     // Con l'accesso fatto c'e' un solo codice, quello breve della campagna: porta al puntatore
     // Firebase e da li' al file Drive. L'id del file resta il codice solo per chi non ha l'accesso.
     if (FirebaseSync.puoInvitare()) {
-      const pronto = await FirebaseSync.preparaInvito();
-      const codice = pronto ? FirebaseSync.getCampCode() : '';
-      if (inp) inp.value = codice;
-      if (hint) hint.textContent = pronto ? '✓ Codice pronto — mandalo al co-autore.' : '✗ Errore — riprova.';
-      if (pronto) { try { await navigator.clipboard.writeText(codice); if (hint) hint.textContent += ' (copiato!)'; } catch(e) {} }
+      const invito = await FirebaseSync.creaInvito().catch(() => null);
+      const pronto = invito ? await FirebaseSync.preparaInvito() : false;
+      if (inp) inp.value = pronto ? invito : '';
+      if (hint) hint.textContent = pronto ? 'Invito pronto: mandalo al master che vuoi far entrare.' : 'Invito non creato: riprova quando torna internet.';
+      if (pronto) { try { await navigator.clipboard.writeText(invito); if (hint) hint.textContent += ' Copiato.'; } catch(e) {} }
       return;
     }
     const result = await DriveBackup.generateInvite(camp);
@@ -13514,7 +13513,7 @@ const FirebaseSync = (() => {
           Toast.show('Ripristino campagna fallito: ' + e.message, 'error', 5000);
         });
 
-        _db.ref('campagne/' + lastShareCode + '/data').once('value').then(snap => {
+        assicuraMembro(lastShareCode, false).then(() => _db.ref('campagne/' + lastShareCode + '/data').once('value')).then(snap => {
           const pointer = snap.val();
           if (pointer && (pointer.__deleted || _eliminata(pointer.id))) {
             // Campagna cancellata (anche da un altro dispositivo): non va ripristinata.
@@ -13566,6 +13565,7 @@ const FirebaseSync = (() => {
         if (_eliminata(camp.id)) { _handleRemoteDelete(camp.id, key); continue; }
 
         try {
+          await assicuraMembro(key, !camp.ownerId || camp.ownerId === uid);
           const existing = await _db.ref('campagne/' + key + '/data').once('value');
           const existingVal = existing.val();
 
@@ -13582,14 +13582,14 @@ const FirebaseSync = (() => {
               const driveFileId = await DriveBackup.syncToDrive(camp);
               await _db.ref('campagne/' + key + '/data').set({
                 __pointer: true, driveFileId, id: camp.id, name: camp.name,
-                updatedAt: Date.now(), updatedBy: uid, updatedByName: user.displayName || user.email, ownerId: uid,
+                updatedAt: Date.now(), updatedBy: uid, updatedByName: user.displayName || 'Co-master', ownerId: uid,
               });
             } else {
               await _db.ref('campagne/' + key + '/data').set({
                 ..._alleggerisci(camp),
                 updatedAt: Date.now(),
                 updatedBy: uid,
-                updatedByName: user.displayName || user.email,
+                updatedByName: user.displayName || 'Co-master',
                 ownerId: uid,
               });
             }
@@ -13617,6 +13617,7 @@ const FirebaseSync = (() => {
       let bloccatePerDrive = 0;
       for (const key of remoteKeys) {
         try {
+          await assicuraMembro(key, false);
           const campSnap = await _db.ref('campagne/' + key + '/data').once('value');
           const pointer = campSnap.val();
           if (!pointer || !pointer.id) continue;
@@ -13724,21 +13725,130 @@ const FirebaseSync = (() => {
     return campId.replace(/[^a-zA-Z0-9]/g,'').slice(-6).toUpperCase() || 'CAMP01';
   };
 
+  // ── Membri e inviti (regole di database.rules.json dal 2026-11) ──
+  // Solo chi sta in campagne/<codice>/membri legge e modifica i dati. Chi crea la campagna
+  // ne diventa il proprietario: invita con un codice CAMPAGNA-INVITO (l'invito si puo'
+  // annullare) e puo' togliere un membro. Fino alla data di passaggio scritta nelle regole,
+  // chi aveva gia' la campagna entra anche senza invito, cosi' nessuno resta fuori.
+  const _membriOk = new Set();
+  const _casuale = (n) => {
+    const ch = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    const r = new Uint32Array(n); crypto.getRandomValues(r);
+    return [...r].map(x => ch[x % ch.length]).join('');
+  };
+  const _io = () => _user || (typeof firebase !== 'undefined' && firebase.auth ? firebase.auth().currentUser : null);
+  const _nomeVisibile = () => (_io() && _io().displayName) || 'Co-master';
+  const _voceMembro = (invito) => ({ invito, nome: _nomeVisibile(), at: firebase.database.ServerValue.TIMESTAMP });
+
+  // ownerHint: true se questo dispositivo puo' essere il creatore (campagna senza ownerId o con il proprio)
+  const assicuraMembro = async (key, ownerHint) => {
+    const io = _io();
+    if (!_db || !io || !key) return false;
+    if (_membriOk.has(key)) return true;
+    const base = _db.ref('campagne/' + key);
+    let prop = null;
+    try { prop = (await base.child('proprietario').once('value')).val(); } catch (e) {}
+    if (prop === io.uid || (!prop && ownerHint !== false)) {
+      try {
+        if (!prop) await base.child('proprietario').set(io.uid);
+        await base.child('membri/' + io.uid).set(_voceMembro('proprietario'));
+        _membriOk.add(key); return true;
+      } catch (e) { /* proprietario gia' preso da un altro: si prova come membro */ }
+    }
+    try {
+      if ((await base.child('membri/' + io.uid).once('value')).exists()) { _membriOk.add(key); return true; }
+    } catch (e) {}
+    try {
+      await base.child('membri/' + io.uid).set(_voceMembro('legacy')); // valido solo nel periodo di passaggio
+      _membriOk.add(key); return true;
+    } catch (e) { return false; }
+  };
+
+  const _seProprietario = async (code) => {
+    if (!(await assicuraMembro(code, true))) return false;
+    const prop = (await _db.ref('campagne/' + code + '/proprietario').once('value')).val();
+    return prop === _user.uid;
+  };
+
+  // Crea (o riusa, se ancora valido) l'invito della campagna aperta e restituisce CODICE-INVITO
+  const creaInvito = async () => {
+    const code = getCampCode();
+    if (!code || !_db || !_user) return null;
+    if (!(await _seProprietario(code))) {
+      Toast.show('Solo chi ha creato la campagna può invitare altri master', 'warning', 4500);
+      return null;
+    }
+    const chiave = 'pgs_invito_' + code;
+    let tok = localStorage.getItem(chiave);
+    if (tok) {
+      try { if (!(await _db.ref('campagne/' + code + '/inviti/' + tok).once('value')).exists()) tok = null; }
+      catch (e) { tok = null; }
+    }
+    if (!tok) {
+      tok = _casuale(6);
+      await _db.ref('campagne/' + code + '/inviti/' + tok).set({ at: firebase.database.ServerValue.TIMESTAMP });
+      localStorage.setItem(chiave, tok);
+    }
+    return code + '-' + tok;
+  };
+
+  // Annulla tutti gli inviti: chi ha un vecchio codice non entra piu'; chi e' gia' dentro resta
+  const annullaInviti = async () => {
+    const code = getCampCode();
+    if (!code || !(await _seProprietario(code))) { Toast.show('Solo chi ha creato la campagna può annullare gli inviti', 'warning'); return; }
+    try {
+      await _db.ref('campagne/' + code + '/inviti').remove();
+      localStorage.removeItem('pgs_invito_' + code);
+      const el = document.getElementById('collab-camp-code'); if (el) el.textContent = 'Premi Copia per creare un nuovo invito';
+      Toast.show('Inviti annullati. Chi è già dentro resta: puoi toglierlo dall’elenco.', 'success', 4500);
+    } catch (e) { Toast.show('Non sono riuscita ad annullare gli inviti: riprova quando torna internet.', 'error'); }
+  };
+
+  const elencoMembri = async () => {
+    const code = getCampCode();
+    if (!code || !_db || !_user) return { membri: [], proprietario: false };
+    try {
+      const [m, p] = await Promise.all([
+        _db.ref('campagne/' + code + '/membri').once('value'),
+        _db.ref('campagne/' + code + '/proprietario').once('value'),
+      ]);
+      const membri = Object.entries(m.val() || {}).map(([uid, v]) => ({ uid, nome: (v && v.nome) || 'Co-master', proprietario: v && v.invito === 'proprietario' }));
+      return { membri, proprietario: p.val() === _user.uid };
+    } catch (e) { return { membri: [], proprietario: false }; }
+  };
+
+  const togliMembro = async (uid) => {
+    const code = getCampCode();
+    if (!code || uid === _user?.uid || !(await _seProprietario(code))) return;
+    try {
+      await _db.ref('campagne/' + code + '/membri/' + uid).remove();
+      Toast.show('Tolto dalla campagna. Ricordati di annullare gli inviti, se ne aveva uno.', 'success', 4500);
+      _renderMembri();
+    } catch (e) { Toast.show('Non sono riuscita a toglierlo: riprova quando torna internet.', 'error'); }
+  };
+
+  const _renderMembri = async () => {
+    const box = document.getElementById('collab-membri');
+    if (!box) return;
+    const { membri, proprietario } = await elencoMembri();
+    if (!membri.length) { box.innerHTML = ''; return; }
+    const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+    box.innerHTML = '<div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:6px;">Chi può modificare questa campagna</div>' +
+      membri.map(x => '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 0;font-size:0.82rem;">' +
+        '<span>' + esc(x.nome) + (x.proprietario ? ' <span style="color:var(--text-muted);font-size:0.75rem;">· ha creato la campagna</span>' : '') + (x.uid === _user.uid ? ' <span style="color:var(--text-muted);font-size:0.75rem;">· tu</span>' : '') + '</span>' +
+        (proprietario && x.uid !== _user.uid ? '<button type="button" class="btn btn-ghost btn-sm" style="min-height:32px;" onclick="FirebaseSync.togliMembro(\'' + x.uid.replace(/[^A-Za-z0-9_-]/g, '') + '\')">Togli</button>' : '') +
+      '</div>').join('') +
+      (proprietario ? '<button type="button" class="btn btn-ghost btn-sm" style="margin-top:6px;min-height:32px;" onclick="FirebaseSync.annullaInviti()">Annulla tutti gli inviti</button>' : '');
+  };
+
   const _startSync = (campId) => {
     if (!_db || !_user) return;
     _stopSync();
 
     const camp = App.getActiveCampaign?.();
     const key = camp?.shareCode || _campKey(campId);
-    _campRef = _db.ref('campagne/' + key);
+    const campRef = _campRef = _db.ref('campagne/' + key);
     _presenceRef = _db.ref('campagne/' + key + '/presenza/' + _user.uid);
-
-    _presenceRef.set({
-      nome: _user.displayName || _user.email,
-      foto: _user.photoURL || null,
-      online: true,
-      at: firebase.database.ServerValue.TIMESTAMP,
-    });
 
     if (camp) {
       _registerCampaignForUser(camp, key);
@@ -13747,14 +13857,45 @@ const FirebaseSync = (() => {
       localStorage.setItem('dm_last_share_code', key);
     }
 
+    // Prima ci si assicura di essere tra i membri, poi ci si aggancia: con le regole nuove
+    // presenza e dati si leggono solo da membri.
+    assicuraMembro(key, !camp?.ownerId || camp.ownerId === _user.uid).then(ok => {
+      if (_campRef !== campRef) return; // nel frattempo e' stata aperta un'altra campagna
+      if (!ok) {
+        _updateSyncStatus('Non sei più tra i master di questa campagna');
+        Toast.show('Non fai più parte di questa campagna condivisa: la tua copia resta su questo dispositivo.', 'warning', 6000);
+        return;
+      }
+      _renderMembri();
+      _agganciaDati(campId, key, campRef);
+    });
+    _listening = true;
+    _updateSyncStatus('In ascolto...');
+  };
+
+  const _agganciaDati = (campId, key, campRef) => {
+    _presenceRef.set({
+      nome: _nomeVisibile(),
+      foto: _user.photoURL || null,
+      online: true,
+      at: firebase.database.ServerValue.TIMESTAMP,
+    }).catch(() => {});
+
     _presenceRef.onDisconnect().remove();
 
-    _db.ref('campagne/' + key + '/presenza').on('value', snap => {
+    campRef.child('presenza').on('value', snap => {
       const presence = snap.val() || {};
       _renderPresence(presence);
-    });
+    }, () => {});
 
-    _campRef.child('data').on('value', snap => {
+    const _tolto = () => {
+      if (_campRef !== campRef) return;
+      _membriOk.delete(key);
+      _updateSyncStatus('Non sei più tra i master di questa campagna');
+      Toast.show('Non fai più parte di questa campagna condivisa: la tua copia resta su questo dispositivo.', 'warning', 6000);
+    };
+
+    campRef.child('data').on('value', snap => {
       const remote = snap.val();
       if (!remote) return;
       if (remote.__deleted) { _handleRemoteDelete(remote.id || campId, key); return; }
@@ -13774,10 +13915,7 @@ const FirebaseSync = (() => {
           Toast.show('Errore scaricando i dati da Drive: ' + e.message, 'error', 5000);
         });
       _risolviConRetry(false);
-    });
-
-    _listening = true;
-    _updateSyncStatus('In ascolto...');
+    }, _tolto);
   };
 
   const _stopSync = () => {
@@ -13836,6 +13974,7 @@ const FirebaseSync = (() => {
     if (!list.length) return;
     for (const p of list) {
       try {
+        await assicuraMembro(p.key, false);
         await _db.ref('campagne/' + p.key + '/data').set({
           __deleted: true, id: p.id,
           deletedAt: firebase.database.ServerValue.TIMESTAMP,
@@ -13871,6 +14010,7 @@ const FirebaseSync = (() => {
     // al primo riconnect (causa esatta del bug "la campagna cancellata ricompare").
     if (_db && _user) {
       try {
+        await assicuraMembro(key, !camp.ownerId || camp.ownerId === _user.uid);
         await _db.ref('campagne/' + key + '/data').set({
           __deleted: true, id: camp.id,
           deletedAt: firebase.database.ServerValue.TIMESTAMP,
@@ -13910,8 +14050,10 @@ const FirebaseSync = (() => {
     if (!camp || !camp.id || _eliminata(camp.id) || !_db || !_user) return;
     // Il riferimento si calcola dalla campagna, non da _campRef: durante un caricamento su Drive
     // lento l'utente puo' aver aperto un'altra campagna, e i dati finirebbero nel posto sbagliato.
-    const ref = _db.ref('campagne/' + (camp.shareCode || _campKey(camp.id)) + '/data');
+    const chiaveCamp = camp.shareCode || _campKey(camp.id);
+    const ref = _db.ref('campagne/' + chiaveCamp + '/data');
     try {
+      if (!(await assicuraMembro(chiaveCamp, !camp.ownerId || camp.ownerId === _user.uid))) return;
       const attuale = (await ref.once('value')).val();
       if (attuale && attuale.__deleted) { _handleRemoteDelete(camp.id, camp.shareCode || _campKey(camp.id)); return; }
       let payload;
@@ -13922,14 +14064,14 @@ const FirebaseSync = (() => {
           id: camp.id, name: camp.name,
           updatedAt: firebase.database.ServerValue.TIMESTAMP,
           updatedBy: _user.uid,
-          updatedByName: _user.displayName || _user.email,
+          updatedByName: _nomeVisibile(),
         };
       } else {
         payload = {
           ..._alleggerisci(camp),
           updatedAt: firebase.database.ServerValue.TIMESTAMP,
           updatedBy: _user.uid,
-          updatedByName: _user.displayName || _user.email,
+          updatedByName: _nomeVisibile(),
         };
       }
       if (_eliminata(camp.id)) return;
@@ -14184,9 +14326,7 @@ const FirebaseSync = (() => {
 
     if (!camp.shareCode) {
 
-      const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-      let code = '';
-      for (let i = 0; i < 6; i++) code += chars[Math.floor(Math.random() * chars.length)];
+      const code = _casuale(6);
       camp.shareCode = code;
       App.saveActiveCampaign({ shareCode: code });
     }
@@ -14216,27 +14356,42 @@ const FirebaseSync = (() => {
   };
 
   const copyCode = async () => {
-    if (_user?.isAnonymous) { Toast.show('Accedi con Google o email per invitare un co-autore', 'warning'); return; }
-    const code = getCampCode();
-    if (!code) return;
-    // Prima gli appunti: dopo un'attesa di rete il browser puo' non considerarlo piu' un gesto dell'utente.
-    try { await navigator.clipboard?.writeText(code); } catch(e) {}
-    Toast.show('Codice copiato, preparo l\'invito...', 'info', 1500);
-    if (await preparaInvito()) Toast.show('Invito pronto: manda il codice al co-autore', 'success', 3000);
+    if (_user?.isAnonymous) { Toast.show('Accedi con Google o email per invitare un altro master', 'warning'); return; }
+    if (!getCampCode()) return;
+    Toast.show('Preparo l’invito...', 'info', 1500);
+    let invito = null;
+    try { invito = await creaInvito(); } catch (e) { Debug.warn('Invito:', e.message); }
+    if (!invito) return;
+    const el = document.getElementById('collab-camp-code');
+    if (el) el.textContent = invito;
+    if (!(await preparaInvito())) return;
+    let copiato = false;
+    try { await navigator.clipboard?.writeText(invito); copiato = true; } catch (e) {}
+    Toast.show(copiato ? 'Invito copiato: mandalo al master che vuoi far entrare' : 'Invito pronto: copialo dal riquadro e mandalo', 'success', 3500);
+    _renderMembri();
   };
 
   let _ingressoInAttesa = false;
 
   const joinCampaign = async (codiceDato) => {
     const digitato = (typeof codiceDato === 'string' ? codiceDato : document.getElementById('collab-join-code')?.value)?.trim() || '';
-    if (digitato.length > 12) return GDriveUI.joinCampaign(digitato); // id di un file Drive
-    const code = digitato.toUpperCase().replace(/[^A-Z0-9]/g,'');
-    if (!code || code.length < 4) { Toast.show('Inserisci il codice a 6 caratteri', 'warning'); return; }
+    const invitoNuovo = digitato.toUpperCase().replace(/\s/g, '').match(/^([A-Z0-9]{6})-?([A-Z0-9]{6})$/);
+    if (!invitoNuovo && digitato.length > 12) return GDriveUI.joinCampaign(digitato); // id di un file Drive
+    const code = invitoNuovo ? invitoNuovo[1] : digitato.toUpperCase().replace(/[^A-Z0-9]/g,'');
+    const gettone = invitoNuovo ? invitoNuovo[2] : null;
+    if (!code || code.length < 4) { Toast.show('Incolla l’invito che ti hanno mandato (es. ABC234-XYZ567)', 'warning'); return; }
     if (!_user) { Toast.show('Accedi prima con Google o email', 'warning'); return; }
     if (!_db) { Toast.show('Sincronizzazione non disponibile in questo momento', 'error'); return; }
     try {
       Toast.show('Ricerca campagna...', 'info', 1500);
 
+      if (gettone) {
+        try { await _db.ref('campagne/' + code + '/membri/' + _user.uid).set(_voceMembro(gettone)); _membriOk.add(code); }
+        catch (e) { Toast.show('Questo invito non vale più: chiedine uno nuovo a chi ha creato la campagna.', 'error', 5000); return; }
+      } else if (!(await assicuraMembro(code, false))) {
+        Toast.show('Serve l’invito completo (es. ABC234-XYZ567): chiedilo a chi ha creato la campagna.', 'error', 5000);
+        return;
+      }
       const snap = await _db.ref('campagne/' + code + '/data').get();
       const pointer = snap.val();
       if (!pointer || pointer.__deleted) {
@@ -14321,8 +14476,12 @@ const FirebaseSync = (() => {
     }
     if (codeEl) {
       const code = getCampCode();
-      codeEl.textContent = _user.isAnonymous ? '(accedi con Google per collaborare)' : (code || '(salva una campagna)');
+      const tok = code ? localStorage.getItem('pgs_invito_' + code) : null;
+      codeEl.textContent = _user.isAnonymous ? '(accedi con Google per collaborare)' : (!code ? '(salva una campagna)' : (tok ? code + '-' + tok : 'Premi Copia per creare l’invito'));
+      const schede = document.getElementById('collab-codice-schede');
+      if (schede) schede.textContent = code || '—';
     }
+    _renderMembri();
   };
 
   const _updateSyncStatus = (msg) => {
@@ -14422,6 +14581,7 @@ const FirebaseSync = (() => {
     useLocal, upgradeToGoogle, switchMode,
     syncNow, push, pushNow, flush, flushAndWait, onCampagnaSaved, onCampagnaActivated,
     getCampCode, copyCode, joinCampaign, deleteCampaign, puoInvitare, preparaInvito,
+    assicuraMembro, creaInvito, annullaInviti, togliMembro, elencoMembri,
   };
 })();
 
@@ -22297,19 +22457,21 @@ document.addEventListener('DOMContentLoaded', initMobileNav);
       <!-- Invita -->
       <div style="border-top:1px solid var(--border);padding-top:14px;margin-bottom:14px;">
         <div style="font-family:var(--font-display);font-size:0.85rem;font-weight:600;margin-bottom:6px;display:flex;align-items:center;gap:6px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg> Invita co-autore</div>
-        <p style="font-size:0.78rem;color:var(--text-muted);margin-bottom:8px;">Copia il codice e mandalo al co-autore. Chi ha il codice può leggere e modificare questa campagna.</p>
+        <p style="font-size:0.78rem;color:var(--text-muted);margin-bottom:8px;">Copia l’invito e mandalo al master che vuoi far entrare. Chi entra con l’invito può leggere e modificare la campagna, finché non lo togli.</p>
         <div style="display:flex;gap:8px;align-items:center;">
           <code id="collab-camp-code" style="flex:1;background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius-md);padding:8px 12px;font-size:0.9rem;letter-spacing:0.12em;text-align:center;cursor:pointer;" onclick="FirebaseSync.copyCode()" title="Clicca per copiare">—</code>
           <button class="btn btn-ghost btn-sm" onclick="FirebaseSync.copyCode()" style="display:flex;align-items:center;gap:6px;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copia</button>
         </div>
-        <div style="font-size:0.7rem;color:var(--text-muted);margin-top:4px;">Codice di 6 caratteri. Resta valido finché non elimini la campagna.</div>
+        <div style="font-size:0.7rem;color:var(--text-muted);margin-top:4px;">L’invito vale finché non lo annulli.</div>
+        <div style="font-size:0.75rem;color:var(--text-muted);margin-top:10px;">Codice per le schede dei giocatori: <code id="collab-codice-schede" style="letter-spacing:0.1em;">—</code>. Collega solo punti ferita e condizioni, non apre la campagna.</div>
+        <div id="collab-membri" style="margin-top:12px;"></div>
       </div>
 
       <!-- Unisciti -->
       <div style="border-top:1px solid var(--border);padding-top:14px;margin-bottom:14px;">
         <div style="font-family:var(--font-display);font-size:0.85rem;font-weight:600;margin-bottom:6px;display:flex;align-items:center;gap:6px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="15.5" r="5.5"/><path d="m21 2-9.6 9.6"/><path d="m15.5 7.5 3 3L22 7l-3-3"/></svg> Unisciti a una campagna</div>
         <div style="display:flex;gap:8px;">
-          <input id="collab-join-code" type="text" class="form-input" placeholder="Codice campagna..." style="flex:1;font-family:var(--font-mono);" autocapitalize="off" autocorrect="off" spellcheck="false">
+          <input id="collab-join-code" type="text" class="form-input" placeholder="Invito, es. ABC234-XYZ567" style="flex:1;font-family:var(--font-mono);" autocapitalize="off" autocorrect="off" spellcheck="false">
           <button class="btn btn-primary btn-sm" onclick="FirebaseSync.joinCampaign()">Accedi</button>
         </div>
       </div>
