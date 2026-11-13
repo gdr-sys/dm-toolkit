@@ -240,6 +240,9 @@ const Scena = (() => {
     editto: '<path d="M7 3h10v16l-5-3-5 3z"/><path d="M10 8h4"/><path d="M10 11h4"/>',
     avviso: '<path d="M12 2v3"/><rect x="4" y="5" width="16" height="15" rx="1"/><path d="M8 10h8"/><path d="M8 14h5"/>',
     tesoro: '<path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2z"/><path d="M14 10l3 3"/><path d="M17 10l-3 3"/>',
+    gazzetta: '<rect x="3" y="4" width="18" height="16" rx="1"/><path d="M7 8h10"/><path d="M7 12h4"/><path d="M7 16h4"/><path d="M14 12h3v4h-3z"/>',
+    contratto: '<path d="M6 3h9l4 4v14H6z"/><path d="M9 9h6"/><path d="M9 13h6"/><path d="M9 18c1-1.5 2-1.5 3 0s2 1.5 3 0"/>',
+    menu: '<path d="M7 3v8a2 2 0 0 0 4 0V3"/><path d="M9 11v10"/><path d="M16 3c-1.5 1-2 3-2 6s1 3 2 3v9"/>',
   };
   const icona = (k) => '<svg class="sc-icona" aria-hidden="true" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">' + (ICONE[k] || '<rect x="4" y="4" width="16" height="16" rx="3"/>') + '</svg>';
 

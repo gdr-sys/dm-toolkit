@@ -29,11 +29,16 @@ const Documenti = (() => {
     editto: { nome: 'Editto', W: 900, H: 1200 },
     avviso: { nome: 'Avviso', W: 900, H: 1000 },
     tesoro: { nome: 'Mappa del tesoro', W: 1200, H: 900 },
+    gazzetta: { nome: 'Gazzetta', W: 900, H: 1200 },
+    contratto: { nome: 'Contratto', W: 900, H: 1200 },
+    menu: { nome: 'Menu della locanda', W: 900, H: 1200 },
   };
 
   /* ── Testi: nomi veri se ci sono, inventati altrimenti ── */
   const NOMI_RISERVA = ['Berengario', 'Ilaria Corvi', 'Tancredi', 'Oriana', 'Fosco il Rosso', 'Madonna Vespri', 'Ugolino', 'Mirella', 'Bastiano Tre Dita', 'Sigismonda'];
   const FAZ_RISERVA = ['Gilda dei Cordari', 'Mano Grigia', 'Ordine del Pozzo', 'Consiglio dei Nove'];
+  // 'di' davanti a un nome che ha gia' l'articolo: di Il Tino -> del Tino, di La Rocca -> della Rocca
+  const _diNome = (n) => { const m = String(n).match(/^(Il|Lo|La|I|Gli|Le) (.+)$/) || String(n).match(/^(L’|L')(.+)$/); return m ? ({ Il: 'del ', Lo: 'dello ', La: 'della ', I: 'dei ', Gli: 'degli ', Le: 'delle ', 'L’': 'dell’', "L'": 'dell’' })[m[1]] + m[2] : 'di ' + n; };
   const testi = (tipo, seme, cmp = {}) => {
     const r = M.rng('testo:' + tipo + ':' + seme);
     const png = () => r.pick(cmp.png && cmp.png.length ? cmp.png : NOMI_RISERVA);
@@ -65,6 +70,25 @@ const Documenti = (() => {
         titolo: scegli(['Il bottino di ' + a, 'L\'oro di ' + a, 'Qui giace il tesoro']),
         corpo: scegli(['Dal vecchio molo conta cento passi verso il monte. Dove l\'albero spezzato guarda il mare, scava sotto la sua ombra di mezzogiorno.', 'Segui l\'acqua finché non diventa sale. Tre pietre segnano la via: la quarta non la vedrai, ma ci inciamperai.', 'Non fidarti della stella che resta ferma. Chi arriva di notte trova solo ciò che lo stava aspettando.']),
         firma: 'A chi verrà dopo',
+      };
+      case 'gazzetta': return {
+        titolo: scegli(['La Voce ' + _diNome(l), 'Il Banditore ' + _diNome(l), 'Gazzetta ' + _diNome(l)]),
+        firma: scegli(['Esce ogni settimana', 'Esce quando c’è da dire', 'Stampata alla bottega di ' + b]) + ' · 2 monete di rame',
+        ...scegli([
+          { soggetto: 'Fuoco nei magazzini di ' + l2, corpo: `Nella notte di ieri un incendio ha distrutto tre magazzini lungo il fiume. Nessun morto, ma il grano dell'inverno è perduto.\n\nLe guardie parlano di una disgrazia. Chi abita nella zona racconta altro: due uomini incappucciati visti correre via poco prima delle fiamme, e un odore di olio che non viene dalle lanterne.\n\n${f} ha già offerto di comprare quel che resta, a un prezzo che molti trovano sospetto. ${a} ha promesso un'indagine, ma non ha detto chi la condurrà.` },
+          { soggetto: f + ' alza il dazio sul sale', corpo: `Da questa settimana chi porta sale a ${l} paga il doppio alle porte. Lo ha deciso ${f}, che parla di strade da riparare e di briganti da cacciare.\n\nI mercanti non ci credono. ${a}, che commercia in pesce salato da trent'anni, dice che per molti sarà la rovina: «O chiudo bottega o comincio a passare di notte, come fanno già in tanti».\n\nLe guardie hanno l'ordine di controllare anche i carri dei pellegrini.` },
+          { soggetto: 'Una luce sopra ' + l2, corpo: `Per tre notti di fila i pastori hanno visto una luce verde muoversi sopra le colline di ${l2}. Non vola come un uccello e non cade come una stella.\n\nIl tempio parla di un segno e invita alla preghiera. ${a} sostiene che sia solo qualcuno con una lanterna e troppo vino in corpo.\n\nIntanto due capre sono sparite, e il figlio del mugnaio giura di aver sentito qualcuno cantare in una lingua che non conosce.` },
+        ]),
+        premio: `Smarrito un mulo grigio sulla strada per ${l2}: chi lo riporta avrà una moneta d'argento.\n\nLa fiera d'autunno si farà comunque, assicura ${b}.\n\nCercasi scrivano che sappia tenere la bocca chiusa. Chiedere alla bottega.`,
+      };
+      case 'contratto': return scegli([
+        { titolo: 'Contratto di scorta', corpo: `${a} si impegna a scortare il carico fino a ${l} entro dieci giorni da oggi.\n${f} pagherà ${monete} monete d'oro: metà alla partenza, metà alla consegna.\nIl contenuto delle casse non è affare di chi le porta, e nessuna cassa va aperta.\nChi rompe il patto restituisce il doppio di quanto ha ricevuto.`, firma: a, premio: 'Per ' + f },
+        { titolo: 'Atto di affitto', corpo: `${b} affitta a ${a} la casa con bottega presso la piazza di ${l}, per un anno intero.\nL'affitto è di ${Math.round(monete / 20)} monete d'argento al mese, da pagare ogni primo giorno.\nLa cantina resta chiusa e la chiave resta a ${b}.\nIn caso di incendio o di guerra il contratto si scioglie senza debiti.`, firma: a, premio: b },
+      ]);
+      case 'menu': return {
+        titolo: 'Locanda ' + scegli(['del Cinghiale Zoppo', 'della Lanterna Rossa', 'delle Tre Botti', 'del Corvo Ubriaco', 'del Ponte Vecchio']),
+        corpo: `Da bere:\nBirra scura — 4 mr\nVino della casa — 1 ma\nIdromele di ${l} — 3 ma\nDa mangiare:\nStufato di montone — 6 mr\nPane nero e formaggio — 2 mr\nPasticcio di anguilla — 8 mr\nPer la notte:\nPagliericcio in comune — 5 mr\nStanza con la chiave — 2 mo`,
+        firma: scegli(['Si paga prima di bere.', 'Niente risse dopo mezzanotte. — ' + a, 'Le armi restano al bancone.']),
       };
       default: return { titolo: '', corpo: '', firma: '' };
     }
@@ -287,6 +311,136 @@ const Documenti = (() => {
     return s;
   };
 
+  /* ── Gazzetta, contratto, menu della locanda ── */
+  const _gazzetta = (o, W, H, c, r) => {
+    const ink = c.ink;
+    let s = `<g filter="url(#doc-i)">`;
+    const testata = String(o.titolo || '');
+    s += _riga(W / 2, 172, testata, F.gotico, Math.min(92, 1300 / Math.max(8, testata.length)), ink);
+    s += `<path d="M90 196H${W - 90}" stroke="${ink}" stroke-width="4"/><path d="M90 205H${W - 90}" stroke="${ink}" stroke-width="1.2"/>`;
+    s += _riga(W / 2, 232, o.firma || '', F.stampa, 22, ink, 'middle', 'font-style="italic"');
+    s += `<path d="M90 248H${W - 90}" stroke="${ink}" stroke-width="1.2"/>`;
+    // Titolone su una o due righe
+    const tit = _blocco(o.soggetto || '', 90, 262, W - 180, 128, { font: F.titoli, max: 58, min: 30, rapporto: 0.5, inter: 1.08, ink, ancora: 'middle' });
+    s += tit.svg;
+    const y0 = Math.max(tit.fine + 34, 330), brevi = String(o.premio || '').trim();
+    const yBox = brevi ? H - 300 : H - 110, col = (W - 180 - 34) / 2;
+    // Articolo su due colonne: il corpo piu' grande che ci sta
+    let dim = 34, righe = [];
+    for (; dim >= 15; dim--) {
+      righe = _aCapo(o.corpo, Math.floor(col / (dim * 0.44)));
+      const alt = righe.reduce((t, rg) => t + dim * 1.32 * (rg ? 1 : 0.62), 0);
+      if (alt <= (yBox - 30 - y0) * 2 - dim * 2) break;
+    }
+    dim = Math.max(dim, 15);
+    const maxY = yBox - 30;
+    // Colonne pari: la prima finisce a meta' del testo (o a fondo pagina, se il testo e' lungo)
+    const altTot = righe.reduce((t, rg) => t + dim * 1.32 * (rg ? 1 : 0.62), 0);
+    const taglio = Math.min(maxY, y0 + dim + altTot / 2);
+    let x = 90, yy = y0 + dim, prima = true, fondo = y0;
+    righe.forEach((rg) => {
+      if (yy > taglio && prima) { prima = false; x = 90 + col + 34; yy = y0 + dim; if (!rg) return; }
+      if (rg) { s += `<text x="${n1(x)}" y="${n1(yy)}" font-family="${F.stampa}" font-size="${dim}" fill="${ink}">${M.esc(rg)}</text>`; fondo = Math.max(fondo, yy); }
+      yy += dim * 1.32 * (rg ? 1 : 0.62);
+    });
+    s += `<path d="M${n1(W / 2)} ${y0}V${n1(Math.min(maxY, fondo + dim * 0.5))}" stroke="${ink}" stroke-width="1" opacity="0.7"/>`;
+    if (brevi) {
+      s += `<rect x="90" y="${yBox}" width="${W - 180}" height="${H - 110 - yBox}" fill="none" stroke="${ink}" stroke-width="2.4"/>`;
+      s += _riga(W / 2, yBox + 38, 'IN BREVE', F.titoli, 26, ink);
+      s += `<path d="M${W / 2 - 150} ${yBox + 50}H${W / 2 + 150}" stroke="${ink}" stroke-width="1"/>`;
+      s += _blocco(brevi, 112, yBox + 58, W - 224, H - 130 - yBox - 66, { font: F.stampa, max: 23, min: 15, rapporto: 0.44, inter: 1.28, ink, corsivo: true }).svg;
+    }
+    return s + '</g>';
+  };
+  const _romano = (n) => [[10, 'X'], [9, 'IX'], [5, 'V'], [4, 'IV'], [1, 'I']].reduce((t, [v, l]) => { while (n >= v) { t += l; n -= v; } return t; }, '');
+  const _contratto = (o, W, H, c, r, st) => {
+    const ink = c.ink;
+    let s = `<g filter="url(#doc-i)"><rect x="76" y="76" width="${W - 152}" height="${H - 152}" fill="none" stroke="${ink}" stroke-width="2"/><rect x="84" y="84" width="${W - 168}" height="${H - 168}" fill="none" stroke="${ink}" stroke-width="0.8"/>`;
+    s += _riga(W / 2, 196, o.titolo || '', F.titoli, Math.min(76, 900 / Math.max(6, String(o.titolo || '').length) * 1.25), ink);
+    s += `<path d="M200 222H${W - 200}" stroke="${ink}" stroke-width="2"/><circle cx="${W / 2}" cy="222" r="5" fill="${ink}"/>`;
+    // Una clausola per riga, numerate: I., II., III.
+    const clausole = String(o.corpo || '').split('\n').map((x) => x.trim()).filter(Boolean);
+    const testo = clausole.map((x, i) => (clausole.length > 1 ? _romano(i + 1) + '. ' : '') + x).join('\n\n');
+    s += _blocco(testo, 130, 262, W - 260, H - 262 - 330, { font: F.stampa, max: 32, min: 18, rapporto: 0.43, inter: 1.36, ink }).svg;
+    // Due firme con le loro righe e il sigillo in mezzo
+    const yF = H - 196;
+    [[130, 360, o.firma], [W - 360, W - 130, o.premio]].forEach(([a, b, nome], i) => {
+      if (nome) s += _riga((a + b) / 2, yF - 12, nome, F.corsivo, Math.min(40, (b - a) / Math.max(6, String(nome).length) * 2.1), ink, 'middle', `transform="rotate(${i ? 1.5 : -2} ${(a + b) / 2} ${yF})"`);
+      s += `<path d="M${a} ${yF}H${b}" stroke="${ink}" stroke-width="1.6"/>`;
+    });
+    s += _riga(245, yF + 30, 'la prima parte', F.stampa, 20, ink, 'middle', 'font-style="italic" opacity="0.8"') + _riga(W - 245, yF + 30, 'la seconda parte', F.stampa, 20, ink, 'middle', 'font-style="italic" opacity="0.8"') + '</g>';
+    s += _sigillo(W / 2, yF - 10, 52, o.stemmaImg ? null : st, r, o.iniziale);
+    return s;
+  };
+  const _menu = (o, W, H, c, r) => {
+    const ink = c.ink;
+    let s = `<g filter="url(#doc-i)"><rect x="80" y="80" width="${W - 160}" height="${H - 160}" rx="18" fill="none" stroke="${ink}" stroke-width="3"/>`;
+    s += _blocco(o.titolo || '', 110, 110, W - 220, 150, { font: F.gotico, max: 76, min: 40, rapporto: 0.5, inter: 1.05, ink, ancora: 'middle' }).svg;
+    s += `<path d="M${W / 2 - 170} 284Q${W / 2 - 85} 268 ${W / 2} 284T${W / 2 + 170} 284" fill="none" stroke="${ink}" stroke-width="2.2"/><circle cx="${W / 2}" cy="284" r="5" fill="${ink}"/>`;
+    // Righe "Piatto — prezzo" con i puntini; una riga che finisce coi due punti e' un titolo di sezione
+    const righe = String(o.corpo || '').split('\n').map((x) => x.trim()).filter(Boolean);
+    const y0 = 320, y1 = H - 210, passo = Math.min(56, (y1 - y0) / Math.max(1, righe.length + righe.filter((x) => /:$/.test(x)).length * 0.5));
+    const dim = Math.max(16, Math.min(32, passo * 0.6));
+    let yy = y0 + dim;
+    righe.forEach((rg) => {
+      const sez = /:$/.test(rg) && !/\s(—|–|-|\|)\s/.test(rg);
+      if (sez) { yy += passo * 0.35; s += _riga(W / 2, yy, rg.replace(/:$/, '').toUpperCase(), F.titoli, dim * 1.05, '#7a1212'); yy += passo * 1.15; return; }
+      const m = rg.match(/^(.*?)\s+(?:—|–|-|\|)\s+(.+)$/);
+      const nome = m ? m[1] : rg, prezzo = m ? m[2] : '';
+      s += _riga(130, yy, nome, F.stampa, dim, ink, 'start');
+      if (prezzo) {
+        s += _riga(W - 130, yy, prezzo, F.stampa, dim, ink, 'end', 'font-style="italic"');
+        const xa = 130 + nome.length * dim * 0.5 + 14, xb = W - 130 - prezzo.length * dim * 0.48 - 14;
+        if (xb - xa > 20) s += `<path d="M${n1(xa)} ${n1(yy - 3)}H${n1(xb)}" stroke="${ink}" stroke-width="2" stroke-dasharray="1.5 7" stroke-linecap="round" opacity="0.75"/>`;
+      }
+      yy += passo;
+    });
+    s += _blocco(o.firma || '', 130, H - 196, W - 260, 90, { font: F.corsivo, max: 34, min: 20, rapporto: 0.4, inter: 1.2, ink, ancora: 'middle' }).svg;
+    return s + '</g>';
+  };
+
+  /* ── Effetti sulla carta: disegnati sopra il testo, dentro il foglio ── */
+  const EFFETTI = { nessuno: 'Nessuno', sangue: 'Macchie di sangue', vino: 'Cerchi di vino', cera: 'Cera di candela', acqua: 'Bagnata' };
+  const _effetto = (o, W, H, c, r) => {
+    const e = o.effetto || 'nessuno';
+    if (e === 'nessuno' || !EFFETTI[e]) return '';
+    const rr = M.rng('effetto:' + e + ':' + o.seme);
+    let s = '<g clip-path="url(#doc-c)">';
+    if (e === 'sangue') {
+      for (let k = 0; k < rr.int(2, 3); k++) {
+        const x = rr.int(140, W - 140), y = rr.int(160, H - 200), q = rr.int(16, 34);
+        s += `<g filter="url(#doc-i)" opacity="0.82"><ellipse cx="${x}" cy="${y}" rx="${q}" ry="${n1(q * 0.8)}" fill="#5c0a0a"/>`;
+        for (let i = 0; i < 16; i++) { const a = rr.range(0, 6.283), d = rr.range(q * 1.1, q * 3.4); s += `<circle cx="${n1(x + Math.cos(a) * d)}" cy="${n1(y + Math.sin(a) * d)}" r="${rr.range(1.2, q / 4).toFixed(1)}" fill="#5c0a0a"/>`; }
+        if (rr.chance(0.7)) { const l = rr.int(50, 140); s += `<path d="M${x - 5} ${y}L${x - 3} ${y + l}Q${x} ${y + l + 10} ${x + 3} ${y + l}L${x + 5} ${y}Z" fill="#5c0a0a"/>`; }
+        s += '</g>';
+      }
+    } else if (e === 'vino') {
+      for (let k = 0; k < 2; k++) {
+        const x = rr.int(170, W - 170), y = rr.int(200, H - 220), q = rr.int(52, 70);
+        s += `<circle cx="${x}" cy="${y}" r="${q}" fill="#6b1530" opacity="0.1" filter="url(#doc-b2)"/>` +
+          `<circle cx="${x}" cy="${y}" r="${q}" fill="none" stroke="#6b1530" stroke-width="${rr.range(4, 7).toFixed(1)}" opacity="0.5" stroke-dasharray="${rr.int(90, 220)} ${rr.int(6, 26)}" filter="url(#doc-i)"/>`;
+      }
+      const x = rr.int(200, W - 200), y = rr.int(250, H - 250);
+      s += `<ellipse cx="${x}" cy="${y}" rx="${rr.int(30, 60)}" ry="${rr.int(18, 40)}" fill="#6b1530" opacity="0.22" filter="url(#doc-b2)"/>`;
+    } else if (e === 'cera') {
+      for (let k = 0; k < rr.int(2, 4); k++) {
+        const x = rr.int(130, W - 130), y = rr.int(150, H - 160), q = rr.int(12, 26), p = [];
+        for (let i = 0; i < 14; i++) { const a = i / 14 * 6.283, m = q * rr.range(0.75, 1.25); p.push([x + Math.cos(a) * m, y + Math.sin(a) * m * 0.85]); }
+        const d = M.via(M.morbida(p, 2, true));
+        s += `<path d="${d}" fill="#000" opacity="0.25" transform="translate(2 3)" filter="url(#doc-b2)"/><path d="${d}" fill="#f0d98a" fill-opacity="0.9" stroke="#a88c3f" stroke-width="1.8"/>` +
+          `<ellipse cx="${n1(x - q * 0.3)}" cy="${n1(y - q * 0.3)}" rx="${n1(q * 0.35)}" ry="${n1(q * 0.2)}" fill="#fff" opacity="0.6"/>`;
+      }
+    } else if (e === 'acqua') {
+      // L'acqua sbiadisce l'inchiostro: chiazze del colore della carta, con l'alone scuro sul bordo
+      for (let k = 0; k < 2; k++) {
+        const x = rr.int(200, W - 200), y = rr.int(260, H - 260), a = rr.int(110, 190), b = rr.int(80, 150);
+        s += `<ellipse cx="${x}" cy="${y}" rx="${a}" ry="${b}" fill="${c.base}" opacity="0.62" filter="url(#doc-b)"/>` +
+          `<ellipse cx="${x}" cy="${y}" rx="${a}" ry="${b}" fill="none" stroke="${c.scura}" stroke-width="5" opacity="0.32" filter="url(#doc-i)"/>`;
+      }
+    }
+    return s + '</g>';
+  };
+
   const genera = (o) => {
     const T = TIPI[o.tipo] || TIPI.lettera, W = T.W, H = T.H;
     const r = M.rng('doc:' + o.tipo + ':' + o.seme), rn = M.rumore(r), c = CARTE[o.carta] || CARTE.pergamena;
@@ -297,9 +451,13 @@ const Documenti = (() => {
     else if (o.tipo === 'editto') svg += _editto(o, W, H, c, r, st);
     else if (o.tipo === 'avviso') svg += _avviso(o, W, H, c, r);
     else if (o.tipo === 'tesoro') svg += _tesoro(o, W, H, c, r, rn);
+    else if (o.tipo === 'gazzetta') svg += _gazzetta(o, W, H, c, r);
+    else if (o.tipo === 'contratto') svg += _contratto(o, W, H, c, r, st);
+    else if (o.tipo === 'menu') svg += _menu(o, W, H, c, r);
     else svg += _lettera(o, W, H, c, r, st);
+    svg += _effetto(o, W, H, c, r);
     return { svg: svg + '</svg>', W, H, nome: o.soggetto || o.titolo || T.nome };
   };
 
-  return { TIPI, CARTE, ETA, testi, genera };
+  return { TIPI, CARTE, ETA, EFFETTI, testi, genera };
 })();

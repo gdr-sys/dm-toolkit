@@ -36,7 +36,7 @@ const Scrittoio = (() => {
     const testi = Documenti.testi(voce, seme, _nomiCampagna());
     // Se il testo nomina una fazione che ha uno stemma, il sigillo e' il suo
     const autrice = (_camp()?.factions || []).find((f) => (f.stemma || f.immagine) && String(testi.firma || '').includes(_nome(f)));
-    return { seme, carta: prima.carta || 'pergamena', eta: prima.eta || 'vissuta', sigillo: autrice ? autrice.id : '', ...testi };
+    return { seme, carta: prima.carta || (voce === 'gazzetta' || voce === 'menu' ? 'avorio' : 'pergamena'), eta: prima.eta || 'vissuta', effetto: prima.effetto || 'nessuno', sigillo: autrice ? autrice.id : '', ...testi };
   };
   // Cambiando il sigillo cambia anche chi firma: un editto non puo' portare lo stemma di altri
   const _cambiaSigillo = (id) => {
@@ -159,23 +159,31 @@ const Scrittoio = (() => {
         '<div class="form-hint">Hai già uno stemma tuo? Caricalo come immagine nella scheda della Fazione: verrà usato anche su editti e lettere.</div>';
     } else {
       const fazioni = (_camp()?.factions || []).filter((f) => f.stemma || f.immagine);
+      const v = _voce;
+      const etTit = { lettera: 'Saluto', gazzetta: 'Nome della gazzetta', menu: 'Nome della locanda' }[v] || 'Titolo';
+      const phTit = { lettera: 'es. Caro amico,', gazzetta: 'es. La Voce di Porto Nebbia', contratto: 'es. Contratto di scorta', menu: 'es. Locanda del Cinghiale Zoppo' }[v] || 'es. Avviso alla cittadinanza';
+      const etCorpo = { tesoro: 'Indizio', taglia: 'Accuse', gazzetta: 'Articolo', contratto: 'Clausole (una per riga)', menu: 'Piatti e prezzi (uno per riga)' }[v] || 'Testo';
+      const phCorpo = { contratto: 'Una clausola per riga: si numerano da sole (I., II., III.).', menu: 'Una riga per piatto: Stufato — 6 mr. Una riga che finisce coi due punti (Da bere:) fa da titolo.' }[v] || 'Scrivi qui quello che vuoi. Una riga vuota fa un nuovo paragrafo; più testo scrivi, più piccola diventa la scrittura.';
+      const etFirma = { avviso: 'A chi rivolgersi', gazzetta: 'Sotto il nome (data, prezzo)', contratto: 'Firma della prima parte', menu: 'In fondo (un motto, una regola)' }[v] || 'Firma';
       box.innerHTML = avviso + '<div class="form-hint" style="margin:0 0 10px;">Ogni testo si può cambiare: scrivi direttamente qui sotto. Con <strong>Foglio bianco</strong> parti da zero.</div>' +
-        _testo('sc-tit', _voce === 'lettera' ? 'Saluto' : 'Titolo', op.titolo, 'titolo', _voce === 'lettera' ? 'es. Caro amico,' : 'es. Avviso alla cittadinanza') +
-        (_voce === 'taglia' ? _testo('sc-sog', 'Ricercato', op.soggetto, 'soggetto') : '') +
-        _area('sc-corpo', _voce === 'tesoro' ? 'Indizio' : _voce === 'taglia' ? 'Accuse' : 'Testo', op.corpo, 'corpo', _voce === 'lettera' || _voce === 'editto' ? 9 : 5, 'Scrivi qui quello che vuoi. Una riga vuota fa un nuovo paragrafo; più testo scrivi, più piccola diventa la scrittura.') +
-        (_voce === 'taglia' ? _testo('sc-premio', 'Ricompensa', op.premio, 'premio') : '') +
-        _testo('sc-firma', _voce === 'avviso' ? 'A chi rivolgersi' : 'Firma', op.firma, 'firma') +
+        _testo('sc-tit', etTit, op.titolo, 'titolo', phTit) +
+        (v === 'taglia' ? _testo('sc-sog', 'Ricercato', op.soggetto, 'soggetto') : v === 'gazzetta' ? _testo('sc-sog', 'Titolo dell’articolo', op.soggetto, 'soggetto', 'es. Fuoco nei magazzini del porto') : '') +
+        _area('sc-corpo', etCorpo, op.corpo, 'corpo', ['lettera', 'editto', 'gazzetta', 'menu'].includes(v) ? 9 : v === 'contratto' ? 7 : 5, phCorpo) +
+        (v === 'taglia' ? _testo('sc-premio', 'Ricompensa', op.premio, 'premio') : v === 'contratto' ? _testo('sc-premio', 'Firma della seconda parte', op.premio, 'premio') : v === 'gazzetta' ? _area('sc-premio', 'In breve (riquadro in fondo, vuoto per toglierlo)', op.premio, 'premio', 4) : '') +
+        _testo('sc-firma', etFirma, op.firma, 'firma') +
         '<div class="carto-griglia">' +
           _sel('sc-carta', 'Carta', Object.entries(Documenti.CARTE).map(([k, v]) => [k, v.nome]), op.carta, 'carta') +
           _sel('sc-eta', 'Stato', Object.entries(Documenti.ETA).map(([k, v]) => [k, v[0]]), op.eta, 'eta') +
-          ((_voce === 'lettera' || _voce === 'editto') && fazioni.length ? _sel('sc-sig', 'Stemma e sigillo', [['', 'Inventato'], ...fazioni.map((f) => [f.id, _nome(f)])], op.sigillo, 'sigillo') : '') +
+          _sel('sc-eff', 'Effetto', Object.entries(Documenti.EFFETTI), op.effetto || 'nessuno', 'effetto') +
+          ((_voce === 'lettera' || _voce === 'editto' || _voce === 'contratto') && fazioni.length ? _sel('sc-sig', 'Stemma e sigillo', [['', 'Inventato'], ...fazioni.map((f) => [f.id, _nome(f)])], op.sigillo, 'sigillo') : '') +
         '</div>' +
-        ((_voce === 'lettera' || _voce === 'editto') && !fazioni.length ? '<div class="form-hint">Dai uno stemma a una Fazione, anche caricando un’immagine tua nella sua scheda, e qui potrai usarlo come sigillo.</div>' : '');
+        ((_voce === 'lettera' || _voce === 'editto' || _voce === 'contratto') && !fazioni.length ? '<div class="form-hint">Dai uno stemma a una Fazione, anche caricando un’immagine tua nella sua scheda, e qui potrai usarlo come sigillo.</div>' : '');
     }
     $('sc-azione').textContent = _voce === 'stemma' ? 'Assegna…' : 'Salva nella Wiki';
     $('sc-bianco').style.display = _voce === 'stemma' ? 'none' : '';
     _sotto();
     $('sc-copia').style.display = _voce === 'stemma' ? 'none' : '';
+    if ($('sc-mostra')) $('sc-mostra').textContent = _voce === 'stemma' ? 'Mostra' : 'Mostra ai giocatori';
     $('sc-nuovo').title = _voce === 'stemma' ? 'Uno stemma diverso' : 'Un documento diverso, scritto con i nomi della tua campagna';
     $('sc-precedente').disabled = !_storia.length;
   };
@@ -194,6 +202,25 @@ const Scrittoio = (() => {
   const riscriviBlasone = () => { const op = _opera(); op.blasoneMano = false; op.blasone = ''; _sotto(); };
 
   /* ── Esportazione ── */
+  // A schermo intero, senza niente dell'app intorno: si gira l'iPad verso i giocatori. Tocca per chiudere.
+  const mostra = () => {
+    if (!_risultato) return;
+    document.getElementById('sc-schermo')?.remove();
+    const o = document.createElement('div');
+    o.id = 'sc-schermo';
+    o.setAttribute('role', 'dialog');
+    o.setAttribute('aria-label', _risultato.nome || 'Documento');
+    const src = _risultato.canvas ? _risultato.canvas.toDataURL('image/png') : 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(_risultato.svgCompleto || _risultato.svg);
+    o.innerHTML = '<img alt="' + _esc(_risultato.nome || 'Documento') + '" src="' + src + '"><button type="button" class="sc-schermo-chiudi" aria-label="Chiudi">×</button><div class="sc-schermo-nota">Tocca per chiudere</div>';
+    const chiudi = () => { try { if (document.fullscreenElement || document.webkitFullscreenElement) (document.exitFullscreen || document.webkitExitFullscreen).call(document); } catch (e) {} o.remove(); document.removeEventListener('keydown', esc); };
+    const esc = (e) => { if (e.key === 'Escape') chiudi(); };
+    o.addEventListener('click', chiudi);
+    document.addEventListener('keydown', esc);
+    document.body.appendChild(o);
+    try { const fs = o.requestFullscreen || o.webkitRequestFullscreen; if (fs) { const p = fs.call(o); if (p && p.catch) p.catch(() => {}); } } catch (e) {}
+    setTimeout(() => o.querySelector('.sc-schermo-nota')?.classList.add('via'), 1800);
+  };
+
   const _nomeFile = () => (_risultato?.nome || 'documento').replace(/[\\/:*?"<>|]+/g, ' ').trim() || 'documento';
   const scaricaPng = () => {
     if (!_risultato?.canvas) return;
@@ -258,7 +285,8 @@ const Scrittoio = (() => {
       const drive = typeof DriveBackup !== 'undefined' && DriveBackup.isConnected();
       $('sc-az-titolo').textContent = 'Salva nella Wiki';
       $('sc-az-corpo').innerHTML = '<div class="form-group" style="margin-bottom:8px;"><label class="form-label" for="sc-az-nome">Titolo della scheda</label><input type="text" id="sc-az-nome" class="form-input" autocomplete="off" value="' + _esc(_risultato.nome) + '"></div>' +
-        '<div class="carto-nota">Lo trovi in Wiki, tra le schede Lore. Da <strong>Vista giocatori</strong> puoi scegliere di condividerlo.</div>' +
+        '<label class="carto-spunta" for="sc-az-vg" style="margin-bottom:8px;"><input type="checkbox" id="sc-az-vg"><span>Mostralo anche nella <strong>Vista giocatori</strong> (il link che mandi al gruppo)</span></label>' +
+        '<div class="carto-nota">Lo trovi in Wiki, tra le schede Lore.</div>' +
         '<div class="carto-nota">' + (drive ? 'L’immagine del documento verrà salvata su Google Drive, il testo nella scheda.' : '<strong>Google Drive non è collegato:</strong> nella scheda si salva solo il testo. Scarica il PNG per avere anche l’immagine, oppure collega Drive dalle Impostazioni.') + '</div>';
       $('sc-az-piede').innerHTML = '<button class="btn btn-ghost" onclick="Modal.close(\'sc-azione\')">Annulla</button><button class="btn btn-primary" id="sc-az-ok" onclick="Scrittoio._confermaDocumento()">Salva</button>';
       const riaperta = _modifica && _modifica.tipo === 'l' && _modifica.voce === _voce && (camp.wiki?.lore || []).some((n) => n.id === _modifica.id);
@@ -336,6 +364,14 @@ const Scrittoio = (() => {
       _riprova('Assegna');
     }
   };
+  // Aggiunge la scheda a quelle che vedono i giocatori; se la vista e' attiva la ripubblica subito
+  const _vistaGiocatori = (id) => {
+    const vg = { attiva: false, lore: [], ...(_camp()?.vistaGiocatori || {}) };
+    if (!(vg.lore || []).includes(id)) vg.lore = [...(vg.lore || []), id];
+    App.saveActiveCampaign({ vistaGiocatori: vg });
+    if (vg.attiva && typeof VistaGiocatori !== 'undefined') setTimeout(() => VistaGiocatori.pubblica(true), 300);
+    else setTimeout(() => Toast.show('Pronto per la Vista giocatori: attivala dalla Dashboard per mandare il link al gruppo.', 'info', 5000), 3200);
+  };
   const _confermaDocumento = async () => {
     const titolo = ($('sc-az-nome').value || '').trim() || _risultato.nome;
     const drive = typeof DriveBackup !== 'undefined' && DriveBackup.isConnected();
@@ -343,7 +379,7 @@ const Scrittoio = (() => {
     try {
       const o = _opera();
       const par = [o.titolo && '<p><strong>' + _esc(o.titolo) + '</strong></p>', o.soggetto && '<p><strong>' + _esc(o.soggetto) + '</strong></p>',
-        ...String(o.corpo || '').split(/\n+/).filter(Boolean).map((p) => '<p>' + _esc(p) + '</p>'), o.premio && '<p>Ricompensa: ' + _esc(o.premio) + '</p>', o.firma && '<p><em>' + _esc(o.firma) + '</em></p>'].filter(Boolean).join('');
+        ...String(o.corpo || '').split(/\n+/).filter(Boolean).map((p) => '<p>' + _esc(p) + '</p>'), o.premio && '<p>' + (_voce === 'taglia' ? 'Ricompensa: ' : '') + _esc(o.premio).replace(/\n+/g, '<br>') + '</p>', o.firma && '<p><em>' + _esc(o.firma) + '</em></p>'].filter(Boolean).join('');
       let img = '';
       if (drive && _risultato.canvas) {
         const url = await DriveBackup.uploadImage(_ridotta(1200, 'image/jpeg', 0.88, '#2a231c'), 'documento_' + titolo);
@@ -357,6 +393,7 @@ const Scrittoio = (() => {
       cfg.saveItem(_camp(), item);
       try { WikiSections.renderCounters(); } catch (e) {}
       Modal.close('sc-azione');
+      if ($('sc-az-vg')?.checked) _vistaGiocatori(item.id);
       _modifica = { tipo: 'l', id: item.id, nome: titolo, voce: _voce };
       _controlli();
       Toast.show(aggiorna ? '“' + titolo + '” aggiornato nella Lore' : '“' + titolo + '” è nella Lore della Wiki', 'success', 3000);
@@ -380,6 +417,11 @@ const Scrittoio = (() => {
       '#sc-vista canvas, #sc-vista svg { display:block; max-width:100%; max-height:100%; width:auto; height:auto; }' +
       '#sc-attesa { position:absolute; left:50%; top:12px; transform:translateX(-50%); padding:6px 14px; background:var(--bg-card); color:var(--text-primary); border:1px solid var(--border); border-radius:var(--radius-full); font-size:0.88rem; box-shadow:var(--shadow-md); z-index:2; white-space:nowrap; }' +
       '#sc-attesa[hidden] { display:none; }' +
+      '#sc-schermo { position:fixed; inset:0; z-index:100000; background:#0d0b09; display:flex; align-items:center; justify-content:center; padding:max(12px, env(safe-area-inset-top)) 12px max(12px, env(safe-area-inset-bottom)); cursor:zoom-out; }' +
+      '#sc-schermo img { max-width:100%; max-height:100%; object-fit:contain; }' +
+      '.sc-schermo-chiudi { position:absolute; top:max(12px, env(safe-area-inset-top)); right:12px; width:44px; height:44px; border-radius:50%; border:0; background:rgba(255,255,255,0.14); color:#fff; font-size:26px; line-height:1; cursor:pointer; }' +
+      '.sc-schermo-nota { position:absolute; bottom:max(16px, env(safe-area-inset-bottom)); left:50%; transform:translateX(-50%); color:#fff; background:rgba(0,0,0,0.55); padding:6px 14px; border-radius:999px; font-size:0.85rem; transition:opacity .6s; }' +
+      '.sc-schermo-nota.via { opacity:0; }' +
       '.sc-con-sotto #sc-stage { height:max(400px, calc(100vh - 430px)); height:max(400px, calc(100dvh - 430px)); }' +
       '#sc-sotto { margin-top:var(--space-sm); padding:12px 14px; } #sc-sotto[hidden] { display:none; }' +
       '.sc-blasone-testa { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:6px; min-height:30px; }' +
@@ -397,7 +439,7 @@ const Scrittoio = (() => {
     _stile();
     el.innerHTML =
       '<div class="page-header"><div><h1 class="page-title">Scrittoio</h1>' +
-        '<p class="page-subtitle">Stemmi per fazioni e luoghi, documenti da consegnare ai giocatori: lettere, taglie, editti, avvisi e mappe del tesoro, scritti con i nomi della tua campagna.</p></div></div>' +
+        '<p class="page-subtitle">Stemmi per fazioni e luoghi, documenti da consegnare ai giocatori: lettere, taglie, editti, avvisi, gazzette, contratti, menu e mappe del tesoro, scritti con i nomi della tua campagna o da te.</p></div></div>' +
       '<div id="sc-voci" role="tablist" aria-label="Cosa creare"></div>' +
       '<div class="carto-comandi">' +
         '<button type="button" class="btn btn-gold btn-sm" id="sc-nuovo" onclick="Scrittoio.nuovo()">Nuovo</button>' +
@@ -407,6 +449,7 @@ const Scrittoio = (() => {
       '</div>' +
       '<div class="carto-corpo"><div class="card carto-pannello" id="sc-controlli"></div>' +
         '<div class="carto-anteprima"><div class="carto-azioni" style="justify-content:flex-end;">' +
+            '<button type="button" class="btn btn-secondary btn-sm" id="sc-mostra" onclick="Scrittoio.mostra()" title="A schermo intero, per passarlo ai giocatori al tavolo">Mostra ai giocatori</button>' +
             '<button type="button" class="btn btn-primary btn-sm" id="sc-azione" onclick="Scrittoio.azione()"></button>' +
             '<button type="button" class="btn btn-secondary btn-sm" id="sc-copia" onclick="Scrittoio.copia()">Copia il testo</button>' +
             '<button type="button" class="btn btn-secondary btn-sm" id="sc-png" onclick="Scrittoio.scaricaPng()">Scarica PNG</button>' +
@@ -428,5 +471,5 @@ const Scrittoio = (() => {
   document.addEventListener('DOMContentLoaded', () => setTimeout(() => { _aggancia(); if ($('page-scrittoio')?.classList.contains('active')) apri(); }, 220));
 
   return { apri, nuovo, precedente, scegli, azione, copia, scaricaPng, scaricaSvg, _campo, _confermaStemma, _confermaDocumento,
-    foglioBianco, riapri, _confermaRiapri, smettiModifica, riscriviBlasone };
+    foglioBianco, riapri, _confermaRiapri, smettiModifica, riscriviBlasone, mostra };
 })();
