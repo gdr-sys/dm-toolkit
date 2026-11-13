@@ -3,6 +3,24 @@
 <html lang="it" data-theme="dark">
 <head>
   <meta charset="UTF-8">
+  <!-- Aspetto salvato applicato prima del primo disegno: senza, a ogni ricarica si vedeva
+       per un attimo la tavolozza predefinita (brace) prima di quella scelta. Stessa logica
+       di Settings._applicaAspetto e App.init. -->
+  <script>
+    (function () {
+      try {
+        var d = document.documentElement;
+        var st = JSON.parse(localStorage.getItem('dmtoolkit_settings') || '{}');
+        d.setAttribute('data-theme', st.theme || 'dark');
+        var s = JSON.parse(localStorage.getItem('dm_settings') || '{}');
+        var T = ['brace', 'grafite', 'bosco', 'cuoio', 'inchiostro', 'vino', 'nero'];
+        var V = { 'default': 'brace', 'gray-900': 'nero', 'gray-800': 'grafite', 'gray-700': 'grafite', 'slate': 'inchiostro', 'parchment': 'cuoio' };
+        d.setAttribute('data-colore', T.indexOf(s.bgColor) >= 0 ? s.bgColor : (V[s.bgColor] || 'brace'));
+        d.setAttribute('data-card', s.card === 'colorate' ? 'colorate' : 'sobrie');
+        if (s.fontSize && s.fontSize !== 100) d.style.fontSize = s.fontSize + '%';
+      } catch (e) {}
+    })();
+  </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Pocket GM Screen</title>
   <meta name="description" content="Pocket GM Screen: tutta la campagna, in tasca. Lo strumento gratuito per master di giochi di ruolo.">
