@@ -682,7 +682,7 @@ body.barra-alta #wiki-section-tabbar:not([style*="display:none"]):not([style*="d
 .schermo-block.in-volo { z-index: 50; opacity: .92; pointer-events: none; box-shadow: 0 24px 48px -16px rgba(0, 0, 0, .7) !important; transition: none !important; }
 
 /* Legenda dei pulsanti degli scontri */
-.combat-legenda { display: flex; flex-wrap: wrap; gap: 6px 18px; padding: 10px 16px 12px; font-size: 0.8rem; color: var(--text-muted); border-bottom: 1px solid var(--border); }
+.combat-legenda { display: flex; flex-wrap: wrap; justify-content: flex-end; text-align: right; gap: 6px 16px; padding: 10px 16px 12px; font-size: 0.8rem; color: var(--text-muted); border-bottom: 1px solid var(--border); }
 .combat-legenda span { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
 .combat-legenda svg { color: var(--text-secondary); }
 .combat-legenda b { font-family: var(--font-mono); color: var(--text-secondary); margin-right: 2px; }
