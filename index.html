@@ -5262,11 +5262,14 @@ const Sessione = (() => {
     if (!camp) { renderNoCampaign(); return; }
 
     if (camp.pendingCombatants && camp.pendingCombatants.length > 0) {
+      // Prima lo scontro salvato: se il modulo non era ancora aperto, newCombat() lo sostituiva con uno vuoto
+      _combat = loadCombat();
       if (!_combat) newCombat();
       camp.pendingCombatants.forEach(c => addCombatantToCurrent(c));
       saveCombat(_combat);
+      const nPending = camp.pendingCombatants.length;
       App.saveActiveCampaign({ pendingCombatants: [] });
-      Toast.show(camp.pendingCombatants.length + ' mostro aggiunto al combat', 'success');
+      Toast.show(nPending === 1 ? 'Mostro aggiunto allo scontro' : `${nPending} mostri aggiunti allo scontro`, 'success');
     }
 
     _combat = loadCombat();
@@ -5498,6 +5501,7 @@ const Sessione = (() => {
     const camp = App.getActiveCampaign();
     const party = camp?.party || [];
     if (!party.length) { Toast.show('Nessun personaggio nel party', 'warning'); return; }
+    if (!_combat) _combat = loadCombat();
     if (!_combat) newCombat();
 
     party.forEach(pg => {
@@ -5543,16 +5547,30 @@ const Sessione = (() => {
     Debug.log('Nuovo combat creato');
   };
 
+  // Ordine d'iniziativa; a parita' prima i PG, poi per nome. Lo usa anche lo Schermo del DM
+  const ordinaCombattenti = (lista) => [...(lista || [])].sort((a, b) => {
+    if (b.iniziativa !== a.iniziativa) return b.iniziativa - a.iniziativa;
+    if (a.tipo === 'pg' && b.tipo !== 'pg') return -1;
+    if (b.tipo === 'pg' && a.tipo !== 'pg') return 1;
+    return String(a.nome || '').localeCompare(String(b.nome || ''), 'it');
+  });
+  // Chi ha il turno: si cerca la creatura (turnoId), la posizione salvata e' solo la riserva
+  const indiceTurno = (combat, ordinati) => {
+    const i = combat?.turnoId ? ordinati.findIndex(c => c.id === combat.turnoId) : -1;
+    return i >= 0 ? i : (combat?.turno || 0);
+  };
+
   const sortCombatants = () => {
     if (!_combat) return;
-    _sortedCombatants = [..._combat.combatants].sort((a, b) => {
-      if (b.iniziativa !== a.iniziativa) return b.iniziativa - a.iniziativa;
-
-      if (a.tipo === 'pg' && b.tipo !== 'pg') return -1;
-      if (b.tipo === 'pg' && a.tipo !== 'pg') return 1;
-      return a.nome.localeCompare(b.nome, 'it');
-    });
+    _sortedCombatants = ordinaCombattenti(_combat.combatants);
+    // Il turno segue la creatura, non la posizione: chi entra o esce a meta' scontro non lo sposta
+    if (_combat.turnoId) {
+      const i = _sortedCombatants.findIndex(c => c.id === _combat.turnoId);
+      if (i >= 0) _combat.turno = i;
+    }
+    if ((_combat.turno || 0) >= _sortedCombatants.length) _combat.turno = 0;
   };
+  const _fissaTurno = () => { if (_combat) _combat.turnoId = _sortedCombatants[_combat.turno || 0]?.id || null; };
 
   const renderCombat = () => {
     const el = document.getElementById('combat-tracker');
@@ -5576,6 +5594,8 @@ const Sessione = (() => {
     }
 
     sortCombatants();
+    // Scontri salvati prima che il turno seguisse la creatura: lo si aggancia a chi ce l'ha ora
+    if (!_combat.turnoId && ((_combat.turno || 0) > 0 || (_combat.round || 1) > 1)) _fissaTurno();
     const round = _combat.round || 1;
     const turnoIdx = _combat.turno || 0;
     const activeCombatant = _sortedCombatants[turnoIdx] || null;
@@ -5697,12 +5717,20 @@ const Sessione = (() => {
       </div>`;
   };
 
+  // Dallo Schermo del DM si puo' premere Avanti senza aver mai aperto Sessione: si carica lo scontro salvato
+  const _preparaScontro = () => {
+    if (!_combat) _combat = loadCombat();
+    if (_combat) sortCombatants();
+  };
+
   const prevTurn = () => {
+    _preparaScontro();
     if (!_combat || !_sortedCombatants.length) return;
     _combat.turno = (_combat.turno - 1 + _sortedCombatants.length) % _sortedCombatants.length;
     if (_combat.turno === _sortedCombatants.length - 1) {
       _combat.round = Math.max(1, (_combat.round || 1) - 1);
     }
+    _fissaTurno();
     saveCombat(_combat);
     renderCombat();
   };
@@ -5724,6 +5752,7 @@ const Sessione = (() => {
   };
 
   const nextTurn = () => {
+    _preparaScontro();
     if (!_combat || !_sortedCombatants.length) return;
 
     if (_combat.turno === _sortedCombatants.length - 1) _tickEffects();
@@ -5732,6 +5761,7 @@ const Sessione = (() => {
       _combat.round++;
       Toast.show(`Round ${_combat.round} iniziato`, 'info');
     }
+    _fissaTurno();
 
     _combat.combatants = _sortedCombatants.map(c => {
       const orig = _combat.combatants.find(x => x.id === c.id);
@@ -5743,6 +5773,7 @@ const Sessione = (() => {
   };
 
   const rollAllInitiative = () => {
+    _preparaScontro();
     if (!_combat) return;
     _combat.combatants.forEach(c => {
       if (c.tipo !== 'pg') {
@@ -5750,6 +5781,7 @@ const Sessione = (() => {
       }
     });
     _combat.turno = 0;
+    _combat.turnoId = null;
     saveCombat(_combat);
     renderCombat();
     Toast.show('Iniziativa lanciata per tutti i mostri', 'success');
@@ -5766,7 +5798,9 @@ const Sessione = (() => {
     const camp = App.getActiveCampaign();
     if (!camp) return;
     const party = [...(camp.party || [])];
-    const pgIdx = party.findIndex(p => p.nome === combatant.nome);
+    // Per id: col nome bastava rinominare il PG (o averne due omonimi) e i PF non tornavano al Party
+    let pgIdx = combatant.pgId ? party.findIndex(p => p.id === combatant.pgId) : -1;
+    if (pgIdx === -1) pgIdx = party.findIndex(p => p.nome === combatant.nome);
     if (pgIdx === -1) return;
     party[pgIdx] = { ...party[pgIdx], hpAttuali: combatant.hp };
     App.saveActiveCampaign({ party });
@@ -5953,46 +5987,38 @@ const Sessione = (() => {
       if (npc) { _mostraSchedaCombat(c.nome, _npcSheetHTML(npc)); return; }
     }
 
+    // Mostro homebrew: prima si mostrava "nessuna scheda nel Compendio"
+    if (c.homebrewId) {
+      const h = (Compendio._getHB ? Compendio._getHB() : []).find(x => x.id === c.homebrewId);
+      if (h) { _mostraSchedaCombat(c.nome, _homebrewSheetHTML(h)); return; }
+    }
+
     if (!MonsterCache.isLoaded()) {
       Toast.show('Caricamento mostri...', 'info', 2000);
       await MonsterCache.load();
     }
 
-    const m = c.monsterId
-      ? (MonsterCache.get(c.monsterId) || MonsterCache.getAll().find(x => x.nome === c.nome))
-      : MonsterCache.getAll().find(x => x.nome === c.nome);
+    // Senza monsterId (es. dal generatore di incontri) si cerca per nome, togliendo il " #2" dei duplicati
+    const nomeBase = String(c.nome || '').replace(/\s+#\d+$/, '');
+    const m = (c.monsterId && MonsterCache.get(c.monsterId))
+      || MonsterCache.getAll().find(x => x.nome === c.nome)
+      || MonsterCache.getAll().find(x => x.nome === nomeBase);
 
     const modStr = (v) => { const m = Math.floor((parseInt(v||10)-10)/2); return (m>=0?'+':'')+m; };
-
-    const parseRoll = (desc) => {
-
-      const match = desc?.match(/(\d+d\d+(?:[+\-]\d+)?)/i);
-      return match ? match[1] : null;
-    };
-
-    const rollFormula = (formula, nomeDanno) => {
-      const result = Dadi.roll(formula);
-      if (result.error) return;
-
-      Toast.show(`${nomeDanno}: ${result.total} (${formula})`, 'info', 4000);
-      Debug.log(`Combat roll: ${nomeDanno} → ${result.total} [${formula}]`);
-    };
 
     const car = m?.caratteristiche || {};
     const statAbbr = { forza:'FOR', destrezza:'DES', costituzione:'COS', intelligenza:'INT', saggezza:'SAG', carisma:'CAR' };
 
-    const azioniHTML = (m?.azioni || []).map(a => {
-      const formula = parseRoll(a.descrizione || a.desc || '');
-      const nomeAz = a.nome || a.name || '?';
-      const descAz = a.descrizione || a.desc || '';
-      return `
-        <div class="sb-action" style="cursor:${formula ? 'pointer' : 'default'};"
-          ${formula ? `onclick="Sessione._rollAction('${formula}','${nomeAz.replace(/'/g,"\'")}',this)"` : ''}>
-          <strong>${nomeAz}.</strong>
-          <span class="text-secondary"> ${descAz}</span>
-          ${formula ? `<span class="badge badge-muted" style="margin-left:4px;font-size:0.6rem;">${formula}</span>` : ''}
-        </div>`;
-    }).join('') || '<div class="text-muted text-sm" style="padding:4px 0;">Nessuna azione disponibile</div>';
+    const e = _escCombat;
+    const lista = (v) => Array.isArray(v) ? v.join(', ') : (v && typeof v === 'object')
+      ? Object.entries(v).filter(([, x]) => x !== '' && x != null).map(([k, x]) => `${k.replace(/_/g, ' ')} ${x}`).join(', ')
+      : (v || '');
+    const riga = (label, v) => { const t = lista(v); return t ? `<div class="stat-row"><strong>${label}</strong> <span>${e(t)}</span></div>` : ''; };
+    const leg = m?.azioni_leggendarie;
+    const legAzioni = Array.isArray(leg) ? leg : (leg?.azioni || []);
+
+    const azioniHTML = (m?.azioni || []).map(a => _azioneCombatHTML(a.nome || a.name, a.descrizione || a.desc)).join('')
+      || '<div class="text-muted text-sm" style="padding:4px 0;">Nessuna azione disponibile</div>';
 
     const content = m ? `
       <div style="max-height:70vh;overflow-y:auto;">
@@ -6015,19 +6041,19 @@ const Sessione = (() => {
             }).join('')}
           </div>
           <div class="stat-block-divider"></div>
+          ${riga('Resistenze', m.resistenze)}${riga('Immunità ai danni', m.immunita_danni)}${riga('Vulnerabilità', m.vulnerabilita)}
+          ${riga('Immunità alle condizioni', m.immunita_condizione)}${riga('Sensi', m.sensi)}${riga('Linguaggi', m.lingue)}
           ${m.grado_sfida ? `<div class="stat-row"><strong>GS</strong> <span>${m.grado_sfida.raw||m.grado_sfida.valore}</span></div>` : ''}
+          ${(m.tratti || []).length ? `<div class="sb-section-title" style="margin-top:8px;">Tratti</div>${m.tratti.map(a => `<div class="sb-action"><strong>${e(a.nome || '')}.</strong> <span class="text-secondary">${e(a.descrizione || '')}</span></div>`).join('')}` : ''}
           <div class="stat-block-divider"></div>
-          <div style="font-size:0.7rem;color:var(--text-muted);margin-bottom:6px;">Clicca su un\'azione con per tirare i dadi automaticamente</div>
+          <div style="font-size:0.7rem;color:var(--text-muted);margin-bottom:6px;">Tocca un'azione con i dadi per tirarli</div>
           <div class="sb-section-title">Azioni</div>
           ${azioniHTML}
-          ${m.azioni_bonus?.length ? `<div class="sb-section-title" style="margin-top:8px;">Azioni Bonus</div>${m.azioni_bonus.map(a=>{
-            const formula = parseRoll(a.descrizione||'');
-            return `<div class="sb-action" style="cursor:${formula?'pointer':'default'};" ${formula?`onclick="Sessione._rollAction('${formula}','${(a.nome||'').replace(/'/g,"\'")}',this)"`:''}>
-              <strong>${a.nome||''}.</strong> <span class="text-secondary">${a.descrizione||''}</span>
-              ${formula?`<span class="badge badge-muted" style="margin-left:4px;font-size:0.6rem;">${formula}</span>`:''}
-            </div>`;
-          }).join('')}` : ''}
-          ${m.reazioni?.length ? `<div class="sb-section-title" style="margin-top:8px;">Reazioni</div>${m.reazioni.map(a=>`<div class="sb-action"><strong>${a.nome||''}.</strong> <span class="text-secondary">${a.descrizione||''}</span></div>`).join('')}` : ''}
+          ${m.azioni_bonus?.length ? `<div class="sb-section-title" style="margin-top:8px;">Azioni Bonus</div>${m.azioni_bonus.map(a => _azioneCombatHTML(a.nome, a.descrizione)).join('')}` : ''}
+          ${m.reazioni?.length ? `<div class="sb-section-title" style="margin-top:8px;">Reazioni</div>${m.reazioni.map(a => _azioneCombatHTML(a.nome, a.descrizione)).join('')}` : ''}
+          ${legAzioni.length ? `<div class="sb-section-title" style="margin-top:8px;">Azioni leggendarie${leg?.utilizzi ? ' · ' + e(String(leg.utilizzi).replace(/^Utilizzi di azioni leggendarie\s*/i, '')) : ''}</div>
+            ${leg?.descrizione_utilizzi ? `<div class="text-muted" style="font-size:0.78rem;margin-bottom:4px;">${e(leg.descrizione_utilizzi)}</div>` : ''}
+            ${legAzioni.map(a => _azioneCombatHTML(a.nome, a.descrizione)).join('')}` : ''}
         </div>
       </div>` :
       `<div class="empty-state"><div class="empty-state-icon"></div>
@@ -6077,11 +6103,13 @@ const Sessione = (() => {
   };
 
   const addCombatantToCurrent = (combatant) => {
+    if (!_combat) _combat = loadCombat();
     if (!_combat) newCombat();
     _combat.combatants.push({
       ...combatant,
       id: combatant.id || 'comb_' + Date.now(),
-      iniziativa: rollInit(0),
+      iniziativa: rollInit(combatant.iniziativaBonus || 0),
+      iniziativaBonus: combatant.iniziativaBonus || 0,
       condizioni: [],
       note: '',
       concentrazione: false,
@@ -6090,8 +6118,11 @@ const Sessione = (() => {
 
   const addMonsterDirect = (dati) => {
 
+    if (!_combat) _combat = loadCombat();
     if (!_combat) newCombat();
-    const bonusInit = dati.iniziativaBonus || 0;
+    // Con monsterId la scheda del Compendio si apre anche per "Goblin #2", e l'iniziativa usa la DES vera
+    const m = dati.monsterId ? MonsterCache.get(dati.monsterId) : null;
+    const bonusInit = dati.iniziativaBonus ?? (m ? _bonusInitMostro(m) : 0);
     const init = rollInit(bonusInit);
     _combat.combatants.push({
       id: 'c_enc_' + Date.now() + '_' + Math.random().toString(36).slice(2,5),
@@ -6099,6 +6130,8 @@ const Sessione = (() => {
       tipo: 'mostro',
       hp: dati.hp || 10, maxHp: dati.maxHp || dati.hp || 10,
       ca: dati.ca || 12,
+      gs: dati.gs || (m?.grado_sfida ? String(m.grado_sfida.raw || m.grado_sfida.valore).split(' (')[0] : ''),
+      ...(dati.monsterId ? { monsterId: dati.monsterId } : {}),
       iniziativa: init, iniziativaBonus: bonusInit,
       condizioni: [], concentrazione: false, note: '',
     });
@@ -6206,6 +6239,7 @@ const Sessione = (() => {
     // Come per i mostri del Compendio: si sceglie quanti metterne (tre guardie, due sgherri...)
     openInputModal(`Quanti ${nome} aggiungere?`, '1', (val) => {
       const qty = Math.max(1, Math.min(20, parseInt(val) || 1));
+      if (!_combat) _combat = loadCombat();
       if (!_combat) newCombat();
       for (let i = 0; i < qty; i++) {
         _combat.combatants.push({
@@ -6233,6 +6267,56 @@ const Sessione = (() => {
     ca: _primoNumero(npc?.ac) || _primoNumero(npc?.ca),
   });
   const _escCombat = (s) => String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+
+  // Dadi di un'azione: nel Compendio sono scritti "3d6 + 5" con gli spazi, prima si prendeva solo "3d6"
+  const _formulaDadiCombat = (desc) => { const m = String(desc || '').match(/(\d+d\d+(?:\s*[+\-]\s*\d+)?)/i); return m ? m[1].replace(/\s+/g, '') : null; };
+  // Azione toccabile: nome e formula viaggiano in data-*, cosi' un apostrofo ("Attacco d'ala") non rompe il tocco
+  const _azioneCombatHTML = (nome, desc) => {
+    const e = _escCombat, f = _formulaDadiCombat(desc);
+    return `<div class="sb-action" style="cursor:${f ? 'pointer' : 'default'};"
+      ${f ? `data-f="${e(f)}" data-n="${e(nome || '')}" onclick="Sessione._rollAction(this.dataset.f, this.dataset.n, this)"` : ''}>
+      <strong>${e(nome || '')}.</strong> <span class="text-secondary">${e(desc || '')}</span>
+      ${f ? `<span class="badge badge-muted" style="margin-left:4px;font-size:0.6rem;">${e(f)}</span>` : ''}
+    </div>`;
+  };
+
+  // Bonus d'iniziativa di un mostro del Compendio: le schede 2024 lo hanno scritto (Aboleth +7), le 2014 no
+  const _bonusInitMostro = (m) => {
+    const b = parseInt(m?.iniziativa?.bonus, 10);
+    return Number.isFinite(b) ? b : (m?.caratteristiche?.destrezza?.modificatore || 0);
+  };
+
+  // Scheda di un mostro homebrew nello scontro: azioni e tratti sono testo libero, una riga per voce
+  const _homebrewSheetHTML = (h) => {
+    const e = _escCombat;
+    const riga = (label, v) => v ? `<div class="stat-row"><strong>${label}</strong> <span>${e(v)}</span></div>` : '';
+    const voci = (testo) => String(testo || '').split('\n').map(l => l.trim()).filter(Boolean).map(l => {
+      const mm = l.match(/^([^.:]{1,60})[.:]\s*(.*)$/);
+      return mm ? _azioneCombatHTML(mm[1], mm[2]) : _azioneCombatHTML('', l).replace('<strong>.</strong> ', '');
+    }).join('');
+    const stats = `${h.stat1 || ''}/${h.stat2 || ''}`.split('/').map(s => parseInt(s, 10));
+    const haStat = stats.some(Number.isFinite);
+    return `
+      <div style="max-height:70vh;overflow-y:auto;">
+        <div class="stat-block">
+          <div class="stat-block-title">${e(h.nome || 'Mostro')}</div>
+          <div class="stat-block-subtitle">${e([h.dimensione, h.tipo, h.allineamento].filter(Boolean).join(', '))}</div>
+          <div class="stat-block-divider"></div>
+          ${riga('Classe Armatura', h.ca)}${riga('Punti Ferita', h.pf)}${riga('Velocità', h.velocita)}${riga('GS', h.gs)}
+          ${haStat ? `<div class="stat-block-divider"></div><div class="stat-abilities">${['FOR','DES','COS','INT','SAG','CAR'].map((ab, i) => {
+            const v = Number.isFinite(stats[i]) ? stats[i] : 10, mod = Math.floor((v - 10) / 2);
+            return `<div class="stat-ability-box"><div class="stat-ability-name">${ab}</div><div class="stat-ability-score">${v}</div><div class="stat-ability-mod">${mod >= 0 ? '+' : ''}${mod}</div></div>`;
+          }).join('')}</div>` : ''}
+          <div class="stat-block-divider"></div>
+          ${riga('Tiri Salvezza', h.ts)}${riga('Sensi', h.sensi)}${riga('Linguaggi', h.lingue)}
+          ${riga('Immunità ai danni', h.immunitaDanni)}${riga('Immunità alle condizioni', h.immunitaCond)}
+          ${h.tratti ? `<div class="sb-section-title" style="margin-top:8px;">Tratti</div>${voci(h.tratti)}` : ''}
+          ${h.azioni || h.legact ? `<div style="font-size:0.7rem;color:var(--text-muted);margin:8px 0 6px;">Tocca un'azione con i dadi per tirarli</div>` : ''}
+          ${h.azioni ? `<div class="sb-section-title">Azioni</div>${voci(h.azioni)}` : ''}
+          ${h.legact ? `<div class="sb-section-title" style="margin-top:8px;">Azioni leggendarie</div>${voci(h.legact)}` : ''}
+        </div>
+      </div>`;
+  };
 
   // Scheda di un PNG nello scontro: come quella di un mostro, con le azioni che tirano i dadi.
   const _npcSheetHTML = (npc) => {
@@ -6305,33 +6389,41 @@ const Sessione = (() => {
     const nome = h?.nome || 'Mostro Homebrew';
     const pf = parseInt(h?.pf) || (h?.punti_ferita?.media) || 20;
     const ca = parseInt(h?.ca) || (h?.classe_armatura) || 12;
-    const gs = parseFloat(h?.gs) || (h?.grado_sfida?.valore) || 1;
+    const gs = String(h?.gs || h?.grado_sfida?.raw || h?.grado_sfida?.valore || '').trim();
     const bonusInit = Math.floor(((parseInt(h?.stat1?.split('/')[1]) || 10) - 10) / 2);
 
-    if (!_combat) newCombat();
-    const init = rollInit(bonusInit);
-    const combatant = {
-      id: 'c_hb_' + Date.now(),
-      nome, tipo: 'mostro',
-      hp: pf, maxHp: pf, ca,
-      iniziativa: init, iniziativaBonus: bonusInit,
-      condizioni: [], concentrazione: false, note: '',
-      homebrewId: id,
-    };
-    _combat.combatants.push(combatant);
-    saveCombat(_combat);
-    renderCombat();
-    Toast.show(`${nome} aggiunto al combat (Init: ${init})`, 'success');
+    // Come per i mostri del Compendio: si sceglie quanti metterne
+    openInputModal(`Quanti ${nome} aggiungere?`, '1', (val) => {
+      const qty = Math.max(1, Math.min(20, parseInt(val) || 1));
+      if (!_combat) _combat = loadCombat();
+      if (!_combat) newCombat();
+      for (let i = 0; i < qty; i++) {
+        _combat.combatants.push({
+          id: 'c_hb_' + Date.now() + '_' + i,
+          nome: nome + (qty > 1 ? ` #${i + 1}` : ''),
+          tipo: 'mostro',
+          hp: pf, maxHp: pf, ca, gs,
+          iniziativa: rollInit(bonusInit), iniziativaBonus: bonusInit,
+          condizioni: [], concentrazione: false, note: '',
+          homebrewId: id,
+        });
+      }
+      saveCombat(_combat);
+      renderCombat();
+      Toast.show(`${qty > 1 ? qty + '× ' : ''}${nome} aggiunto allo scontro`, 'success');
+    }, { type: 'number' });
   };
 
   const addMonsterFromCompendio = (id) => {
     const m = MonsterCache.get(id) || Compendio?.getData()?.monsters?.find(x => x.id === id);
     if (!m) return;
+    if (!_combat) _combat = loadCombat();
     if (!_combat) newCombat();
 
     openInputModal(`Quanti ${m.nome} aggiungere?`, '1', (val) => {
-      const qty = parseInt(val) || 1;
+      const qty = Math.max(1, Math.min(20, parseInt(val) || 1));
       const pf = m.punti_ferita?.media || 10;
+      const bonusInit = _bonusInitMostro(m);
 
       for (let i = 0; i < qty; i++) {
         const suffix = qty > 1 ? ` #${i + 1}` : '';
@@ -6344,8 +6436,8 @@ const Sessione = (() => {
           maxHp: pf,
           ca: m.classe_armatura || 10,
           gs: m.grado_sfida?.raw || '?',
-          iniziativa: rollInit(m.caratteristiche?.destrezza?.modificatore || 0),
-          iniziativaBonus: m.caratteristiche?.destrezza?.modificatore || 0,
+          iniziativa: rollInit(bonusInit),
+          iniziativaBonus: bonusInit,
           condizioni: [],
           note: '',
           concentrazione: false,
@@ -6377,6 +6469,7 @@ const Sessione = (() => {
     const qty = Math.max(1, Math.min(20, parseInt(document.getElementById('custom-qty')?.value) || 1));
     const tipo = document.getElementById('custom-tipo')?.value || 'mostro';
 
+    if (!_combat) _combat = loadCombat();
     if (!_combat) newCombat();
 
     for (let i = 0; i < qty; i++) {
@@ -6400,6 +6493,11 @@ const Sessione = (() => {
 
   const removeCombatant = (id) => {
     if (!_combat) return;
+    if (_combat.turnoId === id) {
+      // Esce chi aveva il turno: passa a chi lo seguiva
+      const i = _sortedCombatants.findIndex(c => c.id === id);
+      _combat.turnoId = _sortedCombatants[i + 1]?.id || _sortedCombatants.find(c => c.id !== id)?.id || null;
+    }
     _combat.combatants = _combat.combatants.filter(c => c.id !== id);
     if (_combat.turno >= _combat.combatants.length) _combat.turno = 0;
     saveCombat(_combat);
@@ -6476,6 +6574,7 @@ const Sessione = (() => {
     changeHP, setHP, quickDamage,
     openCondizioneModal, submitCondizioni, removeCondizione,
     toggleConcentrazione, openNote,
+    ordinaCombattenti, indiceTurno,
     apriPF, addMonsterQuick, addMonsterDirect, searchMonster, addMonsterFromCompendio, addHomebrewMonster,
     addNPCFromWorld, _addNPCById,
     addCustomCombatant, submitCustomCombatant, removeCombatant,
@@ -7319,6 +7418,7 @@ const Compendio = (() => {
       maxHp: pf,
       ca: m.classe_armatura || 10,
       iniziativa: 0,
+      iniziativaBonus: Number.isFinite(parseInt(m.iniziativa?.bonus, 10)) ? parseInt(m.iniziativa.bonus, 10) : (m.caratteristiche?.destrezza?.modificatore || 0),
       gs: m.grado_sfida ? (m.grado_sfida.raw || String(m.grado_sfida.valore)) : '?',
       monsterId: m.id,
       condizioni: [],
@@ -8595,8 +8695,8 @@ const Schermo = (() => {
         '</div>';
     }
 
-    const sorted = [...combat.combatants].sort((a, b) => b.iniziativa - a.iniziativa);
-    const activeIdx = combat.turno || 0;
+    const sorted = Sessione.ordinaCombattenti(combat.combatants);
+    const activeIdx = Sessione.indiceTurno(combat, sorted);
 
     const rows = sorted.map((c, i) => {
       const isActive = i === activeIdx;
@@ -8678,8 +8778,8 @@ const Schermo = (() => {
              '</div>';
     }
 
-    const sorted = [...combat.combatants].sort((a,b) => b.iniziativa - a.iniziativa);
-    const activeIdx = combat.turno || 0;
+    const sorted = Sessione.ordinaCombattenti(combat.combatants);
+    const activeIdx = Sessione.indiceTurno(combat, sorted);
 
     return '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">' +
         '<div style="font-family:var(--font-display);font-size:0.85rem;">Round ' + (combat.round||1) + ' · ' +
@@ -16709,9 +16809,11 @@ const WikiSections = (() => {
         id: n.id, nome: n.name || n.nome || '',
         immagine: n.immagine || '',
         ruolo: n.job || n.ruolo || '', razza: n.race || n.razza || '',
-        stato: n.stato || 'Vivo', allineamento: n.alignment || n.allineamento || '',
+        // La scheda PNG salva "align" e "factionId": prima qui non si vedevano
+        stato: n.stato || 'Vivo', allineamento: n.align || n.alignment || n.allineamento || '',
         nascita: n.nascita || null, morte: n.morte || null,
-        sede: n.location || n.sede || '', fazione: n.fazione || '',
+        sede: n.location || n.sede || '',
+        fazione: (() => { const f = n.factionId && (camp?.factions || []).find(x => x.id === n.factionId); return f ? '@' + (f.nome || f.name || '') : (n.fazione || ''); })(),
         apparenza: n.apparenza || n.description || '',
         personalita: n.personality || n.personalita || '',
         vuole: n.wants || n.vuole || '', teme: n.fears || n.teme || '',
@@ -16726,9 +16828,13 @@ const WikiSections = (() => {
         const idx = npcs.findIndex(n => n.id === item.id);
         const d = { ...(idx>=0?npcs[idx]:{}), id:item.id, name:item.nome, nome:item.nome,
           immagine:item.immagine||'', job:item.ruolo, ruolo:item.ruolo, race:item.razza, razza:item.razza,
-          stato:item.stato, alignment:item.allineamento, allineamento:item.allineamento,
+          stato:item.stato, align:item.allineamento, alignment:item.allineamento, allineamento:item.allineamento,
           nascita:item.nascita||null, morte:item.morte||null,
           location:item.sede, sede:item.sede, fazione:item.fazione,
+          // Se la fazione scritta qui e' una di quelle della campagna, la scheda PNG la riconosce
+          factionId: (() => { const t = String(item.fazione || '').split(/[,;]/)[0].trim().replace(/^@/, '').toLowerCase();
+            const f = t && (camp.factions || []).find(x => String(x.nome || x.name || '').trim().toLowerCase() === t);
+            return f ? f.id : ''; })(),
           apparenza:item.apparenza, description:item.apparenza,
           personality:item.personalita, personalita:item.personalita,
           wants:item.vuole, vuole:item.vuole, fears:item.teme, teme:item.teme,
@@ -19780,11 +19886,10 @@ const EncounterBuilder = (() => {
     _ultimoEncounter.forEach(entry => {
       for (let i = 0; i < entry.qty; i++) {
         const nome = entry.qty > 1 ? `${entry.nome} #${i+1}` : entry.nome;
-        const bonusInit = 0;
         Sessione.addMonsterDirect({
           nome, tipo:'mostro',
           hp: entry.hp, maxHp: entry.hp, ca: entry.ca,
-          iniziativaBonus: bonusInit,
+          gs: entry.cr, monsterId: entry.id,
         });
         aggiunti++;
       }

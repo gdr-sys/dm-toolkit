@@ -53,8 +53,11 @@ const VistaGiocatori = (() => {
         .map(x => ({ numero: x.numero, titolo: x.titolo || '', data: x.data || '', recap: String(x.recap).slice(0, 3000) }));
     }
     if (s.iniziativa && c.activeCombat?.combatants?.length) {
-      const ord = [...c.activeCombat.combatants].sort((a, b) => (b.iniziativa ?? 0) - (a.iniziativa ?? 0) || (a.tipo === 'pg' ? -1 : 1));
-      snap.iniziativa = { round: c.activeCombat.round || 1, turno: c.activeCombat.turno || 0, ordine: ord.map(x => ({ nome: x.nome || x.name || '?', pg: x.tipo === 'pg', ko: (x.hp ?? 1) <= 0 })) };
+      // Stesso ordine e stesso turno del tracker del DM (prima a parita' d'iniziativa potevano non coincidere)
+      const S = typeof Sessione !== 'undefined' && Sessione.ordinaCombattenti ? Sessione : null;
+      const ord = S ? S.ordinaCombattenti(c.activeCombat.combatants)
+        : [...c.activeCombat.combatants].sort((a, b) => (b.iniziativa ?? 0) - (a.iniziativa ?? 0) || (a.tipo === 'pg' ? -1 : 1));
+      snap.iniziativa = { round: c.activeCombat.round || 1, turno: S ? S.indiceTurno(c.activeCombat, ord) : (c.activeCombat.turno || 0), ordine: ord.map(x => ({ nome: x.nome || x.name || '?', pg: x.tipo === 'pg', ko: (x.hp ?? 1) <= 0 })) };
     }
     const luoghi = (c.locations || []).filter(l => s.luoghi.includes(l.id));
     snap.luoghi = luoghi.map(l => ({ nome: _nome(l), tipo: l.tipo || '', descrizione: String(l.atmosfera || l.description || '').slice(0, 2000), immagine: _immagine(l.immagine) }));
