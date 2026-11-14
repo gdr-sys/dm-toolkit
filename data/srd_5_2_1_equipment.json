@@ -4376,7 +4376,7 @@
   },
   {
     "id": "locanda_squallido",
-    "nome": "Locanda Squallido",
+    "nome": "Locanda Squallida",
     "tipo": "vitto_alloggio",
     "categoria": "Vitto e alloggio",
     "pagine_sorgente": "114-115",
@@ -4400,7 +4400,7 @@
   },
   {
     "id": "locanda_povero",
-    "nome": "Locanda Povero",
+    "nome": "Locanda Povera",
     "tipo": "vitto_alloggio",
     "categoria": "Vitto e alloggio",
     "pagine_sorgente": "114-115",
@@ -4424,7 +4424,7 @@
   },
   {
     "id": "locanda_modesto",
-    "nome": "Locanda Modesto",
+    "nome": "Locanda Modesta",
     "tipo": "vitto_alloggio",
     "categoria": "Vitto e alloggio",
     "pagine_sorgente": "114-115",
@@ -4448,7 +4448,7 @@
   },
   {
     "id": "locanda_agiato",
-    "nome": "Locanda Agiato",
+    "nome": "Locanda Agiata",
     "tipo": "vitto_alloggio",
     "categoria": "Vitto e alloggio",
     "pagine_sorgente": "114-115",
@@ -4472,7 +4472,7 @@
   },
   {
     "id": "locanda_ricco",
-    "nome": "Locanda Ricco",
+    "nome": "Locanda Ricca",
     "tipo": "vitto_alloggio",
     "categoria": "Vitto e alloggio",
     "pagine_sorgente": "114-115",
@@ -4496,7 +4496,7 @@
   },
   {
     "id": "locanda_aristocratico",
-    "nome": "Locanda Aristocratico",
+    "nome": "Locanda Aristocratica",
     "tipo": "vitto_alloggio",
     "categoria": "Vitto e alloggio",
     "pagine_sorgente": "114-115",
@@ -4808,7 +4808,7 @@
   },
   {
     "id": "servizio_magico_trucchetto",
-    "nome": "Servizio magico Trucchetto",
+    "nome": "Servizio magico (trucchetto)",
     "tipo": "servizio",
     "categoria": "Servizi magici",
     "pagine_sorgente": "114-115",
@@ -4832,7 +4832,7 @@
   },
   {
     "id": "servizio_magico_1",
-    "nome": "Servizio magico 1",
+    "nome": "Servizio magico (1° livello)",
     "tipo": "servizio",
     "categoria": "Servizi magici",
     "pagine_sorgente": "114-115",
@@ -4856,7 +4856,7 @@
   },
   {
     "id": "servizio_magico_2",
-    "nome": "Servizio magico 2",
+    "nome": "Servizio magico (2° livello)",
     "tipo": "servizio",
     "categoria": "Servizi magici",
     "pagine_sorgente": "114-115",
@@ -4880,7 +4880,7 @@
   },
   {
     "id": "servizio_magico_3",
-    "nome": "Servizio magico 3",
+    "nome": "Servizio magico (3° livello)",
     "tipo": "servizio",
     "categoria": "Servizi magici",
     "pagine_sorgente": "114-115",
@@ -4904,7 +4904,7 @@
   },
   {
     "id": "servizio_magico_4_5",
-    "nome": "Servizio magico 4-5",
+    "nome": "Servizio magico (4°-5° livello)",
     "tipo": "servizio",
     "categoria": "Servizi magici",
     "pagine_sorgente": "114-115",
@@ -4928,7 +4928,7 @@
   },
   {
     "id": "servizio_magico_6_8",
-    "nome": "Servizio magico 6-8",
+    "nome": "Servizio magico (6°-8° livello)",
     "tipo": "servizio",
     "categoria": "Servizi magici",
     "pagine_sorgente": "114-115",
@@ -4952,7 +4952,7 @@
   },
   {
     "id": "servizio_magico_9",
-    "nome": "Servizio magico 9",
+    "nome": "Servizio magico (9° livello)",
     "tipo": "servizio",
     "categoria": "Servizi magici",
     "pagine_sorgente": "114-115",
