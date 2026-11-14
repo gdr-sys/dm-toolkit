@@ -616,11 +616,12 @@ body.barra-alta #wiki-section-tabbar:not([style*="display:none"]):not([style*="d
 .sc-paesaggi { display: flex; flex-wrap: wrap; gap: 6px; }
 .sc-paesaggi button { border: 0; border-radius: 999px; padding: 6px 12px; background: color-mix(in oklch, var(--text-primary) 9%, transparent); color: var(--text-primary); font: 600 0.84rem var(--font-body); cursor: pointer; }
 .sc-paesaggi button[aria-pressed="true"] { background: var(--text-primary); color: var(--bg-primary); }
-@media (max-width: 760px) { #dn-hero > .sc-cambia { top: auto; bottom: 10px; left: auto; right: 12px; transform: none; } }
+/* Fino a 1100px (iPad verticale compreso) le linguette in alto arrivano al centro: il pulsante va in basso a destra */
+@media (max-width: 1100px) { #dn-hero > .sc-cambia { top: auto; bottom: 10px; left: auto; right: 12px; transform: none; } }
 
 /* I titoli dei vuoti ora sono h2: stessa misura di prima */
 .module-placeholder h2 { font-size: 1.4rem; margin: 0 0 6px; }
-.sc-hero > .sc-cambia { top: 14px; bottom: auto; } #dn-hero > .sc-cambia { top: 22px; } @media (max-width: 760px) { .sc-hero > .sc-cambia { top: 10px; right: 12px; } #dn-hero > .sc-cambia { top: auto; bottom: 10px; } }
+.sc-hero > .sc-cambia { top: 14px; bottom: auto; } @media (min-width: 1101px) { #dn-hero > .sc-cambia { top: 22px; } } @media (max-width: 760px) { .sc-hero > .sc-cambia { top: 10px; right: 12px; } #dn-hero > .sc-cambia { top: auto; bottom: 10px; } }
 .schermo-block-resize { background: transparent !important; border-top: 0 !important; }
 .carto-azioni .carto-zoom { position: static !important; padding: 0 !important; background: var(--bg-card) !important; margin-right: 4px; }
 
