@@ -81,7 +81,7 @@ const CampagnaHub = (() => {
         '<button type="button" class="btn btn-ghost btn-sm" onclick="App.editCampaign(\'' + camp.id + '\')">Modifica</button></div>' +
       '<h2 class="hub-nome">' + _esc(camp.name) + '</h2>' +
       // Testi incollati da PDF hanno un a capo a fine riga: si uniscono, restano solo i paragrafi
-      (camp.description ? '<p class="hub-desc">' + _esc(String(camp.description).replace(/([^\n])\n(?!\n)/g, '$1 ')) + '</p>' : '') +
+      (camp.description ? '<p class="hub-desc">' + _esc(Testo.semplice(camp.description).replace(/([^\n])\n(?!\n)/g, '$1 ')) + '</p>' : '') +
       '</div></div>' +
       _gruppo('Al tavolo', [
         _card(_iconaMenu('campagna'), 'Dashboard', 'Ultima sessione, scadenze, clock e quest', go('campagna')),

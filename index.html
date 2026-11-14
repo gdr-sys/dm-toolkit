@@ -1537,8 +1537,8 @@
           </div>
           <!-- Toolbar formattazione (riusa quella delle note campagna) -->
           <div id="wiki-toolbar" style="display:flex;flex-wrap:wrap;gap:2px;padding:4px 8px;border-bottom:1px solid var(--border);background:var(--bg-secondary);flex-shrink:0;">
-            <button class="nc-tb" onclick="wikiF('bold')" title="Grassetto"><b>B</b></button>
-            <button class="nc-tb" onclick="wikiF('italic')" title="Corsivo"><i>I</i></button>
+            <button class="nc-tb" onclick="wikiF('bold')" title="Grassetto"><b>G</b></button>
+            <button class="nc-tb" onclick="wikiF('italic')" title="Corsivo"><i style="font-family:Georgia,serif;">C</i></button>
             <button class="nc-tb" onclick="wikiF('underline')" title="Sottolineato"><u>S</u></button>
             <button class="nc-tb" onclick="wikiF('strikeThrough')" title="Barrato"><s>ab</s></button>
             <div style="width:1px;background:var(--border);margin:2px 3px;"></div>
@@ -1553,7 +1553,7 @@
             <div style="width:1px;background:var(--border);margin:2px 3px;"></div>
             <button class="nc-tb" onclick="wikiInsertImage()" title="Inserisci immagine via URL" style="color:#c98a24;" aria-label="Inserisci immagine via URL"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="m21 16-5-5-9 9"/></svg></button>
             <button class="nc-tb" onclick="wikiInsertTag()" style="color:var(--accent-secondary-text);">#tag</button>
-            <button class="nc-tb" onclick="wikiInsertLink()" style="color:#3f7fc4;">[[link]]</button>
+            <button class="nc-tb" onmousedown="event.preventDefault()" onclick="EditorTesto.collega(document.getElementById('wiki-note-content'))" title="Collega un PNG, un PG, un luogo, una fazione, una missione o una nota" style="color:var(--accent-text);font-weight:600;"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg> Collega</button>
             <div style="width:1px;background:var(--border);margin:2px 3px;"></div>
             <button class="nc-tb" onclick="wikiF('removeFormat')" style="font-size:0.7rem;color:var(--text-muted);"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
             <div style="width:1px;background:var(--border);margin:2px 3px;"></div>
@@ -1582,7 +1582,7 @@
             contenteditable="true"
             spellcheck="true"
             style="flex:1;padding:16px;overflow-y:auto;outline:none;font-size:0.9rem;line-height:1.8;color:var(--text-primary);"
-            data-placeholder="Inizia a scrivere... Usa [[link]] per collegare note, #tag per categorizzare."
+            data-placeholder="Inizia a scrivere... Collega (o @) per collegare PNG, PG, luoghi e note, #tag per etichettare."
             oninput="WikiDM.saveNote(); MentionPicker.onInput(event, this)"
             onkeydown="wikiEditorKeydown(event); MentionPicker.onKeydown(event)">
           </div>
@@ -4128,7 +4128,7 @@ const App = (() => {
         <div class="hn-main">
           <div class="hn-stato">${isActive ? '<span class="dn-chip acqua">In uso</span>' : ''}<span class="hn-tipo">${typeLabel} · ${sistema}</span></div>
           <h2>${_esc(camp.name)}</h2>
-          ${camp.description ? '<p>' + camp.description + '</p>' : ''}
+          ${camp.description ? '<div class="et-testo">' + Testo.html(camp.description) + '</div>' : ''}
           <div class="hn-azioni-c">
             <button type="button" class="btn btn-primary btn-lg" onclick="App.openCampaign('${camp.id}')">Apri la dashboard</button>
             <button type="button" class="btn btn-ghost btn-lg" onclick="App.editCampaign('${camp.id}')">Modifica</button>
@@ -4822,16 +4822,17 @@ const NPC = (() => {
     if (val)  val.textContent = rel + ' / 100';
 
     const setText = (id, txt) => { const e = document.getElementById(id); if (e) e.textContent = txt || '—'; };
-    setText('npc-view-trait',  npc.trait);
-    setText('npc-view-secret', npc.secret);
-    setText('npc-view-wants',  npc.wants);
-    setText('npc-view-offers', npc.offers);
+    const setRicco = (id, v) => { const e = document.getElementById(id); if (!e) return; e.classList.add('et-testo'); e.innerHTML = Testo.vuoto(v) ? '—' : Testo.mostra(v); };
+    setRicco('npc-view-trait',  npc.trait);
+    setRicco('npc-view-secret', npc.secret);
+    setRicco('npc-view-wants',  npc.wants);
+    setRicco('npc-view-offers', npc.offers);
     setText('npc-view-links',  npc.links);
     setText('npc-view-voice',  [npc.voice, npc.tic].filter(Boolean).join(' · '));
     setText('npc-view-cadenza',  npc.cadenza);
     setText('npc-view-saluto',   npc.saluto);
     setText('npc-view-argomento', npc.argomentoRicorrente);
-    setText('npc-view-obiettivo', npc.obiettivoSegreto);
+    setRicco('npc-view-obiettivo', npc.obiettivoSegreto);
     setText('npc-view-hook',     npc.hookSituazionale);
 
     const archEl = document.getElementById('npc-view-archetipo');
@@ -4968,7 +4969,7 @@ const NPC = (() => {
     }
 
     const notes = document.getElementById('sb-notes');
-    if (notes) notes.textContent = npc.combatNotes || '';
+    if (notes) { notes.classList.add('et-testo'); notes.innerHTML = Testo.html(npc.combatNotes); }
 
     Modal.open('npc-view');
     Debug.log(`NPC view: ${npc.name}`);
@@ -6378,7 +6379,7 @@ const Sessione = (() => {
           ${sezione('Reazioni', npc.reazioni)}
           ${sezione('Azioni leggendarie', npc.azioniLeggendarie)}
           ${!haAzioni ? `<div class="text-muted text-sm" style="padding:6px 0;">Nessuna azione nella scheda del PNG. Aggiungile da Mondo › PNG › Combattimento.</div>` : ''}
-          ${npc.combatNotes ? `<div class="stat-block-divider"></div><div class="text-muted" style="font-size:0.8rem;white-space:pre-wrap;">${e(npc.combatNotes)}</div>` : ''}
+          ${npc.combatNotes ? `<div class="stat-block-divider"></div><div class="text-muted et-testo" style="font-size:0.8rem;">${Testo.html(npc.combatNotes)}</div>` : ''}
         </div>
       </div>`;
   };
@@ -8569,7 +8570,7 @@ const Schermo = (() => {
       notes.map((n, i) =>
         '<div style="display:flex;gap:6px;align-items:flex-start;padding:4px 0;border-bottom:1px solid var(--border);">' +
           '<span style="flex-shrink:0;font-size:0.72rem;color:var(--text-muted);font-weight:600;">' + ({ '📌': 'Nota', '👤': 'PNG', '📍': 'Luogo', '⚔️': 'Combattimento', '🎯': 'Obiettivo', '❓': 'Da fare', '💡': 'Idea' }[n.tipo] || '') + '</span>' +
-          '<span style="flex:1;font-size:0.8rem;line-height:1.4;word-break:break-word;">' + (n.testo||'') + '</span>' +
+          '<span class="et-testo" style="flex:1;font-size:0.8rem;line-height:1.4;word-break:break-word;">' + Testo.mostra(n.testo||'') + '</span>' +
           '<button class="btn btn-ghost btn-icon-sm" style="flex-shrink:0;font-size:0.65rem;opacity:0.5;" ' +
             'onclick="NoteSessione.remove('+i+');Schermo._refreshNoteSessione()" title="Rimuovi" aria-label="Rimuovi"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>' +
         '</div>'
@@ -8671,7 +8672,7 @@ const Schermo = (() => {
   };
 
   const renderNote = (block) => `
-    <textarea
+    <textarea class="schermo-nota"
       style="width:100%;min-height:120px;background:transparent;border:none;resize:vertical;font-family:var(--font-body);font-size:0.85rem;color:var(--text-primary);outline:none;padding:0;"
       placeholder="Scrivi note rapide qui..."
       onchange="Schermo.saveNote('${block.id}', this.value)"
@@ -9177,8 +9178,8 @@ const Schermo = (() => {
       }).join('') + '</div>';
   };
 
-  const renderCustom = (block) => `
-    <div style="font-size:0.85rem;color:var(--text-secondary);white-space:pre-wrap;line-height:1.6;">${block.content || '<span class="text-muted">Clicca per modificare</span>'}</div>`;
+  // Il blocco personalizzato si scrive sul posto come le note (prima si modificava da una finestra di solo testo)
+  const renderCustom = (block) => renderNote(block);
 
   const addBlock = () => {
 
@@ -9433,6 +9434,11 @@ const Schermo = (() => {
     const block = _blocks.find(b => b.id === id);
     if (!block) return;
     openInputModal('Titolo del blocco', block.title || '', (title) => {
+      if (block.type === 'note' || block.type === 'custom') {
+        block.title = title || block.title;
+        save(); render();
+        return;
+      }
       openInputModal('Contenuto', block.content || '', (content) => {
         block.title = title || block.title;
         block.content = content;
@@ -11379,7 +11385,7 @@ const WikiDM = (() => {
         </div>
         <button class="btn btn-primary" onclick="WikiDM.newNote()">+ Crea prima nota</button>
         <div style="margin-top:20px;font-size:0.72rem;">
-          Usa <kbd style="background:var(--bg-tertiary);padding:1px 5px;border-radius:3px;">[[link]]</kbd> per collegare ·
+          Usa <kbd style="background:var(--bg-tertiary);padding:1px 5px;border-radius:3px;">Collega</kbd> (o <kbd style="background:var(--bg-tertiary);padding:1px 5px;border-radius:3px;">@</kbd>) per collegare ·
           <kbd style="background:var(--bg-tertiary);padding:1px 5px;border-radius:3px;">#tag</kbd> per categorizzare
         </div>
       </div>`;
@@ -11933,6 +11939,18 @@ const wikiInsertLink = () => {
 };
 
 const wikiNavigateLink = (key) => {
+  // PG, missioni e incontri (collegabili dal 2026-11): si cerca la scheda per nome nella sua sezione
+  const _pref = String(key || '').split(':')[0];
+  const _SEZ = { pg: 'pg', quest: 'quest', incontro: 'incontri' };
+  if (_SEZ[_pref] && typeof WikiSections !== 'undefined') {
+    const nome = key.slice(_pref.length + 1).trim().toLowerCase();
+    let dati = [];
+    try { dati = WikiSections._getCfg(_SEZ[_pref]).getData(App.getActiveCampaign()) || []; } catch (e) {}
+    const x = dati.find(i => (i.nome || '').trim().toLowerCase() === nome);
+    if (x) { WikiSections.goto(_SEZ[_pref]); setTimeout(() => WikiSections.openCard(_SEZ[_pref], x.id), 150); }
+    else Toast.show('"' + key.slice(_pref.length + 1) + '" non trovato', 'warning', 2500);
+    return;
+  }
 
   const tipo = key.startsWith('png:') ? 'png'
              : key.startsWith('luogo:') ? 'luogo'
@@ -11957,7 +11975,7 @@ const wikiNavigateLink = (key) => {
 
   if (tipo === 'luogo') {
     const camp = App.getActiveCampaign();
-    const loc = (camp?.locations||[]).find(l => (l.nome||'').toLowerCase() === titolo.toLowerCase());
+    const loc = (camp?.locations||[]).find(l => (l.nome||l.name||'').toLowerCase() === titolo.toLowerCase());
     if (loc) {
       WikiSections.goto('luoghi');
       setTimeout(() => WikiSections.openCard('luoghi', loc.id), 150);
@@ -11969,7 +11987,7 @@ const wikiNavigateLink = (key) => {
 
   if (tipo === 'fazione') {
     const camp = App.getActiveCampaign();
-    const faz = (camp?.factions||[]).find(f => (f.nome||'').toLowerCase() === titolo.toLowerCase());
+    const faz = (camp?.factions||[]).find(f => (f.nome||f.name||'').toLowerCase() === titolo.toLowerCase());
     if (faz) {
       WikiSections.goto('fazioni');
       setTimeout(() => WikiSections.openCard('fazioni', faz.id), 150);
@@ -13095,12 +13113,12 @@ const _mondoToWiki = (tipo, entita) => {
       '</p>' +
       '<p>#npc #png' + (entita.factionId ? '' : '') + (razza ? ' #'+razza.toLowerCase().replace(/\s+/g,'_') : '') + '</p>' +
       '<h2>Tratto caratteriale</h2>' +
-      '<p>' + personalita + '</p>' +
+      '<div>' + Testo.html(personalita) + '</div>' +
       '<h2>Vuole</h2>' +
-      '<p>' + (vuole||'...') + '</p>' +
-      (segreto ? '<h2>Segreto DM</h2><div class="wiki-callout wiki-callout-secret"><span class="wiki-callout-label">SEGRETO DM</span><p>' + segreto + '</p></div>' : '') +
+      '<div>' + (Testo.html(vuole) || '...') + '</div>' +
+      (segreto ? '<h2>Segreto DM</h2><div class="wiki-callout wiki-callout-secret"><span class="wiki-callout-label">SEGRETO DM</span><div>' + Testo.html(segreto) + '</div></div>' : '') +
       '<h2>Legami</h2>' +
-      '<p>' + relazioni + '</p>';
+      '<div>' + Testo.html(relazioni) + '</div>';
   }
 
   else if (tipo === 'luogo') {
@@ -13111,9 +13129,9 @@ const _mondoToWiki = (tipo, entita) => {
       '<h1>' + nome + '</h1>' +
       '<p><strong>Tipo:</strong> ' + (entita.tipo||'') + ' &nbsp;|&nbsp; #luogo' + (entita.tipo ? ' #'+entita.tipo : '') + '</p>' +
       '<h2>Descrizione</h2>' +
-      '<p>' + atmosfera + '</p>' +
-      (punti ? '<h2>Punti di Interesse</h2><p>' + punti + '</p>' : '') +
-      (noteLibere ? '<h2>Note DM</h2><blockquote>' + noteLibere + '</blockquote>' : '');
+      '<div>' + Testo.html(atmosfera) + '</div>' +
+      (punti ? '<h2>Punti di Interesse</h2><div>' + Testo.html(punti) + '</div>' : '') +
+      (noteLibere ? '<h2>Note DM</h2><blockquote>' + Testo.html(noteLibere) + '</blockquote>' : '');
   }
 
   else if (tipo === 'fazione') {
@@ -13123,8 +13141,8 @@ const _mondoToWiki = (tipo, entita) => {
       '<h1>' + nome + '</h1>' +
       '<p>#fazione' + (entita.tipo ? ' #'+entita.tipo.toLowerCase().replace(/\s+/g,'_') : '') + '</p>' +
       '<h2>Obiettivi</h2>' +
-      '<p>' + obiettivo + '</p>' +
-      (noteLibere ? '<h2>Note DM</h2><div class="wiki-callout wiki-callout-secret"><span class="wiki-callout-label">SEGRETO DM</span><p>' + noteLibere + '</p></div>' : '');
+      '<div>' + Testo.html(obiettivo) + '</div>' +
+      (noteLibere ? '<h2>Note DM</h2><div class="wiki-callout wiki-callout-secret"><span class="wiki-callout-label">SEGRETO DM</span><div>' + Testo.html(noteLibere) + '</div></div>' : '');
   }
 
   const now = Date.now();
@@ -13168,14 +13186,18 @@ const wikiToMondo = (notaId) => {
   const extractSection = (heading) => {
     const re = new RegExp('<h2[^>]*>[^<]*' + heading + '[^<]*<\\/h2>([\\s\\S]*?)(?=<h[12]|<hr|$)', 'i');
     const m = html.match(re);
-    return m ? m[1].replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim() : null;
+    if (!m) return null;
+    // Si tiene la formattazione; via l'etichetta e la cornice del riquadro "Segreto DM"
+    const dentro = m[1].replace(/<span class="wiki-callout-label">[\s\S]*?<\/span>/gi, '').replace(/<div class="wiki-callout[^"]*"[^>]*>/gi, '<div>');
+    const h = Testo.html(dentro).trim();
+    return Testo.vuoto(h) ? null : h;
   };
 
   if (tipo === 'npc') {
     const npcs = (camp.npcs||[]).map(n => {
       if (n.id !== nota.mondoId) return n;
       const personalita = extractSection('Tratto') || n.personalita || n.personality || '';
-      const vuole = extractField('Vuole') || n.vuole || n.wants || '';
+      const vuole = extractSection('Vuole') || n.vuole || n.wants || '';
       const segreto = extractSection('Segreto') || n.segreto || n.secret || '';
       const relazioni = extractSection('Legami') || n.relazioni || n.links || '';
       return {
@@ -13313,9 +13335,9 @@ const _enrichedSearch = (q, camp) => {
 
   (camp?.npcs||[]).forEach(n => {
     const ruolo = n.job || n.ruolo || '', razza = n.race || n.razza || '';
-    const personalita = n.personality || n.personalita || '';
-    const segreto = n.secret || n.segreto || '';
-    const vuole = n.wants || n.vuole || '';
+    const personalita = Testo.semplice(n.personality || n.personalita || '');
+    const segreto = Testo.semplice(n.secret || n.segreto || '');
+    const vuole = Testo.semplice(n.wants || n.vuole || '');
     const haystack = [n.name||n.nome, n.alias, ruolo, razza, personalita, segreto, vuole].filter(Boolean).join(' ').toLowerCase();
     if (haystack.includes(query)) {
       let sub = ruolo || razza || '';
@@ -13330,8 +13352,8 @@ const _enrichedSearch = (q, camp) => {
   });
 
   (camp?.locations||[]).forEach(l => {
-    const atmosfera = l.atmosfera || l.description || '';
-    const haystack = [l.nome, l.tipo, atmosfera, l.storia].filter(Boolean).join(' ').toLowerCase();
+    const atmosfera = Testo.semplice(l.atmosfera || l.description || '');
+    const haystack = [l.nome, l.tipo, atmosfera, Testo.semplice(l.storia)].filter(Boolean).join(' ').toLowerCase();
     if (haystack.includes(query)) {
       let sub = l.tipo || '';
       if (atmosfera.toLowerCase().includes(query)) sub = atmosfera.replace(/<[^>]+>/g,'').slice(0,40);
@@ -13342,8 +13364,8 @@ const _enrichedSearch = (q, camp) => {
   });
 
   (camp?.factions||[]).forEach(f => {
-    const obiettivo = f.obiettivo || f.description || '';
-    const haystack = [f.nome, f.tipo, obiettivo, f.risorse].filter(Boolean).join(' ').toLowerCase();
+    const obiettivo = Testo.semplice(f.obiettivo || f.description || '');
+    const haystack = [f.nome, f.tipo, obiettivo, Testo.semplice(f.risorse)].filter(Boolean).join(' ').toLowerCase();
     if (haystack.includes(query)) {
       let sub = f.tipo || '';
       if (obiettivo.toLowerCase().includes(query)) sub = obiettivo.replace(/<[^>]+>/g,'').slice(0,40);
@@ -14870,33 +14892,33 @@ const MentionPicker = (() => {
       });
     });
 
-    (camp?.npcs||[]).forEach(n => {
-      const nome = n.name || n.nome || '';
-      if (!lc || nome.toLowerCase().includes(lc)) {
-        items.push({ label:''+nome, key:'png:'+nome, tipo:'png', id:n.id, color:'#3f9a6b' });
-      }
+    // Tutto quello che si puo' collegare, con lo stesso prefisso usato dai link gia' scritti
+    const GRUPPI = [
+      ['png',      'png',      '#3f9a6b', 'PNG'],
+      ['pg',       'pg',       '#2f9aa3', 'PG'],
+      ['luoghi',   'luogo',    '#c98a24', 'Luogo'],
+      ['fazioni',  'fazione',  '#cf5450', 'Fazione'],
+      ['quest',    'quest',    '#b07a3a', 'Missione'],
+      ['incontri', 'incontro', '#a8584e', 'Incontro'],
+    ];
+    GRUPPI.forEach(([sez, pref, color, etichetta]) => {
+      let dati = [];
+      try { dati = (typeof WikiSections !== 'undefined' && WikiSections._getCfg(sez)?.getData(camp)) || []; } catch (e) {}
+      dati.forEach(x => {
+        const nome = x.nome || '';
+        if (nome && (!lc || nome.toLowerCase().includes(lc))) items.push({ label: nome, key: pref + ':' + nome, tipo: pref, id: x.id, color, gruppo: etichetta });
+      });
     });
-
-    (camp?.locations||[]).forEach(l => {
-      if (!lc || (l.nome||'').toLowerCase().includes(lc)) {
-        items.push({ label:''+(l.nome||''), key:'luogo:'+(l.nome||''), tipo:'luogo', id:l.id, color:'#c98a24' });
-      }
-    });
-
-    (camp?.factions||[]).forEach(f => {
-      if (!lc || (f.nome||'').toLowerCase().includes(lc)) {
-        items.push({ label:''+(f.nome||''), key:'fazione:'+(f.nome||''), tipo:'fazione', id:f.id, color:'#cf5450' });
-      }
-    });
-
-    const risultati = items.slice(0, 12);
+    // Prima schede (PNG, PG, luoghi...), poi le note
+    items.sort((a, b) => (a.tipo === 'wiki') - (b.tipo === 'wiki'));
+    const risultati = items.slice(0, 15);
     // "+ Crea nuovo PNG/Luogo/Fazione" quando si sta scrivendo un nome che ancora non
     // esiste da nessuna parte: cosi' @mentions in Sessione, PNG, Luoghi ecc. puo' creare
     // la scheda al volo esattamente come gia' succede nella Timeline del Calendario,
     // invece di dover prima interrompersi per aggiungerla a mano dalla Wiki.
     const nomeDigitato = q.trim();
     if (nomeDigitato) {
-      const giaEsiste = (tipoCfg) => items.some(it => it.tipo === tipoCfg && it.label.toLowerCase().includes(nomeDigitato.toLowerCase()) && it.label.toLowerCase().replace(/^\S+\s/, '') === nomeDigitato.toLowerCase());
+      const giaEsiste = (tipoCfg) => items.some(it => it.tipo === tipoCfg && it.label.trim().toLowerCase() === nomeDigitato.toLowerCase());
       [['png','','PNG'], ['luogo','','Luogo'], ['fazione','','Fazione']].forEach(([tipoCfg, emoji, label]) => {
         if (!giaEsiste(tipoCfg)) {
           risultati.push({ label: '+ Crea ' + label + ' "' + nomeDigitato + '"', key: nomeDigitato, tipo: 'crea', tipoEntita: tipoCfg, color: 'var(--accent-primary)' });
@@ -14912,10 +14934,13 @@ const MentionPicker = (() => {
     dd.style.display = 'block';
 
     const vw = window.innerWidth, vh = window.innerHeight;
-    const left = Math.min(x, vw - 280);
-    const top  = y + 22 + window.scrollY;
+    const left = Math.max(8, Math.min(x, vw - 280));
+    // Il menu e' position:fixed: le coordinate sono gia' quelle dello schermo. Prima si
+    // aggiungeva lo scorrimento della pagina e, scrivendo in fondo a una scheda, il menu
+    // finiva fuori dallo schermo.
+    const top  = y + 22;
     dd.style.left = left + 'px';
-    dd.style.top  = (top > vh - 300 ? y - 10 - 280 + window.scrollY : top) + 'px';
+    dd.style.top  = Math.max(8, top > vh - 300 ? y - 10 - 280 : top) + 'px';
     _renderList();
   };
 
@@ -14941,7 +14966,8 @@ const MentionPicker = (() => {
       'padding:7px 12px;cursor:pointer;font-size:0.82rem;display:flex;align-items:center;gap:8px;'+
       (_idx===i ? 'background:var(--bg-tertiary);' : '')+'">' +
         '<span style="width:6px;height:6px;border-radius:50%;background:'+r.color+';flex-shrink:0;"></span>'+
-        r.label +
+        '<span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + r.label + '</span>' +
+        (r.gruppo ? '<span style="font-size:0.7rem;color:var(--text-muted);flex-shrink:0;">' + r.gruppo + '</span>' : '') +
       '</div>'
     ).join('');
   };
@@ -15031,18 +15057,14 @@ const MentionPicker = (() => {
       return;
     }
 
-    const titolo = r.tipo === 'wiki' ? r.key
-                 : r.tipo === 'png'  ? r.key.slice(4)
-                 : r.tipo === 'luogo' ? r.key.slice(6)
-                 : r.key.slice(8);
+    const titolo = r.tipo === 'wiki' ? r.key : r.key.slice(r.key.indexOf(':') + 1);
     const icon = r.tipo === 'png' ? ''
                : r.tipo === 'luogo' ? ''
                : r.tipo === 'fazione' ? ''
                : '';
 
     document.execCommand('insertHTML', false,
-      '<span class="nc-wikilink" data-link="'+r.key+'" '+
-      'onclick="wikiNavigateLink(\''+r.key.replace(/'/g,"\\'")+'\')" '+
+      '<span class="nc-wikilink" data-link="'+r.key.replace(/"/g,'&quot;')+'" data-tipo="'+r.tipo+'" data-id="'+(r.id||'')+'" '+
       'style="cursor:pointer;color:color-mix(in srgb, ' + r.color + ' 50%, var(--text-primary));">@'+icon+titolo+'</span>&nbsp;'
     );
 
@@ -15436,7 +15458,7 @@ const SessioniLog = (() => {
             }).join('') +
           '</div>' : '') +
 
-          (s.recap ? '<div style="font-size:0.78rem;color:var(--text-secondary);border-top:1px solid var(--border);padding-top:8px;line-height:1.5;">'+s.recap.slice(0,200)+(s.recap.length>200?'...':'')+'</div>' : '') +
+          (s.recap ? '<div style="font-size:0.78rem;color:var(--text-secondary);border-top:1px solid var(--border);padding-top:8px;line-height:1.5;">'+Testo.esc(Testo.semplice(s.recap).slice(0,200))+(Testo.semplice(s.recap).length>200?'...':'')+'</div>' : '') +
 
         '</div>'
       );
@@ -15585,9 +15607,9 @@ const SessioniLog = (() => {
       '<p><strong>Data:</strong> '+(s.data||'')+'&nbsp;|&nbsp;<strong>Stato:</strong> '+(s.stato||'')+'&nbsp;|&nbsp;#sessione</p>' +
       (npcsLinks ? '<p><strong>PNG coinvolti:</strong> '+npcsLinks+'</p>' : '') +
       (beatsHtml ? '<h2>Beat</h2><ul>'+beatsHtml+'</ul>' : '') +
-      (s.notePrep ? '<h2>Note di prep</h2><p>'+s.notePrep+'</p>' : '') +
+      (s.notePrep ? '<h2>Note di prep</h2><div>'+Testo.html(s.notePrep)+'</div>' : '') +
       '<h2>Note live</h2><p></p>' +
-      (s.recap ? '<h2>Recap</h2><p>'+s.recap+'</p>' : '<h2>Recap</h2><p></p>');
+      (s.recap ? '<h2>Recap</h2><div>'+Testo.html(s.recap)+'</div>' : '<h2>Recap</h2><p></p>');
 
     const nota = {
       id: uid,
@@ -17418,7 +17440,7 @@ const WikiSections = (() => {
         // dentro un campo di testo lungo (Descrizione, Personalita, Storia...) restava
         // testo inerte, non cliccabile — funzionava solo nei pochi campi dedicati di tipo
         // 'mention'. Qui e' dove la maggior parte delle @menzioni viene scritta davvero.
-        content = '<div style="font-size:0.85rem;line-height:1.7;white-space:pre-wrap;">' + _parseLinks(_escHtml(String(val))) + '</div>';
+        content = '<div class="et-testo" style="font-size:0.85rem;line-height:1.7;">' + Testo.mostra(val) + '</div>';
       } else if (f.type === 'select') {
         const sc = STATUS_COLORS[val] || cfg.color;
         content = '<span style="padding:2px 10px;background:' + sc + '22;color:color-mix(in srgb, ' + sc + ' 50%, var(--text-primary));border:1px solid ' + sc + '44;border-radius:var(--radius-full);font-size:0.78rem;">' + _escHtml(String(val)) + '</span>';
@@ -17480,7 +17502,8 @@ const WikiSections = (() => {
         if (f.key === sottoKey) return;
         let testo;
         if (f.type === 'date_inworld') testo = (v && typeof v === 'object') ? _escHtml(Calendario.formatDate(Calendario.get(), v)) : '';
-        else if (f.type === 'mention' || f.type === 'mentions' || f.type === 'long' || f.type === 'secret') testo = _parseLinks(_escHtml(String(v)));
+        else if (f.type === 'long' || f.type === 'secret') testo = '<div class="et-testo">' + Testo.mostra(v) + '</div>';
+        else if (f.type === 'mention' || f.type === 'mentions') testo = _parseLinks(_escHtml(String(v)));
         else testo = _escHtml(String(v));
         if (!testo) return;
         if (f.type === 'secret') segreti.push([f.label, testo]);
@@ -17708,9 +17731,9 @@ const WikiSections = (() => {
         (isEdit ?
           '<div id="ws-editor-free" contenteditable="true" spellcheck="true" ' +
           'style="min-height:120px;padding:12px 16px;font-size:0.88rem;line-height:1.8;outline:none;color:var(--text-primary);" ' +
-          'data-placeholder="Note libere... [[Nome]] per collegare · @Nome per menzione · #tag">' + (item.note || '') + '</div>' :
+          'data-placeholder="Note libere... Collega (o @) per collegare PNG, PG e luoghi · #tag per etichettare">' + (item.note || '') + '</div>' :
           (item.note ?
-            '<div style="padding:12px 16px;font-size:0.88rem;line-height:1.8;color:var(--text-primary);">' + WikiSections._parseLinks(item.note) + '</div>' :
+            '<div class="et-testo" style="padding:12px 16px;font-size:0.88rem;line-height:1.8;color:var(--text-primary);">' + Testo.mostra(item.note) + '</div>' :
             '<div style="padding:12px 16px;font-size:0.82rem;color:var(--text-muted);font-style:italic;">Nessuna nota. Clicca Modifica per aggiungerne.</div>')
         ) +
       '</div>' +
@@ -17868,7 +17891,7 @@ const WikiSections = (() => {
     }
     let special = s.special ? String(s.special).split('\n').filter(l => l.trim())
       .map(l => '<div class="sb-action">' + _escHtml(l) + '</div>').join('') : '';
-    const talenti = s.talenti ? String(s.talenti).split('\n').filter(l => l.trim())
+    const talenti = s.talenti ? Testo.semplice(s.talenti).split('\n').map(l => l.replace(/^- /, '')).filter(l => l.trim())
       .map(l => '<div class="sb-action">' + _escHtml(l) + '</div>').join('') : '';
     if (s.abilitaSpeciale) {
       const [nome, resto] = String(s.abilitaSpeciale).split('(');
@@ -17907,14 +17930,14 @@ const WikiSections = (() => {
         row('Immunità / Resistenze', s.immunities) + row('Vulnerabilità', s.vulnerabilities) +
         row('Immunità alle condizioni', s.condImmunities) +
         row('Sensi', s.senses) + row('Linguaggi', s.languages) +
-        row('Equipaggiamento', s.gear) +
+        row('Equipaggiamento', Testo.semplice(s.gear).replace(/\n+/g, ', ')) +
         (talenti ? '<div class="sb-section-title">Talenti</div>' + talenti : '') +
         (special ? '<div class="sb-section-title">Tratti</div>' + special : '') +
         (actions ? '<div class="sb-section-title">Azioni</div>' + actions : '') +
         sect('Azioni bonus', s.azioniBonus) +
         sect('Reazioni', s.reazioni) +
         sect('Azioni leggendarie', s.azioniLeggendarie) +
-        (s.combatNotes ? '<div class="stat-block-divider"></div><div class="text-muted" style="font-size:0.8rem;white-space:pre-wrap;">' + _escHtml(s.combatNotes) + '</div>' : '') +
+        (s.combatNotes ? '<div class="stat-block-divider"></div><div class="text-muted et-testo" style="font-size:0.8rem;">' + Testo.mostra(s.combatNotes) + '</div>' : '') +
       '</div>' +
     '</div>';
   };
@@ -18818,8 +18841,8 @@ const SessCtx = (() => {
       ['Data', sess.data || '—'],
       ['Stato', sess.stato || '—'],
       ['Meteo', sess.meteo || '—'],
-      ['Obiettivi', sess.notePrep || '—'],
-      ['Ganci', sess.ganci || '—'],
+      ['Obiettivi', Testo.vuoto(sess.notePrep) ? '—' : '<div class="et-testo">' + Testo.mostra(sess.notePrep) + '</div>'],
+      ['Ganci', Testo.vuoto(sess.ganci) ? '—' : '<div class="et-testo">' + Testo.mostra(sess.ganci) + '</div>'],
       ['XP', sess.xp || '—'],
     ];
 
@@ -19116,7 +19139,7 @@ const Trame = (() => {
             '</div>' +
             '<div id="trama-corpo" contenteditable="true" ' +
             'style="min-height:200px;padding:14px;font-size:0.88rem;line-height:1.8;outline:none;" ' +
-            'data-placeholder="Corpo principale della trama — usa [[Link]], @Personaggio, #tag...">' + (t.corpo||'') + '</div>' +
+            'data-placeholder="Corpo principale della trama — Collega (o @) per collegare PNG, PG e luoghi, #tag per etichettare">' + (t.corpo||'') + '</div>' +
           '</div>' +
         '</div>' +
 
@@ -19234,7 +19257,7 @@ const renderDashboard = () => {
         '<div class="dn-lead" style="padding:0;">' +
           '<div class="dn-quando"><span class="dn-chip '+chip+'">'+sl+'</span><span class="num">Sessione '+(ultima.numero||'?')+(dataBella?' · '+dataBella:'')+'</span></div>' +
           '<h2>'+(ultima.titolo||('Sessione '+(ultima.numero||'')))+'</h2>' +
-          (ultima.recap?'<p>'+ultima.recap+'</p>':'<p style="color:var(--text-muted);">Nessun riassunto: aprila per scriverlo.</p>') +
+          (ultima.recap?'<div class="et-testo">'+Testo.mostra(ultima.recap)+'</div>':'<p style="color:var(--text-muted);">Nessun riassunto: aprila per scriverlo.</p>') +
           '<div class="dn-azioni-s">' +
             '<button class="btn dash-sess-open" data-id="'+ultima.id+'">Apri la scheda</button>' +
             (typeof PreviouslyOn!=='undefined'?'<button class="btn" onclick="PreviouslyOn.open()">Riassunto per il gruppo</button>':'') +
@@ -19253,7 +19276,7 @@ const renderDashboard = () => {
 
   var dashGanci = document.getElementById('dash-ganci');
   if (dashGanci) dashGanci.innerHTML = (ultima&&ultima.ganci)
-    ? '<div style="font-size:0.85rem;line-height:1.7;">'+String(ultima.ganci).replace(/\n/g,'<br>')+'</div>'
+    ? '<div class="et-testo" style="font-size:0.85rem;line-height:1.7;">'+Testo.mostra(ultima.ganci)+'</div>'
     : '<div style="color:var(--text-muted);font-size:0.82rem;">Nessun gancio.</div>';
 
   var dashQuest = document.getElementById('dash-quest-attive');
@@ -21791,7 +21814,7 @@ const CalendarioUI = (() => {
         (ev.tipo === 'deadline' ? '<span class="badge badge-warning">Deadline' + (ev.completata ? ' · completata' : '') + '</span>' : '') +
         '<span class="badge badge-muted">' + (ev.layer === 'mondo' ? 'Storia del mondo' : 'Cronaca campagna') + '</span>' +
       '</div>' +
-      (ev.descrizione ? '<div class="form-group"><label class="form-label">Descrizione</label><div style="font-size:0.88rem;white-space:pre-wrap;">' + _esc(ev.descrizione) + '</div></div>' : '') +
+      (ev.descrizione ? '<div class="form-group"><label class="form-label">Descrizione</label><div class="et-testo" style="font-size:0.88rem;">' + Testo.mostra(ev.descrizione) + '</div></div>' : '') +
       '<div class="form-group"><label class="form-label">Entità collegate</label>' + entitaHTML + '</div>';
 
     document.getElementById('cev-view-footer').style.display = '';
@@ -23341,6 +23364,7 @@ document.addEventListener('DOMContentLoaded', initMobileNav);
 <script src="js/cartografo-ritocchi.js"></script>
 <script src="js/cartografo.js"></script>
 <script src="js/scrittoio.js"></script>
+<script src="js/editor-testo.js"></script>
 <script src="js/calendario-config.js"></script>
 <script src="js/calendario-cielo.js"></script>
 

@@ -50,7 +50,7 @@ const VistaGiocatori = (() => {
     if (s.riassunti) {
       snap.sessioni = (c.sessioni_log || []).filter(x => x.stato === 'giocata' && x.recap)
         .sort((a, b) => (b.numero || 0) - (a.numero || 0)).slice(0, 10)
-        .map(x => ({ numero: x.numero, titolo: x.titolo || '', data: x.data || '', recap: String(x.recap).slice(0, 3000) }));
+        .map(x => ({ numero: x.numero, titolo: x.titolo || '', data: x.data || '', recap: Testo.semplice(x.recap).slice(0, 3000) }));
     }
     if (s.iniziativa && c.activeCombat?.combatants?.length) {
       // Stesso ordine e stesso turno del tracker del DM (prima a parita' d'iniziativa potevano non coincidere)
@@ -60,8 +60,8 @@ const VistaGiocatori = (() => {
       snap.iniziativa = { round: c.activeCombat.round || 1, turno: S ? S.indiceTurno(c.activeCombat, ord) : (c.activeCombat.turno || 0), ordine: ord.map(x => ({ nome: x.nome || x.name || '?', pg: x.tipo === 'pg', ko: (x.hp ?? 1) <= 0 })) };
     }
     const luoghi = (c.locations || []).filter(l => s.luoghi.includes(l.id));
-    snap.luoghi = luoghi.map(l => ({ nome: _nome(l), tipo: l.tipo || '', descrizione: String(l.atmosfera || l.description || '').slice(0, 2000), immagine: _immagine(l.immagine) }));
-    snap.png = (c.npcs || []).filter(n => s.png.includes(n.id)).map(n => ({ nome: _nome(n), ruolo: n.ruolo || n.job || '', razza: n.razza || n.race || '', aspetto: String(n.apparenza || '').slice(0, 1500), immagine: _immagine(n.immagine) }));
+    snap.luoghi = luoghi.map(l => ({ nome: _nome(l), tipo: l.tipo || '', descrizione: Testo.semplice(l.atmosfera || l.description || '').slice(0, 2000), immagine: _immagine(l.immagine) }));
+    snap.png = (c.npcs || []).filter(n => s.png.includes(n.id)).map(n => ({ nome: _nome(n), ruolo: n.ruolo || n.job || '', razza: n.razza || n.race || '', aspetto: Testo.semplice(n.apparenza || '').slice(0, 1500), immagine: _immagine(n.immagine) }));
     snap.documenti = (c.wiki?.lore || []).filter(n => s.lore.includes(n.id)).map(n => ({ titolo: n.titolo || '', html: _testoSicuro(n.contenuto).slice(0, 20000) }));
     const nomiLuoghi = new Set(luoghi.map(l => l.id));
     snap.mappe = (c.mappe || []).filter(m => s.mappe.includes(m.id) && _immagine(m.immagine)).map(m => ({

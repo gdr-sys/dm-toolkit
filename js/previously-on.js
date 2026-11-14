@@ -53,7 +53,7 @@ const PreviouslyOn = (() => {
 
     let core;
     if (s.recap && s.recap.trim()) {
-      core = s.recap.trim();
+      core = Testo.semplice(s.recap).trim();
     } else if (beats.length) {
       const ordered = mainBeat ? [mainBeat, ...beats.filter(b => b !== mainBeat)] : beats;
       core = 'Il party ha vissuto ' + ordered.map(b => b.titolo || _tipoLabel(b.tipo)).join(', ') + '.';

@@ -59,14 +59,21 @@ const QuickView = (() => {
   const _renderFields = (cfg, item) => {
     const rows = (cfg.fields || []).map(f => {
       let val = item[f.key];
+      let ricco = null;
       if (val === undefined || val === null || val === '') return '';
       if (f.type === 'date_inworld') {
         if (!val || typeof val !== 'object') return '';
         val = [val.giorno, val.mese, val.anno].filter(v => v !== undefined && v !== null).join('/');
         if (!val) return '';
       } else if (f.type === 'long' || f.type === 'secret') {
-        val = _plainText(val);
-        if (!val) return '';
+        // Testi lunghi scritti con l'editor: si vedono con grassetti, elenchi e collegamenti
+        if (typeof Testo !== 'undefined') {
+          if (Testo.vuoto(val)) return '';
+          ricco = Testo.mostra(val);
+        } else {
+          val = _plainText(val);
+          if (!val) return '';
+        }
       } else if (Array.isArray(val)) {
         val = val.join(', ');
         if (!val) return '';
@@ -77,7 +84,9 @@ const QuickView = (() => {
       return (
         '<div class="' + (isSecret ? 'wiki-callout wiki-callout-secret' : '') + '" style="margin-bottom:10px;' + (isSecret ? 'padding:8px 10px;border-radius:var(--radius-sm);' : '') + '">' +
           '<div style="font-size:0.68rem;font-family:var(--font-display);text-transform:uppercase;letter-spacing:0.05em;color:var(--text-muted);margin-bottom:2px;">' + _escHtml(f.label) + '</div>' +
-          '<div style="font-size:0.85rem;line-height:1.5;color:var(--text-secondary);white-space:pre-wrap;">' + _escHtml(val) + '</div>' +
+          (ricco !== null
+            ? '<div class="et-testo" style="font-size:0.85rem;line-height:1.5;color:var(--text-secondary);">' + ricco + '</div>'
+            : '<div style="font-size:0.85rem;line-height:1.5;color:var(--text-secondary);white-space:pre-wrap;">' + _escHtml(val) + '</div>') +
         '</div>'
       );
     }).join('');

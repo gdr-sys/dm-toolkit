@@ -779,3 +779,25 @@ button[onclick*="').value='';Compendio.onSearch("] { min-width: 32px; min-height
 
 /* Calendario: anno bisestile */
 .cal-bis { font-size: 0.7rem; font-weight: 600; color: var(--accent-text); padding: 1px 8px; border-radius: 999px; background: var(--bg-tertiary); margin-left: 6px; vertical-align: middle; }
+
+/* ── Titoli nei testi scritti (note, schede, descrizioni) ──
+   Sempre un po' di colore, anche nelle tavolozze Grigio e Nero (lì l'accento è quasi
+   grigio): si usa la tinta d'accento con una saturazione minima, e per Grigio e Nero
+   una tinta calda fissa, come il vino del logo. Luminosità scelte per il contrasto
+   in giorno e in notte. */
+:root { --tit-h: var(--ha); --tit-c: max(var(--ca), .1); }
+[data-colore="grafite"], [data-colore="nero"] { --tit-h: 32; --tit-c: .12; }
+:root {
+  --titolo:   oklch(43% var(--tit-c) var(--tit-h));
+  --titolo-2: oklch(49% calc(var(--tit-c) * .85) var(--tit-h));
+}
+[data-theme="dark"] {
+  --titolo:   oklch(81% calc(var(--tit-c) * .95) var(--tit-h));
+  --titolo-2: oklch(75% calc(var(--tit-c) * .8) var(--tit-h));
+}
+[contenteditable] h1, .et-testo h1,
+[contenteditable] h2, .et-testo h2 { color: var(--titolo) !important; font-family: var(--font-titoli); font-weight: 400; letter-spacing: 0.01em; }
+[contenteditable] h1, .et-testo h1 { font-size: 1.45rem; border-bottom-color: color-mix(in oklch, var(--titolo) 35%, transparent); }
+[contenteditable] h2, .et-testo h2 { font-size: 1.22rem; margin: 0.7em 0 0.25em; }
+[contenteditable] h3, .et-testo h3 { color: var(--titolo-2) !important; font-family: var(--font-body); font-weight: 700; font-size: 1rem; margin: 0.55em 0 0.2em; }
+.mz-sez h3, .mz-dettagli dt { color: var(--titolo); }

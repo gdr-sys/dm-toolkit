@@ -72,7 +72,7 @@ const ProssimeScadenze = (() => {
           return '<div class="sc-t sc-cw' + (i === 0 ? ' sc-larga' : '') + (g <= 7 ? ' sc-urgente' : '') + '" data-t="lava" role="button" tabindex="0" onclick="ProssimeScadenze.openItem(\'' + it.id + '\')">' +
             '<span class="sc-et">Scadenza' + (scaduta ? ' · ' + _label(g).toLowerCase() : '') + '</span>' +
             '<h3 class="sc-h">' + _esc(it.titolo || 'Senza titolo') + '</h3>' +
-            (it.conseguenza ? '<small class="sc-s">' + (scaduta ? '<strong>È successo:</strong> ' : 'Se scade: ') + _esc(it.conseguenza) + '</small>' : '') +
+            (it.conseguenza ? '<small class="sc-s">' + (scaduta ? '<strong>È successo:</strong> ' : 'Se scade: ') + _esc(Testo.semplice(it.conseguenza)) + '</small>' : '') +
             (scaduta ? '' : '<div class="sc-w sc-giorni" aria-label="' + _label(g) + '">' + (g === 1 ? '1' : g) + '<em>' + (g === 1 ? 'giorno' : 'giorni') + '</em></div>') +
           '</div>';
         }).join('')
