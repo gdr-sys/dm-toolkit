@@ -178,7 +178,7 @@ const CalendarioConfig = (() => {
         giorni: Math.max(1, _int(row.querySelector('.ccfg-m-giorni')?.value, 30)),
       };
     });
-    if (g('ccfg-bis')) _draft.bisestile = { attivo: g('ccfg-bis').checked, ogni: Math.max(2, _int(g('ccfg-bis-ogni').value, 4)), mese: _int(g('ccfg-bis-mese').value, 0), giorni: Math.max(1, _int(g('ccfg-bis-giorni').value, 1)) };
+    if (g('ccfg-bis')) _draft.bisestile = { ..._draft.bisestile, da: _draft.bisestile.attivo ? (_draft.bisestile.da ?? Calendario.get()?.anno ?? 0) : (Calendario.get()?.anno ?? 0), attivo: g('ccfg-bis').checked, ogni: Math.max(2, _int(g('ccfg-bis-ogni').value, 4)), mese: _int(g('ccfg-bis-mese').value, 0), giorni: Math.max(1, _int(g('ccfg-bis-giorni').value, 1)) };
     document.querySelectorAll('#ccfg-ere-list .ccfg-era-row').forEach(row => {
       const i = _int(row.dataset.i, -1);
       if (i < 0 || !_draft.ere[i]) return;

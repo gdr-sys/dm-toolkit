@@ -21153,12 +21153,13 @@ const Calendario = (() => {
   const _bis = (cal) => {
     const b = cal?.bisestile;
     if (!b || !b.attivo || !(b.ogni >= 2) || !cal.mesi?.length) return null;
-    return { ogni: Math.round(b.ogni), mese: Math.max(0, Math.min(b.mese || 0, cal.mesi.length - 1)), giorni: Math.max(1, Math.round(b.giorni || 1)) };
+    return { ogni: Math.round(b.ogni), mese: Math.max(0, Math.min(b.mese || 0, cal.mesi.length - 1)), giorni: Math.max(1, Math.round(b.giorni || 1)), da: Math.round(b.da || 0) };
   };
   const isBisestile = (cal, anno) => { const b = _bis(cal); return !!b && (((anno || 0) % b.ogni) + b.ogni) % b.ogni === 0; };
   const giorniMese = (cal, m, anno) => { const b = _bis(cal); return (cal?.mesi?.[m]?.giorni || 30) + (b && b.mese === m && isBisestile(cal, anno) ? b.giorni : 0); };
-  // Primo giorno assoluto di un anno: gli anni bisestili prima di questo aggiungono i loro giorni
-  const _inizioAnno = (cal, anno) => { const b = _bis(cal); return anno * daysPerYear(cal) + (b ? Math.ceil(anno / b.ogni) * b.giorni : 0); };
+  // Primo giorno assoluto di un anno: gli anni bisestili prima di questo aggiungono i loro giorni.
+  // Si contano dall'anno in cui sono stati accesi (b.da): le date di prima non si spostano, e oggi resta oggi.
+  const _inizioAnno = (cal, anno) => { const b = _bis(cal); return anno * daysPerYear(cal) + (b ? (Math.ceil(anno / b.ogni) - Math.ceil(b.da / b.ogni)) * b.giorni : 0); };
   // Che giorno dell'anno e' un giorno assoluto (serve alle stagioni)
   const giornoAnno = (cal, abs) => {
     const dpy = daysPerYear(cal) || 360, b = _bis(cal);
