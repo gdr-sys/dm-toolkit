@@ -2914,6 +2914,11 @@ const Debug = (() => {
    STORAGE.JS — Gestione dati localStorage + debug
    ============================================================ */
 
+// Le schede SRD 2024 (mostri, oggetti magici) segnano corsivo e grassetto con gli asterischi
+// ("*Tiro per colpire in mischia:* +4", "**Focus elementale.**"): qui diventano corsivo e grassetto veri.
+// Va usata su testo gia' sicuro (escapato o fidato), perche' aggiunge solo <em> e <strong>.
+const testoSRD = (s) => String(s ?? '').replace(/\*\*([^*\n]+?)\*\*/g, '<strong>$1</strong>').replace(/\*([^*\n]+?)\*/g, '<em>$1</em>');
+
 const Storage = (() => {
   const PREFIX = 'dmtoolkit_';
 
@@ -6174,7 +6179,7 @@ const Sessione = (() => {
           ${riga('Resistenze', m.resistenze)}${riga('Immunità ai danni', m.immunita_danni)}${riga('Vulnerabilità', m.vulnerabilita)}
           ${riga('Immunità alle condizioni', m.immunita_condizione)}${riga('Sensi', m.sensi)}${riga('Linguaggi', m.lingue)}
           ${m.grado_sfida ? `<div class="stat-row"><strong>GS</strong> <span>${m.grado_sfida.raw||m.grado_sfida.valore}</span></div>` : ''}
-          ${(m.tratti || []).length ? `<div class="sb-section-title" style="margin-top:8px;">Tratti</div>${m.tratti.map(a => `<div class="sb-action"><strong>${e(a.nome || '')}.</strong> <span class="text-secondary">${e(a.descrizione || '')}</span></div>`).join('')}` : ''}
+          ${(m.tratti || []).length ? `<div class="sb-section-title" style="margin-top:8px;">Tratti</div>${m.tratti.map(a => `<div class="sb-action"><strong>${e(a.nome || '')}.</strong> <span class="text-secondary">${testoSRD(e(a.descrizione || ''))}</span></div>`).join('')}` : ''}
           <div class="stat-block-divider"></div>
           <div style="font-size:0.7rem;color:var(--text-muted);margin-bottom:6px;">Tocca un'azione con i dadi per tirarli</div>
           <div class="sb-section-title">Azioni</div>
@@ -6437,7 +6442,7 @@ const Sessione = (() => {
     const e = _escCombat, f = _formulaDadiCombat(desc), b = f ? _bonusColpoCombat(desc) : null;
     return `<div class="sb-action" style="cursor:${f ? 'pointer' : 'default'};"
       ${f ? `data-f="${e(f)}" data-n="${e(nome || '')}" ${b !== null ? `data-a="${b}"` : ''} onclick="Sessione._rollAction(this.dataset.f, this.dataset.n, this, this.dataset.a)"` : ''}>
-      <strong>${e(nome || '')}.</strong> <span class="text-secondary">${e(desc || '')}</span>
+      <strong>${e(nome || '')}.</strong> <span class="text-secondary">${testoSRD(e(desc || ''))}</span>
       ${f ? `<span class="badge badge-muted" style="margin-left:4px;font-size:0.6rem;">${e(_badgeAzioneCombat(f, b))}</span>` : ''}
     </div>`;
   };
@@ -7397,14 +7402,14 @@ const Compendio = (() => {
     const renderAzioni = (lista, titolo) => {
       if (!lista || !lista.length) return '';
       return `<div class="sb-section-title">${titolo}</div>` +
-        lista.map(a => `<div class="sb-action"><strong>${a.nome}.</strong> <span class="text-secondary">${a.descrizione || ''}</span></div>`).join('');
+        lista.map(a => `<div class="sb-action"><strong>${a.nome}.</strong> <span class="text-secondary">${testoSRD(a.descrizione || '')}</span></div>`).join('');
     };
 
     const renderAzioniLegg = (al) => {
       if (!al || !al.azioni || !al.azioni.length) return '';
       return `<div class="sb-section-title">Azioni Leggendarie</div>
-        <div class="sb-action text-muted text-sm" style="margin-bottom:6px;">${al.descrizione_utilizzi || ''}</div>` +
-        al.azioni.map(a => `<div class="sb-action"><strong>${a.nome}.</strong> <span class="text-secondary">${a.descrizione || ''}</span></div>`).join('');
+        <div class="sb-action text-muted text-sm" style="margin-bottom:6px;">${testoSRD(al.descrizione_utilizzi || '')}</div>` +
+        al.azioni.map(a => `<div class="sb-action"><strong>${a.nome}.</strong> <span class="text-secondary">${testoSRD(a.descrizione || '')}</span></div>`).join('');
     };
 
     const immunLine = (label, arr) => arr && arr.length ? `<div class="stat-row"><strong>${label}</strong> <span>${arr.join(', ')}</span></div>` : '';
@@ -7440,7 +7445,7 @@ const Compendio = (() => {
         <div class="stat-row"><strong>Grado di Sfida</strong> <span>${gs.raw || gsDisplay(m)}</span></div>
         <div class="stat-row"><strong>Bonus Competenza</strong> <span>+${m.bonus_competenza || '?'}</span></div>
         <div class="stat-block-divider"></div>
-        ${(m.tratti || []).map(t => `<div class="sb-action"><strong>${t.nome}.</strong> <span class="text-secondary">${t.descrizione || ''}</span></div>`).join('')}
+        ${(m.tratti || []).map(t => `<div class="sb-action"><strong>${t.nome}.</strong> <span class="text-secondary">${testoSRD(t.descrizione || '')}</span></div>`).join('')}
         ${renderAzioni(m.azioni, 'Azioni')}
         ${renderAzioni(m.azioni_bonus, 'Azioni Bonus')}
         ${renderAzioni(m.reazioni, 'Reazioni')}
@@ -7479,7 +7484,7 @@ const Compendio = (() => {
           <span class="text-sm text-muted">${i.tipo || ''}</span>
           ${i.richiede_sintonia ? '<span class="badge badge-muted">richiede sintonia</span>' : ''}
         </div>
-        <div class="text-sm" style="line-height:1.7;white-space:pre-wrap;">${i.descrizione || '—'}</div>
+        <div class="text-sm" style="line-height:1.7;white-space:pre-wrap;">${testoSRD(i.descrizione || '—')}</div>
         ${sezioniHTML}
       </div>`;
 
@@ -11973,7 +11978,7 @@ const GlobalSearch = (() => {
         { key:'spells',      label:'Incantesimo',     open:'openSpell' },
       ].forEach(({ key, label, open }) => {
         (cd[key]||[]).slice(0,500).forEach(item => {
-          const desc = (item.descrizione||'').replace(/<[^>]+>/g,'');
+          const desc = (item.descrizione||'').replace(/<[^>]+>/g,'').replace(/\*/g,'');
           const haystack = [item.nome, item.tipo, item.scuola, desc].filter(Boolean).join(' ').toLowerCase();
           if (haystack.includes(query)) {
             let sub = item.tipo || item.scuola || '';
