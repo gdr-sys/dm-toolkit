@@ -236,7 +236,7 @@ const TurniFazione = (() => {
       const cs = ChiusuraSessione.salva;
       ChiusuraSessione.salva = function () {
         const r = cs.apply(ChiusuraSessione, arguments);
-        setTimeout(() => { if (_fazioni().length && document.getElementById('modal-chiusura-sessione')?.classList.contains('hidden')) apri(); }, 700);
+        setTimeout(() => { if (_fazioni().length && document.getElementById('modal-chiusura-sessione')?.style.display === 'none') apri(); }, 700);
         return r;
       };
     }

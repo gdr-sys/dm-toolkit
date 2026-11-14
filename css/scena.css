@@ -801,3 +801,27 @@ button[onclick*="').value='';Compendio.onSearch("] { min-width: 32px; min-height
 [contenteditable] h2, .et-testo h2 { font-size: 1.22rem; margin: 0.7em 0 0.25em; }
 [contenteditable] h3, .et-testo h3 { color: var(--titolo-2) !important; font-family: var(--font-body); font-weight: 700; font-size: 1rem; margin: 0.55em 0 0.2em; }
 .mz-sez h3, .mz-dettagli dt { color: var(--titolo); }
+
+/* ── Ko-fi dopo la chiusura della sessione (js/supporto.js): riquadro discreto, non un modale ── */
+#supporto-riquadro {
+  position: fixed;
+  right: 16px;
+  bottom: calc(80px + env(safe-area-inset-bottom, 0px));
+  z-index: 9000;
+  width: min(360px, calc(100vw - 32px));
+  padding: 14px 16px;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg, 14px);
+  box-shadow: var(--shadow-lg);
+  animation: supporto-entra 0.25s ease-out;
+}
+#supporto-riquadro .supporto-testa { display: flex; align-items: center; gap: 8px; }
+#supporto-riquadro .supporto-testa strong { font-size: 0.95rem; }
+#supporto-riquadro .supporto-icona { color: var(--accent-text); display: inline-flex; }
+#supporto-riquadro .supporto-x { margin-left: auto; }
+#supporto-riquadro p { margin: 6px 0 12px; font-size: 0.86rem; line-height: 1.5; color: var(--text-secondary); }
+#supporto-riquadro .supporto-azioni { display: flex; gap: 8px; flex-wrap: wrap; }
+@keyframes supporto-entra { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { #supporto-riquadro { animation: none; } }
