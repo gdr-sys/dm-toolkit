@@ -37,6 +37,10 @@ Per vederla in azione: apri l'app e, nella Home vuota, scegli **"Prova con una c
     <td><img src="scopri/img/app-tiro.jpg" alt="Una tabella casuale tirata nella pagina Generatori"><br><b>Generatori</b>: le tue tabelle casuali, a un clic</td>
     <td><img src="docs/img/scrittoio.jpg" alt="Uno stemma creato nello Scrittoio"><br><b>Scrittoio</b>: stemmi e documenti per i giocatori</td>
   </tr>
+  <tr>
+    <td><img src="docs/img/esagoni.jpg" alt="Un regno con la griglia di esagoni, gli esagoni esplorati e il segnalino del gruppo"><br><b>Esagoni</b>: esplorazione esagono per esagono, con i tempi di viaggio</td>
+    <td><img src="docs/img/calendario.jpg" alt="Il calendario con le fasi della luna, il meteo di ogni giorno e un mercato che si ripete ogni mese"><br><b>Calendario</b>: lune, stagioni e meteo legati alla data</td>
+  </tr>
 </table>
 
 ---
@@ -47,12 +51,12 @@ Per vederla in azione: apri l'app e, nella Home vuota, scegli **"Prova con una c
 |---|---|
 | Wiki | Editor completo, [[collegamenti]], @menzioni, tag, grafo, modelli, import da foglio di calcolo |
 | Mondo | PNG, Luoghi, Fazioni, Quest, PG, Trame, Incontri |
-| Mappe | Mappe interattive con segnaposto, mappe annidate, misura distanze, zoom con due dita |
-| Cartografo | Genera mappe di regni, città, villaggi, caverne, dungeon ed edifici e le mette nelle tue mappe |
-| Scrittoio | Stemmi per fazioni e luoghi; lettere, taglie, editti, avvisi e mappe del tesoro scritti con i nomi della campagna |
-| Calendario | Calendario in-world personalizzabile, eventi, scadenze, timeline |
+| Mappe | Mappe interattive con segnaposto, mappe annidate, percorsi e tempi di viaggio, esagoni ed esplorazione, zoom con due dita |
+| Cartografo | Genera regni (con i confini tra i regni), città, villaggi, caverne, dungeon su più livelli ed edifici; ritocchi, tavolo virtuale, stampa in scala |
+| Scrittoio | Stemmi con la blasonatura; lettere, taglie, editti, avvisi, gazzette, contratti, menu e mappe del tesoro, scritti con i nomi della campagna o da te |
+| Calendario | Calendario in-world personalizzabile con lune, stagioni, meteo, anni bisestili ed ere; eventi anche ricorrenti, scadenze, timeline |
 | Sessioni | Combat tracker, scene planner, diario delle sessioni, clock |
-| Generatori | 22 generatori pronti + **le tue tabelle casuali** |
+| Generatori | 22 generatori pronti + **le tue tabelle casuali**, con tiri multipli e variabili |
 | Compendio | SRD 5.1 e 5.2.1, homebrew |
 | Schermo del DM | Blocchi personalizzabili, trascinabili |
 | Sincronizzazione | Google Drive per i dati, Firebase come segnale in tempo reale |
@@ -105,7 +109,10 @@ Carica un'immagine come mappa interattiva. Puoi spostarla trascinando e ingrandi
 
 - **Segnaposto** collegabili a PNG, luoghi, fazioni o note; le coordinate sono in percentuale, quindi restano giuste su ogni schermo.
 - **Mappe annidate** — un segnaposto può aprire un'altra mappa (regione → città → taverna), con il pulsante per tornare indietro.
-- **Distanze e percorsi** — con **Percorso** clicchi una tappa dopo l'altra, segnaposto o punti qualsiasi della mappa: la linea si disegna sulla mappa con i km di ogni tratto e il totale. In **Tempi di viaggio** ogni tratto ha il suo terreno (strada, colline, montagna, mare aperto…): sulla terraferma si va a piedi o a cavallo, in mare in barca o in nave, con il passo lento, normale o veloce. I tratti in mare si vedono azzurri sulla mappa. Una giornata di viaggio è di 8 ore.
+- **Distanze e percorsi** — con **Percorso** clicchi una tappa dopo l'altra, segnaposto o punti qualsiasi della mappa: la linea si disegna sulla mappa con i km di ogni tratto e il totale. In **Tempi di viaggio** ogni tratto ha il suo terreno (strada, colline, montagna, mare aperto…): sulla terraferma si va a piedi o a cavallo, in mare in barca o in nave, con il passo lento, normale o veloce. I tratti in mare si vedono azzurri sulla mappa. Una giornata di viaggio è di 8 ore, e **Fai passare il viaggio nel Calendario** fa avanzare la data e l'ora della campagna.
+- **Esagoni ed esplorazione** — con **Esagoni** la mappa si copre di una griglia esagonale, che si accende e si spegne per ogni mappa. Tocchi un esagono per segnarlo come esplorato, per spostarci il gruppo o per scriverci una nota che vedi solo tu. Spostando il gruppo l'app calcola il tempo di viaggio secondo il terreno e, se vuoi, fa avanzare il Calendario. La griglia ha il lato in km, si mette con il lato o con la punta in alto, mostra i numeri degli esagoni (0101, 0102…) e si sposta per allinearla a una griglia già disegnata sulla mappa.
+
+![Un regno con la griglia di esagoni: gli esagoni esplorati sono velati di giallo e il segnalino del gruppo sta nel suo esagono](docs/img/esagoni.jpg)
 
 ### Cartografo
 
@@ -120,6 +127,12 @@ Crea una mappa da zero, senza caricare nulla: **regno** (isola, continente, arci
 - **Metti nelle mappe** la porta nella pagina Mappa con la scala già impostata e i luoghi segnati dai pin con le loro note. A richiesta crea anche le schede Luogo nella Wiki.
 - **Genera la sua mappa**: clicca un pin e crea la mappa di quel luogo, già collegata. La città nata da un regno eredita ciò che lì si vede, come il mare e il fiume. Così si scende dal regno alla città fino alla locanda, e si torna indietro.
 - **Scarica PNG o SVG** per stamparla o usarla altrove. Il codice della mappa, con le stesse opzioni, ridà la stessa mappa.
+- **Ritocca** — dopo averla generata, rinomini o nascondi ogni nome scritto sulla mappa e aggiungi scritte tue toccando il punto giusto. I segnaposto seguono i nomi nuovi, e i ritocchi restano anche cambiando colori o opzioni.
+- **Confini tra i regni** — da 2 a 6 regni, ognuno con la sua capitale: i confini seguono creste e fiumi, ogni regno ha il suo nome sulla mappa e, a scelta, una tinta leggera.
+- **Città** con mura, castello, fiume, mare, **cimitero** fuori dalle porte (o camposanto dentro le mura) e **baraccopoli** addossata alle mura.
+- **Dungeon su più livelli** — fino a 3, uno accanto all'altro, con le scale che scendono al livello dopo.
+- **Tavolo virtuale** — dungeon e case si esportano in Universal VTT (.dd2vtt) con muri e porte già pronti, per Foundry, Roll20, Fantasy Grounds e gli altri tavoli virtuali.
+- **Stampa in scala** — dungeon e case su fogli A4 numerati da unire, un quadretto = 1,5 m = 2,5 cm, la misura delle miniature, con la griglia di combattimento a scelta. I fogli vuoti non si stampano.
 
 I generatori sono scritti apposta per il toolkit e funzionano senza servizi esterni. Senza Google Drive collegato, l'immagine messa nelle mappe resta solo sul dispositivo.
 
@@ -127,16 +140,22 @@ I generatori sono scritti apposta per il toolkit e funzionano senza servizi este
 
 ![Lo Scrittoio crea stemmi, poi una lettera, una taglia, un editto e una mappa del tesoro con i nomi della campagna](docs/img/demo-scrittoio.gif)
 
-- **Stemmi** con forma, colori, simbolo, corona, mantello e motto. Assegnato a una Fazione o a un Luogo, diventa l'immagine della sua scheda; quello di una Fazione diventa anche il sigillo dei suoi documenti. Se hai già uno stemma tuo, caricalo come immagine nella scheda della Fazione: finisce su editti e lettere.
-- **Documenti da consegnare ai giocatori**: lettere sigillate, taglie, editti, avvisi da bacheca e mappe del tesoro. Il testo nasce con i nomi di PNG, luoghi e fazioni della campagna e si può sempre modificare, così come la carta e il suo stato.
-- **Salva nella Wiki** lo mette tra le schede Lore, da cui la **Vista giocatori** può condividerlo. L'immagine si salva nella scheda solo con Google Drive collegato; altrimenti resta il testo e puoi scaricare il PNG.
+- **Stemmi** con forma, colori, simbolo, corona, mantello e motto, e sotto la **blasonatura** in araldica italiana ("D'azzurro, al leone d'oro"), scritta da sola e modificabile. Assegnato a una Fazione o a un Luogo, diventa l'immagine della sua scheda; quello di una Fazione diventa anche il sigillo dei suoi documenti. Se hai già uno stemma tuo, caricalo come immagine nella scheda della Fazione: finisce su editti e lettere.
+- **Documenti da consegnare ai giocatori**: lettere sigillate, taglie, editti, avvisi da bacheca, mappe del tesoro, **gazzette** su due colonne, **contratti** con clausole numerate e due firme, **menu della locanda** con i prezzi. Il testo nasce con i nomi di PNG, luoghi e fazioni della campagna e si può sempre modificare, così come la carta, il suo stato e gli **effetti** (sangue, vino, cera di candela, foglio bagnato).
+- **Foglio bianco** per scrivere quello che vuoi, e **Riapri** per modificare un documento salvato nella Wiki o lo stemma di una Fazione.
+- **Mostra ai giocatori** apre il documento a schermo intero, da girare verso il tavolo.
+
+![Una gazzetta nello Scrittoio, con il riquadro In breve e le macchie di vino](docs/img/scrittoio-gazzetta.jpg)
+- **Salva nella Wiki** lo mette tra le schede Lore e, con una spunta, anche nella **Vista giocatori**. L'immagine si salva nella scheda solo con Google Drive collegato; altrimenti resta il testo e puoi scaricare il PNG.
 
 ### Calendario e Timeline
 
 ![Il calendario della campagna di esempio](docs/img/calendario.jpg)
 
-- Calendario in-world con preset (Forgotten Realms, Greyhawk…) o **completamente personalizzato**: mesi, giorni della settimana, festività, data e ora di oggi.
-- **Eventi e scadenze** con promemoria; le scadenze vicine compaiono nella Dashboard.
+- Calendario in-world con preset (Forgotten Realms, Greyhawk…) o **completamente personalizzato**: mesi, giorni della settimana, festività, data e ora di oggi, **anni bisestili** ed **ere** ("Anno 12, Seconda Era").
+- **Lune, stagioni e meteo** legati alla data: una o più lune con le loro fasi, le stagioni, e il meteo di ogni giorno secondo il clima scelto, sempre uguale per la stessa data e con cambi graduali. Si vedono nella griglia del mese, nel giorno aperto e nel blocco Meteo dello Schermo del DM, e ognuno si accende e si spegne.
+- **Il tempo passa** con i pulsanti dello Schermo del DM (minuti, ore, giorni, **riposo breve** e **riposo lungo**) e con i viaggi della pagina Mappe.
+- **Eventi e scadenze** con promemoria; le scadenze vicine compaiono nella Dashboard. Un evento può **ripetersi** ogni anno (feste, anniversari) o ogni mese (mercati, tributi).
 - **Conseguenze programmate** — una scadenza può dire cosa succede se il party non interviene: prima della data compare come "Se scade…", dopo come "È successo…". Anche un clock pieno mostra la sua conseguenza.
 - **Timeline** di eventi e sessioni: gli eventi vicini nel tempo vanno su righe diverse, così i nomi non si sovrappongono mai. Lo zoom allarga solo il tempo, le scritte restano leggibili.
 
@@ -173,9 +192,12 @@ I generatori sono scritti apposta per il toolkit e funzionano senza servizi este
 
 - Dado d4, d6, d8, d10, d12, d20, d100 oppure **pesi liberi**.
 - Una voce per riga: con l'intervallo davanti (`1-3 Goblin`), solo il testo (le voci si dividono il dado), o con il peso (`3 Goblin`, esce tre volte più spesso).
-- Dentro una voce, `{2d6+1}` tira dei dadi e `[[Altra tabella]]` tira su un'altra delle tue tabelle.
+- Dentro una voce, `{2d6+1}` tira dei dadi, `[[Altra tabella]]` tira su un'altra delle tue tabelle e `{PNG}`, `{Luogo}`, `{Fazione}`, `{PG}` pescano un nome della tua campagna.
+- **Variabili**: una riga come `$capo = {PNG}` si tira una volta sola, e ogni `$capo` nelle voci diventa lo stesso nome.
+- **Più tiri insieme**, da 1 a 10, senza doppioni (o con, se la tabella lo chiede).
+- **Nelle note** mette il risultato nelle Note di sessione.
 - L'anteprima mostra gli intervalli e avvisa di numeri scoperti, doppi o tabelle richiamate che non esistono.
-- **Import da CSV** (anche da Excel), sempre rivisto prima di salvare.
+- **Import da CSV** (anche da Excel, Google Fogli e Numbers), sempre rivisto prima di salvare, con la guida **Come fare il file** e un file d'esempio da scaricare.
 - Ogni tabella può avere una **categoria**: compare anche nella scheda dei generatori corrispondente (per esempio gli incontri in "Viaggio & Incontri").
 - **Collegabili ai Luoghi**: "Incontri nella Foresta di Velmor" compare nella scheda della foresta, con il suo pulsante Tira.
 
@@ -256,7 +278,7 @@ Un account anonimo si può trasformare in account Google in qualsiasi momento se
 - **Ripristina da Drive** elenca i backup con data e peso, così si riconoscono subito quelli vuoti.
 - Senza Drive collegato, Firebase porta i dati della campagna, ma **mai le immagini e i file pesanti**: quelli restano sul dispositivo e passano su Drive appena lo colleghi. Così Firebase resta leggero e dentro la quota gratuita.
 
-**Collaborazione in tempo reale.** Ogni campagna ha un codice invito: un co-autore lo inserisce e accede alla stessa campagna. Le modifiche partono 2 secondi dopo ogni cambiamento; le modifiche dei due lati vengono unite voce per voce, senza sovrascriversi. Cancellare una campagna vale per tutti i dispositivi, anche quelli offline in quel momento. La presenza online è mostrata nella barra in alto.
+**Collaborazione in tempo reale.** Chi ha creato la campagna copia un invito (es. `ABC234-XYZ567`) e lo manda a un altro master, che entra con il suo account Google e vede e modifica la stessa campagna, anche se i dati stanno sul Drive di chi l'ha creata. Gli inviti si possono annullare, e ogni co-autore si può togliere. Le modifiche partono 2 secondi dopo ogni cambiamento; le modifiche dei due lati vengono unite voce per voce, senza sovrascriversi. Cancellare una campagna vale per tutti i dispositivi, anche quelli offline in quel momento. La presenza online è mostrata nella barra in alto.
 
 ---
 
