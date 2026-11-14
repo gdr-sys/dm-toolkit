@@ -67,7 +67,7 @@ const CalendarioCielo = (() => {
   const stagione = (cal, abs) => {
     const s = impost(cal).stagioni;
     const anno = Calendario.daysPerYear(cal) || 360;
-    const giornoAnno = ((abs % anno) + anno) % anno;
+    const giornoAnno = Calendario.giornoAnno ? Calendario.giornoAnno(cal, abs) : ((abs % anno) + anno) % anno;
     const inizioDi = (st) => (cal.mesi || []).slice(0, Math.max(0, Math.min(st.mese || 0, (cal.mesi || []).length - 1))).reduce((t, m) => t + (m.giorni || 30), 0) + ((st.giorno || 1) - 1);
     const ordinate = s.map((st, i) => ({ ...st, i, d: inizioDi(st) })).sort((a, b) => a.d - b.d);
     let attuale = ordinate[ordinate.length - 1];
