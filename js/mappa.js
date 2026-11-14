@@ -1185,7 +1185,8 @@ const MappaUI = (() => {
       '<div style="display:flex;justify-content:space-between;align-items:baseline;padding-top:10px;font-size:0.95rem;">' +
         '<strong>Totale</strong><strong style="font-family:var(--font-mono);color:var(--accent-text);">' + _fmtTempo(totale) + '</strong>' +
       '</div>' +
-      '<p class="text-muted" style="font-size:0.72rem;line-height:1.5;margin:8px 0 0;">Una giornata di viaggio è di 8 ore, con le velocità del passo di viaggio delle regole.</p>';
+      '<p class="text-muted" style="font-size:0.72rem;line-height:1.5;margin:8px 0 0;">Una giornata di viaggio è di 8 ore, con le velocità del passo di viaggio delle regole.</p>' +
+      (typeof Calendario !== 'undefined' && Calendario.get() ? '<button type="button" class="btn btn-secondary btn-sm" style="margin-top:10px;width:100%;" onclick="MappaUI._viaggioNelCalendario(' + totale + ')">Fai passare il viaggio nel Calendario</button>' : '');
   };
 
   const _terrenoTratto = (n, terreno) => {
@@ -1195,6 +1196,17 @@ const MappaUI = (() => {
     _disegnaPercorso(); // i tratti in mare si vedono azzurri sulla mappa
   };
   const _sceltaViaggio = (chiave, valore) => { _viaggio[chiave] = valore; _ricalcolaMisura(); };
+  // Le giornate intere di viaggio sono giorni pieni (si cammina 8 ore, poi si mangia e si dorme); il resto sono ore di cammino
+  const _viaggioNelCalendario = (giorni) => {
+    let cal = Calendario.get();
+    if (!cal || !(giorni > 0)) return;
+    const interi = Math.floor(giorni + 1e-9), minuti = interi * 1440 + Math.round((giorni - interi) * 8 * 60);
+    cal = Calendario.advance(cal, 'minuti', minuti);
+    Calendario.save(cal);
+    try { if (typeof Schermo !== 'undefined' && Schermo._refreshTempo) Schermo._refreshTempo(); } catch (e) {}
+    Modal.close('mappa-distanza');
+    Toast.show('Arrivati: ' + Calendario.getDateStr(cal) + ' ' + Calendario.getTimeStr(cal), 'success', 3500);
+  };
 
   const init = () => {
     _injectModals();
@@ -1210,7 +1222,7 @@ const MappaUI = (() => {
     vaiAMappa, tornaIndietro, entraInMappa, nuovaMappa, eliminaMappaCorrente, aggiungiDaImmagine, generaDaPin,
     apriImpostazioni, salvaImpostazioni, _onFilePicked,
     apriModalNuovoPin, confermaNuovoPin, modificaPin, _onPinTipoChange, _onPinEntitaChange, _pickColore,
-    onPinClick, rimuoviPin, _ricalcolaMisura, _terrenoTratto, _sceltaViaggio,
+    onPinClick, rimuoviPin, _ricalcolaMisura, _terrenoTratto, _sceltaViaggio, _viaggioNelCalendario,
     iniziaPercorso, annullaTappa, fermaPercorso, mostraTempiPercorso,
     iniziaMisuraDaPin: iniziaPercorso, // nome vecchio, se qualcosa lo chiama ancora
     // Per js/mappa-esagoni.js: la mappa aperta e cio' che serve per disegnarci sopra

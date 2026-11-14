@@ -8879,6 +8879,8 @@ const Schermo = (() => {
         <button class="btn btn-secondary btn-sm" style="font-size:0.72rem;" onclick="Schermo._avanzaTempo('ore',1)">+1 ora</button>
         <button class="btn btn-secondary btn-sm" style="font-size:0.72rem;" onclick="Schermo._avanzaTempo('ore',8)">+8 ore</button>
         <button class="btn btn-secondary btn-sm" style="font-size:0.72rem;" onclick="Schermo._avanzaTempo('giorni',1)">+1 giorno</button>
+        <button class="btn btn-secondary btn-sm" style="font-size:0.72rem;" onclick="Schermo._avanzaTempo('ore',1,'Riposo breve')" title="Un'ora">Riposo breve</button>
+        <button class="btn btn-secondary btn-sm" style="font-size:0.72rem;" onclick="Schermo._avanzaTempo('ore',8,'Riposo lungo')" title="Otto ore">Riposo lungo</button>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;">
         <button class="btn btn-ghost btn-sm" style="font-size:0.65rem;" onclick="Schermo._avanzaTempo('minuti',-10)">−10 min</button>
@@ -8887,13 +8889,13 @@ const Schermo = (() => {
       <button class="btn btn-ghost btn-sm" style="font-size:0.65rem;width:100%;margin-top:4px;" onclick="App.navigateTo('calendario');setTimeout(()=>{try{CalendarioUI.showTab('config')}catch(e){}},150)">Imposta data e ora</button>`;
   };
 
-  const _avanzaTempo = (unit, amount) => {
+  const _avanzaTempo = (unit, amount, cosa) => {
     let cal = Calendario.get();
     if (!cal) { Toast.show('Nessun calendario attivo', 'warning'); return; }
     cal = Calendario.advance(cal, unit, amount);
     Calendario.save(cal);
     _blocks.filter(b => b.type === 'tempo').forEach(b => updateBlockContent(b));
-    Toast.show(Calendario.getDateStr(cal) + ' ' + Calendario.getTimeStr(cal), 'info', 2000);
+    Toast.show((cosa ? cosa + ' finito: ' : '') + Calendario.getDateStr(cal) + ' ' + Calendario.getTimeStr(cal), 'info', 2400);
   };
 
   const advanceTime = (minutes) => _avanzaTempo('minuti', minutes);
@@ -21095,8 +21097,10 @@ const Calendario = (() => {
     const nomeMese = mese?.it || mese?.nome || '';
     const giorno = cal.giorno;
     const anno = cal.anno;
-    const gg = cal.giorni_settimana?.[(giorno-1) % (cal.giorni_settimana?.length||7)] || '';
-    return `${gg}, ${giorno} ${nomeMese} — ${cal.prefisso_anno} ${anno}`;
+    const nSett = cal.giorni_settimana?.length || 7;
+    const abs = toAbsoluteDay(cal, { giorno, mese: cal.mese, anno });
+    const gg = cal.giorni_settimana?.[((abs % nSett) + nSett) % nSett] || '';
+    return `${gg}, ${giorno} ${nomeMese} — ${annoStr(cal, anno)}`;
   };
 
   const getTimeStr = (cal) => {
@@ -21120,15 +21124,15 @@ const Calendario = (() => {
       const extraDays = (unit === 'giorni' ? amount : 0) + daysFromHours;
       c.giorno += extraDays;
 
-      while (c.giorno > (c.mesi[c.mese]?.giorni||30)) {
-        c.giorno -= (c.mesi[c.mese]?.giorni||30);
+      while (c.giorno > giorniMese(c, c.mese, c.anno)) {
+        c.giorno -= giorniMese(c, c.mese, c.anno);
         c.mese++;
         if (c.mese >= c.mesi.length) { c.mese = 0; c.anno++; }
       }
       while (c.giorno < 1) {
         c.mese--;
         if (c.mese < 0) { c.mese = c.mesi.length-1; c.anno--; }
-        c.giorno += (c.mesi[c.mese]?.giorni||30);
+        c.giorno += giorniMese(c, c.mese, c.anno);
       }
     }
     if (unit === 'mesi') { c.mese += amount; while(c.mese>=c.mesi.length){c.mese-=c.mesi.length;c.anno++;} while(c.mese<0){c.mese+=c.mesi.length;c.anno--;} }
@@ -21144,6 +21148,36 @@ const Calendario = (() => {
   // dell'anno" per convertire una data in un numero assoluto comparabile.
   const daysPerYear = (cal) => (cal?.mesi || []).reduce((s, m) => s + (m.giorni || 30), 0);
 
+  // Anni bisestili (facoltativi): cal.bisestile = { attivo, ogni: 4, mese: indice, giorni: 1 }.
+  // Senza bisestili ogni calcolo resta identico a prima.
+  const _bis = (cal) => {
+    const b = cal?.bisestile;
+    if (!b || !b.attivo || !(b.ogni >= 2) || !cal.mesi?.length) return null;
+    return { ogni: Math.round(b.ogni), mese: Math.max(0, Math.min(b.mese || 0, cal.mesi.length - 1)), giorni: Math.max(1, Math.round(b.giorni || 1)) };
+  };
+  const isBisestile = (cal, anno) => { const b = _bis(cal); return !!b && (((anno || 0) % b.ogni) + b.ogni) % b.ogni === 0; };
+  const giorniMese = (cal, m, anno) => { const b = _bis(cal); return (cal?.mesi?.[m]?.giorni || 30) + (b && b.mese === m && isBisestile(cal, anno) ? b.giorni : 0); };
+  // Primo giorno assoluto di un anno: gli anni bisestili prima di questo aggiungono i loro giorni
+  const _inizioAnno = (cal, anno) => { const b = _bis(cal); return anno * daysPerYear(cal) + (b ? Math.ceil(anno / b.ogni) * b.giorni : 0); };
+  // Che giorno dell'anno e' un giorno assoluto (serve alle stagioni)
+  const giornoAnno = (cal, abs) => {
+    const dpy = daysPerYear(cal) || 360, b = _bis(cal);
+    if (!b) return ((abs % dpy) + dpy) % dpy;
+    let anno = Math.floor(abs / (dpy + b.giorni / b.ogni));
+    while (_inizioAnno(cal, anno) > abs) anno--;
+    while (_inizioAnno(cal, anno + 1) <= abs) anno++;
+    return abs - _inizioAnno(cal, anno);
+  };
+
+  // Ere (facoltative): cal.ere = [{ nome, da, riparte }]. L'anno salvato resta quello di sempre;
+  // si mostra con l'era in cui cade e, se l'era riparte da 1, contato dal suo inizio.
+  const eraDi = (cal, anno) => [...(cal?.ere || [])].filter(e => e && e.nome && Number.isFinite(+e.da)).sort((a, b) => b.da - a.da).find(e => anno >= e.da) || null;
+  const annoStr = (cal, anno) => {
+    const e = eraDi(cal, anno), pre = (cal?.prefisso_anno || '').trim();
+    const n = e && e.riparte ? anno - e.da + 1 : anno;
+    return ((pre ? pre + ' ' : '') + n + (e ? ', ' + e.nome : '')).trim();
+  };
+
   // Converte {giorno,mese,anno} in un intero assoluto ordinabile/comparabile (per Timeline
   // e countdown deadline). L'indice mese e' clampato: se una data e' stata salvata sotto un
   // preset con piu' mesi (es. Greyhawk, 16) e la campagna e' poi passata a uno con meno mesi
@@ -21152,8 +21186,10 @@ const Calendario = (() => {
   const toAbsoluteDay = (cal, date) => {
     if (!cal || !date || !cal.mesi?.length) return null;
     const mIdx = Math.max(0, Math.min(date.mese || 0, cal.mesi.length - 1));
-    const dayOfYear = cal.mesi.slice(0, mIdx).reduce((s, m) => s + (m.giorni || 30), 0) + ((date.giorno || 1) - 1);
-    return (date.anno || 0) * daysPerYear(cal) + dayOfYear;
+    const anno = date.anno || 0;
+    let dayOfYear = (date.giorno || 1) - 1;
+    for (let m = 0; m < mIdx; m++) dayOfYear += giorniMese(cal, m, anno);
+    return _inizioAnno(cal, anno) + dayOfYear;
   };
 
   const diffGiorni = (cal, dateA, dateB) => {
@@ -21168,10 +21204,11 @@ const Calendario = (() => {
     if (!cal || !cal.mesi?.length) return `${date.giorno}/${(date.mese || 0) + 1}/${date.anno}`;
     const mIdx = Math.max(0, Math.min(date.mese || 0, cal.mesi.length - 1));
     const mese = cal.mesi[mIdx];
-    return `${date.giorno} ${mese?.it || mese?.nome || ''} — ${cal.prefisso_anno || ''} ${date.anno}`.replace(/\s+/g, ' ').trim();
+    return `${date.giorno} ${mese?.it || mese?.nome || ''} — ${annoStr(cal, date.anno)}`.replace(/\s+/g, ' ').trim();
   };
 
-  return { initPreset, getDateStr, getTimeStr, advance, save, get, PRESET, toAbsoluteDay, diffGiorni, formatDate, daysPerYear };
+  return { initPreset, getDateStr, getTimeStr, advance, save, get, PRESET, toAbsoluteDay, diffGiorni, formatDate, daysPerYear,
+    isBisestile, giorniMese, giornoAnno, annoStr, eraDi };
 })();
 
 // Vista mensile + CRUD eventi/deadline del Calendario (sezioni 5.3/5.4 del backlog).
@@ -21259,6 +21296,16 @@ const CalendarioUI = (() => {
 
   let _selectedGiorno = null;
 
+  // Gli eventi di un giorno, compresi quelli che si ripetono ogni anno o ogni mese (dalla loro data in poi)
+  const _eventiDelGiorno = (giorno, mese, anno) => _getEventi().filter(e => {
+    const d = e.data;
+    if (!d || d.giorno !== giorno) return false;
+    if (d.mese === mese && d.anno === anno) return true;
+    if (e.ripete === 'anno') return d.mese === mese && anno > d.anno;
+    if (e.ripete === 'mese') return anno > d.anno || (anno === d.anno && mese > d.mese);
+    return false;
+  });
+
   const _renderMese = () => {
     const el = document.getElementById('calendario-tab-mese');
     if (!el) return;
@@ -21271,10 +21318,9 @@ const CalendarioUI = (() => {
     if (_viewMese >= cal.mesi.length) _viewMese = cal.mesi.length - 1;
     if (_viewMese < 0) _viewMese = 0;
     const mese = cal.mesi[_viewMese];
-    const giorniInMese = mese?.giorni || 30;
-    const eventi = _getEventi().filter(e => e.data && e.data.mese === _viewMese && e.data.anno === _viewAnno);
+    const giorniInMese = Calendario.giorniMese(cal, _viewMese, _viewAnno);
     const eventiPerGiorno = {};
-    eventi.forEach(e => { (eventiPerGiorno[e.data.giorno] = eventiPerGiorno[e.data.giorno] || []).push(e); });
+    for (let g = 1; g <= giorniInMese; g++) { const evs = _eventiDelGiorno(g, _viewMese, _viewAnno); if (evs.length) eventiPerGiorno[g] = evs; }
 
     const nGiorniSett = cal.giorni_settimana?.length || 7;
     const primoGiornoAssoluto = Calendario.toAbsoluteDay(cal, { giorno: 1, mese: _viewMese, anno: _viewAnno });
@@ -21313,7 +21359,7 @@ const CalendarioUI = (() => {
         '<div style="display:flex;align-items:center;gap:4px;">' +
           '<button class="btn btn-ghost btn-icon-sm" onclick="CalendarioUI.navAnno(-1)" title="Anno precedente">«</button>' +
           '<button class="btn btn-ghost btn-icon-sm" onclick="CalendarioUI.navMese(-1)" title="Mese precedente">‹</button>' +
-          '<div class="cal-mese">' + _esc(mese?.it || mese?.nome || '') + ' — ' + _esc(cal.prefisso_anno || '') + ' ' + _viewAnno + '</div>' +
+          '<div class="cal-mese">' + _esc(mese?.it || mese?.nome || '') + ' — ' + _esc(Calendario.annoStr(cal, _viewAnno)) + (Calendario.isBisestile(cal, _viewAnno) ? ' <span class="cal-bis">bisestile</span>' : '') + '</div>' +
           (typeof CalendarioCielo !== 'undefined' ? CalendarioCielo.etichettaMese(cal, primoGiornoAssoluto, giorniInMese) : '') +
           '<button class="btn btn-ghost btn-icon-sm" onclick="CalendarioUI.navMese(1)" title="Mese successivo">›</button>' +
           '<button class="btn btn-ghost btn-icon-sm" onclick="CalendarioUI.navAnno(1)" title="Anno successivo">»</button>' +
@@ -21345,7 +21391,7 @@ const CalendarioUI = (() => {
     const curEl = document.getElementById('cal-day-' + giorno);
     if (curEl && giorno !== cal.giorno) curEl.style.border = '2px solid var(--accent-secondary)';
 
-    const eventi = _getEventi().filter(e => e.data && e.data.giorno === giorno && e.data.mese === _viewMese && e.data.anno === _viewAnno);
+    const eventi = _eventiDelGiorno(giorno, _viewMese, _viewAnno);
     const mese = cal.mesi[_viewMese];
     const titolo = giorno + ' ' + (mese?.it || mese?.nome || '') + ' — ' + (cal.prefisso_anno || '') + ' ' + _viewAnno;
     panel.innerHTML = '<div class="card" style="padding:14px;border:1px solid var(--accent-secondary);">' +
@@ -21375,9 +21421,9 @@ const CalendarioUI = (() => {
     const wrap = document.getElementById('cev-data-wrap');
     if (!wrap) return;
     const mese = Math.max(0, Math.min(data?.mese ?? cal.mese ?? 0, cal.mesi.length - 1));
-    const giorniInMese = cal.mesi[mese]?.giorni || 30;
-    const giorno = Math.max(1, Math.min(data?.giorno ?? cal.giorno ?? 1, giorniInMese));
     const anno = data?.anno ?? cal.anno ?? cal.anno_base ?? 1;
+    const giorniInMese = Calendario.giorniMese(cal, mese, anno);
+    const giorno = Math.max(1, Math.min(data?.giorno ?? cal.giorno ?? 1, giorniInMese));
     const giornoOpts = Array.from({ length: giorniInMese }, (_, i) => i + 1).map(g => '<option value="' + g + '"' + (g === giorno ? ' selected' : '') + '>' + g + '</option>').join('');
     const meseOpts = cal.mesi.map((m, i) => '<option value="' + i + '"' + (i === mese ? ' selected' : '') + '>' + _esc(m.it || m.nome) + '</option>').join('');
     wrap.innerHTML =
@@ -21540,6 +21586,7 @@ const CalendarioUI = (() => {
     document.getElementById('cev-titolo').value = '';
     document.getElementById('cev-tipo').value = 'evento';
     document.getElementById('cev-layer').value = 'campagna';
+    document.getElementById('cev-ripete').value = '';
     document.getElementById('cev-descrizione').value = '';
     document.getElementById('cev-promemoria').value = 3;
     document.getElementById('cev-conseguenza').value = '';
@@ -21566,6 +21613,7 @@ const CalendarioUI = (() => {
     document.getElementById('cev-titolo').value = ev.titolo || '';
     document.getElementById('cev-tipo').value = ev.tipo || 'evento';
     document.getElementById('cev-layer').value = ev.layer || 'campagna';
+    document.getElementById('cev-ripete').value = ev.ripete || '';
     document.getElementById('cev-descrizione').value = ev.descrizione || '';
     document.getElementById('cev-promemoria').value = ev.promemoriaGiorni ?? 3;
     document.getElementById('cev-conseguenza').value = ev.conseguenza || '';
@@ -21600,6 +21648,7 @@ const CalendarioUI = (() => {
       layer: document.getElementById('cev-layer').value,
       categoria: document.getElementById('cev-categoria').value,
       data: { giorno, mese, anno },
+      ripete: document.getElementById('cev-ripete')?.value || '',
       entita: [..._editEntita],
       promemoriaGiorni: parseInt(document.getElementById('cev-promemoria').value, 10) || 0,
       conseguenza: document.getElementById('cev-tipo').value === 'deadline' ? document.getElementById('cev-conseguenza').value.trim() : '',
@@ -22656,6 +22705,14 @@ document.addEventListener('DOMContentLoaded', initMobileNav);
       <div class="form-group">
         <label class="form-label">Data (in-world)</label>
         <div id="cev-data-wrap" style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;"></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="cev-ripete">Si ripete</label>
+        <select id="cev-ripete" class="form-select">
+          <option value="">No, solo quel giorno</option>
+          <option value="anno">Ogni anno, stesso giorno (feste, anniversari)</option>
+          <option value="mese">Ogni mese, stesso giorno (mercati, tributi)</option>
+        </select>
       </div>
       <div class="form-group" id="cev-promemoria-wrap">
         <label class="form-label">Avvisa quanti giorni prima (deadline)</label>

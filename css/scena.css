@@ -774,3 +774,6 @@ button[onclick*="').value='';Compendio.onSearch("] { min-width: 32px; min-height
 .tc-quanti { width: auto; font-size: 0.8rem; padding: 4px 8px; }
 .tc-multi { flex: 1; margin: 0; padding-left: 1.3em; display: grid; gap: 4px; }
 .tc-note { flex-shrink: 0; white-space: nowrap; }
+
+/* Calendario: anno bisestile */
+.cal-bis { font-size: 0.7rem; font-weight: 600; color: var(--accent-text); padding: 1px 8px; border-radius: 999px; background: var(--bg-tertiary); margin-left: 6px; vertical-align: middle; }
