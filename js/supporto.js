@@ -60,7 +60,7 @@ const Supporto = (() => {
         '<strong>Ti è utile al tavolo?</strong>' +
         '<button type="button" class="btn btn-ghost btn-icon-sm supporto-x" aria-label="Chiudi"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>' +
       '</div>' +
-      '<p>Pocket GM Screen è gratuito e lo resterà. Lo porto avanti da sola: se vuoi, puoi offrirmi un caffè su Ko-fi.</p>' +
+      '<p>Pocket GM Screen è gratuito e lo resterà. Lo porto avanti nel mio tempo libero: se vuoi, puoi offrirmi un caffè su Ko-fi.</p>' +
       '<div class="supporto-azioni">' +
         '<a class="btn btn-primary btn-sm" href="' + URL_KOFI + '" target="_blank" rel="noopener">Offrimi un caffè</a>' +
         '<button type="button" class="btn btn-ghost btn-sm supporto-mai">Non chiederlo più</button>' +
