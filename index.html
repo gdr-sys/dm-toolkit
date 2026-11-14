@@ -14389,6 +14389,15 @@ const FirebaseSync = (() => {
   const copyCode = async () => {
     if (_user?.isAnonymous) { Toast.show('Accedi con Google o email per invitare un altro master', 'warning'); return; }
     if (!getCampCode()) return;
+    // Drive era collegato ma l'accesso e' scaduto (o e' stato rinnovato in un'altra scheda): si
+    // ricollega subito, finche' il tocco e' ancora "fresco" e il browser lascia aprire la finestra
+    // di Google, e poi l'invito riparte da solo. Prima l'app si fermava con "Drive scollegato".
+    if (localStorage.getItem('dm_drive_connected') === 'true' && !DriveBackup.isConnected()) {
+      Toast.show('Ricollego Google Drive, poi preparo l’invito...', 'info', 4000);
+      GDrive.onConnect(() => setTimeout(() => copyCode(), 300));
+      DriveBackup.connect();
+      return;
+    }
     Toast.show('Preparo l’invito...', 'info', 1500);
     let invito = null;
     try { invito = await creaInvito(); } catch (e) { Debug.warn('Invito:', e.message); }
