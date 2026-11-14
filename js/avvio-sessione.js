@@ -24,7 +24,9 @@ const AvvioSessione = (() => {
   const _leggi = (k) => { try { return localStorage.getItem(k); } catch (e) { return null; } };
   const _scrivi = (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} };
   const attivo = () => _leggi(KEY) === '1';
-  const _testo = (t) => _esc(String(t || '').replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').trim()).replace(/\n/g, '<br>');
+  // Testi scritti con l'editor: si tiene la formattazione e i collegamenti si possono toccare
+  const _testo = (t) => typeof Testo !== 'undefined' ? '<span class="et-testo">' + Testo.mostra(t) + '</span>'
+    : _esc(String(t || '').replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').trim()).replace(/\n/g, '<br>');
 
   // ── Impostazione (in Impostazioni, sotto "Schermo sempre acceso") ──
 
@@ -100,7 +102,7 @@ const AvvioSessione = (() => {
     const prossima = sessioni.find(s => s.stato !== 'giocata');
 
     // 1. Previously On
-    const po = (camp.previouslyOnArchive || []).slice(-1)[0]?.testo || (ultima?.recap ? 'Nella sessione precedente:\n\n' + ultima.recap : '');
+    const po = (camp.previouslyOnArchive || []).slice(-1)[0]?.testo || (ultima?.recap ? 'Nella sessione precedente:\n\n' + Testo.semplice(ultima.recap) : '');
     const s1 = po
       ? '<div id="avvio-po" style="white-space:pre-line;background:var(--bg-secondary);border-radius:var(--radius-sm);padding:10px 12px;color:var(--text-primary);">' + _esc(po) + '</div>' +
         '<button type="button" class="btn btn-ghost btn-sm" style="margin-top:6px;" onclick="AvvioSessione.copia()">Copia il testo</button>'

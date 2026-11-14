@@ -381,7 +381,8 @@ const MappaUI = (() => {
       const colore = p.colore || COLORI[0];
       // Il titolo al passaggio del mouse anticipa anche l'inizio della nota,
       // cosi' non serve aprire il pin solo per ricordarsi cosa c'e' scritto.
-      const anteprimaNota = (!p.tipo && p.note) ? ' — ' + p.note.slice(0, 60) + (p.note.length > 60 ? '…' : '') : '';
+      const notaTxt = Testo.semplice(p.note || '');
+      const anteprimaNota = (!p.tipo && notaTxt) ? ' — ' + notaTxt.slice(0, 60) + (notaTxt.length > 60 ? '…' : '') : '';
       return (
         '<div class="mappa-pin" data-pin-id="' + p.id + '" title="' + _escHtml(nome + anteprimaNota) + '" ' +
           'style="position:absolute;left:' + (p.x * 100) + '%;top:' + (p.y * 100) + '%;transform:translate(-50%,-100%);cursor:pointer;z-index:2;" ' +
@@ -974,7 +975,7 @@ const MappaUI = (() => {
     const pop = document.getElementById('mappa-pin-popover');
     pop.innerHTML =
       '<div style="font-family:var(--font-display);font-size:0.9rem;margin-bottom:' + (pin.note ? '4' : '8') + 'px;">' + _escHtml(nome) + '</div>' +
-      (pin.note ? '<div class="text-sm text-muted" style="margin-bottom:8px;white-space:pre-wrap;max-width:220px;">' + _escHtml(pin.note) + '</div>' : '') +
+      (pin.note ? '<div class="text-sm text-muted et-testo" style="margin-bottom:8px;max-width:220px;">' + Testo.mostra(pin.note) + '</div>' : '') +
       '<div style="display:flex;flex-direction:column;gap:4px;">' +
         (item ? '<button class="btn btn-secondary btn-sm" onclick="QuickView.open(\'' + pin.tipo + '\',\'' + pin.entitaId + '\');document.getElementById(\'mappa-pin-popover\').style.display=\'none\';">Apri scheda</button>' : '') +
         (mappaCollegata ? '<button class="btn btn-secondary btn-sm" onclick="MappaUI.entraInMappa(\'' + mappaCollegata.id + '\')">Apri questa mappa</button>' : '') +

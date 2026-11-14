@@ -186,7 +186,7 @@ const ChiusuraSessione = (() => {
     // "Previously On…" nello stesso formato del modulo previously-on.js
     if (document.getElementById('cs-po')?.checked) {
       const intro = 'Nella sessione precedente (S' + chiusa.numero + (chiusa.titolo ? ' — ' + chiusa.titolo : '') + (chiusa.data ? ', ' + chiusa.data : '') + '):';
-      patch.previouslyOnArchive = [...(camp.previouslyOnArchive || []), { id: 'po_' + Date.now(), testo: intro + '\n\n' + recap, createdAt: Date.now(), aggiornatoAt: Date.now() }];
+      patch.previouslyOnArchive = [...(camp.previouslyOnArchive || []), { id: 'po_' + Date.now(), testo: intro + '\n\n' + Testo.semplice(recap), createdAt: Date.now(), aggiornatoAt: Date.now() }];
     }
 
     App.saveActiveCampaign(patch);

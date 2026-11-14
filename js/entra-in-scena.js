@@ -74,7 +74,7 @@ const EntraInScena = (() => {
     if (!s || !el) return;
     const chip = (tipo, x) => typeof VociCampagna !== 'undefined' ? VociCampagna.chipHTML([{ tipo, id: x.id, nome: _nome(x) }]) : _esc(_nome(x));
     el.innerHTML =
-      (s.luogo.atmosfera ? '<div style="font-size:0.9rem;color:var(--text-secondary);line-height:1.6;font-style:italic;">' + _esc(s.luogo.atmosfera) + '</div>' : '') +
+      (s.luogo.atmosfera ? '<div style="font-size:0.9rem;color:var(--text-secondary);line-height:1.6;font-style:italic;">' + _esc(Testo.semplice(s.luogo.atmosfera)) + '</div>' : '') +
       _riga('Tempo (' + s.stagione + ')', _esc(s.meteo)) +
       _riga('Si sente', _esc(s.sensi)) +
       _riga('Sta succedendo', _esc(s.evento.charAt(0).toUpperCase() + s.evento.slice(1))) +
@@ -83,7 +83,7 @@ const EntraInScena = (() => {
       (s.voce ? _riga('Voce che gira', _esc(s.voce.testo) + '<div style="margin-top:3px;display:flex;flex-wrap:wrap;gap:4px;">' + VociCampagna.chipHTML(s.voce.entita) + '</div>') : '') +
       s.tiri.map(t => _riga(_esc(t.nome), _esc(t.testo))).join('') +
       (!s.tiri.length ? _riga('Tabelle casuali', '<span style="color:var(--text-muted);">Collega una tua tabella a questo luogo (Generatori → Le mie tabelle) per tirarla qui.</span>') : '');
-    _testo = ['Scena: ' + _nome(s.luogo), s.luogo.atmosfera, 'Tempo: ' + s.meteo, 'Si sente: ' + s.sensi, 'Sta succedendo: ' + s.evento,
+    _testo = ['Scena: ' + _nome(s.luogo), Testo.semplice(s.luogo.atmosfera), 'Tempo: ' + s.meteo, 'Si sente: ' + s.sensi, 'Sta succedendo: ' + s.evento,
       s.png.length ? 'Chi c\'è: ' + s.png.map(_nome).join(', ') : '', s.quest.length ? 'Quest: ' + s.quest.map(_nome).join(', ') : '',
       s.voce ? 'Voce: ' + s.voce.testo : '', ...s.tiri.map(t => t.nome + ': ' + t.testo)].filter(Boolean).join('\n');
     const t = document.getElementById('eis-titolo');

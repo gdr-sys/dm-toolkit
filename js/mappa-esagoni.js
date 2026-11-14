@@ -118,7 +118,7 @@ const MappaEsagoni = (() => {
       if (!e.note[k]) return;
       const [col, row] = _parse(k);
       const [cx, cy] = _centro(g, col, row);
-      out += '<g><title>' + _esc(e.note[k]) + '</title><circle cx="' + (cx + R * 0.45).toFixed(1) + '" cy="' + (cy - R * 0.3).toFixed(1) + '" r="' + Math.max(R * 0.12, 4 * s).toFixed(1) + '" fill="#2d5a6b" stroke="#fff" stroke-width="' + (1.5 * s).toFixed(2) + '"/></g>';
+      out += '<g><title>' + _esc(Testo.semplice(e.note[k])) + '</title><circle cx="' + (cx + R * 0.45).toFixed(1) + '" cy="' + (cy - R * 0.3).toFixed(1) + '" r="' + Math.max(R * 0.12, 4 * s).toFixed(1) + '" fill="#2d5a6b" stroke="#fff" stroke-width="' + (1.5 * s).toFixed(2) + '"/></g>';
     });
 
     // Il gruppo: bordo dorato spesso attorno all'esagono e un segnalino al centro
