@@ -86,6 +86,11 @@ self.addEventListener('activate', (event) => {
 // Chiamate alle API (Drive, Firebase, login Google): dati personali e sempre diversi, non vanno
 // messi in cache ne' sostituiti offline con index.html. Le immagini su drive.google.com invece
 // passano dalla cache come il resto, cosi' le mappe si vedono anche senza internet.
+// Dopo una richiesta scaduta la rete è da considerare lenta per un po': gli altri file arrivano
+// subito dalla copia salvata (la rete li aggiorna lo stesso in sottofondo), invece di aspettare
+// 3 secondi ciascuno.
+let _lentaFino = 0;
+
 const _soloRete = (url) => /(^|\.)googleapis\.com$/.test(url.hostname) && url.hostname !== 'fonts.googleapis.com'
   || /firebaseio\.com$|firebasedatabase\.app$|accounts\.google\.com$|^api\.github\.com$/.test(url.hostname);
 
@@ -124,10 +129,11 @@ self.addEventListener('fetch', (event) => {
       if (finito) return;
       if (cached) { finito = true; resolve(cached); }
     });
-    const timer = setTimeout(usaCache, 3000);
+    const timer = setTimeout(() => { _lentaFino = Date.now() + 30000; usaCache(); }, Date.now() < _lentaFino ? 0 : 3000);
     rete.then((response) => {
       if (finito) return;
       clearTimeout(timer);
+      _lentaFino = 0; // la rete ha risposto in tempo: di nuovo prima la rete
       // Risposta d'errore del server: meglio la copia buona, se esiste
       if (!response.ok && response.type !== 'opaque') {
         return dallaCache().then((cached) => { if (!finito) { finito = true; resolve(cached || response); } });
