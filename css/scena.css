@@ -803,10 +803,10 @@ button[onclick*="').value='';Compendio.onSearch("] { min-width: 32px; min-height
 .mz-sez h3, .mz-dettagli dt { color: var(--titolo); }
 
 /* ── Ko-fi dopo la chiusura della sessione (js/supporto.js): riquadro discreto, non un modale ── */
-#supporto-riquadro {
+#supporto-riquadro, #avviso-home {
   position: fixed;
   right: 16px;
-  bottom: calc(80px + env(safe-area-inset-bottom, 0px));
+  bottom: calc(132px + env(safe-area-inset-bottom, 0px)); /* sopra il pulsante dei dadi */
   z-index: 9000;
   width: min(360px, calc(100vw - 32px));
   padding: 14px 16px;
@@ -817,11 +817,11 @@ button[onclick*="').value='';Compendio.onSearch("] { min-width: 32px; min-height
   box-shadow: var(--shadow-lg);
   animation: supporto-entra 0.25s ease-out;
 }
-#supporto-riquadro .supporto-testa { display: flex; align-items: center; gap: 8px; }
-#supporto-riquadro .supporto-testa strong { font-size: 0.95rem; }
-#supporto-riquadro .supporto-icona { color: var(--accent-text); display: inline-flex; }
-#supporto-riquadro .supporto-x { margin-left: auto; }
-#supporto-riquadro p { margin: 6px 0 12px; font-size: 0.86rem; line-height: 1.5; color: var(--text-secondary); }
-#supporto-riquadro .supporto-azioni { display: flex; gap: 8px; flex-wrap: wrap; }
+#supporto-riquadro .supporto-testa , #avviso-home .supporto-testa { display: flex; align-items: center; gap: 8px; }
+#supporto-riquadro .supporto-testa strong , #avviso-home .supporto-testa strong { font-size: 0.95rem; }
+#supporto-riquadro .supporto-icona , #avviso-home .supporto-icona { color: var(--accent-text); display: inline-flex; }
+#supporto-riquadro .supporto-x , #avviso-home .supporto-x { margin-left: auto; }
+#supporto-riquadro p , #avviso-home p { margin: 6px 0 12px; font-size: 0.86rem; line-height: 1.5; color: var(--text-secondary); }
+#supporto-riquadro .supporto-azioni , #avviso-home .supporto-azioni { display: flex; gap: 8px; flex-wrap: wrap; }
 @keyframes supporto-entra { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
-@media (prefers-reduced-motion: reduce) { #supporto-riquadro { animation: none; } }
+@media (prefers-reduced-motion: reduce) { #supporto-riquadro, #avviso-home { animation: none; } }

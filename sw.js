@@ -100,13 +100,46 @@ self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
   const richiesta = url.origin === self.location.origin ? fetch(event.request.url, { cache: 'no-cache' }) : fetch(event.request);
 
-  event.respondWith(
-    richiesta
-      .then((response) => {
-        const copy = response.clone();
-        caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy)).catch(() => {});
-        return response;
-      })
-      .catch(() => caches.match(event.request).then((cached) => cached || caches.match('./index.html')))
-  );
+  // Rete aggiornata in cache solo se la risposta è buona: una pagina d'errore del server (404, 500)
+  // non deve prendere il posto della copia buona che serve offline.
+  const rete = richiesta.then((response) => {
+    if (response.ok || response.type === 'opaque') {
+      const copy = response.clone();
+      caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy)).catch(() => {});
+    }
+    return response;
+  });
+  rete.catch(() => {}); // se vince la cache, un errore di rete arrivato dopo non va segnalato
+
+  // Pagina dell'app solo al posto di una pagina (navigazione), non di un'immagine o di un file di dati.
+  const pagina = event.request.mode === 'navigate';
+  const dallaCache = () => caches.match(event.request, { ignoreSearch: pagina })
+    .then((cached) => cached || (pagina ? caches.match('./index.html') : undefined));
+
+  // Con poco campo la richiesta può restare appesa a lungo senza mai fallire: dopo 3 secondi si usa
+  // la copia salvata (se c'è) e intanto la rete, se poi risponde, aggiorna la cache per la prossima volta.
+  event.respondWith(new Promise((resolve, reject) => {
+    let finito = false;
+    const usaCache = () => dallaCache().then((cached) => {
+      if (finito) return;
+      if (cached) { finito = true; resolve(cached); }
+    });
+    const timer = setTimeout(usaCache, 3000);
+    rete.then((response) => {
+      if (finito) return;
+      clearTimeout(timer);
+      // Risposta d'errore del server: meglio la copia buona, se esiste
+      if (!response.ok && response.type !== 'opaque') {
+        return dallaCache().then((cached) => { if (!finito) { finito = true; resolve(cached || response); } });
+      }
+      finito = true; resolve(response);
+    }, () => {
+      clearTimeout(timer);
+      dallaCache().then((cached) => {
+        if (finito) return;
+        finito = true;
+        if (cached) resolve(cached); else reject(new TypeError('offline'));
+      });
+    });
+  }));
 });
