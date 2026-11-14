@@ -192,14 +192,17 @@ button.dn-row:hover .dn-t, a.dn-row:hover .dn-t { color: var(--accent-text); }
 @media (max-width: 760px) { #page-home .campaign-grid-section { padding: 16px 14px 96px; } }
 #page-home #campaign-grid { padding: 0 !important; margin: 0 !important; }
 
-/* ── Barra in alto da 900px (js/barra-alta.js) ── */
+/* ── Barra in alto da 900px (js/barra-alta.js) ──
+   La disposizione (niente menu laterale, contenuto a tutta larghezza, barra alta 60px) dipende solo
+   dalla larghezza, non dalla classe che il JavaScript aggiunge dopo: cosi' al caricamento la pagina
+   non salta di lato quando il menu laterale lascia il posto alla barra. */
 .ba-barra { display: none; }
 @media (min-width: 900px) {
-  body.barra-alta #sidebar { display: none !important; }
-  body.barra-alta #main-content, body.barra-alta #main-content.expanded { margin-left: 0 !important; }
-  body.barra-alta #topbar { min-height: 60px; padding: env(safe-area-inset-top, 0px) 20px 0; gap: 12px; background: color-mix(in srgb, var(--bg-primary) 92%, transparent); backdrop-filter: blur(10px); }
-  body.barra-alta .topbar-title { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-  body.barra-alta .ba-barra { display: flex; align-items: center; gap: 14px; flex: 1; min-width: 0; height: 60px; }
+  body #sidebar { display: none !important; }
+  body #main-content, body #main-content.expanded { margin-left: 0 !important; }
+  body #topbar { min-height: 60px; padding: env(safe-area-inset-top, 0px) 20px 0; gap: 12px; background: color-mix(in srgb, var(--bg-primary) 92%, transparent); backdrop-filter: blur(10px); }
+  body .topbar-title { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  body .ba-barra { display: flex; align-items: center; gap: 14px; flex: 1; min-width: 0; height: 60px; }
   .ba-logo { display: flex; align-items: center; gap: 10px; background: none; border: 0; padding: 4px; cursor: pointer; color: var(--text-primary); font: 700 1rem var(--font-body); letter-spacing: -0.01em; border-radius: 8px; }
   .ba-logo img { width: 26px; height: 26px; }
   .ba-campagna { display: flex; align-items: center; gap: 8px; max-width: 240px; height: 36px; padding: 0 12px; border: 1px solid var(--border); border-radius: 10px; background: var(--bg-card); color: var(--text-secondary); font: 500 0.9rem var(--font-body); cursor: pointer; }

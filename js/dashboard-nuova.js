@@ -167,6 +167,7 @@ const DashboardNuova = (() => {
       if (typeof Scena !== 'undefined') Scena.tutte(eroe);
     } finally {
       _lavoro = false;
+      contenitore.classList.add('dn-pronto'); // ora si puo' mostrare: niente salti al caricamento (vedi scena.css)
       if (_osservatore) _osservatore.observe(g, { childList: true, subtree: true });
     }
   };

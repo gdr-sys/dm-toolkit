@@ -826,3 +826,9 @@ button[onclick*="').value='';Compendio.onSearch("] { min-width: 32px; min-height
 #supporto-riquadro .supporto-azioni , #avviso-home .supporto-azioni { display: flex; gap: 8px; flex-wrap: wrap; }
 @keyframes supporto-entra { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 @media (prefers-reduced-motion: reduce) { #supporto-riquadro, #avviso-home { animation: none; } }
+
+/* Dashboard: la prima disegnata è nel vecchio ordine e js/dashboard-nuova.js la riordina subito dopo.
+   Finché non è pronta resta invisibile, così al caricamento non salta; se il riordino non arrivasse
+   (errore), compare comunque dopo un secondo. */
+#page-campagna > div:has(> .dash-grid):not(.dn-pronto) { visibility: hidden; animation: dn-mostra 0s 1s forwards; }
+@keyframes dn-mostra { to { visibility: visible; } }
