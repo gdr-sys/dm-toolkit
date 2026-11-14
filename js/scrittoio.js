@@ -92,24 +92,30 @@ const Scrittoio = (() => {
       return d;
     }
     const id = _idDrive(url);
-    // Su Drive: con Drive collegato si scarica il file con l'accesso di Google
-    if (id && typeof GDrive !== 'undefined' && GDrive.token) {
-      try {
-        const r = await fetch('https://www.googleapis.com/drive/v3/files/' + id + '?alt=media', { headers: { Authorization: 'Bearer ' + GDrive.token } });
-        if (r.ok) {
-          const b = await r.blob();
-          if (/^image\//.test(b.type)) {
-            const u = URL.createObjectURL(b);
-            const d = await _comeJpeg(u, false, png);
-            URL.revokeObjectURL(u);
-            if (d) return d;
-          }
-        }
-      } catch (e) {}
+    const daBlob = async (b) => {
+      if (!b || !/^image\//.test(b.type)) return null;
+      const u = URL.createObjectURL(b);
+      const d = await _comeJpeg(u, false, png);
+      URL.revokeObjectURL(u);
+      return d;
+    };
+    if (id) {
+      // 1. Con Drive collegato: i file caricati dall'app (l'accesso di Google vale solo per quelli)
+      if (typeof GDrive !== 'undefined' && GDrive.token) {
+        try {
+          const r = await fetch('https://www.googleapis.com/drive/v3/files/' + id + '?alt=media', { headers: { Authorization: 'Bearer ' + GDrive.token } });
+          if (r.ok) { const d = await daBlob(await r.blob()); if (d) return d; }
+        } catch (e) {}
+      }
+      // 2. Immagini condivise con "chiunque abbia il link", anche messe su Drive a mano o da un altro account
+      if (typeof DriveBackup !== 'undefined' && DriveBackup.immaginePubblica) {
+        const d = await daBlob(await DriveBackup.immaginePubblica(id));
+        if (d) return d;
+      }
     }
     const d = await _comeJpeg(typeof DriveBackup !== 'undefined' ? DriveBackup.toEmbeddableUrl(url) : url, true, png);
     if (!d) _ultimoMotivo = id
-      ? (typeof GDrive !== 'undefined' && GDrive.token ? 'Google Drive non la lascia leggere (forse è di un altro account)' : 'è su Google Drive: collega Drive dalle Impostazioni e riprova')
+      ? 'su Google Drive non è condivisa con «chiunque abbia il link». Aprila su Drive, tocca Condividi e scegli «Chiunque abbia il link», oppure caricala dal dispositivo nella scheda'
       : 'il sito dove sta non permette di copiarla: caricala dal dispositivo nella scheda';
     return d;
   };

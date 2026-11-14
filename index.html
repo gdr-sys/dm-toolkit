@@ -16547,6 +16547,16 @@ const DriveBackup = (() => {
     listBackups, openRestoreModal, restoreBackup,
     isConnected, ready, syncToDrive, downloadFromDrive, deleteFromDrive, _aggiornaStato, uploadImage, replaceImagesWithDriveLinks, toEmbeddableUrl,
     generateInvite, acceptInvite, adottaFileSync, scaricaCondiviso,
+    // Scarica un'immagine di Drive condivisa con "chiunque abbia il link" (anche non caricata
+    // dall'app): la usa lo Scrittoio per i ritratti delle taglie. Restituisce un Blob o null.
+    immaginePubblica: async (fileId) => {
+      try {
+        const r = await fetch('https://www.googleapis.com/drive/v3/files/' + encodeURIComponent(fileId) + '?alt=media&key=' + PICKER_API_KEY);
+        if (!r.ok) return null;
+        const b = await r.blob();
+        return /^image\//.test(b.type) ? b : null;
+      } catch (e) { return null; }
+    },
   };
 })();
 
