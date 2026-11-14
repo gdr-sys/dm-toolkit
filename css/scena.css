@@ -298,6 +298,8 @@ input, textarea { caret-color: var(--ac); }
 .mz-faccia img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; cursor: zoom-in; }
 .mz-faccia .mz-iniz { font: 400 12rem/1 var(--font-titoli); color: oklch(var(--tle) calc(.14 * var(--kt)) var(--th)); opacity: .45; }
 .mz-faccia .mz-angolo { display: none; }
+/* Con l'immagine la lettera iniziale non serve: si vedeva dietro le parti trasparenti del ritratto. Se l'immagine non si carica, con-img sparisce e la lettera torna. */
+.mz-faccia.con-img .mz-iniz { display: none; }
 .mz-testa { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
 .mz-testa .mz-torna { align-self: flex-start; display: inline-flex; align-items: center; gap: 6px; background: none; border: 0; padding: 4px 0; font: 600 0.92rem var(--font-body); color: var(--text-muted); cursor: pointer; }
 .mz-testa .mz-torna:hover { color: var(--text-primary); }
