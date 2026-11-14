@@ -2965,9 +2965,123 @@ const Storage = (() => {
     language: 'it',
   });
 
+  /* ── Immagini fuori da localStorage ──
+     localStorage tiene circa 5 MB in tutto: senza Drive bastavano due o tre mappe per
+     riempirlo. Le immagini incorporate (data:image, oltre 20 KB: mappe, ritratti, stemmi,
+     documenti) vanno in IndexedDB, che ha spazio per centinaia di MB; nella campagna salvata
+     resta un riferimento "pgsimg:<chiave>", rimesso al suo posto quando la si legge. Chi
+     usa la campagna (pagine, Drive, esportazione) vede sempre l'immagine vera.
+     Un'immagine passa a riferimento solo dopo che IndexedDB ha confermato di averla:
+     fino ad allora resta dentro la campagna come prima. */
+  const IMG_PREFIX = 'pgsimg:';
+  const IMG_MIN = 20 * 1024;
+  const _img = new Map();     // chiave -> data URI (lette o confermate in IndexedDB)
+  const _imgChiave = new Map(); // data URI -> chiave (stessa stringa: ricerca veloce)
+  const _imgInCorso = new Set();
+  let _db = null;
+  const _apriDb = () => new Promise((resolve) => {
+    try {
+      const req = indexedDB.open('pgs_immagini', 1);
+      req.onupgradeneeded = () => req.result.createObjectStore('img');
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => resolve(null);
+      req.onblocked = () => resolve(null);
+    } catch (e) { resolve(null); }
+  });
+  const _hash = (s) => { // FNV-1a su tutta la stringa, piu' la lunghezza
+    let h = 0x811c9dc5;
+    for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 0x01000193); }
+    return (h >>> 0).toString(36) + s.length.toString(36);
+  };
+  // Rilegge le immagini salvate prima di tutto il resto (App.init aspetta, al massimo 2,5 s)
+  const pronto = new Promise((resolve) => {
+    const fine = () => resolve(true);
+    setTimeout(fine, 2500);
+    _apriDb().then((db) => {
+      _db = db;
+      if (!db) return fine();
+      try {
+        const tx = db.transaction('img', 'readonly');
+        const req = tx.objectStore('img').openCursor();
+        req.onsuccess = () => {
+          const c = req.result;
+          if (!c) return fine();
+          const v = c.value;
+          if (v && typeof v.d === 'string') { _img.set(c.key, v.d); _imgChiave.set(v.d, c.key); }
+          c.continue();
+        };
+        req.onerror = fine;
+      } catch (e) { fine(); }
+    });
+  });
+  const _salvaImg = (chiave, dati) => {
+    if (!_db || _imgInCorso.has(chiave)) return;
+    _imgInCorso.add(chiave);
+    try {
+      const tx = _db.transaction('img', 'readwrite');
+      tx.objectStore('img').put({ d: dati, t: Date.now() }, chiave);
+      tx.oncomplete = () => {
+        _imgInCorso.delete(chiave);
+        _img.set(chiave, dati); _imgChiave.set(dati, chiave);
+        _risalvaPresto(); // ora la campagna puo' tenere solo il riferimento e liberare spazio
+      };
+      tx.onerror = tx.onabort = () => { _imgInCorso.delete(chiave); };
+    } catch (e) { _imgInCorso.delete(chiave); }
+  };
+  // Come _salvaImg, ma l'immagine e' gia' in memoria e la campagna punta gia' al riferimento
+  const _salvaImgForzata = (chiave, dati) => {
+    if (!_db) return;
+    try {
+      const tx = _db.transaction('img', 'readwrite');
+      tx.objectStore('img').put({ d: dati, t: Date.now() }, chiave);
+      tx.onerror = tx.onabort = () => { Debug.error('Immagine non salvata in IndexedDB', chiave); };
+    } catch (e) {}
+  };
+  let _risalvaTimer = null;
+  const _risalvaPresto = () => {
+    clearTimeout(_risalvaTimer);
+    _risalvaTimer = setTimeout(() => { try { saveCampaigns(getCampaigns()); } catch (e) {} }, 300);
+  };
+  const _sostituisci = (k, v) => {
+    if (typeof v !== 'string' || v.length < IMG_MIN || !v.startsWith('data:image')) return v;
+    let chiave = _imgChiave.get(v);
+    if (chiave && _img.has(chiave)) return IMG_PREFIX + chiave;
+    if (!_db) return v;
+    chiave = _hash(v);
+    if (_img.get(chiave) === v) { _imgChiave.set(v, chiave); return IMG_PREFIX + chiave; }
+    _salvaImg(chiave, v);
+    return v;
+  };
+  const _rimetti = (k, v) => (typeof v === 'string' && v.startsWith(IMG_PREFIX) && _img.has(v.slice(IMG_PREFIX.length))) ? _img.get(v.slice(IMG_PREFIX.length)) : v;
+  // Una campagna (o un elenco) con le immagini vere al posto dei riferimenti
+  const risolvi = (x) => { try { return JSON.parse(JSON.stringify(x), _rimetti); } catch (e) { return x; } };
+  // Pulizia: immagini non piu' usate da nessuna campagna, salvate da almeno un giorno
+  // (un'altra scheda aperta potrebbe averne appena aggiunta una non ancora nel riferimento)
+  const _pulisciImg = () => {
+    if (!_db) return;
+    let raw = '';
+    try { raw = localStorage.getItem(KEYS.campaigns) || ''; } catch (e) { return; }
+    try {
+      const tx = _db.transaction('img', 'readwrite');
+      const req = tx.objectStore('img').openCursor();
+      req.onsuccess = () => {
+        const c = req.result;
+        if (!c) return;
+        const usata = raw.includes(IMG_PREFIX + c.key) || raw.includes(c.value && c.value.d ? c.value.d.slice(0, 200) : '\u0000');
+        if (!usata && c.value && Date.now() - (c.value.t || 0) > 24 * 60 * 60 * 1000) {
+          const d = c.value.d; _img.delete(c.key); if (d) _imgChiave.delete(d);
+          c.delete();
+        }
+        c.continue();
+      };
+    } catch (e) {}
+  };
+  pronto.then(() => setTimeout(_pulisciImg, 20000));
+
   const get = (key, fallback = null) => {
     try {
       const raw = localStorage.getItem(key);
+      if (raw !== null && key === KEYS.campaigns) return JSON.parse(raw, _rimetti);
       return raw !== null ? JSON.parse(raw) : fallback;
     } catch (e) {
       Debug.error(`Storage.get(${key}):`, e.message);
@@ -2977,10 +3091,24 @@ const Storage = (() => {
 
   const set = (key, value) => {
     try {
-      localStorage.setItem(key, JSON.stringify(value));
+      localStorage.setItem(key, key === KEYS.campaigns ? JSON.stringify(value, _sostituisci) : JSON.stringify(value));
       return true;
     } catch (e) {
       Debug.error(`Storage.set(${key}):`, e.message);
+
+      // Spazio finito con immagini nuove non ancora confermate da IndexedDB: si salvano subito
+      // come riferimento (la scrittura in IndexedDB e' gia' partita) invece di scartarle.
+      if (key === KEYS.campaigns && _db) {
+        try {
+          localStorage.setItem(key, JSON.stringify(value, (k, v) => {
+            if (typeof v !== 'string' || v.length < IMG_MIN || !v.startsWith('data:image')) return v;
+            const chiave = _imgChiave.get(v) || _hash(v);
+            if (!_img.has(chiave)) { _img.set(chiave, v); _imgChiave.set(v, chiave); _salvaImgForzata(chiave, v); }
+            return IMG_PREFIX + chiave;
+          }));
+          return true;
+        } catch (e3) { /* nemmeno cosi': si prosegue togliendo le immagini nuove */ }
+      }
 
       if (key.includes('campaigns') && Array.isArray(value)) {
         // Non cancellare le immagini gia' salvate con successo in precedenza: rimuovi solo
@@ -3209,6 +3337,7 @@ const Storage = (() => {
     exportCampaign, importCampaign,
     getMasterScreen, saveMasterScreen,
     getStorageInfo,
+    pronto, risolvi,
     emptyCampaign
   };
 })();
@@ -16032,7 +16161,9 @@ const DriveBackup = (() => {
     if (!isConnected()) return null;
     if (!_folderId) _folderId = await _getOrCreateFolder();
 
-    const campCopy = JSON.parse(JSON.stringify(camp));
+    // Immagini tenute in IndexedDB: su Drive va sempre l'immagine vera, mai il riferimento
+    try { await Storage.pronto; } catch (e) {}
+    const campCopy = Storage.risolvi(camp);
     await replaceImagesWithDriveLinks(campCopy);
     const content = JSON.stringify(campCopy);
     // Le immagini appena spostate su Drive vanno tolte anche dalla copia locale, altrimenti
@@ -22205,16 +22336,21 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('debug-body'),
     document.getElementById('debug-panel')
   );
-  App.init();
-  BackupSystem.autoBackup();
-  Settings.init();
-  try { WikiSections.init(); } catch(e) {}
-  setTimeout(() => { try { DriveBackup.init(); } catch(e) {} }, 1200);
+  // Prima le immagini salvate in IndexedDB (di solito pochi centesimi di secondo, al massimo 2,5 s),
+  // poi l'app: chi legge le campagne all'avvio trova gia' le immagini vere.
+  const avvia = () => {
+    App.init();
+    BackupSystem.autoBackup();
+    Settings.init();
+    try { WikiSections.init(); } catch(e) {}
+    setTimeout(() => { try { DriveBackup.init(); } catch(e) {} }, 1200);
 
-  setTimeout(() => { try { GDriveUI.init(); } catch(e) {} }, 1000);
-  setTimeout(() => { try { FirebaseSync.init(); } catch(e) {} }, 500);
+    setTimeout(() => { try { GDriveUI.init(); } catch(e) {} }, 1000);
+    setTimeout(() => { try { FirebaseSync.init(); } catch(e) {} }, 500);
 
-  setTimeout(() => MonsterCache.load(), 500);
+    setTimeout(() => MonsterCache.load(), 500);
+  };
+  Storage.pronto.then(avvia, avvia);
 
   if ('serviceWorker' in navigator && window.self === window.top) {
     navigator.serviceWorker.register('sw.js').catch(function(){});

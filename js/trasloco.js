@@ -33,6 +33,8 @@ const Trasloco = (() => {
         if (CHIAVI.test(k) && k !== FATTO) o[k] = localStorage.getItem(k);
       }
     } catch (e) {}
+    // Immagini tenute in IndexedDB (ogni indirizzo ha il suo): si consegnano quelle vere
+    try { if (typeof Storage !== 'undefined' && Storage.getCampaigns) o.dmtoolkit_campaigns = JSON.stringify(Storage.getCampaigns()); } catch (e) {}
     return o;
   };
 
@@ -45,14 +47,15 @@ const Trasloco = (() => {
     let arrivate = [];
     try { arrivate = JSON.parse(dati.dmtoolkit_campaigns || '[]') || []; } catch (e) {}
     let qui = [];
-    try { qui = JSON.parse(_leggi('dmtoolkit_campaigns') || '[]') || []; } catch (e) {}
+    try { qui = Storage.getCampaigns() || []; } catch (e) {}
     // Campagne: per id, vince la versione aggiornata piu' di recente
     const mappa = new Map(qui.map((c) => [c.id, c]));
     for (const c of arrivate) {
       const g = mappa.get(c.id);
       if (!g || (c.updatedAt || 0) > (g.updatedAt || 0)) mappa.set(c.id, c);
     }
-    if (arrivate.length) _scrivi('dmtoolkit_campaigns', JSON.stringify([...mappa.values()]));
+    // Con Storage le immagini pesanti vanno in IndexedDB invece di riempire localStorage
+    if (arrivate.length) { try { Storage.saveCampaigns([...mappa.values()]); } catch (e) { _scrivi('dmtoolkit_campaigns', JSON.stringify([...mappa.values()])); } }
     // Il resto: solo cio' che qui manca (impostazioni gia' scelte al nuovo indirizzo restano)
     for (const [k, v] of Object.entries(dati)) {
       if (k === 'dmtoolkit_campaigns') continue;
@@ -66,10 +69,13 @@ const Trasloco = (() => {
     const onMsg = (e) => {
       if (e.origin !== VECCHIO || !e.data || e.data.tipo !== 'pgs-trasloco-dati') return;
       window.removeEventListener('message', onMsg);
-      const n = _unisci(e.data.dati || {});
-      try { window.opener.postMessage({ tipo: 'pgs-trasloco-fatto', campagne: n }, VECCHIO); } catch (err) {}
-      _scrivi('pgs_trasloco_arrivato', String(n));
-      location.replace(location.pathname);
+      Promise.resolve(typeof Storage !== 'undefined' && Storage.pronto).then(() => {
+        const n = _unisci(e.data.dati || {});
+        try { window.opener.postMessage({ tipo: 'pgs-trasloco-fatto', campagne: n }, VECCHIO); } catch (err) {}
+        _scrivi('pgs_trasloco_arrivato', String(n));
+        // Il tempo di scrivere le immagini in IndexedDB prima di ricaricare
+        setTimeout(() => location.replace(location.pathname), 800);
+      });
     };
     window.addEventListener('message', onMsg);
     try { window.opener.postMessage({ tipo: 'pgs-trasloco-pronto' }, VECCHIO); } catch (e) {}
