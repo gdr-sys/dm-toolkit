@@ -591,9 +591,95 @@ const CartoRegno = (() => {
     scena.sort((a, b) => a[0] - b[0]);
     s += scena.map((q) => q[1]).join('');
 
+    /* Regni e confini. Ogni regno parte dalla sua citta' piu' importante e si allarga sul terreno:
+       salire sui monti e passare un fiume costa fatica, il mare costa ancora di piu'. Cosi' i confini
+       corrono lungo creste e fiumi, e le isole vanno al regno piu' vicino via mare. */
+    let regni = [];
     if (o.confini) {
-      const cap = citta.filter((c) => c.rango === 2).map((c) => [c.x, c.y]);
-      if (cap.length > 1) s += `<g clip-path="url(#carto-terra)"><path d="${M.celle(cap, -50, -50, W + 50, H + 50).map((q) => M.via(q)).join('')}" fill="none" stroke="${A ? t.tetto : t.ambra}" stroke-width="2.6" stroke-dasharray="12 6 2 6" opacity="0.6"/></g>`;
+      const quantiRegni = Math.max(2, Math.min(6, parseInt(o.regni, 10) || 3));
+      const semi = citta.filter((c) => c.rango === 2).slice();
+      const altre = citta.filter((c) => c.rango === 1);
+      while (semi.length < quantiRegni && altre.length) {
+        // la prossima capitale e' la citta' piu' lontana da quelle gia' scelte
+        altre.sort((a, b) => Math.min(...semi.map((s0) => M.dist([s0.x, s0.y], [b.x, b.y]))) - Math.min(...semi.map((s0) => M.dist([s0.x, s0.y], [a.x, a.y]))));
+        semi.push(altre.shift());
+      }
+      const regione = new Int16Array(cw * ch).fill(-1), costo = new Float64Array(cw * ch).fill(Infinity), cq = _coda();
+      semi.forEach((c, n) => { costo[c.k] = 0; regione[c.k] = n; cq.push(c.k, 0); });
+      const fatica = (k) => {
+        const i = k % cw, j = (k - i) / cw;
+        if (eg[k] <= 0) return 9;
+        return 1 + Math.pow(Math.max(0, eg[k]), 1.6) * 14 + (piuFiume[k] ? 7 : 0) + rm(i * 0.08 + 3, j * 0.08 + 7) * 7 + rm(i * 0.25 + 9, j * 0.25 + 1) * 2;
+      };
+      while (cq.size) {
+        const k = cq.pop(), i = k % cw, j = (k - i) / cw;
+        // anche in diagonale: i confini non vengono a scalini dritti
+        for (const [a, b] of V8) {
+          const u = i + a, v = j + b;
+          if (u < 0 || v < 0 || u >= cw || v >= ch) continue;
+          const n = id(u, v), c2 = costo[k] + fatica(n) * (a && b ? 1.414 : 1);
+          if (c2 < costo[n]) { costo[n] = c2; regione[n] = regione[k]; cq.push(n, c2); }
+        }
+      }
+      // Confine = i lati tra due celle di terra di regni diversi, uniti in linee e ammorbiditi
+      const S = G * C, chiave = (x, y) => x + ',' + y, vicini = new Map();
+      const lato = (x1, y1, x2, y2) => {
+        const a = chiave(x1, y1), b = chiave(x2, y2);
+        if (!vicini.has(a)) vicini.set(a, []); if (!vicini.has(b)) vicini.set(b, []);
+        vicini.get(a).push(b); vicini.get(b).push(a);
+      };
+      const terraC = (k) => eg[k] > 0;
+      for (let j = 0; j < ch; j++) for (let i = 0; i < cw; i++) {
+        const k = id(i, j);
+        if (!terraC(k)) continue;
+        if (i + 1 < cw && terraC(k + 1) && regione[k + 1] !== regione[k]) lato(i + 1, j, i + 1, j + 1);
+        if (j + 1 < ch && terraC(k + cw) && regione[k + cw] !== regione[k]) lato(i, j + 1, i + 1, j + 1);
+      }
+      const usati = new Set(), linee = [];
+      const segno = (a, b) => (a < b ? a + '|' + b : b + '|' + a);
+      for (const [p0, lista] of vicini) {
+        for (const p1 of lista) {
+          if (usati.has(segno(p0, p1))) continue;
+          // si cammina da p0 verso p1 finche' la linea continua senza bivi
+          const linea = [p0, p1];
+          usati.add(segno(p0, p1));
+          let prima = p0, ora = p1;
+          for (;;) {
+            const avanti = (vicini.get(ora) || []).filter((q) => q !== prima && !usati.has(segno(ora, q)));
+            if (avanti.length !== 1 || vicini.get(ora).length > 2) break;
+            usati.add(segno(ora, avanti[0])); linea.push(avanti[0]); prima = ora; ora = avanti[0];
+          }
+          linee.push(linea.map((q) => q.split(',').map((n) => +n * S)));
+        }
+      }
+      // Via gli scalini (si tengono i punti di mezzo dei lati) e un leggero tremolio, come un confine tracciato a mano
+      const tratti = linee.filter((l) => l.length > 1).map((l) => {
+        const mezzi = [l[0]];
+        for (let q = 1; q < l.length; q++) mezzi.push([(l[q - 1][0] + l[q][0]) / 2, (l[q - 1][1] + l[q][1]) / 2]);
+        mezzi.push(l[l.length - 1]);
+        const mossi = mezzi.map(([x, y], q) => (q === 0 || q === mezzi.length - 1) ? [x, y] : [x + (rn(x * 0.013 + 31, y * 0.013) - 0.5) * 20, y + (rn(x * 0.013, y * 0.013 + 57) - 0.5) * 20]);
+        return M.morbida(mossi, 3);
+      });
+      // Tinte leggere dei regni (a scelta) e nomi: la zona di ogni regno e' fatta dalle sue celle
+      const TINTE = ['#b5523b', '#3f6f8f', '#6b8f3f', '#8f6bb5', '#b58a3b', '#3f8f86'];
+      let tinte = '';
+      regni = semi.map((c, n) => {
+        let sx = 0, sy = 0, tot = 0;
+        for (let k = 0; k < cw * ch; k++) if (regione[k] === n && eg[k] > 0) { const i = k % cw; sx += i; sy += (k - i) / cw; tot++; }
+        const titolo = (c.rango === 2 ? (n === 0 ? 'Regno di ' : 'Principato di ') : r.pick(['Contea di ', 'Marca di ', 'Ducato di ', 'Baronia di '])) + c.nome;
+        return { n, nome: titolo, capitale: c.nome, x: tot ? sx / tot * S : c.x, y: tot ? sy / tot * S : c.y, celle: tot };
+      });
+      if (o.tinte) {
+        regni.forEach((g) => {
+          const f = (i, j) => { const u = Math.min(cw - 1, Math.floor(i / C)), v = Math.min(ch - 1, Math.floor(j / C)); return regione[id(u, v)] === g.n ? 1 : -1; };
+          const forme = M.contorni(w, h, f, 0, G).map((l) => M.morbida(l, 2, true));
+          if (forme.length) tinte += `<path d="${forme.map((l) => M.via(l)).join('')}" fill="${TINTE[g.n % TINTE.length]}" opacity="${scuro ? 0.09 : 0.13}" fill-rule="evenodd"/>`;
+        });
+      }
+      const colore = A ? t.tetto : t.ambra;
+      s += `<g clip-path="url(#carto-terra)">${tinte}` +
+        `<path d="${tratti.map((l) => M.via(l, false)).join('')}" fill="none" stroke="${A ? t.carta : t.mare}" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.7"/>` +
+        `<path d="${tratti.map((l) => M.via(l, false)).join('')}" fill="none" stroke="${colore}" stroke-width="2.6" stroke-dasharray="12 6 2 6" stroke-linecap="round" stroke-linejoin="round"/></g>`;
     }
 
     /* ─── Scritte ─── */
@@ -603,7 +689,7 @@ const CartoRegno = (() => {
     const larghezza = (txt, size, sp = 0) => txt.length * (size * 0.5 + sp);
     const stile = (size, extra = {}) => ({ size, font: t.font, colore: t.testo, alone: t.testoAlone, aloneW: Math.max(3, size * 0.22), peso: t.peso, ...extra });
     const posa = (x, y, txt, st, passi) => {
-      const size = st.size, l = larghezza(txt, size);
+      const size = st.size, l = larghezza(txt, size, st.spazio || 0);
       for (const [dx, dy] of passi) {
         const px = x + dx, py = y + dy, x0 = px - l / 2, x1 = px + l / 2;
         if (x0 < 42 || x1 > W - 42 || py - size < 42 || py > H - 40 || urta(x0, py - size, x1, py + 3)) continue;
@@ -624,6 +710,8 @@ const CartoRegno = (() => {
       posa(c.x, c.y, c.nome, stile(size), [[0, sotto], [0, sotto + 16], [0, -size * 1.3 - (c.rango === 2 ? 36 : 22)], [larghezza(c.nome, size) / 2 + 30, 6], [-larghezza(c.nome, size) / 2 - 30, 6]]);
     });
     notevoli.forEach((c) => posa(c.x, c.y, c.nome, stile(16), [[0, 19], [0, -19], [0, 35]]));
+    // Nomi dei regni, larghi e in corsivo, nel mezzo delle loro terre
+    regni.forEach((g) => { if (g.celle > 40) posa(g.x, g.y, g.nome, stile(21, { corsivo: true, spazio: 2, peso: A ? 600 : 500 }), [[0, 0], [0, 44], [0, -44], [80, 20], [-80, 20], [0, 90], [0, -90]]); });
 
     // Nomi curvi su montagne e boschi: si misura ogni gruppo per seguirne la forma
     const gruppiDa = (f) => {
@@ -787,7 +875,8 @@ const CartoRegno = (() => {
         ? { tipo: 'villaggio', opzioni: { taglia: 'medio', fiume: conFiume } }
         : { tipo: 'citta', opzioni: { taglia: c.rango === 2 ? 'grande' : 'media', costa: sulMare, fiume: conFiume, mura: true, castello: c.rango === 2 } };
       return { x: c.x, y: c.y, label: c.nome, sottotipo: '', genera, tipoLuogo: c.rango >= 1 ? 'Città' : 'Villaggio', note: ruolo + '.' + (vie ? ' Strade per ' + vie + '.' : '') + (mare ? ' Via mare per ' + mare + '.' : '') };
-    }).concat(notevoli.map((c) => ({ x: c.x, y: c.y, label: c.nome, sottotipo: 'pericolo', tipoLuogo: 'Dungeon', genera: { tipo: 'dungeon', opzioni: {} }, note: 'Luogo misterioso, tutto da riempire.' })));
+    }).concat(notevoli.map((c) => ({ x: c.x, y: c.y, label: c.nome, sottotipo: 'pericolo', tipoLuogo: 'Dungeon', genera: { tipo: 'dungeon', opzioni: {} }, note: 'Luogo misterioso, tutto da riempire.' })))
+      .concat(regni.filter((g) => g.celle > 40).map((g) => ({ x: g.x, y: g.y - 30, label: g.nome, sottotipo: '', note: 'Capitale: ' + g.capitale + '. I confini seguono monti e fiumi.' })));
 
     const svg = M.apri(W, H, A ? M.PALETTE.atlante : M.PALETTE.cartografo, o.seme) + s + (o.nomi === false ? '' : testi) + rosa + cornice + scala + '</svg>';
     return { nome, pin, W, H, larghezzaKm: W * kmPx, svg };
