@@ -118,6 +118,7 @@ const Cartografo = (() => {
       const a = _attuale(), tipo = _stato.tipo;
       try {
         const m = K().genera(tipo, { ...a.opzioni, seme: a.seme, nome: _nomeEffettivo() });
+        if (typeof CartoRitocchi !== 'undefined') CartoRitocchi.applica(m, a); // nomi cambiati e scritte aggiunte
         const css = await _font();
         if (turno !== _turno) return;
         m.svgCompleto = _conFont(m.svg, css);
@@ -158,7 +159,7 @@ const Cartografo = (() => {
     const f = _storia.pop();
     if (!f) return;
     _stato.tipo = f.tipo;
-    _stato.perTipo[f.tipo] = { opzioni: f.opzioni, seme: f.seme, nome: f.nome };
+    _stato.perTipo[f.tipo] = { opzioni: f.opzioni, seme: f.seme, nome: f.nome, ...(f.ritocchi ? { ritocchi: f.ritocchi } : {}) };
     _aggiornaControlli(); genera();
   };
   const scegliTipo = (t) => {
@@ -278,7 +279,9 @@ const Cartografo = (() => {
     }, { passive: false });
     st.addEventListener('dblclick', _adatta);
     st.addEventListener('gesturestart', (e) => e.preventDefault());
+    let tocco = null;
     st.addEventListener('pointerdown', (e) => {
+      tocco = punti.size ? null : { x: e.clientX, y: e.clientY };
       punti.set(e.pointerId, [e.clientX, e.clientY]);
       if (punti.size === 2) {
         const [a, b] = [...punti.values()];
@@ -299,7 +302,15 @@ const Cartografo = (() => {
       }
     });
     const fine = (e) => { punti.delete(e.pointerId); if (punti.size < 2) inizio = null; };
-    st.addEventListener('pointerup', fine);
+    st.addEventListener('pointerup', (e) => {
+      const t = tocco;
+      tocco = null;
+      if (t && punti.size === 1 && Math.hypot(e.clientX - t.x, e.clientY - t.y) < 8 && typeof CartoRitocchi !== 'undefined' && CartoRitocchi.inAttesa()) {
+        const b = st.getBoundingClientRect();
+        CartoRitocchi.tocco((e.clientX - b.left - V.x) / V.s, (e.clientY - b.top - V.y) / V.s);
+      }
+      fine(e);
+    });
     st.addEventListener('pointercancel', fine);
     if (window.ResizeObserver) new ResizeObserver(() => { if (st.offsetParent) { const era = V.s <= V.fit * 1.001; const f = Math.min(st.clientWidth / V.W, st.clientHeight / V.H); if (era) _adatta(); else { V.fit = f; _applica(); } } }).observe(st);
   };
@@ -655,6 +666,15 @@ const Cartografo = (() => {
       '.carto-nome-mappa { font-family:var(--font-display); font-size:1.05rem; color:var(--text-primary); line-height:1.25; overflow-wrap:anywhere; }' +
       '#carto-info { font-size:0.85rem; color:var(--text-muted); }' +
       '.carto-azioni { display:flex; flex-wrap:wrap; gap:6px; align-items:center; }' +
+      '#carto-stage.carto-posa { cursor:crosshair !important; outline:3px dashed var(--accent-primary); outline-offset:-3px; }' +
+      '.carto-rit-lista { display:grid; gap:6px; max-height:42vh; overflow-y:auto; padding-right:2px; }' +
+      '.carto-rit-riga { display:flex; gap:8px; align-items:center; }' +
+      '.carto-rit-riga .form-input { flex:1; min-width:0; font-size:0.85rem; }' +
+      '.carto-rit-riga .form-select { width:auto !important; font-size:0.8rem; }' +
+      '.carto-rit-nascondi { display:inline-flex; align-items:center; gap:6px; font-size:0.8rem; white-space:nowrap; cursor:pointer; }' +
+      '.carto-rit-scritta { margin-bottom:6px; }' +
+      '.carto-rit-nuova { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-top:4px; }' +
+      '.carto-rit-nuova .form-input { flex:1 1 200px; } .carto-rit-nuova .form-select { width:auto !important; }' +
       '#carto-stage { position:relative; overflow:hidden; height:max(440px, calc(100vh - 300px)); height:max(440px, calc(100dvh - 300px)); background:var(--bg-tertiary); border:1px solid var(--border); border-radius:var(--radius-lg); user-select:none; -webkit-user-select:none; }' +
       '#carto-contesto:not([hidden]) ~ .carto-corpo #carto-stage { height:max(440px, calc(100vh - 352px)); height:max(440px, calc(100dvh - 352px)); }' +
       '#carto-vista { position:absolute; left:0; top:0; transform-origin:0 0; }' +
@@ -694,6 +714,7 @@ const Cartografo = (() => {
               '<div class="carto-zoom"><button type="button" class="btn btn-ghost btn-icon-sm" onclick="Cartografo.zoom(1/1.4)" aria-label="Riduci">−</button>' +
               '<button type="button" class="btn btn-ghost btn-sm" id="carto-zoom" onclick="Cartografo.zoomReset()" title="Adatta allo spazio">100%</button>' +
               '<button type="button" class="btn btn-ghost btn-icon-sm" onclick="Cartografo.zoom(1.4)" aria-label="Ingrandisci">+</button></div>' +
+              '<button type="button" class="btn btn-secondary btn-sm" onclick="Cartografo.ritocca()" title="Rinomina o nascondi i nomi, aggiungi scritte tue">Ritocca</button>' +
               '<button type="button" class="btn btn-primary btn-sm" onclick="Cartografo.apriMettiNelleMappe()">Metti nelle mappe</button>' +
               '<button type="button" class="btn btn-secondary btn-sm" id="carto-png" onclick="Cartografo.scaricaPng()">Scarica PNG</button>' +
               '<button type="button" class="btn btn-secondary btn-sm" onclick="Cartografo.scaricaSvg()">Scarica SVG</button>' +
@@ -727,5 +748,9 @@ const Cartografo = (() => {
   document.addEventListener('DOMContentLoaded', () => setTimeout(() => { _aggancia(); if ($('page-cartografo')?.classList.contains('active')) apri(); }, 200));
 
   const strumenti = { fontDa: _fontDa, conFont: _conFont, inCanvas: _inCanvas, scarica: _scarica, stile: _stile };
-  return { strumenti, perPin, annullaContesto, apri, nuova, aCaso, _tieniColori, precedente, scegliTipo, zoom, zoomReset, scaricaPng, scaricaSvg, scaricaVtt, stampaScala, _confermaScelta, apriMettiNelleMappe, _confermaMappe, _opzione, _nome, _seme };
+  const ritocca = () => {
+    if (!_mappa || typeof CartoRitocchi === 'undefined') return;
+    CartoRitocchi.apri({ stato: () => ({ a: _attuale(), mappa: _mappa }), salvaStato: _salva, rigenera: genera });
+  };
+  return { strumenti, ritocca, perPin, annullaContesto, apri, nuova, aCaso, _tieniColori, precedente, scegliTipo, zoom, zoomReset, scaricaPng, scaricaSvg, scaricaVtt, stampaScala, _confermaScelta, apriMettiNelleMappe, _confermaMappe, _opzione, _nome, _seme };
 })();
