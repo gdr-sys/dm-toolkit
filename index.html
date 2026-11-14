@@ -6086,21 +6086,43 @@ const Sessione = (() => {
     document.body.appendChild(modal);
   };
 
-  const _rollAction = (formula, nome, el) => {
-    const result = Dadi.roll(formula);
+  // Tocco su un'azione: se e' un attacco tira prima il d20 per colpire (con il bonus della scheda),
+  // poi i danni. 20 naturale = critico (dadi dei danni raddoppiati, regole 5e), 1 naturale = manca.
+  const _rollAction = (formula, nome, el, bonus) => {
+    const haColpo = bonus !== undefined && bonus !== null && bonus !== '' && Number.isFinite(Number(bonus));
+    const b = haColpo ? Number(bonus) : 0;
+    let nat = 0, colpo = null;
+    if (haColpo) {
+      nat = Dadi.roll('1d20').total;
+      colpo = nat + b;
+    }
+    const critico = haColpo && nat === 20;
+    const formulaDanni = critico ? formula.replace(/(\d*)d(\d+)/gi, (_, n, f) => `${(parseInt(n, 10) || 1) * 2}d${f}`) : formula;
+    const result = Dadi.roll(formulaDanni);
     if (result.error) { Toast.show('Formula non valida: ' + formula, 'warning'); return; }
 
     const existing = el.querySelector('.action-roll-result');
     if (existing) existing.remove();
     const div = document.createElement('div');
     div.className = 'action-roll-result';
-    div.style.cssText = 'margin-top:4px;padding:4px 8px;background:var(--bg-tertiary);border-radius:var(--radius-sm);font-family:var(--font-mono);font-size:0.85rem;display:flex;align-items:center;gap:8px;';
-    div.innerHTML = `<span style="color:var(--accent-secondary-text);font-weight:700;font-size:1.1rem;">${result.total}</span><span style="color:var(--text-muted);font-size:0.72rem;">${result.detail}</span><span style="color:var(--text-muted);font-size:0.7rem;">${nome}</span>`;
+    div.style.cssText = 'margin-top:4px;padding:4px 8px;background:var(--bg-tertiary);border-radius:var(--radius-sm);font-family:var(--font-mono);font-size:0.85rem;display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px;';
+    const num = (v, colore) => `<span style="color:${colore};font-weight:700;font-size:1.1rem;">${v}</span>`;
+    const nota = (t) => `<span style="color:var(--text-muted);font-size:0.72rem;">${t}</span>`;
+    const pezzi = [];
+    if (haColpo) {
+      const esito = nat === 20 ? ' · critico!' : nat === 1 ? ' · 1 naturale, manca' : '';
+      const colore = nat === 20 ? 'var(--success-text, var(--accent-secondary-text))' : nat === 1 ? 'var(--danger-text)' : 'var(--accent-secondary-text)';
+      pezzi.push(`<span style="display:inline-flex;align-items:center;gap:6px;">${nota('Colpire')}${num(colpo, colore)}${nota(`d20 ${nat} ${b >= 0 ? '+' : '−'} ${Math.abs(b)}${esito}`)}</span>`);
+    }
+    pezzi.push(`<span style="display:inline-flex;align-items:center;gap:6px;">${haColpo ? nota('Danni') : ''}${num(result.total, 'var(--accent-secondary-text)')}${nota(result.detail)}</span>`);
+    pezzi.push(`<span style="color:var(--text-muted);font-size:0.7rem;">${_escCombat(nome)}</span>`);
+    div.innerHTML = pezzi.join('');
     el.appendChild(div);
 
     div.style.animation = 'diceResult 0.3s ease';
-    Storage.addDiceRoll(formula, result.rolls, result.total);
-    Debug.log(`${nome}: ${result.total} [${formula}] → ${result.detail}`);
+    if (haColpo) Storage.addDiceRoll(`1d20${b >= 0 ? '+' : ''}${b}`, [nat], colpo);
+    Storage.addDiceRoll(formulaDanni, result.rolls, result.total);
+    Debug.log(`${nome}: ${haColpo ? `colpire ${colpo} (d20 ${nat}${b >= 0 ? '+' : ''}${b}), ` : ''}danni ${result.total} [${formulaDanni}] → ${result.detail}`);
   };
 
   const addCombatantToCurrent = (combatant) => {
@@ -6271,13 +6293,23 @@ const Sessione = (() => {
 
   // Dadi di un'azione: nel Compendio sono scritti "3d6 + 5" con gli spazi, prima si prendeva solo "3d6"
   const _formulaDadiCombat = (desc) => { const m = String(desc || '').match(/(\d+d\d+(?:\s*[+\-]\s*\d+)?)/i); return m ? m[1].replace(/\s+/g, '') : null; };
-  // Azione toccabile: nome e formula viaggiano in data-*, cosi' un apostrofo ("Attacco d'ala") non rompe il tocco
+  // Bonus per colpire scritto nella scheda: "+4 al tiro per colpire" (2014), "*Tiro per colpire in mischia:* +4" (2024),
+  // "+4 to hit" (homebrew in inglese). Le frasi tipo "se il tiro per colpire e' stato effettuato con vantaggio" non contano.
+  const _bonusColpoCombat = (desc) => {
+    const s = String(desc || '').replace(/−/g, '-');
+    const m = s.match(/([+\-]\s?\d+)\s+al\s+tiro\s+per\s+colpire/i)
+      || s.match(/tiro\s+per\s+colpire[^:.]{0,40}:\**\s*([+\-]\s?\d+)/i)
+      || s.match(/([+\-]\s?\d+)\s+to\s+hit/i);
+    return m ? parseInt(m[1].replace(/\s/g, ''), 10) : null;
+  };
+  const _badgeAzioneCombat = (f, b) => `${b !== null ? `${b >= 0 ? '+' : '−'}${Math.abs(b)} · ` : ''}${f}`;
+  // Azione toccabile: nome, formula e bonus viaggiano in data-*, cosi' un apostrofo ("Attacco d'ala") non rompe il tocco
   const _azioneCombatHTML = (nome, desc) => {
-    const e = _escCombat, f = _formulaDadiCombat(desc);
+    const e = _escCombat, f = _formulaDadiCombat(desc), b = f ? _bonusColpoCombat(desc) : null;
     return `<div class="sb-action" style="cursor:${f ? 'pointer' : 'default'};"
-      ${f ? `data-f="${e(f)}" data-n="${e(nome || '')}" onclick="Sessione._rollAction(this.dataset.f, this.dataset.n, this)"` : ''}>
+      ${f ? `data-f="${e(f)}" data-n="${e(nome || '')}" ${b !== null ? `data-a="${b}"` : ''} onclick="Sessione._rollAction(this.dataset.f, this.dataset.n, this, this.dataset.a)"` : ''}>
       <strong>${e(nome || '')}.</strong> <span class="text-secondary">${e(desc || '')}</span>
-      ${f ? `<span class="badge badge-muted" style="margin-left:4px;font-size:0.6rem;">${e(f)}</span>` : ''}
+      ${f ? `<span class="badge badge-muted" style="margin-left:4px;font-size:0.6rem;">${e(_badgeAzioneCombat(f, b))}</span>` : ''}
     </div>`;
   };
 
@@ -6326,11 +6358,11 @@ const Sessione = (() => {
     const formulaDi = (desc) => { const m = String(desc || '').match(/(\d+d\d+(?:\s*[+\-]\s*\d+)?)/i); return m ? m[1].replace(/\s+/g, '') : null; };
     const riga = (label, v) => (v || v === 0) ? `<div class="stat-row"><strong>${label}</strong> <span>${e(v)}</span></div>` : '';
     const azione = (a) => {
-      const f = formulaDi(a.desc);
+      const f = formulaDi(a.desc), b = f ? _bonusColpoCombat(a.desc) : null;
       return `<div class="sb-action" style="cursor:${f ? 'pointer' : 'default'};"
-        ${f ? `data-f="${e(f)}" data-n="${e(a.name)}" onclick="Sessione._rollAction(this.dataset.f, this.dataset.n, this)"` : ''}>
+        ${f ? `data-f="${e(f)}" data-n="${e(a.name)}" ${b !== null ? `data-a="${b}"` : ''} onclick="Sessione._rollAction(this.dataset.f, this.dataset.n, this, this.dataset.a)"` : ''}>
         <strong>${e(a.name)}.</strong> <span class="text-secondary">${e(a.desc || '')}</span>
-        ${f ? `<span class="badge badge-muted" style="margin-left:4px;font-size:0.6rem;">${e(f)}</span>` : ''}
+        ${f ? `<span class="badge badge-muted" style="margin-left:4px;font-size:0.6rem;">${e(_badgeAzioneCombat(f, b))}</span>` : ''}
       </div>`;
     };
     const sezione = (titolo, arr) => {
