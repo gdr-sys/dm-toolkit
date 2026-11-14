@@ -843,3 +843,14 @@
   #main-content { padding-bottom: calc(var(--mobile-nav-height) + var(--safe-bottom)); }
   #dice-widget { bottom: calc(var(--mobile-nav-height) + var(--safe-bottom) + var(--space-sm)); }
 }
+
+/* Telefoni: le regole qui sopra allargano ogni campo delle finestre a tutta larghezza.
+   Le caselle di spunta e i pallini restano piccoli accanto alla loro scritta (prima
+   si allargavano e la scritta finiva dall'altra parte). In fondo alla finestra c'e'
+   spazio per le barre del browser che si sovrappongono alla pagina (iPhone), cosi'
+   si arriva sempre a "Salva". */
+@media (max-width: 768px) {
+  .modal input[type="checkbox"],
+  .modal input[type="radio"] { width: auto !important; min-width: 18px; height: 18px; flex-shrink: 0; margin: 0; }
+  .modal { max-height: 92vh !important; max-height: 92dvh !important; padding-bottom: max(24px, calc(env(safe-area-inset-bottom) + 72px)) !important; }
+}

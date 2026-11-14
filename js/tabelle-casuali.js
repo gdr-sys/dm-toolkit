@@ -279,6 +279,7 @@ const TabelleCasuali = (() => {
           '<div id="tc-sottotitolo" style="font-size:0.78rem;color:var(--text-muted);margin-top:2px;">Tabelle casuali del tuo mondo: le scrivi tu, l\'app le tira.</div>' +
         '</div>' +
         '<div style="display:flex;gap:6px;flex-wrap:wrap;">' +
+          '<button type="button" class="btn btn-ghost btn-sm" onclick="TabelleCasuali.guidaCSV()" title="Come preparare il file da importare">Come fare il file</button>' +
           '<label class="btn btn-ghost btn-sm" style="cursor:pointer;" title="Importa una tabella da un file CSV o di testo">Importa CSV' +
             '<input type="file" accept=".csv,.txt,text/csv,text/plain" style="display:none;" onchange="TabelleCasuali.importaFile(event)">' +
           '</label>' +
@@ -361,10 +362,10 @@ const TabelleCasuali = (() => {
             '<code>{PNG}</code>, <code>{Luogo}</code>, <code>{Fazione}</code> e <code>{PG}</code> pescano un nome della tua campagna. ' +
             'Una riga come <code>$capo = {PNG}</code> crea una variabile: ogni <code>$capo</code> nelle voci diventa lo stesso nome, anche tirando più volte.' +
           '</div>' +
-          '<label style="display:flex;align-items:center;gap:8px;font-size:0.85rem;margin-bottom:12px;cursor:pointer;"><input type="checkbox" id="tc-unici" checked> Tirando più volte insieme, niente doppioni</label>' +
+          '<label style="display:flex;align-items:center;gap:8px;font-size:0.85rem;margin-bottom:12px;cursor:pointer;"><input type="checkbox" id="tc-unici" checked><span>Tirando più volte insieme, niente doppioni</span></label>' +
           '<div id="tc-anteprima" style="margin-bottom:12px;"></div>' +
           '<div class="form-group" style="margin:0;"><label class="form-label">Collega a uno o più Luoghi</label>' +
-            '<div id="tc-luoghi" style="display:flex;flex-wrap:wrap;gap:6px 14px;max-height:120px;overflow-y:auto;font-size:0.85rem;"></div></div>' +
+            '<div id="tc-luoghi" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px 14px;max-height:180px;overflow-y:auto;font-size:0.85rem;"></div></div>' +
         '</div>' +
         '<div class="modal-footer" style="justify-content:space-between;">' +
           '<button type="button" class="btn btn-ghost" id="tc-elimina" style="color:var(--danger-text);" onclick="TabelleCasuali._elimina()">Elimina</button>' +
@@ -424,7 +425,7 @@ const TabelleCasuali = (() => {
     document.getElementById('tc-elimina').style.visibility = t ? 'visible' : 'hidden';
     const luoghi = [...(_camp()?.locations || [])].sort((a, b) => (a.nome || a.name || '').localeCompare(b.nome || b.name || '', 'it'));
     document.getElementById('tc-luoghi').innerHTML = luoghi.length
-      ? luoghi.map(l => '<label style="display:inline-flex;align-items:center;gap:6px;cursor:pointer;">' +
+      ? luoghi.map(l => '<label style="display:flex;align-items:center;gap:8px;cursor:pointer;line-height:1.3;">' +
           '<input type="checkbox" value="' + _esc(l.id) + '"' + ((dati.luoghi || []).includes(l.id) ? ' checked' : '') + '>' +
           _esc(l.nome || l.name || 'Senza nome') + '</label>').join('')
       : '<span style="color:var(--text-muted);">Nessun luogo nella campagna.</span>';
@@ -525,6 +526,46 @@ const TabelleCasuali = (() => {
     return { nome: String(nomeFile || '').replace(/\.[^.]+$/, '').replace(/[_-]+/g, ' ').trim(), dado, sorgente: righeSorgente.join('\n'), luoghi: [] };
   };
 
+  // ── Come fare il file da importare ──
+  const ESEMPIO_CSV = 'Tiro;Risultato\n1-8;Un branco di lupi affamati\n9-14;Banditi con un carro rubato\n15-19;Un druido che chiede aiuto\n20;Una carovana di mercanti di {Luogo}\n';
+  const guidaCSV = () => {
+    let m = document.getElementById('modal-tc-guida');
+    if (!m) {
+      m = document.createElement('div');
+      m.className = 'modal-overlay hidden'; m.id = 'modal-tc-guida'; m.style.display = 'none';
+      m.onclick = (ev) => { if (ev.target === m) Modal.close('tc-guida'); };
+      const cella = 'padding:6px 10px;border-bottom:1px solid var(--border);text-align:left;';
+      m.innerHTML = '<div class="modal" style="max-width:560px;"><div class="modal-header"><h3 class="modal-title">Come fare il file</h3>' +
+        '<button type="button" class="btn btn-ghost btn-icon-sm" onclick="Modal.close(\'tc-guida\')" aria-label="Chiudi"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>' +
+        '<div class="modal-body" style="font-size:0.88rem;line-height:1.55;">' +
+          '<p style="margin:0 0 10px;">Va bene un foglio di <strong>Excel</strong>, <strong>Google Fogli</strong> o <strong>Numbers</strong>: una tabella per file, una voce per riga.</p>' +
+          '<table style="width:100%;border-collapse:collapse;margin-bottom:12px;font-size:0.84rem;"><thead><tr><th style="' + cella + 'width:90px;">Tiro</th><th style="' + cella + '">Risultato</th></tr></thead><tbody>' +
+            [['1-8', 'Un branco di lupi affamati'], ['9-14', 'Banditi con un carro rubato'], ['15-19', 'Un druido che chiede aiuto'], ['20', 'Una carovana di mercanti di {Luogo}']].map(([a, b]) => '<tr><td style="' + cella + 'font-family:var(--font-mono);">' + a + '</td><td style="' + cella + '">' + _esc(b) + '</td></tr>').join('') +
+          '</tbody></table>' +
+          '<ol style="margin:0 0 10px;padding-left:1.2em;display:grid;gap:6px;">' +
+            '<li>Nella <strong>prima colonna</strong> i numeri del dado (un numero o un intervallo come 1-8). Il dado lo capisce l\'app dal numero più alto: qui 20, quindi d20.</li>' +
+            '<li>Nella <strong>seconda colonna</strong> il risultato. Puoi usare anche <code>{2d6}</code>, <code>{PNG}</code>, <code>{Luogo}</code> e le altre scritture delle tabelle.</li>' +
+            '<li>Se non vuoi i numeri, scrivi solo i risultati in una colonna: le voci si dividono il dado in parti uguali.</li>' +
+            '<li>Salva come <strong>CSV</strong>: in Excel <em>File › Salva con nome › CSV</em>, in Google Fogli <em>File › Scarica › CSV</em>, in Numbers <em>Esporta › CSV</em>.</li>' +
+            '<li>Premi <strong>Importa CSV</strong> e scegli il file: la tabella si apre da controllare, il nome viene dal nome del file. Premi Salva.</li>' +
+          '</ol>' +
+          '<p class="text-muted" style="margin:0;font-size:0.8rem;">La riga di intestazione (Tiro, Risultato) si può mettere o no.</p>' +
+        '</div><div class="modal-footer" style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;">' +
+          '<button type="button" class="btn btn-secondary" onclick="TabelleCasuali.scaricaEsempio()">Scarica l\'esempio</button>' +
+          '<button type="button" class="btn btn-primary" onclick="Modal.close(\'tc-guida\')">Ho capito</button></div></div>';
+      document.body.appendChild(m);
+    }
+    Modal.open('tc-guida');
+  };
+  // Il file d'esempio, gia' pronto da aprire con Excel o Google Fogli e da modificare
+  const scaricaEsempio = () => {
+    const blob = new Blob(['\ufeff' + ESEMPIO_CSV], { type: 'text/csv;charset=utf-8' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = 'Incontri nella foresta.csv';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+  };
+
   const importaFile = (e) => {
     const file = e.target?.files?.[0];
     if (!file) return;
@@ -558,5 +599,5 @@ const TabelleCasuali = (() => {
 
   document.addEventListener('DOMContentLoaded', () => setTimeout(() => { _aggancia(); render(); }, 200));
 
-  return { render, filtra, filtrate, tira, tiraTesto, nelleNote, apriEditor, importaFile, bloccoLuogo, interpreta, daCSV, _anteprima, _salvaEditor, _elimina };
+  return { render, filtra, filtrate, tira, tiraTesto, nelleNote, guidaCSV, scaricaEsempio, apriEditor, importaFile, bloccoLuogo, interpreta, daCSV, _anteprima, _salvaEditor, _elimina };
 })();
