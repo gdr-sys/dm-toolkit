@@ -28,7 +28,8 @@ const CartoCatalogo = (() => {
       opzioni: [
         POPOLO(),
         S('taglia', 'Dimensione', [['piccola', 'Piccola'], ['media', 'Media'], ['grande', 'Grande']], 'media'),
-        C('mura', 'Mura', true, 0.85), C('castello', 'Castello', true, 0.7), C('fiume', 'Fiume', true, 0.6), C('costa', 'Mare', false, 0.35), C('griglia', 'Griglia', true, 0.6),
+        C('mura', 'Mura', true, 0.85), C('castello', 'Castello', true, 0.7), C('fiume', 'Fiume', true, 0.6), C('costa', 'Mare', false, 0.35),
+        C('cimitero', 'Cimitero', true, 0.6), C('baracche', 'Baraccopoli', false, 0.4), C('griglia', 'Griglia', true, 0.6),
       ],
     },
     villaggio: {

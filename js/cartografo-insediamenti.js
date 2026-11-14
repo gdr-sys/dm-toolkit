@@ -4,6 +4,8 @@
    La citta' e' un borgo a raggiera: vie maestre dalla piazza alle
    porte, anelli di strade, isolati con le case in fila sulla strada,
    mura curve con torri tonde e campi a ventaglio tutt'attorno.
+   Fuori dalle mura, a scelta: il cimitero tra due strade e le
+   baracche addossate alle mura vicino alle porte.
    ============================================================ */
 
 const CartoInsediamenti = (() => {
@@ -188,6 +190,27 @@ const CartoInsediamenti = (() => {
     /* ── Campagna: campi a ventaglio attorno alle mura ── */
     let svg = `<rect x="0" y="0" width="${W}" height="${H}" fill="${p.erba}" opacity="0.6"/>`;
     const bosco = (q) => rn(q[0] * 0.0048 + 91, q[1] * 0.0048 + 13, 3);
+    // Cimitero: fuori dalle mura, tra due strade che escono dalle porte, con il suo muretto
+    let cimitero = null;
+    if (o.cimitero) {
+      const posti = [];
+      for (let k = 0; k < N0; k++) {
+        const poly = cella(k + 0.3, k + 0.7, 1.13, 1.4, [0, 0, 0, 0]);
+        if (poly.length < 4) continue;
+        const geo = { u0: k + 0.3, u1: k + 0.7, v0: 1.13, v1: 1.4, fuori: true };
+        const c = M.centro(poly);
+        if (poly.some((q) => inAcqua(q, 10) || q[0] < 50 || q[1] < 110 || q[0] > W - 50 || q[1] > H - 50)) continue;
+        if (stradeFuori.some((l) => l.some((q) => M.dentro(q, poly)))) continue;
+        posti.push({ poly, centro: c, ...geo });
+      }
+      cimitero = posti.length ? r.pick(posti) : null;
+      // Nessun posto fuori (citta' grande che riempie il foglio): un camposanto dentro le mura, nell'anello esterno
+      if (!cimitero) {
+        const c = r.shuffle(isolati.filter((x) => x.banda === BANDE.length - 2 && ['normale', 'poveri'].includes(x.tipo) && x.area > 2500 && !inAcqua(x.centro, 20)))[0];
+        if (c) { c.tipo = 'cimitero'; cimitero = { poly: c.poly, centro: c.centro, u0: c.u0, u1: c.u1, v0: c.v0, v1: c.v1, fuori: false }; }
+      }
+    }
+    const nelCimitero = (q, m = 0) => !!cimitero && (M.dentro(q, cimitero.poly) || M.distLinea(q, cimitero.poly.concat([cimitero.poly[0]])) < m);
     const CAMPI = [1.16, 1.48, 1.84, 2.26, 2.74, 3.3];
     const nSpicchi = N0 * 7;
     for (let j = 0; j < CAMPI.length - 1; j++) {
@@ -202,6 +225,7 @@ const CartoInsediamenti = (() => {
           const c = M.centro(poly);
           if (c[0] < -60 || c[1] < -60 || c[0] > W + 60 || c[1] > H + 60) continue;
           if (poly.some((q) => inAcqua(q, 3)) || bosco(c) > 0.57 || stradeFuori.some((l) => M.distLinea(c, l) < 18)) continue;
+          if (cimitero && (poly.some((q) => nelCimitero(q, 4)) || cimitero.poly.some((q) => M.dentro(q, poly)))) continue;
           const dir = P((a + b) / 2, CAMPI[j + 1]), dir0 = P((a + b) / 2, CAMPI[j]);
           svg += M.campo(poly, r.pick(p.campi), Math.atan2(dir[1] - dir0[1], dir[0] - dir0[0]), 6.5, p);
         }
@@ -253,6 +277,44 @@ const CartoInsediamenti = (() => {
 
     /* ── Case: una fila continua lungo la strada, cortili e orti dietro ── */
     const case_ = [], casePregiate = [], alberi = [];
+    if (cimitero) {
+      const q = cimitero.poly, d = M.via(q), ci = cimitero, ang = angoloU((ci.u0 + ci.u1) / 2);
+      svg += `<path d="${d}" fill="${p.erba2}" stroke="${p.inchiostro}" stroke-width="2.2" stroke-linejoin="round"/>`;
+      // Lapidi in file, orientate come il cimitero; una cappella e qualche cipresso
+      const interno = cella(ci.u0, ci.u1, ci.v0, ci.v1, ci.fuori ? [7, 7, 7, 7] : [5, 5, 5, 5]);
+      const [kx, ky] = cimitero.centro, cap = M.rettangolo(kx, ky, 16, 22, ang);
+      let lapidi = '';
+      const vm = (ci.v0 + ci.v1) / 2, um = (ci.u0 + ci.u1) / 2;
+      for (let uu = ci.u0; uu < ci.u1; uu += (ci.u1 - ci.u0) / Math.max(6, M.dist(P(ci.u0, vm), P(ci.u1, vm)) / 9)) {
+        for (let vv = ci.v0; vv < ci.v1; vv += (ci.v1 - ci.v0) / Math.max(4, M.dist(P(um, ci.v0), P(um, ci.v1)) / 10)) {
+          const [x, y] = P(uu, vv);
+          if (!interno.length || !M.dentro([x, y], interno) || M.dist([x, y], [kx, ky]) < 20 || r.chance(0.12)) continue;
+          lapidi += `<path d="${M.via(M.rettangolo(x, y, 3.2, 5.2, ang))}"/>`;
+        }
+      }
+      svg += `<g fill="${p.carta}" stroke="${p.inchiostro}" stroke-width="0.7">${lapidi}</g>`;
+      casePregiate.push({ poly: cap, colore: p.tettoNobile });
+      for (let i = 0; i < 7; i++) { const v = [kx + r.range(-55, 55), ky + r.range(-45, 45)]; if (interno.length && M.dentro(v, interno) && M.dist(v, [kx, ky]) > 18) alberi.push([v[0], v[1], 0.55]); }
+    }
+    // Baraccopoli: casupole storte e fitte addossate alle mura, accanto a una o due porte
+    const baracche = [], zoneBaracche = [];
+    if (o.baracche) {
+      const scelte = r.shuffle(porte.slice()).slice(0, taglia === 'piccola' ? 1 : 2);
+      scelte.forEach(({ k }) => {
+        const lato = r.chance(0.5) ? 1 : -1, u0 = k + lato * 0.06, u1 = k + lato * r.range(0.32, 0.46);
+        const a = Math.min(u0, u1), b = Math.max(u0, u1), messe = [];
+        for (let i = 0; i < 260 && messe.length < (taglia === 'grande' ? 70 : 50); i++) {
+          const uu = r.range(a, b), vv = 1.035 + Math.pow(r.f(), 1.6) * 0.15, [x, y] = P(uu, vv);
+          const l = r.range(6, 10), w = r.range(5, 8), ang = angoloU(uu) + r.range(-0.5, 0.5), poly = M.rettangolo(x, y, l, w, ang);
+          if (poly.some((v) => inAcqua(v, 2) || M.dentro(v, muraPoly)) || M.distLinea([x, y], anelloMura) < 9 || nelCimitero([x, y], 8)) continue;
+          if (stradeFuori.some((s) => M.distLinea([x, y], s) < 9) || x < 30 || y < 90 || x > W - 30 || y > H - 30) continue;
+          if (messe.some((m) => M.dist(m, [x, y]) < 7.5)) continue;
+          messe.push([x, y]);
+          baracche.push({ poly, colore: r.pick([p.stradaBordo, p.tetti[r.int(0, p.tetti.length - 1)]]) });
+        }
+        if (messe.length > 8) zoneBaracche.push({ centro: M.centro(messe), punti: messe });
+      });
+    }
     let speciali = '', castelloSvg = '';
     const PROFILI = {
       poveri: { prof: [10, 14], larg: [7, 11], pieno: 0.97 }, normale: { prof: [13, 18], larg: [9, 15], pieno: 0.93 },
@@ -313,6 +375,8 @@ const CartoInsediamenti = (() => {
           const v = [tx + r.range(-1, 1) * s * 0.7, ty + r.range(-1, 1) * s * 0.7];
           if (M.dentro(v, q) && Math.abs((v[0] - tx) * -s0 + (v[1] - ty) * c0) > s * 0.42) alberi.push([v[0], v[1], 0.8]);
         }
+      } else if (c.tipo === 'cimitero') {
+        // disegnato a parte, con lapidi e cappella
       } else if (c.tipo === 'parco') {
         speciali += `<path d="${M.via(q)}" fill="${p.erba2}" stroke="${p.stradaBordo}" stroke-width="0.8"/>`;
         for (let i = 0; i < c.area / 240; i++) { const v = [c.centro[0] + r.range(-60, 60), c.centro[1] + r.range(-60, 60)]; if (M.dentro(v, q) && !inAcqua(v, 6)) alberi.push([v[0], v[1], r.range(0.85, 1.3)]); }
@@ -350,7 +414,7 @@ const CartoInsediamenti = (() => {
 
     /* ── Sobborghi fuori dalle porte e case sparse ── */
     const fuori = [], suolo = [];
-    const libera = (x, y, s) => suolo.every(([a, b, c]) => Math.hypot(a - x, b - y) > c + s);
+    const libera = (x, y, s) => suolo.every(([a, b, c]) => Math.hypot(a - x, b - y) > c + s) && !nelCimitero([x, y], s + 6) && !zoneBaracche.some((z) => z.punti.some((m) => Math.hypot(m[0] - x, m[1] - y) < s + 8));
     stradeFuori.forEach((l) => {
       let percorsa = 0;
       const limite = r.range(170, 330) * (R / 305);
@@ -374,14 +438,14 @@ const CartoInsediamenti = (() => {
       suolo.push([x, y, 12]);
       fuori.push({ poly: M.rettangolo(x, y, r.range(14, 22), r.range(10, 13), angoloU(u) + r.range(-0.2, 0.2)), colore: r.pick(p.tetti) });
     }
-    svg += speciali + M.edifici(case_.concat(fuori), p) + M.edifici(casePregiate, p, 3.5) + castelloSvg;
+    svg += speciali + M.edifici(case_.concat(fuori), p) + (baracche.length ? M.edifici(baracche, p, 0.6) : '') + M.edifici(casePregiate, p, 3.5) + castelloSvg;
 
     // Boschi oltre i campi
     for (let y = 30; y < H - 20; y += 21) for (let x = 30; x < W - 20; x += 21) {
       const q = [x + r.range(-9, 9), y + r.range(-9, 9)], d = dalCentro(q);
       const fitto = bosco(q) > 0.56 || (d > R * 2.6 && bosco(q) > 0.47);
       if (!(fitto || r.chance(0.012)) || inAcqua(q, 8) || (fitto && r.chance(0.12))) continue;
-      if (M.dentro(q, muraPoly) || M.distLinea(q, anelloMura) < 22) continue;
+      if (M.dentro(q, muraPoly) || M.distLinea(q, anelloMura) < 22 || nelCimitero(q, 10) || zoneBaracche.some((z) => z.punti.some((m) => M.dist(m, q) < 14))) continue;
       if (stradeFuori.some((l) => M.distLinea(q, l) < 15) || fuori.some((c) => M.dist(q, M.centro(c.poly)) < 18)) continue;
       alberi.push([q[0], q[1], r.range(0.9, 1.5)]);
     }
@@ -432,6 +496,17 @@ const CartoInsediamenti = (() => {
     if (castello) metti(castello.centro[0], castello.centro[1] + 6, 'Castello', { size: 18, font: p.fontTitolo, peso: 600 }, 'Sede del potere cittadino, con cinta muraria propria.');
     if (castello) Object.assign(pin[pin.length - 1], { tipoLuogo: 'Castello', y: castello.centro[1] - 12, genera: { tipo: 'dungeon', opzioni: { tema: 'fortezza' } } });
     if (o.mura) porte.forEach(({ g }) => usate.push(g));
+    if (cimitero) {
+      const [x, y] = cimitero.centro, ys = cimitero.poly.map((q) => q[1]), giu = Math.max(...ys) + 18, su = Math.min(...ys) - 9;
+      metti(x, giu < H - 40 ? giu : su, 'Cimitero', { size: 15, corsivo: true, peso: 600 }, 'Fuori dalle mura, come vuole l\'usanza: lapidi, una cappella, i cipressi. Di notte qualcuno giura di vedere lanterne.');
+      Object.assign(pin[pin.length - 1], { x, y, tipoLuogo: 'Cimitero', genera: { tipo: 'dungeon', opzioni: { tema: 'cripta' } } });
+    }
+    zoneBaracche.forEach((z, i) => {
+      const [x, y] = z.centro, nomeB = ['Le Baracche', 'Borgo Fango', 'Fuoriporta'][i % 3];
+      const ex = Math.max(70, Math.min(W - 70, x)), ey = Math.max(110, Math.min(H - 40, y + 4));
+      if (!usate.some((u) => Math.hypot(u[0] - ex, u[1] - ey) < 34)) metti(ex, ey, nomeB, { size: 14, corsivo: true, peso: 600 }, 'Casupole di legno e fango addossate alle mura: chi non può permettersi la città vive qui. Poche guardie, molte voci.');
+      else pin.push({ x, y, label: nomeB, note: 'Casupole di legno e fango addossate alle mura: chi non può permettersi la città vive qui. Poche guardie, molte voci.', sottotipo: '' });
+    });
     // Nomi dei rioni: lungo l'anello di mezzo del loro spicchio
     const RIONI = ['Conciatori', 'Tintori', 'Fabbri', 'Pescatori', 'Vasai', 'Tessitori', 'Mercanti', 'Falegnami', 'Sellai', 'Corvi', 'Cordai', 'Speziali', 'Candelai', 'Bottai', 'Vecchia Porta', 'Pozzo Nero', 'Tre Ponti', 'Colle Alto'];
     const nomiRioni = r.shuffle(RIONI);
