@@ -374,7 +374,8 @@ const Cartografo = (() => {
   // tagliata lungo i quadretti (un quadretto in piu' di margine), a ppg pixel per quadretto.
   const _ritaglio = async (piano, ppg, opz = {}) => {
     const casa = _mappa.tipo === 'abitazione', a = _attuale();
-    const extra = casa ? { soloPiano: piano, tetto: false } : { rotazione: 'dritto' };
+    const livelli = _mappa.tipo === 'dungeon' && (_mappa.pianiVtt || []).length > 1;
+    const extra = casa ? { soloPiano: piano, tetto: false } : { rotazione: 'dritto', ...(livelli ? { soloLivello: piano || 0 } : {}) };
     const m = K().genera(_mappa.tipo, { ...a.opzioni, seme: a.seme, nome: _nomeEffettivo(), legenda: false, titolo: false, griglia: false, nomi: !!opz.numeri, ...extra });
     const v = m.vtt;
     if (!v || v.ang !== 0) throw new Error('dati dei quadretti mancanti');
@@ -406,16 +407,16 @@ const Cartografo = (() => {
       m.onclick = (e) => { if (e.target === m) Modal.close('carto-vtt'); };
       document.body.appendChild(m);
     }
-    const piani = _mappa.tipo === 'abitazione' ? (_mappa.pianiVtt || []) : [];
+    const piani = _mappa.pianiVtt || [];
     const stampa = azione === 'stampa';
     const scelte = (piani.length > 1
-      ? '<label class="form-label" for="carto-vtt-piano">Piano</label><select id="carto-vtt-piano" class="form-select" style="margin-bottom:12px;">' + piani.map((n, i) => '<option value="' + i + '">' + n + '</option>').join('') + '</select>'
+      ? '<label class="form-label" for="carto-vtt-piano">' + (_mappa.tipo === 'dungeon' ? 'Livello' : 'Piano') + '</label><select id="carto-vtt-piano" class="form-select" style="margin-bottom:12px;">' + piani.map((n, i) => '<option value="' + i + '">' + n + '</option>').join('') + '</select>'
       : '') +
       (stampa
         ? '<label style="display:flex;gap:8px;align-items:center;min-height:36px;"><input type="checkbox" id="carto-vtt-griglia" checked> Griglia di combattimento (1 quadretto = 1,5 m)</label>' +
           '<label style="display:flex;gap:8px;align-items:center;min-height:36px;"><input type="checkbox" id="carto-vtt-numeri"> Numeri delle stanze (per il master)</label>' +
           '<p style="margin:10px 0 0;font-size:0.8rem;color:var(--text-muted);">Ogni quadretto esce di 2,5 cm, la misura delle miniature. La mappa si divide su più fogli A4 numerati da unire.</p>'
-        : '<p style="margin:0;font-size:0.85rem;color:var(--text-muted);">Ogni piano diventa una mappa a sé per il tavolo virtuale.</p>');
+        : '<p style="margin:0;font-size:0.85rem;color:var(--text-muted);">Ogni ' + (_mappa.tipo === 'dungeon' ? 'livello' : 'piano') + ' diventa una mappa a sé per il tavolo virtuale.</p>');
     m.innerHTML = '<div class="modal" style="max-width:420px;"><div class="modal-header"><h3 class="modal-title">' + (stampa ? 'Stampa in scala' : 'Tavolo virtuale') + '</h3>' +
       '<button class="btn btn-ghost btn-icon-sm" onclick="Modal.close(\'carto-vtt\')" aria-label="Chiudi"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>' +
       '<div class="modal-body">' + scelte + '</div>' +
@@ -432,7 +433,7 @@ const Cartografo = (() => {
 
   const scaricaVtt = async (piano) => {
     if (!_mappa || !VTT_TIPI.includes(_mappa.tipo)) return;
-    const casa = _mappa.tipo === 'abitazione';
+    const casa = (_mappa.pianiVtt || []).length > 1;
     if (casa && !Number.isInteger(piano)) {
       if ((_mappa.pianiVtt || []).length > 1) { _apriScelta('vtt'); return; }
       piano = 0;
@@ -502,7 +503,7 @@ const Cartografo = (() => {
         fogli += '<section class="foglio"><img src="' + t.toDataURL('image/jpeg', 0.92) + '" style="width:' + (qw * 25.4) + 'mm;height:' + (qh * 25.4) + 'mm;" alt="Foglio ' + nome + '">' +
           '<p>Foglio ' + nome + ' · riga ' + lettere[r] + ', colonna ' + (k + 1) + ' di ' + colonne + '</p></section>';
       }
-      const titolo = (_mappa.nome || 'Mappa') + (_mappa.tipo === 'abitazione' && (_mappa.pianiVtt || []).length > 1 ? ' - ' + _mappa.pianiVtt[piano || 0] : '');
+      const titolo = (_mappa.nome || 'Mappa') + ((_mappa.pianiVtt || []).length > 1 ? ' - ' + _mappa.pianiVtt[piano || 0] : '');
       const esc = (x) => String(x).replace(/[&<>"]/g, (q) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[q]));
       w.document.open();
       w.document.write('<!doctype html><html lang="it"><head><meta charset="utf-8"><title>' + esc(titolo) + ' · stampa in scala</title><style>' +

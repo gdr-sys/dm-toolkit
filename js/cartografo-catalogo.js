@@ -59,6 +59,7 @@ const CartoCatalogo = (() => {
       opzioni: [
         POPOLO(),
         S('tema', 'Tema', [['cripta', 'Cripta'], ['fortezza', 'Fortezza'], ['tempio', 'Tempio'], ['miniera', 'Miniera']], 'cripta'),
+        S('livelli', 'Livelli', [['1', '1'], ['2', '2'], ['3', '3']], '1'),
         S('taglia', 'Dimensione', [['piccolo', 'Piccolo'], ['medio', 'Medio'], ['grande', 'Grande']], 'medio'),
         S('rotazione', 'Orientamento', [['caso', 'A caso'], ['dritto', 'Dritto'], ['traverso', 'Di traverso']], 'caso'),
         C('griglia', 'Griglia', true, 0.8), C('trappole', 'Trappole', true, 0.7), C('legenda', 'Legenda', true, 1),

@@ -9,14 +9,16 @@
 const CartoDungeon = (() => {
   const M = CartoMotore, n1 = M.n1;
 
-  const dungeon = (o) => {
-    const r = M.rng('dungeon:' + o.seme);
+  const _livello = (o) => {
+    const L = Math.max(0, o.livello || 0), N = Math.max(1, o.livelli || 1), multi = N > 1;
+    const r = M.rng('dungeon:' + o.seme + (L ? '-L' + L : ''));
     const t = M.TONI_INTERNI[M.stileDi(o.palette)];
     const carta = M.cartaInterni(t);
     const tema = CartoTesti.TEMI_DUNGEON[o.tema] || CartoTesti.TEMI_DUNGEON.cripta;
     const conLegenda = o.legenda !== false;
     const quante = { piccolo: 6, medio: 10, grande: 15 }[o.taglia] || 10;
-    const nome = o.nome || r.pick(tema.nome) + ' ' + M.nomeLuogo(r, o.popolo);
+    // Il nome viene dal primo livello: tutti i livelli sono lo stesso dungeon
+    const nome = o.nome || (L ? (() => { const r0 = M.rng('dungeon:' + o.seme); return r0.pick(tema.nome) + ' ' + M.nomeLuogo(r0, o.popolo); })() : r.pick(tema.nome) + ' ' + M.nomeLuogo(r, o.popolo));
     const storia = r.pick(CartoTesti.STORIE[o.tema] || CartoTesti.STORIE.cripta);
     const W = conLegenda ? 1400 : 1200, H = 1000, largoMappa = conLegenda ? 1020 : W;
 
@@ -290,17 +292,19 @@ const CartoDungeon = (() => {
     const prima = stanze[0], ingX = prima.x + (prima.w >> 1);
     g0 += scala(px(ingX) - S * 0.5, py(prima.y + prima.h), S * 2, S * 1.5, false);
     const lontana = stanze.slice(1).sort((a, b) => b.gen - a.gen).find((s) => s.forma === 'rett' && s.w >= 4 && s.h >= 4) || stanze.slice(1).find((s) => s.forma === 'rett' && s.w >= 3 && s.h >= 3);
-    if (lontana) {
+    // L'ultimo livello non scende piu'
+    if (lontana && !(multi && L === N - 1)) {
       g0 += scala(px(lontana.x + lontana.w - 2), py(lontana.y + lontana.h - 1.5), S * 2, S * 1.5, true);
-      dati[lontana.id][1] += ' Scale verso il livello inferiore.';
+      dati[lontana.id][1] += multi ? ' Scale che scendono al livello ' + (L + 2) + '.' : ' Scale verso il livello inferiore.';
     }
+    if (multi && L > 0) dati[0][1] += ' Qui arrivano le scale dal livello ' + L + '.';
 
     /* ── Testi: si scrivono diritti anche se la pianta e' ruotata ── */
     let testi = '';
     const voci = [], pin = [];
     // Di traverso la scritta resta orizzontale: va piu' lontana, per non toccare le scale
     const pIng = schermo(ingX + 0.5, prima.y + prima.h + (ang ? 3.1 : 2.2));
-    testi += M.etichetta(pIng[0], pIng[1], 'Ingresso', carta, { size: 17, corsivo: t.stile !== 'notte', colore: I, alone: t.sfondo, aloneW: 3.5 });
+    testi += M.etichetta(pIng[0], pIng[1], multi && L > 0 ? 'Dal livello ' + L : 'Ingresso', carta, { size: 17, corsivo: t.stile !== 'notte', colore: I, alone: t.sfondo, aloneW: 3.5 });
     stanze.forEach((s, i) => {
       // Il numero sta dove non c'e' l'arredo: le colonne corrono lungo i muri, il resto sta al centro
       const arr = dati[i][2];
@@ -314,7 +318,7 @@ const CartoDungeon = (() => {
       const [x, y] = schermo(quartoX, quartoY);
       if (conLegenda) testi += M.numeroTondo(x, y, i + 1, { numeroFondo: t.numero, numeroTesto: t.stile === 'notte' && !t.chiaro ? '#0e1d26' : '#ffffff' }, Math.max(12, S * 0.5));
       const trappola = o.trappole !== false && i > 0 && r.chance(0.26) ? ' ' + r.pick(CartoTesti.TRAPPOLE) : '';
-      const titolo = i === 0 ? 'Ingresso: ' + dati[i][0].toLowerCase() : dati[i][0];
+      const titolo = i === 0 ? (multi && L > 0 ? 'Arrivo: ' : 'Ingresso: ') + dati[i][0].toLowerCase() : dati[i][0];
       voci.push({ n: i + 1, titolo, testo: dati[i][1] + trappola });
       pin.push({ x, y: y - 10, label: (i + 1) + '. ' + titolo, note: dati[i][1] + trappola, sottotipo: trappola ? 'pericolo' : (dati[i][2] === 'baule' ? 'tesoro' : 'nota') });
     });
@@ -326,7 +330,7 @@ const CartoDungeon = (() => {
     if (o.nomi !== false) svg += testi;
     if (conLegenda) svg += M.legenda(W - 348, 36, 316, H - 72, 'Le stanze', voci, { ...carta, numeroFondo: t.numero, numeroTesto: t.stile === 'notte' && !t.chiaro ? '#0e1d26' : '#ffffff' });
     if (o.titolo !== false) {
-      svg += M.etichetta(cxM, 72, nome, carta, { size: 48, font: M.FONT_APP_TITOLI, peso: 400, aloneW: 6 });
+      svg += M.etichetta(cxM, 72, nome + (multi ? ' · Livello ' + (L + 1) : ''), carta, { size: 48, font: M.FONT_APP_TITOLI, peso: 400, aloneW: 6 });
       M.righe(storia, 86).forEach((riga, i) => { svg += M.etichetta(cxM, 104 + i * 24, riga, carta, { size: 17, font: M.FONT_APP_TESTO, peso: 500, colore: t.stile === 'notte' ? carta.ambra : I, aloneW: 4 }); });
     }
     svg += M.scala(50, H - 48, S * 5, { valore: 7.5, nome: 'metri' }, 2, carta) + M.chiudi(W, H, carta);
@@ -359,6 +363,28 @@ const CartoDungeon = (() => {
       return { S, ang, ox: cxM - ccx * S, oy: cyM - ccy * S, minX, minY, maxX, maxY, muri: muriV, porte: porteV, celle };
     })();
     return { nome, pin, W, H, larghezzaKm: W / S * 1.5 / 1000, svg, vtt }; // un quadretto = 1,5 metri
+  };
+
+  /* ── Piu' livelli: uno accanto all'altro sulla stessa mappa; per il tavolo virtuale e la stampa, uno alla volta ── */
+  const dungeon = (o) => {
+    const N = Math.max(1, Math.min(3, parseInt(o.livelli, 10) || 1));
+    const nomiLivelli = Array.from({ length: N }, (_, i) => 'Livello ' + (i + 1));
+    if (N === 1) return _livello({ ...o, livello: 0, livelli: 1 });
+    if (Number.isInteger(o.soloLivello)) return { ..._livello({ ...o, livello: Math.min(N - 1, Math.max(0, o.soloLivello)), livelli: N }), pianiVtt: nomiLivelli };
+    const livelli = nomiLivelli.map((_, i) => _livello({ ...o, livello: i, livelli: N }));
+    const W1 = livelli[0].W, H1 = livelli[0].H, W = W1 * N, H = H1;
+    // Ogni livello e' un SVG dentro l'SVG: gli id (ritagli, filtri, curve) prendono il prefisso del livello per non confondersi
+    const dentro = livelli.map((m, i) => {
+      const pre = 'L' + (i + 1) + '-';
+      return m.svg.replace(/id="([^"]+)"/g, (_, x) => 'id="' + pre + x + '"').replace(/url\(#([^)]+)\)/g, (_, x) => 'url(#' + pre + x + ')').replace(/href="#([^"]+)"/g, (_, x) => 'href="#' + pre + x + '"')
+        .replace(/^<svg\b/, '<svg x="' + (i * W1) + '" y="0"');
+    }).join('');
+    // Tra un livello e l'altro, una linea sottile
+    let righe = '';
+    for (let i = 1; i < N; i++) righe += '<path d="M' + (i * W1) + ' 30V' + (H - 30) + '" stroke="#000" stroke-opacity="0.25" stroke-width="3" stroke-dasharray="10 8"/>';
+    const svg = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 ' + W + ' ' + H + '" width="' + W + '" height="' + H + '">' + dentro + righe + '</svg>';
+    const pin = livelli.flatMap((m, i) => m.pin.map((p) => ({ ...p, x: p.x + i * W1, label: 'L' + (i + 1) + ' · ' + p.label })));
+    return { nome: livelli[0].nome, pin, W, H, larghezzaKm: livelli[0].larghezzaKm * N, svg, pianiVtt: nomiLivelli };
   };
 
   return { dungeon };
