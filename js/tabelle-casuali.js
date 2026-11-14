@@ -354,7 +354,7 @@ const TabelleCasuali = (() => {
             '<select id="tc-categoria" class="form-select"></select>' +
             '<div style="font-size:0.75rem;color:var(--text-muted);margin-top:4px;">La tabella compare anche in quella scheda dei Generatori, oltre che in Le mie tabelle.</div></div>' +
           '<div class="form-group" style="margin-bottom:6px;"><label class="form-label" for="tc-sorgente">Voci — una per riga</label>' +
-            '<textarea id="tc-sorgente" class="form-textarea" rows="9" spellcheck="false" style="font-family:var(--font-mono);font-size:0.82rem;line-height:1.6;" oninput="TabelleCasuali._anteprima()" placeholder="$capo = {PNG}&#10;1-8 Un branco di lupi\n9-14 {1d4} banditi con un carro rubato\n15-19 Un druido che chiede aiuto\n20 Tira di nuovo: [[Eventi strani]]"></textarea></div>' +
+            '<textarea id="tc-sorgente" class="form-textarea" rows="9" spellcheck="false" style="font-family:var(--font-mono);font-size:0.82rem;line-height:1.6;" oninput="TabelleCasuali._anteprima()" placeholder="Per esempio:&#10;1-8 Un branco di lupi\n9-14 {1d4} banditi con un carro rubato\n15-19 Un druido che chiede aiuto\n20 Tira di nuovo: [[Eventi strani]]"></textarea></div>' +
           '<div style="font-size:0.78rem;color:var(--text-muted);line-height:1.55;margin-bottom:12px;">' +
             'Scrivi l\'intervallo davanti (<code>1-3 Goblin</code>) oppure solo il testo: le voci si dividono il dado in parti uguali. ' +
             'Con <strong>Pesi liberi</strong> il numero davanti è il peso (<code>3 Goblin</code> esce 3 volte più spesso). ' +
