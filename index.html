@@ -5948,6 +5948,11 @@ const Sessione = (() => {
     const c = _combat?.combatants.find(x => x.id === id);
     if (!c) return;
 
+    if (c.npcId) {
+      const npc = (App.getActiveCampaign()?.npcs || []).find(n => n.id === c.npcId);
+      if (npc) { _mostraSchedaCombat(c.nome, _npcSheetHTML(npc)); return; }
+    }
+
     if (!MonsterCache.isLoaded()) {
       Toast.show('Caricamento mostri...', 'info', 2000);
       await MonsterCache.load();
@@ -6031,6 +6036,11 @@ const Sessione = (() => {
         ${c.gs ? `<p class="text-sm">GS ${c.gs} · CA ${c.ca} · PF ${c.hp}/${c.maxHp}</p>` : ''}
       </div>`;
 
+    _mostraSchedaCombat(c.nome, content);
+    Debug.log(`Combat sheet: ${c.nome} (${m ? 'da compendio' : 'custom'})`);
+  };
+
+  const _mostraSchedaCombat = (titolo, content) => {
     const existingModal = document.getElementById('combat-sheet-modal');
     if (existingModal) existingModal.remove();
 
@@ -6040,14 +6050,13 @@ const Sessione = (() => {
     modal.style.cssText = 'display:flex;';
     modal.innerHTML = `<div class="modal" style="max-width:540px;">
       <div class="modal-header">
-        <h2 style="font-family:var(--font-display);font-size:1rem;">${c.nome}</h2>
+        <h2 style="font-family:var(--font-display);font-size:1rem;">${titolo}</h2>
         <button class="btn btn-ghost btn-icon" onclick="document.getElementById('combat-sheet-modal')?.remove()" aria-label="Chiudi"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
       </div>
       <div class="modal-body" style="padding:0;">${content}</div>
     </div>`;
     modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
     document.body.appendChild(modal);
-    Debug.log(`Combat sheet: ${c.nome} (${m ? 'da compendio' : 'custom'})`);
   };
 
   const _rollAction = (formula, nome, el) => {
@@ -6158,17 +6167,20 @@ const Sessione = (() => {
           <input autocomplete="off" type="text" class="form-input" placeholder="Cerca NPC..." style="flex:1;"
             oninput="this.closest('.modal').querySelectorAll('.comp-row').forEach(r=>r.style.display=r.textContent.toLowerCase().includes(this.value.toLowerCase())?'':'none')">
         </div>
-        ${npcs.map(npc => `
-          <div class="comp-row" onclick="Sessione._addNPCById('${npc.id}');this.closest('.modal-overlay').remove()">
+        ${npcs.map(npc => {
+          const s = _npcStatCombat(npc);
+          return `
+          <div class="comp-row" onclick="this.closest('.modal-overlay').remove();Sessione._addNPCById('${npc.id}')">
             <div class="comp-row-main">
-              <span class="comp-row-name">${npc.name || 'NPC senza nome'}</span>
-              <span class="comp-row-meta">${[npc.race, npc.role].filter(Boolean).join(' · ')}</span>
+              <span class="comp-row-name">${_escCombat(npc.name || 'PNG senza nome')}</span>
+              <span class="comp-row-meta">${_escCombat([npc.race, npc.job].filter(Boolean).join(' · '))}</span>
             </div>
             <div class="comp-row-stats">
-              ${npc.ca ? `<span class="comp-stat-pill">CA ${npc.ca}</span>` : ''}
-              ${npc.hpMax ? `<span class="comp-stat-pill">PF ${npc.hpMax}</span>` : ''}
+              ${npc.cr ? `<span class="comp-stat-pill">GS ${_escCombat(npc.cr)}</span>` : ''}
+              ${s.ca ? `<span class="comp-stat-pill">CA ${s.ca}</span>` : ''}
+              ${s.pf ? `<span class="comp-stat-pill">PF ${s.pf}</span>` : ''}
             </div>
-          </div>`).join('')}
+          </div>`; }).join('')}
       </div>
       <div class="modal-footer">
         <button class="btn btn-ghost" onclick="this.closest('.modal-overlay').remove()">Chiudi</button>
@@ -6184,26 +6196,107 @@ const Sessione = (() => {
     const npc = (camp?.npcs || []).find(n => n.id === id);
     if (!npc) return;
 
-    if (!_combat) newCombat();
-
-    const nome = npc.name || 'NPC';
-    const pf = parseInt(npc.hpMax || npc.hp) || 20;
-    const ca = parseInt(npc.ca) || 12;
+    const nome = npc.name || 'PNG';
+    const s = _npcStatCombat(npc);
+    const pf = s.pf || 20;
+    const ca = s.ca || 12;
     const initEsplicita = parseInt(npc.iniziativa, 10);
     const bonusInit = Number.isFinite(initEsplicita) ? initEsplicita : Math.floor(((parseInt(npc.dex) || 10) - 10) / 2);
-    const init = rollInit(bonusInit);
 
-    _combat.combatants.push({
-      id: 'c_npc_' + Date.now(),
-      nome, tipo: 'mostro',
-      hp: pf, maxHp: pf, ca,
-      iniziativa: init, iniziativaBonus: bonusInit,
-      condizioni: [], concentrazione: false, note: npc.role || '',
-      npcId: id,
-    });
-    saveCombat(_combat);
-    renderCombat();
-    Toast.show(`${nome} aggiunto al combat (Init: ${init})`, 'success');
+    // Come per i mostri del Compendio: si sceglie quanti metterne (tre guardie, due sgherri...)
+    openInputModal(`Quanti ${nome} aggiungere?`, '1', (val) => {
+      const qty = Math.max(1, Math.min(20, parseInt(val) || 1));
+      if (!_combat) newCombat();
+      for (let i = 0; i < qty; i++) {
+        _combat.combatants.push({
+          id: 'c_npc_' + Date.now() + '_' + i,
+          nome: nome + (qty > 1 ? ` #${i + 1}` : ''),
+          tipo: 'mostro',
+          hp: pf, maxHp: pf, ca,
+          gs: npc.cr ? String(npc.cr) : '',
+          iniziativa: rollInit(bonusInit), iniziativaBonus: bonusInit,
+          condizioni: [], concentrazione: false, note: '',
+          npcId: id,
+        });
+      }
+      saveCombat(_combat);
+      renderCombat();
+      Toast.show(`${qty > 1 ? qty + '× ' : ''}${nome} aggiunto allo scontro`, 'success');
+    }, { type: 'number' });
+  };
+
+  // PF e CA del PNG: nella scheda sono testo libero ("22 (4d8+4)", "15 armatura di cuoio"),
+  // si prende il primo numero. I nomi vecchi (hpMax, ca) restano come riserva.
+  const _primoNumero = (v) => { const m = String(v ?? '').match(/\d+/); return m ? parseInt(m[0], 10) : 0; };
+  const _npcStatCombat = (npc) => ({
+    pf: _primoNumero(npc?.hp) || _primoNumero(npc?.hpMax),
+    ca: _primoNumero(npc?.ac) || _primoNumero(npc?.ca),
+  });
+  const _escCombat = (s) => String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+
+  // Scheda di un PNG nello scontro: come quella di un mostro, con le azioni che tirano i dadi.
+  const _npcSheetHTML = (npc) => {
+    const e = _escCombat;
+    const modStr = (v) => { const m = Math.floor(((parseInt(v, 10) || 10) - 10) / 2); return (m >= 0 ? '+' : '') + m; };
+    const formulaDi = (desc) => { const m = String(desc || '').match(/(\d+d\d+(?:\s*[+\-]\s*\d+)?)/i); return m ? m[1].replace(/\s+/g, '') : null; };
+    const riga = (label, v) => (v || v === 0) ? `<div class="stat-row"><strong>${label}</strong> <span>${e(v)}</span></div>` : '';
+    const azione = (a) => {
+      const f = formulaDi(a.desc);
+      return `<div class="sb-action" style="cursor:${f ? 'pointer' : 'default'};"
+        ${f ? `data-f="${e(f)}" data-n="${e(a.name)}" onclick="Sessione._rollAction(this.dataset.f, this.dataset.n, this)"` : ''}>
+        <strong>${e(a.name)}.</strong> <span class="text-secondary">${e(a.desc || '')}</span>
+        ${f ? `<span class="badge badge-muted" style="margin-left:4px;font-size:0.6rem;">${e(f)}</span>` : ''}
+      </div>`;
+    };
+    const sezione = (titolo, arr) => {
+      const items = (arr || []).filter(a => a && a.name);
+      return items.length ? `<div class="sb-section-title" style="margin-top:8px;">${titolo}</div>${items.map(azione).join('')}` : '';
+    };
+
+    // PNG fatti col generatore: niente lista azioni, ma arma e dado d'attacco
+    let azioni = (npc.actions || []).filter(a => a && a.name);
+    if (!azioni.length && npc.nomeArma && npc.dadoAttacco) {
+      const atk = npc.attaccoBonus !== undefined && npc.attaccoBonus !== '' ? `${npc.attaccoBonus >= 0 ? '+' : ''}${npc.attaccoBonus} al tiro per colpire, ` : '';
+      azioni = [{ name: npc.nomeArma, desc: `${atk}danno ${npc.dadoAttacco} da ${npc.tipoDanno || 'contundente'}.` }];
+      if (npc.numAttacchi > 1) azioni.unshift({ name: 'Multiattacco', desc: `${npc.numAttacchi} attacchi con ${npc.nomeArma}.` });
+    }
+    const tratti = String(npc.special || '').split('\n').filter(l => l.trim())
+      .map(l => `<div class="sb-action">${e(l)}</div>`).join('');
+    const vel = npc.speed;
+    const iniz = (() => { const n = parseInt(npc.iniziativa, 10); return Number.isFinite(n) ? (n >= 0 ? '+' + n : String(n)) : (npc.dex ? modStr(npc.dex) : ''); })();
+    const sub = [npc.type || 'Umanoide', npc.align].filter(Boolean).join(', ');
+    const haAzioni = azioni.length || (npc.azioniBonus || []).length || (npc.reazioni || []).length || (npc.azioniLeggendarie || []).length;
+
+    return `
+      <div style="max-height:70vh;overflow-y:auto;">
+        <div class="stat-block">
+          <div class="stat-block-title">${e(npc.name || 'PNG')}</div>
+          <div class="stat-block-subtitle">${e(sub)}${npc.cr ? ' · GS ' + e(npc.cr) : ''}</div>
+          <div class="stat-block-divider"></div>
+          ${riga('Classe Armatura', npc.ac)}${riga('Punti Ferita', npc.hp)}${riga('Velocità', vel)}${riga('Iniziativa', iniz)}
+          <div class="stat-block-divider"></div>
+          <div class="stat-abilities">
+            ${[['FOR', npc.str], ['DES', npc.dex], ['COS', npc.con], ['INT', npc.int_], ['SAG', npc.wis], ['CAR', npc.cha]].map(([ab, v]) => `
+              <div class="stat-ability-box">
+                <div class="stat-ability-name">${ab}</div>
+                <div class="stat-ability-score">${e(v || 10)}</div>
+                <div class="stat-ability-mod">${modStr(v)}</div>
+              </div>`).join('')}
+          </div>
+          <div class="stat-block-divider"></div>
+          ${riga('Tiri Salvezza', npc.savingThrows)}${riga('Abilità', npc.skills)}
+          ${riga('Immunità / Resistenze', npc.immunities)}${riga('Vulnerabilità', npc.vulnerabilities)}
+          ${riga('Immunità alle condizioni', npc.condImmunities)}${riga('Sensi', npc.senses)}${riga('Linguaggi', npc.languages)}
+          ${tratti ? `<div class="sb-section-title" style="margin-top:8px;">Tratti</div>${tratti}` : ''}
+          ${haAzioni ? `<div style="font-size:0.7rem;color:var(--text-muted);margin:8px 0 6px;">Tocca un'azione con i dadi per tirarli</div>` : ''}
+          ${sezione('Azioni', azioni)}
+          ${sezione('Azioni Bonus', npc.azioniBonus)}
+          ${sezione('Reazioni', npc.reazioni)}
+          ${sezione('Azioni leggendarie', npc.azioniLeggendarie)}
+          ${!haAzioni ? `<div class="text-muted text-sm" style="padding:6px 0;">Nessuna azione nella scheda del PNG. Aggiungile da Mondo › PNG › Combattimento.</div>` : ''}
+          ${npc.combatNotes ? `<div class="stat-block-divider"></div><div class="text-muted" style="font-size:0.8rem;white-space:pre-wrap;">${e(npc.combatNotes)}</div>` : ''}
+        </div>
+      </div>`;
   };
 
   const addHomebrewMonster = (id) => {
