@@ -167,6 +167,11 @@ const MappaEsagoni = (() => {
     const [col, row] = _daPunto(g, fx * g.w, fy * g.h);
     const k = _key(col, row);
     if (_azione === 'nota') { _apriNota(k, col, row, e.note[k] || ''); return true; }
+    // "Cosa succede?": si tira un incontro per questo esagono (js/esagoni-incontri.js)
+    if (_azione === 'incontro') {
+      if (typeof EsagoniIncontri !== 'undefined') EsagoniIncontri.apri({ k, nome: _nome(col, row), terreno: e.terreno, nota: e.note[k] || '' });
+      return true;
+    }
     if (_azione === 'gruppo') {
       const da = e.gruppo ? _parse(e.gruppo) : null;
       const passi = da ? _distanza(da, [col, row]) : 0;
@@ -182,6 +187,10 @@ const MappaEsagoni = (() => {
         }
       } else if (passi && ore) {
         Toast.show(passi + (passi === 1 ? ' esagono' : ' esagoni') + ', ' + _fmtOre(ore) + ' di viaggio', 'info', 2200);
+      }
+      // Entrando negli esagoni si controlla se succede qualcosa (1 su 6 per esagono attraversato)
+      if (passi && document.getElementById('esa-incontri')?.checked && typeof EsagoniIncontri !== 'undefined') {
+        EsagoniIncontri.controlla({ k, nome: _nome(col, row), terreno: e.terreno, nota: e.note[k] || '', passi });
       }
     } else {
       _salva((x) => { if (x.esplorati[k]) delete x.esplorati[k]; else x.esplorati[k] = 1; });
@@ -256,7 +265,7 @@ const MappaEsagoni = (() => {
       '<div class="esa-riga">' +
         '<label class="esa-check"><input type="checkbox"' + (e.attivi ? ' checked' : '') + ' onchange="MappaEsagoni.imposta(\'attivi\',this.checked)"> <strong>Esagoni</strong></label>' +
         (e.attivi
-          ? '<span class="esa-gruppo-seg" role="group" aria-label="Toccando un esagono">' + _seg('esplora', 'Segna esplorato') + _seg('gruppo', 'Sposta il gruppo') + _seg('nota', 'Nota') + '</span>'
+          ? '<span class="esa-gruppo-seg" role="group" aria-label="Toccando un esagono">' + _seg('esplora', 'Segna esplorato') + _seg('gruppo', 'Sposta il gruppo') + _seg('nota', 'Nota') + (typeof EsagoniIncontri !== 'undefined' ? _seg('incontro', 'Cosa succede?') : '') + '</span>'
           : '<span class="text-muted" style="font-size:0.8rem;">Griglia spenta su questa mappa</span>') +
         '<button type="button" class="btn btn-secondary btn-sm" style="margin-left:auto;" onclick="MappaEsagoni.chiudi()">Fine</button>' +
       '</div>' +
@@ -269,11 +278,14 @@ const MappaEsagoni = (() => {
                   '<span><strong>' + _fmtOre(ore) + '</strong> a esagono</span>' +
                   '<span class="text-muted">· in viaggio: <strong style="color:var(--text-primary);">' + _fmtViaggio(e.ore || 0) + '</strong></span>' +
                   ((e.ore || 0) ? '<button type="button" class="btn btn-ghost btn-sm" onclick="MappaEsagoni.imposta(\'ore\',0)">Azzera</button>' : '') +
-                  (haCal ? '<label class="esa-check"><input type="checkbox" id="esa-orologio" checked> fa avanzare il Calendario</label>' : '')
+                  (haCal ? '<label class="esa-check"><input type="checkbox" id="esa-orologio" checked> fa avanzare il Calendario</label>' : '') +
+                  (typeof EsagoniIncontri !== 'undefined' ? '<label class="esa-check"><input type="checkbox" id="esa-incontri"' + (EsagoniIncontri.controllaAttivo() ? ' checked' : '') + ' onchange="EsagoniIncontri.controllaAttivo(this.checked)"> controlla gli incontri</label>' : '')
                 : '<span class="text-muted">Per i tempi di viaggio scrivi quanti km è larga la mappa in <em>Modifica mappa</em>.</span>') +
             '</div>'
           : '<div class="esa-riga esa-info text-muted">' +
-              (_azione === 'nota' ? 'Tocca un esagono per scriverci una nota.' : 'Tocca un esagono per segnarlo come esplorato (ritocca per togliere).') +
+              (_azione === 'nota' ? 'Tocca un esagono per scriverci una nota.'
+                : _azione === 'incontro' ? 'Tocca un esagono per vedere cosa succede lì (tabella: ' + _esc(typeof EsagoniIncontri !== 'undefined' ? EsagoniIncontri.nomeTabella(e.terreno) : '') + ').'
+                : 'Tocca un esagono per segnarlo come esplorato (ritocca per togliere).') +
               ' Esplorati: <strong style="color:var(--text-primary);">' + nEspl + '</strong>' +
             '</div>') +
         '<details class="esa-griglia"' + (_aperto ? ' open' : '') + ' ontoggle="MappaEsagoni._dettagli(this.open)"><summary>Griglia</summary><div class="esa-riga">' +
@@ -322,6 +334,14 @@ const MappaEsagoni = (() => {
   // Cambiando mappa il pannello si chiude
   const cambioMappa = () => { _attivo = false; aggiorna(); };
 
-  return { disegna, aggiorna, click, attivo, apri, chiudi, azione, imposta, sposta, azzera, cambioMappa, _salvaNota, _dettagli,
+  // Aggiunge una riga alla nota di un esagono (la usa js/esagoni-incontri.js)
+  const aggiungiNota = (k, testo) => {
+    const t = String(testo || '').trim(); if (!t) return;
+    // Le note scritte con l'editor sono HTML: lì si va a capo con <br>
+    _salva((x) => { x.note[k] = x.note[k] ? x.note[k] + (/<[a-z]/i.test(x.note[k]) ? '<br>' : '\n') + t : t; });
+    aggiorna();
+  };
+
+  return { disegna, aggiorna, click, attivo, apri, chiudi, azione, imposta, sposta, azzera, cambioMappa, _salvaNota, _dettagli, aggiungiNota,
     _test: { _geo, _daPunto, _centro, _distanza } };
 })();

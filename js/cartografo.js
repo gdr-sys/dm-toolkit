@@ -340,7 +340,12 @@ const Cartografo = (() => {
     if (png) { png.disabled = !m.canvas; png.title = m.canvas ? '' : 'Questo browser non riesce a creare il PNG: usa “Scarica SVG”.'; }
     const prec = $('carto-precedente');
     if (prec) prec.disabled = !_storia.length;
+    // Altri moduli che vogliono sapere quale mappa e' in vista (es. js/dungeon-chiave.js)
+    _dopoMostra.forEach((f) => { try { f(m); } catch (e) {} });
   };
+  const _dopoMostra = [];
+  const dopoMostra = (f) => { if (typeof f === 'function') _dopoMostra.push(f); };
+  const mappaAttuale = () => _mappa;
 
   /* ── Esportazione ── */
   const _nomeFile = () => (_mappa.nome || 'mappa').replace(/[\\/:*?"<>|]+/g, ' ').trim() || 'mappa';
@@ -753,5 +758,5 @@ const Cartografo = (() => {
     if (!_mappa || typeof CartoRitocchi === 'undefined') return;
     CartoRitocchi.apri({ stato: () => ({ a: _attuale(), mappa: _mappa }), salvaStato: _salva, rigenera: genera });
   };
-  return { strumenti, ritocca, perPin, annullaContesto, apri, nuova, aCaso, _tieniColori, precedente, scegliTipo, zoom, zoomReset, scaricaPng, scaricaSvg, scaricaVtt, stampaScala, _confermaScelta, apriMettiNelleMappe, _confermaMappe, _opzione, _nome, _seme };
+  return { strumenti, ritocca, perPin, annullaContesto, apri, nuova, aCaso, _tieniColori, precedente, scegliTipo, zoom, zoomReset, scaricaPng, scaricaSvg, scaricaVtt, stampaScala, _confermaScelta, apriMettiNelleMappe, _confermaMappe, _opzione, _nome, _seme, dopoMostra, mappaAttuale };
 })();
