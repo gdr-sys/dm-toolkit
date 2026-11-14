@@ -77,8 +77,12 @@ const Scrittoio = (() => {
         const fazione = (_camp()?.factions || []).find((f) => f.id === op.sigillo);
         const propria = voce !== 'stemma' && fazione && !fazione.stemma && fazione.immagine ? await _datiImmagine(fazione.immagine) : null;
         if (voce !== 'stemma' && fazione && !fazione.stemma && fazione.immagine && !propria) Toast.show('L’immagine di ' + _nome(fazione) + ' non si è potuta leggere: uso uno stemma inventato.', 'warning', 5000);
+        // Taglia presa da una scheda: il ritratto del PNG o PG al posto della figura incappucciata
+        const scheda = voce === 'taglia' ? _scheda(op.ritrattoDa) : null;
+        const ritratto = scheda && scheda.immagine ? await _datiImmagine(scheda.immagine) : null;
+        if (scheda && scheda.immagine && !ritratto) Toast.show('Il ritratto di ' + _nome(scheda) + ' non si è potuto leggere: uso la figura incappucciata.', 'warning', 5000);
         const m = voce === 'stemma' ? Araldica.genera({ ...op, nome: op.nome || '' })
-          : Documenti.genera({ ...op, tipo: voce, stemma: _stemmaDi(op.sigillo), stemmaImg: propria, iniziale: propria ? _nome(fazione).charAt(0) : '' });
+          : Documenti.genera({ ...op, tipo: voce, stemma: _stemmaDi(op.sigillo), stemmaImg: propria, iniziale: propria ? _nome(fazione).charAt(0) : '', ritrattoImg: ritratto });
         const S = Cartografo.strumenti;
         const css = (await S.fontDa(FONT_BASE)) + (await S.fontDa(FONT_DOC));
         if (turno !== _turno) return;
@@ -127,6 +131,38 @@ const Scrittoio = (() => {
   };
   const scegli = (v) => { if (v !== _voce) { _ricorda(); _voce = v; _controlli(); disegna(); } };
   const _blasone = (op = _opera()) => (op.blasoneMano ? String(op.blasone || '') : Araldica.blasona(op));
+  /* ── Taglie dalle schede di PNG e PG ── */
+  // v = "png:id" o "pg:id"
+  const _scheda = (v) => {
+    const [t, id] = String(v || '').split(/:(.*)/);
+    if (!id) return null;
+    const c = _camp();
+    return (t === 'pg' ? (c?.pg || []) : (c?.npcs || [])).find((x) => x.id === id) || null;
+  };
+  const _testoPiano = (s) => (typeof Testo !== 'undefined' ? Testo.semplice(s) : String(s || '').replace(/<[^>]+>/g, ' ')).replace(/\s+/g, ' ').trim();
+  const _daScheda = (v) => {
+    const op = _opera();
+    op.ritrattoDa = v || '';
+    const s = _scheda(v);
+    if (s) {
+      const pg = v.startsWith('pg:');
+      op.soggetto = _nome(s);
+      // Segni particolari: chi e', piu' l'aspetto se c'e' (una riga sola, si puo' cambiare)
+      const chi = [s.razza || s.race, pg ? s.classe : (s.job || s.ruolo)].filter(Boolean).join(', ');
+      const aspetto = _testoPiano(s.apparenza || s.description || '').slice(0, 140);
+      const segni = [chi, aspetto].filter(Boolean).join('. ');
+      const accuse = String(op.corpo || '').split(/\n+/).filter((r) => !/^Segni particolari:/i.test(r)).join('\n').trim();
+      op.corpo = accuse + (segni ? (accuse ? '\n' : '') + 'Segni particolari: ' + segni + (/[.!?]$/.test(segni) ? '' : '.') : '');
+      // Ricompensa: cresce col GS del PNG o col livello del PG
+      const gs = String(s.cr || '').includes('/') ? (() => { const [a, b] = String(s.cr).split('/'); return (+a || 0) / (+b || 1); })() : parseFloat(s.cr);
+      const liv = parseInt(s.livello, 10);
+      const base = pg ? (liv > 0 ? liv * 100 : 300) : (gs > 0 ? Math.max(25, Math.round(gs * 120 / 25) * 25) : 0);
+      if (base) op.premio = base.toLocaleString('it-IT') + ' monete d\'oro';
+    }
+    _controlli();
+    disegna();
+  };
+
   const _campo = (k, val) => {
     if (k === 'sigillo') _cambiaSigillo(val); else _opera()[k] = val;
     if (_voce === 'stemma') {
@@ -167,7 +203,14 @@ const Scrittoio = (() => {
       const etFirma = { avviso: 'A chi rivolgersi', gazzetta: 'Sotto il nome (data, prezzo)', contratto: 'Firma della prima parte', menu: 'In fondo (un motto, una regola)' }[v] || 'Firma';
       box.innerHTML = avviso + '<div class="form-hint" style="margin:0 0 10px;">Ogni testo si può cambiare: scrivi direttamente qui sotto. Con <strong>Foglio bianco</strong> parti da zero.</div>' +
         _testo('sc-tit', etTit, op.titolo, 'titolo', phTit) +
-        (v === 'taglia' ? _testo('sc-sog', 'Ricercato', op.soggetto, 'soggetto') : v === 'gazzetta' ? _testo('sc-sog', 'Titolo dell’articolo', op.soggetto, 'soggetto', 'es. Fuoco nei magazzini del porto') : '') +
+        (v === 'taglia' ? (() => {
+          const c = _camp(), png = (c?.npcs || []).filter(_nome), pgs = (c?.pg || []).filter(_nome);
+          if (!png.length && !pgs.length) return '';
+          const opz = (l, t) => l.map((x) => '<option value="' + t + ':' + _esc(x.id) + '"' + (op.ritrattoDa === t + ':' + x.id ? ' selected' : '') + '>' + _esc(_nome(x)) + (x.immagine ? '' : ' (senza ritratto)') + '</option>').join('');
+          return '<div class="form-group"><label class="form-label" for="sc-dalla">Prendi da una scheda</label><select id="sc-dalla" class="form-select" onchange="Scrittoio._daScheda(this.value)">' +
+            '<option value="">Nessuna: ricercato inventato</option>' + (png.length ? '<optgroup label="PNG">' + opz(png, 'png') + '</optgroup>' : '') + (pgs.length ? '<optgroup label="PG">' + opz(pgs, 'pg') + '</optgroup>' : '') +
+            '</select><div class="form-hint">Nome, segni particolari e ricompensa (dal GS o dal livello) si riempiono da soli; se la scheda ha un’immagine diventa il ritratto.</div></div>';
+        })() + _testo('sc-sog', 'Ricercato', op.soggetto, 'soggetto') : v === 'gazzetta' ? _testo('sc-sog', 'Titolo dell’articolo', op.soggetto, 'soggetto', 'es. Fuoco nei magazzini del porto') : '') +
         _area('sc-corpo', etCorpo, op.corpo, 'corpo', ['lettera', 'editto', 'gazzetta', 'menu'].includes(v) ? 9 : v === 'contratto' ? 7 : 5, phCorpo) +
         (v === 'taglia' ? _testo('sc-premio', 'Ricompensa', op.premio, 'premio') : v === 'contratto' ? _testo('sc-premio', 'Firma della seconda parte', op.premio, 'premio') : v === 'gazzetta' ? _area('sc-premio', 'In breve (riquadro in fondo, vuoto per toglierlo)', op.premio, 'premio', 4) : '') +
         _testo('sc-firma', etFirma, op.firma, 'firma') +
@@ -473,5 +516,7 @@ const Scrittoio = (() => {
   document.addEventListener('DOMContentLoaded', () => setTimeout(() => { _aggancia(); if ($('page-scrittoio')?.classList.contains('active')) apri(); }, 220));
 
   return { apri, nuovo, precedente, scegli, azione, copia, scaricaPng, scaricaSvg, _campo, _confermaStemma, _confermaDocumento,
-    foglioBianco, riapri, _confermaRiapri, smettiModifica, riscriviBlasone, mostra };
+    foglioBianco, riapri, _confermaRiapri, smettiModifica, riscriviBlasone, mostra, _daScheda,
+    // Per js/scrittoio-scadenze.js: che documento e' aperto e quale e' stato salvato per ultimo
+    stato: () => ({ voce: _voce, opera: _opera(), salvato: _modifica }) };
 })();

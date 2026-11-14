@@ -214,10 +214,17 @@ const Documenti = (() => {
     // Ritratto da incisione: una figura incappucciata, senza volto
     const x = W / 2, y = 400, fw = 300, fh = 300;
     s += `<rect x="${x - fw / 2}" y="${y - fh / 2 + 4}" width="${fw}" height="${fh}" fill="#00000012" stroke="${ink}" stroke-width="4"/><rect x="${x - fw / 2 + 9}" y="${y - fh / 2 + 13}" width="${fw - 18}" height="${fh - 18}" fill="none" stroke="${ink}" stroke-width="1.4"/>`;
+    // Ritratto preso dalla scheda di un PNG o PG: in bianco e nero seppiato, come una stampa
+    if (o.ritrattoImg) {
+      s += `<filter id="doc-incisione" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values="0.36 0.62 0.12 0 0  0.30 0.54 0.10 0 0  0.22 0.40 0.08 0 0  0 0 0 1 0"/><feComponentTransfer><feFuncR type="linear" slope="1.25" intercept="-0.08"/><feFuncG type="linear" slope="1.25" intercept="-0.08"/><feFuncB type="linear" slope="1.25" intercept="-0.08"/></feComponentTransfer></filter>` +
+        `<clipPath id="doc-ritr"><rect x="${x - fw / 2 + 10}" y="${y - fh / 2 + 14}" width="${fw - 20}" height="${fh - 20}"/></clipPath>` +
+        `<image href="${o.ritrattoImg}" x="${x - fw / 2 + 10}" y="${y - fh / 2 + 14}" width="${fw - 20}" height="${fh - 20}" preserveAspectRatio="xMidYMid slice" clip-path="url(#doc-ritr)" filter="url(#doc-incisione)" opacity="0.92"/>`;
+    } else {
     { let raggi = ''; for (let a = 0; a < 6.283; a += 0.13) raggi += `M${x} ${y - 20}L${n1(x + Math.cos(a) * 240)} ${n1(y - 20 + Math.sin(a) * 240)}`; s += `<clipPath id="doc-ritr"><rect x="${x - fw / 2 + 10}" y="${y - fh / 2 + 14}" width="${fw - 20}" height="${fh - 20}"/></clipPath><path clip-path="url(#doc-ritr)" d="${raggi}" stroke="${ink}" stroke-width="1.1" opacity="0.5"/>`; }
     const cappuccio = `M${x - 100} ${y + 142}C${x - 100} ${y + 60} ${x - 88} ${y + 40} ${x - 68} ${y + 18}C${x - 72} ${y - 60} ${x - 40} ${y - 112} ${x} ${y - 118}C${x + 40} ${y - 112} ${x + 72} ${y - 60} ${x + 68} ${y + 18}C${x + 88} ${y + 40} ${x + 100} ${y + 60} ${x + 100} ${y + 142}Z`;
     s += `<path d="${cappuccio}" fill="${ink}"/><ellipse cx="${x}" cy="${y - 22}" rx="40" ry="54" fill="#000"/><path d="M${x - 19} ${y - 30}l15 5l-15 3ZM${x + 19} ${y - 30}l-15 5l15 3Z" fill="${c.base}"/>`;
     s += `<path d="${M.tratteggio([[x - 88, y + 70], [x + 88, y + 70], [x + 92, y + 142], [x - 92, y + 142]], 0.9, 5)}" stroke="${c.base}" stroke-width="1" opacity="0.28"/>`;
+    }
     s += _riga(W / 2, 630, o.soggetto || '', F.titoli, Math.min(74, 780 / Math.max(6, String(o.soggetto || '').length) * 1.5), ink);
     s += _blocco(o.corpo, 130, 650, W - 260, 220, { font: F.stampa, max: 34, min: 20, rapporto: 0.43, inter: 1.3, ink, ancora: 'middle' }).svg;
     s += _riga(W / 2, 925, 'Ricompensa', F.stampa, 36, ink, 'middle', 'font-style="italic"') + `<path d="M170 914H${W / 2 - 104}M${W / 2 + 104} 914H${W - 170}" stroke="${ink}" stroke-width="2"/>`;
