@@ -3040,7 +3040,21 @@ const Storage = (() => {
     catch (e) { Debug.error(`Storage.remove(${key}):`, e.message); return false; }
   };
 
-  const getCampaigns = () => get(KEYS.campaigns, []);
+  // Riparazione delle campagne "[object Object]": una vecchia versione (fino al 5 ago 2026), quando un
+  // co-master entrava, creava una campagna vuota mettendo l'intera campagna ricevuta nel campo del
+  // nome. I dati veri sono ancora tutti li': si rimettono al loro posto, una volta sola.
+  const _riparaNomi = (list) => {
+    let cambiato = false;
+    const out = (list || []).map(c => {
+      const vera = c && c.name;
+      if (!vera || typeof vera !== 'object' || Array.isArray(vera)) return c;
+      cambiato = true;
+      return { ...c, ...vera, id: c.id, name: typeof vera.name === 'string' && vera.name ? vera.name : 'Campagna condivisa', shareCode: vera.shareCode || c.shareCode };
+    });
+    if (cambiato) { set(KEYS.campaigns, out); try { Debug.log('Riparate campagne con il nome "[object Object]"'); } catch (e) {} }
+    return out;
+  };
+  const getCampaigns = () => _riparaNomi(get(KEYS.campaigns, []));
   const saveCampaigns = (list) => set(KEYS.campaigns, list);
 
   const getCampaign = (id) => {
@@ -16145,7 +16159,8 @@ const DriveBackup = (() => {
   // il link pubblico, Google vuole che scelga il file nel suo selettore. Si apre solo se il
   // download viene rifiutato, e il permesso poi resta valido per quell'account.
   // Chiave del progetto Google Cloud di DEFAULT_CLIENT_ID: e' pubblica come il Client ID, e va
-  // limitata a gdr-sys.github.io, pocketgmscreen.pages.dev e alle API Picker e Drive.
+  // limitata a pocketgmscreen.pages.dev, gdr-sys.github.io e docs.google.com (il selettore gira in un
+  // iframe di docs.google.com: senza, "La chiave sviluppatore API non e' valida") e alle API Picker e Drive.
   const PICKER_API_KEY = 'AIzaSyC-TkSBCslT5Z-rru8q80qwSoavS6J0zy0';
 
   const _caricaPicker = () => new Promise((resolve, reject) => {
@@ -22351,7 +22366,7 @@ document.addEventListener('DOMContentLoaded', initMobileNav);
         <li>Vai su <a href="https://console.cloud.google.com" target="_blank" style="color:#3f7fc4;">console.cloud.google.com</a></li>
         <li>Crea progetto → abilita <strong>Google Drive API</strong></li>
         <li>Credenziali → OAuth 2.0 Client ID → tipo <strong>Web</strong></li>
-        <li>Aggiungi <code style="background:var(--bg-tertiary);padding:1px 5px;border-radius:3px;">https://gdr-sys.github.io</code> come origine autorizzata</li>
+        <li>Aggiungi <code style="background:var(--bg-tertiary);padding:1px 5px;border-radius:3px;">https://pocketgmscreen.pages.dev</code> come origine autorizzata</li>
         <li>Copia il Client ID qui sotto</li>
       </ol>
       <input id="gdrive-client-id-input" type="text" class="form-input" placeholder="xxxxxx.apps.googleusercontent.com" style="margin-bottom:8px;">
@@ -22427,7 +22442,7 @@ document.addEventListener('DOMContentLoaded', initMobileNav);
         <li>Crea progetto → abilita <strong>Google Authentication</strong></li>
         <li>Crea <strong>Realtime Database</strong> (modalità test)</li>
         <li>Impostazioni progetto → Aggiungi app Web → copia la config</li>
-        <li>Aggiungi <code style="background:var(--bg-tertiary);padding:1px 5px;border-radius:3px;">gdr-sys.github.io</code> ai domini autorizzati</li>
+        <li>Aggiungi <code style="background:var(--bg-tertiary);padding:1px 5px;border-radius:3px;">pocketgmscreen.pages.dev</code> ai domini autorizzati</li>
       </ol>
       <div style="background:var(--bg-secondary);border-radius:var(--radius-md);padding:10px;margin-bottom:12px;">
         <div style="font-size:0.72rem;color:var(--text-muted);margin-bottom:6px;">Incolla qui la tua Firebase config (oggetto JS):</div>
