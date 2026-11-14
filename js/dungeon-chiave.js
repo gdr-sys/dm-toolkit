@@ -154,7 +154,17 @@ const DungeonChiave = (() => {
       const p = _chiave.pin[k], vecchia = _chiave.stanze[k];
       _chiave.stanze[k] = _stanza(_chiave.nome, p, k, (vecchia.sale || 0) + 1 + Math.floor(Math.random() * 1000), _chiave.livello);
     });
+    // Si ridisegna tutto ma la lista resta dove si era arrivati: prima tornava in cima,
+    // scomodissimo cambiando una stanza in fondo
+    const lista = document.querySelector('#dk-corpo .dk-lista');
+    const su = lista ? lista.scrollTop : 0;
     _render();
+    const nuova = document.querySelector('#dk-corpo .dk-lista');
+    if (nuova) nuova.scrollTop = su;
+    if (Number.isInteger(i)) {
+      const st = nuova && nuova.children[i];
+      if (st) { st.style.transition = 'background-color .6s'; st.style.backgroundColor = 'var(--bg-tertiary)'; setTimeout(() => { st.style.backgroundColor = ''; }, 600); }
+    }
   };
 
   const _html = () => _chiave.stanze.map(s =>

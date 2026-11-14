@@ -55,13 +55,63 @@ const Scrittoio = (() => {
   };
   // Un'immagine caricata dal DM sulla Fazione puo' fare da stemma nei documenti. Va incorporata:
   // un SVG usato come immagine non puo' leggere file esterni.
-  const _datiImmagine = async (url) => {
+  // Immagini delle schede (ritratti delle taglie, stemmi caricati delle fazioni) dentro il documento.
+  // Prima si leggevano con fetch: la protezione dell'app (CSP) e Google Drive lo bloccano, e le foto
+  // in formati che il disegno non sa leggere (o enormi) davano il punto interrogativo.
+  // Ora l'immagine passa da un <img> e da un canvas: esce sempre un JPEG leggero e leggibile.
+  const _idDrive = (url) => /drive\.google\.com|googleusercontent\.com/.test(url)
+    ? ((String(url).match(/\/file\/d\/([\w-]+)/) || String(url).match(/[?&]id=([\w-]+)/) || String(url).match(/\/d\/([\w-]+)/) || [])[1] || null) : null;
+  const _comeJpeg = (src, cors, png) => new Promise((ok) => {
+    const img = new Image();
+    if (cors) img.crossOrigin = 'anonymous';
+    const fine = (v) => { clearTimeout(t); ok(v); };
+    const t = setTimeout(() => fine(null), 15000);
+    img.onload = () => {
+      try {
+        if (!img.naturalWidth) return fine(null);
+        const f = Math.min(1, 800 / Math.max(img.naturalWidth, img.naturalHeight));
+        const c = document.createElement('canvas');
+        c.width = Math.max(1, Math.round(img.naturalWidth * f)); c.height = Math.max(1, Math.round(img.naturalHeight * f));
+        const g = c.getContext('2d');
+        if (!png) { g.fillStyle = '#fff'; g.fillRect(0, 0, c.width, c.height); } // nel ritratto le trasparenze diventano carta, non nero
+        g.drawImage(img, 0, 0, c.width, c.height);
+        fine(png ? c.toDataURL('image/png') : c.toDataURL('image/jpeg', 0.88));
+      } catch (e) { fine(null); } // immagine di un sito che non permette di copiarla
+    };
+    img.onerror = () => fine(null);
+    img.src = src;
+  });
+  let _ultimoMotivo = '';
+  // png = true per gli stemmi delle fazioni: restano trasparenti sul foglio
+  const _datiImmagine = async (url, png) => {
+    _ultimoMotivo = '';
     if (!url) return null;
-    if (url.startsWith('data:')) return url;
-    try {
-      const b = await (await fetch(typeof DriveBackup !== 'undefined' ? DriveBackup.toEmbeddableUrl(url) : url)).blob();
-      return await new Promise((ok, no) => { const fr = new FileReader(); fr.onload = () => ok(fr.result); fr.onerror = no; fr.readAsDataURL(b); });
-    } catch (e) { return null; }
+    if (url.startsWith('data:')) {
+      const d = await _comeJpeg(url, false, png);
+      if (!d) _ultimoMotivo = 'il formato dell’immagine non si riesce a leggere: ricaricala nella scheda (JPG o PNG)';
+      return d;
+    }
+    const id = _idDrive(url);
+    // Su Drive: con Drive collegato si scarica il file con l'accesso di Google
+    if (id && typeof GDrive !== 'undefined' && GDrive.token) {
+      try {
+        const r = await fetch('https://www.googleapis.com/drive/v3/files/' + id + '?alt=media', { headers: { Authorization: 'Bearer ' + GDrive.token } });
+        if (r.ok) {
+          const b = await r.blob();
+          if (/^image\//.test(b.type)) {
+            const u = URL.createObjectURL(b);
+            const d = await _comeJpeg(u, false, png);
+            URL.revokeObjectURL(u);
+            if (d) return d;
+          }
+        }
+      } catch (e) {}
+    }
+    const d = await _comeJpeg(typeof DriveBackup !== 'undefined' ? DriveBackup.toEmbeddableUrl(url) : url, true, png);
+    if (!d) _ultimoMotivo = id
+      ? (typeof GDrive !== 'undefined' && GDrive.token ? 'Google Drive non la lascia leggere (forse è di un altro account)' : 'è su Google Drive: collega Drive dalle Impostazioni e riprova')
+      : 'il sito dove sta non permette di copiarla: caricala dal dispositivo nella scheda';
+    return d;
   };
 
   /* ── Disegno ── */
@@ -75,12 +125,12 @@ const Scrittoio = (() => {
       const voce = _voce, op = _opera();
       try {
         const fazione = (_camp()?.factions || []).find((f) => f.id === op.sigillo);
-        const propria = voce !== 'stemma' && fazione && !fazione.stemma && fazione.immagine ? await _datiImmagine(fazione.immagine) : null;
+        const propria = voce !== 'stemma' && fazione && !fazione.stemma && fazione.immagine ? await _datiImmagine(fazione.immagine, true) : null;
         if (voce !== 'stemma' && fazione && !fazione.stemma && fazione.immagine && !propria) Toast.show('L’immagine di ' + _nome(fazione) + ' non si è potuta leggere: uso uno stemma inventato.', 'warning', 5000);
         // Taglia presa da una scheda: il ritratto del PNG o PG al posto della figura incappucciata
         const scheda = voce === 'taglia' ? _scheda(op.ritrattoDa) : null;
         const ritratto = scheda && scheda.immagine ? await _datiImmagine(scheda.immagine) : null;
-        if (scheda && scheda.immagine && !ritratto) Toast.show('Il ritratto di ' + _nome(scheda) + ' non si è potuto leggere: uso la figura incappucciata.', 'warning', 5000);
+        if (scheda && scheda.immagine && !ritratto) Toast.show('Il ritratto di ' + _nome(scheda) + ' non si è potuto usare: ' + (_ultimoMotivo || 'immagine non leggibile') + '. Per ora c’è la figura incappucciata.', 'warning', 7000);
         const m = voce === 'stemma' ? Araldica.genera({ ...op, nome: op.nome || '' })
           : Documenti.genera({ ...op, tipo: voce, stemma: _stemmaDi(op.sigillo), stemmaImg: propria, iniziale: propria ? _nome(fazione).charAt(0) : '', ritrattoImg: ritratto });
         const S = Cartografo.strumenti;
