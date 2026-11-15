@@ -18,7 +18,13 @@ const CampagnaDemo = (() => {
   const crea = () => {
     if (typeof Storage === 'undefined' || typeof WikiSections === 'undefined') return;
     const esistente = (Storage.getCampaigns() || []).find(c => c.name === NOME);
-    if (esistente) { App.openCampaign(esistente.id); return; }
+    if (esistente) {
+      // Chi l'aveva gia' creata riceve i ritratti aggiunti dopo, senza toccare quelli che ha cambiato
+      const RITRATTI = { 'Tessa Brunvento': 'tessa', 'Fratello Orsino': 'orsino', 'Madre Cinerea': 'cinerea', 'Bertrando Viti': 'bertrando', 'Capitano Dalia Ferraguto': 'dalia' };
+      const npcs = (esistente.npcs || []).map(n => (!n.immagine && RITRATTI[n.nome]) ? { ...n, immagine: 'img/demo/' + RITRATTI[n.nome] + '.webp' } : n);
+      if (npcs.some((n, i) => n !== (esistente.npcs || [])[i])) Storage.updateCampaign(esistente.id, { npcs });
+      App.openCampaign(esistente.id); return;
+    }
 
     const camp = Storage.createCampaign(NOME, 'campagna');
     Storage.updateCampaign(camp.id, {
@@ -61,19 +67,22 @@ const CampagnaDemo = (() => {
       risorse: 'Denaro, carri, il rispetto di tutto il villaggio.' });
 
     // ── PNG ──
-    const tessa = nuovo('png', { nome: 'Tessa Brunvento', ruolo: 'Ostessa del Tino Rovesciato', razza: 'Umana', stato: 'Vivo', sede: '@Il Tino Rovesciato',
+    const tessa = nuovo('png', { nome: 'Tessa Brunvento', immagine: 'img/demo/tessa.webp', ruolo: 'Ostessa del Tino Rovesciato', razza: 'Umana', stato: 'Vivo', sede: '@Il Tino Rovesciato',
       personalita: 'Schietta, ride forte, ricorda il nome di ogni cliente.', vuole: 'Che il villaggio resti unito.', teme: 'Che suo figlio si unisca ai Custodi.',
       segreto: 'Suo figlio Elio frequenta già i Custodi della Cenere di nascosto.' });
-    const orsino = nuovo('png', { nome: 'Fratello Orsino', ruolo: 'Ultimo monaco della Fiamma Quieta', razza: 'Nano', stato: 'Vivo', sede: '@Monte Ardegna',
+    const orsino = nuovo('png', { nome: 'Fratello Orsino', immagine: 'img/demo/orsino.webp', ruolo: 'Ultimo monaco della Fiamma Quieta', razza: 'Nano', stato: 'Vivo', sede: '@Monte Ardegna',
       personalita: 'Vecchio, distratto, parla per enigmi.', vuole: 'Riparare il sigillo prima che sia tardi.',
       segreto: 'Ha più di trecento anni: è legato al sigillo, e se il sigillo si spezza del tutto morirà.' });
-    const cinerea = nuovo('png', { nome: 'Madre Cinerea', ruolo: 'Guida dei Custodi della Cenere', razza: 'Tiefling', stato: 'Vivo', fazione: '@Custodi della Cenere',
+    const cinerea = nuovo('png', { nome: 'Madre Cinerea', immagine: 'img/demo/cinerea.webp', ruolo: 'Guida dei Custodi della Cenere', razza: 'Umana', stato: 'Vivo', fazione: '@Custodi della Cenere',
       personalita: 'Calma, gentile, convincente. Non alza mai la voce.', vuole: 'L\'eruzione.',
       segreto: 'È stata lei a guidare i Custodi nella cripta e a spezzare il primo dei tre anelli del sigillo.' });
-    nuovo('png', { nome: 'Bertrando Viti', ruolo: 'Capo della Gilda dei Vignaioli', razza: 'Halfling', stato: 'Vivo', fazione: '@Gilda dei Vignaioli',
-      personalita: 'Agitato, generoso, sempre con un bicchiere in mano.', vuole: 'Salvare la vendemmia, a qualsiasi costo.', teme: 'La rovina.' });
-    nuovo('png', { nome: 'Capitano Dalia Ferraguto', ruolo: 'Comandante della guardia di Corvara', razza: 'Mezzelfa', stato: 'Vivo', sede: '@Corvara',
-      personalita: 'Pratica e diffidente.', vuole: 'Evacuare la valle prima che il fuoco arrivi al fiume.' });
+    nuovo('png', { nome: 'Bertrando Viti', immagine: 'img/demo/bertrando.webp', ruolo: 'Capo della Gilda dei Vignaioli', razza: 'Umano', stato: 'Vivo', fazione: '@Gilda dei Vignaioli',
+      personalita: 'Elegante anche sotto la cenere, agitato, generoso, sempre con un bicchiere in mano.', vuole: 'Salvare la vendemmia, a qualsiasi costo.', teme: 'La rovina.' });
+    nuovo('png', { nome: 'Capitano Dalia Ferraguto', immagine: 'img/demo/dalia.webp', ruolo: 'Comandante della guardia di Corvara, ex fabbra', razza: 'Mezzelfa', stato: 'Vivo', sede: '@Corvara',
+      personalita: 'Pratica e diffidente. Si forgia da sola le lame della guardia.', vuole: 'Evacuare la valle prima che il fuoco arrivi al fiume.' });
+    nuovo('png', { nome: 'Rocco Sassobianco', immagine: 'img/demo/rocco.webp', ruolo: 'Carrettiere della Gilda dei Vignaioli', razza: 'Umano', stato: 'Vivo', fazione: '@Gilda dei Vignaioli', sede: '@Valmora',
+      personalita: 'Taciturno, fischietta quando è nervoso. Conosce ogni buca della strada per Corvara.', vuole: 'Portare i carri a destinazione e tornare a casa intero.', teme: 'Le creature di fuoco che scendono di notte sulla strada.',
+      segreto: 'Ha visto Madre Cinerea parlare con un mercante di Corvara che compra vino a metà prezzo.' });
 
     // ── Quest ──
     nuovo('quest', { nome: 'Il sigillo spezzato', tipo: 'Principale', stato: 'Attiva', priorita: 'Alta', committente: '@Fratello Orsino',

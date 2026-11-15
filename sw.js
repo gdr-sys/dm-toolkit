@@ -1,7 +1,7 @@
 /* Pocket GM Screen (già DM Toolkit) — © 2026 Noemi Marcolini. Tutti i diritti riservati. Vedi LICENSE. */
 // Cambiare il numero quando cambia l'elenco dei file precaricati, cosi' il nuovo service
 // worker scarica di nuovo tutto e cancella la cache vecchia.
-const CACHE_NAME = 'dm-toolkit-v36';
+const CACHE_NAME = 'dm-toolkit-v37';
 const APP_SHELL = [
   './',
   './index.html',
@@ -19,6 +19,8 @@ const APP_SHELL = [
   './icons/icon-maskable-512.png',
   './icons/apple-touch-icon.png',
   './icons/favicon-48.png',
+  // Ritratti dei PNG della campagna di esempio (js/campagna-demo.js)
+  ...['tessa', 'orsino', 'cinerea', 'bertrando', 'dalia', 'rocco'].map((n) => './img/demo/' + n + '.webp'),
 ];
 
 // Dati del Compendio, generatori, schermo del DM...: vengono letti con fetch solo quando si
