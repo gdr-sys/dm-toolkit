@@ -37,11 +37,32 @@ const Documenti = (() => {
   /* ── Testi: nomi veri se ci sono, inventati altrimenti ── */
   const NOMI_RISERVA = ['Berengario', 'Ilaria Corvi', 'Tancredi', 'Oriana', 'Fosco il Rosso', 'Madonna Vespri', 'Ugolino', 'Mirella', 'Bastiano Tre Dita', 'Sigismonda'];
   const FAZ_RISERVA = ['Gilda dei Cordari', 'Mano Grigia', 'Ordine del Pozzo', 'Consiglio dei Nove'];
+  // Nomi senza articolo che ne vogliono uno ("Custodi della Cenere" -> "I Custodi della Cenere", "Cripta della
+  // Fiamma" -> "La Cripta"): si guarda la prima parola. I nomi propri (Valmora, Corvara) restano senza.
+  const _ARTICOLI = (() => {
+    const m = {};
+    const metti = (art, parole) => parole.split(' ').forEach((w) => { m[w] = art; });
+    metti('La', 'Cripta Gilda Rocca Torre Compagnia Fratellanza Foresta Palude Valle Città Lega Confraternita Casa Corte Chiesa Grotta Miniera Taverna Locanda Piana Baia Fortezza Cittadella Guardia Mano Setta Loggia Congrega Biblioteca Cattedrale Rovina Tomba Villa Fonte Gola Collina Montagna Strada Via Porta Piazza Spada Corona Rosa Fiamma Società Banda Flotta Milizia Cerchia');
+    metti('Il', 'Monte Bosco Lago Porto Circolo Consiglio Tempio Castello Forte Passo Ponte Mercato Collegio Culto Clan Concilio Santuario Covo Regno Ducato Feudo Villaggio Borgo Mulino Faro Fiume Colle Picco Sentiero Cerchio Patto Sindacato Tribunale Tino Mastio Bastione Priorato Monastero Convento');
+    metti('L’', 'Ordine Abbazia Accademia Isola Avamposto Eremo Osservatorio Alleanza Assemblea Arena Altare');
+    metti('Lo', 'Scudo Stretto Spirito Sperone');
+    metti('I', 'Custodi Figli Fratelli Cavalieri Guardiani Signori Mercanti Lupi Corvi Seguaci Discepoli Predoni Ladri Monti Colli Mastri Vignaioli Pellegrini Cacciatori Mercenari Veglianti Servi Devoti Cercatori Fedeli');
+    metti('Gli', 'Eredi Eletti Spettri Inquisitori Adepti Illuminati Occhi Antichi');
+    metti('Le', 'Sorelle Lame Ombre Paludi Rovine Terre Grotte Figlie Mani Voci Spade');
+    return m;
+  })();
+  const _conArt = (n) => {
+    n = String(n || '').trim();
+    if (/^(?:(?:Il|Lo|La|I|Gli|Le) |L’|L')/.test(n)) return n;
+    const art = _ARTICOLI[n.split(' ')[0]];
+    return art ? (art === 'L’' ? 'L’' + n : art + ' ' + n) : n;
+  };
+  const _pl = (n) => /^(?:I|Gli|Le) /.test(_conArt(n));
   // 'di' davanti a un nome che ha gia' l'articolo: di Il Tino -> del Tino, di La Rocca -> della Rocca
   // 'a' e 'per/verso/fino a' davanti a un nome con l'articolo: a Il Tino -> al Tino, verso Il Tino -> verso il Tino
-  const _aNome = (n) => { const m = String(n).match(/^(Il|Lo|La|I|Gli|Le) (.+)$/) || String(n).match(/^(L’|L')(.+)$/); return m ? ({ Il: 'al ', Lo: 'allo ', La: 'alla ', I: 'ai ', Gli: 'agli ', Le: 'alle ', 'L’': 'all’', "L'": 'all’' })[m[1]] + m[2] : 'a ' + n; };
-  const _art = (n) => String(n).replace(/^(?:(?:Il|Lo|La|I|Gli|Le) |L’|L')/, (m) => m.toLowerCase());
-  const _diNome = (n) => { const m = String(n).match(/^(Il|Lo|La|I|Gli|Le) (.+)$/) || String(n).match(/^(L’|L')(.+)$/); return m ? ({ Il: 'del ', Lo: 'dello ', La: 'della ', I: 'dei ', Gli: 'degli ', Le: 'delle ', 'L’': 'dell’', "L'": 'dell’' })[m[1]] + m[2] : 'di ' + n; };
+  const _aNome = (n) => { n = _conArt(n); const m = String(n).match(/^(Il|Lo|La|I|Gli|Le) (.+)$/) || String(n).match(/^(L’|L')(.+)$/); return m ? ({ Il: 'al ', Lo: 'allo ', La: 'alla ', I: 'ai ', Gli: 'agli ', Le: 'alle ', 'L’': 'all’', "L'": 'all’' })[m[1]] + m[2] : 'a ' + n; };
+  const _art = (n) => _conArt(n).replace(/^(?:(?:Il|Lo|La|I|Gli|Le) |L’|L')/, (m) => m.toLowerCase());
+  const _diNome = (n) => { n = _conArt(n); const m = String(n).match(/^(Il|Lo|La|I|Gli|Le) (.+)$/) || String(n).match(/^(L’|L')(.+)$/); return m ? ({ Il: 'del ', Lo: 'dello ', La: 'della ', I: 'dei ', Gli: 'degli ', Le: 'delle ', 'L’': 'dell’', "L'": 'dell’' })[m[1]] + m[2] : 'di ' + n; };
   const testi = (tipo, seme, cmp = {}) => {
     const r = M.rng('testo:' + tipo + ':' + seme);
     const png = () => r.pick(cmp.png && cmp.png.length ? cmp.png : NOMI_RISERVA);
@@ -52,20 +73,20 @@ const Documenti = (() => {
     switch (tipo) {
       case 'lettera': return scegli([
         { titolo: 'Per ' + a + ', nelle sue mani', corpo: `Non scrivermi più ${_aNome(l)}: le lettere vengono aperte prima di arrivare. So chi le apre e so per conto di chi.\n\nQuello che hai nascosto sotto il pozzo non è più al sicuro. Portalo via prima della luna nuova, e non fidarti di ${b}, qualunque cosa ti dica.\n\nBrucia questa lettera.`, firma: 'Chi ti vuole ancora vivo' },
-        { titolo: 'A ' + a + ',', corpo: `Ti scrivo con la mano che trema. Quello che abbiamo visto ${_aNome(l)} non era un incidente, e ora anche ${f} lo sa.\n\nMi hanno offerto denaro per tacere. Ho accettato, che il cielo mi perdoni. Se leggi queste righe, significa che il denaro non è bastato.\n\nCerca ${b} e riferisci che la chiave è dove l'abbiamo lasciata.`, firma: b },
+        { titolo: 'A ' + a + ',', corpo: `Ti scrivo con la mano che trema. Quello che abbiamo visto ${_aNome(l)} non era un incidente, e ora anche ${_art(f)} ${_pl(f) ? 'lo sanno' : 'lo sa'}.\n\nMi hanno offerto denaro per tacere. Ho accettato, che il cielo mi perdoni. Se leggi queste righe, significa che il denaro non è bastato.\n\nCerca ${b} e riferisci che la chiave è dove l'abbiamo lasciata.`, firma: b },
         { titolo: 'Sorella mia,', corpo: `Il viaggio verso ${_art(l)} è andato peggio del previsto, ma sono vivo. ${a} mi ha trovato un letto e non fa domande, cosa che di questi tempi vale più dell'oro.\n\nSe qualcuno chiede di me, sono morto da due inverni. Di' lo stesso anche alla mamma, se puoi farlo senza piangere.\n\nTornerò quando sarà finita.`, firma: 'Tuo fratello' },
       ]);
       case 'taglia': return {
         titolo: scegli(['Ricercato', 'Taglia', 'Vivo o morto']), soggetto: a,
-        corpo: scegli([`Furto nei magazzini ${_diNome(l)} e ferimento di due guardie durante la fuga. Porta armi: non avvicinatevi da soli.`, `Tradimento contro ${f}. Ultimo avvistamento sulla strada per ${_art(l)}. Non ascoltate ciò che dice.`, `Furto, incendio e falsificazione di sigilli. Chiunque offra riparo sarà ritenuto complice.`, `Fuga dalle prigioni ${_diNome(l)} la notte scorsa. Segni particolari: una cicatrice sulla mano sinistra e un accento straniero.`]),
-        premio: monete + ' monete d\'oro', firma: 'Per ordine di ' + f,
+        corpo: scegli([`Furto nei magazzini ${_diNome(l)} e ferimento di due guardie durante la fuga. Porta armi: non avvicinatevi da soli.`, `Tradimento contro ${_art(f)}. Ultimo avvistamento sulla strada per ${_art(l)}. Non ascoltate ciò che dice.`, `Furto, incendio e falsificazione di sigilli. Chiunque offra riparo sarà ritenuto complice.`, `Fuga dalle prigioni ${_diNome(l)} la notte scorsa. Segni particolari: una cicatrice sulla mano sinistra e un accento straniero.`]),
+        premio: monete + ' monete d\'oro', firma: 'Per ordine ' + _diNome(f),
       };
       case 'editto': return {
-        titolo: 'Editto', corpo: scegli([`Si fa sapere a tutti gli abitanti ${_diNome(l)} che, da questo giorno e fino a nuovo ordine, le porte verranno chiuse al calar del sole.\n\nChiunque sia trovato fuori dalle mura dopo il coprifuoco verrà condotto ai ceppi senza processo. Le locande chiuderanno al primo rintocco.\n\nChi ha notizie su quanto accaduto ${_aNome(l2)} si presenti al corpo di guardia: sarà ricompensato.`, `In considerazione dei recenti disordini, ${f} dispone che ogni carro in transito per ${_art(l)} paghi una nuova gabella di ${Math.round(monete / 20)} monete.\n\nÈ proibito portare armi entro le mura senza licenza. È altresì proibito dare asilo a chiunque non sia iscritto nei registri.\n\nChi disobbedirà ne risponderà con i propri beni.`]),
-        firma: 'Dato ' + _aNome(l) + ', per volontà di ' + f,
+        titolo: 'Editto', corpo: scegli([`Si fa sapere a tutti gli abitanti ${_diNome(l)} che, da questo giorno e fino a nuovo ordine, le porte verranno chiuse al calar del sole.\n\nChiunque sia trovato fuori dalle mura dopo il coprifuoco verrà condotto ai ceppi senza processo. Le locande chiuderanno al primo rintocco.\n\nChi ha notizie su quanto accaduto ${_aNome(l2)} si presenti al corpo di guardia: sarà ricompensato.`, `In considerazione dei recenti disordini, ${_art(f)} ${_pl(f) ? 'dispongono' : 'dispone'} che ogni carro in transito per ${_art(l)} paghi una nuova gabella di ${Math.round(monete / 20)} monete.\n\nÈ proibito portare armi entro le mura senza licenza. È altresì proibito dare asilo a chiunque non sia iscritto nei registri.\n\nChi disobbedirà ne risponderà con i propri beni.`]),
+        firma: 'Dato ' + _aNome(l) + ', per volontà ' + _diNome(f),
       };
       case 'avviso': return scegli([
-        { titolo: 'Cercasi aiuto', corpo: `Qualcosa ammazza le bestie nella valle sotto ${l}. Già sei capre e un mulo. Non sono lupi, i lupi non aprono i recinti.\n\nPago ${monete} monete a chi lo trova.`, firma: 'Chiedere di ' + a + ' alla locanda' },
+        { titolo: 'Cercasi aiuto', corpo: `Qualcosa ammazza le bestie nella valle sotto ${_art(l)}. Già sei capre e un mulo. Non sono lupi, i lupi non aprono i recinti.\n\nPago ${monete} monete a chi lo trova.`, firma: 'Chiedere di ' + a + ' alla locanda' },
         { titolo: 'Scomparso', corpo: `Mio figlio è uscito tre sere fa verso ${_art(l)} e non è tornato. Ha dodici anni e un cappello rosso.\n\nChi l'ha visto parli, non chiedo altro. Ho poco ma è tutto suo.`, firma: a },
         { titolo: 'Guardie per carovana', corpo: `Partenza per ${_art(l)} tra tre giorni. Si cercano braccia buone e poche domande.\n\n${Math.round(monete / 10)} monete al giorno, cibo compreso. Il carico non è affar vostro.`, firma: 'Rivolgersi a ' + a },
       ]);
@@ -79,13 +100,13 @@ const Documenti = (() => {
         firma: scegli(['Esce ogni settimana', 'Esce quando c’è da dire', 'Stampata alla bottega di ' + b]) + ' · 2 monete di rame',
         ...scegli([
           { soggetto: 'Fuoco nei magazzini ' + _diNome(l2), corpo: `Nella notte di ieri un incendio ha distrutto tre magazzini lungo il fiume. Nessun morto, ma il grano dell'inverno è perduto.\n\nLe guardie parlano di una disgrazia. Chi abita nella zona racconta altro: due uomini incappucciati visti correre via poco prima delle fiamme, e un odore di olio che non viene dalle lanterne.\n\n${f} ha già offerto di comprare quel che resta, a un prezzo che molti trovano sospetto. ${a} ha promesso un'indagine, ma non ha detto chi la condurrà.` },
-          { soggetto: f + ' alza il dazio sul sale', corpo: `Da questa settimana chi porta sale ${_aNome(l)} paga il doppio alle porte. Lo ha deciso ${f}, che parla di strade da riparare e di briganti da cacciare.\n\nI mercanti non ci credono. ${a}, che commercia in pesce salato da trent'anni, dice che per molti sarà la rovina: «O chiudo bottega o comincio a passare di notte, come fanno già in tanti».\n\nLe guardie hanno l'ordine di controllare anche i carri dei pellegrini.` },
+          { soggetto: f + ' alza il dazio sul sale', corpo: `Da questa settimana chi porta sale ${_aNome(l)} paga il doppio alle porte. Lo ${_pl(f) ? 'hanno' : 'ha'} deciso ${_art(f)}, che ${_pl(f) ? 'parlano' : 'parla'} di strade da riparare e di briganti da cacciare.\n\nI mercanti non ci credono. ${a}, che commercia in pesce salato da trent'anni, dice che per molti sarà la rovina: «O chiudo bottega o comincio a passare di notte, come fanno già in tanti».\n\nLe guardie hanno l'ordine di controllare anche i carri dei pellegrini.` },
           { soggetto: 'Una luce sopra ' + l2.replace(/^(Il|Lo|La|I|Gli|Le) /, (m) => m.toLowerCase()), corpo: `Per tre notti di fila i pastori hanno visto una luce verde muoversi sopra le colline di ${l2}. Non vola come un uccello e non cade come una stella.\n\nIl tempio parla di un segno e invita alla preghiera. ${a} sostiene che sia solo qualcuno con una lanterna e troppo vino in corpo.\n\nIntanto due capre sono sparite, e il figlio del mugnaio giura di aver sentito qualcuno cantare in una lingua che non conosce.` },
         ]),
         premio: `Smarrito un mulo grigio sulla strada per ${_art(l2)}: chi lo riporta avrà una moneta d'argento.\n\nLa fiera d'autunno si farà comunque, assicura ${b}.\n\nCercasi scrivano che sappia tenere la bocca chiusa. Chiedere alla bottega.`,
       };
       case 'contratto': return scegli([
-        { titolo: 'Contratto di scorta', corpo: `${a} si impegna a scortare il carico fino ${_aNome(l)} entro dieci giorni da oggi.\n${f} pagherà ${monete} monete d'oro: metà alla partenza, metà alla consegna.\nIl contenuto delle casse non è affare di chi le porta, e nessuna cassa va aperta.\nChi rompe il patto restituisce il doppio di quanto ha ricevuto.`, firma: a, premio: 'Per ' + f },
+        { titolo: 'Contratto di scorta', corpo: `${a} si impegna a scortare il carico fino ${_aNome(l)} entro dieci giorni da oggi.\n${f} pagherà ${monete} monete d'oro: metà alla partenza, metà alla consegna.\nIl contenuto delle casse non è affare di chi le porta, e nessuna cassa va aperta.\nChi rompe il patto restituisce il doppio di quanto ha ricevuto.`, firma: a, premio: 'Per ' + _art(f) },
         { titolo: 'Atto di affitto', corpo: `${b} affitta a ${a} la casa con bottega presso la piazza ${_diNome(l)}, per un anno intero.\nL'affitto è di ${Math.round(monete / 20)} monete d'argento al mese, da pagare ogni primo giorno.\nLa cantina resta chiusa e la chiave resta a ${b}.\nIn caso di incendio o di guerra il contratto si scioglie senza debiti.`, firma: a, premio: b },
       ]);
       case 'menu': return {
