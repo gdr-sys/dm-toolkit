@@ -9,6 +9,7 @@
 
 [![Scopri](https://img.shields.io/badge/scopri-il%20sito%20di%20presentazione-8B2635?style=flat-square)](https://pocketgmscreen.pages.dev/scopri/)
 [![Live](https://img.shields.io/badge/apri-l'app-crimson?style=flat-square)](https://pocketgmscreen.pages.dev/)
+[![Trailer](https://img.shields.io/badge/guarda-il%20trailer-FF0000?style=flat-square&logo=youtube&logoColor=white)](https://youtu.be/VDOrEB4ioKI)
 [![D&D 5e](https://img.shields.io/badge/D%26D-5e%202014%20%2F%202024-8B2635?style=flat-square)](https://pocketgmscreen.pages.dev/)
 [![Vanilla JS](https://img.shields.io/badge/stack-Vanilla%20JS-F7DF1E?style=flat-square&logo=javascript&logoColor=black)](https://pocketgmscreen.pages.dev/)
 [![Firebase](https://img.shields.io/badge/sync-Firebase-FFCA28?style=flat-square&logo=firebase&logoColor=black)](https://firebase.google.com/)
