@@ -44,7 +44,7 @@ const WikiImport = (() => {
       { key: 'cr', dataKey: 'cr', label: 'Statblock: Grado di Sfida', hint: 'es. 2 oppure 1/4' },
       { key: 'ac', dataKey: 'ac', label: 'Statblock: Classe Armatura', hint: 'es. 15' },
       { key: 'hp', dataKey: 'hp', label: 'Statblock: Punti Ferita', hint: 'es. 45 oppure 45 (6d8+12)' },
-      { key: 'speed', dataKey: 'speed', label: 'Statblock: Velocita', hint: 'es. 9 m' },
+      { key: 'speed', dataKey: 'speed', label: 'Statblock: Velocità', hint: 'es. 9 m' },
       { key: 'iniziativa', dataKey: 'iniziativa', label: 'Statblock: Iniziativa', hint: 'es. +2 (vuoto = da Destrezza)' },
       { key: 'profBonus', dataKey: 'profBonus', label: 'Statblock: Bonus Competenza', hint: 'es. 2' },
       { key: 'type', dataKey: 'type', label: 'Statblock: Tipo creatura', hint: 'es. Umanoide (vuoto = Umanoide)' },
@@ -56,7 +56,7 @@ const WikiImport = (() => {
       { key: 'wis', dataKey: 'wis', label: 'Statblock: Saggezza', hint: 'es. 11' },
       { key: 'cha', dataKey: 'cha', label: 'Statblock: Carisma', hint: 'es. 14' },
       { key: 'savingThrows', dataKey: 'savingThrows', label: 'Statblock: Tiri Salvezza', hint: 'es. Des +4, Sag +2' },
-      { key: 'skills', dataKey: 'skills', label: 'Statblock: Abilita', hint: 'es. Percezione +4, Furtivita +3' },
+      { key: 'skills', dataKey: 'skills', label: 'Statblock: Abilità', hint: 'es. Percezione +4, Furtivita +3' },
       { key: 'immunities', dataKey: 'immunities', label: 'Statblock: Immunita/Resistenze ai danni', hint: 'es. resistenza fuoco' },
       { key: 'vulnerabilities', dataKey: 'vulnerabilities', label: 'Statblock: Vulnerabilita', hint: '' },
       { key: 'condImmunities', dataKey: 'condImmunities', label: 'Statblock: Immunita alle condizioni', hint: '' },
@@ -82,7 +82,7 @@ const WikiImport = (() => {
       { key: 'wis', dataKey: 'wis', label: 'Statblock: Saggezza', hint: 'es. 12' },
       { key: 'cha', dataKey: 'cha', label: 'Statblock: Carisma', hint: 'es. 8' },
       { key: 'savingThrows', dataKey: 'savingThrows', label: 'Statblock: Tiri Salvezza', hint: 'es. For +5, Cos +4' },
-      { key: 'skills', dataKey: 'skills', label: 'Statblock: Abilita', hint: 'es. Atletica +5, Percezione +3' },
+      { key: 'skills', dataKey: 'skills', label: 'Statblock: Abilità', hint: 'es. Atletica +5, Percezione +3' },
       { key: 'gear', dataKey: 'gear', label: 'Statblock: Equipaggiamento', hint: '' },
       { key: 'talenti', dataKey: 'talenti', label: 'Statblock: Talenti', multiline: true, hint: 'uno per riga' },
       { key: 'azioni', dataKey: 'azioni', label: 'Statblock: Azioni', actionList: true, hint: 'una per riga: Nome: descrizione' },
@@ -94,7 +94,8 @@ const WikiImport = (() => {
   const COMBAT_TARGET = { png: 'npcs', pg: 'party' };
 
   const _cfg = (tipo) => WikiSections._getCfg(tipo);
-  const _norm = (s) => String(s || '').trim().toLowerCase();
+  // Senza accenti: un CSV con "Velocita" (template vecchio) e uno con "Velocità" trovano la stessa colonna
+  const _norm = (s) => String(s || '').trim().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
 
   const _escHtml = (s) => String(s)
     .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
