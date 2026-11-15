@@ -549,7 +549,7 @@
       <div class="page-header">
         <div>
           <h1 class="page-title">Sessione</h1>
-          <p class="page-subtitle" id="sess-subtitle">Combat Tracker · Party · Scontri salvati</p>
+          <p class="page-subtitle" id="sess-subtitle">Scontro · Gruppo · Scontri salvati</p>
         </div>
         <div style="display:flex;gap:var(--space-sm);align-items:center;flex-wrap:wrap;">
           <!-- Tab: corrente / storico -->
@@ -564,7 +564,7 @@
           </button>
           <button class="btn btn-secondary" onclick="Sessione.addPGtoCombat()">
             <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
-            Party in Combat
+            Party nello scontro
           </button>
         </div>
       </div>
@@ -1134,7 +1134,7 @@
           <!-- Sezione Loot -->
           <div id="enc-loot-section" style="display:none;border-top:1px solid var(--border);">
             <div style="padding:8px 12px;display:flex;align-items:center;justify-content:space-between;">
-              <span style="font-family:var(--font-display);font-size:0.82rem;">Loot Post-Combat</span>
+              <span style="font-family:var(--font-display);font-size:0.82rem;">Bottino dopo lo scontro</span>
               <div style="display:flex;gap:6px;">
                 <select id="enc-loot-stato" class="form-select" style="width:auto;font-size:0.72rem;">
                   <option value="intatto">✓ Intatto</option>
@@ -2718,7 +2718,7 @@
     </div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="Modal.close('custom-combatant-modal')">Annulla</button>
-      <button class="btn btn-primary" onclick="Sessione.submitCustomCombatant()">Aggiungi al Combat</button>
+      <button class="btn btn-primary" onclick="Sessione.submitCustomCombatant()">Aggiungi allo scontro</button>
     </div>
   </div>
 </div>
@@ -2772,7 +2772,7 @@
     <div class="modal-header">
       <h2 style="font-family:var(--font-display);font-size:1.1rem;" id="comp-detail-title">—</h2>
       <div style="display:flex;gap:var(--space-sm);align-items:center;">
-        <button class="btn btn-primary btn-sm" id="comp-detail-combat-btn" style="display:none;" onclick="Compendio.sendCurrentToCombat()">Aggiungi al Combat</button>
+        <button class="btn btn-primary btn-sm" id="comp-detail-combat-btn" style="display:none;" onclick="Compendio.sendCurrentToCombat()">Aggiungi allo scontro</button>
         <button class="btn btn-ghost btn-icon" onclick="Modal.close('comp-detail')" aria-label="Chiudi"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
       </div>
     </div>
@@ -5662,7 +5662,7 @@ const Sessione = (() => {
     saveCombat(_combat);
     renderCombat();
     _startPgLiveSync();
-    Toast.show('Party aggiunto al combat', 'success');
+    Toast.show('Party aggiunto allo scontro', 'success');
   };
 
   const newCombat = () => {
@@ -6349,7 +6349,7 @@ const Sessione = (() => {
     modal.style.cssText = 'display:flex;';
     modal.innerHTML = `<div class="modal" style="max-width:420px;">
       <div class="modal-header">
-        <h2 style="font-family:var(--font-display);font-size:1rem;">Aggiungi NPC al Combat</h2>
+        <h2 style="font-family:var(--font-display);font-size:1rem;">Aggiungi PNG allo scontro</h2>
         <button class="btn btn-ghost btn-icon" onclick="this.closest('.modal-overlay').remove()" aria-label="Chiudi"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
       </div>
       <div class="modal-body" style="padding:0;max-height:50vh;overflow-y:auto;">
@@ -7596,7 +7596,7 @@ const Compendio = (() => {
       const pending = camp.pendingCombatants || [];
       pending.push(combatant);
       App.saveActiveCampaign({ pendingCombatants: pending });
-      Toast.show(`${m.nome} aggiunto al Combat Tracker`, 'success');
+      Toast.show(`${m.nome} aggiunto allo scontro`, 'success');
       Modal.close('comp-detail');
       App.navigateTo('sessione');
     } else {
@@ -7798,7 +7798,7 @@ const Compendio = (() => {
           (h.azioni ? '<div style="font-family:var(--font-display);font-size:0.7rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--accent-text);margin:8px 0 4px;">Azioni</div><div style="font-size:0.85rem;white-space:pre-wrap;line-height:1.6;">' + h.azioni + '</div>' : '') +
           (h.legact ? '<div style="font-family:var(--font-display);font-size:0.7rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--accent-text);margin:8px 0 4px;">Azioni Leggendarie</div><div style="font-size:0.85rem;white-space:pre-wrap;line-height:1.6;">' + h.legact + '</div>' : '') +
           '<div style="margin-top:12px;padding-top:8px;border-top:1px solid var(--border);">' +
-            '<button class="btn btn-primary btn-sm" onclick="Sessione.addHomebrewMonster(\''+id+'\');this.closest(\'.modal-overlay\').remove()">Aggiungi al Combat Tracker</button>' +
+            '<button class="btn btn-primary btn-sm" onclick="Sessione.addHomebrewMonster(\''+id+'\');this.closest(\'.modal-overlay\').remove()">Aggiungi allo scontro</button>' +
           '</div>' +
         '</div>';
         break;
@@ -8329,15 +8329,15 @@ const Schermo = (() => {
       defaultSize: 'md',
     },
     combat_mini: {
-      label: 'Combat Tracker (ridotto)',
+      label: 'Scontro (ridotto)',
       icon: _svgIcon('<line x1="14.5" y1="17.5" x2="3" y2="6"/><line x1="13" y1="19" x2="19" y2="13"/><line x1="16" y1="16" x2="20" y2="20"/><line x1="19" y1="21" x2="21" y2="19"/>'),
-      desc: 'Iniziativa, HP, turno attivo con pulsanti essenziali',
+      desc: 'Iniziativa, PF, turno attivo con pulsanti essenziali',
       defaultSize: 'lg',
     },
     combat_full: {
-      label: 'Combat Tracker (completo)',
+      label: 'Scontro (completo)',
       icon: _svgIcon('<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>'),
-      desc: 'Combat tracker identico alla sezione Sessione',
+      desc: 'Lo stesso scontro della sezione Sessione',
       defaultSize: 'xl',
     },
     condizioni: {
@@ -8578,7 +8578,10 @@ const Schermo = (() => {
 
       const titoliFix = {
         'Percezioni Passive Party': 'Party',
-        'Combat Mini': 'Combat Tracker',
+        'Combat Mini': 'Scontro (ridotto)',
+        'Combat Tracker': 'Scontro (ridotto)',
+        'Combat Tracker (ridotto)': 'Scontro (ridotto)',
+        'Combat Tracker (completo)': 'Scontro (completo)',
         'Riferimento Condizioni': 'Condizioni (tabella completa)',
       };
       _blocks.forEach(b => {
@@ -9177,7 +9180,7 @@ const Schermo = (() => {
       ['Ammunizione', 'Richiede munizioni per attaccare a distanza. Fine scontro: recuperi metà delle munizioni usate (se non magiche).'],
       ['Destrezza', 'Puoi usare FOR o DES per TxC e danno.'],
       ['Lanciabile', 'Puoi lanciare quest\'arma come attacco a distanza. Gittata tra parentesi.'],
-      ['Leggera', 'Adatta al combattimento con due armi (bonus action attack).'],
+      ['Leggera', 'Adatta al combattimento con due armi (attacco con azione bonus).'],
       ['Lunga', 'Portata di 3m invece di 1,5m.'],
       ['Mischia', 'Attacco da mischia a 1,5m.'],
       ['Pesante', 'Creature Piccole e Minuscole: Svantaggio ai TxC.'],
@@ -19816,7 +19819,7 @@ const EncounterBuilder = (() => {
       ).join('') +
       `</tbody></table>` +
       `<div style="display:flex;gap:6px;">
-        <button class="btn btn-primary btn-sm" onclick="EncounterBuilder.aggiungiAlCombat()">Aggiungi al Combat Tracker</button>
+        <button class="btn btn-primary btn-sm" onclick="EncounterBuilder.aggiungiAlCombat()">Aggiungi allo scontro</button>
         <button class="btn btn-secondary btn-sm" onclick="EncounterBuilder.genera()">Rigenera</button>
       </div>`;
 
@@ -19843,7 +19846,7 @@ const EncounterBuilder = (() => {
     });
 
     App.navigateTo('sessione');
-    Toast.show(`${aggiunti} nemici aggiunti al Combat Tracker!`, 'success', 3000);
+    Toast.show(`${aggiunti} nemici aggiunti allo scontro`, 'success', 3000);
   };
 
   const generaLoot = () => {

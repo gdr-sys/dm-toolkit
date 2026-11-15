@@ -40,7 +40,7 @@ const ChiusuraSessione = (() => {
     b.className = 'btn btn-primary btn-sm';
     b.style.fontSize = '0.78rem';
     b.textContent = 'Chiudi la sessione';
-    b.title = 'Cinque domande per chiudere la sessione: compila diario, ganci e "Previously On…"';
+    b.title = 'Cinque domande per chiudere la sessione: compila diario, ganci e riassunto per il gruppo';
     b.onclick = () => apri();
     nuova.insertAdjacentElement('afterend', b);
   };
@@ -95,7 +95,7 @@ const ChiusuraSessione = (() => {
         '<input id="cs-titolo" type="text" class="form-input" autocomplete="off" style="flex:1;min-width:180px;font-size:0.85rem;" placeholder="Titolo (facoltativo)" value="' + _esc(s?.titolo || '') + '">' +
       '</label>' +
 
-      _domanda(1, 'Cosa è successo?', 'Due o tre frasi bastano: diventano il riassunto della sessione e il prossimo "Previously On…".',
+      _domanda(1, 'Cosa è successo?', 'Due o tre frasi bastano: diventano il riassunto della sessione e il prossimo riassunto per il gruppo.',
         '<textarea id="cs-recap" class="form-textarea" rows="4" style="font-size:0.88rem;" placeholder="Il party ha raggiunto la cripta, ha respinto i Custodi e ha scoperto che il primo anello del sigillo è spezzato…">' + _esc(s?.recap || '') + '</textarea>') +
 
       _domanda(2, 'XP e bottino', '',
@@ -117,7 +117,7 @@ const ChiusuraSessione = (() => {
         '</div>') +
 
       '<label style="display:flex;align-items:center;gap:8px;margin-top:16px;font-size:0.85rem;color:var(--text-secondary);cursor:pointer;">' +
-        '<input type="checkbox" id="cs-po" checked> Salva il riassunto anche come "Previously On…" per la prossima volta</label>';
+        '<input type="checkbox" id="cs-po" checked> Salva il riassunto anche come riassunto per il gruppo, per la prossima volta</label>';
   };
 
   const _cambiaSessione = () => {
@@ -191,7 +191,7 @@ const ChiusuraSessione = (() => {
 
     App.saveActiveCampaign(patch);
     Modal.close('chiusura-sessione');
-    Toast.show('Sessione ' + chiusa.numero + ' chiusa: diario, ganci' + (gancio ? ', prossima sessione' : '') + (patch.previouslyOnArchive ? ' e "Previously On…"' : '') + ' aggiornati', 'success', 4000);
+    Toast.show('Sessione ' + chiusa.numero + ' chiusa: diario, ganci' + (gancio ? ', prossima sessione' : '') + (patch.previouslyOnArchive ? ' e riassunto per il gruppo' : '') + ' aggiornati', 'success', 4000);
     try { if (typeof SessioniLog !== 'undefined') SessioniLog.renderList?.(); } catch (e) {}
     try { renderDashboard?.(); } catch (e) {}
   };

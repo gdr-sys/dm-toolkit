@@ -142,7 +142,7 @@ const VistaGiocatori = (() => {
       '<label style="display:flex;align-items:center;gap:8px;font-size:0.92rem;font-weight:600;cursor:pointer;"><input type="checkbox" id="vg-attiva"' + (s.attiva ? ' checked' : '') + '> Condividi con i giocatori</label>' +
       '<div style="font-size:0.8rem;color:var(--text-muted);line-height:1.5;margin:4px 0 10px;">I giocatori aprono un link e vedono solo quello che scegli qui, aggiornato da solo. Non vedono mai la campagna: segreti, motivazioni dei PNG e punti ferita dei mostri restano esclusi in ogni caso.</div>' +
       (s.id && s.attiva ? '<div style="display:flex;gap:6px;align-items:center;margin-bottom:10px;"><input type="text" class="form-input" readonly value="' + _esc(_link(s.id)) + '" style="font-size:0.8rem;" onclick="this.select()"><button type="button" class="btn btn-secondary btn-sm" onclick="VistaGiocatori.copiaLink()">Copia</button></div>' : '') +
-      '<div style="display:flex;flex-direction:column;gap:6px;">' + opz('previously', 'Il "Previously On…" più recente') + opz('riassunti', 'I riassunti delle sessioni giocate') + opz('iniziativa', 'L\'ordine di iniziativa durante gli scontri (in diretta)') + '</div>' +
+      '<div style="display:flex;flex-direction:column;gap:6px;">' + opz('previously', 'Il riassunto per il gruppo più recente') + opz('riassunti', 'I riassunti delle sessioni giocate') + opz('iniziativa', 'L\'ordine di iniziativa durante gli scontri (in diretta)') + '</div>' +
       _lista('Luoghi', 'luoghi', (c.locations || []).filter(_nome)) +
       _lista('PNG — nome, ruolo, aspetto e ritratto', 'png', (c.npcs || []).filter(_nome)) +
       _lista('Documenti della Wiki (handout) — i riquadri "Segreto DM" vengono tolti', 'lore', (c.wiki?.lore || []).filter(n => n.titolo)) +

@@ -184,7 +184,7 @@ const PreviouslyOn = (() => {
     overlay.innerHTML =
       '<div class="modal" style="max-width:560px;">' +
         '<div class="modal-header">' +
-          '<h3 class="modal-title">Previously On...</h3>' +
+          '<h3 class="modal-title">Riassunto per il gruppo</h3>' +
           '<button class="btn btn-ghost btn-icon-sm" onclick="Modal.close(\'previously-on\')">' + _svgClose + '</button>' +
         '</div>' +
         '<div class="modal-body">' +
@@ -233,7 +233,7 @@ const PreviouslyOn = (() => {
     card.className = 'card dash-card-full';
     card.id = 'dash-prevon-card';
     card.innerHTML =
-      '<div class="card-header"><h2 class="card-title">Previously On...</h2></div>' +
+      '<div class="card-header"><h2 class="card-title">Riassunto per il gruppo</h2></div>' +
       '<div style="padding:6px 0;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">' +
         '<div style="font-size:0.82rem;color:var(--text-muted);">Riassunto narrativo delle ultime sessioni, pronto da condividere con il gruppo.</div>' +
         '<button class="btn btn-primary btn-sm" onclick="PreviouslyOn.open()">Genera</button>' +

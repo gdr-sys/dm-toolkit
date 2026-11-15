@@ -39,7 +39,7 @@ const AvvioSessione = (() => {
     el.style.marginTop = '14px';
     el.innerHTML =
       '<div style="margin-bottom:8px;"><div style="font-size:0.88rem;font-weight:600;">Avvio guidato della sessione</div>' +
-        '<div style="font-size:0.72rem;color:var(--text-muted);">Prima di iniziare: "Previously On…", sessione pianificata, clock, segreti e linee della Sessione Zero</div></div>' +
+        '<div style="font-size:0.72rem;color:var(--text-muted);">Prima di iniziare: riassunto per il gruppo, sessione pianificata, clock, segreti e linee della Sessione Zero</div></div>' +
       '<div style="display:flex;gap:6px;flex-wrap:wrap;">' +
         '<button type="button" class="btn btn-ghost btn-sm avvio-guidato-btn" data-v="1" style="font-size:0.78rem;" onclick="AvvioSessione.imposta(true)">Attivo</button>' +
         '<button type="button" class="btn btn-ghost btn-sm avvio-guidato-btn" data-v="0" style="font-size:0.78rem;" onclick="AvvioSessione.imposta(false)">Disattivato</button>' +
@@ -146,7 +146,7 @@ const AvvioSessione = (() => {
       (pg.length ? '<div><span style="color:var(--text-muted);">PG:</span> ' + pg.join(', ') + ' — dai a ognuno almeno un momento.</div>' : '') ||
       _vuoto('Nessuna linea o velo: se non l\'avete fatta, la Sessione Zero aiuta a concordarli.');
 
-    return _sezione(1, 'Leggi il "Previously On…"', s1) +
+    return _sezione(1, 'Leggi il riassunto per il gruppo', s1) +
       _sezione(2, 'La sessione di oggi', s2) +
       _sezione(3, 'Cosa preme', s3) +
       _sezione(4, 'Segreti da far emergere', s4) +

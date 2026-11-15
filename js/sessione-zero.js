@@ -127,7 +127,7 @@ const SessioneZero = (() => {
       '<div style="font-size:0.85rem;color:var(--text-secondary);line-height:1.6;">Da compilare insieme ai giocatori prima della prima sessione, e da riaprire quando serve. Tutto quello che decidete resta qui, a portata di mano.</div>' +
 
       _titolo('Aspettative del tavolo') +
-      '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;">' +
+      '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,250px),1fr));gap:10px;">' +
         ASPETTATIVE.map(([k, nome, opzioni]) =>
           '<label style="display:flex;flex-direction:column;gap:4px;font-size:0.8rem;color:var(--text-secondary);">' + nome +
             '<select class="form-select" style="font-size:0.85rem;" onchange="SessioneZero.imposta(\'' + k + '\',this.value)">' +
