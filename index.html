@@ -5748,7 +5748,7 @@ const Sessione = (() => {
         <div style="display:flex;gap:var(--space-sm);">
           <button class="btn btn-primary btn-sm" onclick="Sessione.nextTurn()"><svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l12-7.5Z"/></svg> Avanti</button>
           <button class="btn btn-secondary btn-sm" onclick="Sessione.addMonsterQuick()">+ Mostro</button>
-          <button class="btn btn-secondary btn-sm" onclick="Sessione.rollAllInitiative()">Init tutti</button>
+          <button class="btn btn-secondary btn-sm" onclick="Sessione.rollAllInitiative()" title="Tira l’iniziativa per tutti">Iniziativa</button>
           <button class="btn btn-ghost btn-sm" onclick="Sessione.saveCombatSession()">Salva</button>
           <button class="btn btn-danger btn-sm" onclick="Sessione.endCombat()"><svg aria-hidden="true" width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="5" width="14" height="14" rx="2"/></svg> Fine</button>
         </div>
@@ -5769,7 +5769,7 @@ const Sessione = (() => {
       <div class="combat-footer">
         <button class="btn btn-ghost btn-sm" onclick="Sessione.addPGtoCombat()">+ Party</button>
         <button class="btn btn-ghost btn-sm" onclick="Sessione.addMonsterQuick()">+ Mostro</button>
-        <button class="btn btn-ghost btn-sm" onclick="Sessione.addNPCFromWorld()">+ NPC</button>
+        <button class="btn btn-ghost btn-sm" onclick="Sessione.addNPCFromWorld()">+ PNG</button>
         <button class="btn btn-ghost btn-sm" onclick="Sessione.addCustomCombatant()">+ Homebrew</button>
       </div>
     `;
@@ -8924,7 +8924,7 @@ const Schermo = (() => {
           <span style="color:var(--accent-secondary-text);margin-left:8px;font-size:0.85rem;">${sorted[activeIdx]?.nome || '—'}</span>
         </div>
         <div style="display:flex;gap:6px;flex-wrap:wrap;">
-          <button class="btn btn-ghost btn-sm" onclick="Sessione.rollAllInitiative();setTimeout(()=>Schermo._refreshCombat(),200)">Init tutti</button>
+          <button class="btn btn-ghost btn-sm" onclick="Sessione.rollAllInitiative();setTimeout(()=>Schermo._refreshCombat(),200)" title="Tira l’iniziativa per tutti">Iniziativa</button>
           <button class="btn btn-secondary btn-sm" onclick="Sessione.prevTurn();setTimeout(()=>Schermo._refreshCombat(),200)">◀ Indietro</button>
           <button class="btn btn-primary btn-sm" onclick="Sessione.nextTurn();setTimeout(()=>Schermo._refreshCombat(),200)">▶ Avanti</button>
           <button class="btn btn-ghost btn-sm" onclick="App.navigateTo('sessione');closeMobileMenu()">→ Sessione</button>
@@ -8956,7 +8956,7 @@ const Schermo = (() => {
           '<span style="color:var(--accent-secondary-text);">' + (sorted[activeIdx]?.nome||'') + '</span></div>' +
         '<div style="display:flex;gap:4px;">' +
           '<button class="btn btn-primary btn-sm" onclick="Sessione.nextTurn();Schermo._refreshCombat()">▶ Avanti</button>' +
-          '<button class="btn btn-secondary btn-sm" onclick="Sessione.rollAllInitiative();Schermo._refreshCombat()" title="Init tutti">Init</button>' +
+          '<button class="btn btn-secondary btn-sm" onclick="Sessione.rollAllInitiative();Schermo._refreshCombat()" title="Tira l’iniziativa per tutti">Iniziativa</button>' +
         '</div>' +
       '</div>' +
       '<div style="display:flex;flex-direction:column;gap:2px;">' +
