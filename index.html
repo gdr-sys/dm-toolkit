@@ -15520,7 +15520,7 @@ const SessioniLog = (() => {
       '<h1>Sessione '+s.numero+' — '+(s.titolo||'')+'</h1>' +
       '<p><strong>Data:</strong> '+(s.data||'')+'&nbsp;|&nbsp;<strong>Stato:</strong> '+(s.stato||'')+'&nbsp;|&nbsp;#sessione</p>' +
       (npcsLinks ? '<p><strong>PNG coinvolti:</strong> '+npcsLinks+'</p>' : '') +
-      (beatsHtml ? '<h2>Beat</h2><ul>'+beatsHtml+'</ul>' : '') +
+      (beatsHtml ? '<h2>Scaletta</h2><ul>'+beatsHtml+'</ul>' : '') +
       (s.notePrep ? '<h2>Note di prep</h2><div>'+Testo.html(s.notePrep)+'</div>' : '') +
       '<h2>Note live</h2><p></p>' +
       (s.recap ? '<h2>Recap</h2><div>'+Testo.html(s.recap)+'</div>' : '<h2>Recap</h2><p></p>');
@@ -17095,7 +17095,7 @@ const WikiSections = (() => {
         { key: 'luoghi_previsti',label: 'Luoghi previsti',   type: 'mentions', hint: '@Luoghi dove si svolgerà' },
         { key: 'fazioni',       label: 'Fazioni coinvolte',  type: 'mentions', hint: '@Fazione che ha un ruolo' },
         { key: 'obiettivi',     label: 'Obiettivi DM',       type: 'long',    hint: 'Cosa vuoi che succeda? Rivelazioni, hook...' },
-        { key: 'beat_prep',     label: 'Scene / Beat pianificati', type: 'long', hint: 'Sequenza di scene previste' },
+        { key: 'beat_prep',     label: 'Scene pianificate', type: 'long', hint: 'Sequenza di scene previste' },
         { key: 'ganci_entrata', label: 'Ganci in entrata',   type: 'long',    hint: 'Fili aperti dalla sessione precedente' },
         { key: 'segreto',       label: 'Note DM private',    type: 'secret',  hint: 'Twist, segreti, info riservate' },
 
