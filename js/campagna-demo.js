@@ -21,8 +21,15 @@ const CampagnaDemo = (() => {
     if (esistente) {
       // Chi l'aveva gia' creata riceve i ritratti aggiunti dopo, senza toccare quelli che ha cambiato
       const RITRATTI = { 'Tessa Brunvento': 'tessa', 'Fratello Orsino': 'orsino', 'Madre Cinerea': 'cinerea', 'Bertrando Viti': 'bertrando', 'Capitano Dalia Ferraguto': 'dalia' };
-      const npcs = (esistente.npcs || []).map(n => (!n.immagine && RITRATTI[n.nome]) ? { ...n, immagine: 'img/demo/' + RITRATTI[n.nome] + '.webp' } : n);
-      if (npcs.some((n, i) => n !== (esistente.npcs || [])[i])) Storage.updateCampaign(esistente.id, { npcs });
+      Object.assign(RITRATTI, { 'Valmora': 'valmora', 'Monte Ardegna': 'ardegna', 'Il Tino Rovesciato': 'tino', 'Cripta della Fiamma Quieta': 'cripta', 'Corvara': 'corvara',
+        'Custodi della Cenere': 'custodi', 'Gilda dei Vignaioli': 'gilda', 'Ilaria del Pozzo': 'ilaria', 'Grun Pietrafonda': 'grun', 'Selvaggia': 'selvaggia' });
+      const agg = {};
+      ['npcs', 'locations', 'factions', 'pg'].forEach((k) => {
+        const prima = esistente[k] || [];
+        const dopo = prima.map(x => (x && !x.immagine && RITRATTI[x.nome]) ? { ...x, immagine: 'img/demo/' + RITRATTI[x.nome] + '.webp' } : x);
+        if (dopo.some((x, i) => x !== prima[i])) agg[k] = dopo;
+      });
+      if (Object.keys(agg).length) Storage.updateCampaign(esistente.id, agg);
       App.openCampaign(esistente.id); return;
     }
 
@@ -39,30 +46,30 @@ const CampagnaDemo = (() => {
     const link = (chiave, testo) => '<span class="nc-wikilink" data-link="' + chiave + '" onclick="wikiNavigateLink(\'' + chiave.replace(/'/g, "\\'") + '\')">[[' + testo + ']]</span>';
 
     // ── Luoghi ──
-    const valmora = nuovo('luoghi', { nome: 'Valmora', tipo: 'Villaggio', clima: 'Temperato, ora coperto di cenere',
+    const valmora = nuovo('luoghi', { nome: 'Valmora', immagine: 'img/demo/valmora.webp', tipo: 'Villaggio', clima: 'Temperato, ora coperto di cenere',
       atmosfera: 'Un villaggio di vignaioli ai piedi del vulcano. Le case di pietra grigia hanno i tetti coperti da un velo di cenere che la gente spazza ogni mattina, e l\'aria sa di zolfo e mosto.',
       storia: 'Fondato dai monaci dell\'Ordine della Fiamma Quieta, che giurarono di vegliare sul vulcano. L\'ordine si è sciolto un secolo fa.',
       pericoli: 'Scosse di terremoto, crepe che si aprono nei campi, creature di fuoco che scendono di notte.' });
-    const ardegna = nuovo('luoghi', { nome: 'Monte Ardegna', tipo: 'Regione', regione: '',
+    const ardegna = nuovo('luoghi', { nome: 'Monte Ardegna', immagine: 'img/demo/ardegna.webp', tipo: 'Regione', regione: '',
       atmosfera: 'Il vulcano domina la valle. Dal cratere sale una colonna di fumo che di notte si tinge di rosso. Sui fianchi, vigneti abbandonati e antichi eremi scavati nella roccia.',
       pericoli: 'Gas velenosi nelle gallerie, colate di lava improvvise, elementali del fuoco.',
       segreto: 'Il vulcano non si è svegliato da solo: qualcuno ha spezzato il sigillo dei monaci nella Cripta della Fiamma.' });
-    const locanda = nuovo('luoghi', { nome: 'Il Tino Rovesciato', tipo: 'Taverna',
+    const locanda = nuovo('luoghi', { nome: 'Il Tino Rovesciato', immagine: 'img/demo/tino.webp', tipo: 'Taverna',
       atmosfera: 'L\'unica locanda di Valmora, ricavata in una vecchia cantina. Botti enormi fanno da tavoli e il vino rosso della casa è famoso in tutta la regione.',
       punti: 'La botte più grande nasconde una scala verso le cantine dimenticate.' });
-    const cripta = nuovo('luoghi', { nome: 'Cripta della Fiamma Quieta', tipo: 'Dungeon',
+    const cripta = nuovo('luoghi', { nome: 'Cripta della Fiamma Quieta', immagine: 'img/demo/cripta.webp', tipo: 'Dungeon',
       atmosfera: 'Scavata nel fianco del vulcano, la cripta custodisce le tombe dei monaci e il sigillo che teneva addormentato l\'Ardegna. Le pareti sono calde al tatto.',
       pericoli: 'Trappole dei monaci ancora attive, non morti che proteggono il sigillo.',
       segreto: 'Il sigillo è stato spezzato dall\'interno: uno dei monaci non è mai morto davvero.' });
-    const corvara = nuovo('luoghi', { nome: 'Corvara', tipo: 'Città',
+    const corvara = nuovo('luoghi', { nome: 'Corvara', immagine: 'img/demo/corvara.webp', tipo: 'Città',
       atmosfera: 'La città mercantile a due giorni di strada, sul fiume. Qui si vende il vino di Valmora e si decide il destino della valle.' });
 
     // ── Fazioni ──
-    nuovo('fazioni', { nome: 'Custodi della Cenere', tipo: 'Religiosa', attitudine: 'Sospettosa',
+    nuovo('fazioni', { nome: 'Custodi della Cenere', immagine: 'img/demo/custodi.webp', tipo: 'Religiosa', attitudine: 'Sospettosa',
       obiettivo: 'Dicono di voler placare il vulcano con preghiere e offerte.',
       vero_obiettivo: 'Vogliono che il vulcano erutti: credono che dal fuoco rinascerà il loro dio dimenticato.',
       sede: '@Monte Ardegna', risorse: 'Una ventina di fedeli, conoscenza delle gallerie del vulcano.' });
-    nuovo('fazioni', { nome: 'Gilda dei Vignaioli', tipo: 'Mercantile', attitudine: 'Amichevole',
+    nuovo('fazioni', { nome: 'Gilda dei Vignaioli', immagine: 'img/demo/gilda.webp', tipo: 'Mercantile', attitudine: 'Amichevole',
       obiettivo: 'Salvare la vendemmia e il commercio con Corvara.', sede: '@Valmora',
       risorse: 'Denaro, carri, il rispetto di tutto il villaggio.' });
 
@@ -94,9 +101,9 @@ const CampagnaDemo = (() => {
       obiettivo: 'Capire dove sparisce Elio, il figlio di Tessa, ogni notte.' });
 
     // ── PG (finiscono anche nel Party di Sessione Live) ──
-    nuovo('pg', { nome: 'Ilaria del Pozzo', classe: 'Chierica', razza: 'Umana', livello: 3, hp_max: 24, ca: 18, perc_pass: 13, giocatore: 'Giocatrice 1', motivazione: 'Ritrovare il tempio dove è cresciuta, sepolto dalla cenere.' });
-    nuovo('pg', { nome: 'Grun Pietrafonda', classe: 'Guerriero', razza: 'Nano', livello: 3, hp_max: 31, ca: 17, perc_pass: 11, giocatore: 'Giocatore 2', motivazione: 'Ripagare un debito con Fratello Orsino.' });
-    nuovo('pg', { nome: 'Selvaggia', classe: 'Ranger', razza: 'Elfa dei boschi', livello: 3, hp_max: 26, ca: 15, perc_pass: 15, giocatore: 'Giocatrice 3', motivazione: 'Proteggere gli animali che fuggono dal vulcano.' });
+    nuovo('pg', { nome: 'Ilaria del Pozzo', immagine: 'img/demo/ilaria.webp', classe: 'Chierica', razza: 'Umana', livello: 3, hp_max: 24, ca: 18, perc_pass: 13, giocatore: 'Giocatrice 1', motivazione: 'Ritrovare il tempio dove è cresciuta, sepolto dalla cenere.' });
+    nuovo('pg', { nome: 'Grun Pietrafonda', immagine: 'img/demo/grun.webp', classe: 'Guerriero', razza: 'Nano', livello: 3, hp_max: 31, ca: 17, perc_pass: 11, giocatore: 'Giocatore 2', motivazione: 'Ripagare un debito con Fratello Orsino.' });
+    nuovo('pg', { nome: 'Selvaggia', immagine: 'img/demo/selvaggia.webp', classe: 'Ranger', razza: 'Elfa dei boschi', livello: 3, hp_max: 26, ca: 15, perc_pass: 15, giocatore: 'Giocatrice 3', motivazione: 'Proteggere gli animali che fuggono dal vulcano.' });
     nuovo('pg', { nome: 'Mirto Lanterna', classe: 'Bardo', razza: 'Halfling', livello: 3, hp_max: 20, ca: 14, perc_pass: 12, giocatore: 'Giocatore 4', motivazione: 'Scrivere la ballata dell\'eruzione, possibilmente da vivo.' });
 
     // ── Calendario, eventi, sessioni, tabelle, Sessione Zero, Wiki, clock ──

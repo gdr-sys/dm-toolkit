@@ -19,8 +19,8 @@ const APP_SHELL = [
   './icons/icon-maskable-512.png',
   './icons/apple-touch-icon.png',
   './icons/favicon-48.png',
-  // Ritratti dei PNG della campagna di esempio (js/campagna-demo.js)
-  ...['tessa', 'orsino', 'cinerea', 'bertrando', 'dalia', 'rocco'].map((n) => './img/demo/' + n + '.webp'),
+  // Immagini della campagna di esempio (js/campagna-demo.js)
+  ...['tessa', 'orsino', 'cinerea', 'bertrando', 'dalia', 'rocco', 'valmora', 'ardegna', 'tino', 'cripta', 'corvara', 'custodi', 'gilda', 'ilaria', 'grun', 'selvaggia'].map((n) => './img/demo/' + n + '.webp'),
 ];
 
 // Dati del Compendio, generatori, schermo del DM...: vengono letti con fetch solo quando si
