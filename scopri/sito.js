@@ -104,4 +104,16 @@
       bottoni.forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
     }));
   }
+
+  /* Trailer: il video sta sul sito (niente YouTube incorporato, quindi niente cookie di terzi) */
+  const dialogo = document.getElementById('trailer');
+  const apri = document.querySelector('.trailer-apri');
+  if (dialogo && apri && dialogo.showModal) {
+    const video = dialogo.querySelector('video');
+    apri.addEventListener('click', () => { dialogo.showModal(); video.play().catch(() => {}); });
+    const chiudi = () => { video.pause(); if (dialogo.open) dialogo.close(); };
+    dialogo.querySelector('[data-chiudi]').addEventListener('click', chiudi);
+    dialogo.addEventListener('click', (e) => { if (e.target === dialogo) chiudi(); });
+    dialogo.addEventListener('close', () => video.pause());
+  } else if (apri) apri.hidden = true;
 })();
