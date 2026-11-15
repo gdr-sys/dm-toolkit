@@ -496,7 +496,7 @@
           <!-- Clocks -->
           <div class="card">
             <div class="card-header">
-              <h2 class="card-title">Clocks</h2>
+              <h2 class="card-title">Clock</h2>
               <button class="btn btn-ghost btn-sm" onclick="App.navigateTo('sessione')" style="font-size:0.72rem;">→</button>
             </div>
             <div id="dash-clocks-preview" style="padding:4px 0;"></div>
@@ -574,7 +574,7 @@
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-lg);">
           <div>
             <h2 style="font-family:var(--font-display);font-size:1.1rem;margin:0;">Sessioni della campagna</h2>
-            <p style="font-size:0.78rem;color:var(--text-muted);margin:4px 0 0;">Ogni sessione ha i suoi beat, note e un collegamento alla Wiki.</p>
+            <p style="font-size:0.78rem;color:var(--text-muted);margin:4px 0 0;">Ogni sessione ha la sua scaletta, le note e un collegamento alla Wiki.</p>
           </div>
         </div>
         <div id="sessioni-log-list" style="display:flex;flex-direction:column;gap:10px;"></div>
@@ -618,20 +618,20 @@
         <div class="card" style="margin-top:var(--space-lg);">
           <div class="card-header" style="flex-wrap:wrap;gap:6px;">
             <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0;">
-              <h2 class="card-title" style="margin:0;">Scene Planner</h2>
+              <h2 class="card-title" style="margin:0;">Scaletta delle scene</h2>
               <span id="scene-sess-badge" style="display:none;font-size:0.68rem;color:var(--accent-secondary-text);background:rgba(93,164,90,0.1);padding:2px 8px;border-radius:var(--radius-full);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></span>
             </div>
             <div style="display:flex;gap:4px;align-items:center;">
               <button class="btn btn-ghost btn-sm" onclick="SessioniLog.showTab('storico')" style="font-size:0.72rem;color:var(--text-muted);">Storico →</button>
-              <button class="btn btn-ghost btn-sm" onclick="ScenePlanner.addBeat()" style="font-size:0.8rem;">+ Beat</button>
+              <button class="btn btn-ghost btn-sm" onclick="ScenePlanner.addBeat()" style="font-size:0.8rem;">+ Scena</button>
               <button class="btn btn-ghost btn-sm" onclick="ScenePlanner.clear()" style="font-size:0.72rem;color:var(--text-muted);">Pulisci</button>
             </div>
           </div>
           <div id="scene-planner-empty" style="padding:12px;color:var(--text-muted);font-size:0.82rem;display:none;">
-            <div>Nessun beat.</div>
+            <div>Nessuna scena in scaletta.</div>
             <div style="font-size:0.78rem;margin-top:4px;">
-              <strong>Crea prima una sessione</strong> con "+ Nuova Sessione" e impostala come "In corso" — i beat si salveranno in quella sessione.
-              <br>Oppure aggiungi beat liberi senza sessione.
+              <strong>Crea prima una sessione</strong> con "+ Nuova Sessione" e impostala come "In corso" — le scene si salveranno in quella sessione.
+              <br>Oppure aggiungi scene libere, senza sessione.
             </div>
           </div>
           <div id="scene-planner-list" style="padding:8px;display:flex;flex-direction:column;gap:6px;"></div>
@@ -640,7 +640,7 @@
         <!-- Clocks / Progress Tracker -->
         <div class="card" style="margin-top:var(--space-lg);">
           <div class="card-header">
-            <h2 class="card-title">Clocks</h2>
+            <h2 class="card-title">Clock</h2>
             <button class="btn btn-primary btn-sm" onclick="Clocks.add()">+ Clock</button>
           </div>
           <div id="clocks-list" style="padding:8px;display:flex;flex-wrap:wrap;gap:12px;min-height:50px;">
@@ -15132,7 +15132,7 @@ const ScenePlanner = (() => {
             '</div>' +
 
             '<input type="text" value="'+((b.titolo||'').replace(/"/g,'&quot;'))+'" '+
-            'placeholder="Titolo beat..." '+
+            'placeholder="Titolo della scena..." '+
             'onchange="ScenePlanner.setTitolo('+i+',this.value)" '+
             'style="width:100%;background:transparent;border:none;border-bottom:1px solid var(--border);'+
             'padding:2px 0;font-size:0.85rem;color:var(--text-primary);font-family:var(--font-display);'+
@@ -15226,7 +15226,7 @@ const ScenePlanner = (() => {
   };
 
   const clear = () => {
-    openConfirmModal('Pulire i beat?', 'Pulire tutti i beat della sessione?', () => {
+    openConfirmModal('Pulire la scaletta?', 'Togliere tutte le scene della scaletta?', () => {
       _saveBeats([]);
       render();
     }, 'Pulisci');
@@ -15461,7 +15461,7 @@ const SessioniLog = (() => {
     );
     _saveSessioni(sessioni);
     renderList();
-    Toast.show('Sessione impostata come in corso — i beat si salvano qui', 'success', 2000);
+    Toast.show('Sessione impostata come in corso — la scaletta si salva qui', 'success', 2000);
 
     setTimeout(() => { try { ScenePlanner.render(); } catch(e) {} }, 100);
   };
