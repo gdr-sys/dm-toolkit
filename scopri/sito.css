@@ -242,3 +242,15 @@ footer.closing > .wrap { display: flex; flex-direction: column; justify-content:
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
 }
+
+/* Trailer: pulsante discreto sotto le azioni e finestra con il video */
+.trailer-apri { display: inline-flex; align-items: center; gap: .6em; margin-top: 18px; padding: .4em 0; min-height: 44px; border: 0; background: none; color: var(--carta); font: 600 1.0625rem/1.2 var(--testo); cursor: pointer; }
+.trailer-apri svg { width: 30px; height: 30px; color: var(--ambra); transition: transform .2s var(--curva); }
+.trailer-apri span { color: var(--nebbia); font-weight: 400; }
+.trailer-apri:hover svg { transform: scale(1.08); }
+.trailer { width: min(1100px, calc(100vw - 32px)); max-height: calc(100vh - 32px); padding: 0; border: 0; border-radius: var(--raggio); background: var(--fondo); color: var(--carta); box-shadow: 0 40px 120px -20px #000; overflow: hidden; }
+.trailer::backdrop { background: color-mix(in oklch, var(--stanza) 82%, transparent); backdrop-filter: blur(4px); }
+.trailer video { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; background: #000; }
+.trailer__piede { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 14px 18px; font-size: 1rem; }
+.trailer__piede a { color: var(--nebbia); }
+@media (prefers-reduced-motion: reduce) { .trailer-apri svg { transition: none; } }
