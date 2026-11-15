@@ -16894,7 +16894,8 @@ const WikiSections = (() => {
           id:n.id, nome:n.titolo||'',
           categoria:n.categoria||'Generale', periodo:n.periodo||'',
           collegati:n.collegati||'', rilevanza:n.rilevanza||'Media', fonti:n.fonti||'',
-          contenuto:n.contenuto||'', note:'', tags:n.tags||[], _source:'wiki',
+          // Il testo della nota (scritto anche dalla Wiki classica) si legge e si modifica nelle Note libere della scheda
+          contenuto:n.contenuto||'', note:n.contenuto||'', tags:n.tags||[], _source:'wiki',
         }));
       },
       saveItem: (camp, item) => {
@@ -16903,7 +16904,7 @@ const WikiSections = (() => {
         const idx = wiki.lore.findIndex(n => n.id === item.id);
         const d = { id:item.id, titolo:item.nome, categoria:item.categoria, periodo:item.periodo,
           collegati:item.collegati, rilevanza:item.rilevanza, fonti:item.fonti,
-          contenuto:item.contenuto||'', tags:item.tags||[], aggiornatoAt:Date.now() };
+          contenuto:(item.note !== undefined ? item.note : item.contenuto)||'', tags:item.tags||[], aggiornatoAt:Date.now() };
         // Un documento dello Scrittoio porta con se' i suoi testi, per poterlo riaprire e modificare
         const sc = item.scrittoio || (idx>=0 && wiki.lore[idx].scrittoio);
         if (sc) d.scrittoio = sc;
@@ -17451,7 +17452,7 @@ const WikiSections = (() => {
           '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> Modifica</button></div>' +
         '</div>';
       const testi = lunghi.length ? '<div class="mz-testi">' + lunghi.map(([l, t]) => '<section class="mz-sez"><h3>' + _escHtml(l) + '</h3><div>' + t + '</div></section>').join('') + '</div>'
-        : '<div class="mz-testi"><p class="text-muted" style="margin:0;">Nessuna descrizione. Usa Modifica per aggiungerla.</p></div>';
+        : (item.note ? '' : '<div class="mz-testi"><p class="text-muted" style="margin:0;">Nessuna descrizione. Usa Modifica per aggiungerla.</p></div>');
       const lato = '<div class="mz-lato">' +
         segreti.map(([l, t]) => '<div class="mz-segreto"><h3>' + _escHtml(l.replace(/\s*DM$/, '')) + ', solo per te</h3><div>' + t + '</div></div>').join('') +
         (dettagli.length ? '<dl class="mz-dettagli">' + dettagli.map(([l, t]) => '<dt>' + _escHtml(l) + '</dt><dd>' + t + '</dd>').join('') + '</dl>' : '') +

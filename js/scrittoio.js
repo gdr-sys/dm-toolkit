@@ -487,7 +487,7 @@ const Scrittoio = (() => {
       const cfg = WikiSections._getCfg('lore');
       const aggiorna = document.querySelector('input[name="sc-az-dove"]:checked')?.value === 'aggiorna' && _modifica;
       const item = (aggiorna && (cfg.getData(_camp()) || []).find((x) => x.id === _modifica.id)) || cfg.newItem();
-      item.nome = titolo; item.contenuto = img + par;
+      item.nome = titolo; item.contenuto = img + par; item.note = item.contenuto;
       item.scrittoio = { voce: _voce, op: JSON.parse(JSON.stringify(o)) };
       cfg.saveItem(_camp(), item);
       try { WikiSections.renderCounters(); } catch (e) {}
