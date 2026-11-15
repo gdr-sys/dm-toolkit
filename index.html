@@ -1937,7 +1937,7 @@
       <div class="page-header">
         <div>
           <h1 class="page-title">Calendario</h1>
-          <p class="page-subtitle">Data in-world, eventi, deadline e timeline della campagna</p>
+          <p class="page-subtitle">Data nel mondo di gioco, eventi, scadenze e timeline della campagna</p>
         </div>
       </div>
 
@@ -21458,7 +21458,7 @@ const CalendarioUI = (() => {
   // e' aprire ogni evento uno per uno.
   const _legendaHTML = (conSessione) => {
     const voci = [
-      '<span style="display:inline-flex;align-items:center;gap:5px;font-size:0.72rem;color:var(--text-secondary);"><span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--accent-danger);flex-shrink:0;"></span>Deadline</span>',
+      '<span style="display:inline-flex;align-items:center;gap:5px;font-size:0.72rem;color:var(--text-secondary);"><span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--accent-danger);flex-shrink:0;"></span>Scadenza</span>',
     ];
     Object.keys(CATEGORIE).filter(k => k).forEach(k => {
       voci.push('<span style="display:inline-flex;align-items:center;gap:5px;font-size:0.72rem;color:var(--text-secondary);"><span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:' + CATEGORIE[k].color + ';flex-shrink:0;"></span>' + _esc(CATEGORIE[k].label) + '</span>');
@@ -21578,7 +21578,7 @@ const CalendarioUI = (() => {
         return '<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-top:1px solid var(--border);cursor:pointer;" onclick="CalendarioUI.viewEvento(\'' + e.id + '\')">' +
           '<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:' + (e.tipo === 'deadline' ? 'var(--accent-danger)' : cat.color) + ';flex-shrink:0;"></span>' +
           '<span style="font-size:0.85rem;flex:1;">' + _esc(e.titolo || '(senza titolo)') + '</span>' +
-          '<span class="text-muted" style="font-size:0.7rem;">' + (e.tipo === 'deadline' ? 'Deadline' : cat.label) + '</span>' +
+          '<span class="text-muted" style="font-size:0.7rem;">' + (e.tipo === 'deadline' ? 'Scadenza' : cat.label) + '</span>' +
         '</div>';
       }).join('') : '<div class="text-muted" style="font-size:0.82rem;">Nessun evento in questo giorno.</div>') +
       '</div>';
@@ -21738,7 +21738,7 @@ const CalendarioUI = (() => {
       '<div class="form-group"><label class="form-label">Data</label><div style="font-size:0.9rem;">' + _esc(dataStr) + '</div></div>' +
       '<div class="form-group" style="display:flex;gap:6px;flex-wrap:wrap;">' +
         '<span class="badge" style="background:' + cat.color + ';color:#fff;">' + _esc(cat.label) + '</span>' +
-        (ev.tipo === 'deadline' ? '<span class="badge badge-warning">Deadline' + (ev.completata ? ' · completata' : '') + '</span>' : '') +
+        (ev.tipo === 'deadline' ? '<span class="badge badge-warning">Scadenza' + (ev.completata ? ' · completata' : '') + '</span>' : '') +
         '<span class="badge badge-muted">' + (ev.layer === 'mondo' ? 'Storia del mondo' : 'Cronaca campagna') + '</span>' +
       '</div>' +
       (ev.descrizione ? '<div class="form-group"><label class="form-label">Descrizione</label><div class="et-testo" style="font-size:0.88rem;">' + Testo.mostra(ev.descrizione) + '</div></div>' : '') +
@@ -22866,7 +22866,7 @@ document.addEventListener('DOMContentLoaded', initMobileNav);
           <label class="form-label">Tipo</label>
           <select id="cev-tipo" class="form-select" onchange="CalendarioUI._onTipoChange()">
             <option value="evento">Evento</option>
-            <option value="deadline">Deadline</option>
+            <option value="deadline">Scadenza</option>
           </select>
         </div>
         <div class="form-group">
