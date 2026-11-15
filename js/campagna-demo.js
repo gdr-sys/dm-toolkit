@@ -22,7 +22,7 @@ const CampagnaDemo = (() => {
       // Chi l'aveva gia' creata riceve i ritratti aggiunti dopo, senza toccare quelli che ha cambiato
       const RITRATTI = { 'Tessa Brunvento': 'tessa', 'Fratello Orsino': 'orsino', 'Madre Cinerea': 'cinerea', 'Bertrando Viti': 'bertrando', 'Capitano Dalia Ferraguto': 'dalia' };
       Object.assign(RITRATTI, { 'Valmora': 'valmora', 'Monte Ardegna': 'ardegna', 'Il Tino Rovesciato': 'tino', 'Cripta della Fiamma Quieta': 'cripta', 'Corvara': 'corvara',
-        'Custodi della Cenere': 'custodi', 'Gilda dei Vignaioli': 'gilda', 'Ilaria del Pozzo': 'ilaria', 'Grun Pietrafonda': 'grun', 'Selvaggia': 'selvaggia' });
+        'Custodi della Cenere': 'custodi', 'Gilda dei Vignaioli': 'gilda', 'Ilaria del Pozzo': 'ilaria', 'Grun Pietrafonda': 'grun', 'Selvaggia': 'selvaggia', 'Mirto Lanterna': 'mirto' });
       const agg = {};
       ['npcs', 'locations', 'factions', 'pg'].forEach((k) => {
         const prima = esistente[k] || [];
@@ -104,7 +104,7 @@ const CampagnaDemo = (() => {
     nuovo('pg', { nome: 'Ilaria del Pozzo', immagine: 'img/demo/ilaria.webp', classe: 'Chierica', razza: 'Umana', livello: 3, hp_max: 24, ca: 18, perc_pass: 13, giocatore: 'Giocatrice 1', motivazione: 'Ritrovare il tempio dove è cresciuta, sepolto dalla cenere.' });
     nuovo('pg', { nome: 'Grun Pietrafonda', immagine: 'img/demo/grun.webp', classe: 'Guerriero', razza: 'Nano', livello: 3, hp_max: 31, ca: 17, perc_pass: 11, giocatore: 'Giocatore 2', motivazione: 'Ripagare un debito con Fratello Orsino.' });
     nuovo('pg', { nome: 'Selvaggia', immagine: 'img/demo/selvaggia.webp', classe: 'Ranger', razza: 'Elfa dei boschi', livello: 3, hp_max: 26, ca: 15, perc_pass: 15, giocatore: 'Giocatrice 3', motivazione: 'Proteggere gli animali che fuggono dal vulcano.' });
-    nuovo('pg', { nome: 'Mirto Lanterna', classe: 'Bardo', razza: 'Halfling', livello: 3, hp_max: 20, ca: 14, perc_pass: 12, giocatore: 'Giocatore 4', motivazione: 'Scrivere la ballata dell\'eruzione, possibilmente da vivo.' });
+    nuovo('pg', { nome: 'Mirto Lanterna', immagine: 'img/demo/mirto.webp', classe: 'Bardo', razza: 'Halfling', livello: 3, hp_max: 20, ca: 14, perc_pass: 12, giocatore: 'Giocatore 4', motivazione: 'Scrivere la ballata dell\'eruzione, possibilmente da vivo.' });
 
     // ── Calendario, eventi, sessioni, tabelle, Sessione Zero, Wiki, clock ──
     const mesi = ['Gelo', 'Brina', 'Germoglio', 'Fioritura', 'Messe', 'Sole Alto', 'Calura', 'Vendemmia', 'Mosto', 'Nebbia', 'Brace', 'Lunga Notte'].map(n => ({ nome: n, giorni: 30, it: '' }));
