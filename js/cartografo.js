@@ -373,7 +373,7 @@ const Cartografo = (() => {
   // Si rigenera la stessa mappa diritta, senza legenda, titolo e griglia disegnata (la griglia la
   // mette il tavolo virtuale) e la si ritaglia lungo i quadretti: cosi' la griglia del tavolo
   // cade esattamente su quella del dungeon. Muri e porte arrivano gia' pronti per la visuale.
-  const VTT_TIPI = ['dungeon', 'abitazione'];
+  const VTT_TIPI = ['dungeon', 'abitazione', 'battaglia'];
   const PPG = 100; // pixel per quadretto nel file esportato
   // Ritaglio comune a tavolo virtuale e stampa: la stessa mappa diritta, senza legenda e titolo,
   // tagliata lungo i quadretti (un quadretto in piu' di margine), a ppg pixel per quadretto.

@@ -234,6 +234,7 @@ const Scena = (() => {
     caverna: '<path d="M2 20c1-8 5-13 10-13s9 5 10 13"/><path d="M8 20c0-4 2-7 4-7s4 3 4 7"/><path d="M2 20h20"/>',
     dungeon: '<rect x="4" y="4" width="16" height="16" rx="1"/><path d="M4 12h6v8"/><path d="M14 4v6h6"/><path d="M14 16h2"/>',
     abitazione: '<path d="M3 11l9-7 9 7"/><path d="M5 9.5V20h14V9.5"/><path d="M10 20v-6h4v6"/>',
+    battaglia: '<rect x="3" y="3" width="18" height="18" rx="1.5"/><path d="M9 3v18"/><path d="M15 3v18"/><path d="M3 9h18"/><path d="M3 15h18"/>',
     stemma: '<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M12 8v8"/><path d="M8 12h8"/>',
     lettera: '<rect x="3" y="5" width="18" height="14" rx="1.5"/><path d="M3 7l9 6 9-6"/>',
     taglia: '<rect x="4" y="3" width="16" height="18" rx="1"/><circle cx="12" cy="10" r="3"/><path d="M8 17h8"/>',

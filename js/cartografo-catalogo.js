@@ -65,6 +65,16 @@ const CartoCatalogo = (() => {
         C('griglia', 'Griglia', true, 0.8), C('trappole', 'Trappole', true, 0.7), C('legenda', 'Legenda', true, 1),
       ],
     },
+    battaglia: {
+      nome: 'Battle map', genera: (o) => CartoBattaglia.battaglia(o),
+      colori: [['colori', 'Colori'], ['atlante', 'Carta'], ['notte', 'Notte']],
+      opzioni: [
+        POPOLO(),
+        S('scena', 'Scena', [['bosco', 'Strada nel bosco'], ['ponte', 'Ponte sul fiume'], ['locanda', 'Interno di locanda']], 'bosco'),
+        S('taglia', 'Quadretti', [['piccola', '18 × 13'], ['media', '24 × 17'], ['grande', '30 × 21']], 'media'),
+        C('griglia', 'Griglia', true, 0.9), C('legenda', 'Legenda', true, 1),
+      ],
+    },
     abitazione: {
       nome: 'Abitazione', genera: (o) => CartoAbitazione.abitazione(o),
       colori: [['atlante', 'Carta'], ['colori', 'Colori'], ['notte', 'Notte']],
