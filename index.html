@@ -5650,7 +5650,7 @@ const Sessione = (() => {
           pgId: pg.id,
           hp: pg.hpAttuali || pg.hpMax || 0,
           maxHp: pg.hpMax || 0,
-          ca: pg.ca || 10,
+          ca: parseInt((String(pg.ca || '').match(/\d+/) || [])[0], 10) || 10,
           iniziativa: rollInit(pg.iniziativaBonus),
           iniziativaBonus: pg.iniziativaBonus || 0,
           condizioni: [],
@@ -6430,11 +6430,16 @@ const Sessione = (() => {
   const _formulaDadiCombat = (desc) => { const m = String(desc || '').match(/(\d+d\d+(?:\s*[+\-]\s*\d+)?)/i); return m ? m[1].replace(/\s+/g, '') : null; };
   // Bonus per colpire scritto nella scheda: "+4 al tiro per colpire" (2014), "*Tiro per colpire in mischia:* +4" (2024),
   // "+4 to hit" (homebrew in inglese). Le frasi tipo "se il tiro per colpire e' stato effettuato con vantaggio" non contano.
+  // Nelle schede scritte a mano vale anche "+4 al colpire", "+5 a colpire", "colpire +6", "TxC +3" o un "+4," all'inizio:
+  // prima serviva la frase esatta "al tiro per colpire" e le azioni dei PNG tiravano solo i danni, senza d20.
   const _bonusColpoCombat = (desc) => {
-    const s = String(desc || '').replace(/−/g, '-');
-    const m = s.match(/([+\-]\s?\d+)\s+al\s+tiro\s+per\s+colpire/i)
-      || s.match(/tiro\s+per\s+colpire[^:.]{0,40}:\**\s*([+\-]\s?\d+)/i)
-      || s.match(/([+\-]\s?\d+)\s+to\s+hit/i);
+    // Via le formule dei dadi ("1d6 + 2"), cosi' il "+ 2" dei danni non sembra un bonus per colpire
+    const s = String(desc || '').replace(/[−–]/g, '-').replace(/\d+\s*d\s*\d+(\s*[+\-]\s*\d+)?/gi, ' # ');
+    const m = s.match(/([+\-]\s?\d+)\s+(?:al\s+|a\s+|per\s+)?(?:tiro\s+per\s+)?colpire/i)
+      || s.match(/(?:tiro\s+per\s+)?colpire[^:.,+\-\d#]{0,40}:?\**\s*([+\-]\s?\d+)/i)
+      || s.match(/\b(?:txc|tpc|tc)\b\s*:?\s*([+\-]?\s?\d+)/i)
+      || s.match(/([+\-]\s?\d+)\s+(?:to\s+hit|all'attacco|al\s+tiro\s+d'attacco|per\s+attaccare)/i)
+      || s.match(/^\s*([+\-]\s?\d+)\b/);
     return m ? parseInt(m[1].replace(/\s/g, ''), 10) : null;
   };
   const _badgeAzioneCombat = (f, b) => `${b !== null ? `${b >= 0 ? '+' : '−'}${Math.abs(b)} · ` : ''}${f}`;
@@ -16969,7 +16974,7 @@ const WikiSections = (() => {
           ...existingParty,
           id: d.id, nome: d.nome,
           classe: d.classe, livello: d.livello, giocatore: d.giocatore,
-          hpMax, ca: parseInt(d.ca) || 10,
+          hpMax, ca: parseInt((String(d.ca || '').match(/\d+/) || [])[0], 10) || 10, // "CA 16" o "16 (cotta)": conta il numero
           iniziativaBonus: parseInt(String(d.iniziativa).replace(/[^-\d]/g,'')) || 0,
           percezionePassiva: parseInt(d.perc_pass) || 10,
           hpAttuali: (pIdx >= 0 && existingParty.hpAttuali != null) ? existingParty.hpAttuali : hpMax,
