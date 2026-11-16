@@ -70,7 +70,7 @@ const CartoCatalogo = (() => {
       colori: [['colori', 'Colori'], ['notte', 'Notte']],
       opzioni: [
         POPOLO(),
-        S('scena', 'Scena', [['bosco', 'Strada nel bosco'], ['ponte', 'Ponte sul fiume'], ['locanda', 'Interno di locanda']], 'bosco'),
+        S('scena', 'Scena', [['bosco', 'Bosco'], ['ponte', 'Fiume e ponte'], ['accampamento', 'Accampamento'], ['rovine', 'Rovine'], ['palude', 'Palude'], ['locanda', 'Interno di locanda']], 'bosco'),
         S('taglia', 'Quadretti', [['piccola', '18 × 13'], ['media', '24 × 17'], ['grande', '30 × 21']], 'media'),
         C('griglia', 'Griglia', true, 0.9), C('legenda', 'Legenda', true, 1),
       ],
