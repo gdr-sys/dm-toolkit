@@ -117,6 +117,8 @@ const Cartografo = (() => {
       if (turno !== _turno) return;
       const a = _attuale(), tipo = _stato.tipo;
       try {
+        // Le battle map usano immagini dipinte: si caricano una volta, la prima volta che servono
+        if (tipo === 'battaglia' && typeof CartoBattaglia !== 'undefined' && !CartoBattaglia.pronta()) { await CartoBattaglia.carica(); if (turno !== _turno) return; }
         const m = K().genera(tipo, { ...a.opzioni, seme: a.seme, nome: _nomeEffettivo() });
         if (typeof CartoRitocchi !== 'undefined') CartoRitocchi.applica(m, a); // nomi cambiati e scritte aggiunte
         const css = await _font();

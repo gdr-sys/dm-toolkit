@@ -67,7 +67,7 @@ const CartoCatalogo = (() => {
     },
     battaglia: {
       nome: 'Battle map', genera: (o) => CartoBattaglia.battaglia(o),
-      colori: [['colori', 'Colori'], ['atlante', 'Carta'], ['notte', 'Notte']],
+      colori: [['colori', 'Colori'], ['notte', 'Notte']],
       opzioni: [
         POPOLO(),
         S('scena', 'Scena', [['bosco', 'Strada nel bosco'], ['ponte', 'Ponte sul fiume'], ['locanda', 'Interno di locanda']], 'bosco'),
