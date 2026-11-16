@@ -7,6 +7,9 @@
    (al tavolo, con poca luce, I l 1 e O 0 non si confondono). Il mono resta per codici e numeri tecnici. */
 @import url('../assets/fonts/app.css');
 
+/* Un elemento con l'attributo hidden resta nascosto anche se una classe (es. .btn) gli dà un display */
+[hidden] { display: none !important; }
+
 /* ── Variabili Tema Chiaro ── */
 :root {
   /* Colori principali */
