@@ -367,9 +367,10 @@ const CartoBattagliaScene = (() => {
   };
   // L'acqua scura della palude: bassa ai bordi, profonda al centro, un velo verdastro sopra
   const _pozza = (k, b, fonda = true) => {
-    k.L.terra += `<path d="${b.d}" fill="url(#bm-p-terreno-acqua-profonda)" filter="url(#carto-b4)"/>`;
-    k.L.terra += `<path d="${b.d}" fill="none" stroke="url(#bm-p-terreno-acqua-bassa)" stroke-width="${k.n1(k.S * (fonda ? 1.6 : 4))}" opacity="0.8" filter="url(#carto-b4)"/>`;
-    k.L.terra += `<path d="${b.d}" fill="#3d4a1c" opacity="0.32"/>`;
+    // Acqua bassa su tutta la pozza, il centro profondo se e' grande, poi un velo verde scuro: acqua di palude, non di piscina
+    k.L.terra += `<path d="${b.d}" fill="url(#bm-p-terreno-acqua-bassa)" filter="url(#carto-b4)"/>`;
+    if (fonda) k.L.terra += `<path d="${blob(k, b.cu, b.cw, b.ru * 0.62, b.rw * 0.62, 0.2).d}" fill="url(#bm-p-terreno-acqua-profonda)" filter="url(#carto-b12)"/>`;
+    k.L.terra += `<path d="${b.d}" fill="#2f3d16" opacity="0.45" filter="url(#carto-b4)"/>`;
   };
   const _sponde = (k, b, n) => {
     for (let i = 0; i < n; i++) { const a = k.r.range(0, DUE); k.L.sopra += k.spr(k.c(['canneto-1', 'canneto-2']), b.cu + Math.cos(a) * b.ru, b.cw + Math.sin(a) * b.rw, k.r.range(1.3, 2), k.r.range(-25, 25)); }
@@ -539,11 +540,12 @@ const CartoBattagliaScene = (() => {
     const nome = k.o.nome || 'La fattoria dei ' + k.M.nomeLuogo(r, k.o.popolo);
     k.L.defs += k.pattern('terreno-erba', 5) + k.pattern('terreno-terra', 6, 90) + k.pattern('terreno-erba-secca', 5);
     k.L.terra += k.tutto('terreno-erba');
-    const lu = 11 + r.int(0, 2), lw = 8 + r.int(0, 1);
+    const lu = 10 + r.int(0, 1), lw = 8;
     const sx = r.chance(0.5), u0 = sx ? 2 + r.int(0, 2) : cols - lu - 2 - r.int(0, 2), w0 = Math.round((rows - lw) / 2 + r.range(-1, 1)), u1 = u0 + lu, w1 = w0 + lw;
     k.L.terra += `<rect x="${k.X(u0)}" y="${k.Y(w0)}" width="${lu * k.S}" height="${lw * k.S}" fill="url(#bm-p-terreno-terra)" opacity="0.9" filter="url(#carto-b4)"/>`;
     const gU = sx ? u1 : u0, gW = (w0 + w1) / 2 + r.range(-2, 2);
-    const sent = lineaMorbida(k, [[gU, gW], [sx ? cols + 1.5 : -1.5, r.range(3, rows - 3)]], 1.6, 31);
+    // Il sentiero esce verso un angolo: il frutteto sta nell'altra meta', cosi' non lo attraversa
+    const suSent = r.chance(0.5), sent = lineaMorbida(k, [[gU, gW], [sx ? cols + 1.5 : -1.5, suSent ? r.range(1.5, 3) : r.range(rows - 3, rows - 1.5)]], 1.2, 31);
     const dS = via(k, 'sent', [sent], 2.2, 'terreno-terra');
     recinto(k, [[u0, w0], [u1, w0], [u1, w1], [u0, w1], [u0, w0]], [[gU, gW]]);
     const fu = sx ? u0 + 3.4 : u1 - 3.4, fw = w0 + 3;
@@ -558,7 +560,7 @@ const CartoBattagliaScene = (() => {
     metti(k, 'legnaia', (u, w) => u > u0 + 1 && u < u1 - 1 && w > w0 + 1 && w < w1 - 1, 1.6);
     // Fuori: frutteto in file e campi
     const fx0 = sx ? u1 + 3 : 2, fx1 = sx ? cols - 2 : u0 - 3;
-    const frutW = r.chance(0.5) ? [1.5, rows / 2 - 1] : [rows / 2 + 1, rows - 1.5];
+    const frutW = suSent ? [rows / 2, rows - 1] : [1, rows / 2];
     for (let u = fx0 + 1.2; u < fx1 - 0.6; u += 2.6) for (let w = frutW[0] + 1.2; w < frutW[1] - 0.4; w += 2.6) if (dS(u, w) > 1.8 && k.libero(u, w, 0.8)) { k.L.alto += k.spr(k.c(['quercia-1', 'quercia-2', 'cespuglio-bianco']), u + r.range(-0.2, 0.2), w + r.range(-0.2, 0.2), r.range(1.9, 2.3), r.range(0, 360)); k.occupa(u, w, 0.9); }
     k.segna((fx0 + fx1) / 2, frutW[0] + 0.6, 'Frutteto', 'Alberi in fila: mezza copertura, ci si arrampica facilmente.');
     const cw2 = frutW[0] < rows / 2 ? rows * 0.75 : rows * 0.25;
@@ -871,7 +873,8 @@ const CartoBattagliaScene = (() => {
   const _sale = (k, n) => {
     const { r, cols, rows } = k, sale = [];
     for (let t = 0; t < 300 && sale.length < n; t++) {
-      const ru = r.range(2.8, 4.4), rw = r.range(2.4, 3.6), u = r.range(ru + 0.8, cols - ru - 0.8), w = r.range(rw + 0.8, rows - rw - 0.8);
+      const f = Math.min(1, rows / 17); // sui fogli piccoli sale piu' piccole, cosi' ce ne stanno di piu'
+      const ru = r.range(2.8, 4.4) * f, rw = r.range(2.4, 3.6) * f, u = r.range(ru + 0.8, cols - ru - 0.8), w = r.range(rw + 0.8, rows - rw - 0.8);
       if (sale.some((s) => Math.hypot((s.cu - u) / (s.ru + ru + 2), (s.cw - w) / (s.rw + rw + 1.5)) < 1)) continue;
       sale.push(blob(k, u, w, ru, rw, 0.3));
     }
@@ -1063,10 +1066,11 @@ const CartoBattagliaScene = (() => {
     k.segna(mu, mw - 2.2, 'Sala delle statue', 'Le quattro statue guardano il sarcofago del fondatore. Mezza copertura.');
     // Le due cripte di famiglia
     [qa, qb].forEach(([a, b, c, d], i) => {
-      const cu = (a + c) / 2, cw = (b + d) / 2;
-      for (let j = 0; j < 2; j++) k.L.sopra += k.spr('sarcofago', a + 1.5 + j * 3, cw, 2, 0);
-      if (i === 0) { k.L.sopra += k.spr('forziere', cu, cw + (b < mw ? -1.4 : 1.4), 0.9, 0); k.segna(cu, cw, 'Cripta di famiglia', 'Due sarcofagi e un forziere con il corredo funebre.'); }
-      else { k.L.sopra += k.spr('altare', cu, cw + (b < mw ? -1.4 : 1.4), 1.8, b < mw ? 180 : 0); k.luce(cu, cw, 2, '#9fd0ff', 0.4); k.segna(cu, cw, 'Cappella privata', 'Un piccolo altare con una lampada che non si spegne mai.'); }
+      const cu = (a + c) / 2, cw = (b + d) / 2, bassa = d - b < 4; // sui fogli piccoli la cripta e' bassa: tutto in fila
+      for (let j = 0; j < 2; j++) k.L.sopra += bassa ? k.spr('sarcofago', j ? c - 1.2 : a + 1.2, cw, 1.7, 90) : k.spr('sarcofago', a + 1.5 + j * 3, cw, 2, 0);
+      const dw = bassa ? 0 : (b < mw ? -1.4 : 1.4);
+      if (i === 0) { k.L.sopra += k.spr('forziere', cu, cw + dw, 0.9, 0); k.segna(cu, cw, 'Cripta di famiglia', 'Due sarcofagi e un forziere con il corredo funebre.'); }
+      else { k.L.sopra += k.spr('altare', cu, cw + dw, bassa ? 1.4 : 1.8, b < mw ? 180 : 0); k.luce(cu, cw, 2, '#9fd0ff', 0.4); k.segna(cu, cw, 'Cappella privata', 'Un piccolo altare con una lampada che non si spegne mai.'); }
     });
     for (let i = 0; i < 3; i++) metti(k, ['macerie', 'colonna-crollata', 'ossa'], dentro, 1.2, { raggio: 0.5 });
     k.segna(1.4, mw - 1.4, 'Corridoi', 'Larghi 3 metri, in pietra. Il buio è totale senza una luce.');
@@ -1148,7 +1152,7 @@ const CartoBattagliaScene = (() => {
     k.L.terra += k.riempi('terreno-fango', 'rive') + k.riempi('terreno-acqua-bassa', 'rus');
     // Un laghetto dove il ruscello si allarga
     const li = Math.floor(rus.length * r.range(0.2, 0.35)), [lu, lw] = rus[li], lago = blob(k, lu, lw, r.range(2.6, 3.4), r.range(2, 2.6), 0.3);
-    k.L.terra += `<path d="${lago.d}" fill="url(#bm-p-terreno-fango)" filter="url(#carto-b4)"/>` + `<path d="${blob(k, lu, lw, lago.ru - 0.6, lago.rw - 0.6, 0.25).d}" fill="url(#bm-p-terreno-acqua-bassa)" filter="url(#carto-b4)"/>` + `<path d="${blob(k, lu, lw, lago.ru * 0.5, lago.rw * 0.5, 0.2).d}" fill="url(#bm-p-terreno-acqua-profonda)" filter="url(#carto-b12)"/>`;
+    k.L.terra += `<path d="${lago.d}" fill="url(#bm-p-terreno-fango)" opacity="0.35" filter="url(#carto-b4)"/>` + `<path d="${blob(k, lu, lw, lago.ru - 0.3, lago.rw - 0.3, 0.25).d}" fill="url(#bm-p-terreno-acqua-bassa)" filter="url(#carto-b4)"/>` + `<path d="${blob(k, lu, lw, lago.ru * 0.5, lago.rw * 0.5, 0.2).d}" fill="url(#bm-p-terreno-acqua-profonda)" filter="url(#carto-b12)"/>`;
     const acqua = (u, w) => k.dist([u, w], rus) < 1.4 || lago.dentro(u, w, -0.4);
     k.segna(lu, lw, 'Laghetto', 'Profondo al centro: si nuota. Pesci argentati.');
     const ri = rus[Math.floor(rus.length * 0.75)];

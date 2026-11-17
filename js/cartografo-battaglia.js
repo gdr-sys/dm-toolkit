@@ -13,7 +13,8 @@
 
 const CartoBattaglia = (() => {
   const M = CartoMotore, n1 = M.n1;
-  const DIM = { piccola: [18, 13], media: [24, 17], grande: [30, 21] };
+  // Quadretti nelle proporzioni di un A4 orizzontale (297 x 210 mm = 1,414)
+  const DIM = { piccola: [17, 12], media: [24, 17], grande: [31, 22] };
   const NOMI = [
     'alberello-1', 'alberello-2', 'albero-morto', 'altare', 'alveare', 'ancora', 'anfore', 'balle-fieno', 'bancarella-blu', 'bancarella-gialla',
     'bancarella-rossa', 'banco-frutta', 'banco-pesce', 'bancone', 'barca', 'barca-vela', 'barile', 'baule', 'botti', 'braciere', 'camino',
@@ -75,13 +76,16 @@ const CartoBattaglia = (() => {
     const carta = M.cartaInterni(t);
     const ink = t.ink;
     const [cols, rows] = DIM[o.taglia] || DIM.media;
-    const conLegenda = o.legenda !== false;
+    // Foglio intero: la mappa riempie tutta l'immagine, nelle proporzioni di un A4 orizzontale
+    // (i quadretti 17x12, 24x17, 31x22 sono scelti per questo); niente titolo, legenda e cornice.
+    const foglio = o.impagina !== 'scheda';
+    const conLegenda = !foglio && o.legenda !== false;
 
     /* ── Impaginazione: quanto e' grande un quadretto ── */
-    const W = 1400, H = 1000;
-    const areaW = conLegenda ? W - 40 - 392 : W - 80, top = o.titolo !== false ? 118 : 46, areaH = H - top - 74;
-    const S = Math.floor(Math.min(areaW / cols, areaH / rows));
-    const ox = Math.round(40 + (areaW - cols * S) / 2), oy = Math.round(top + (areaH - rows * S) / 2);
+    const areaW = conLegenda ? 1400 - 40 - 392 : 1400 - 80, top = o.titolo !== false ? 118 : 46, areaH = 1000 - top - 74;
+    const S = foglio ? Math.round(1754 / cols) : Math.floor(Math.min(areaW / cols, areaH / rows)); // 1754 px = A4 a 150 punti per pollice
+    const W = foglio ? cols * S : 1400, H = foglio ? rows * S : 1000;
+    const ox = foglio ? 0 : Math.round(40 + (areaW - cols * S) / 2), oy = foglio ? 0 : Math.round(top + (areaH - rows * S) / 2);
     const X = (u) => ox + u * S, Y = (u) => oy + u * S;
     const P = ([u, w]) => [X(u), Y(w)];
     const linea = (l) => 'M' + l.map((p) => P(p).map(n1).join(' ')).join('L');
@@ -153,7 +157,8 @@ const CartoBattaglia = (() => {
       L.defs += pattern(pat, 3);
       const spM = Math.max(8, S * 0.36);
       const dM = lista.map(([a, b, c2, d]) => `M${n1(X(a))} ${n1(Y(b))}L${n1(X(c2))} ${n1(Y(d))}`).join('');
-      L.alto += `<path d="${dM}" stroke="#000" stroke-width="${n1(spM * 2.2)}" opacity="0.3" filter="url(#carto-b12)"/><path d="${dM}" stroke="#2a221c" stroke-width="${n1(spM + 3)}" stroke-linecap="square"/><path d="${dM}" stroke="url(#bm-p-${pat})" stroke-width="${n1(spM)}" stroke-linecap="square"/>`;
+      // Muro scuro con la pietra sopra, piu' scura del pavimento: si distingue anche quando il pavimento e' di pietra
+      L.alto += `<path d="${dM}" stroke="#000" stroke-width="${n1(spM * 2.4)}" opacity="0.35" filter="url(#carto-b12)"/><path d="${dM}" stroke="#1c1712" stroke-width="${n1(spM + Math.max(4, S * 0.08))}" stroke-linecap="square"/><path d="${dM}" stroke="url(#bm-p-${pat})" stroke-width="${n1(spM)}" stroke-linecap="square"/><path d="${dM}" stroke="#2b241d" stroke-width="${n1(spM)}" stroke-linecap="square" opacity="0.45"/>`;
       listaPorte.forEach(({ seg: [a, b, c2] }) => {
         const vert = a === c2, x = X(a), y = Y(b);
         L.alto += vert ? `<rect x="${n1(x - spM / 2)}" y="${n1(y + 2)}" width="${n1(spM)}" height="${n1(S - 4)}" fill="#8a5a32" stroke="#2a221c" stroke-width="1.6"/>`
@@ -381,7 +386,8 @@ const CartoBattaglia = (() => {
       let d = '';
       for (let u = 0; u <= cols; u++) d += `M${X(u)} ${oy}V${oy + rows * S}`;
       for (let w = 0; w <= rows; w++) d += `M${ox} ${Y(w)}H${ox + cols * S}`;
-      griglia = `<path d="${d}" fill="none" stroke="#000" stroke-width="1.4" opacity="0.32"/><path d="${d}" fill="none" stroke="#fff" stroke-width="0.6" opacity="0.18"/>`;
+      const sp = Math.max(1.4, S / 34); // linee un po' piu' spesse sui fogli grandi, cosi' si vedono anche stampate
+      griglia = `<path d="${d}" fill="none" stroke="#000" stroke-width="${n1(sp)}" opacity="0.34"/><path d="${d}" fill="none" stroke="#fff" stroke-width="${n1(sp * 0.42)}" opacity="0.18"/>`;
     }
     const buio = notte ? `<rect x="${ox}" y="${oy}" width="${cols * S}" height="${rows * S}" fill="#0b1a2a" opacity="0.5"/>` : '';
 
@@ -402,20 +408,22 @@ const CartoBattaglia = (() => {
     const immagini = [...usate].map((n) => { const im = _img[n]; return `<image id="bm-${n}" href="${im.url}" x="${-im.w / 2}" y="${-im.h / 2}" width="${im.w}" height="${im.h}"/>`; }).join('');
     const clip = `<clipPath id="carto-bm"><rect x="${ox}" y="${oy}" width="${cols * S}" height="${rows * S}"/></clipPath>`;
     let svg = M.apri(W, H, carta, o.seme) + `<defs>${immagini}${L.defs}${clip}</defs>`;
-    svg += `<rect x="${ox - 6}" y="${oy - 6}" width="${cols * S + 12}" height="${rows * S + 12}" rx="6" fill="#000" opacity="0.25" filter="url(#carto-b4)"/>`;
+    if (!foglio) svg += `<rect x="${ox - 6}" y="${oy - 6}" width="${cols * S + 12}" height="${rows * S + 12}" rx="6" fill="#000" opacity="0.25" filter="url(#carto-b4)"/>`;
     svg += `<g clip-path="url(#carto-bm)">${L.terra}${L.sotto}${L.sopra}${L.alto}${buio}${notte ? L.luci : ""}${griglia}</g>`;
-    svg += `<rect x="${ox}" y="${oy}" width="${cols * S}" height="${rows * S}" fill="none" stroke="${ink}" stroke-width="2.4"/>`;
-    if (o.nomi !== false) svg += testi;
+    if (!foglio) svg += `<rect x="${ox}" y="${oy}" width="${cols * S}" height="${rows * S}" fill="none" stroke="${ink}" stroke-width="2.4"/>`;
+    // Sul foglio intero i numeri ci sono se c'e' la legenda (che si stampa a parte, per il master)
+    if (o.nomi !== false && (!foglio || o.legenda !== false)) svg += testi;
     if (conLegenda) svg += M.legenda(W - 372, 36, 340, H - 72, 'Cosa c\'è', voci, pal);
     const areaTit = conLegenda ? W - 380 : W;
-    if (o.titolo !== false) svg += M.etichetta(areaTit / 2, 74, nome, carta, { size: 44, font: M.FONT_APP_TITOLI, peso: 400, colore: t.ink, alone: t.sfondo, aloneW: 6 });
-    svg += M.scala(ox, H - 40, S * 2, { valore: 3, nome: 'metri' }, 2, { ...carta, carta: t.pavimento }) + M.chiudi(W, H, carta);
+    if (!foglio && o.titolo !== false) svg += M.etichetta(areaTit / 2, 74, nome, carta, { size: 44, font: M.FONT_APP_TITOLI, peso: 400, colore: t.ink, alone: t.sfondo, aloneW: 6 });
+    if (!foglio) svg += M.scala(ox, H - 40, S * 2, { valore: 3, nome: 'metri' }, 2, { ...carta, carta: t.pavimento });
+    svg += M.chiudi(W, H, foglio ? { ...carta, senzaCornice: true } : carta); // sul foglio intero niente cornice: la mappa arriva al bordo
 
     // Dati per tavolo virtuale e stampa in scala: tutti i quadretti sono calpestabili
     const celle = [];
     for (let w = 0; w < rows; w++) for (let u = 0; u < cols; u++) if (!celleOk || celleOk(u + 0.5, w + 0.5)) celle.push([u, w]);
     const vtt = { S, ang: 0, ox, oy, minX: 0, minY: 0, maxX: cols, maxY: rows, muri, porte, celle };
-    return { nome, pin, W, H, larghezzaKm: W / S * 1.5 / 1000, svg, vtt }; // un quadretto = 1,5 metri
+    return { nome, pin, W, H, larghezzaKm: W / S * 1.5 / 1000, svg, vtt, foglio, legenda: foglio && o.legenda !== false ? voci : null }; // un quadretto = 1,5 metri
   };
 
   return { battaglia, carica, pronta };

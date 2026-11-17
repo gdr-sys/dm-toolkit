@@ -71,8 +71,9 @@ const CartoCatalogo = (() => {
       opzioni: [
         POPOLO(),
         S('scena', 'Scena', [['bosco', 'Bosco'], ['ponte', 'Fiume e ponte'], ['accampamento', 'Accampamento'], ['rovine', 'Rovine'], ['palude', 'Palude'], ['villaggio', 'Villaggio'], ['mercato', 'Mercato'], ['cimitero', 'Cimitero'], ['porto', 'Porto e costa'], ['caverna', 'Caverna'], ['cripta', 'Cripta'], ['locanda', 'Interno di locanda']], 'bosco'),
-        S('taglia', 'Quadretti', [['piccola', '18 × 13'], ['media', '24 × 17'], ['grande', '30 × 21']], 'media'),
-        C('griglia', 'Griglia', true, 0.9), C('legenda', 'Legenda', true, 1),
+        S('taglia', 'Quadretti', [['piccola', '17 × 12'], ['media', '24 × 17'], ['grande', '31 × 22']], 'media'),
+        S('impagina', 'Impaginazione', [['foglio', 'Foglio A4 intero'], ['scheda', 'Con titolo e legenda']], 'foglio'),
+        C('griglia', 'Griglia', true, 0.9), C('legenda', 'Numeri e legenda', true, 1),
       ],
     },
     abitazione: {

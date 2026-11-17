@@ -332,7 +332,7 @@ const Cartografo = (() => {
     else v.innerHTML = m.svg;
     _adatta();
     const T = K().TIPI[m.tipo];
-    { const bv = $('carto-vtt'), bs = $('carto-stampa'); if (bv) bv.hidden = !VTT_TIPI.includes(m.tipo); if (bs) bs.hidden = !VTT_TIPI.includes(m.tipo); }
+    { const bv = $('carto-vtt'), bs = $('carto-stampa'), b4 = $('carto-a4'); if (bv) bv.hidden = !VTT_TIPI.includes(m.tipo); if (bs) bs.hidden = !VTT_TIPI.includes(m.tipo); if (b4) b4.hidden = m.tipo !== 'battaglia'; }
     $('carto-titolo-mappa').textContent = m.nome;
     const n = m.pin.length;
     $('carto-info').textContent = T.nome + ' · ' + _scala(m.larghezzaKm) + ' da un lato all’altro · ' + n + (n === 1 ? ' luogo' : ' luoghi');
@@ -387,7 +387,8 @@ const Cartografo = (() => {
     const v = m.vtt;
     if (!v || v.ang !== 0) throw new Error('dati dei quadretti mancanti');
     const scala = ppg / v.S;
-    const x0 = v.minX - 1, y0 = v.minY - 1, larghi = v.maxX + 1 - x0, alti = v.maxY + 1 - y0;
+    const mg = _mappa.tipo === 'battaglia' ? 0 : 1; // la battle map arriva gia' al bordo dei quadretti
+    const x0 = v.minX - mg, y0 = v.minY - mg, larghi = v.maxX + mg - x0, alti = v.maxY + mg - y0;
     const sorgente = await _inCanvas(_conFont(m.svg, await _font()), m.W, m.H, scala);
     const c = document.createElement('canvas');
     c.width = larghi * ppg; c.height = alti * ppg;
@@ -532,6 +533,47 @@ const Cartografo = (() => {
       w.document.close();
     } catch (e) {
       if (typeof Debug !== 'undefined') Debug.warn('Cartografo stampa: ' + e);
+      try { w.close(); } catch (er) {}
+      Toast.show('La stampa non è riuscita. Riprova con “Nuova mappa”.', 'error', 5000);
+    }
+  };
+
+  /* ── Battle map su un A4 intero: la mappa da mettere sul tavolo, poi la legenda per il master ── */
+  const stampaA4 = async () => {
+    if (!_mappa || _mappa.tipo !== 'battaglia') return;
+    const w = window.open('', '_blank');
+    if (!w) { Toast.show('Il browser ha bloccato la finestra di stampa: permetti le finestre per questo sito e riprova.', 'warning', 6000); return; }
+    w.document.write('<!doctype html><meta charset="utf-8"><title>Preparo il foglio…</title><body style="font:16px system-ui;padding:24px;">Preparo il foglio…</body>');
+    try {
+      const a = _attuale();
+      const m = K().genera('battaglia', { ...a.opzioni, seme: a.seme, nome: _nomeEffettivo(), impagina: 'foglio' });
+      const c = await _inCanvas(_conFont(m.svg, await _font()), m.W, m.H, 1);
+      const esc = (x) => String(x).replace(/[&<>"]/g, (q) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[q]));
+      const voci = m.legenda || [];
+      const legenda = voci.length ? '<section class="foglio legenda"><h1>' + esc(m.nome) + '</h1><p class="sotto">Per il master · un quadretto = 1,5 metri</p><ol>' +
+        voci.map((v) => '<li><b>' + esc(v.titolo) + '</b> ' + esc(v.testo) + '</li>').join('') + '</ol></section>' : '';
+      w.document.open();
+      w.document.write('<!doctype html><html lang="it"><head><meta charset="utf-8"><title>' + esc(m.nome) + ' · A4</title><style>' +
+        '@page { size: A4 landscape; margin: 5mm; }' +
+        'body { margin: 0; font-family: system-ui, sans-serif; color: #2a2420; }' +
+        '.guida { max-width: 640px; margin: 24px auto; padding: 0 16px; line-height: 1.5; }' +
+        '.guida button { font: 600 16px system-ui; padding: 12px 22px; border-radius: 999px; border: 0; background: #8a4f1f; color: #fff; cursor: pointer; }' +
+        '.foglio { break-after: page; page-break-after: always; width: 287mm; height: 200mm; display: flex; align-items: center; justify-content: center; overflow: hidden; }' +
+        '.foglio img { max-width: 287mm; max-height: 200mm; display: block; }' +
+        '.legenda { display: block; box-sizing: border-box; padding: 6mm 8mm; columns: 2; column-gap: 10mm; }' +
+        '.legenda h1 { column-span: all; font: 600 20pt Georgia, serif; margin: 0; } .legenda .sotto { column-span: all; margin: 1mm 0 5mm; color: #6b605a; font-size: 10pt; }' +
+        '.legenda ol { margin: 0; padding-left: 7mm; font-size: 11pt; line-height: 1.45; } .legenda li { margin-bottom: 2.5mm; break-inside: avoid; }' +
+        '@media screen { .foglio { margin: 24px auto; box-shadow: 0 2px 12px rgba(0,0,0,.18); background: #fff; } body { background: #e9e4dc; } }' +
+        '@media print { .guida { display: none; } }' +
+        '</style></head><body>' +
+        '<div class="guida"><h1 style="font-size:24px;margin:0 0 8px;">' + esc(m.nome) + '</h1>' +
+        '<p>La mappa occupa tutto un foglio A4 in orizzontale' + (legenda ? '; nel secondo foglio ci sono i numeri spiegati, per il master' : '') + '. Ogni quadretto è 1,5 metri.</p>' +
+        '<p>Nella finestra di stampa scegli <b>orizzontale</b> e margini <b>minimi</b> o <b>nessuno</b>, così la mappa arriva quasi al bordo del foglio.</p>' +
+        '<p><button type="button" onclick="window.print()">Stampa</button></p></div>' +
+        '<section class="foglio"><img src="' + c.toDataURL('image/jpeg', 0.93) + '" alt="' + esc(m.nome) + '"></section>' + legenda + '</body></html>');
+      w.document.close();
+    } catch (e) {
+      if (typeof Debug !== 'undefined') Debug.warn('Cartografo A4: ' + e);
       try { w.close(); } catch (er) {}
       Toast.show('La stampa non è riuscita. Riprova con “Nuova mappa”.', 'error', 5000);
     }
@@ -727,6 +769,7 @@ const Cartografo = (() => {
               '<button type="button" class="btn btn-secondary btn-sm" id="carto-png" onclick="Cartografo.scaricaPng()">Scarica PNG</button>' +
               '<button type="button" class="btn btn-secondary btn-sm" onclick="Cartografo.scaricaSvg()">Scarica SVG</button>' +
               '<button type="button" class="btn btn-secondary btn-sm" id="carto-vtt" hidden onclick="Cartografo.scaricaVtt()" title="Per Foundry, Roll20, Fantasy Grounds e altri tavoli virtuali: mappa con muri e porte">Tavolo virtuale</button>' +
+              '<button type="button" class="btn btn-secondary btn-sm" id="carto-a4" hidden onclick="Cartografo.stampaA4()" title="La battle map su un foglio A4 intero, più la legenda per il master">Stampa A4</button>' +
               '<button type="button" class="btn btn-secondary btn-sm" id="carto-stampa" hidden onclick="Cartografo.stampaScala()" title="Quadretti da 2,5 cm su fogli A4, per giocare con le miniature">Stampa in scala</button>' +
             '</div></div>' +
           '<div id="carto-stage"><div id="carto-vista" role="img"></div>' +
@@ -760,5 +803,5 @@ const Cartografo = (() => {
     if (!_mappa || typeof CartoRitocchi === 'undefined') return;
     CartoRitocchi.apri({ stato: () => ({ a: _attuale(), mappa: _mappa }), salvaStato: _salva, rigenera: genera });
   };
-  return { strumenti, ritocca, perPin, annullaContesto, apri, nuova, aCaso, _tieniColori, precedente, scegliTipo, zoom, zoomReset, scaricaPng, scaricaSvg, scaricaVtt, stampaScala, _confermaScelta, apriMettiNelleMappe, _confermaMappe, _opzione, _nome, _seme, dopoMostra, mappaAttuale };
+  return { strumenti, ritocca, perPin, annullaContesto, apri, nuova, aCaso, _tieniColori, precedente, scegliTipo, zoom, zoomReset, scaricaPng, scaricaSvg, scaricaVtt, stampaScala, stampaA4, _confermaScelta, apriMettiNelleMappe, _confermaMappe, _opzione, _nome, _seme, dopoMostra, mappaAttuale };
 })();
