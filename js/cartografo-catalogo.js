@@ -10,6 +10,29 @@ const CartoCatalogo = (() => {
   const S = (k, l, v, d) => ({ k, l, v, d });
   const C = (k, l, d = true, pCaso = 0.5) => ({ k, l, c: true, d, pCaso });
   const POPOLO = () => S('popolo', 'Nomi', CartoMotore.POPOLO_OPZIONI, 'italiano');
+  // Battle map: varianti di ogni scena (la chiave e' quella dell'impianto in cartografo-battaglia-scene.js, 'base' = la scena stessa)
+  const VARIANTI = {
+    bosco: [['base', 'Strada nel bosco'], ['bivio', 'Bivio'], ['radura', 'Radura'], ['ruscello', 'Ruscello']],
+    ponte: [['ponte', 'Con il ponte'], ['guado', 'Con il guado'], ['entrambi', 'Ponte e guado']],
+    accampamento: [['base', 'Campo nella radura'], ['carovana', 'Carovana'], ['avamposto', 'Avamposto']],
+    rovine: [['base', 'Tempio'], ['chiostro', 'Chiostro'], ['torre', 'Torre crollata']],
+    palude: [['base', 'Acquitrini'], ['capanna', 'Capanna della strega']],
+    villaggio: [['base', 'Piazza'], ['incrocio', 'Crocevia'], ['fattoria', 'Fattoria']],
+    mercato: [['base', 'Piazza del mercato'], ['strada', 'Via del mercato'], ['fiera', 'Fiera']],
+    cimitero: [['base', 'Cimitero recintato'], ['bosco', 'Tombe nel bosco']],
+    porto: [['base', 'Banchina e moli'], ['cala', 'Cala']],
+    caverna: [['base', 'Grotte'], ['fiume', 'Fiume sotterraneo'], ['tana', 'Tana']],
+    cripta: [['base', 'Cripta'], ['catacombe', 'Catacombe']],
+  };
+  const AL_CHIUSO = ['caverna', 'cripta', 'locanda'];
+  // [chiave, etichetta, dove ci sta] — gli stessi di ELEMENTI in cartografo-battaglia.js
+  const ELEMENTI_BM = [
+    ['carro', 'Carro', ['aperto']], ['rovesciato', 'Carro rovesciato', ['aperto']], ['tenda', 'Tenda', ['aperto']], ['fuoco', 'Fuoco', ['aperto', 'grotta', 'chiuso']],
+    ['massi', 'Massi', ['aperto', 'grotta']], ['tronco', 'Albero caduto', ['aperto']], ['rovi', 'Rovi', ['aperto']], ['stagno', 'Stagno', ['aperto']],
+    ['pozzo', 'Pozzo', ['aperto']], ['lapidi', 'Tombe', ['aperto']], ['statua', 'Statua', ['aperto', 'grotta', 'chiuso']], ['rovine', 'Rovine', ['aperto', 'grotta', 'chiuso']],
+    ['casse', 'Casse e barili', ['aperto', 'grotta', 'chiuso']], ['tesoro', 'Tesoro', ['aperto', 'grotta', 'chiuso']], ['ossa', 'Ossa', ['aperto', 'grotta', 'chiuso']],
+    ['gabbia', 'Gabbia', ['aperto', 'grotta', 'chiuso']], ['altare', 'Altare', ['aperto', 'grotta', 'chiuso']],
+  ];
   const TIPI = {
     regno: {
       nome: 'Regno', genera: (o) => CartoRegno.regno(o),
@@ -70,9 +93,16 @@ const CartoCatalogo = (() => {
       colori: [['colori', 'Colori'], ['notte', 'Notte']],
       opzioni: [
         POPOLO(),
-        S('scena', 'Scena', [['bosco', 'Bosco'], ['ponte', 'Fiume e ponte'], ['accampamento', 'Accampamento'], ['rovine', 'Rovine'], ['palude', 'Palude'], ['villaggio', 'Villaggio'], ['mercato', 'Mercato'], ['cimitero', 'Cimitero'], ['porto', 'Porto e costa'], ['caverna', 'Caverna'], ['cripta', 'Cripta'], ['locanda', 'Interno di locanda']], 'bosco'),
+        { ...S('scena', 'Scena', [['bosco', 'Bosco'], ['ponte', 'Fiume'], ['accampamento', 'Accampamento'], ['rovine', 'Rovine'], ['palude', 'Palude'], ['villaggio', 'Villaggio'], ['mercato', 'Mercato'], ['cimitero', 'Cimitero'], ['porto', 'Porto e costa'], ['caverna', 'Caverna'], ['cripta', 'Cripta'], ['locanda', 'Interno di locanda']], 'bosco'), azzera: ['impianto'] },
+        // Variante: dipende dalla scena (dip); in v tutte, per validare quelle salvate
+        { ...S('impianto', 'Variante', [['caso', 'A caso']].concat(...Object.values(VARIANTI)), 'caso'), dip: (o) => [['caso', 'A caso']].concat(VARIANTI[o.scena] || []), se: (o) => (VARIANTI[o.scena] || []).length > 1, caso: 'caso' },
+        { ...S('terreno', 'Terreno', [['auto', 'Automatico'], ['prato', 'Prato'], ['secco', 'Erba secca'], ['deserto', 'Deserto'], ['neve', 'Neve'], ['fango', 'Fango']], 'auto'), se: (o) => !AL_CHIUSO.includes(o.scena) },
+        { ...S('vegetazione', 'Alberi', [['auto', 'Automatico'], ['nessuna', 'Nessuno'], ['rada', 'Pochi'], ['fitta', 'Tanti']], 'auto'), se: (o) => !AL_CHIUSO.includes(o.scena) },
+        { ...S('strada', 'Strade', [['auto', 'Automatico'], ['sterrata', 'Sterrate'], ['selciata', 'Selciate']], 'auto'), se: (o) => !AL_CHIUSO.includes(o.scena) && o.scena !== 'palude' },
         S('taglia', 'Quadretti', [['piccola', '17 × 12'], ['media', '24 × 17'], ['grande', '31 × 22']], 'media'),
         S('impagina', 'Impaginazione', [['foglio', 'Foglio A4 intero'], ['scheda', 'Con titolo e legenda']], 'foglio'),
+        // Oggetti da aggiungere alla scena (scelta multipla); al chiuso compaiono solo quelli che ci stanno
+        { k: 'elementi', l: 'Aggiungi', m: true, d: [], v: ELEMENTI_BM, dip: (o) => ELEMENTI_BM.filter((e) => e[2].includes(o.scena === 'caverna' ? 'grotta' : AL_CHIUSO.includes(o.scena) ? 'chiuso' : 'aperto') && !(o.scena === 'locanda' && ['rovine', 'altare'].includes(e[0]))) },
         C('griglia', 'Griglia', true, 0.9), C('legenda', 'Numeri e legenda', true, 1),
       ],
     },
@@ -91,14 +121,14 @@ const CartoCatalogo = (() => {
   const seme = () => Math.random().toString(36).slice(2, 8);
   const predefinite = (tipo) => {
     const o = { palette: TIPI[tipo].colori[0][0], nomi: true, titolo: true };
-    TIPI[tipo].opzioni.forEach((x) => { o[x.k] = x.d; });
+    TIPI[tipo].opzioni.forEach((x) => { o[x.k] = Array.isArray(x.d) ? x.d.slice() : x.d; });
     return o;
   };
   // A caso, dentro un tipo di mappa: opzioni e colori estratti davvero, ma con pesi sensati (una citta' di solito ha le mura)
   const aCaso = (tipo) => {
     const pick = (l) => l[Math.floor(Math.random() * l.length)];
     const o = { palette: pick(TIPI[tipo].colori)[0], nomi: true, titolo: true };
-    TIPI[tipo].opzioni.forEach((x) => { o[x.k] = x.c ? Math.random() < x.pCaso : x.k === 'popolo' ? (Math.random() < 0.7 ? 'italiano' : pick(x.v)[0]) : pick(x.v)[0]; });
+    TIPI[tipo].opzioni.forEach((x) => { o[x.k] = x.m ? [] : 'caso' in x ? x.caso : x.c ? Math.random() < x.pCaso : x.k === 'popolo' ? (Math.random() < 0.7 ? 'italiano' : pick(x.v)[0]) : pick(x.v)[0]; });
     return o;
   };
   const genera = (tipo, o) => TIPI[tipo].genera(o);

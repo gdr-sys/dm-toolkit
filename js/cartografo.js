@@ -35,6 +35,7 @@ const Cartografo = (() => {
     if (salvate) {
       T.opzioni.forEach((x) => {
         if (x.c) { if (typeof salvate[x.k] === 'boolean') o[x.k] = salvate[x.k]; }
+        else if (x.m) { if (Array.isArray(salvate[x.k])) o[x.k] = salvate[x.k].filter((v) => x.v.some(([k]) => k === v)); }
         else if (x.v.some(([v]) => v === salvate[x.k])) o[x.k] = salvate[x.k];
       });
       if (T.colori.some(([v]) => v === salvate.palette)) o.palette = salvate.palette;
@@ -171,7 +172,24 @@ const Cartografo = (() => {
     _aggiornaControlli(); genera();
   };
   const _dopoModifica = (ritardo = 180) => { clearTimeout(_timer); _timer = setTimeout(genera, ritardo); };
-  const _opzione = (k, v) => { _ricordaPrecedente(); _attuale().opzioni[k] = v; _dopoModifica(); };
+  const _opzione = (k, v) => {
+    _ricordaPrecedente();
+    const T = K().TIPI[_stato.tipo], a = _attuale(), x = T.opzioni.find((q) => q.k === k);
+    a.opzioni[k] = v;
+    // Le opzioni che dipendono da questa (es. la variante dipende dalla scena) tornano al valore iniziale
+    if (x && x.azzera) x.azzera.forEach((d) => { const y = T.opzioni.find((q) => q.k === d); if (y) a.opzioni[d] = Array.isArray(y.d) ? y.d.slice() : y.d; });
+    if (T.opzioni.some((q) => q.se || q.dip)) _aggiornaControlli();
+    _dopoModifica();
+  };
+  // Scelta multipla (es. oggetti da aggiungere alla battle map): accende o spegne una voce
+  const _multi = (k, v) => {
+    _ricordaPrecedente();
+    const a = _attuale(), l = Array.isArray(a.opzioni[k]) ? a.opzioni[k].slice() : [], i = l.indexOf(v);
+    if (i >= 0) l.splice(i, 1); else l.push(v);
+    a.opzioni[k] = l;
+    const b = document.querySelector('[data-multi="' + k + ':' + v + '"]'); if (b) b.setAttribute('aria-pressed', String(i < 0));
+    _dopoModifica();
+  };
   const _nome = (v) => { _attuale().nome = String(v).trim(); _dopoModifica(0); };
   const _seme = (v) => {
     const s = String(v).trim();
@@ -189,14 +207,18 @@ const Cartografo = (() => {
     const sel = (id, etichetta, lista, val, azione) => '<div class="form-group"><label class="form-label" for="' + id + '">' + _esc(etichetta) + '</label>' +
       '<select id="' + id + '" class="form-select" onchange="' + azione + '">' + lista.map(([v, l]) => '<option value="' + _esc(v) + '"' + (v === val ? ' selected' : '') + '>' + _esc(l) + '</option>').join('') + '</select></div>';
     const spunta = (id, etichetta, val, azione) => '<label class="carto-spunta" for="' + id + '"><input type="checkbox" id="' + id + '"' + (val ? ' checked' : '') + ' onchange="' + azione + '"><span>' + _esc(etichetta) + '</span></label>';
-    const scelte = T.opzioni.filter((x) => !x.c), spunte = T.opzioni.filter((x) => x.c);
+    const vis = (x) => !x.se || x.se(a.opzioni);
+    const scelte = T.opzioni.filter((x) => !x.c && !x.m && vis(x)), spunte = T.opzioni.filter((x) => x.c), multi = T.opzioni.filter((x) => x.m && vis(x));
+    const valori = (x) => x.dip ? x.dip(a.opzioni) : x.v;
+    const chip = (x, [v, l]) => { const on = (a.opzioni[x.k] || []).includes(v); return '<button type="button" class="carto-chip" data-multi="' + _esc(x.k + ':' + v) + '" aria-pressed="' + on + '" onclick="Cartografo._multi(\'' + x.k + '\',\'' + v + '\')">' + _esc(l) + '</button>'; };
     $('carto-controlli').innerHTML =
       '<div class="form-group"><label class="form-label" for="carto-nome">Nome sulla mappa</label>' +
         '<input type="text" id="carto-nome" class="form-input" autocomplete="off" value="' + _esc(_nomeEffettivo()) + '" placeholder="Casuale" onchange="Cartografo._nome(this.value)"></div>' +
       '<div class="carto-griglia">' +
-        scelte.map((x) => sel('carto-op-' + x.k, x.l, x.v, a.opzioni[x.k], 'Cartografo._opzione(\'' + x.k + '\',this.value)')).join('') +
+        scelte.map((x) => sel('carto-op-' + x.k, x.l, valori(x), a.opzioni[x.k], 'Cartografo._opzione(\'' + x.k + '\',this.value)')).join('') +
         sel('carto-colori', 'Colori', T.colori, a.opzioni.palette, 'Cartografo._opzione(\'palette\',this.value)') +
       '</div>' +
+      multi.map((x) => '<div class="carto-gruppo" role="group" aria-label="' + _esc(x.l) + '"><div class="form-label">' + _esc(x.l) + '</div><div class="carto-chips">' + valori(x).map((e) => chip(x, e)).join('') + '</div></div>').join('') +
       '<div class="carto-gruppo" role="group" aria-label="Cosa mostrare sulla mappa"><div class="form-label">Sulla mappa</div><div class="carto-spunte">' +
         spunte.map((x) => spunta('carto-op-' + x.k, x.l, a.opzioni[x.k], 'Cartografo._opzione(\'' + x.k + '\',this.checked)')).join('') +
         spunta('carto-nomi', 'Nomi e numeri', a.opzioni.nomi, 'Cartografo._opzione(\'nomi\',this.checked)') +
@@ -704,11 +726,15 @@ const Cartografo = (() => {
       '.carto-corpo { display:grid; grid-template-columns:minmax(280px,320px) minmax(0,1fr); gap:var(--space-md); align-items:start; }' +
       '.carto-pannello { margin:0; }' +
       '.carto-pannello:hover { box-shadow:var(--shadow-sm); }' +
-      '.carto-griglia { display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); column-gap:10px; }' +
+      '.carto-griglia { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); column-gap:10px; }' +
       '.carto-griglia > :last-child:nth-child(odd) { grid-column:1 / -1; }' +
       '.carto-gruppo { margin-bottom:var(--space-md); }' +
       '.carto-spunta { display:flex; align-items:center; gap:8px; min-height:34px; cursor:pointer; color:var(--text-primary); font-size:0.92rem; line-height:1.3; }' +
       '.carto-spunta input { width:18px; height:18px; flex-shrink:0; accent-color:var(--accent-primary); cursor:pointer; }' +
+      '.carto-chips { display:flex; flex-wrap:wrap; gap:6px; }' +
+      '.carto-chip { min-height:36px; padding:6px 12px; border-radius:999px; border:1px solid var(--border-strong); background:var(--bg-secondary); color:var(--text-primary); font:inherit; font-size:0.88rem; line-height:1.2; cursor:pointer; }' +
+      '.carto-chip[aria-pressed="true"] { background:var(--accent-primary); border-color:var(--accent-primary); color:var(--text-on-accent, #fff); }' +
+      '.carto-chip:focus-visible { outline:2px solid var(--accent-primary); outline-offset:2px; }' +
       '.carto-spunte { display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); column-gap:10px; }' +
       '.carto-nota { font-size:0.88rem; line-height:1.5; color:var(--text-secondary); padding:8px 10px; margin-top:8px; background:var(--bg-tertiary); border-radius:var(--radius-md); }' +
       '.carto-anteprima { min-width:0; display:flex; flex-direction:column; gap:8px; }' +
@@ -803,5 +829,5 @@ const Cartografo = (() => {
     if (!_mappa || typeof CartoRitocchi === 'undefined') return;
     CartoRitocchi.apri({ stato: () => ({ a: _attuale(), mappa: _mappa }), salvaStato: _salva, rigenera: genera });
   };
-  return { strumenti, ritocca, perPin, annullaContesto, apri, nuova, aCaso, _tieniColori, precedente, scegliTipo, zoom, zoomReset, scaricaPng, scaricaSvg, scaricaVtt, stampaScala, stampaA4, _confermaScelta, apriMettiNelleMappe, _confermaMappe, _opzione, _nome, _seme, dopoMostra, mappaAttuale };
+  return { strumenti, ritocca, perPin, annullaContesto, apri, nuova, aCaso, _tieniColori, precedente, scegliTipo, zoom, zoomReset, scaricaPng, scaricaSvg, scaricaVtt, stampaScala, stampaA4, _confermaScelta, apriMettiNelleMappe, _confermaMappe, _opzione, _multi, _nome, _seme, dopoMostra, mappaAttuale };
 })();

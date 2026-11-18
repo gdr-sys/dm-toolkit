@@ -26,10 +26,16 @@ const CartoBattagliaScene = (() => {
     };
   };
   // Strada o sentiero: una o piu' linee spezzate riempite con un terreno
+  // Registra anche la zona "strada" (li' non si posano gli oggetti aggiunti) e segue il tipo di strada scelto
   const via = (k, id, linee, larg, pat) => {
+    linee = linee.filter((l) => l.length > 1);
+    const p = k.viaPat(pat);
     k.maschera(id, linee.map((l) => `<path d="${k.linea(l)}" fill="none" stroke="#fff" stroke-width="${k.n1(larg * k.S)}" stroke-linecap="round" stroke-linejoin="round" filter="url(#carto-b4)"/>`).join(''));
-    k.L.terra += k.riempi(pat, id);
-    return (u, w) => Math.min(...linee.map((l) => k.dist([u, w], l)));
+    k.L.terra += k.riempi(p, id);
+    const d = (u, w) => linee.length ? Math.min(...linee.map((l) => k.dist([u, w], l))) : Infinity;
+    k.zona('strada', (u, w) => d(u, w) < larg / 2 + 0.4);
+    linee.forEach((l) => k.strade.push(l));
+    return d;
   };
   const lineaMorbida = (k, pts, amp, seme) => {
     // Linea da A a B con qualche curva: punti ogni mezzo quadretto
@@ -111,6 +117,12 @@ const CartoBattagliaScene = (() => {
     for (let y = -lw / 2 + 0.5; y < lw / 2; y += 0.75) solchi += `<rect x="${k.n1(k.X(u - lu / 2))}" y="${k.n1(k.Y(w + y))}" width="${k.n1(lu * k.S)}" height="${k.n1(k.S * 0.22)}" fill="#5a4326" opacity="0.28"/>`;
     k.L.terra += `<g transform="rotate(${k.n1(rot)} ${k.n1(k.X(u))} ${k.n1(k.Y(w))})"><rect x="${k.n1(k.X(u - lu / 2))}" y="${k.n1(k.Y(w - lw / 2))}" width="${k.n1(lu * k.S)}" height="${k.n1(lw * k.S)}" fill="url(#bm-p-terreno-erba-secca)" rx="${k.n1(k.S * 0.4)}" filter="url(#carto-b4)" data-c="${id}"/>${solchi}</g>`;
   };
+  // Un campo (rettangolo con la staccionata) e' lontano dalle strade e dentro la mappa?
+  const campoLibero = (k, dS, u, w, lu, lw, marg = 1.9) => {
+    if (u - lu / 2 < -1 || u + lu / 2 > k.cols + 1 || w - lw / 2 < -1 || w + lw / 2 > k.rows + 1) return false;
+    for (let a = -0.5; a <= 0.5; a += 0.125) for (let b = -0.5; b <= 0.5; b += 0.125) if (dS(u + a * (lu + 0.6), w + b * (lw + 0.6)) < marg) return false;
+    return true;
+  };
   // Staccionata lungo una spezzata (pezzi da 3 quadretti), con varchi
   const recinto = (k, pts, varchi = [], nome = 'staccionata', pezzo = 3) => {
     for (let i = 0; i < pts.length - 1; i++) {
@@ -119,6 +131,7 @@ const CartoBattagliaScene = (() => {
         const t = (j + 0.5) / n, u = a[0] + (b[0] - a[0]) * t, w = a[1] + (b[1] - a[1]) * t;
         if (varchi.some(([x, y]) => Math.hypot(x - u, y - w) < pezzo * 0.6)) continue;
         k.L.sopra += k.spr(nome, u, w, L / n + 0.15, ang);
+        for (let q = -0.4; q <= 0.4; q += 0.4) k.occupa(u + (b[0] - a[0]) / L * q * pezzo, w + (b[1] - a[1]) / L * q * pezzo, 0.45);
       }
     }
   };
@@ -160,7 +173,12 @@ const CartoBattagliaScene = (() => {
       metti(k, 'rastrelliera', (u, w) => R.dentro(u, w, -0.5) && dS(u, w) > 1.5, 1.6);
       metti(k, 'barile', (u, w) => R.dentro(u, w), 0.8);
     } else {
-      metti(k, 'carro', (u, w) => R.dentro(u, w, 0.6) && !R.dentro(u, w, -1.2) && dS(u, w) > 2, 3, { raggio: 1.5 });
+      // Il carro e' arrivato dal sentiero: sta sul sentiero appena fuori dal campo, girato per ripartire
+      const iC = sent.findIndex(([u, w]) => !R.dentro(u, w, 1.2));
+      if (iC > 0 && iC < sent.length - 2) {
+        const [u, w] = sent[iC], [u2, w2] = sent[iC + 1];
+        if (u > 1.5 && w > 1.5 && u < cols - 1.5 && w < rows - 1.5 && k.libero(u, w, 1.4)) { k.L.sopra += k.spr('carro', u, w, 3, deg(Math.atan2(w2 - w, u2 - u))); k.occupa(u, w, 1.5); }
+      }
       metti(k, 'baule', (u, w) => R.dentro(u, w, -0.5), 0.9);
       metti(k, 'cartello', (u, w) => dS(u, w) < 1.6 && dS(u, w) > 1 && !R.dentro(u, w), 1.3, { rot: 0 });
     }
@@ -192,7 +210,10 @@ const CartoBattagliaScene = (() => {
     k.L.terra += `<path d="${R.d}" fill="url(#bm-p-terreno-erba-secca)" opacity="0.8" filter="url(#carto-b12)"/>`;
     fuoco(k, cu, cw);
     k.segna(cu + 1.2, cw - 0.9, 'Fuoco', 'Luce fioca fino a 6 m.');
-    const carri = anello(k, ['carro', 'carro', 'carro-fieno'], cu, cw, 3.9, 3.3, r.int(5, 6), 3.2, 0.12, () => true, 90);
+    // Varco nel cerchio dalla parte della strada: da li' i carri sono entrati e da li' escono
+    const aVarco = Math.atan2(wS - cw, 0), fuoriVarco = (u, w) => { const d = Math.abs(((Math.atan2(w - cw, u - cu) - aVarco) % DUE + DUE * 1.5) % DUE - Math.PI); return d > 0.6; };
+    for (let t = 1; t < 5; t++) k.occupa(cu, cw + Math.sign(wS - cw) * t, 0.9); // il passaggio dal varco al fuoco resta libero
+    const carri = anello(k, ['carro', 'carro', 'carro-fieno'], cu, cw, 3.9, 3.3, r.int(5, 6), 3.2, 0.12, fuoriVarco, 90);
     if (carri[0]) k.segna(carri[0][0], carri[0][1] - 1.6, 'Cerchio di carri', 'Tre quarti di copertura; tra un carro e l\'altro si passa uno alla volta.');
     for (let i = 0; i < 3; i++) { const a = r.range(0, DUE); merci(k, cu + Math.cos(a) * 2, cw + Math.sin(a) * 1.6, 3); }
     metti(k, 'tenda', (u, w) => !R.dentro(u, w, 0.8) && dS(u, w) > 2.4, 2.4, { area: [cu - 9, cw - 7, cu + 9, cw + 7] });
@@ -219,6 +240,11 @@ const CartoBattagliaScene = (() => {
     const dS = via(k, 'sent', [sent], 2.2, 'terreno-terra');
     recinto(k, [[u0, w0], [u1, w0], [u1, w1], [u0, w1], [u0, w0]], [[portaU, portaW]]);
     k.segna(portaU + 1.8, portaW + (portaW === w1 ? 0.8 : -0.8), 'Palizzata', 'Mezza copertura; scavalcarla costa movimento extra. L\'unico varco è il cancello.');
+    // Dal cancello parte un corridoio libero largo quanto un carro: niente tende o fuochi davanti all'ingresso
+    const dentroV = portaW === w1 ? -1 : 1;
+    for (let t = 0.5; t < lw * 0.55; t += 0.8) k.occupa(portaU, portaW + dentroV * t, 1.3);
+    // Bracieri ai due lati del cancello, appoggiati alla palizzata
+    [-1, 1].forEach((s) => { const bu = portaU + s * 2, bw = portaW + dentroV * 0.8; k.L.sopra += k.spr('braciere', bu, bw, 0.9, 0); k.occupa(bu, bw, 0.5); k.luce(bu, bw, 3.2); });
     // Tende in due file, il fuoco in mezzo
     const fila = r.chance(0.5);
     for (let i = 0; i < 4; i++) {
@@ -234,13 +260,13 @@ const CartoBattagliaScene = (() => {
     const fu = (u0 + u1) / 2 + (fila ? 3 : -3), fw = (w0 + w1) / 2 + (portaW === w0 ? 2.6 : -2.6);
     for (let j = -1; j <= 1; j++) if (k.libero(fu + j * 1.6, fw, 0.5)) { k.L.sopra += k.spr('spaventapasseri', fu + j * 1.6, fw, 1.3, 0); k.occupa(fu + j * 1.6, fw, 0.6); }
     k.segna(fu + 2.6, fw, 'Fantocci', 'Bersagli di paglia per gli allenamenti: mezza copertura.');
-    metti(k, 'carro', dentro, 3, { raggio: 1.5, rot: 90, area: [u0 + 1.6, w0 + 2, u1 - 1.6, w1 - 2] });
+    // Il carro dentro sta accanto al corridoio, girato verso il cancello: puo' uscire
+    metti(k, 'carro', dentro, 3, { raggio: 1.5, rot: 90, area: [portaU - 4, w0 + 2, portaU + 4, w1 - 2] });
     merci(k, u0 + 1.5, w0 + (portaW === w0 ? lw - 1.5 : 1.5), 5, ['barile', 'sacchi', 'cassa']);
     metti(k, 'legnaia', dentro, 1.6, { area: [u0 + 1, w0 + 1, u1 - 1, w1 - 1] });
-    metti(k, 'carro', (u, w) => !dentro(u, w) && dS(u, w) < 3 && dS(u, w) > 1.5, 3, { raggio: 1.5 });
-    metti(k, 'braciere', (u, w) => Math.hypot(u - portaU, w - portaW) < 2.2 && dentro(u, w), 0.9, { tent: 80 });
-    const b = metti(k, 'braciere', (u, w) => Math.hypot(u - portaU, w - portaW) < 2.4 && dentro(u, w), 0.9, { tent: 80 });
-    if (b) k.luce(b[0], b[1], 3.2);
+    // Il carro fuori sta sul sentiero, girato come il sentiero
+    const iS = sent.findIndex(([u, w]) => Math.abs(w - portaW) > 3);
+    if (iS > 0 && iS < sent.length - 1) { const [u, w] = sent[iS], [u2, w2] = sent[iS + 1]; if (w > 1.5 && w < rows - 1.5 && k.libero(u, w, 1.4)) { k.L.sopra += k.spr('carro', u, w, 3, deg(Math.atan2(w2 - w, u2 - u))); k.occupa(u, w, 1.5); } }
     k.sparsi(5, (u, w) => !dentro(u, w) && dS(u, w) > 1.5 && !(u > u0 - 2 && u < u1 + 2 && w > w0 - 2 && w < w1 + 2), k.SASSI.concat(k.CESPUGLI), 0.6, 1.2);
     k.bosco((u, w) => !(u > u0 - 3.5 && u < u1 + 3.5 && w > w0 - 3.5 && w < w1 + 3.5) && dS(u, w) > 2, 0.8, 0.6);
     return nome;
@@ -262,7 +288,9 @@ const CartoBattagliaScene = (() => {
       for (let j = 0; j < pezzi; j++) {
         const f = (j + 0.5) / pezzi - 0.5;
         if (k.r.chance(buco) || (li === varco && Math.abs(f) < 0.2)) { if (k.r.chance(0.6)) k.L.sopra += k.spr('macerie', u + (rot % 180 ? 0 : f * lung) + k.r.range(-0.6, 0.6), w + (rot % 180 ? f * lung : 0) + k.r.range(-0.6, 0.6), k.r.range(1, 1.4), k.r.range(0, 360)); continue; }
-        k.L.sopra += k.spr('muretto-rotto', u + (rot % 180 ? 0 : f * lung), w + (rot % 180 ? f * lung : 0), Math.min(3.4, lung / pezzi + 0.25), rot + (k.r.chance(0.5) ? 180 : 0));
+        const mu = u + (rot % 180 ? 0 : f * lung), mw = w + (rot % 180 ? f * lung : 0);
+        k.L.sopra += k.spr('muretto-rotto', mu, mw, Math.min(3.4, lung / pezzi + 0.25), rot + (k.r.chance(0.5) ? 180 : 0));
+        k.occupa(mu, mw, 0.9);
       }
     });
   };
@@ -348,7 +376,7 @@ const CartoBattagliaScene = (() => {
     k.segna(tu + verso * (rag + 4), tw + 1.8, 'Macerie', 'La torre è crollata da questa parte: terreno difficile, mezza copertura.');
     // Il sentiero di guardia che passava dalla torre
     const sent = lineaMorbida(k, [[verso > 0 ? -1.5 : cols + 1.5, tw + r.range(-3, 3)], [tu - verso * rag, tw], [tu + verso * rag, tw + r.range(-4, 4)], [verso > 0 ? cols + 1.5 : -1.5, r.range(2, rows - 2)]], 1.2, 6);
-    const dS = via(k, 'sent', [sent.filter(([u, w]) => !T.dentro(u, w))], 1.8, 'terreno-terra');
+    const dS = via(k, 'sent', k.spezza(sent, (u, w) => !T.dentro(u, w)), 1.8, 'terreno-terra');
     metti(k, 'pozzo', (u, w) => !T.dentro(u, w, 1.5) && dS(u, w) > 1.5 && dS(u, w) < 4, 1.6);
     metti(k, 'scheletro', (u, w) => !T.dentro(u, w, 1) && Math.hypot(u - tu, w - tw) < rag + 5, 1.4, { strato: 'sotto' });
     metti(k, 'forziere', (u, w) => T.dentro(u, w, -1.2) && k.libero(u, w, 1), 0.9);
@@ -388,6 +416,7 @@ const CartoBattagliaScene = (() => {
     }
     pozze.forEach((p) => _pozza(k, p, p.ru > 2.4));
     const inPozza = (u, w, m = 0) => pozze.some((p) => p.dentro(u, w, m));
+    k.zona('acqua', (u, w) => inPozza(u, w, 0.3));
     // Il sentiero di tronchi e passerelle che la attraversa
     const sent = lineaMorbida(k, [[-1.5, r.range(3, rows - 3)], [cols * 0.5, r.range(3, rows - 3)], [cols + 1.5, r.range(3, rows - 3)]], 2.5, 11);
     let passi = 0;
@@ -419,6 +448,7 @@ const CartoBattagliaScene = (() => {
     const iu = W.cu + r.range(-2, 2), iw = W.cw + r.range(-1.5, 1.5), I = blob(k, iu, iw, 3.2, 2.6, 0.25);
     k.L.terra += `<path d="${I.d}" fill="url(#bm-p-terreno-fango)" filter="url(#carto-b4)"/><path d="${I.d}" fill="url(#bm-p-terreno-erba-secca)" opacity="0.6" filter="url(#carto-b4)"/>`;
     const acqua = (u, w) => W.dentro(u, w) && !I.dentro(u, w);
+    k.zona('acqua', acqua);
     edificio(k, 'capanno', iu, iw, 2.6, r.pick([0, 90, 180, 270]));
     k.segna(iu, iw - 2, 'Capanna', 'Pozioni, erbe appese e un calderone ancora caldo.');
     k.L.sopra += k.spr('braciere', iu + 2, iw + 0.6, 0.9, 0); k.luce(iu + 2, iw + 0.6, 2.8, '#9cff7a', 0.4);
@@ -469,8 +499,12 @@ const CartoBattagliaScene = (() => {
     // Strade che partono dalla piazza verso 3 o 4 lati
     const lati = r.shuffle([0, 1, 2, 3]).slice(0, r.int(3, 4));
     const strade = lati.map((l, i) => lineaMorbida(k, [[P.cu, P.cw], fuori(k, l, r.range(0.3, 0.7))], 1.2, 13 + i * 5));
-    const dS = via(k, 'strade', strade, 2.6, 'terreno-terra');
-    k.L.terra += `<path d="${P.d}" fill="url(#bm-p-terreno-ciottolato)" filter="url(#carto-b4)"/>`;
+    // Piazza e strade dello stesso tipo: tutto selciato o tutto sterrato
+    const tipoStrada = k.viaPat(r.chance(0.5) ? 'terreno-ciottolato' : 'terreno-terra');
+    const dS = via(k, 'strade', strade, 2.6, tipoStrada);
+    k.maschera('piazza', `<path d="${P.d}" fill="#fff" filter="url(#carto-b4)"/>`); // sfumata la forma, non la trama
+    k.L.terra += k.riempi(tipoStrada, 'piazza');
+    k.zona('strada', (u, w) => P.dentro(u, w));
     const centro = r.chance(0.5) ? 'fontana' : 'pozzo';
     k.L.sopra += k.spr(centro, P.cu, P.cw, centro === 'fontana' ? 2.6 : 1.8, 0); k.occupa(P.cu, P.cw, 1.6);
     k.segna(P.cu + 1.6, P.cw - 1, centro === 'fontana' ? 'Fontana' : 'Pozzo', centro === 'fontana' ? 'Mezza copertura. L\'acqua arriva alla vita.' : 'Profondo 10 metri; la corda regge una persona.');
@@ -490,7 +524,7 @@ const CartoBattagliaScene = (() => {
     if (b1) { merci(k, b1[0], b1[1] + 1.4, 2); k.segna(b1[0], b1[1] - 1.5, 'Bancarella', 'Mezza copertura; rovesciarla crea terreno difficile.'); }
     metti(k, ['bancarella-rossa', 'bancarella-blu', 'bancarella-gialla', 'banco-frutta'], (u, w) => P.dentro(u, w, -1.2) && Math.hypot(u - P.cu, w - P.cw) > 2.4, 2.2, { rot: (u, w) => deg(Math.atan2(w - P.cw, u - P.cu)) + 90 });
     metti(k, 'carro', (u, w) => dS(u, w) < 1 && !P.dentro(u, w, 1), 3, { raggio: 1.5, rot: 0 });
-    lanterne(k, 3, (u, w) => !P.dentro(u, w) && P.dentro(u, w, 1.5));
+    lanterne(k, 3, (u, w) => !P.dentro(u, w, 0.3) && P.dentro(u, w, 1.5) && dS(u, w) > 1.8);
     k.sparsi(8, (u, w) => dS(u, w) > 1.6 && !P.dentro(u, w, 1), ['cespuglio-bianco', 'cespuglio-giallo', 'legnaia', 'barile', 'balle-fieno'], 0.9, 1.5);
     k.bosco((u, w) => dS(u, w) > 2 && !P.dentro(u, w, 3) && r.chance(0.35), 0.5, 0.25);
     return nome;
@@ -505,14 +539,19 @@ const CartoBattagliaScene = (() => {
     const s1 = lineaMorbida(k, [[-1.5, xw + r.range(-3, 3)], [xu, xw], [cols + 1.5, xw + r.range(-3, 3)]], 1.4, 21);
     const s2 = lineaMorbida(k, [[xu + r.range(-4, 4), -1.5], [xu, xw], [xu + r.range(-4, 4), rows + 1.5]], 1.4, 27);
     const dS = via(k, 'strade', [s1, s2], 2.6, 'terreno-terra');
-    k.L.sopra += k.spr('cartello', xu + 1.6, xw - 1.6, 1.5, r.range(-20, 20)); k.occupa(xu + 1.6, xw - 1.6, 0.6);
-    k.segna(xu + 1.6, xw - 2.8, 'Cartello', 'Indica quattro paesi. Una freccia è stata girata apposta.');
+    // Il cartello sta all'angolo dell'incrocio, sul bordo della strada, non in mezzo
+    const ca = posto(k, (u, w) => dS(u, w) > 1.7 && dS(u, w) < 2.5, 0.6, [xu - 3.5, xw - 3.5, xu + 3.5, xw + 3.5], 120);
+    if (ca) { k.L.sopra += k.spr('cartello', ca[0], ca[1], 1.5, r.range(-20, 20)); k.occupa(ca[0], ca[1], 0.6); k.segna(ca[0], ca[1] - 1.2, 'Cartello', 'Indica quattro paesi. Una freccia è stata girata apposta.'); }
     // Quattro quarti: campi, orti, case
     const quarti = r.shuffle([[-1, -1], [1, -1], [1, 1], [-1, 1]]);
     quarti.forEach(([su, sw], i) => {
-      const qu = xu + su * r.range(5, 7), qw = xw + sw * r.range(4, 5);
+      let qu = xu + su * r.range(5, 7), qw = xw + sw * r.range(4, 5);
       if (i < 2) {
-        const lu = r.range(6, 8), lw = r.range(4, 5);
+        let lu = r.range(6, 8), lw = r.range(4, 5);
+        // Il campo non deve toccare le strade: lo allontano dall'incrocio e lo rimpicciolisco finche' serve
+        let t = 0;
+        while (t < 14 && !campoLibero(k, dS, qu, qw, lu, lw)) { qu += su * 0.6; qw += sw * 0.45; if (t % 3 === 2) { lu = Math.max(4, lu - 0.8); lw = Math.max(3, lw - 0.5); } t++; }
+        if (!campoLibero(k, dS, qu, qw, lu, lw)) return;
         campo(k, qu, qw, lu, lw, r.range(-8, 8));
         k.occupa(qu, qw, Math.min(lu, lw) * 0.45);
         recinto(k, [[qu - lu / 2 - 0.3, qw - lw / 2 - 0.3], [qu + lu / 2 + 0.3, qw - lw / 2 - 0.3], [qu + lu / 2 + 0.3, qw + lw / 2 + 0.3], [qu - lu / 2 - 0.3, qw + lw / 2 + 0.3], [qu - lu / 2 - 0.3, qw - lw / 2 - 0.3]], [[qu - su * lu / 2, qw]]);
@@ -563,10 +602,15 @@ const CartoBattagliaScene = (() => {
     const frutW = suSent ? [rows / 2, rows - 1] : [1, rows / 2];
     for (let u = fx0 + 1.2; u < fx1 - 0.6; u += 2.6) for (let w = frutW[0] + 1.2; w < frutW[1] - 0.4; w += 2.6) if (dS(u, w) > 1.8 && k.libero(u, w, 0.8)) { k.L.alto += k.spr(k.c(['quercia-1', 'quercia-2', 'cespuglio-bianco']), u + r.range(-0.2, 0.2), w + r.range(-0.2, 0.2), r.range(1.9, 2.3), r.range(0, 360)); k.occupa(u, w, 0.9); }
     k.segna((fx0 + fx1) / 2, frutW[0] + 0.6, 'Frutteto', 'Alberi in fila: mezza copertura, ci si arrampica facilmente.');
-    const cw2 = frutW[0] < rows / 2 ? rows * 0.75 : rows * 0.25;
-    campo(k, (fx0 + fx1) / 2, cw2, Math.abs(fx1 - fx0) - 1, 4.5, r.range(-4, 4));
-    k.L.sopra += k.spr('spaventapasseri', (fx0 + fx1) / 2, cw2, 1.4, 0);
-    for (let j = 0; j < 3; j++) k.L.sopra += k.spr('alveare', fx0 + 0.6 + j * 1.3, cw2 + (cw2 > rows / 2 ? -3 : 3), 0.9, 0);
+    // Il campo sta nella meta' libera dal frutteto; se il sentiero lo attraversa lo sposto verso il bordo o lo stringo
+    let cw2 = frutW[0] < rows / 2 ? rows * 0.75 : rows * 0.25, cu2 = (fx0 + fx1) / 2, clu = Math.abs(fx1 - fx0) - 1, clw = 4.5;
+    const versoBordo = cw2 > rows / 2 ? 1 : -1;
+    for (let t = 0; t < 12 && !campoLibero(k, dS, cu2, cw2, clu, clw, 1.5); t++) { if (t % 2) cw2 += versoBordo * 0.5; else { clu = Math.max(4, clu - 1); cu2 += (sx ? 0.5 : -0.5); } }
+    if (clu >= 4 && campoLibero(k, dS, cu2, cw2, clu, clw, 1.5)) {
+      campo(k, cu2, cw2, clu, clw, r.range(-4, 4)); k.occupa(cu2, cw2, Math.min(clu, clw) * 0.45);
+      k.L.sopra += k.spr('spaventapasseri', cu2, cw2, 1.4, 0);
+      for (let j = 0; j < 3; j++) { const au = cu2 - clu / 2 + 0.6 + j * 1.3, aw = cw2 - versoBordo * 3; if (dS(au, aw) > 1.4) k.L.sopra += k.spr('alveare', au, aw, 0.9, 0); }
+    }
     k.sparsi(5, (u, w) => dS(u, w) > 1.5 && (u < u0 - 1 || u > u1 + 1 || w < w0 - 1 || w > w1 + 1), k.CESPUGLI.concat(['stagno', 'cespuglio-giallo']), 1, 1.6);
     k.bosco((u, w) => bordo(k, 2)(u, w) && dS(u, w) > 2 && (u < u0 - 1.5 || u > u1 + 1.5 || w < w0 - 1.5 || w > w1 + 1.5) && r.chance(0.6), 0.6, 0.3);
     return nome;
@@ -603,7 +647,7 @@ const CartoBattagliaScene = (() => {
     metti(k, 'carro-fieno', (u, w) => u < 4 || u > cols - 4, 3, { raggio: 1.5, rot: 90 });
     for (let i = 0; i < 4; i++) metti(k, ['barile', 'balle-fieno', 'anfore', 'sacchi'], (u, w) => true, r.range(0.9, 1.3));
     k.segna(fu, fw + 2.2, 'Folla', 'Nel mezzo della giornata la piazza è piena: terreno difficile ovunque.');
-    lanterne(k, 3, (u, w) => w > 2.5 && w < rows - 2.5);
+    lanterne(k, 3, (u, w) => (w > 2.5 && w < 3.4) || (w > rows - 3.4 && w < rows - 2.5)); // lungo le case, non in mezzo alla piazza
     return nome;
   };
   // Mercato lungo una via: bancarelle davanti alle case, un vicolo laterale
@@ -780,6 +824,7 @@ const CartoBattagliaScene = (() => {
     k.L.terra += k.tutto('terreno-terra');
     // Banchina: dritta, di pietra, con il bordo di legno
     const costa = { pts: [[-1.5, quota], [cols + 1.5, quota]], mare: (u, w, m = 0) => giu ? w > quota + m : w < quota - m, linea: () => quota };
+    k.zona('acqua', (u, w) => costa.mare(u, w, -0.5));
     const tw = giu ? quota - 4.5 : quota, bw = 4.5;
     k.L.terra += `<rect x="${k.X(0)}" y="${k.n1(k.Y(tw))}" width="${cols * k.S}" height="${k.n1(bw * k.S)}" fill="url(#bm-p-terreno-ciottolato)"/>`;
     _mare(k, costa, giu, 2.2);
@@ -826,6 +871,7 @@ const CartoBattagliaScene = (() => {
     k.L.terra += `<path d="${ds}" fill="url(#bm-p-terreno-terra)" filter="url(#carto-b12)"/>`;
     _mare(k, costa, giu, 2.6);
     const spiaggia = (u, w) => sabbia.mare(u, w, 0.6) && !costa.mare(u, w, -0.3);
+    k.zona('acqua', (u, w) => costa.mare(u, w, -0.5));
     k.segna(cols * 0.5, (costa.linea(cols * 0.5) + sabbia.linea(cols * 0.5)) / 2, 'Spiaggia', 'Sabbia morbida: chi corre lascia tracce chiarissime.');
     // Scogliere ai due lati che chiudono la cala
     [1.5, cols - 1.5].forEach((u0) => { for (let i = 0; i < 4; i++) { const u = u0 + (u0 < cols / 2 ? 1 : -1) * r.range(0, 3), w = costa.linea(u) + (giu ? 1 : -1) * r.range(-1, 3); k.L.sopra += k.spr(k.c(['scoglio-1', 'scoglio-2', 'roccia-grande']), u, w, r.range(2, 3), r.range(0, 360)); k.occupa(u, w, 1.3); } });
@@ -922,6 +968,7 @@ const CartoBattagliaScene = (() => {
     k.L.terra += `<g mask="url(#bm-m-grotta)">${k.riempi('terreno-acqua-profonda', 'fiume')}</g>`;
     k.L.terra += `<g mask="url(#bm-m-grotta)"><path d="${k.linea(fiume)}" fill="none" stroke="#000" stroke-width="${k.n1(3.6 * k.S)}" opacity="0.35" filter="url(#carto-b12)"/></g>`;
     const inFiume = (u, w) => k.dist([u, w], fiume) < 1.5;
+    k.zona('acqua', (u, w) => k.dist([u, w], fiume) < 2);
     // Ponte dove una galleria attraversa il fiume
     let messo = false;
     gallerie.forEach((g) => { if (messo) return; const i = g.findIndex(([u, w]) => inFiume(u, w)); if (i < 1) return; const [u, w] = g[i]; k.L.sopra += k.spr('ponte-legno', u, w, 4.6, 0); k.occupa(u, w, 2); k.segna(u, w - 1.6, 'Ponte di assi', 'Oscilla: chi corre fa un tiro di Destrezza (CD 10) o cade nel fiume.'); messo = true; });
@@ -1116,7 +1163,7 @@ const CartoBattagliaScene = (() => {
     const R = blob(k, cols * r.range(0.4, 0.6), rows * r.range(0.42, 0.58), cols * 0.26, rows * 0.3, 0.3);
     k.L.terra += `<path d="${R.d}" fill="url(#bm-p-terreno-erba-secca)" opacity="0.6" filter="url(#carto-b12)"/>`;
     const sent = lineaMorbida(k, [fuori(k, r.int(0, 3), r.range(0.3, 0.7)), [R.cu + r.range(-2, 2), R.cw + r.range(-2, 2)]], 1.8, 161);
-    const dS = via(k, 'sent', [sent.filter(([u, w]) => !R.dentro(u, w, -1))], 1.5, 'terreno-terra');
+    const dS = via(k, 'sent', k.spezza(sent, (u, w) => !R.dentro(u, w, -1)), 1.5, 'terreno-terra');
     const pietre = r.chance(0.6);
     if (pietre) {
       const n = r.int(7, 9), rr = Math.min(R.ru, R.rw) * 0.55;
@@ -1154,18 +1201,21 @@ const CartoBattagliaScene = (() => {
     const li = Math.floor(rus.length * r.range(0.2, 0.35)), [lu, lw] = rus[li], lago = blob(k, lu, lw, r.range(2.6, 3.4), r.range(2, 2.6), 0.3);
     k.L.terra += `<path d="${lago.d}" fill="url(#bm-p-terreno-fango)" opacity="0.35" filter="url(#carto-b4)"/>` + `<path d="${blob(k, lu, lw, lago.ru - 0.3, lago.rw - 0.3, 0.25).d}" fill="url(#bm-p-terreno-acqua-bassa)" filter="url(#carto-b4)"/>` + `<path d="${blob(k, lu, lw, lago.ru * 0.5, lago.rw * 0.5, 0.2).d}" fill="url(#bm-p-terreno-acqua-profonda)" filter="url(#carto-b12)"/>`;
     const acqua = (u, w) => k.dist([u, w], rus) < 1.4 || lago.dentro(u, w, -0.4);
+    k.zona('acqua', (u, w) => k.dist([u, w], rus) < 1.8 || lago.dentro(u, w));
     k.segna(lu, lw, 'Laghetto', 'Profondo al centro: si nuota. Pesci argentati.');
     const ri = rus[Math.floor(rus.length * 0.75)];
     k.segna(ri[0] + 1.6, ri[1], 'Ruscello', 'Acqua alle ginocchia, sassi scivolosi: terreno difficile.');
     // Il sentiero attraversa il ruscello sul tronco caduto, piu' in basso il guado
     const pw = rows * r.range(0.55, 0.7), pi = rus.reduce((b, p, i) => Math.abs(p[1] - pw) < Math.abs(rus[b][1] - pw) ? i : b, 0), [pu] = rus[pi];
     const sent = lineaMorbida(k, [[-1.5, pw + r.range(-3, 3)], [pu - 2.2, pw], [pu + 2.2, pw], [cols + 1.5, pw + r.range(-3, 3)]], 1.6, 181);
-    const dS = via(k, 'sent', [sent.filter(([u, w]) => !acqua(u, w))], 1.7, 'terreno-terra');
+    const dS = via(k, 'sent', k.spezza(sent, (u, w) => !acqua(u, w)), 1.7, 'terreno-terra');
     k.L.sopra += k.spr('tronco-caduto', pu, pw, 5, r.range(-8, 8)); k.occupa(pu, pw, 2);
     k.segna(pu, pw - 1.3, 'Tronco-ponte', 'Si attraversa in fila. Destrezza CD 10 se si combatte sopra.');
     const gi = Math.min(rus.length - 3, pi + 8), [gu, gw] = rus[gi];
-    for (let k2 = -1.2; k2 <= 1.2; k2 += 0.8) k.L.sopra += k.spr(k.c(k.SASSI), gu + k2, gw + r.range(-0.2, 0.2), 0.75, r.range(0, 360));
-    k.segna(gu + 1.8, gw, 'Guado', 'Sassi piatti: si passa senza bagnarsi, uno alla volta.');
+    if (r.chance(0.5)) { // non tutti i ruscelli hanno i sassi per passare
+      for (let k2 = -1.2; k2 <= 1.2; k2 += 0.8) k.L.sopra += k.spr(k.c(k.SASSI), gu + k2, gw + r.range(-0.2, 0.2), 0.75, r.range(0, 360));
+      k.segna(gu + 1.8, gw, 'Guado', 'Sassi piatti: si passa senza bagnarsi, uno alla volta.');
+    }
     for (let i = 0; i < 5; i++) { const p = rus[r.int(2, rus.length - 3)]; if (k.libero(p[0] + 1.4, p[1], 0.9)) { k.L.sopra += k.spr(k.c(['canneto-1', 'canneto-2']), p[0] + (r.chance(0.5) ? 1.4 : -1.4), p[1], r.range(1.4, 1.9), r.range(-20, 20)); } }
     k.L.sotto += k.spr(k.c(['ninfee-1', 'ninfee-2']), lu + r.range(-1, 1), lw + r.range(-0.8, 0.8), 1.3, r.range(0, 360));
     const ma = metti(k, k.MASSI, (u, w) => !acqua(u, w) && k.dist([u, w], rus) < 3.4 && dS(u, w) > 1.6, 1.7, { raggio: 0.9 });

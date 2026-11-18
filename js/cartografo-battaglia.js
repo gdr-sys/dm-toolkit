@@ -36,12 +36,82 @@ const CartoBattaglia = (() => {
   const _leggi = (nome) => fetch('assets/battlemap/' + nome + '.webp')
     .then((r) => { if (!r.ok) throw new Error(nome); return r.blob(); })
     .then((b) => new Promise((ok, no) => { const f = new FileReader(); f.onload = () => ok(f.result); f.onerror = no; f.readAsDataURL(b); }))
-    .then((url) => new Promise((ok, no) => { const i = new Image(); i.onload = () => { _img[nome] = { url, w: i.naturalWidth, h: i.naturalHeight }; ok(); }; i.onerror = no; i.src = url; }));
+    .then((url) => new Promise((ok, no) => { const i = new Image(); i.onload = () => { _img[nome] = { url, w: i.naturalWidth, h: i.naturalHeight, el: i }; ok(); }; i.onerror = no; i.src = url; }));
   const carica = () => {
     if (!_carico) _carico = Promise.all(NOMI.map(_leggi)).catch((e) => { _carico = null; throw e; });
     return _carico;
   };
   const pronta = () => NOMI.every((n) => _img[n]);
+
+  /* ── Terreni e oggetti derivati (deserto, neve): ricolorati una volta dalle immagini dipinte ──
+     Le piastrelle si ricolorano pixel per pixel (restano senza giunte); gli oggetti innevati
+     ricevono macchie bianche a rumore, piu' fitte sulle parti in luce. */
+  const _hash = (x, y) => { let h = Math.imul(x, 374761393) + Math.imul(y, 668265263); h = Math.imul(h ^ (h >>> 13), 1274126177); return ((h ^ (h >>> 16)) >>> 0) / 4294967295; };
+  const _vn = (x, y) => {
+    const xi = Math.floor(x), yi = Math.floor(y), xf = x - xi, yf = y - yi, s = (t) => t * t * (3 - 2 * t);
+    const a = _hash(xi, yi), b = _hash(xi + 1, yi), c = _hash(xi, yi + 1), d = _hash(xi + 1, yi + 1);
+    return a + (b - a) * s(xf) + (c - a) * s(yf) + (a - b - c + d) * s(xf) * s(yf);
+  };
+  const _lerp = (a, b, t) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t];
+  const _ricolora = (da, nuovo, f, opaco) => {
+    if (_img[nuovo] || !_img[da]) return;
+    const im = _img[da], c = document.createElement('canvas'); c.width = im.w; c.height = im.h;
+    const g = c.getContext('2d'); g.drawImage(im.el, 0, 0);
+    const d = g.getImageData(0, 0, im.w, im.h), p = d.data;
+    // Luminosita' normalizzata sui valori reali dell'immagine, cosi' la trama resta leggibile
+    let lo = 1, hi = 0;
+    for (let i = 0; i < p.length; i += 16) { if (p[i + 3] < 128) continue; const L = (p[i] * 0.3 + p[i + 1] * 0.59 + p[i + 2] * 0.11) / 255; if (L < lo) lo = L; if (L > hi) hi = L; }
+    const span = Math.max(0.05, hi - lo);
+    for (let i = 0; i < p.length; i += 4) {
+      if (!p[i + 3]) continue;
+      const L = Math.max(0, Math.min(1, ((p[i] * 0.3 + p[i + 1] * 0.59 + p[i + 2] * 0.11) / 255 - lo) / span));
+      const q = i / 4, o = f([p[i], p[i + 1], p[i + 2]], L, q % im.w, (q / im.w) | 0, im.w, im.h);
+      p[i] = o[0]; p[i + 1] = o[1]; p[i + 2] = o[2];
+    }
+    g.putImageData(d, 0, 0);
+    _img[nuovo] = { url: opaco ? c.toDataURL('image/jpeg', 0.88) : c.toDataURL('image/webp', 0.86), w: im.w, h: im.h };
+  };
+  const _scala = (c0, c1) => (rgb, L) => _lerp(c0, c1, L);
+  const _innevato = (forza) => (rgb, L, x, y, W) => {
+    const sc = Math.max(6, W / 7), n = 0.65 * _vn(x / sc, y / sc) + 0.35 * _vn(x / sc * 2.3 + 7, y / sc * 2.3 + 3);
+    const t = Math.max(0, Math.min(1, (n + (L - 0.5) * 0.55 - 0.4 - (1 - forza) * 0.25) / 0.18)) * 0.92 * forza;
+    return _lerp(rgb, [236 + 16 * L, 242 + 11 * L, 248 + 7 * L], t);
+  };
+  const DA_INNEVARE = ['quercia-1', 'quercia-2', 'quercia-3', 'pino-1', 'pino-2', 'pino-3', 'alberello-1', 'alberello-2', 'cespuglio-1', 'cespuglio-2', 'cespuglio-3',
+    'masso-1', 'masso-2', 'masso-3', 'sasso-1', 'sasso-2', 'sasso-3', 'roccia-grande', 'scoglio-1', 'scoglio-2', 'rovi-1', 'rovi-2', 'ceppo', 'tronco-caduto', 'albero-morto'];
+  const _derivati = { deserto: false, neve: false };
+  const _deriva = (bioma) => {
+    if (_derivati[bioma] || typeof document === 'undefined') return;
+    if (bioma === 'deserto') {
+      _ricolora('terreno-terra', 'gen-sabbia', _scala([188, 140, 80], [250, 228, 176]), true);
+      // Cespugli secchi: stessa forma dei cespugli, colori della steppa
+      ['cespuglio-1', 'cespuglio-2', 'cespuglio-3'].forEach((n) => _ricolora(n, 'gen-' + n + '-secco', _scala([92, 72, 40], [196, 170, 108])));
+      _ricolora('terreno-terra', 'gen-sabbia-scura', _scala([158, 112, 64], [218, 174, 114]), true);
+    }
+    if (bioma === 'neve') {
+      _ricolora('terreno-fango', 'gen-neve', _scala([192, 204, 220], [252, 253, 255]), true);
+      _ricolora('terreno-terra', 'gen-neve-calpestata', _scala([164, 172, 188], [228, 232, 240]), true);
+      _ricolora('terreno-fango', 'gen-neve-strada', _scala([112, 104, 100], [206, 204, 206]), true);
+      DA_INNEVARE.forEach((n) => _ricolora(n, 'gen-' + n + '-neve', _innevato(/masso|sasso|roccia|scoglio/.test(n) ? 0.55 : 1)));
+    }
+    _derivati[bioma] = true;
+  };
+  // Che terreno usa ogni piastrella in ogni ambiente (l'id del pattern resta lo stesso: le scene non cambiano)
+  const BIOMI = {
+    prato: {},
+    secco: { 'terreno-erba': 'terreno-erba-secca', 'terreno-erba-secca': 'terreno-terra' },
+    deserto: { 'terreno-erba': 'gen-sabbia', 'terreno-erba-secca': 'gen-sabbia-scura', 'terreno-terra': 'gen-sabbia-scura', 'terreno-fango': 'gen-sabbia-scura' },
+    neve: { 'terreno-erba': 'gen-neve', 'terreno-erba-secca': 'gen-neve-calpestata', 'terreno-terra': 'gen-neve-strada', 'terreno-fango': 'gen-neve-calpestata' },
+    fango: { 'terreno-erba': 'terreno-fango', 'terreno-fango': 'terreno-erba-secca' },
+  };
+  const AL_CHIUSO = ['caverna', 'cripta', 'locanda'];
+  // Spezza una linea nei tratti dove "tieni" e' vero: i pezzi non si ricollegano sopra l'acqua
+  const spezza = (l, tieni) => {
+    const out = []; let cur = [];
+    l.forEach((p) => { if (tieni(p[0], p[1])) cur.push(p); else { if (cur.length > 1) out.push(cur); cur = []; } });
+    if (cur.length > 1) out.push(cur);
+    return out;
+  };
 
   // Curva liscia che attraversa la mappa (in quadretti), da un lato all'altro
   const _attraversa = (r, rn, cols, rows, verticale, ampiezza, seme) => {
@@ -70,7 +140,15 @@ const CartoBattaglia = (() => {
     const scelta = SCENE.includes(o.scena) ? o.scena : SCENE.includes(String(o.scena).split('_')[0]) ? String(o.scena).split('_')[0] : 'bosco';
     // Ogni scena ha piu' impianti: varianti con una pianta diversa, non gli stessi oggetti spostati
     const impianti = [scelta].concat(Object.keys(EXTRA).filter((k) => k.startsWith(scelta + '_')));
-    const scena = EXTRA[o.scena] && o.scena.includes('_') ? o.scena : String(o.scena).endsWith('_base') ? scelta : r.pick(impianti); // un impianto preciso si puo' chiedere per nome
+    // La variante si sceglie dal menu (o.impianto) o col nome completo (o.scena = 'bosco_bivio'); altrimenti a caso
+    const imp = o.impianto && o.impianto !== 'caso' ? o.impianto : null;
+    const scena = imp ? (EXTRA[scelta + '_' + imp] ? scelta + '_' + imp : scelta)
+      : EXTRA[o.scena] && o.scena.includes('_') ? o.scena : String(o.scena).endsWith('_base') ? scelta : r.pick(impianti);
+    const chiuso = AL_CHIUSO.includes(scelta);
+    const bioma = !chiuso && BIOMI[o.terreno] ? o.terreno : 'auto';
+    if (bioma === 'deserto' || bioma === 'neve') _deriva(bioma);
+    const mappa = BIOMI[bioma] || {};
+    const VEG = chiuso ? 1 : ({ nessuna: 0, rada: 0.5, normale: 1, fitta: 1.7 })[o.vegetazione] ?? 1;
     const notte = o.palette === 'notte';
     const t = M.TONI_INTERNI[notte ? 'notte' : 'colori'];
     const carta = M.cartaInterni(t);
@@ -92,15 +170,58 @@ const CartoBattaglia = (() => {
 
     /* ── Strumenti di disegno ── */
     const usate = new Set();
+    const QUERCE = ['quercia-1', 'quercia-2', 'quercia-3'], PINI = ['pino-1', 'pino-2', 'pino-3'], CESPUGLI = ['cespuglio-1', 'cespuglio-2', 'cespuglio-3'];
+    const MASSI = ['masso-1', 'masso-2', 'masso-3'], SASSI = ['sasso-1', 'sasso-2', 'sasso-3'];
+    const ALBERI = new Set(QUERCE.concat(PINI, ['alberello-1', 'alberello-2']));
+    // Gli oggetti cambiano con l'ambiente: pini innevati, cespugli secchi nel deserto, meno alberi se la vegetazione e' rada
+    const sostituto = (nome) => {
+      if (chiuso) return nome;
+      if (ALBERI.has(nome)) {
+        if (VEG === 0 || (VEG < 1 && r.chance(1 - VEG))) return null;
+        if (bioma === 'neve') return 'gen-' + (r.chance(0.75) ? r.pick(PINI) : nome) + '-neve';
+        if (bioma === 'deserto') return r.chance(0.08) ? 'albero-morto' : null;
+        if (bioma === 'secco' && QUERCE.includes(nome) && r.chance(0.25)) return 'albero-morto';
+        if (bioma === 'fango' && QUERCE.includes(nome) && r.chance(0.45)) return 'albero-morto';
+        return nome;
+      }
+      if (bioma === 'neve') {
+        if (['cespuglio-bianco', 'cespuglio-giallo'].includes(nome)) return 'gen-' + r.pick(CESPUGLI) + '-neve';
+        if (['funghi-1', 'funghi-2', 'cerchio-funghi', 'ninfee-1', 'ninfee-2', 'alveare'].includes(nome)) return null;
+        return _img['gen-' + nome + '-neve'] ? 'gen-' + nome + '-neve' : nome;
+      }
+      if (bioma === 'deserto') {
+        if (CESPUGLI.includes(nome) || ['cespuglio-bianco', 'cespuglio-giallo', 'rovi-1', 'rovi-2'].includes(nome)) return r.chance(0.6) ? 'gen-' + r.pick(CESPUGLI) + '-secco' : r.chance(0.5) ? r.pick(SASSI) : null;
+        if (['funghi-1', 'funghi-2', 'cerchio-funghi', 'alveare'].includes(nome)) return null;
+      }
+      if (bioma === 'secco' && CESPUGLI.includes(nome) && r.chance(0.4)) return 'cespuglio-giallo';
+      return nome;
+    };
     // Un oggetto: centro in quadretti, lato lungo in quadretti, rotazione in gradi
-    const spr = (nome, u, w, lato, rot = 0) => {
+    const spr = (nome0, u, w, lato, rot = 0) => {
+      const nome = sostituto(nome0);
+      if (!nome || !_img[nome]) return '';
       const im = _img[nome]; usate.add(nome);
       const k = (lato * S) / Math.max(im.w, im.h);
       return `<use href="#bm-${nome}" transform="translate(${n1(X(u))} ${n1(Y(w))}) rotate(${n1(rot)}) scale(${(Math.round(k * 10000) / 10000)})"/>`;
     };
-    // Piastrella di terreno: un'immagine ogni "lato" quadretti
+    // Piastrella di terreno: un'immagine ogni "lato" quadretti (l'ambiente puo' cambiarne l'immagine, non l'id)
     const fatti = new Set();
-    const pattern = (nome, lato, ruota = 0) => { if (fatti.has(nome)) return ''; fatti.add(nome); usate.add(nome); return `<pattern id="bm-p-${nome}" patternUnits="userSpaceOnUse" x="${ox}" y="${oy}"${ruota ? ` patternTransform="rotate(${ruota} ${ox} ${oy})"` : ''} width="${n1(lato * S)}" height="${n1(lato * S)}"><use href="#bm-${nome}" transform="translate(${n1(lato * S / 2)} ${n1(lato * S / 2)}) scale(${(Math.round(lato * S / _img[nome].w * 10000) / 10000)})"/></pattern>`; };
+    const pattern = (nome, lato, ruota = 0) => {
+      if (fatti.has(nome)) return ''; fatti.add(nome);
+      const src = _img[mappa[nome]] ? mappa[nome] : nome; usate.add(src);
+      return `<pattern id="bm-p-${nome}" patternUnits="userSpaceOnUse" x="${ox}" y="${oy}"${ruota ? ` patternTransform="rotate(${ruota} ${ox} ${oy})"` : ''} width="${n1(lato * S)}" height="${n1(lato * S)}"><use href="#bm-${src}" transform="translate(${n1(lato * S / 2)} ${n1(lato * S / 2)}) scale(${(Math.round(lato * S / _img[src].w * 10000) / 10000)})"/></pattern>`;
+    };
+    // Tipo di strada scelto (sterrata o selciata): vale per strade, sentieri e piazze che ne seguono il tipo
+    const viaPat = (pat) => {
+      if (pat !== 'terreno-terra' && pat !== 'terreno-ciottolato') return pat;
+      const p = o.strada === 'sterrata' ? 'terreno-terra' : o.strada === 'selciata' ? 'terreno-ciottolato' : pat;
+      L.defs += p === 'terreno-terra' ? pattern(p, 6, 90) : pattern(p, 3);
+      return p;
+    };
+    // Zone dove non si posano gli oggetti aggiunti: acqua e strade (le scene le registrano)
+    const zone = { acqua: [], strada: [] }, strade = [];
+    const zona = (tipo, f) => zone[tipo].push(f);
+    let interno = null; // al chiuso senza pianta (locanda): dove si puo' posare
     const punti = [];
     const segna = (u, w, titolo, testo) => punti.push({ u, w, titolo, testo });
     const occupati = []; // [u, w, raggio]
@@ -110,8 +231,6 @@ const CartoBattaglia = (() => {
     const L = { defs: '', terra: '', sotto: '', sopra: '', alto: '', luci: '' };
     let nome;
     const c = (nomi) => r.pick(nomi.filter((n) => _img[n]));
-    const QUERCE = ['quercia-1', 'quercia-2', 'quercia-3'], PINI = ['pino-1', 'pino-2', 'pino-3'], CESPUGLI = ['cespuglio-1', 'cespuglio-2', 'cespuglio-3'];
-    const MASSI = ['masso-1', 'masso-2', 'masso-3'], SASSI = ['sasso-1', 'sasso-2', 'sasso-3'];
     // Macchia irregolare (stagno, radura, chiazza) come percorso in pixel
     const macchia = (cu, cw, ru, rw, irr = 0.25) => {
       const q = [], n = 28, ph = r.range(0, 9);
@@ -121,7 +240,7 @@ const CartoBattaglia = (() => {
     // Bosco: alberi ovunque "ok(u, w)" lo permette, piu' o meno fitti
     const bosco = (ok, fitto = 1, pini = 0.45) => {
       const lista = [];
-      for (let tent = 0; tent < cols * rows * 1.3 * fitto; tent++) {
+      for (let tent = 0; tent < cols * rows * 1.3 * fitto * Math.max(1, VEG); tent++) {
         const u = r.range(-0.6, cols + 0.6), w = r.range(-0.6, rows + 0.6), lato = r.range(2.1, 3);
         if (!ok(u, w) || !libero(u, w, lato * 0.42)) continue;
         lista.push([u, w, lato]); occupa(u, w, lato * 0.42);
@@ -165,7 +284,7 @@ const CartoBattaglia = (() => {
           : `<rect x="${n1(x + 2)}" y="${n1(y - spM / 2)}" width="${n1(S - 4)}" height="${n1(spM)}" fill="#8a5a32" stroke="#2a221c" stroke-width="1.6"/>`;
       });
     };
-    const kit = () => ({ o, r, rn, M, n1, cols, rows, S, X, Y, P, linea, notte, L, muri, porte, spr, pattern, segna, libero, occupa, occupati, macchia, bosco, sparsi, tutto, luce, maschera, riempi, c, QUERCE, PINI, CESPUGLI, MASSI, SASSI, attraversa: (vert, amp, seme) => _attraversa(r, rn, cols, rows, vert, amp, seme), dist: _distSpezzata, vicino: _vicino, pianta, murature, img: _img });
+    const kit = () => ({ o, r, rn, M, n1, cols, rows, S, X, Y, P, linea, notte, L, muri, porte, spr, pattern, segna, libero, occupa, occupati, macchia, bosco, sparsi, tutto, luce, maschera, riempi, c, QUERCE, PINI, CESPUGLI, MASSI, SASSI, attraversa: (vert, amp, seme) => _attraversa(r, rn, cols, rows, vert, amp, seme), dist: _distSpezzata, vicino: _vicino, pianta, murature, img: _img, viaPat, zona, strade, spezza, bioma, VEG, imp });
     const tutto = (pat) => `<rect x="${ox}" y="${oy}" width="${cols * S}" height="${rows * S}" fill="url(#bm-p-${pat})"/>`;
 
     if (scena === 'bosco') {
@@ -180,7 +299,8 @@ const CartoBattaglia = (() => {
       let chiazze = '';
       for (let i = 0; i < 5; i++) { const k = r.int(2, strada.length - 3), [u, w] = strada[k]; chiazze += `<ellipse cx="${n1(X(u + r.range(-1, 1)))}" cy="${n1(Y(w + r.range(-1.4, 1.4)))}" rx="${n1(S * r.range(0.8, 1.6))}" ry="${n1(S * r.range(0.5, 1))}"/>`; }
       L.terra += `<g fill="url(#bm-p-terreno-fango)" opacity="0.55" filter="url(#carto-b4)">${chiazze}</g>`;
-      L.terra += `<rect x="${ox}" y="${oy}" width="${cols * S}" height="${rows * S}" fill="url(#bm-p-terreno-terra)" mask="url(#bm-m-strada)"/>`;
+      L.terra += `<rect x="${ox}" y="${oy}" width="${cols * S}" height="${rows * S}" fill="url(#bm-p-${viaPat('terreno-terra')})" mask="url(#bm-m-strada)"/>`;
+      zona('strada', (u, w) => dS(u, w) < 1.9); strade.push(strada);
 
       // Il carro rovesciato sulla strada, con la ruota staccata e le casse cadute
       const iC = Math.floor(strada.length * r.range(0.4, 0.6)), [cu, cw] = strada[iC], q2 = strada[iC + 1];
@@ -228,17 +348,17 @@ const CartoBattaglia = (() => {
       }
       // Alberi: fitti ai margini, radi vicino alla strada
       const alberi = [];
-      for (let tent = 0; tent < cols * rows * 1.2; tent++) {
+      for (let tent = 0; tent < cols * rows * 1.2 * Math.max(1, VEG); tent++) {
         const u = r.range(-0.5, cols + 0.5), w = r.range(-0.5, rows + 0.5), d = dS(u, w);
         if (d < 2.6) continue;
         const lato = r.range(2.2, 3);
-        if (!libero(u, w, lato * 0.42) || (d < 4.2 && r.chance(0.6))) continue;
+        if (!libero(u, w, lato * 0.42) || (d < 4.2 && r.chance(VEG > 1 ? 0.3 : 0.6))) continue;
         alberi.push([u, w, lato]); occupa(u, w, lato * 0.42);
       }
       alberi.sort((a, b) => a[1] - b[1]).forEach(([u, w, lato]) => { L.alto += spr(r.chance(0.55) ? r.pick(['quercia-1', 'quercia-2', 'quercia-3']) : r.pick(['pino-1', 'pino-2', 'pino-3']), u, w, lato, r.range(0, 360)); });
       if (r.chance(0.5)) { const a = alberi.find(([u, w]) => u > 2 && w > 2 && u < cols - 2 && w < rows - 2); if (a) L.alto += spr('albero-morto', a[0] + 3, a[1], 2.2, r.range(0, 360)); }
       const vicino = alberi.filter(([u, w]) => u > 2 && u < cols - 2 && w > 2 && w < rows - 2).sort((a, b) => dS(a[0], a[1]) - dS(b[0], b[1]))[0];
-      if (vicino) segna(vicino[0], vicino[1], 'Alberi', 'Tre quarti di copertura dietro il tronco; ci si può arrampicare.');
+      if (vicino && VEG > 0 && bioma !== 'deserto') segna(vicino[0], vicino[1], 'Alberi', 'Tre quarti di copertura dietro il tronco; ci si può arrampicare.');
     } else if (scena === 'ponte') {
       /* ═════ Ponte sul fiume ═════ */
       nome = o.nome || r.pick(['Il ponte di ', 'Il guado di ', 'Il passo di ']) + M.nomeLuogo(r, o.popolo);
@@ -259,18 +379,26 @@ const CartoBattaglia = (() => {
       const strada = [[-1, wP + r.range(-1, 1)], [cols * 0.25, wP + r.range(-0.6, 0.6)], [cols * 0.5, wP], [cols * 0.75, wP + r.range(-0.6, 0.6)], [cols + 1, wP + r.range(-1, 1)]];
       // La strada si ferma sulle rive: sull'acqua c'e' solo il ponte
       L.defs += `<mask id="bm-m-strada" maskUnits="userSpaceOnUse"><path d="${linea(strada)}" fill="none" stroke="#fff" stroke-width="${n1(2.6 * S)}" stroke-linecap="round" filter="url(#carto-b4)"/><path d="${lf}" fill="none" stroke="#000" stroke-width="${n1((larg + 0.8) * S)}" stroke-linecap="round" filter="url(#carto-b4)"/></mask>`;
-      L.terra += `<g mask="url(#bm-m-strada)"><rect x="${ox}" y="${oy}" width="${cols * S}" height="${rows * S}" fill="url(#bm-p-terreno-terra)"/></g>`;
-      // Il ponte, di legno o di pietra
+      L.terra += `<g mask="url(#bm-m-strada)"><rect x="${ox}" y="${oy}" width="${cols * S}" height="${rows * S}" fill="url(#bm-p-${viaPat('terreno-terra')})"/></g>`;
+      zona('acqua', (u, w) => dF(u, w) < larg / 2 + 0.5);
+      zona('strada', (u, w) => _distSpezzata([u, w], strada) < 1.7); strade.push(strada);
+      // Come si passa: solo il ponte, solo il guado, o tutti e due (si sceglie dalla variante)
+      const passaggio = ['ponte', 'guado', 'entrambi'].includes(imp) ? imp : r.pick(['ponte', 'ponte', 'entrambi', 'guado']);
       const iF = _vicino(fiume, wP, 1), cU = fiume[iF][0];
-      const pietra = r.chance(0.45);
-      L.sopra += spr(pietra ? 'ponte-pietra' : 'ponte-legno', cU, wP, larg + 2.6, 0);
-      occupa(cU, wP, 3.4);
-      segna(cU, wP - 1.9, 'Ponte', pietra ? 'I parapetti di pietra danno tre quarti di copertura.' : 'Il parapetto dà mezza copertura; si passa in due affiancati.');
-      // Il guado, piu' a valle o a monte
-      const wG = wP > rows / 2 ? Math.max(2.2, wP - 5) : Math.min(rows - 2.2, wP + 5);
-      const gU = fiume[_vicino(fiume, wG, 1)][0];
-      for (let k = -larg / 2 + 0.6; k <= larg / 2 - 0.5; k += 0.85) L.sopra += spr(r.pick(['sasso-1', 'sasso-2', 'sasso-3']), gU + k, wG + r.range(-0.18, 0.18), r.range(0.7, 0.85), r.range(0, 360));
-      segna(gU - larg / 2 - 0.4, wG, 'Guado', 'Acqua bassa: terreno difficile. I sassi reggono una persona alla volta.');
+      if (passaggio !== 'guado') {
+        const pietra = r.chance(0.45);
+        L.sopra += spr(pietra ? 'ponte-pietra' : 'ponte-legno', cU, wP, larg + 2.6, 0);
+        occupa(cU, wP, 3.4);
+        segna(cU, wP - 1.9, 'Ponte', pietra ? 'I parapetti di pietra danno tre quarti di copertura.' : 'Il parapetto dà mezza copertura; si passa in due affiancati.');
+      }
+      // Il guado: dove arriva la strada se non c'e' il ponte, altrimenti piu' a valle o a monte
+      const wG = passaggio === 'guado' ? wP : wP > rows / 2 ? Math.max(2.2, wP - 5) : Math.min(rows - 2.2, wP + 5);
+      if (passaggio !== 'ponte') {
+        const gU = fiume[_vicino(fiume, wG, 1)][0];
+        for (let k = -larg / 2 + 0.6; k <= larg / 2 - 0.5; k += 0.85) L.sopra += spr(r.pick(['sasso-1', 'sasso-2', 'sasso-3']), gU + k, wG + r.range(-0.18, 0.18), r.range(0.7, 0.85), r.range(0, 360));
+        occupa(gU, wG, larg / 2);
+        segna(gU - larg / 2 - 0.4, wG + (passaggio === 'guado' ? -1.6 : 0), 'Guado', 'Acqua bassa: terreno difficile. I sassi reggono una persona alla volta.');
+      }
       segna(cU + 0.4, wP + (wP > rows / 2 ? 3.4 : -3.4), 'Acqua profonda', 'Si nuota: ogni metro costa il doppio. La corrente spinge a valle.');
       // Canneti e ninfee lungo le rive, e una barca ormeggiata
       let nCanne = 0;
@@ -305,9 +433,9 @@ const CartoBattaglia = (() => {
         L.sotto += spr(r.pick(['cespuglio-1', 'cespuglio-2', 'cespuglio-3', 'sasso-1', 'sasso-2', 'ceppo']), u, w, r.range(0.8, 1.3), r.range(0, 360)); occupa(u, w, 0.5);
       }
       const alberi = [];
-      for (let tent = 0; tent < cols * rows * 0.9; tent++) {
+      for (let tent = 0; tent < cols * rows * 0.9 * Math.max(1, VEG); tent++) {
         const u = r.range(-0.5, cols + 0.5), w = r.range(-0.5, rows + 0.5), lato = r.range(2.2, 2.9);
-        if (dF(u, w) < larg / 2 + 1.4 || Math.abs(w - wP) < 2.4 || !libero(u, w, lato * 0.42) || r.chance(0.4)) continue;
+        if (dF(u, w) < larg / 2 + 1.4 || Math.abs(w - wP) < 2.4 || !libero(u, w, lato * 0.42) || r.chance(VEG > 1 ? 0.1 : 0.4)) continue;
         alberi.push([u, w, lato]); occupa(u, w, lato * 0.42);
       }
       alberi.sort((a, b) => a[1] - b[1]).forEach(([u, w, lato]) => { L.alto += spr(r.chance(0.6) ? r.pick(['quercia-1', 'quercia-2', 'quercia-3']) : r.pick(['pino-1', 'pino-2', 'pino-3']), u, w, lato, r.range(0, 360)); });
@@ -318,6 +446,7 @@ const CartoBattaglia = (() => {
       nome = o.nome || 'Locanda ' + r.pick(['del Cinghiale Allegro', 'del Gallo Nero', 'del Boccale Rotto', 'del Corvo Bianco', 'della Botte Storta', 'del Drago Spezzato', 'dei Tre Pozzi']);
       const c0 = 1, r0 = 1, c1 = cols - 1, r1 = rows - 1;
       const cucinaW = Math.max(4, Math.round((c1 - c0) * 0.26)), cx = c1 - cucinaW;
+      interno = (u, w, rr) => u - rr > c0 + 0.4 && u + rr < c1 - 0.4 && w - rr > r0 + 0.4 && w + rr < r1 - 0.4 && Math.abs(u - cx) > rr + 0.4;
       L.defs += pattern('terreno-legno', 3) + pattern('terreno-pietra', 3) + pattern('terreno-erba', 5);
       L.terra += `<rect x="${ox}" y="${oy}" width="${cols * S}" height="${rows * S}" fill="url(#bm-p-terreno-erba)"/>` +
         `<rect x="${X(c0)}" y="${Y(r0)}" width="${(cx - c0) * S}" height="${(r1 - r0) * S}" fill="url(#bm-p-terreno-legno)"/>` +
@@ -379,6 +508,54 @@ const CartoBattaglia = (() => {
       L.sopra += spr('sacchi', cx + 0.8, r1 - 0.8, 1, r.range(0, 360)) + spr('barile', cx + 0.8, r1 - 1.9, 0.8, 0);
       segna(cx + (c1 - cx) / 2 - 0.4, r1 - 3.1, 'Cucina', 'Forno acceso, coltelli e pentole a portata di mano; i sacchi danno mezza copertura.');
     }
+
+    /* ── Vegetazione fitta: altri alberi lungo i bordi, lontano da acqua, strade e oggetti ── */
+    const inAcqua = (u, w, rr = 0) => zone.acqua.some((f) => f(u, w) || (rr && (f(u + rr, w) || f(u - rr, w) || f(u, w + rr) || f(u, w - rr))));
+    const inStrada = (u, w) => zone.strada.some((f) => f(u, w));
+    if (!chiuso && VEG > 1 && !['mercato', 'porto', 'cimitero'].includes(scelta)) bosco((u, w) => (u < 3 || w < 3 || u > cols - 3 || w > rows - 3) && !inAcqua(u, w, 1.2) && !inStrada(u, w), 0.5, bioma === 'neve' ? 0.8 : 0.45);
+
+    /* ── Oggetti aggiunti a mano (menu "Aggiungi"): mai in acqua, in strada o fuori dalle stanze ── */
+    const ambiente = scelta === 'caverna' ? 'grotta' : chiuso ? 'chiuso' : 'aperto';
+    const dentroOk = (u, w, rr) => {
+      if (celleOk) return [[0, 0], [rr, 0], [-rr, 0], [0, rr], [0, -rr]].every(([a, b]) => celleOk(u + a, w + b));
+      if (interno) return interno(u, w, rr);
+      return u > rr + 0.4 && w > rr + 0.4 && u < cols - rr - 0.4 && w < rows - rr - 0.4;
+    };
+    const posOk = (u, w, rr, suStrada) => libero(u, w, rr) && dentroOk(u, w, rr) && !inAcqua(u, w, rr) && (suStrada || !inStrada(u, w));
+    const trova = (rr, extra = () => true, tent = 260) => {
+      for (let i = 0; i < tent; i++) { const u = r.range(1, cols - 1), w = r.range(1, rows - 1); if (posOk(u, w, rr) && extra(u, w)) return [u, w]; }
+      return null;
+    };
+    const posa = (strato, nomeS, u, w, lato, rot, rr) => { L[strato] += spr(nomeS, u, w, lato, rot); occupa(u, w, rr); };
+    // Un carro sta sulla strada, girato come la strada; se non ci sono strade, in uno spiazzo
+    const suStrada = (rr) => {
+      for (const l of r.shuffle(strade.slice())) for (let t = 0; t < 40; t++) {
+        const i = r.int(2, l.length - 3), [u, w] = l[i], [u2, w2] = l[i + 1];
+        if (u < 2 || w < 2 || u > cols - 2 || w > rows - 2 || !posOk(u, w, rr, true)) continue;
+        return [u, w, Math.atan2(w2 - w, u2 - u) * 180 / Math.PI];
+      }
+      return null;
+    };
+    const ELEMENTI = {
+      carro: { dove: ['aperto'], f: () => { const p = suStrada(1.5) || (() => { const q = trova(1.6); return q && [q[0], q[1], r.pick([0, 90])]; })(); if (!p) return; posa('sopra', r.pick(['carro', 'carro', 'carro-fieno']), p[0], p[1], 3, p[2] + (r.chance(0.5) ? 0 : 180), 1.5); segna(p[0], p[1] - 1.6, 'Carro', 'Tre quarti di copertura dietro le ruote; i cavalli si spaventano facilmente.'); } },
+      rovesciato: { dove: ['aperto'], f: () => { const p = trova(1.6, (u, w) => !strade.length || strade.some((l) => _distSpezzata([u, w], l) < 4)); if (!p) return; posa('sopra', 'carro-rovesciato', p[0], p[1], 3.2, r.range(0, 360), 1.6); posa('sopra', 'ruota', p[0] + 1.6, p[1] + 1, 0.95, r.range(0, 360), 0.4); segna(p[0], p[1] - 1.6, 'Carro rovesciato', 'Tre quarti di copertura. Le casse sparse sono terreno difficile.'); } },
+      tenda: { dove: ['aperto'], f: () => { const p = trova(1.3); if (!p) return; posa('sopra', 'tenda', p[0], p[1], 2.4, r.range(0, 360), 1.3); segna(p[0], p[1] - 1.6, 'Tenda', 'Mezza copertura; chi dorme dentro è sorpreso facilmente.'); } },
+      fuoco: { dove: ['aperto', 'grotta', 'chiuso'], f: () => { const p = trova(1); if (!p) return; if (ambiente === 'chiuso') { posa('sopra', 'braciere', p[0], p[1], 0.9, 0, 0.6); luce(p[0], p[1], 3); segna(p[0] + 1, p[1], 'Braciere', 'Luce fioca fino a 6 m. Rovesciato, incendia ciò che ha intorno.'); return; } posa('sopra', 'fuoco-campo', p[0], p[1], 1.3, r.range(0, 360), 0.9); luce(p[0], p[1], 4.5, '#ffb347', 0.5); segna(p[0] + 1.2, p[1] - 0.9, 'Fuoco', 'Luce fioca fino a 6 m. Chi ci finisce dentro prende danni da fuoco.'); } },
+      massi: { dove: ['aperto', 'grotta'], f: () => { let primo = null; for (let i = 0; i < 3; i++) { const p = trova(0.9, primo ? (u, w) => Math.hypot(u - primo[0], w - primo[1]) < 4 : undefined); if (!p) continue; posa('sopra', r.pick(MASSI), p[0], p[1], r.range(1.4, 1.9), r.range(0, 360), 0.9); primo = primo || p; } if (primo) segna(primo[0], primo[1] - 1.2, 'Massi', 'Mezza copertura.'); } },
+      tronco: { dove: ['aperto'], f: () => { const p = trova(1.8); if (!p) return; posa('sopra', 'tronco-caduto', p[0], p[1], 4.6, r.range(0, 360), 1.8); segna(p[0], p[1] - 1.3, 'Albero caduto', 'Mezza copertura; scavalcarlo costa movimento extra.'); } },
+      rovi: { dove: ['aperto'], f: () => { const p = trova(1.5); if (!p) return; posa('sopra', 'rovi-1', p[0] - 0.5, p[1], 2, r.range(0, 360), 1.4); L.sopra += spr('rovi-2', p[0] + 0.7, p[1] + 0.3, 1.8, r.range(0, 360)); segna(p[0], p[1] - 1.5, 'Rovi', 'Terreno difficile; chi ci finisce dentro resta impigliato.'); } },
+      stagno: { dove: ['aperto'], f: () => { const p = trova(1.6); if (!p) return; posa('sotto', 'stagno', p[0], p[1], 3, r.range(0, 360), 1.6); zona('acqua', (u, w) => Math.hypot(u - p[0], w - p[1]) < 1.4); segna(p[0] + 1.8, p[1], 'Stagno', 'Acqua alla vita: terreno difficile.'); } },
+      pozzo: { dove: ['aperto'], f: () => { const p = trova(1.1); if (!p) return; posa('sopra', 'pozzo', p[0], p[1], 1.7, 0, 1.1); segna(p[0] + 1.3, p[1], 'Pozzo', 'Profondo 10 metri; la corda regge una persona.'); } },
+      lapidi: { dove: ['aperto'], f: () => { const p = trova(2.4); if (!p) return; const rot = r.range(-20, 20); occupa(p[0], p[1], 2.4); for (let i = 0; i < 5; i++) { const u = p[0] + (i % 3 - 1) * 1.5 + r.range(-0.2, 0.2), w = p[1] + (i < 3 ? -0.9 : 0.9); L.sopra += spr(r.pick(['lapide-1', 'lapide-2', 'lapide-3', 'croce-celtica']), u, w, 1.1, rot + r.range(-12, 12)); } segna(p[0], p[1] - 2, 'Tombe', 'Mezza copertura. La terra è smossa davanti a una di esse.'); } },
+      statua: { dove: ['aperto', 'grotta', 'chiuso'], f: () => { const p = trova(0.9); if (!p) return; posa('sopra', r.pick(['statua-angelo', 'statua-cavaliere']), p[0], p[1], 1.6, r.range(0, 360), 0.9); segna(p[0] + 1.2, p[1], 'Statua', 'Tre quarti di copertura dietro il basamento.'); } },
+      rovine: { dove: ['aperto', 'grotta', 'chiuso'], f: () => { if (scelta === 'locanda') return; const p = trova(2.2); if (!p) return; occupa(p[0], p[1], 2.2); const a = r.range(0, 360); L.sopra += spr('muretto-rotto', p[0], p[1] - 1, 3, a) + spr('colonna-crollata', p[0] + 0.8, p[1] + 0.9, 2.6, a + r.range(40, 100)) + spr('macerie', p[0] - 1.2, p[1] + 0.8, 1.2, r.range(0, 360)); segna(p[0], p[1] - 2, 'Rovine', 'Muro crollato e colonne: mezza copertura, le macerie sono terreno difficile.'); } },
+      casse: { dove: ['aperto', 'grotta', 'chiuso'], f: () => { const p = trova(1.1); if (!p) return; occupa(p[0], p[1], 1.1); for (let i = 0; i < 4; i++) { const a = r.range(0, Math.PI * 2), d = r.range(0, 0.9); L.sopra += spr(r.pick(['cassa', 'barile', 'sacchi', 'cassa', 'botti']), p[0] + Math.cos(a) * d, p[1] + Math.sin(a) * d, r.range(0.75, 1), r.range(0, 360)); } segna(p[0], p[1] - 1.3, 'Casse e barili', 'Mezza copertura. Una cassa rotta sparge la merce: terreno difficile.'); } },
+      tesoro: { dove: ['aperto', 'grotta', 'chiuso'], f: () => { const p = trova(0.9); if (!p) return; posa('sopra', 'tesoro', p[0], p[1], 1.3, 0, 0.9); L.sopra += spr('forziere', p[0] + 0.9, p[1] + 0.5, 0.95, r.range(-20, 20)); luce(p[0], p[1], 1.8, '#ffd86b', 0.35); segna(p[0], p[1] - 1.2, 'Tesoro', 'Monete e un forziere chiuso (Scassinare CD 15). Forse è una trappola.'); } },
+      ossa: { dove: ['aperto', 'grotta', 'chiuso'], f: () => { const p = trova(1); if (!p) return; occupa(p[0], p[1], 1); L.sotto += spr('scheletro', p[0], p[1], 1.4, r.range(0, 360)) + spr('ossa', p[0] + 1, p[1] + 0.6, 1.1, r.range(0, 360)); segna(p[0], p[1] - 1.2, 'Ossa', 'Qualcuno non ce l\'ha fatta. Ha ancora la borsa.'); } },
+      gabbia: { dove: ['aperto', 'grotta', 'chiuso'], f: () => { const p = trova(0.9); if (!p) return; posa('sopra', 'gabbia', p[0], p[1], 1.5, r.pick([0, 90]), 0.9); segna(p[0], p[1] - 1.2, 'Gabbia', 'Dentro c\'è un prigioniero. Il lucchetto si scassina (CD 15).'); } },
+      altare: { dove: ['aperto', 'grotta', 'chiuso'], f: () => { if (scelta === 'locanda') return; const p = trova(1.2); if (!p) return; posa('sopra', 'altare', p[0], p[1], 1.9, r.pick([0, 90, 180, 270]), 1.2); luce(p[0], p[1], 2.4, '#a8e6ff', 0.35); segna(p[0], p[1] - 1.5, 'Altare', 'Un sigillo inciso: chi lo tocca sente una voce.'); } },
+    };
+    (Array.isArray(o.elementi) ? o.elementi : []).forEach((k) => { const e = ELEMENTI[k]; if (e && e.dove.includes(ambiente)) e.f(); });
 
     /* ── Griglia di combattimento ── */
     let griglia = '';
