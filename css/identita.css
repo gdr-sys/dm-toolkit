@@ -238,3 +238,5 @@ button.dn-row:hover .dn-t, a.dn-row:hover .dn-t { color: var(--accent-text); }
 .app-social { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
 .app-social-logo { display: inline-grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; color: var(--text-secondary); border: 1px solid var(--border); background: var(--bg-secondary); transition: color .15s, border-color .15s; }
 .app-social-logo:hover, .app-social-logo:focus-visible { color: var(--accent-text); border-color: var(--accent-primary); outline: none; }
+/* Copia del fondo nelle altre pagine */
+.app-firma-copia { margin-bottom: 24px; }
