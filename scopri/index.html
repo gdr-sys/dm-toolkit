@@ -130,7 +130,28 @@
     </div>
   </section>
 
-  <section class="discesa fondo" id="generatori">
+  <section class="discesa fondo" id="battlemap">
+    <div class="wrap due">
+      <div>
+        <h2>Battle map pronte per lo scontro</h2>
+        <p class="lead">Dodici scene, dal bosco alla cripta, su prato, erba secca, fango, neve o deserto. Terreni e oggetti dipinti, con i quadretti da 1,5 m. Se un carro o una tenda non sta dove vuoi, lo sposti con un dito.</p>
+        <div class="tappe" role="tablist" aria-label="Passi: Battle map pronte per lo scontro">
+          <button class="tappa" role="tab" type="button" aria-controls="lastra-battlemap"><strong>La scena</strong><span>Scegli luogo e terreno, aggiungi carrozza, pozzo o tesoro.</span></button>
+          <button class="tappa" role="tab" type="button" aria-controls="lastra-battlemap"><strong>Sposta e ruota</strong><span>Trascina, ruota, duplica, elimina o cambia ogni oggetto.</span></button>
+          <button class="tappa" role="tab" type="button" aria-controls="lastra-battlemap"><strong>Al tavolo</strong><span>Stampa su A4 in scala per le miniature o usala sul tavolo virtuale.</span></button>
+        </div>
+      </div>
+      <div class="lastra" id="lastra-battlemap" role="tabpanel" style="--r:1.44">
+        <img class="lastra__strato" data-fuoco="41% 21.9%" src="img/app-battlemap.jpg" loading="lazy" alt="Il Cartografo con una battle map di un accampamento nella neve." width="1800" height="1250">
+        <img class="lastra__strato" data-fuoco="85.7% 21.9%" src="img/app-battlemap-sposta.jpg" loading="lazy" alt="Sposta e ruota: la carrozza scelta, con i pulsanti per ruotarla, cambiarla, duplicarla o eliminarla." width="1800" height="1250">
+        <img class="lastra__strato" src="img/battlemap.jpg" loading="lazy" alt="Una battle map di rovine nel deserto, con palme, cactus, una carrozza e i punti numerati." width="1400" height="992">
+        <button class="segno" type="button" data-da="0" style="--x:41%;--y:21.9%"><svg viewBox="0 0 44 44" aria-hidden="true"><path fill="currentColor" d="M22 42S8 27 8 16a14 14 0 1 1 28 0c0 11-14 26-14 26Z"/><circle cx="22" cy="16" r="5" fill="#f2ecd8"/></svg><span>Sposta e ruota</span></button>
+        <button class="segno segno--sx" type="button" data-da="1" hidden style="--x:85.7%;--y:21.9%"><svg viewBox="0 0 44 44" aria-hidden="true"><path fill="currentColor" d="M22 42S8 27 8 16a14 14 0 1 1 28 0c0 11-14 26-14 26Z"/><circle cx="22" cy="16" r="5" fill="#f2ecd8"/></svg><span>Stampa A4</span></button>
+      </div>
+    </div>
+  </section>
+
+  <section class="discesa" id="generatori">
     <div class="wrap due">
       <div>
         <h2>Generatori e Compendio per improvvisare</h2>
