@@ -231,3 +231,10 @@ button.dn-row:hover .dn-t, a.dn-row:hover .dn-t { color: var(--accent-text); }
 [style*="border-left:3px solid"], [style*="border-left: 3px solid"], [style*="border-left:4px solid"], [style*="border-left: 4px solid"] { border-left-width: 1px !important; }
 /* ── Pagine della Wiki: stessa larghezza massima della Dashboard ── */
 .page[id^="page-wiki"] > * { max-width: 1240px; margin-left: auto; margin-right: auto; }
+
+/* Fondo della Home e della finestra informazioni: loghi dei social al centro e firma */
+.app-firma { margin: 40px auto 8px; display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; }
+.app-firma p { margin: 0; color: var(--text-muted); font-size: 0.85rem; }
+.app-social { display: flex; justify-content: center; gap: 10px; }
+.app-social-logo { display: inline-grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; color: var(--text-secondary); border: 1px solid var(--border); background: var(--bg-secondary); transition: color .15s, border-color .15s; }
+.app-social-logo:hover, .app-social-logo:focus-visible { color: var(--accent-text); border-color: var(--accent-primary); outline: none; }

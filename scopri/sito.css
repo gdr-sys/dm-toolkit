@@ -254,3 +254,9 @@ footer.closing > .wrap { display: flex; flex-direction: column; justify-content:
 .trailer__piede { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 14px 18px; font-size: 1rem; }
 .trailer__piede a { color: var(--nebbia); }
 @media (prefers-reduced-motion: reduce) { .trailer-apri svg { transition: none; } }
+
+/* Loghi dei social al centro in fondo, con la firma sotto */
+.piede__social { display: flex; justify-content: center; gap: 12px; margin-top: 28px; }
+.piede__logo { display: inline-grid; place-items: center; width: 48px; height: 48px; border-radius: 50%; border: 1px solid currentColor; opacity: .85; transition: color .15s, opacity .15s; }
+.piede__logo:hover, .piede__logo:focus-visible { color: var(--ambra-forte); opacity: 1; }
+.piede p.piede__firma { text-align: center; max-width: none; margin-top: 12px; }
