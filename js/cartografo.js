@@ -53,6 +53,16 @@ const Cartografo = (() => {
         Object.entries(salvate.sposta).forEach(([k, v]) => { if (/^\d+$/.test(k) && Array.isArray(v) && v.length === 3 && v.every(Number.isFinite)) sp[k] = v; });
         if (Object.keys(sp).length) o.sposta = sp;
       }
+      if (salvate.tipo && typeof salvate.tipo === 'object') {
+        const t = {};
+        Object.entries(salvate.tipo).forEach(([k, v]) => { if (/^\d+$/.test(k) && typeof v === 'string' && /^[a-z0-9-]+$/.test(v)) t[k] = v; });
+        if (Object.keys(t).length) o.tipo = t;
+      }
+      if (salvate.varianti && typeof salvate.varianti === 'object') {
+        const t = {};
+        Object.entries(salvate.varianti).forEach(([k, v]) => { if (Number.isInteger(v) && v >= 0) t[k] = v; });
+        if (Object.keys(t).length) o.varianti = t;
+      }
       if (Array.isArray(salvate.togli)) { const t = salvate.togli.filter((n) => Number.isInteger(n) && n >= 0); if (t.length) o.togli = t; }
       if (Array.isArray(salvate.copie)) {
         const c = salvate.copie.filter((x) => x && (typeof x.f === 'string' || (Array.isArray(x.f) && x.f.length && x.f.every(Number.isInteger))) && [x.u, x.w, x.g].every(Number.isFinite)).slice(0, 80)
@@ -167,7 +177,7 @@ const Cartografo = (() => {
     _storia.push(_fotografia());
     if (_storia.length > 20) _storia.shift();
   };
-  const nuova = () => { _ricordaPrecedente(); const a = _attuale(); a.seme = K().seme(); delete a.opzioni.pos; delete a.opzioni.sposta; delete a.opzioni.togli; delete a.opzioni.copie; _sel = null; _aggiornaControlli(); genera(); };
+  const nuova = () => { _ricordaPrecedente(); const a = _attuale(); a.seme = K().seme(); ['pos', 'sposta', 'togli', 'copie', 'tipo', 'varianti'].forEach((x) => delete a.opzioni[x]); _sel = null; _aggiornaControlli(); genera(); };
   // Il caso resta sempre dentro il tipo di mappa scelto. I colori restano quelli del DM se lo ha
   // chiesto; "Nomi" e "Titolo" sono una preferenza di lettura, non una caratteristica della mappa.
   const aCaso = () => {
@@ -199,7 +209,7 @@ const Cartografo = (() => {
     a.opzioni[k] = v;
     if (['scena', 'impianto', 'taglia'].includes(k)) { delete a.opzioni.pos; _sel = null; }
     // Gli oggetti della scena si riconoscono dall'ordine in cui sono posati: cambiando la scena non valgono piu'
-    if (!['palette', 'nomi', 'titolo', 'griglia', 'legenda'].includes(k)) { delete a.opzioni.sposta; delete a.opzioni.togli; delete a.opzioni.copie; if (_sel && _sel.tipo !== 'agg') _sel = null; }
+    if (!['palette', 'nomi', 'titolo', 'griglia', 'legenda'].includes(k)) { delete a.opzioni.sposta; delete a.opzioni.togli; delete a.opzioni.copie; delete a.opzioni.tipo; if (_sel && _sel.tipo !== 'agg') _sel = null; }
     // Le opzioni che dipendono da questa (es. la variante dipende dalla scena) tornano al valore iniziale
     if (x && x.azzera) x.azzera.forEach((d) => { const y = T.opzioni.find((q) => q.k === d); if (y) a.opzioni[d] = Array.isArray(y.d) ? y.d.slice() : y.d; });
     if (T.opzioni.some((q) => q.se || q.dip)) _aggiornaControlli();
@@ -418,6 +428,7 @@ const Cartografo = (() => {
   const _gradi = (g) => Math.round(((g % 360) + 360) % 360);
   const _nomeAgg = (m, k) => { const voce = K().TIPI[m.tipo].opzioni.find((q) => q.m), e = voce && voce.v.find((q) => q[0] === k); return e ? e[1] : k; };
   const ICONE = {
+    cambia: '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 7h13l-3-3M20 17H7l3 3" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
     copia: '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M16 4H6a2 2 0 0 0-2 2v10" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>',
     cestino: '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
     sx: '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.4-5.7M4 4v4h4" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
@@ -485,12 +496,39 @@ const Cartografo = (() => {
     _sel = { tipo: 'copia', i: copie.length - 1 };
     _dopoSpostamento();
   };
+  // Cambia: l'oggetto della scena passa al tipo successivo della sua famiglia; quello aggiunto al prossimo tipo o aspetto
+  const _puoCambiare = (m) => {
+    if (!_sel) return false;
+    if (_sel.tipo === 'agg') return true;
+    if (_sel.tipo !== 'scena') return false;
+    const q = (m.oggetti || []).find((o) => o.id === _sel.ids[0]);
+    return !!(q && q.alt);
+  };
+  const _cambiaSel = () => {
+    const m = _mappa;
+    if (!m || !_puoCambiare(m)) return;
+    _ricordaPrecedente();
+    const a = _attuale();
+    if (_sel.tipo === 'agg') {
+      a.opzioni.pos = _posizioni(); // resta dov'e'
+      const v = { ...(a.opzioni.varianti || {}) };
+      // Il tipo che si vede ora +1 (carro, carrozza, statua); per gli altri, un nuovo aspetto
+      const x = (m.aggiunti || []).find((q) => q.k === _sel.k);
+      v[_sel.k] = x && Number.isInteger(x.vi) ? x.vi + 1 : (Number.isInteger(v[_sel.k]) ? v[_sel.k] + 1 : 1);
+      a.opzioni.varianti = v;
+    } else {
+      const q = m.oggetti.find((o) => o.id === _sel.ids[0]), i = q.alt.indexOf(q.nome);
+      a.opzioni.tipo = { ...(a.opzioni.tipo || {}), [q.id]: q.alt[(i + 1) % q.alt.length] };
+    }
+    _dopoSpostamento();
+  };
   const _eliminaSel = () => {
     if (!_sel || !_mappa) return;
     const a = _attuale();
     if (_sel.tipo === 'agg') {
       const voce = K().TIPI[_mappa.tipo].opzioni.find((q) => q.m), k = _sel.k;
       a.opzioni.pos = _posizioni(); // gli altri oggetti aggiunti restano dove sono
+      if (a.opzioni.varianti) delete a.opzioni.varianti[k];
       _sel = null;
       _multi(voce.k, k);
       _aggiornaControlli();
@@ -506,12 +544,15 @@ const Cartografo = (() => {
     if (!_sel) return;
     _ricordaPrecedente();
     const a = _attuale();
-    if (_sel.tipo === 'agg') { const pos = _posizioni(); delete pos[_sel.k]; a.opzioni.pos = pos; _sel = null; }
-    else if (a.opzioni.sposta) { const sp = { ...a.opzioni.sposta }; _sel.ids.forEach((id) => delete sp[id]); a.opzioni.sposta = sp; }
+    if (_sel.tipo === 'agg') { const pos = _posizioni(); delete pos[_sel.k]; a.opzioni.pos = pos; if (a.opzioni.varianti) delete a.opzioni.varianti[_sel.k]; _sel = null; }
+    else {
+      if (a.opzioni.sposta) { const sp = { ...a.opzioni.sposta }; _sel.ids.forEach((id) => delete sp[id]); a.opzioni.sposta = sp; }
+      if (a.opzioni.tipo) { const t = { ...a.opzioni.tipo }; _sel.ids.forEach((id) => delete t[id]); if (Object.keys(t).length) a.opzioni.tipo = t; else delete a.opzioni.tipo; }
+    }
     _dopoSpostamento();
   };
   const rimettiACaso = () => { _ricordaPrecedente(); delete _attuale().opzioni.pos; _sel = null; _aggiornaControlli(); genera(); };
-  const rimettiTutto = () => { _ricordaPrecedente(); const a = _attuale(); delete a.opzioni.pos; delete a.opzioni.sposta; delete a.opzioni.togli; delete a.opzioni.copie; _sel = null; _aggiornaControlli(); genera(); };
+  const rimettiTutto = () => { _ricordaPrecedente(); const a = _attuale(); ['pos', 'sposta', 'togli', 'copie', 'tipo', 'varianti'].forEach((x) => delete a.opzioni[x]); _sel = null; _aggiornaControlli(); genera(); };
   const spostaRuota = () => {
     _modoSposta = !_modoSposta; _sel = null;
     if (_mappa) _rifaiManiglie();
@@ -620,11 +661,15 @@ const Cartografo = (() => {
     bar.innerHTML =
       '<button type="button" class="btn btn-ghost btn-sm" onclick="Cartografo._ruotaSel(-45)" aria-label="Ruota a sinistra di 45 gradi" title="Ruota a sinistra">' + ICONE.sx + '</button>' +
       '<button type="button" class="btn btn-ghost btn-sm" onclick="Cartografo._ruotaSel(45)" aria-label="Ruota a destra di 45 gradi" title="Ruota a destra">' + ICONE.dx + '</button>' +
+      (_puoCambiare(m) ? '<button type="button" class="btn btn-ghost btn-sm carto-cambia" onclick="Cartografo._cambiaSel()" aria-label="Cambia tipo" title="Cambia tipo">' + ICONE.cambia + '<span>Cambia</span></button>' : '') +
       '<button type="button" class="btn btn-ghost btn-sm" onclick="Cartografo._duplicaSel()" aria-label="Duplica" title="Duplica">' + ICONE.copia + '</button>' +
       '<button type="button" class="btn btn-ghost btn-sm carto-elimina" onclick="Cartografo._eliminaSel()" aria-label="Elimina" title="Elimina">' + ICONE.cestino + '</button>' +
       (_sel.tipo === 'copia' ? '' : '<button type="button" class="btn btn-ghost btn-sm" onclick="Cartografo._rimettiSel()">Com’era</button>');
     bar.addEventListener('pointerdown', (ev) => ev.stopPropagation());
     strato.appendChild(bar);
+    // La barretta resta dentro la mappa anche per gli oggetti vicino al bordo
+    const mezza = bar.offsetWidth / V.s / 2 + 6 / V.s;
+    bar.style.left = Math.max(mezza, Math.min(m.W - mezza, t.x)) + 'px';
   };
   const _rifaiManiglie = () => {
     const v = $('carto-vista');
@@ -638,7 +683,7 @@ const Cartografo = (() => {
     if (st) st.classList.toggle('carto-modo-sposta', attivo);
     if (barra) {
       barra.hidden = !attivo;
-      const oa = _attuale().opzioni, qualcosa = !!(oa.pos || oa.sposta || oa.togli || oa.copie);
+      const oa = _attuale().opzioni, qualcosa = !!(oa.pos || oa.sposta || oa.togli || oa.copie || oa.tipo || oa.varianti);
       barra.innerHTML = '<span>Trascina un oggetto per spostarlo. Toccalo per ruotarlo.</span>' +
         (qualcosa ? '<button type="button" class="btn btn-ghost btn-sm" onclick="Cartografo.rimettiTutto()">Rimetti tutto com’era</button>' : '');
     }
@@ -1085,6 +1130,8 @@ const Cartografo = (() => {
       '.carto-strumenti { position:absolute; display:flex; gap:4px; padding:4px; background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-md); box-shadow:var(--shadow-md); white-space:nowrap; transform-origin:top center; transform:translate(-50%, calc(10px * var(--inv, 1))) scale(var(--inv, 1)); z-index:2; }' +
       '.carto-strumenti-su { transform-origin:bottom center; transform:translate(-50%, calc(-100% - 46px * var(--inv, 1))) scale(var(--inv, 1)); }' +
       '.carto-strumenti .carto-elimina { color:var(--danger, #d9534f); }' +
+      '.carto-strumenti .carto-cambia { gap:6px; padding-left:10px; padding-right:12px; }' +
+      '#carto-vista .carto-strumenti svg, #carto-vista .carto-giro svg { display:inline-block; width:18px; height:18px; flex-shrink:0; }' +
       '.carto-strumenti .btn { min-height:40px; min-width:40px; display:inline-flex; align-items:center; justify-content:center; }' +
       '#carto-sposta[aria-pressed="true"] { background:var(--accent-primary) !important; border-color:var(--accent-primary) !important; color:var(--text-on-accent, #fff) !important; }' +
       '#carto-sposta-barra { position:absolute; left:8px; bottom:8px; right:8px; display:flex; flex-wrap:wrap; align-items:center; gap:4px 10px; width:max-content; max-width:calc(100% - 16px); padding:6px 6px 6px 12px; background:var(--bg-card); color:var(--text-primary); border:1px solid var(--border); border-radius:var(--radius-md); box-shadow:var(--shadow-md); font-size:0.88rem; z-index:2; }' +
@@ -1185,5 +1232,5 @@ const Cartografo = (() => {
     if (!_mappa || typeof CartoRitocchi === 'undefined') return;
     CartoRitocchi.apri({ stato: () => ({ a: _attuale(), mappa: _mappa }), salvaStato: _salva, rigenera: genera });
   };
-  return { strumenti, ritocca, perPin, annullaContesto, apri, nuova, aCaso, _tieniColori, precedente, scegliTipo, zoom, zoomReset, scaricaPng, scaricaSvg, scaricaVtt, stampaScala, stampaA4, _confermaScelta, apriMettiNelleMappe, _confermaMappe, _opzione, _multi, _apri, rimettiACaso, rimettiTutto, spostaRuota, _ruotaSel, _rimettiSel, _duplicaSel, _eliminaSel, _nome, _seme, dopoMostra, mappaAttuale };
+  return { strumenti, ritocca, perPin, annullaContesto, apri, nuova, aCaso, _tieniColori, precedente, scegliTipo, zoom, zoomReset, scaricaPng, scaricaSvg, scaricaVtt, stampaScala, stampaA4, _confermaScelta, apriMettiNelleMappe, _confermaMappe, _opzione, _multi, _apri, rimettiACaso, rimettiTutto, spostaRuota, _ruotaSel, _rimettiSel, _duplicaSel, _eliminaSel, _cambiaSel, _nome, _seme, dopoMostra, mappaAttuale };
 })();
