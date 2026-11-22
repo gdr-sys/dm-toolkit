@@ -27,7 +27,7 @@ const CartoCatalogo = (() => {
   const AL_CHIUSO = ['caverna', 'cripta', 'locanda'];
   // [chiave, etichetta, dove ci sta] — gli stessi di ELEMENTI in cartografo-battaglia.js
   const ELEMENTI_BM = [
-    ['carro', 'Carro', ['aperto']], ['rovesciato', 'Carro rovesciato', ['aperto']], ['tenda', 'Tenda', ['aperto']], ['fuoco', 'Fuoco', ['aperto', 'grotta', 'chiuso']],
+    ['carro', 'Carro', ['aperto']], ['carrozza', 'Carrozza', ['aperto']], ['rovesciato', 'Carro rovesciato', ['aperto']], ['tenda', 'Tenda', ['aperto']], ['fuoco', 'Fuoco', ['aperto', 'grotta', 'chiuso']],
     ['massi', 'Massi', ['aperto', 'grotta']], ['tronco', 'Albero caduto', ['aperto']], ['rovi', 'Rovi', ['aperto']], ['stagno', 'Stagno', ['aperto']],
     ['pozzo', 'Pozzo', ['aperto']], ['lapidi', 'Tombe', ['aperto']], ['statua', 'Statua', ['aperto', 'grotta', 'chiuso']], ['rovine', 'Rovine', ['aperto', 'grotta', 'chiuso']],
     ['casse', 'Casse e barili', ['aperto', 'grotta', 'chiuso']], ['tesoro', 'Tesoro', ['aperto', 'grotta', 'chiuso']], ['ossa', 'Ossa', ['aperto', 'grotta', 'chiuso']],

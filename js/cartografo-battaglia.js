@@ -28,7 +28,9 @@ const CartoBattaglia = (() => {
     'scoglio-2', 'sedia', 'sgabello', 'spaventapasseri', 'staccionata', 'stagno', 'stalagmiti-1', 'stalagmiti-2', 'stalagmiti-3', 'statua-angelo',
     'statua-cavaliere', 'tappeto', 'tavolo-lungo', 'tavolo-tondo-1', 'tavolo-tondo-2', 'tenda', 'terreno-acqua-bassa', 'terreno-acqua-profonda',
     'terreno-ciottolato', 'terreno-erba', 'terreno-erba-secca', 'terreno-fango', 'terreno-legno', 'terreno-pietra', 'terreno-terra', 'tesoro',
-    'tronco-caduto'];
+    'tronco-caduto',
+    // Deserto, neve e carrozza (generati con ChatGPT il 2026-11-22)
+    'cactus-1', 'cactus-2', 'cactus-3', 'palma-1', 'palma-2', 'roccia-arenaria', 'rotolacampo', 'teschio', 'sassi-deserto', 'pino-neve-1', 'pino-neve-2', 'pino-neve-3', 'albero-spoglio-neve', 'cespuglio-neve', 'masso-neve', 'stagno-ghiacciato', 'cumulo-neve', 'legna-neve', 'carrozza', 'carrozza-cavalli', 'cavalli', 'terreno-sabbia', 'terreno-neve', 'terreno-neve-calpestata'];
 
   /* ── Immagini: si leggono una volta come data URL, cosi' finiscono dentro l'SVG ── */
   const _img = {};
@@ -83,14 +85,14 @@ const CartoBattaglia = (() => {
   const _deriva = (bioma) => {
     if (_derivati[bioma] || typeof document === 'undefined') return;
     if (bioma === 'deserto') {
-      _ricolora('terreno-terra', 'gen-sabbia', _scala([188, 140, 80], [250, 228, 176]), true);
+      _ricolora('terreno-sabbia', 'gen-sabbia', _scala([196, 150, 92], [250, 230, 184]), true);
       // Cespugli secchi: stessa forma dei cespugli, colori della steppa
       ['cespuglio-1', 'cespuglio-2', 'cespuglio-3'].forEach((n) => _ricolora(n, 'gen-' + n + '-secco', _scala([92, 72, 40], [196, 170, 108])));
-      _ricolora('terreno-terra', 'gen-sabbia-scura', _scala([158, 112, 64], [218, 174, 114]), true);
+      _ricolora('terreno-sabbia', 'gen-sabbia-scura', _scala([160, 116, 68], [224, 184, 126]), true);
     }
     if (bioma === 'neve') {
       _ricolora('terreno-fango', 'gen-neve', _scala([192, 204, 220], [252, 253, 255]), true);
-      _ricolora('terreno-terra', 'gen-neve-calpestata', _scala([164, 172, 188], [228, 232, 240]), true);
+      _ricolora('terreno-neve', 'gen-neve-calpestata', _scala([170, 180, 196], [232, 236, 244]), true);
       _ricolora('terreno-fango', 'gen-neve-strada', _scala([112, 104, 100], [206, 204, 206]), true);
       DA_INNEVARE.forEach((n) => _ricolora(n, 'gen-' + n + '-neve', _innevato(/masso|sasso|roccia|scoglio/.test(n) ? 0.55 : 1)));
     }
@@ -101,7 +103,7 @@ const CartoBattaglia = (() => {
     prato: {},
     secco: { 'terreno-erba': 'terreno-erba-secca', 'terreno-erba-secca': 'terreno-terra' },
     deserto: { 'terreno-erba': 'gen-sabbia', 'terreno-erba-secca': 'gen-sabbia-scura', 'terreno-terra': 'gen-sabbia-scura', 'terreno-fango': 'gen-sabbia-scura' },
-    neve: { 'terreno-erba': 'gen-neve', 'terreno-erba-secca': 'gen-neve-calpestata', 'terreno-terra': 'gen-neve-strada', 'terreno-fango': 'gen-neve-calpestata' },
+    neve: { 'terreno-erba': 'terreno-neve', 'terreno-erba-secca': 'gen-neve-calpestata', 'terreno-terra': 'terreno-neve-calpestata', 'terreno-fango': 'gen-neve-calpestata' },
     fango: { 'terreno-erba': 'terreno-fango', 'terreno-fango': 'terreno-erba-secca' },
   };
   const AL_CHIUSO = ['caverna', 'cripta', 'locanda'];
@@ -173,24 +175,34 @@ const CartoBattaglia = (() => {
     const QUERCE = ['quercia-1', 'quercia-2', 'quercia-3'], PINI = ['pino-1', 'pino-2', 'pino-3'], CESPUGLI = ['cespuglio-1', 'cespuglio-2', 'cespuglio-3'];
     const MASSI = ['masso-1', 'masso-2', 'masso-3'], SASSI = ['sasso-1', 'sasso-2', 'sasso-3'];
     const ALBERI = new Set(QUERCE.concat(PINI, ['alberello-1', 'alberello-2']));
+    const PINI_NEVE = ['pino-neve-1', 'pino-neve-2', 'pino-neve-3'], PALME = ['palma-1', 'palma-2'], CACTUS = ['cactus-1', 'cactus-2', 'cactus-3'];
+    // Misure diverse da quella dell'oggetto che sostituiscono (un cactus non e' grande come una quercia)
+    const MISURA = { 'cactus-1': 0.5, 'cactus-2': 0.42, 'cactus-3': 0.5, 'palma-1': 0.95, 'palma-2': 0.8, rotolacampo: 0.75, teschio: 0.8, 'sassi-deserto': 1.1, 'cumulo-neve': 1.2, 'albero-spoglio-neve': 0.95 };
     // Gli oggetti cambiano con l'ambiente: pini innevati, cespugli secchi nel deserto, meno alberi se la vegetazione e' rada
     const sostituto = (nome) => {
       if (chiuso) return nome;
       if (ALBERI.has(nome)) {
         if (VEG === 0 || (VEG < 1 && r.chance(1 - VEG))) return null;
-        if (bioma === 'neve') return 'gen-' + (r.chance(0.75) ? r.pick(PINI) : nome) + '-neve';
-        if (bioma === 'deserto') return r.chance(0.08) ? 'albero-morto' : null;
+        if (bioma === 'neve') { const t = r.f(); return t < 0.62 ? r.pick(PINI_NEVE) : t < 0.84 ? 'albero-spoglio-neve' : 'gen-' + r.pick(PINI) + '-neve'; }
+        if (bioma === 'deserto') { const t = r.f(); return t < 0.22 ? r.pick(PALME) : t < 0.5 ? r.pick(CACTUS) : t < 0.55 ? 'albero-morto' : null; }
         if (bioma === 'secco' && QUERCE.includes(nome) && r.chance(0.25)) return 'albero-morto';
         if (bioma === 'fango' && QUERCE.includes(nome) && r.chance(0.45)) return 'albero-morto';
         return nome;
       }
       if (bioma === 'neve') {
-        if (['cespuglio-bianco', 'cespuglio-giallo'].includes(nome)) return 'gen-' + r.pick(CESPUGLI) + '-neve';
+        if (['cespuglio-bianco', 'cespuglio-giallo'].includes(nome) || (CESPUGLI.includes(nome) && r.chance(0.5))) return r.chance(0.6) ? 'cespuglio-neve' : 'gen-' + r.pick(CESPUGLI) + '-neve';
+        if ((MASSI.includes(nome) || nome === 'roccia-grande') && r.chance(0.5)) return 'masso-neve';
+        if (nome === 'stagno') return 'stagno-ghiacciato';
+        if (nome === 'legnaia') return 'legna-neve';
+        if (nome === 'ceppo') return r.chance(0.5) ? 'cumulo-neve' : 'gen-ceppo-neve';
         if (['funghi-1', 'funghi-2', 'cerchio-funghi', 'ninfee-1', 'ninfee-2', 'alveare'].includes(nome)) return null;
         return _img['gen-' + nome + '-neve'] ? 'gen-' + nome + '-neve' : nome;
       }
       if (bioma === 'deserto') {
-        if (CESPUGLI.includes(nome) || ['cespuglio-bianco', 'cespuglio-giallo', 'rovi-1', 'rovi-2'].includes(nome)) return r.chance(0.6) ? 'gen-' + r.pick(CESPUGLI) + '-secco' : r.chance(0.5) ? r.pick(SASSI) : null;
+        if (CESPUGLI.includes(nome) || ['cespuglio-bianco', 'cespuglio-giallo', 'rovi-1', 'rovi-2'].includes(nome)) { const t = r.f(); return t < 0.35 ? 'rotolacampo' : t < 0.6 ? 'gen-' + r.pick(CESPUGLI) + '-secco' : t < 0.8 ? 'sassi-deserto' : null; }
+        if (MASSI.includes(nome) || nome === 'roccia-grande' || SASSI.includes(nome)) return SASSI.includes(nome) ? 'sassi-deserto' : 'roccia-arenaria';
+        if (nome === 'ceppo') return r.chance(0.35) ? 'teschio' : 'sassi-deserto';
+        if (nome === 'ossa' && r.chance(0.5)) return 'teschio';
         if (['funghi-1', 'funghi-2', 'cerchio-funghi', 'alveare'].includes(nome)) return null;
       }
       if (bioma === 'secco' && CESPUGLI.includes(nome) && r.chance(0.4)) return 'cespuglio-giallo';
@@ -207,6 +219,7 @@ const CartoBattaglia = (() => {
       if (d) { u += d[0] || 0; w += d[1] || 0; rot += d[2] || 0; }
       const nome = sostituto(nome0);
       if (!nome || !_img[nome]) return '';
+      if (nome !== nome0 && MISURA[nome]) lato *= MISURA[nome];
       const im = _img[nome]; usate.add(nome);
       const k = (lato * S) / Math.max(im.w, im.h);
       const use = `<use href="#bm-${nome}" transform="translate(${n1(X(u))} ${n1(Y(w))}) rotate(${n1(rot)}) scale(${(Math.round(k * 10000) / 10000)})"/>`;
@@ -574,6 +587,7 @@ const CartoBattaglia = (() => {
     };
     const ELEMENTI = {
       carro: { dove: ['aperto'], f: () => { const p = (!fisso && suStrada(1.5)) || (() => { const q = trova(1.6); return q && [q[0], q[1], re.pick([0, 90])]; })(); if (!p) return; rotUsata = rotFissa != null ? rotFissa : p[2] + (re.chance(0.5) ? 0 : 180); posa('sopra', re.pick(['carro', 'carro', 'carro-fieno']), p[0], p[1], 3, rotUsata, 1.5); segna(p[0], p[1] - 1.6, 'Carro', 'Tre quarti di copertura dietro le ruote; i cavalli si spaventano facilmente.'); } },
+      carrozza: { dove: ['aperto'], f: () => { const coi = re.chance(0.65), lato = coi ? 5.2 : 3.2, rr = coi ? 2.2 : 1.6; const p = (!fisso && suStrada(rr)) || (() => { const q = trova(rr); return q && [q[0], q[1], re.pick([0, 90])]; })(); if (!p) return; rotUsata = rotFissa != null ? rotFissa : p[2] + (re.chance(0.5) ? 0 : 180); posa('sopra', coi ? 'carrozza-cavalli' : 'carrozza', p[0], p[1], lato, rotUsata, rr); segna(p[0], p[1] - rr - 0.2, 'Carrozza', 'Dentro, copertura totale; dietro le ruote, tre quarti. Un nobile in viaggio, o qualcuno che finge di esserlo.'); } },
       rovesciato: { dove: ['aperto'], f: () => { const p = trova(1.6, (u, w) => !strade.length || strade.some((l) => _distSpezzata([u, w], l) < 4)); if (!p) return; posa('sopra', 'carro-rovesciato', p[0], p[1], 3.2, re.range(0, 360), 1.6); posa('sopra', 'ruota', p[0] + 1.6, p[1] + 1, 0.95, re.range(0, 360), 0.4); segna(p[0], p[1] - 1.6, 'Carro rovesciato', 'Tre quarti di copertura. Le casse sparse sono terreno difficile.'); } },
       tenda: { dove: ['aperto'], f: () => { const p = trova(1.3); if (!p) return; posa('sopra', 'tenda', p[0], p[1], 2.4, re.range(0, 360), 1.3); segna(p[0], p[1] - 1.6, 'Tenda', 'Mezza copertura; chi dorme dentro è sorpreso facilmente.'); } },
       fuoco: { dove: ['aperto', 'grotta', 'chiuso'], f: () => { const p = trova(1); if (!p) return; if (ambiente === 'chiuso') { posa('sopra', 'braciere', p[0], p[1], 0.9, 0, 0.6); luce(p[0], p[1], 3); segna(p[0] + 1, p[1], 'Braciere', 'Luce fioca fino a 6 m. Rovesciato, incendia ciò che ha intorno.'); return; } posa('sopra', 'fuoco-campo', p[0], p[1], 1.3, re.range(0, 360), 0.9); luce(p[0], p[1], 4.5, '#ffb347', 0.5); segna(p[0] + 1.2, p[1] - 0.9, 'Fuoco', 'Luce fioca fino a 6 m. Chi ci finisce dentro prende danni da fuoco.'); } },
