@@ -41,6 +41,24 @@ const Cartografo = (() => {
       if (T.colori.some(([v]) => v === salvate.palette)) o.palette = salvate.palette;
       if (typeof salvate.nomi === 'boolean') o.nomi = salvate.nomi;
       if (typeof salvate.titolo === 'boolean') o.titolo = salvate.titolo;
+      // Oggetti spostati a mano sulla battle map: { chiave: [u, w, rotazione?] } in quadretti
+      if (salvate.pos && typeof salvate.pos === 'object') {
+        const pos = {};
+        Object.entries(salvate.pos).forEach(([k, v]) => { if (Array.isArray(v) && v.length >= 2 && v.slice(0, 4).every(Number.isFinite)) pos[k] = v.slice(0, 4); });
+        if (Object.keys(pos).length) o.pos = pos;
+      }
+      // Oggetti della scena spostati o ruotati: { numero: [du, dw, gradi] }
+      if (salvate.sposta && typeof salvate.sposta === 'object') {
+        const sp = {};
+        Object.entries(salvate.sposta).forEach(([k, v]) => { if (/^\d+$/.test(k) && Array.isArray(v) && v.length === 3 && v.every(Number.isFinite)) sp[k] = v; });
+        if (Object.keys(sp).length) o.sposta = sp;
+      }
+      if (Array.isArray(salvate.togli)) { const t = salvate.togli.filter((n) => Number.isInteger(n) && n >= 0); if (t.length) o.togli = t; }
+      if (Array.isArray(salvate.copie)) {
+        const c = salvate.copie.filter((x) => x && (typeof x.f === 'string' || (Array.isArray(x.f) && x.f.length && x.f.every(Number.isInteger))) && [x.u, x.w, x.g].every(Number.isFinite)).slice(0, 80)
+          .map((x) => ({ f: Array.isArray(x.f) ? x.f.slice() : x.f, u: x.u, w: x.w, g: x.g }));
+        if (c.length) o.copie = c;
+      }
     }
     return o;
   };
@@ -52,8 +70,11 @@ const Cartografo = (() => {
       const v = s && s.perTipo && s.perTipo[t];
       perTipo[t] = { opzioni: _opzioniValide(t, v && v.opzioni), seme: (v && v.seme) || K().seme(), nome: (v && v.nome) || '' };
     });
-    _stato = { tipo: s && tipi.includes(s.tipo) ? s.tipo : 'regno', perTipo, tieniColori: s ? s.tieniColori !== false : true };
+    _stato = { tipo: s && tipi.includes(s.tipo) ? s.tipo : 'regno', perTipo, tieniColori: s ? s.tieniColori !== false : true,
+      aperti: { aggiungi: !!(s && s.aperti && s.aperti.aggiungi), altre: !!(s && s.aperti && s.aperti.altre) } };
   };
+  // Le sezioni a scomparsa del menu restano come il DM le ha lasciate
+  const _apri = (k, v) => { if (!_stato.aperti) _stato.aperti = {}; _stato.aperti[k] = !!v; _salva(); };
   const _salva = () => { try { localStorage.setItem(KEY, JSON.stringify(_stato)); } catch (e) {} };
   const _attuale = () => _stato.perTipo[_stato.tipo];
   const _nomeEffettivo = () => _attuale().nome || (_contesto ? _contesto.nome : '');
@@ -146,7 +167,7 @@ const Cartografo = (() => {
     _storia.push(_fotografia());
     if (_storia.length > 20) _storia.shift();
   };
-  const nuova = () => { _ricordaPrecedente(); _attuale().seme = K().seme(); _aggiornaControlli(); genera(); };
+  const nuova = () => { _ricordaPrecedente(); const a = _attuale(); a.seme = K().seme(); delete a.opzioni.pos; delete a.opzioni.sposta; delete a.opzioni.togli; delete a.opzioni.copie; _sel = null; _aggiornaControlli(); genera(); };
   // Il caso resta sempre dentro il tipo di mappa scelto. I colori restano quelli del DM se lo ha
   // chiesto; "Nomi" e "Titolo" sono una preferenza di lettura, non una caratteristica della mappa.
   const aCaso = () => {
@@ -176,6 +197,9 @@ const Cartografo = (() => {
     _ricordaPrecedente();
     const T = K().TIPI[_stato.tipo], a = _attuale(), x = T.opzioni.find((q) => q.k === k);
     a.opzioni[k] = v;
+    if (['scena', 'impianto', 'taglia'].includes(k)) { delete a.opzioni.pos; _sel = null; }
+    // Gli oggetti della scena si riconoscono dall'ordine in cui sono posati: cambiando la scena non valgono piu'
+    if (!['palette', 'nomi', 'titolo', 'griglia', 'legenda'].includes(k)) { delete a.opzioni.sposta; delete a.opzioni.togli; delete a.opzioni.copie; if (_sel && _sel.tipo !== 'agg') _sel = null; }
     // Le opzioni che dipendono da questa (es. la variante dipende dalla scena) tornano al valore iniziale
     if (x && x.azzera) x.azzera.forEach((d) => { const y = T.opzioni.find((q) => q.k === d); if (y) a.opzioni[d] = Array.isArray(y.d) ? y.d.slice() : y.d; });
     if (T.opzioni.some((q) => q.se || q.dip)) _aggiornaControlli();
@@ -185,9 +209,10 @@ const Cartografo = (() => {
   const _multi = (k, v) => {
     _ricordaPrecedente();
     const a = _attuale(), l = Array.isArray(a.opzioni[k]) ? a.opzioni[k].slice() : [], i = l.indexOf(v);
-    if (i >= 0) l.splice(i, 1); else l.push(v);
+    if (i >= 0) { l.splice(i, 1); if (a.opzioni.pos) { delete a.opzioni.pos[v]; if (!Object.keys(a.opzioni.pos).length) delete a.opzioni.pos; } } else l.push(v);
     a.opzioni[k] = l;
     const b = document.querySelector('[data-multi="' + k + ':' + v + '"]'); if (b) b.setAttribute('aria-pressed', String(i < 0));
+    const n = document.querySelector('[data-conta="' + k + '"]'); if (n) { n.textContent = l.length; n.hidden = !l.length; }
     _dopoModifica();
   };
   const _nome = (v) => { _attuale().nome = String(v).trim(); _dopoModifica(0); };
@@ -211,22 +236,32 @@ const Cartografo = (() => {
     const scelte = T.opzioni.filter((x) => !x.c && !x.m && vis(x)), spunte = T.opzioni.filter((x) => x.c), multi = T.opzioni.filter((x) => x.m && vis(x));
     const valori = (x) => x.dip ? x.dip(a.opzioni) : x.v;
     const chip = (x, [v, l]) => { const on = (a.opzioni[x.k] || []).includes(v); return '<button type="button" class="carto-chip" data-multi="' + _esc(x.k + ':' + v) + '" aria-pressed="' + on + '" onclick="Cartografo._multi(\'' + x.k + '\',\'' + v + '\')">' + _esc(l) + '</button>'; };
+    // In vista le scelte che cambiano la mappa; a scomparsa gli oggetti da aggiungere e le preferenze
+    // (nomi, impaginazione, colori, codice), cosi' su iPad non si scorre per mezza pagina.
+    const SECONDARIE = ['popolo', 'impagina'], ARIA = (x) => '<svg class="carto-freccia" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>' + x;
+    const selDi = (x) => sel('carto-op-' + x.k, x.l, valori(x), a.opzioni[x.k], 'Cartografo._opzione(\'' + x.k + '\',this.value)');
+    const sezione = (k, titolo, extra, corpo) => '<details class="carto-sezione"' + (_stato.aperti && _stato.aperti[k] ? ' open' : '') + ' ontoggle="Cartografo._apri(\'' + k + '\',this.open)">' +
+      '<summary>' + ARIA('<span>' + _esc(titolo) + '</span>') + extra + '</summary><div class="carto-sezione-corpo">' + corpo + '</div></details>';
+    const principali = scelte.filter((x) => !SECONDARIE.includes(x.k)), secondarie = scelte.filter((x) => SECONDARIE.includes(x.k));
     $('carto-controlli').innerHTML =
-      '<div class="form-group"><label class="form-label" for="carto-nome">Nome sulla mappa</label>' +
-        '<input type="text" id="carto-nome" class="form-input" autocomplete="off" value="' + _esc(_nomeEffettivo()) + '" placeholder="Casuale" onchange="Cartografo._nome(this.value)"></div>' +
-      '<div class="carto-griglia">' +
-        scelte.map((x) => sel('carto-op-' + x.k, x.l, valori(x), a.opzioni[x.k], 'Cartografo._opzione(\'' + x.k + '\',this.value)')).join('') +
-        sel('carto-colori', 'Colori', T.colori, a.opzioni.palette, 'Cartografo._opzione(\'palette\',this.value)') +
-      '</div>' +
-      multi.map((x) => '<div class="carto-gruppo" role="group" aria-label="' + _esc(x.l) + '"><div class="form-label">' + _esc(x.l) + '</div><div class="carto-chips">' + valori(x).map((e) => chip(x, e)).join('') + '</div></div>').join('') +
-      '<div class="carto-gruppo" role="group" aria-label="Cosa mostrare sulla mappa"><div class="form-label">Sulla mappa</div><div class="carto-spunte">' +
-        spunte.map((x) => spunta('carto-op-' + x.k, x.l, a.opzioni[x.k], 'Cartografo._opzione(\'' + x.k + '\',this.checked)')).join('') +
-        spunta('carto-nomi', 'Nomi e numeri', a.opzioni.nomi, 'Cartografo._opzione(\'nomi\',this.checked)') +
-        spunta('carto-titolo', 'Titolo', a.opzioni.titolo, 'Cartografo._opzione(\'titolo\',this.checked)') +
-      '</div></div>' +
-      '<div class="form-group" style="margin-bottom:0;"><label class="form-label" for="carto-seme">Codice della mappa</label>' +
-        '<input type="text" id="carto-seme" class="form-input" autocomplete="off" value="' + _esc(a.seme) + '" onchange="Cartografo._seme(this.value)">' +
-        '<div class="form-hint">Stesso codice e stesse opzioni danno la stessa mappa: annotalo per ritrovarla.</div></div>';
+      '<div class="carto-griglia carto-principali">' + principali.map(selDi).join('') + '</div>' +
+      (spunte.length ? '<div class="carto-spunte carto-gruppo" role="group" aria-label="Cosa mettere sulla mappa">' +
+        spunte.map((x) => spunta('carto-op-' + x.k, x.l, a.opzioni[x.k], 'Cartografo._opzione(\'' + x.k + '\',this.checked)')).join('') + '</div>' : '') +
+      multi.map((x) => { const n = (a.opzioni[x.k] || []).length; return sezione('aggiungi', x.l, '<span class="carto-conta" data-conta="' + _esc(x.k) + '"' + (n ? '' : ' hidden') + '>' + n + '</span>',
+        '<div class="carto-chips" role="group" aria-label="' + _esc(x.l) + '">' + valori(x).map((e) => chip(x, e)).join('') + '</div>' +
+        '<div class="carto-suggerimento"><span>Per spostarli o ruotarli, usa “Sposta e ruota” sopra la mappa.</span>' +
+          (a.opzioni.pos ? '<button type="button" class="btn btn-ghost btn-sm" onclick="Cartografo.rimettiACaso()">Rimettili a caso</button>' : '') + '</div>'); }).join('') +
+      sezione('altre', 'Nome, colori e altro', '',
+        '<div class="form-group"><label class="form-label" for="carto-nome">Nome sulla mappa</label>' +
+          '<input type="text" id="carto-nome" class="form-input" autocomplete="off" value="' + _esc(_nomeEffettivo()) + '" placeholder="Casuale" onchange="Cartografo._nome(this.value)"></div>' +
+        '<div class="carto-griglia">' + secondarie.map(selDi).join('') +
+          sel('carto-colori', 'Colori', T.colori, a.opzioni.palette, 'Cartografo._opzione(\'palette\',this.value)') + '</div>' +
+        '<div class="carto-spunte carto-gruppo" role="group" aria-label="Scritte sulla mappa">' +
+          spunta('carto-nomi', 'Nomi e numeri', a.opzioni.nomi, 'Cartografo._opzione(\'nomi\',this.checked)') +
+          spunta('carto-titolo', 'Titolo', a.opzioni.titolo, 'Cartografo._opzione(\'titolo\',this.checked)') + '</div>' +
+        '<div class="form-group" style="margin-bottom:0;"><label class="form-label" for="carto-seme">Codice della mappa</label>' +
+          '<input type="text" id="carto-seme" class="form-input" autocomplete="off" value="' + _esc(a.seme) + '" onchange="Cartografo._seme(this.value)">' +
+          '<div class="form-hint">Stesso codice e stesse opzioni danno la stessa mappa: annotalo per ritrovarla.</div></div>');
     const prec = $('carto-precedente');
     if (prec) prec.disabled = !_storia.length;
   };
@@ -268,6 +303,7 @@ const Cartografo = (() => {
     V.y = lh <= sh ? (sh - lh) / 2 : Math.min(0, Math.max(sh - lh, V.y));
     v.style.width = V.W + 'px'; v.style.height = V.H + 'px';
     v.style.transform = 'translate(' + V.x + 'px,' + V.y + 'px) scale(' + V.s + ')';
+    v.style.setProperty('--inv', String(1 / V.s));
     const ingrandita = V.s > V.fit * 1.001;
     // Non ingrandita, su telefono la pagina deve poter scorrere anche passando sopra la mappa
     st.style.touchAction = ingrandita ? 'none' : 'pan-y';
@@ -353,11 +389,16 @@ const Cartografo = (() => {
     if (m.canvas) { m.canvas.style.cssText = 'display:block;width:100%;height:100%;'; v.appendChild(m.canvas); }
     else v.innerHTML = m.svg;
     _adatta();
+    _maniglie(m);
     const T = K().TIPI[m.tipo];
     { const bv = $('carto-vtt'), bs = $('carto-stampa'), b4 = $('carto-a4'); if (bv) bv.hidden = !VTT_TIPI.includes(m.tipo); if (bs) bs.hidden = !VTT_TIPI.includes(m.tipo); if (b4) b4.hidden = m.tipo !== 'battaglia'; }
     $('carto-titolo-mappa').textContent = m.nome;
     const n = m.pin.length;
     $('carto-info').textContent = T.nome + ' · ' + _scala(m.larghezzaKm) + ' da un lato all’altro · ' + n + (n === 1 ? ' luogo' : ' luoghi');
+    if (m.nonMessi && m.nonMessi.length) {
+      const voce = K().TIPI[m.tipo].opzioni.find((q) => q.m), nomi = m.nonMessi.map((k) => { const e = voce && voce.v.find((x) => x[0] === k); return e ? e[1] : k; });
+      $('carto-info').textContent += ' · Non c’è posto per: ' + nomi.join(', ');
+    }
     const nomeEl = $('carto-nome');
     if (nomeEl && !nomeEl.value) nomeEl.placeholder = 'Casuale: ' + m.nome;
     const png = $('carto-png');
@@ -366,6 +407,285 @@ const Cartografo = (() => {
     if (prec) prec.disabled = !_storia.length;
     // Altri moduli che vogliono sapere quale mappa e' in vista (es. js/dungeon-chiave.js)
     _dopoMostra.forEach((f) => { try { f(m); } catch (e) {} });
+  };
+  /* ── Sposta e ruota (battle map) ──
+     Con il pulsante acceso ogni oggetto si prende: trascinato si sposta, toccato resta scelto e si
+     ruota (pulsanti o maniglia da girare). Mentre lo si muove si vede solo l'oggetto, non la mappa
+     intorno. Oggetti aggiunti: opzioni.pos = { chiave: [u, w, giro, rotazione del carro?] };
+     oggetti della scena: opzioni.sposta = { numero: [du, dw, gradi] }, in quadretti. */
+  let _modoSposta = false, _sel = null; // _sel: { tipo: 'agg', k } oppure { tipo: 'scena', ids: [...] }
+  const _r1 = (x) => Math.round(x * 10) / 10;
+  const _gradi = (g) => Math.round(((g % 360) + 360) % 360);
+  const _nomeAgg = (m, k) => { const voce = K().TIPI[m.tipo].opzioni.find((q) => q.m), e = voce && voce.v.find((q) => q[0] === k); return e ? e[1] : k; };
+  const ICONE = {
+    copia: '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M16 4H6a2 2 0 0 0-2 2v10" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>',
+    cestino: '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    sx: '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.4-5.7M4 4v4h4" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    dx: '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.4-5.7M20 4v4h-4" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  };
+  // Spostandone uno, gli altri oggetti aggiunti restano dove sono: si fissano tutti
+  const _posizioni = () => {
+    const pos = {};
+    ((_mappa && _mappa.aggiunti) || []).forEach((x) => { pos[x.k] = [_r1(x.u), _r1(x.w), _gradi(x.giro || 0)].concat(x.rot != null ? [Math.round(x.rot)] : []); });
+    return pos;
+  };
+  const _dopoSpostamento = () => { _aggiornaControlli(); _dopoModifica(0); };
+  const _muoviAgg = (k, du, dw, dg = 0) => {
+    if (!_mappa || !(_mappa.aggiunti || []).some((q) => q.k === k)) return;
+    _ricordaPrecedente();
+    const a = _attuale(), pos = _posizioni(), v = pos[k];
+    v[0] = _r1(v[0] + du); v[1] = _r1(v[1] + dw); v[2] = _gradi(v[2] + dg);
+    a.opzioni.pos = pos;
+    _dopoSpostamento();
+  };
+  // Oggetti della scena (in pixel della mappa): spostati e ruotati attorno al centro di quello preso
+  const _muoviScena = (ids, cx, cy, dx, dy, dg = 0) => {
+    const m = _mappa, S = m.quadretto;
+    _ricordaPrecedente();
+    const a = _attuale(), sp = { ...(a.opzioni.sposta || {}) }, rad = dg * Math.PI / 180, cs = Math.cos(rad), sn = Math.sin(rad);
+    ids.forEach((id) => {
+      const q = m.oggetti.find((o) => o.id === id);
+      if (!q) return;
+      const px = q.x - cx, py = q.y - cy, nx = cx + px * cs - py * sn + dx, ny = cy + px * sn + py * cs + dy, d = sp[id] || [0, 0, 0];
+      sp[id] = [_r1(d[0] + (nx - q.x) / S), _r1(d[1] + (ny - q.y) / S), _gradi((d[2] || 0) + dg)];
+    });
+    a.opzioni.sposta = sp;
+    _dopoSpostamento();
+  };
+  const _muoviCopia = (i, du, dw, dg = 0) => {
+    const a = _attuale(), c = (a.opzioni.copie || [])[i];
+    if (!c) return;
+    _ricordaPrecedente();
+    const m = _mappa, cols = m.vtt.maxX, rows = m.vtt.maxY;
+    a.opzioni.copie = a.opzioni.copie.map((x, j) => j !== i ? x : { ...x, u: _r1(Math.max(0.5, Math.min(cols - 0.5, x.u + du))), w: _r1(Math.max(0.5, Math.min(rows - 0.5, x.w + dw))), g: _gradi(x.g + dg) });
+    _dopoSpostamento();
+  };
+  // Un'azione sull'oggetto scelto, qualunque sia il tipo
+  const _applicaSel = (t, du, dw, dg) => {
+    if (_sel.tipo === 'agg') _muoviAgg(_sel.k, du, dw, dg);
+    else if (_sel.tipo === 'copia') _muoviCopia(_sel.i, du, dw, dg);
+    else _muoviScena(_sel.ids, t.x, t.y, du * _mappa.quadretto, dw * _mappa.quadretto, dg);
+  };
+  const _ruotaSel = (dg) => { const t = _mappa && _bersaglio(_mappa); if (t) _applicaSel(t, 0, 0, dg); };
+  // La copia nasce accanto all'originale e diventa l'oggetto scelto
+  const _duplicaSel = () => {
+    const m = _mappa, t = m && _bersaglio(m);
+    if (!t) return;
+    _ricordaPrecedente();
+    const a = _attuale(), S = m.quadretto, cols = m.vtt.maxX, rows = m.vtt.maxY;
+    const u0 = (t.x - m.vtt.ox) / S, w0 = (t.y - m.vtt.oy) / S, passo = Math.max(1.5, t.R / S);
+    const u = u0 + passo < cols - 0.5 ? u0 + passo : u0 - passo, w = Math.max(0.5, Math.min(rows - 0.5, w0 + 0.5));
+    const copie = (a.opzioni.copie || []).slice();
+    if (_sel.tipo === 'copia') { const c = copie[_sel.i]; if (!c) return; copie.push({ f: Array.isArray(c.f) ? c.f.slice() : c.f, u: _r1(u), w: _r1(w), g: c.g }); }
+    else {
+      if (_sel.tipo === 'agg') a.opzioni.pos = _posizioni(); // l'originale resta dov'e'
+      copie.push({ f: _sel.tipo === 'agg' ? _sel.k : _sel.ids.slice(), u: _r1(u), w: _r1(w), g: 0 });
+    }
+    a.opzioni.copie = copie;
+    _sel = { tipo: 'copia', i: copie.length - 1 };
+    _dopoSpostamento();
+  };
+  const _eliminaSel = () => {
+    if (!_sel || !_mappa) return;
+    const a = _attuale();
+    if (_sel.tipo === 'agg') {
+      const voce = K().TIPI[_mappa.tipo].opzioni.find((q) => q.m), k = _sel.k;
+      a.opzioni.pos = _posizioni(); // gli altri oggetti aggiunti restano dove sono
+      _sel = null;
+      _multi(voce.k, k);
+      _aggiornaControlli();
+      return;
+    }
+    _ricordaPrecedente();
+    if (_sel.tipo === 'copia') { const c = (a.opzioni.copie || []).slice(); c.splice(_sel.i, 1); if (c.length) a.opzioni.copie = c; else delete a.opzioni.copie; }
+    else a.opzioni.togli = [...new Set((a.opzioni.togli || []).concat(_sel.ids))];
+    _sel = null;
+    _dopoSpostamento();
+  };
+  const _rimettiSel = () => {
+    if (!_sel) return;
+    _ricordaPrecedente();
+    const a = _attuale();
+    if (_sel.tipo === 'agg') { const pos = _posizioni(); delete pos[_sel.k]; a.opzioni.pos = pos; _sel = null; }
+    else if (a.opzioni.sposta) { const sp = { ...a.opzioni.sposta }; _sel.ids.forEach((id) => delete sp[id]); a.opzioni.sposta = sp; }
+    _dopoSpostamento();
+  };
+  const rimettiACaso = () => { _ricordaPrecedente(); delete _attuale().opzioni.pos; _sel = null; _aggiornaControlli(); genera(); };
+  const rimettiTutto = () => { _ricordaPrecedente(); const a = _attuale(); delete a.opzioni.pos; delete a.opzioni.sposta; delete a.opzioni.togli; delete a.opzioni.copie; _sel = null; _aggiornaControlli(); genera(); };
+  const spostaRuota = () => {
+    _modoSposta = !_modoSposta; _sel = null;
+    if (_mappa) _rifaiManiglie();
+  };
+  // Quello che e' scelto ora: centro, raggio e disegno (solo le sue immagini)
+  const _bersaglio = (m) => {
+    if (!_sel) return null;
+    if (_sel.tipo === 'agg') {
+      const x = (m.aggiunti || []).find((q) => q.k === _sel.k);
+      return x && { x: x.x, y: x.y, R: Math.max(x.r * 1.1, 24 / V.s), disegno: x.disegno, giro: x.giro || 0, nome: _nomeAgg(m, x.k) };
+    }
+    if (_sel.tipo === 'copia') {
+      const c = (m.copie || []).find((q) => q.i === _sel.i);
+      return c && { x: c.x, y: c.y, R: Math.max(c.r * 1.05, 24 / V.s), disegno: c.disegno, giro: 0, nome: 'Copia' };
+    }
+    const membri = _sel.ids.map((id) => (m.oggetti || []).find((q) => q.id === id)).filter(Boolean);
+    if (!membri.length) return null;
+    const c = membri[0], R = Math.max(24 / V.s, ...membri.map((q) => Math.hypot(q.x - c.x, q.y - c.y) + q.r));
+    return { x: c.x, y: c.y, R, disegno: membri.map((q) => q.disegno).join(''), giro: 0, nome: 'Oggetto' };
+  };
+  // L'oggetto da solo, per vederlo muovere senza la mappa intorno
+  const _fantasma = (t) => {
+    const nomi = [...new Set([...t.disegno.matchAll(/href="#bm-([^"]+)"/g)].map((q) => q[1]))];
+    const defs = nomi.map((n) => { const im = CartoBattaglia.immagine(n); return im ? '<image id="bm-' + n + '" href="' + im.url + '" x="' + (-im.w / 2) + '" y="' + (-im.h / 2) + '" width="' + im.w + '" height="' + im.h + '"/>' : ''; }).join('');
+    const d = document.createElement('div');
+    d.className = 'carto-fantasma';
+    d.style.cssText = 'left:' + (t.x - t.R) + 'px;top:' + (t.y - t.R) + 'px;width:' + 2 * t.R + 'px;height:' + 2 * t.R + 'px;';
+    d.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="' + (t.x - t.R) + ' ' + (t.y - t.R) + ' ' + 2 * t.R + ' ' + 2 * t.R + '" width="100%" height="100%" style="overflow:visible"><defs>' + defs + '</defs><g transform="rotate(' + t.giro + ' ' + t.x + ' ' + t.y + ')">' + t.disegno + '</g></svg>';
+    return d;
+  };
+  // Oggetto della scena sotto il dito: il piu' piccolo (cosi' si prende anche cio' che sta sotto un albero);
+  // un tavolo si porta dietro le sue sedie (oggetti piu' piccoli posati subito prima o dopo, li' attorno)
+  const _prendi = (m, px, py) => {
+    const tol = 14 / V.s;
+    const c = (m.oggetti || []).filter((q) => Math.hypot(q.x - px, q.y - py) < Math.max(q.r * 0.8, tol));
+    if (!c.length) return null;
+    c.sort((a, b) => a.r - b.r || b.id - a.id);
+    const p = c[0], ids = [p.id];
+    if (!p.albero) m.oggetti.forEach((q) => { if (q.id !== p.id && !q.albero && Math.abs(q.id - p.id) <= 8 && q.r < p.r && Math.hypot(q.x - p.x, q.y - p.y) < p.r + 0.45 * m.quadretto) ids.push(q.id); });
+    return ids;
+  };
+  // Trascinare: si muove solo l'oggetto; al rilascio la mappa si ridisegna con l'oggetto nel posto nuovo
+  const _trascina = (ev, m, strato) => {
+    ev.stopPropagation(); ev.preventDefault();
+    const t = _bersaglio(m), el = ev.currentTarget;
+    if (!t) return;
+    try { el.setPointerCapture(ev.pointerId); } catch (z) {}
+    const S = m.quadretto, x0 = ev.clientX, y0 = ev.clientY;
+    const minX = m.vtt.ox + S * 0.5 - t.x, maxX = m.vtt.ox + (m.vtt.maxX - 0.5) * S - t.x, minY = m.vtt.oy + S * 0.5 - t.y, maxY = m.vtt.oy + (m.vtt.maxY - 0.5) * S - t.y;
+    let dx = 0, dy = 0, f = null;
+    const muovi = (e) => {
+      e.stopPropagation();
+      dx = Math.max(minX, Math.min(maxX, (e.clientX - x0) / V.s)); dy = Math.max(minY, Math.min(maxY, (e.clientY - y0) / V.s));
+      if (!f && Math.hypot(e.clientX - x0, e.clientY - y0) > 6) {
+        f = _fantasma(t); strato.appendChild(f);
+        strato.classList.add('carto-in-mano');
+      }
+      if (f) f.style.transform = 'translate(' + dx + 'px,' + dy + 'px)';
+    };
+    const fine = (e) => {
+      e.stopPropagation();
+      el.removeEventListener('pointermove', muovi); el.removeEventListener('pointerup', fine); el.removeEventListener('pointercancel', fine);
+      if (!f) return; // solo un tocco: l'oggetto resta scelto
+      _applicaSel(t, dx / S, dy / S, 0);
+    };
+    el.addEventListener('pointermove', muovi); el.addEventListener('pointerup', fine); el.addEventListener('pointercancel', fine);
+  };
+  // Cerchio intorno all'oggetto scelto, maniglia per ruotarlo e pulsanti
+  const _disegnaSel = (m, strato) => {
+    strato.querySelectorAll('.carto-sel, .carto-strumenti, .carto-giro').forEach((e) => e.remove());
+    const t = _bersaglio(m);
+    if (!t) return;
+    const anello = document.createElement('div');
+    anello.className = 'carto-sel';
+    anello.style.cssText = 'left:' + (t.x - t.R) + 'px;top:' + (t.y - t.R) + 'px;width:' + 2 * t.R + 'px;height:' + 2 * t.R + 'px;';
+    strato.appendChild(anello);
+    // Maniglia: si gira intorno all'oggetto
+    const giro = document.createElement('button');
+    giro.type = 'button'; giro.className = 'carto-giro';
+    giro.setAttribute('aria-label', 'Ruota: trascina intorno all’oggetto');
+    giro.title = 'Trascina per ruotare';
+    giro.style.cssText = 'left:' + t.x + 'px;top:' + (t.y - t.R) + 'px;';
+    giro.innerHTML = ICONE.dx;
+    giro.addEventListener('pointerdown', (ev) => {
+      ev.stopPropagation(); ev.preventDefault();
+      try { giro.setPointerCapture(ev.pointerId); } catch (z) {}
+      const b = anello.getBoundingClientRect(), cx = b.left + b.width / 2, cy = b.top + b.height / 2;
+      const a0 = Math.atan2(ev.clientY - cy, ev.clientX - cx);
+      const f = _fantasma(t); strato.appendChild(f); strato.classList.add('carto-in-mano');
+      let dg = 0;
+      const muovi = (e) => { e.stopPropagation(); dg = Math.round((Math.atan2(e.clientY - cy, e.clientX - cx) - a0) * 180 / Math.PI / 5) * 5; f.style.transform = 'rotate(' + dg + 'deg)'; };
+      const fine = (e) => {
+        e.stopPropagation();
+        giro.removeEventListener('pointermove', muovi); giro.removeEventListener('pointerup', fine); giro.removeEventListener('pointercancel', fine);
+        if (Math.abs(dg) < 1) { f.remove(); strato.classList.remove('carto-in-mano'); return; }
+        _applicaSel(t, 0, 0, dg);
+      };
+      giro.addEventListener('pointermove', muovi); giro.addEventListener('pointerup', fine); giro.addEventListener('pointercancel', fine);
+    });
+    strato.appendChild(giro);
+    // Pulsanti sotto l'oggetto (sopra, se l'oggetto e' in fondo alla mappa)
+    const sotto = t.y + t.R + 70 / V.s < m.H;
+    const bar = document.createElement('div');
+    bar.className = 'carto-strumenti' + (sotto ? '' : ' carto-strumenti-su');
+    bar.style.cssText = 'left:' + t.x + 'px;top:' + (sotto ? t.y + t.R : t.y - t.R) + 'px;';
+    bar.innerHTML =
+      '<button type="button" class="btn btn-ghost btn-sm" onclick="Cartografo._ruotaSel(-45)" aria-label="Ruota a sinistra di 45 gradi" title="Ruota a sinistra">' + ICONE.sx + '</button>' +
+      '<button type="button" class="btn btn-ghost btn-sm" onclick="Cartografo._ruotaSel(45)" aria-label="Ruota a destra di 45 gradi" title="Ruota a destra">' + ICONE.dx + '</button>' +
+      '<button type="button" class="btn btn-ghost btn-sm" onclick="Cartografo._duplicaSel()" aria-label="Duplica" title="Duplica">' + ICONE.copia + '</button>' +
+      '<button type="button" class="btn btn-ghost btn-sm carto-elimina" onclick="Cartografo._eliminaSel()" aria-label="Elimina" title="Elimina">' + ICONE.cestino + '</button>' +
+      (_sel.tipo === 'copia' ? '' : '<button type="button" class="btn btn-ghost btn-sm" onclick="Cartografo._rimettiSel()">Com’era</button>');
+    bar.addEventListener('pointerdown', (ev) => ev.stopPropagation());
+    strato.appendChild(bar);
+  };
+  const _rifaiManiglie = () => {
+    const v = $('carto-vista');
+    if (v) v.querySelectorAll('.carto-maniglie').forEach((e) => e.remove());
+    _maniglie(_mappa);
+  };
+  const _maniglie = (m) => {
+    const v = $('carto-vista'), bt = $('carto-sposta'), st = $('carto-stage'), barra = $('carto-sposta-barra');
+    const attivo = _modoSposta && m.tipo === 'battaglia';
+    if (bt) { bt.hidden = m.tipo !== 'battaglia'; bt.setAttribute('aria-pressed', String(attivo)); }
+    if (st) st.classList.toggle('carto-modo-sposta', attivo);
+    if (barra) {
+      barra.hidden = !attivo;
+      const oa = _attuale().opzioni, qualcosa = !!(oa.pos || oa.sposta || oa.togli || oa.copie);
+      barra.innerHTML = '<span>Trascina un oggetto per spostarlo. Toccalo per ruotarlo.</span>' +
+        (qualcosa ? '<button type="button" class="btn btn-ghost btn-sm" onclick="Cartografo.rimettiTutto()">Rimetti tutto com’era</button>' : '');
+    }
+    if (!v || !attivo) return;
+    const strato = document.createElement('div');
+    strato.className = 'carto-maniglie';
+    // Il piano prende gli oggetti della scena; se sotto il dito non c'e' niente, il tocco passa alla mappa
+    const piano = document.createElement('div');
+    piano.className = 'carto-piano';
+    piano.addEventListener('pointerdown', (ev) => {
+      const b = v.getBoundingClientRect(), ids = _prendi(m, (ev.clientX - b.left) / V.s, (ev.clientY - b.top) / V.s);
+      if (!ids) { if (_sel) { _sel = null; _disegnaSel(m, strato); } return; }
+      _sel = { tipo: 'scena', ids };
+      _disegnaSel(m, strato);
+      _trascina(ev, m, strato);
+    });
+    strato.appendChild(piano);
+    // Gli oggetti aggiunti dal menu hanno un cerchio tratteggiato: si prendono sempre come un pezzo unico
+    (m.aggiunti || []).forEach((x) => {
+      const R = Math.max(x.r * 1.05, 24 / V.s), nome = _nomeAgg(m, x.k);
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'carto-maniglia';
+      b.style.cssText = 'left:' + (x.x - R) + 'px;top:' + (x.y - R) + 'px;width:' + 2 * R + 'px;height:' + 2 * R + 'px;';
+      b.setAttribute('aria-label', nome + ': trascina per spostare, frecce per spostare di un quadretto, R per ruotare');
+      b.title = nome;
+      b.addEventListener('pointerdown', (ev) => { _sel = { tipo: 'agg', k: x.k }; _disegnaSel(m, strato); _trascina(ev, m, strato); });
+      b.addEventListener('keydown', (ev) => {
+        const d = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] }[ev.key];
+        if (d) { ev.preventDefault(); _sel = { tipo: 'agg', k: x.k }; _muoviAgg(x.k, d[0], d[1]); }
+        else if (ev.key === 'r' || ev.key === 'R') { ev.preventDefault(); _sel = { tipo: 'agg', k: x.k }; _muoviAgg(x.k, 0, 0, ev.shiftKey ? -15 : 15); }
+      });
+      strato.appendChild(b);
+    });
+    (m.copie || []).forEach((c) => {
+      const R = Math.max(c.r * 1.05, 24 / V.s);
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'carto-maniglia';
+      b.style.cssText = 'left:' + (c.x - R) + 'px;top:' + (c.y - R) + 'px;width:' + 2 * R + 'px;height:' + 2 * R + 'px;';
+      b.setAttribute('aria-label', 'Copia: trascina per spostare');
+      b.title = 'Copia';
+      b.addEventListener('pointerdown', (ev) => { _sel = { tipo: 'copia', i: c.i }; _disegnaSel(m, strato); _trascina(ev, m, strato); });
+      strato.appendChild(b);
+    });
+    v.appendChild(strato);
+    _disegnaSel(m, strato);
   };
   const _dopoMostra = [];
   const dopoMostra = (f) => { if (typeof f === 'function') _dopoMostra.push(f); };
@@ -710,15 +1030,21 @@ const Cartografo = (() => {
     // della larghezza della finestra. Per questo si guarda la pagina (container), non lo schermo.
     const stretto =
       '.carto-corpo { grid-template-columns:minmax(0,1fr); }' +
-      '.carto-anteprima { order:-1; }' +
-      '#carto-stage, #carto-contesto:not([hidden]) ~ .carto-corpo #carto-stage { height:auto; aspect-ratio:var(--carto-ar, 7/5); }' +
+      // Mappa sopra e ferma in alto mentre si scorrono le impostazioni: ogni modifica si vede subito
+      '.carto-anteprima { display:contents; }' +
+      '.carto-barra { order:-2; }' +
+      '#carto-stage { order:-1; position:sticky; top:calc(var(--carto-sopra, 56px) + 8px); z-index:3; box-shadow:0 6px 16px -8px rgba(0,0,0,.45); }' +
+      '#carto-stage, #carto-contesto:not([hidden]) ~ .carto-corpo #carto-stage { height:auto; aspect-ratio:var(--carto-ar, 7/5); max-height:calc(100dvh - var(--carto-sopra, 56px) - 300px); min-height:200px; }' +
+      '.carto-principali { grid-template-columns:repeat(3,minmax(0,1fr)); }' +
       // Sulla mappa intera in alto c'e' il titolo: lo zoom non lo deve coprire
       '.carto-zoom { top:auto; bottom:8px; right:8px; }';
     const telefono =
       '.carto-comandi > .btn, .carto-azioni > .btn { flex:1 1 auto; min-height:40px; }' +
-      '.carto-azioni { width:100%; }';
+      '.carto-azioni { width:100%; }' +
+      '.carto-principali { grid-template-columns:repeat(2,minmax(0,1fr)); }';
     st.textContent =
-      '#page-cartografo { container-type:inline-size; }' +
+      // overflow:clip invece di auto: la pagina non scorre da sola (scorre il documento) e cosi' la mappa puo' restare ferma in alto
+      '#page-cartografo { container-type:inline-size; overflow:clip; }' +
       '#carto-tipi { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:var(--space-sm); }' +
       '#carto-contesto { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:6px 12px; padding:8px 12px; margin-bottom:var(--space-sm); background:var(--bg-tertiary); border:1px solid var(--border-strong); border-radius:var(--radius-md); color:var(--text-primary); font-size:0.92rem; }' +
       '#carto-contesto[hidden] { display:none; }' +
@@ -735,6 +1061,34 @@ const Cartografo = (() => {
       '.carto-chip { min-height:36px; padding:6px 12px; border-radius:999px; border:1px solid var(--border-strong); background:var(--bg-secondary); color:var(--text-primary); font:inherit; font-size:0.88rem; line-height:1.2; cursor:pointer; }' +
       '.carto-chip[aria-pressed="true"] { background:var(--accent-primary); border-color:var(--accent-primary); color:var(--text-on-accent, #fff); }' +
       '.carto-chip:focus-visible { outline:2px solid var(--accent-primary); outline-offset:2px; }' +
+      '.carto-principali > :last-child:nth-child(odd) { grid-column:auto; }' +
+      '.carto-sezione { border-top:1px solid var(--border); }' +
+      '.carto-sezione:last-child { margin-bottom:calc(-1 * var(--space-sm)); }' +
+      '.carto-sezione > summary { display:flex; align-items:center; gap:8px; min-height:48px; cursor:pointer; list-style:none; color:var(--text-primary); font-weight:600; font-size:0.95rem; -webkit-user-select:none; user-select:none; }' +
+      '.carto-sezione > summary::-webkit-details-marker { display:none; }' +
+      '.carto-sezione > summary:focus-visible { outline:2px solid var(--accent-primary); outline-offset:2px; border-radius:var(--radius-sm); }' +
+      '.carto-freccia { flex-shrink:0; color:var(--text-muted); transition:transform .15s ease; }' +
+      '.carto-sezione[open] .carto-freccia { transform:rotate(90deg); }' +
+      '.carto-conta { min-width:22px; height:22px; padding:0 7px; border-radius:999px; background:var(--accent-primary); color:var(--text-on-accent, #fff); font-size:0.8rem; line-height:22px; text-align:center; }' +
+      '.carto-conta[hidden] { display:none; }' +
+      '.carto-sezione-corpo { padding-bottom:var(--space-md); }' +
+      '.carto-suggerimento { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:6px 10px; margin-top:10px; font-size:0.88rem; color:var(--text-secondary); }' +
+      '.carto-maniglie { position:absolute; inset:0; }' +
+      '.carto-piano { position:absolute; inset:0; touch-action:none; cursor:pointer; }' +
+      '.carto-maniglia { position:absolute; padding:0; border-radius:50%; border:calc(2px * var(--inv, 1)) dashed rgba(255,255,255,.9); background:transparent; box-shadow:0 0 0 calc(1px * var(--inv, 1)) rgba(0,0,0,.4); cursor:grab; touch-action:none; }' +
+      '.carto-maniglia:hover, .carto-maniglia:focus-visible { border-style:solid; border-color:var(--accent-primary); outline:none; }' +
+      '.carto-sel { position:absolute; pointer-events:none; border-radius:50%; border:calc(3px * var(--inv, 1)) solid var(--accent-primary); box-shadow:0 0 0 calc(2px * var(--inv, 1)) rgba(0,0,0,.35); }' +
+      '.carto-in-mano .carto-sel { border-style:dashed; border-color:rgba(255,255,255,.9); background:rgba(20,14,10,.62); }' +
+      '.carto-in-mano .carto-strumenti, .carto-in-mano .carto-giro { visibility:hidden; }' +
+      '.carto-fantasma { position:absolute; pointer-events:none; z-index:3; filter:drop-shadow(0 calc(10px * var(--inv, 1)) calc(10px * var(--inv, 1)) rgba(0,0,0,.6)); }' +
+      '.carto-giro { position:absolute; width:36px; height:36px; padding:0; display:grid; place-items:center; border-radius:50%; border:2px solid #fff; background:var(--accent-primary); color:var(--text-on-accent, #fff); box-shadow:0 2px 8px rgba(0,0,0,.45); transform:translate(-50%,-50%) scale(var(--inv, 1)); cursor:grab; touch-action:none; z-index:2; }' +
+      '.carto-strumenti { position:absolute; display:flex; gap:4px; padding:4px; background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-md); box-shadow:var(--shadow-md); white-space:nowrap; transform-origin:top center; transform:translate(-50%, calc(10px * var(--inv, 1))) scale(var(--inv, 1)); z-index:2; }' +
+      '.carto-strumenti-su { transform-origin:bottom center; transform:translate(-50%, calc(-100% - 46px * var(--inv, 1))) scale(var(--inv, 1)); }' +
+      '.carto-strumenti .carto-elimina { color:var(--danger, #d9534f); }' +
+      '.carto-strumenti .btn { min-height:40px; min-width:40px; display:inline-flex; align-items:center; justify-content:center; }' +
+      '#carto-sposta[aria-pressed="true"] { background:var(--accent-primary) !important; border-color:var(--accent-primary) !important; color:var(--text-on-accent, #fff) !important; }' +
+      '#carto-sposta-barra { position:absolute; left:8px; bottom:8px; right:8px; display:flex; flex-wrap:wrap; align-items:center; gap:4px 10px; width:max-content; max-width:calc(100% - 16px); padding:6px 6px 6px 12px; background:var(--bg-card); color:var(--text-primary); border:1px solid var(--border); border-radius:var(--radius-md); box-shadow:var(--shadow-md); font-size:0.88rem; z-index:2; }' +
+      '#carto-sposta-barra[hidden] { display:none; }' +
       '.carto-spunte { display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); column-gap:10px; }' +
       '.carto-nota { font-size:0.88rem; line-height:1.5; color:var(--text-secondary); padding:8px 10px; margin-top:8px; background:var(--bg-tertiary); border-radius:var(--radius-md); }' +
       '.carto-anteprima { min-width:0; display:flex; flex-direction:column; gap:8px; }' +
@@ -790,6 +1144,7 @@ const Cartografo = (() => {
               '<div class="carto-zoom"><button type="button" class="btn btn-ghost btn-icon-sm" onclick="Cartografo.zoom(1/1.4)" aria-label="Riduci">−</button>' +
               '<button type="button" class="btn btn-ghost btn-sm" id="carto-zoom" onclick="Cartografo.zoomReset()" title="Adatta allo spazio">100%</button>' +
               '<button type="button" class="btn btn-ghost btn-icon-sm" onclick="Cartografo.zoom(1.4)" aria-label="Ingrandisci">+</button></div>' +
+              '<button type="button" class="btn btn-secondary btn-sm" id="carto-sposta" hidden aria-pressed="false" onclick="Cartografo.spostaRuota()" title="Prendi gli oggetti della mappa per spostarli e ruotarli">Sposta e ruota</button>' +
               '<button type="button" class="btn btn-secondary btn-sm" onclick="Cartografo.ritocca()" title="Rinomina o nascondi i nomi, aggiungi scritte tue">Ritocca</button>' +
               '<button type="button" class="btn btn-primary btn-sm" onclick="Cartografo.apriMettiNelleMappe()">Metti nelle mappe</button>' +
               '<button type="button" class="btn btn-secondary btn-sm" id="carto-png" onclick="Cartografo.scaricaPng()">Scarica PNG</button>' +
@@ -800,6 +1155,7 @@ const Cartografo = (() => {
             '</div></div>' +
           '<div id="carto-stage"><div id="carto-vista" role="img"></div>' +
             '<div id="carto-attesa" role="status">Sto disegnando la mappa…</div>' +
+            '<div id="carto-sposta-barra" hidden></div>' +
           '</div>' +
         '</div>' +
       '</div>';
@@ -829,5 +1185,5 @@ const Cartografo = (() => {
     if (!_mappa || typeof CartoRitocchi === 'undefined') return;
     CartoRitocchi.apri({ stato: () => ({ a: _attuale(), mappa: _mappa }), salvaStato: _salva, rigenera: genera });
   };
-  return { strumenti, ritocca, perPin, annullaContesto, apri, nuova, aCaso, _tieniColori, precedente, scegliTipo, zoom, zoomReset, scaricaPng, scaricaSvg, scaricaVtt, stampaScala, stampaA4, _confermaScelta, apriMettiNelleMappe, _confermaMappe, _opzione, _multi, _nome, _seme, dopoMostra, mappaAttuale };
+  return { strumenti, ritocca, perPin, annullaContesto, apri, nuova, aCaso, _tieniColori, precedente, scegliTipo, zoom, zoomReset, scaricaPng, scaricaSvg, scaricaVtt, stampaScala, stampaA4, _confermaScelta, apriMettiNelleMappe, _confermaMappe, _opzione, _multi, _apri, rimettiACaso, rimettiTutto, spostaRuota, _ruotaSel, _rimettiSel, _duplicaSel, _eliminaSel, _nome, _seme, dopoMostra, mappaAttuale };
 })();

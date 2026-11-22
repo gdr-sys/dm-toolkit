@@ -151,6 +151,7 @@ body {
   background-color: var(--bg-primary);
   transition: background-color var(--transition-normal), color var(--transition-normal);
   overflow-x: hidden;
+  overflow-x: clip;
 }
 
 /* ── Tipografia ── */

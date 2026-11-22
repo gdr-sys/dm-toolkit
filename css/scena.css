@@ -71,7 +71,7 @@
 [data-theme="dark"][data-colore="nero"] { --bg-primary: #000; --bg-secondary: oklch(11% 0 0); --bg-card: oklch(16% 0 0); --bg-card-hover: oklch(20% 0 0); --bg-tertiary: oklch(24% 0 0); --campo: oklch(9% 0 0); }
 
 /* ── Testo ── */
-body { font-family: var(--font-body); background: var(--bg-primary); color: var(--text-primary); overflow-x: hidden; }
+body { font-family: var(--font-body); background: var(--bg-primary); color: var(--text-primary); overflow-x: hidden; overflow-x: clip; }
 h1, h2, h3, h4, .page-title, .card-title, .modal-title, .logo-text { font-family: var(--font-titoli); font-weight: 400; letter-spacing: -0.01em; overflow-wrap: break-word; }
 .page-title, .page-header h1 { font-size: clamp(2.2rem, 5vw, 4rem); line-height: 1; letter-spacing: -0.02em; text-wrap: balance; }
 .page-subtitle { font-size: 1.05rem; color: var(--text-secondary); margin-top: 8px; }

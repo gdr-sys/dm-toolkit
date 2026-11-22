@@ -197,12 +197,22 @@ const CartoBattaglia = (() => {
       return nome;
     };
     // Un oggetto: centro in quadretti, lato lungo in quadretti, rotazione in gradi
+    // Ogni immagine posata ha un numero: a parita' di mappa e opzioni e' sempre lo stesso oggetto,
+    // cosi' il DM puo' spostarlo e ruotarlo (o.sposta = { numero: [du, dw, gradi] })
+    let nSpr = 0, ultimoSpr = -1;
+    const sprInfo = [];
     const spr = (nome0, u, w, lato, rot = 0) => {
+      const id = nSpr++; ultimoSpr = id;
+      const d = o.sposta && o.sposta[id];
+      if (d) { u += d[0] || 0; w += d[1] || 0; rot += d[2] || 0; }
       const nome = sostituto(nome0);
       if (!nome || !_img[nome]) return '';
       const im = _img[nome]; usate.add(nome);
       const k = (lato * S) / Math.max(im.w, im.h);
-      return `<use href="#bm-${nome}" transform="translate(${n1(X(u))} ${n1(Y(w))}) rotate(${n1(rot)}) scale(${(Math.round(k * 10000) / 10000)})"/>`;
+      const use = `<use href="#bm-${nome}" transform="translate(${n1(X(u))} ${n1(Y(w))}) rotate(${n1(rot)}) scale(${(Math.round(k * 10000) / 10000)})"/>`;
+      const tolto = !!(o.togli && o.togli.includes(id));
+      sprInfo.push({ id, u, w, r: lato / 2, nome, use, tolto, albero: QUERCE.includes(nome0) || PINI.includes(nome0) || CESPUGLI.includes(nome0) });
+      return tolto ? '' : use;
     };
     // Piastrella di terreno: un'immagine ogni "lato" quadretti (l'ambiente puo' cambiarne l'immagine, non l'id)
     const fatti = new Set();
@@ -224,9 +234,17 @@ const CartoBattaglia = (() => {
     let interno = null; // al chiuso senza pianta (locanda): dove si puo' posare
     const punti = [];
     const segna = (u, w, titolo, testo) => punti.push({ u, w, titolo, testo });
-    const occupati = []; // [u, w, raggio]
-    const libero = (u, w, rr) => occupati.every(([a, b, q]) => Math.hypot(a - u, b - w) > rr + q);
-    const occupa = (u, w, rr) => occupati.push([u, w, rr]);
+    const occupati = []; // [u, w, raggio, mobile?]
+    // oltreMobili: alberi e cespugli non contano (lasciano il posto agli oggetti scelti dal DM)
+    const libero = (u, w, rr, oltreMobili) => occupati.every(([a, b, q, m]) => (oltreMobili && m != null) || Math.hypot(a - u, b - w) > rr + q);
+    const occupa = (u, w, rr, m) => occupati.push([u, w, rr, m]);
+    // Alberi e cespugli si scrivono come segnaposto: se un oggetto aggiunto ha bisogno del loro posto, spariscono
+    const mobili = [];
+    const tieni = (svg) => mobili.push({ svg, via: false }) - 1;
+    const segnaposto = (i) => '\u0001' + i + '\u0001';
+    const sgombra = (u, w, rr) => {
+      for (let i = occupati.length - 1; i >= 0; i--) { const [a, b, q, m] = occupati[i]; if (m != null && Math.hypot(a - u, b - w) < rr + q) { mobili[m].via = true; occupati.splice(i, 1); } }
+    };
     const muri = [], porte = [];
     const L = { defs: '', terra: '', sotto: '', sopra: '', alto: '', luci: '' };
     let nome;
@@ -243,9 +261,10 @@ const CartoBattaglia = (() => {
       for (let tent = 0; tent < cols * rows * 1.3 * fitto * Math.max(1, VEG); tent++) {
         const u = r.range(-0.6, cols + 0.6), w = r.range(-0.6, rows + 0.6), lato = r.range(2.1, 3);
         if (!ok(u, w) || !libero(u, w, lato * 0.42)) continue;
-        lista.push([u, w, lato]); occupa(u, w, lato * 0.42);
+        const i = tieni('');
+        lista.push([u, w, lato, i]); occupa(u, w, lato * 0.42, i);
       }
-      lista.sort((a, b) => a[1] - b[1]).forEach(([u, w, lato]) => { L.alto += spr(c(r.chance(pini) ? PINI : QUERCE), u, w, lato, r.range(0, 360)); });
+      lista.sort((a, b) => a[1] - b[1]).forEach(([u, w, lato, i]) => { mobili[i].svg = spr(c(r.chance(pini) ? PINI : QUERCE), u, w, lato, r.range(0, 360)); mobili[i].id = ultimoSpr; L.alto += segnaposto(i); });
       return lista;
     };
     // Oggetti sparsi a terra (cespugli, sassi, ceppi...)
@@ -253,7 +272,8 @@ const CartoBattaglia = (() => {
       for (let i = 0, messi = 0; i < quanti * 8 && messi < quanti; i++) {
         const u = r.range(0.5, cols - 0.5), w = r.range(0.5, rows - 0.5), lato = r.range(min, max);
         if (!ok(u, w) || !libero(u, w, lato * 0.45)) continue;
-        L.sotto += spr(c(nomi), u, w, lato, r.range(0, 360)); occupa(u, w, lato * 0.45); messi++;
+        const i = tieni(spr(c(nomi), u, w, lato, r.range(0, 360))); mobili[i].id = ultimoSpr;
+        L.sotto += segnaposto(i); occupa(u, w, lato * 0.45, i); messi++;
       }
     };
     const luce = (u, w, raggio, colore = '#ffb347', forza = 0.45) => { L.luci += `<circle cx="${n1(X(u))}" cy="${n1(Y(w))}" r="${n1(S * raggio)}" fill="${colore}" opacity="${forza}" filter="url(#carto-b40)" style="mix-blend-mode:screen"/>`; };
@@ -521,41 +541,98 @@ const CartoBattaglia = (() => {
       if (interno) return interno(u, w, rr);
       return u > rr + 0.4 && w > rr + 0.4 && u < cols - rr - 0.4 && w < rows - rr - 0.4;
     };
-    const posOk = (u, w, rr, suStrada) => libero(u, w, rr) && dentroOk(u, w, rr) && !inAcqua(u, w, rr) && (suStrada || !inStrada(u, w));
+    const posOk = (u, w, rr, suStrada, oltreMobili) => libero(u, w, rr, oltreMobili) && dentroOk(u, w, rr) && !inAcqua(u, w, rr) && (suStrada || !inStrada(u, w));
+    // Ogni oggetto ha il suo caso (spostarne uno non rimescola gli altri) e puo' avere un posto scelto dal DM
+    let re = r, fisso = null, rotFissa = null, primo = null, rotUsata = null;
+    const prendi = (p, rr) => { if (p && !primo) primo = [p[0], p[1], rr]; return p; };
     const trova = (rr, extra = () => true, tent = 260) => {
-      for (let i = 0; i < tent; i++) { const u = r.range(1, cols - 1), w = r.range(1, rows - 1); if (posOk(u, w, rr) && extra(u, w)) return [u, w]; }
+      // Posto scelto dal DM: si rispetta; se cade in acqua o dentro un muro, si va al punto buono piu' vicino
+      if (fisso) {
+        const [u0, w0] = fisso; fisso = null;
+        const buono = (u, w) => u >= 0.3 && w >= 0.3 && u <= cols - 0.3 && w <= rows - 0.3 && !inAcqua(u, w) && (celleOk || interno ? dentroOk(u, w, 0.3) : true);
+        for (let d = 0; d <= 5; d += 0.5) for (let k = 0, n = d ? Math.ceil(d * 8) : 1; k < n; k++) {
+          const u = u0 + Math.cos(k / n * Math.PI * 2) * d, w = w0 + Math.sin(k / n * Math.PI * 2) * d;
+          if (buono(u, w)) { sgombra(u, w, rr); return prendi([u, w], rr); }
+        }
+      }
+      for (let i = 0; i < tent; i++) { const u = re.range(1, cols - 1), w = re.range(1, rows - 1); if (posOk(u, w, rr) && extra(u, w)) return prendi([u, w], rr); }
+      // Nessuno spazio libero: alberi e cespugli lasciano il posto all'oggetto scelto; se non basta,
+      // l'oggetto puo' toccare gli altri oggetti della scena e infine stare sulla strada (mai in acqua o fuori dalle stanze)
+      const lasco = [(u, w) => posOk(u, w, rr, false, true), (u, w) => dentroOk(u, w, rr) && !inAcqua(u, w, rr) && !inStrada(u, w), (u, w) => dentroOk(u, w, rr) && !inAcqua(u, w, rr), (u, w) => dentroOk(u, w, rr * 0.5) && !inAcqua(u, w, rr * 0.5)];
+      for (const ok of lasco) for (let i = 0; i < tent; i++) { const u = re.range(1, cols - 1), w = re.range(1, rows - 1); if (ok(u, w) && extra(u, w)) { sgombra(u, w, rr); return prendi([u, w], rr); } }
       return null;
     };
     const posa = (strato, nomeS, u, w, lato, rot, rr) => { L[strato] += spr(nomeS, u, w, lato, rot); occupa(u, w, rr); };
     // Un carro sta sulla strada, girato come la strada; se non ci sono strade, in uno spiazzo
     const suStrada = (rr) => {
-      for (const l of r.shuffle(strade.slice())) for (let t = 0; t < 40; t++) {
-        const i = r.int(2, l.length - 3), [u, w] = l[i], [u2, w2] = l[i + 1];
+      for (const l of re.shuffle(strade.slice())) for (let t = 0; t < 40; t++) {
+        const i = re.int(2, l.length - 3), [u, w] = l[i], [u2, w2] = l[i + 1];
         if (u < 2 || w < 2 || u > cols - 2 || w > rows - 2 || !posOk(u, w, rr, true)) continue;
-        return [u, w, Math.atan2(w2 - w, u2 - u) * 180 / Math.PI];
+        return prendi([u, w, Math.atan2(w2 - w, u2 - u) * 180 / Math.PI], rr);
       }
       return null;
     };
     const ELEMENTI = {
-      carro: { dove: ['aperto'], f: () => { const p = suStrada(1.5) || (() => { const q = trova(1.6); return q && [q[0], q[1], r.pick([0, 90])]; })(); if (!p) return; posa('sopra', r.pick(['carro', 'carro', 'carro-fieno']), p[0], p[1], 3, p[2] + (r.chance(0.5) ? 0 : 180), 1.5); segna(p[0], p[1] - 1.6, 'Carro', 'Tre quarti di copertura dietro le ruote; i cavalli si spaventano facilmente.'); } },
-      rovesciato: { dove: ['aperto'], f: () => { const p = trova(1.6, (u, w) => !strade.length || strade.some((l) => _distSpezzata([u, w], l) < 4)); if (!p) return; posa('sopra', 'carro-rovesciato', p[0], p[1], 3.2, r.range(0, 360), 1.6); posa('sopra', 'ruota', p[0] + 1.6, p[1] + 1, 0.95, r.range(0, 360), 0.4); segna(p[0], p[1] - 1.6, 'Carro rovesciato', 'Tre quarti di copertura. Le casse sparse sono terreno difficile.'); } },
-      tenda: { dove: ['aperto'], f: () => { const p = trova(1.3); if (!p) return; posa('sopra', 'tenda', p[0], p[1], 2.4, r.range(0, 360), 1.3); segna(p[0], p[1] - 1.6, 'Tenda', 'Mezza copertura; chi dorme dentro è sorpreso facilmente.'); } },
-      fuoco: { dove: ['aperto', 'grotta', 'chiuso'], f: () => { const p = trova(1); if (!p) return; if (ambiente === 'chiuso') { posa('sopra', 'braciere', p[0], p[1], 0.9, 0, 0.6); luce(p[0], p[1], 3); segna(p[0] + 1, p[1], 'Braciere', 'Luce fioca fino a 6 m. Rovesciato, incendia ciò che ha intorno.'); return; } posa('sopra', 'fuoco-campo', p[0], p[1], 1.3, r.range(0, 360), 0.9); luce(p[0], p[1], 4.5, '#ffb347', 0.5); segna(p[0] + 1.2, p[1] - 0.9, 'Fuoco', 'Luce fioca fino a 6 m. Chi ci finisce dentro prende danni da fuoco.'); } },
-      massi: { dove: ['aperto', 'grotta'], f: () => { let primo = null; for (let i = 0; i < 3; i++) { const p = trova(0.9, primo ? (u, w) => Math.hypot(u - primo[0], w - primo[1]) < 4 : undefined); if (!p) continue; posa('sopra', r.pick(MASSI), p[0], p[1], r.range(1.4, 1.9), r.range(0, 360), 0.9); primo = primo || p; } if (primo) segna(primo[0], primo[1] - 1.2, 'Massi', 'Mezza copertura.'); } },
-      tronco: { dove: ['aperto'], f: () => { const p = trova(1.8); if (!p) return; posa('sopra', 'tronco-caduto', p[0], p[1], 4.6, r.range(0, 360), 1.8); segna(p[0], p[1] - 1.3, 'Albero caduto', 'Mezza copertura; scavalcarlo costa movimento extra.'); } },
-      rovi: { dove: ['aperto'], f: () => { const p = trova(1.5); if (!p) return; posa('sopra', 'rovi-1', p[0] - 0.5, p[1], 2, r.range(0, 360), 1.4); L.sopra += spr('rovi-2', p[0] + 0.7, p[1] + 0.3, 1.8, r.range(0, 360)); segna(p[0], p[1] - 1.5, 'Rovi', 'Terreno difficile; chi ci finisce dentro resta impigliato.'); } },
-      stagno: { dove: ['aperto'], f: () => { const p = trova(1.6); if (!p) return; posa('sotto', 'stagno', p[0], p[1], 3, r.range(0, 360), 1.6); zona('acqua', (u, w) => Math.hypot(u - p[0], w - p[1]) < 1.4); segna(p[0] + 1.8, p[1], 'Stagno', 'Acqua alla vita: terreno difficile.'); } },
+      carro: { dove: ['aperto'], f: () => { const p = (!fisso && suStrada(1.5)) || (() => { const q = trova(1.6); return q && [q[0], q[1], re.pick([0, 90])]; })(); if (!p) return; rotUsata = rotFissa != null ? rotFissa : p[2] + (re.chance(0.5) ? 0 : 180); posa('sopra', re.pick(['carro', 'carro', 'carro-fieno']), p[0], p[1], 3, rotUsata, 1.5); segna(p[0], p[1] - 1.6, 'Carro', 'Tre quarti di copertura dietro le ruote; i cavalli si spaventano facilmente.'); } },
+      rovesciato: { dove: ['aperto'], f: () => { const p = trova(1.6, (u, w) => !strade.length || strade.some((l) => _distSpezzata([u, w], l) < 4)); if (!p) return; posa('sopra', 'carro-rovesciato', p[0], p[1], 3.2, re.range(0, 360), 1.6); posa('sopra', 'ruota', p[0] + 1.6, p[1] + 1, 0.95, re.range(0, 360), 0.4); segna(p[0], p[1] - 1.6, 'Carro rovesciato', 'Tre quarti di copertura. Le casse sparse sono terreno difficile.'); } },
+      tenda: { dove: ['aperto'], f: () => { const p = trova(1.3); if (!p) return; posa('sopra', 'tenda', p[0], p[1], 2.4, re.range(0, 360), 1.3); segna(p[0], p[1] - 1.6, 'Tenda', 'Mezza copertura; chi dorme dentro è sorpreso facilmente.'); } },
+      fuoco: { dove: ['aperto', 'grotta', 'chiuso'], f: () => { const p = trova(1); if (!p) return; if (ambiente === 'chiuso') { posa('sopra', 'braciere', p[0], p[1], 0.9, 0, 0.6); luce(p[0], p[1], 3); segna(p[0] + 1, p[1], 'Braciere', 'Luce fioca fino a 6 m. Rovesciato, incendia ciò che ha intorno.'); return; } posa('sopra', 'fuoco-campo', p[0], p[1], 1.3, re.range(0, 360), 0.9); luce(p[0], p[1], 4.5, '#ffb347', 0.5); segna(p[0] + 1.2, p[1] - 0.9, 'Fuoco', 'Luce fioca fino a 6 m. Chi ci finisce dentro prende danni da fuoco.'); } },
+      massi: { dove: ['aperto', 'grotta'], f: () => { let primo = null; for (let i = 0; i < 3; i++) { const p = trova(0.9, primo ? (u, w) => Math.hypot(u - primo[0], w - primo[1]) < 4 : undefined); if (!p) continue; posa('sopra', re.pick(MASSI), p[0], p[1], re.range(1.4, 1.9), re.range(0, 360), 0.9); primo = primo || p; } if (primo) segna(primo[0], primo[1] - 1.2, 'Massi', 'Mezza copertura.'); } },
+      tronco: { dove: ['aperto'], f: () => { const p = trova(1.8); if (!p) return; posa('sopra', 'tronco-caduto', p[0], p[1], 4.6, re.range(0, 360), 1.8); segna(p[0], p[1] - 1.3, 'Albero caduto', 'Mezza copertura; scavalcarlo costa movimento extra.'); } },
+      rovi: { dove: ['aperto'], f: () => { const p = trova(1.5); if (!p) return; posa('sopra', 'rovi-1', p[0] - 0.5, p[1], 2, re.range(0, 360), 1.4); L.sopra += spr('rovi-2', p[0] + 0.7, p[1] + 0.3, 1.8, re.range(0, 360)); segna(p[0], p[1] - 1.5, 'Rovi', 'Terreno difficile; chi ci finisce dentro resta impigliato.'); } },
+      stagno: { dove: ['aperto'], f: () => { const p = trova(1.6); if (!p) return; posa('sotto', 'stagno', p[0], p[1], 3, re.range(0, 360), 1.6); zona('acqua', (u, w) => Math.hypot(u - p[0], w - p[1]) < 1.4); segna(p[0] + 1.8, p[1], 'Stagno', 'Acqua alla vita: terreno difficile.'); } },
       pozzo: { dove: ['aperto'], f: () => { const p = trova(1.1); if (!p) return; posa('sopra', 'pozzo', p[0], p[1], 1.7, 0, 1.1); segna(p[0] + 1.3, p[1], 'Pozzo', 'Profondo 10 metri; la corda regge una persona.'); } },
-      lapidi: { dove: ['aperto'], f: () => { const p = trova(2.4); if (!p) return; const rot = r.range(-20, 20); occupa(p[0], p[1], 2.4); for (let i = 0; i < 5; i++) { const u = p[0] + (i % 3 - 1) * 1.5 + r.range(-0.2, 0.2), w = p[1] + (i < 3 ? -0.9 : 0.9); L.sopra += spr(r.pick(['lapide-1', 'lapide-2', 'lapide-3', 'croce-celtica']), u, w, 1.1, rot + r.range(-12, 12)); } segna(p[0], p[1] - 2, 'Tombe', 'Mezza copertura. La terra è smossa davanti a una di esse.'); } },
-      statua: { dove: ['aperto', 'grotta', 'chiuso'], f: () => { const p = trova(0.9); if (!p) return; posa('sopra', r.pick(['statua-angelo', 'statua-cavaliere']), p[0], p[1], 1.6, r.range(0, 360), 0.9); segna(p[0] + 1.2, p[1], 'Statua', 'Tre quarti di copertura dietro il basamento.'); } },
-      rovine: { dove: ['aperto', 'grotta', 'chiuso'], f: () => { if (scelta === 'locanda') return; const p = trova(2.2); if (!p) return; occupa(p[0], p[1], 2.2); const a = r.range(0, 360); L.sopra += spr('muretto-rotto', p[0], p[1] - 1, 3, a) + spr('colonna-crollata', p[0] + 0.8, p[1] + 0.9, 2.6, a + r.range(40, 100)) + spr('macerie', p[0] - 1.2, p[1] + 0.8, 1.2, r.range(0, 360)); segna(p[0], p[1] - 2, 'Rovine', 'Muro crollato e colonne: mezza copertura, le macerie sono terreno difficile.'); } },
-      casse: { dove: ['aperto', 'grotta', 'chiuso'], f: () => { const p = trova(1.1); if (!p) return; occupa(p[0], p[1], 1.1); for (let i = 0; i < 4; i++) { const a = r.range(0, Math.PI * 2), d = r.range(0, 0.9); L.sopra += spr(r.pick(['cassa', 'barile', 'sacchi', 'cassa', 'botti']), p[0] + Math.cos(a) * d, p[1] + Math.sin(a) * d, r.range(0.75, 1), r.range(0, 360)); } segna(p[0], p[1] - 1.3, 'Casse e barili', 'Mezza copertura. Una cassa rotta sparge la merce: terreno difficile.'); } },
-      tesoro: { dove: ['aperto', 'grotta', 'chiuso'], f: () => { const p = trova(0.9); if (!p) return; posa('sopra', 'tesoro', p[0], p[1], 1.3, 0, 0.9); L.sopra += spr('forziere', p[0] + 0.9, p[1] + 0.5, 0.95, r.range(-20, 20)); luce(p[0], p[1], 1.8, '#ffd86b', 0.35); segna(p[0], p[1] - 1.2, 'Tesoro', 'Monete e un forziere chiuso (Scassinare CD 15). Forse è una trappola.'); } },
-      ossa: { dove: ['aperto', 'grotta', 'chiuso'], f: () => { const p = trova(1); if (!p) return; occupa(p[0], p[1], 1); L.sotto += spr('scheletro', p[0], p[1], 1.4, r.range(0, 360)) + spr('ossa', p[0] + 1, p[1] + 0.6, 1.1, r.range(0, 360)); segna(p[0], p[1] - 1.2, 'Ossa', 'Qualcuno non ce l\'ha fatta. Ha ancora la borsa.'); } },
-      gabbia: { dove: ['aperto', 'grotta', 'chiuso'], f: () => { const p = trova(0.9); if (!p) return; posa('sopra', 'gabbia', p[0], p[1], 1.5, r.pick([0, 90]), 0.9); segna(p[0], p[1] - 1.2, 'Gabbia', 'Dentro c\'è un prigioniero. Il lucchetto si scassina (CD 15).'); } },
-      altare: { dove: ['aperto', 'grotta', 'chiuso'], f: () => { if (scelta === 'locanda') return; const p = trova(1.2); if (!p) return; posa('sopra', 'altare', p[0], p[1], 1.9, r.pick([0, 90, 180, 270]), 1.2); luce(p[0], p[1], 2.4, '#a8e6ff', 0.35); segna(p[0], p[1] - 1.5, 'Altare', 'Un sigillo inciso: chi lo tocca sente una voce.'); } },
+      lapidi: { dove: ['aperto'], f: () => { const p = trova(2.4); if (!p) return; const rot = re.range(-20, 20); occupa(p[0], p[1], 2.4); for (let i = 0; i < 5; i++) { const u = p[0] + (i % 3 - 1) * 1.5 + re.range(-0.2, 0.2), w = p[1] + (i < 3 ? -0.9 : 0.9); L.sopra += spr(re.pick(['lapide-1', 'lapide-2', 'lapide-3', 'croce-celtica']), u, w, 1.1, rot + re.range(-12, 12)); } segna(p[0], p[1] - 2, 'Tombe', 'Mezza copertura. La terra è smossa davanti a una di esse.'); } },
+      statua: { dove: ['aperto', 'grotta', 'chiuso'], f: () => { const p = trova(0.9); if (!p) return; posa('sopra', re.pick(['statua-angelo', 'statua-cavaliere']), p[0], p[1], 1.6, re.range(0, 360), 0.9); segna(p[0] + 1.2, p[1], 'Statua', 'Tre quarti di copertura dietro il basamento.'); } },
+      rovine: { dove: ['aperto', 'grotta', 'chiuso'], f: () => { if (scelta === 'locanda') return; const p = trova(2.2); if (!p) return; occupa(p[0], p[1], 2.2); const a = re.range(0, 360); L.sopra += spr('muretto-rotto', p[0], p[1] - 1, 3, a) + spr('colonna-crollata', p[0] + 0.8, p[1] + 0.9, 2.6, a + re.range(40, 100)) + spr('macerie', p[0] - 1.2, p[1] + 0.8, 1.2, re.range(0, 360)); segna(p[0], p[1] - 2, 'Rovine', 'Muro crollato e colonne: mezza copertura, le macerie sono terreno difficile.'); } },
+      casse: { dove: ['aperto', 'grotta', 'chiuso'], f: () => { const p = trova(1.1); if (!p) return; occupa(p[0], p[1], 1.1); for (let i = 0; i < 4; i++) { const a = re.range(0, Math.PI * 2), d = re.range(0, 0.9); L.sopra += spr(re.pick(['cassa', 'barile', 'sacchi', 'cassa', 'botti']), p[0] + Math.cos(a) * d, p[1] + Math.sin(a) * d, re.range(0.75, 1), re.range(0, 360)); } segna(p[0], p[1] - 1.3, 'Casse e barili', 'Mezza copertura. Una cassa rotta sparge la merce: terreno difficile.'); } },
+      tesoro: { dove: ['aperto', 'grotta', 'chiuso'], f: () => { const p = trova(0.9); if (!p) return; posa('sopra', 'tesoro', p[0], p[1], 1.3, 0, 0.9); L.sopra += spr('forziere', p[0] + 0.9, p[1] + 0.5, 0.95, re.range(-20, 20)); luce(p[0], p[1], 1.8, '#ffd86b', 0.35); segna(p[0], p[1] - 1.2, 'Tesoro', 'Monete e un forziere chiuso (Scassinare CD 15). Forse è una trappola.'); } },
+      ossa: { dove: ['aperto', 'grotta', 'chiuso'], f: () => { const p = trova(1); if (!p) return; occupa(p[0], p[1], 1); L.sotto += spr('scheletro', p[0], p[1], 1.4, re.range(0, 360)) + spr('ossa', p[0] + 1, p[1] + 0.6, 1.1, re.range(0, 360)); segna(p[0], p[1] - 1.2, 'Ossa', 'Qualcuno non ce l\'ha fatta. Ha ancora la borsa.'); } },
+      gabbia: { dove: ['aperto', 'grotta', 'chiuso'], f: () => { const p = trova(0.9); if (!p) return; posa('sopra', 'gabbia', p[0], p[1], 1.5, re.pick([0, 90]), 0.9); segna(p[0], p[1] - 1.2, 'Gabbia', 'Dentro c\'è un prigioniero. Il lucchetto si scassina (CD 15).'); } },
+      altare: { dove: ['aperto', 'grotta', 'chiuso'], f: () => { if (scelta === 'locanda') return; const p = trova(1.2); if (!p) return; posa('sopra', 'altare', p[0], p[1], 1.9, re.pick([0, 90, 180, 270]), 1.2); luce(p[0], p[1], 2.4, '#a8e6ff', 0.35); segna(p[0], p[1] - 1.5, 'Altare', 'Un sigillo inciso: chi lo tocca sente una voce.'); } },
     };
-    (Array.isArray(o.elementi) ? o.elementi : []).forEach((k) => { const e = ELEMENTI[k]; if (e && e.dove.includes(ambiente)) e.f(); });
+    const aggiunti = [], nonMessi = [], primoAgg = nSpr;
+    (Array.isArray(o.elementi) ? o.elementi : []).forEach((k) => {
+      const e = ELEMENTI[k];
+      if (!e || !e.dove.includes(ambiente)) return;
+      const fp = o.pos && o.pos[k], ok = Array.isArray(fp) && fp.length >= 2 && Number.isFinite(fp[0]) && Number.isFinite(fp[1]);
+      re = M.rng('battaglia:' + o.seme + ':' + k);
+      fisso = ok ? [Math.max(0.5, Math.min(cols - 0.5, fp[0])), Math.max(0.5, Math.min(rows - 0.5, fp[1]))] : null;
+      const giro = ok && Number.isFinite(fp[2]) ? fp[2] : 0;
+      rotFissa = ok && Number.isFinite(fp[3]) ? fp[3] : null;
+      primo = null; rotUsata = null;
+      const da = nSpr, lSotto = L.sotto.length, lSopra = L.sopra.length;
+      e.f();
+      if (primo && giro) {
+        const g = (t) => `<g transform="rotate(${n1(giro)} ${n1(X(primo[0]))} ${n1(Y(primo[1]))})">${t}</g>`;
+        L.sotto = L.sotto.slice(0, lSotto) + g(L.sotto.slice(lSotto)); L.sopra = L.sopra.slice(0, lSopra) + g(L.sopra.slice(lSopra));
+      }
+      const disegno = sprInfo.filter((q) => q.id >= da).map((q) => q.use).join('');
+      if (primo) aggiunti.push({ k, u: primo[0], w: primo[1], rr: primo[2], rot: rotUsata, giro, disegno });
+      else if (!(scelta === 'locanda' && ['rovine', 'altare'].includes(k))) nonMessi.push(k);
+    });
+
+    /* ── Copie fatte dal DM con "Duplica": stesso disegno, posto e rotazione propri ── */
+    const copie = [];
+    (Array.isArray(o.copie) ? o.copie : []).forEach((cp, i) => {
+      let dis = '', cx = 0, cy = 0, rag = 0;
+      if (typeof cp.f === 'string') {
+        const a = aggiunti.find((x) => x.k === cp.f);
+        if (!a) return;
+        cx = X(a.u); cy = Y(a.w); rag = a.rr * S;
+        dis = a.giro ? `<g transform="rotate(${n1(a.giro)} ${n1(cx)} ${n1(cy)})">${a.disegno}</g>` : a.disegno;
+      } else if (Array.isArray(cp.f)) {
+        const mm = cp.f.map((id) => sprInfo.find((q) => q.id === id)).filter(Boolean);
+        if (!mm.length) return;
+        cx = X(mm[0].u); cy = Y(mm[0].w);
+        rag = Math.max(...mm.map((q) => Math.hypot(X(q.u) - cx, Y(q.w) - cy) + q.r * S));
+        dis = mm.map((q) => q.use).join('');
+      } else return;
+      const nx = X(cp.u), ny = Y(cp.w);
+      const g = `<g transform="translate(${n1(nx - cx)} ${n1(ny - cy)}) rotate(${n1(cp.g || 0)} ${n1(cx)} ${n1(cy)})">${dis}</g>`;
+      L.sopra += g;
+      copie.push({ i, x: nx, y: ny, r: rag, disegno: g });
+    });
 
     /* ── Griglia di combattimento ── */
     let griglia = '';
@@ -567,6 +644,30 @@ const CartoBattaglia = (() => {
       griglia = `<path d="${d}" fill="none" stroke="#000" stroke-width="${n1(sp)}" opacity="0.34"/><path d="${d}" fill="none" stroke="#fff" stroke-width="${n1(sp * 0.42)}" opacity="0.18"/>`;
     }
     const buio = notte ? `<rect x="${ox}" y="${oy}" width="${cols * S}" height="${rows * S}" fill="#0b1a2a" opacity="0.5"/>` : '';
+
+    /* ── Gli oggetti della scena spostati dal DM si portano dietro il loro numero ── */
+    const tolti = new Set(mobili.filter((q) => q.via).map((q) => q.id));
+    const scena0 = sprInfo.filter((q) => q.id < primoAgg && !tolti.has(q.id) && !q.tolto);
+    if (o.togli && o.togli.length) {
+      const via = new Set();
+      sprInfo.filter((q) => q.tolto && q.id < primoAgg && !q.albero).forEach((q) => {
+        let best = -1, bd = q.r + 1.2;
+        punti.forEach((pt, i) => { const dd = Math.hypot(pt.u - q.u, pt.w - q.w); if (dd < bd && !via.has(i)) { bd = dd; best = i; } });
+        if (best >= 0) via.add(best);
+      });
+      for (let i = punti.length - 1; i >= 0; i--) if (via.has(i)) punti.splice(i, 1);
+    }
+    if (o.sposta) {
+      const presi = new Set();
+      Object.entries(o.sposta).forEach(([id, d]) => {
+        const q = scena0.find((x) => x.id === +id);
+        if (!q || (!d[0] && !d[1])) return;
+        const u0 = q.u - (d[0] || 0), w0 = q.w - (d[1] || 0);
+        let best = -1, bd = q.r + 1.2;
+        punti.forEach((pt, i) => { const dd = Math.hypot(pt.u - u0, pt.w - w0); if (dd < bd && !presi.has(i)) { bd = dd; best = i; } });
+        if (best >= 0) { presi.add(best); punti[best].u += d[0] || 0; punti[best].w += d[1] || 0; }
+      });
+    }
 
     /* ── Numeri e legenda ── */
     const voci = [], pin = [], messi = [];
@@ -586,7 +687,8 @@ const CartoBattaglia = (() => {
     const clip = `<clipPath id="carto-bm"><rect x="${ox}" y="${oy}" width="${cols * S}" height="${rows * S}"/></clipPath>`;
     let svg = M.apri(W, H, carta, o.seme) + `<defs>${immagini}${L.defs}${clip}</defs>`;
     if (!foglio) svg += `<rect x="${ox - 6}" y="${oy - 6}" width="${cols * S + 12}" height="${rows * S + 12}" rx="6" fill="#000" opacity="0.25" filter="url(#carto-b4)"/>`;
-    svg += `<g clip-path="url(#carto-bm)">${L.terra}${L.sotto}${L.sopra}${L.alto}${buio}${notte ? L.luci : ""}${griglia}</g>`;
+    const conMobili = (t) => t.replace(/\u0001(\d+)\u0001/g, (x, i) => mobili[i].via ? '' : mobili[i].svg);
+    svg += `<g clip-path="url(#carto-bm)">${L.terra}${conMobili(L.sotto)}${conMobili(L.sopra)}${conMobili(L.alto)}${buio}${notte ? L.luci : ""}${griglia}</g>`;
     if (!foglio) svg += `<rect x="${ox}" y="${oy}" width="${cols * S}" height="${rows * S}" fill="none" stroke="${ink}" stroke-width="2.4"/>`;
     // Sul foglio intero i numeri ci sono se c'e' la legenda (che si stampa a parte, per il master)
     if (o.nomi !== false && (!foglio || o.legenda !== false)) svg += testi;
@@ -600,8 +702,12 @@ const CartoBattaglia = (() => {
     const celle = [];
     for (let w = 0; w < rows; w++) for (let u = 0; u < cols; u++) if (!celleOk || celleOk(u + 0.5, w + 0.5)) celle.push([u, w]);
     const vtt = { S, ang: 0, ox, oy, minX: 0, minY: 0, maxX: cols, maxY: rows, muri, porte, celle };
-    return { nome, pin, W, H, larghezzaKm: W / S * 1.5 / 1000, svg, vtt, foglio, legenda: foglio && o.legenda !== false ? voci : null }; // un quadretto = 1,5 metri
+    // Oggetti aggiunti, in pixel della mappa: l'anteprima li rende trascinabili
+    const spostabili = aggiunti.map((x) => ({ ...x, x: X(x.u), y: Y(x.w), r: x.rr * S }));
+    const oggetti = scena0.map((q) => ({ id: q.id, x: X(q.u), y: Y(q.w), r: q.r * S, albero: q.albero, disegno: q.use }));
+    return { nome, pin, W, H, larghezzaKm: W / S * 1.5 / 1000, svg, vtt, foglio, aggiunti: spostabili, oggetti, copie, nonMessi, quadretto: S, legenda: foglio && o.legenda !== false ? voci : null }; // un quadretto = 1,5 metri
   };
 
-  return { battaglia, carica, pronta };
+  const immagine = (nome) => _img[nome] ? { url: _img[nome].url, w: _img[nome].w, h: _img[nome].h } : null;
+  return { battaglia, carica, pronta, immagine };
 })();
