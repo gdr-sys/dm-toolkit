@@ -6,8 +6,7 @@
   const modello = document.querySelector('#page-home > .app-firma');
   if (!modello) return;
 
-  // Pagine dove il fondo non ha senso (mappa a tutto schermo)
-  const SENZA = new Set(['page-home', 'page-mappa']);
+  const SENZA = new Set(['page-home']); // la Home ha già il suo
 
   const visibile = (el) => el && el.offsetParent !== null && getComputedStyle(el).display !== 'none';
 
