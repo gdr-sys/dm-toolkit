@@ -1290,7 +1290,7 @@
         <div class="text-muted text-sm">Caricamento dati in corso...</div>
       </div>
 
-      <div id="comp-content">
+      <div id="comp-content" style="min-height:100vh;">
         <!-- Tabs -->
         <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:var(--space-md);margin-bottom:var(--space-md);">
           <div class="tabs" style="flex-wrap:wrap;">
@@ -7037,6 +7037,13 @@ const Compendio = (() => {
   };
 
   const switchTab = (tab) => {
+    // La riga delle schede non deve muoversi sotto il dito: se la nuova lista e' piu' corta la pagina si accorcia
+    // e il browser riporta su lo scorrimento. Teniamo l'area alta almeno quanto lo schermo e, dopo il cambio,
+    // rimettiamo la riga delle schede esattamente dov'era.
+    const barra = document.querySelector('#comp-content .tabs');
+    const yPrima = barra ? barra.getBoundingClientRect().top : null;
+    const tieniFerma = () => { if (barra && yPrima !== null) { const d = barra.getBoundingClientRect().top - yPrima; if (Math.abs(d) > 1) window.scrollBy(0, d); } };
+    requestAnimationFrame(tieniFerma);
     _activeTab = tab;
     const tabKeys = ['monsters', 'magic_items', 'equipment', 'rules', 'spells', 'homebrew', 'cerca', 'velocita'];
     const countIds = { monsters: 'comp-count-monsters', magic_items: 'comp-count-magic', equipment: 'comp-count-equip', rules: 'comp-count-rules', spells: 'comp-count-spells', homebrew: 'comp-count-homebrew', cerca: 'comp-count-cerca', velocita: '' };
