@@ -246,3 +246,5 @@ button.dn-row:hover .dn-t, a.dn-row:hover .dn-t { color: var(--accent-text); }
 .app-social-logo:hover, .app-social-logo:focus-visible { color: var(--accent-text); border-color: var(--accent-primary); outline: none; }
 /* Copia del fondo nelle altre pagine */
 .app-firma-copia { margin-bottom: 24px; }
+
+.app-famiglia a { color: var(--accent-text); font-weight: 600; text-underline-offset: 3px; }
