@@ -191,6 +191,12 @@ button.dn-row:hover .dn-t, a.dn-row:hover .dn-t { color: var(--accent-text); }
 #page-home #campaign-grid .home-empty-v2 { background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; }
 @media (max-width: 760px) { #page-home .campaign-grid-section { padding: 16px 14px 96px; } }
 #page-home #campaign-grid { padding: 0 !important; margin: 0 !important; }
+/* Finché l'elenco delle campagne non è disegnato (renderHomePage aggiunge .hn-pronto) la Home resta
+   invisibile: prima si vedeva vuota e poi saltava giù (spostamento segnalato da Cloudflare).
+   Se lo script fallisse, dopo 3 secondi si mostra comunque. */
+#page-home:not(.hn-pronto) > .campaign-grid-section,
+#page-home:not(.hn-pronto) > .app-firma { visibility: hidden; animation: hn-mostra 0s 3s forwards; }
+@keyframes hn-mostra { to { visibility: visible; } }
 
 /* ── Barra in alto da 900px (js/barra-alta.js) ──
    La disposizione (niente menu laterale, contenuto a tutta larghezza, barra alta 60px) dipende solo

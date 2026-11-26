@@ -4153,6 +4153,8 @@ const App = (() => {
   const renderHomePage = () => {
     const grid = document.getElementById('campaign-grid');
     if (!grid) return;
+    // Da qui la Home si può mostrare: il contenuto viene scritto in questo stesso passaggio (vedi identita.css)
+    document.getElementById('page-home')?.classList.add('hn-pronto');
 
     const campaigns = Storage.getCampaigns();
     Debug.log(`renderHomePage: ${campaigns.length} campagne`);
