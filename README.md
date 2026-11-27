@@ -321,6 +321,11 @@ Il codice, la grafica, i testi originali e il logo di Pocket GM Screen sono prot
 
 I dati di gioco provengono dal System Reference Document (SRD) di D&D 5e di Wizards of the Coast LLC, [disponibile qui](https://www.dndbeyond.com/srd): SRD 5.1 con licenze OGL 1.0a e [CC-BY-4.0](https://creativecommons.org/licenses/by/4.0/legalcode), SRD 5.2.1 con licenza CC-BY-4.0.
 
+## Della stessa famiglia
+
+- [Pocket Bestiary](https://pocket-bestiary.pages.dev/): tutti i mostri di D&D 5e, 2014 e 2024, con cambio del GS e carte da stampare.
+- [Pocket Grimoire](https://pocket-grimoire.pages.dev/): gli incantesimi, anche homebrew, come carte da stampare.
+
 ## Sostieni il progetto
 
 Pocket GM Screen è gratuito e senza pubblicità. Se ti è utile al tavolo, puoi [offrirmi un caffè su Ko-fi](https://ko-fi.com/noemimarcolini): aiuta a pagare il dominio e il server.
